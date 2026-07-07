@@ -16,7 +16,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version && bun update",
     "release": "bun run build && bun run publish-packages && changeset tag",
-    "publish-packages": "for dir in packages/schema packages/preview packages/core packages/headless packages/canvas packages/driver-image; do (cd \"$dir\" && bun publish || true); done",
+    "publish-packages": "for dir in packages/schema packages/preview packages/core packages/headless packages/canvas packages/driver-image; do (cd \"$dir\" && bun publish --access public) || exit 1; done",
     "verify-pack": "bun run build && for dir in packages/schema packages/preview packages/core packages/headless packages/canvas packages/driver-image; do (cd \"$dir\" && bun pm pack && tgz=$(ls *.tgz | head -1) && echo \"==> $dir ($tgz)\" && tar -xOf \"$tgz\" package/package.json | node -e \"const d=JSON.parse(require('fs').readFileSync(0,'utf8')); const bad=[...Object.entries(d.dependencies??{}),...Object.entries(d.devDependencies??{})].filter(([,v])=>String(v).startsWith('workspace:')||String(v).startsWith('catalog:')); if(bad.length){console.error('Unresolved:',Object.fromEntries(bad)); process.exit(1)} else {console.log('deps ok:', {...d.dependencies,...d.devDependencies})}\" && rm -f *.tgz); done"
   },
   "devDependencies": {
