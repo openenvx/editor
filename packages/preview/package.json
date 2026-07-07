@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/preview",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Layer preview descriptor DSL for OpenEnvx renderers",
   "license": "MIT",
   "type": "module",
@@ -30,7 +30,6 @@
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"
   },
-
   "repository": {
     "type": "git",
     "url": "https://github.com/openenvx/openenvx.git",

@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "OpenEnvx foundation - scene model, plugins, commands, contributions",
   "license": "MIT",
   "type": "module",
@@ -31,7 +31,6 @@
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"
   },
-
   "repository": {
     "type": "git",
     "url": "https://github.com/openenvx/openenvx.git",
