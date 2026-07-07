@@ -16,7 +16,7 @@
     },
     "packages/canvas": {
       "name": "@openenvx/canvas",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@fontsource/cormorant-garamond": "^5.2.11",
         "@fontsource/inter": "^5.2.8",
@@ -52,7 +52,7 @@
     },
     "packages/core": {
       "name": "@openenvx/core",
-      "version": "7.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@openenvx/preview": "workspace:*",
         "@openenvx/schema": "workspace:*",
@@ -66,7 +66,7 @@
     },
     "packages/driver-image": {
       "name": "@openenvx/driver-image",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@openenvx/canvas": "workspace:*",
         "@openenvx/core": "workspace:*",
@@ -83,7 +83,7 @@
     },
     "packages/headless": {
       "name": "@openenvx/headless",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@openenvx/core": "workspace:*",
         "@openenvx/preview": "workspace:*",
@@ -104,7 +104,7 @@
     },
     "packages/preview": {
       "name": "@openenvx/preview",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@openenvx/schema": "workspace:*",
       },
@@ -117,7 +117,7 @@
     },
     "packages/schema": {
       "name": "@openenvx/schema",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
         "tsup": "catalog:dev",
