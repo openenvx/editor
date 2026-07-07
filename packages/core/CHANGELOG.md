@@ -1,5 +1,14 @@
 # @openenvx/core
 
+## 0.1.1
+
+### Patch Changes
+
+- 05c5915: fix: correct versioning in the npm
+- Updated dependencies [05c5915]
+  - @openenvx/preview@0.1.1
+  - @openenvx/schema@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
