@@ -1,0 +1,49 @@
+{
+  "name": "@openenvx/driver-image",
+  "version": "0.0.0",
+  "description": "Image export driver placeholder for OpenEnvx",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@openenvx/preview": "workspace:*",
+    "@openenvx/canvas": "workspace:*",
+    "@openenvx/core": "workspace:*",
+    "@openenvx/headless": "workspace:*",
+    "@openenvx/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@openenvx/typescript-config": "workspace:*",
+    "tsup": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:testing"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openenvx/openenvx.git",
+    "directory": "packages/driver-image"
+  },
+  "bugs": {
+    "url": "https://github.com/openenvx/openenvx/issues"
+  },
+  "homepage": "https://openenvx.dev",
+  "publishConfig": {
+    "access": "public"
+  }
+}

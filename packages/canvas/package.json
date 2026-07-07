@@ -1,0 +1,112 @@
+{
+  "name": "@openenvx/canvas",
+  "version": "0.0.0",
+  "description": "Canvas editor for OpenEnvx absolute layout pages",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./document-export": {
+      "types": "./dist/export/canvas-document-export-service.d.ts",
+      "import": "./dist/export/canvas-document-export-service.js",
+      "default": "./dist/export/canvas-document-export-service.js"
+    },
+    "./export-bytes": {
+      "types": "./dist/export/bytes-to-data-url.d.ts",
+      "import": "./dist/export/bytes-to-data-url.js",
+      "default": "./dist/export/bytes-to-data-url.js"
+    },
+    "./export-layers": {
+      "types": "./dist/export-layers.d.ts",
+      "import": "./dist/export-layers.js",
+      "default": "./dist/export-layers.js"
+    },
+    "./registry": {
+      "types": "./dist/plugin/canvas-registry-service.d.ts",
+      "import": "./dist/plugin/canvas-registry-service.js",
+      "default": "./dist/plugin/canvas-registry-service.js"
+    },
+    "./contributions/layer-preview-renderer-contribution": {
+      "types": "./dist/contributions/layer-preview-renderer-contribution.d.ts",
+      "import": "./dist/contributions/layer-preview-renderer-contribution.js",
+      "default": "./dist/contributions/layer-preview-renderer-contribution.js"
+    },
+    "./artboard-offset": {
+      "types": "./dist/artboard-offset.d.ts",
+      "import": "./dist/artboard-offset.js",
+      "default": "./dist/artboard-offset.js"
+    },
+    "./rich-text-layout": {
+      "types": "./dist/rich-text-layout.d.ts",
+      "import": "./dist/rich-text-layout.js",
+      "default": "./dist/rich-text-layout.js"
+    },
+    "./rich-text-typography": {
+      "types": "./dist/rich-text-typography.d.ts",
+      "import": "./dist/rich-text-typography.js",
+      "default": "./dist/rich-text-typography.js"
+    },
+    "./fonts.css": {
+      "import": "./dist/fonts.css",
+      "default": "./dist/fonts.css"
+    }
+  },
+  "scripts": {
+    "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/ dist/ && cp src/fonts/fonts.css dist/fonts.css",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.2.11",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/parisienne": "^5.2.8",
+    "@openenvx/core": "workspace:*",
+    "@openenvx/headless": "workspace:*",
+    "@openenvx/preview": "workspace:*",
+    "@openenvx/schema": "workspace:*",
+    "@tiptap/pm": "^3.27.3",
+    "@tiptap/react": "^3.27.3",
+    "@tiptap/starter-kit": "^3.27.3",
+    "konva": "^10.3.0",
+    "lucide-react": "1.23.0",
+    "react-konva": "^19.2.5",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@openenvx/typescript-config": "workspace:*",
+    "tsup": "catalog:dev",
+    "@testing-library/react": "16.3.2",
+    "@types/react": "^19.2.3",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "29.1.1",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:testing"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openenvx/openenvx.git",
+    "directory": "packages/canvas"
+  },
+  "bugs": {
+    "url": "https://github.com/openenvx/openenvx/issues"
+  },
+  "homepage": "https://openenvx.dev",
+  "publishConfig": {
+    "access": "public"
+  }
+}

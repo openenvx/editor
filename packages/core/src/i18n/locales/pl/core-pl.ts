@@ -1,0 +1,18 @@
+export default {
+  'core.commandPalette.all': 'Wszystkie',
+  'core.commandPalette.category.scene': 'Scena',
+  'core.commandPalette.category.canvas': 'Płótno',
+  'core.commandPalette.category.file': 'Plik',
+  'core.commandPalette.category.workbench': 'Warsztat',
+  'command.scene.undo': 'Cofnij',
+  'command.scene.redo': 'Ponów',
+  'command.scene.deleteLayer': 'Usuń warstwę',
+  'command.scene.moveUp': 'Przenieś w górę',
+  'command.scene.moveDown': 'Przenieś w dół',
+  'command.scene.moveLayer': 'Przenieś warstwę',
+  'command.scene.toggleLayerLock': 'Przełącz blokadę warstwy',
+  'command.workbench.save': 'Zapisz',
+  'command.workbench.saveAs': 'Zapisz jako',
+  'command.workbench.open': 'Otwórz',
+  'command.workbench.commandPalette.toggle': 'Przełącz paletę poleceń',
+} as const satisfies Record<string, string>;

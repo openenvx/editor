@@ -1,0 +1,23 @@
+.preview {
+  width: 100%;
+}
+
+.placeholder {
+  color: var(--wb-muted-foreground, #6b7280);
+  font-size: 14px;
+  margin: 0;
+}
+
+.stackVertical {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.stackHorizontal {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  width: 100%;
+}

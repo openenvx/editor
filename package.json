@@ -1,0 +1,48 @@
+{
+  "name": "@openenv/openenvx",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test -- --run",
+    "lint": "turbo run lint",
+    "check": "ultracite check && knip",
+    "knip": "knip",
+    "fix": "ultracite fix",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "bun run build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.8",
+    "knip": "^6.25.0",
+    "oxfmt": "^0.58.0",
+    "oxlint": "^1.73.0",
+    "turbo": "catalog:dev",
+    "typescript": "catalog:dev",
+    "ultracite": "7.9.2"
+  },
+  "catalogs": {
+    "dev": {
+      "turbo": "^2.10.4",
+      "typescript": "^6.0.3",
+      "@vitejs/plugin-react": "^4.5.2",
+      "vite": "^6.3.5",
+      "@testing-library/react": "^16.3.0",
+      "@testing-library/user-event": "^14.6.1",
+      "jsdom": "^26.1.0",
+      "tsup": "^8.5.0"
+    },
+    "testing": {
+      "vitest": "^4.1.10"
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "bun@1.3.0"
+}

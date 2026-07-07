@@ -1,0 +1,10 @@
+{
+  "extends": "@openenvx/typescript-config/base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "dom"],
+    "strictNullChecks": true
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
+}

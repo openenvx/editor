@@ -1,0 +1,20 @@
+/** Extension contribution slots. All points are registered in registries.ts. */
+export enum ContributionPoint {
+  Command = 'command',
+  Layer = 'layer',
+  ViewContainer = 'viewContainer',
+  View = 'view',
+  ContextMenu = 'contextMenu',
+  Shortcut = 'shortcut',
+  Overlay = 'overlay',
+  StatusBar = 'statusBar',
+  StatusBarItemRenderer = 'statusBarItemRenderer',
+  Service = 'service',
+  ContextKey = 'contextKey',
+  EditorPane = 'editorPane',
+  InspectorPane = 'inspectorPane',
+  FieldRenderer = 'fieldRenderer',
+  CommandPalette = 'commandPalette',
+  I18n = 'i18n',
+  Toolbar = 'toolbar',
+}

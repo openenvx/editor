@@ -1,0 +1,19 @@
+{
+  "name": "@openenvx/typescript-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    "./base.json": "./base.json",
+    "./css-modules.d.ts": "./css-modules.d.ts",
+    "./tsup.library": {
+      "types": "./tsup.library.d.ts",
+      "import": "./tsup.library.js",
+      "default": "./tsup.library.js"
+    }
+  },
+  "dependencies": {
+    "tsup": "catalog:dev"
+  }
+}

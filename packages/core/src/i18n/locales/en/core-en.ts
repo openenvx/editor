@@ -1,0 +1,18 @@
+export default {
+  'core.commandPalette.all': 'All',
+  'core.commandPalette.category.scene': 'Scene',
+  'core.commandPalette.category.canvas': 'Canvas',
+  'core.commandPalette.category.file': 'File',
+  'core.commandPalette.category.workbench': 'Workbench',
+  'command.scene.undo': 'Undo',
+  'command.scene.redo': 'Redo',
+  'command.scene.deleteLayer': 'Delete Layer',
+  'command.scene.moveUp': 'Move Up',
+  'command.scene.moveDown': 'Move Down',
+  'command.scene.moveLayer': 'Move Layer',
+  'command.scene.toggleLayerLock': 'Toggle Layer Lock',
+  'command.workbench.save': 'Save',
+  'command.workbench.saveAs': 'Save As',
+  'command.workbench.open': 'Open',
+  'command.workbench.commandPalette.toggle': 'Toggle Command Palette',
+} as const satisfies Record<string, string>;

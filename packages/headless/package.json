@@ -1,0 +1,59 @@
+{
+  "name": "@openenvx/headless",
+  "version": "0.0.0",
+  "description": "Headless OpenEnvx controller - subscribe to UI state without a UI framework",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/workbench-context.d.ts",
+      "import": "./dist/react/workbench-context.js",
+      "default": "./dist/react/workbench-context.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@openenvx/core": "workspace:*",
+    "@openenvx/preview": "workspace:*",
+    "@openenvx/schema": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@openenvx/typescript-config": "workspace:*",
+    "tsup": "catalog:dev",
+    "@types/react": "^19.2.3",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:testing"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openenvx/openenvx.git",
+    "directory": "packages/headless"
+  },
+  "bugs": {
+    "url": "https://github.com/openenvx/openenvx/issues"
+  },
+  "homepage": "https://openenvx.dev",
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,299 @@
+import {
+  Command,
+  getActivePage,
+  getPrimaryLayer,
+  localize,
+  updateLayerInTree,
+} from '@openenvx/core';
+import type { CommandContext } from '@openenvx/core';
+import { resolvePagePreset } from '@openenvx/schema';
+import type { Transform } from '@openenvx/schema';
+
+import {
+  CanvasCommandRequestServiceId,
+  CanvasPageResizeServiceId,
+} from '../canvas-service-tokens';
+import { bytesToDataUrl } from '../export/bytes-to-data-url';
+import { CanvasDocumentExportServiceId } from '../export/canvas-document-export-service';
+import type { CanvasDocumentExportService } from '../export/canvas-document-export-service';
+import { applyPagePresetResize } from '../page-resize/apply-page-preset-resize';
+import type { PageResizeService } from '../page-resize/page-resize-types';
+import type { CanvasCommandRequestService } from './canvas-command-request-service';
+
+interface PageSizeArgs {
+  width: number;
+  height: number;
+}
+
+interface PagePresetArgs {
+  presetId: string;
+}
+
+interface LayerTransformArgs {
+  layerId: string;
+  transform: Transform;
+}
+
+interface RichTextTransformArgs {
+  layerId: string;
+  fontSize: number;
+  transform: Transform;
+}
+
+function getCommandRequests(ctx: CommandContext): CanvasCommandRequestService {
+  return ctx.services.get(CanvasCommandRequestServiceId);
+}
+
+function getDocumentExporter(
+  ctx: CommandContext
+): CanvasDocumentExportService | undefined {
+  if (!ctx.services.has(CanvasDocumentExportServiceId)) {
+    return undefined;
+  }
+  return ctx.services.get(CanvasDocumentExportServiceId);
+}
+
+export class SetPageSizeCommand extends Command {
+  readonly id = 'canvas.setPageSize';
+
+  canExecute(ctx: CommandContext): boolean {
+    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const size = args as PageSizeArgs | undefined;
+    if (!size) {
+      return;
+    }
+    const activePageId = ctx.scene.getScene().activePageId;
+    ctx.scene.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: scene.pages.map((page) =>
+          page.id === activePageId && page.layout === 'absolute'
+            ? {
+                ...page,
+                dpi: 96,
+                height: size.height,
+                presetId: undefined,
+                unit: 'px',
+                width: size.width,
+              }
+            : page
+        ),
+      }),
+      label: localize(ctx.services, 'canvas.history.setPageSize', {
+        defaultValue: 'Set page size',
+      }),
+    });
+  }
+}
+
+export class SetPagePresetCommand extends Command {
+  readonly id = 'canvas.setPagePreset';
+
+  canExecute(ctx: CommandContext): boolean {
+    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const presetId = (args as PagePresetArgs | undefined)?.presetId;
+    if (!presetId) {
+      return;
+    }
+
+    if (ctx.services.has(CanvasPageResizeServiceId)) {
+      const pageResize = ctx.services.get<PageResizeService>(
+        CanvasPageResizeServiceId
+      );
+      const nextScene = pageResize.resizeSceneToPreset(
+        ctx.scene.getScene(),
+        presetId
+      );
+      if (nextScene) {
+        ctx.scene.apply({
+          apply: () => nextScene,
+          label: localize(ctx.services, 'canvas.history.resizePage', {
+            defaultValue: 'Resize page',
+          }),
+        });
+        return;
+      }
+    }
+
+    const preset = resolvePagePreset(presetId);
+    if (!preset) {
+      return;
+    }
+    new SetPageSizeCommand().execute(ctx, {
+      height: preset.height,
+      width: preset.width,
+    });
+  }
+}
+
+export class ResizePagePresetCommand extends Command {
+  readonly id = 'canvas.resizePagePreset';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    if (getActivePage(ctx.scene.getScene()).layout !== 'absolute') {
+      return false;
+    }
+    return Boolean((args as PagePresetArgs | undefined)?.presetId);
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const presetId = (args as PagePresetArgs | undefined)?.presetId;
+    if (!presetId) {
+      return;
+    }
+    applyPagePresetResize(ctx, presetId);
+  }
+}
+
+export class UpdateLayerTransformCommand extends Command {
+  readonly id = 'canvas.updateLayerTransform';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    if (args) {
+      return true;
+    }
+    return getCommandRequests(ctx).hasQueuedTransformUpdate();
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const update =
+      (args as LayerTransformArgs | undefined) ??
+      getCommandRequests(ctx).takeQueuedTransformUpdate();
+    if (!update) {
+      return;
+    }
+    applyLayerTransform(ctx, update.layerId, update.transform);
+  }
+}
+
+export class RotateLayerLeftCommand extends Command {
+  readonly id = 'canvas.rotateLeft';
+
+  canExecute(ctx: CommandContext): boolean {
+    return Boolean(getPrimaryLayer(ctx.scene.getScene())?.transform);
+  }
+
+  execute(ctx: CommandContext): void {
+    adjustLayerRotation(ctx, -90);
+  }
+}
+
+export class RotateLayerRightCommand extends Command {
+  readonly id = 'canvas.rotateRight';
+
+  canExecute(ctx: CommandContext): boolean {
+    return Boolean(getPrimaryLayer(ctx.scene.getScene())?.transform);
+  }
+
+  execute(ctx: CommandContext): void {
+    adjustLayerRotation(ctx, 90);
+  }
+}
+
+export class UpdateRichTextTransformCommand extends Command {
+  readonly id = 'canvas.updateRichTextTransform';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    if (args) {
+      return true;
+    }
+    return getCommandRequests(ctx).hasQueuedRichTextTransformUpdate();
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const update =
+      (args as RichTextTransformArgs | undefined) ??
+      getCommandRequests(ctx).takeQueuedRichTextTransformUpdate();
+    if (!update) {
+      return;
+    }
+    ctx.scene.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: scene.pages.map((page) => ({
+          ...page,
+          layers: updateLayerInTree(page.layers, update.layerId, (layer) => {
+            const data =
+              typeof layer.data === 'object' && layer.data !== null
+                ? { ...(layer.data as Record<string, unknown>) }
+                : {};
+            data.fontSize = update.fontSize;
+            return {
+              ...layer,
+              data,
+              transform: update.transform,
+            };
+          }),
+        })),
+      }),
+      label: localize(ctx.services, 'canvas.history.updateRichTextTransform', {
+        defaultValue: 'Update rich text transform',
+      }),
+    });
+  }
+}
+
+export class ExportImageCommand extends Command {
+  readonly id = 'canvas.exportImage';
+
+  canExecute(ctx: CommandContext): boolean {
+    return Boolean(getDocumentExporter(ctx));
+  }
+
+  async execute(
+    ctx: CommandContext
+  ): Promise<{ mimeType: string; dataUrl: string } | null> {
+    const exporter = getDocumentExporter(ctx);
+    if (!exporter) {
+      return null;
+    }
+    const scene = ctx.scene.getScene();
+    const page = getActivePage(scene);
+    const result = await exporter.exportDocument(scene, page.id, {
+      format: 'png',
+    });
+    return {
+      dataUrl: bytesToDataUrl(result.data, result.mimeType),
+      mimeType: result.mimeType,
+    };
+  }
+}
+
+function applyLayerTransform(
+  ctx: CommandContext,
+  layerId: string,
+  transform: Transform
+): void {
+  ctx.scene.apply({
+    apply: (scene) => ({
+      ...scene,
+      pages: scene.pages.map((page) => ({
+        ...page,
+        layers: updateLayerInTree(page.layers, layerId, (layer) => ({
+          ...layer,
+          transform,
+        })),
+      })),
+    }),
+    label: localize(ctx.services, 'canvas.history.updateTransform', {
+      defaultValue: 'Update transform',
+    }),
+  });
+}
+
+function adjustLayerRotation(ctx: CommandContext, delta: number): void {
+  const layer = getPrimaryLayer(ctx.scene.getScene());
+  if (!layer?.transform) {
+    return;
+  }
+  applyLayerTransform(ctx, layer.id, {
+    ...layer.transform,
+    rotation: layer.transform.rotation + delta,
+  });
+}

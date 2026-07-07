@@ -1,0 +1,47 @@
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
+import { getActivePage, resolveEditorPaneKind } from '@openenvx/core';
+
+import { resolveLayerPreview } from '../utils/layer-preview-resolver';
+import type { EditorSlice } from '../workbench-state-cache';
+import type { WorkbenchSliceContext } from './workbench-slice-context';
+
+export class EditorSliceBuilder {
+  build(ctx: WorkbenchSliceContext): EditorSlice {
+    const registries = ctx.manager.getRegistries();
+    const commandCtx = ctx.manager.createCommandContext();
+    const scene = ctx.sceneStore.getScene();
+    const editor = ctx.editorService.getActiveEditor();
+    const activePage = getActivePage(scene);
+    const selectedIds = new Set(scene.selection.selectedLayerIds);
+
+    const layerSurface = activePage.layers.map((layer) => {
+      const def = registries.layers.get(layer.type);
+      const previewCtx = {
+        isSelected: selectedIds.has(layer.id),
+        layerId: layer.id,
+        model: def ? def.getModel(layer) : layer.data,
+        registry: registries.layers,
+      };
+      const view = resolveLayerPreview(
+        def
+          ? (def.renderPreview(previewCtx) as LayerPreviewDescriptor)
+          : {
+              kind: 'placeholder',
+              text: `Unknown: ${layer.type}`,
+            },
+        commandCtx
+      );
+      return { layer, view };
+    });
+
+    return {
+      editor,
+      editorPaneKind: resolveEditorPaneKind(scene),
+      editorPanes: registries.editorPanes.map((pane) => ({
+        Component: pane.Component,
+        editorPaneKind: pane.editorPaneKind,
+      })),
+      layerSurface,
+    };
+  }
+}

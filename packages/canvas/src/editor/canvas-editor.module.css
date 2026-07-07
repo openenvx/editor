@@ -1,0 +1,121 @@
+.host {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.stageHost {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  outline: none;
+}
+
+.stageHost:focus,
+.stageHost:focus-visible {
+  outline: none;
+}
+
+.stageHost canvas {
+  outline: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.layer {
+  pointer-events: auto;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.layer p {
+  margin: 0;
+}
+
+.display {
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.editorHost {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.editorHost :global(.ProseMirror) {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.editorHost :global(.ProseMirror p) {
+  margin: 0;
+}
+
+.bubbleMenu {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--wb-popover, #27272a);
+  box-shadow: var(--wb-shadow-float, 0 4px 12px rgba(0, 0, 0, 0.35));
+}
+
+.formatButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--wb-foreground, #fafafa);
+  cursor: pointer;
+}
+
+.formatButton:hover {
+  background: var(--wb-hover-overlay, #3f3f46);
+}
+
+.marginToggle,
+.marginToggleActive {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  border: 1px solid var(--wb-border, #3f3f46);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: var(--wb-popover, #27272a);
+  color: var(--wb-foreground, #fafafa);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.marginToggleActive {
+  border-color: var(--wb-page-margin, #a855f7);
+  color: var(--wb-page-margin, #a855f7);
+}

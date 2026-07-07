@@ -1,0 +1,858 @@
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
+import type { Layer as SceneLayer } from '@openenvx/core';
+import { isLayerEditable, isLayerWritable } from '@openenvx/core';
+import { createDefaultTransform } from '@openenvx/schema';
+import type Konva from 'konva';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from 'react';
+
+import { computeArtboardOffset } from '../artboard-offset';
+import {
+  bakeNodeTransform,
+  clampAnchorDragPosition,
+  createTransformDragContext,
+  normalizeNodeBeforeTransform,
+} from '../geometry';
+import type { TransformDragContext } from '../geometry';
+import {
+  bakeRichTextTransformEnd,
+  boundRichTextBox,
+  createRichTextTransformRuntime,
+  endRichTextTransformSession,
+  RICH_TEXT_ENABLED_ANCHORS,
+  runRichTextLiveBake,
+  startRichTextTransform,
+} from '../interactions/rich-text-transform-driver';
+import type { RichTextCornerSession } from '../interactions/rich-text-transform-driver';
+import {
+  computeDragSnap,
+  computeResizeSnap,
+  computeSnapThreshold,
+  snapBoundsFromTransform,
+  toSnapBounds,
+  unionSnapBounds,
+} from '../interactions/smart-guides';
+import type { SnapBounds } from '../interactions/smart-guides';
+import { isRichTextHorizontalAnchor } from '../rich-text-resize';
+import {
+  applyTransformerAnchorVisibility,
+  attachTransformerToNodes,
+  getInteraction,
+} from '../canvas-transformer-utils';
+import {
+  EMPTY_SMART_GUIDES,
+  type CanvasStageLayer,
+  type CanvasStageProps,
+  type DragSession,
+  type SelectionBounds,
+  type SmartGuideState,
+} from '../canvas-stage-types';
+import { ViewportController } from '../viewport';
+
+export interface CanvasStageController {
+  stageContainerRef: RefObject<HTMLDivElement | null>;
+  viewport: ViewportController;
+  vp: ReturnType<ViewportController['getViewport']>;
+  artboardOffset: ReturnType<typeof computeArtboardOffset>;
+  artboardGroupRef: RefObject<Konva.Group | null>;
+  transformerRef: RefObject<Konva.Transformer | null>;
+  sizeLabelRef: RefObject<Konva.Label | null>;
+  nodeRefs: RefObject<Map<string, Konva.Group>>;
+  selectedPrimary: string | null;
+  selectedLayerIdSet: Set<string>;
+  selectedLayerIds: string[];
+  selectedTransform: SceneLayer['transform'] | null;
+  selectedInteraction:
+    | ReturnType<typeof getInteraction>
+    | undefined;
+  editingLayerId: string | null;
+  transformSessionLayerId: string | null;
+  smartGuides: SmartGuideState;
+  selectionLabelBounds: SelectionBounds | null;
+  sizeLabelOffsetX: number;
+  sizeLabelText: string;
+  activeDragAnchor: string | null;
+  transformerEnabledAnchors: string[] | undefined;
+  marginOverlayBounds: {
+    height: number;
+    width: number;
+    x: number;
+    y: number;
+  } | null;
+  isLayerSelectable: (layer: SceneLayer) => boolean;
+  isLayerWritableCallback: (layer: SceneLayer) => boolean;
+  onSelectRef: RefObject<CanvasStageProps['onSelectLayer']>;
+  onDoubleClickRef: RefObject<CanvasStageProps['onLayerDoubleClick']>;
+  onTransformRef: RefObject<CanvasStageProps['onTransformChange']>;
+  layersRef: RefObject<CanvasStageLayer[]>;
+  dragSessionRef: RefObject<DragSession | null>;
+  bumpViewport: () => void;
+  clearSmartGuides: () => void;
+  applyDragSnap: (
+    layerId: string,
+    node: Konva.Group,
+    transform: NonNullable<SceneLayer['transform']>
+  ) => void;
+  handleTransformStart: () => void;
+  handleTransformEnd: () => void;
+  anchorDragBoundFunc: (
+    oldAbs: { x: number; y: number },
+    newAbs: { x: number; y: number }
+  ) => { x: number; y: number };
+  boundBoxFunc: (
+    oldBox: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      rotation: number;
+    },
+    newBox: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      rotation: number;
+    }
+  ) => {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    rotation: number;
+  };
+  syncLabelFromTransformer: () => void;
+  scheduleRichTextLiveBake: (
+    layerId: string,
+    view: Extract<LayerPreviewDescriptor, { kind: 'richText' }>
+  ) => void;
+  updateResizeGuides: (node: Konva.Group) => void;
+  handleLayerTransform: (
+    layerId: string,
+    node: Konva.Group,
+    view: LayerPreviewDescriptor,
+    interactionKind: string | undefined
+  ) => void;
+  completeLayerTransform: (input: {
+    layerId: string;
+    view: LayerPreviewDescriptor;
+    transform: NonNullable<SceneLayer['transform']>;
+    node: Konva.Group;
+    interactionKind: string | undefined;
+  }) => void;
+}
+
+export function useCanvasStageController({
+  containerWidth,
+  containerHeight,
+  artboardWidth,
+  artboardHeight,
+  layers,
+  selectedLayerIds,
+  editingLayerId = null,
+  pageMarginBounds = null,
+  showMargins = false,
+  onSelectLayer,
+  onLayerDoubleClick,
+  onTransformChange,
+  onViewportChange,
+  viewportController: externalViewport,
+  canvasLayerInteractions = [],
+}: Pick<
+  CanvasStageProps,
+  | 'containerWidth'
+  | 'containerHeight'
+  | 'artboardWidth'
+  | 'artboardHeight'
+  | 'layers'
+  | 'selectedLayerIds'
+  | 'editingLayerId'
+  | 'pageMarginBounds'
+  | 'showMargins'
+  | 'onSelectLayer'
+  | 'onLayerDoubleClick'
+  | 'onTransformChange'
+  | 'onViewportChange'
+  | 'viewportController'
+  | 'canvasLayerInteractions'
+>): CanvasStageController {
+  const stageContainerRef = useRef<HTMLDivElement>(null);
+  const [internalViewport] = useState(() => new ViewportController());
+  const viewport = externalViewport ?? internalViewport;
+  const [, setViewportTick] = useState(0);
+  const [sizeLabelOffsetX, setSizeLabelOffsetX] = useState(0);
+  const [selectionLabelBounds, setSelectionLabelBounds] =
+    useState<SelectionBounds | null>(null);
+  const [smartGuides, setSmartGuides] =
+    useState<SmartGuideState>(EMPTY_SMART_GUIDES);
+  const [transformSessionLayerId, setTransformSessionLayerId] = useState<
+    string | null
+  >(null);
+  const [activeDragAnchor, setActiveDragAnchor] = useState<string | null>(null);
+  const transformSessionActiveRef = useRef(false);
+  const transformerRef = useRef<Konva.Transformer>(null);
+  const artboardGroupRef = useRef<Konva.Group>(null);
+  const transformDragRef = useRef<TransformDragContext | null>(null);
+  const richTextCornerSessionRef = useRef<RichTextCornerSession | null>(null);
+  const cornerBakeRafRef = useRef<number | null>(null);
+  const richTextBakeInProgressRef = useRef(false);
+  const sizeLabelRef = useRef<Konva.Label>(null);
+  const nodeRefs = useRef<Map<string, Konva.Group>>(new Map());
+  const dragSessionRef = useRef<DragSession | null>(null);
+  const onSelectRef = useRef(onSelectLayer);
+  const onDoubleClickRef = useRef(onLayerDoubleClick);
+  const onTransformRef = useRef(onTransformChange);
+  const onViewportRef = useRef(onViewportChange);
+  const selectedLayerIdsRef = useRef(selectedLayerIds);
+  const layersRef = useRef(layers);
+
+  onSelectRef.current = onSelectLayer;
+  onDoubleClickRef.current = onLayerDoubleClick;
+  onTransformRef.current = onTransformChange;
+  onViewportRef.current = onViewportChange;
+  selectedLayerIdsRef.current = selectedLayerIds;
+  layersRef.current = layers;
+
+  const vp = viewport.getViewport();
+  const selectedPrimary = selectedLayerIds[0] ?? null;
+  const selectedLayerIdSet = useMemo(
+    () => new Set(selectedLayerIds),
+    [selectedLayerIds]
+  );
+  const artboardOffset = computeArtboardOffset(
+    containerWidth,
+    containerHeight,
+    artboardWidth,
+    artboardHeight,
+    vp.zoom,
+    vp.panX,
+    vp.panY
+  );
+
+  const clearSmartGuides = useCallback(() => {
+    setSmartGuides(EMPTY_SMART_GUIDES);
+  }, []);
+
+  const getOtherSnapBounds = useCallback(
+    (excludeIds: Set<string>): SnapBounds[] =>
+      layersRef.current
+        .filter(({ layer }) => !excludeIds.has(layer.id))
+        .map(({ layer }) =>
+          snapBoundsFromTransform(layer.transform ?? createDefaultTransform())
+        ),
+    []
+  );
+
+  const bumpViewport = useCallback(() => {
+    const next = viewport.getViewport();
+    onViewportRef.current?.(next.zoom);
+    setViewportTick((value) => value + 1);
+  }, [viewport]);
+
+  useEffect(() => {
+    onViewportRef.current?.(viewport.getViewport().zoom);
+  }, [viewport]);
+
+  useEffect(() => {
+    if (!editingLayerId) {
+      return;
+    }
+    const node = nodeRefs.current.get(editingLayerId);
+    if (!node) {
+      return;
+    }
+    node.destroyChildren();
+    node.getLayer()?.batchDraw();
+  }, [editingLayerId]);
+
+  useEffect(() => {
+    if (!transformerRef.current || editingLayerId) {
+      transformerRef.current?.nodes([]);
+      return;
+    }
+    const nodes = selectedLayerIds
+      .map((layerId) => nodeRefs.current.get(layerId))
+      .filter((node): node is Konva.Group => Boolean(node));
+    attachTransformerToNodes(transformerRef.current, nodes);
+  }, [editingLayerId, selectedLayerIds]);
+
+  const selectedLayer = selectedPrimary
+    ? layers.find(({ layer }) => layer.id === selectedPrimary)
+    : null;
+  const selectedTransform = selectedLayer?.layer.transform ?? null;
+  const selectedInteraction = selectedLayer
+    ? getInteraction(canvasLayerInteractions, selectedLayer.view.kind)
+    : undefined;
+
+  const isLayerSelectable = useCallback(
+    (layer: SceneLayer) => isLayerEditable(layer),
+    []
+  );
+  const isLayerWritableCallback = useCallback(
+    (layer: SceneLayer) => isLayerWritable(layer),
+    []
+  );
+  const isRichTextSelected = selectedInteraction?.kind === 'richText';
+  const isRichTextSelectedRef = useRef(isRichTextSelected);
+  isRichTextSelectedRef.current = isRichTextSelected;
+
+  const updateSizeLabelImperatively = useCallback((bounds: SelectionBounds) => {
+    const label = sizeLabelRef.current;
+    if (!label) {
+      return;
+    }
+    label.position({
+      x: bounds.x + bounds.width / 2,
+      y: bounds.y + bounds.height + 6,
+    });
+    const text = label.findOne('Text') as Konva.Text | undefined;
+    text?.text(`${Math.round(bounds.width)} × ${Math.round(bounds.height)} px`);
+    label.getLayer()?.batchDraw();
+  }, []);
+
+  const applyDragSnap = useCallback(
+    (
+      layerId: string,
+      node: Konva.Group,
+      transform: NonNullable<SceneLayer['transform']>
+    ) => {
+      const session = dragSessionRef.current;
+      const threshold = computeSnapThreshold(vp.zoom);
+      const artboard = { height: artboardHeight, width: artboardWidth };
+      const marginBounds = showMargins ? pageMarginBounds : null;
+      const excludeIds = new Set(
+        session && selectedLayerIdsRef.current.includes(layerId)
+          ? selectedLayerIdsRef.current
+          : [layerId]
+      );
+      const others = getOtherSnapBounds(excludeIds);
+
+      if (
+        session &&
+        session.layerId === layerId &&
+        selectedLayerIdsRef.current.length > 1
+      ) {
+        const start = session.starts.get(layerId);
+        if (!start) {
+          return;
+        }
+        const dx = node.x() - start.x;
+        const dy = node.y() - start.y;
+        const proposedBounds = selectedLayerIdsRef.current
+          .map((id) => {
+            const layerStart = session.starts.get(id);
+            const layerTransform =
+              layersRef.current.find((entry) => entry.layer.id === id)?.layer
+                .transform ?? createDefaultTransform();
+            if (!layerStart) {
+              return null;
+            }
+            return toSnapBounds(
+              layerStart.x + dx,
+              layerStart.y + dy,
+              layerTransform.width,
+              layerTransform.height
+            );
+          })
+          .filter((bounds): bounds is SnapBounds => bounds !== null);
+        const moving = unionSnapBounds(proposedBounds);
+        const snap = computeDragSnap({
+          artboard,
+          height: moving.height,
+          marginBounds,
+          others,
+          threshold,
+          width: moving.width,
+          x: moving.left,
+          y: moving.top,
+        });
+        const snapDx = snap.x - moving.left;
+        const snapDy = snap.y - moving.top;
+        for (const id of selectedLayerIdsRef.current) {
+          const layerStart = session.starts.get(id);
+          const targetNode = nodeRefs.current.get(id);
+          if (!layerStart || !targetNode) {
+            continue;
+          }
+          targetNode.position({
+            x: layerStart.x + dx + snapDx,
+            y: layerStart.y + dy + snapDy,
+          });
+        }
+        setSmartGuides({ guides: snap.guides, spacing: snap.spacing });
+        return;
+      }
+
+      const snap = computeDragSnap({
+        artboard,
+        height: transform.height,
+        marginBounds,
+        others,
+        threshold,
+        width: transform.width,
+        x: node.x(),
+        y: node.y(),
+      });
+      node.position({ x: snap.x, y: snap.y });
+      setSmartGuides({ guides: snap.guides, spacing: snap.spacing });
+    },
+    [
+      artboardHeight,
+      artboardWidth,
+      getOtherSnapBounds,
+      pageMarginBounds,
+      showMargins,
+      vp.zoom,
+    ]
+  );
+
+  const handleTransformStart = useCallback(() => {
+    if (transformSessionActiveRef.current) {
+      return;
+    }
+    transformSessionActiveRef.current = true;
+    const transformer = transformerRef.current;
+    const node = transformer?.nodes()[0] as Konva.Group | undefined;
+    if (node) {
+      normalizeNodeBeforeTransform(node);
+    }
+
+    const activeAnchor = transformer?.getActiveAnchor() ?? null;
+    if (activeAnchor) {
+      setActiveDragAnchor(activeAnchor);
+      applyTransformerAnchorVisibility(transformer ?? null, activeAnchor, null);
+    }
+
+    if (
+      selectedPrimary &&
+      selectedInteraction?.kind === 'richText' &&
+      selectedLayer &&
+      node
+    ) {
+      setTransformSessionLayerId(selectedPrimary);
+      startRichTextTransform(
+        createRichTextTransformRuntime(
+          selectedPrimary,
+          selectedLayer.view as Extract<
+            LayerPreviewDescriptor,
+            { kind: 'richText' }
+          >,
+          selectedLayer.layer.transform,
+          node,
+          transformer ?? null,
+          activeAnchor,
+          {
+            bakeInProgressRef: richTextBakeInProgressRef,
+            cornerBakeRafRef,
+            dragRef: transformDragRef,
+            nodeRefs: nodeRefs.current,
+            onUpdateSizeLabel: updateSizeLabelImperatively,
+            sessionRef: richTextCornerSessionRef,
+          }
+        )
+      );
+    } else {
+      transformDragRef.current = transformer
+        ? createTransformDragContext(transformer)
+        : null;
+    }
+  }, [
+    selectedInteraction?.kind,
+    selectedLayer,
+    selectedPrimary,
+    updateSizeLabelImperatively,
+  ]);
+
+  const handleTransformEnd = useCallback(() => {
+    transformSessionActiveRef.current = false;
+    setTransformSessionLayerId(null);
+    setActiveDragAnchor(null);
+    clearSmartGuides();
+    applyTransformerAnchorVisibility(
+      transformerRef.current,
+      null,
+      isRichTextSelectedRef.current ? [...RICH_TEXT_ENABLED_ANCHORS] : null
+    );
+    transformDragRef.current = null;
+    endRichTextTransformSession({
+      cornerBakeRafRef,
+      sessionRef: richTextCornerSessionRef,
+    });
+  }, [clearSmartGuides]);
+
+  const updateResizeGuides = useCallback(
+    (node: Konva.Group) => {
+      const anchor = transformDragRef.current?.anchor ?? '';
+      if (!anchor || anchor === 'rotater') {
+        clearSmartGuides();
+        return;
+      }
+      const threshold = computeSnapThreshold(vp.zoom);
+      const excludeIds = new Set(selectedLayerIdsRef.current);
+      const snap = computeResizeSnap({
+        anchor,
+        artboard: { height: artboardHeight, width: artboardWidth },
+        box: {
+          height: node.height() * node.scaleY(),
+          rotation: node.rotation(),
+          width: node.width() * node.scaleX(),
+          x: node.x(),
+          y: node.y(),
+        },
+        marginBounds: showMargins ? pageMarginBounds : null,
+        others: getOtherSnapBounds(excludeIds),
+        threshold,
+      });
+      setSmartGuides({ guides: snap.guides, spacing: snap.spacing });
+    },
+    [
+      artboardHeight,
+      artboardWidth,
+      clearSmartGuides,
+      getOtherSnapBounds,
+      pageMarginBounds,
+      showMargins,
+      vp.zoom,
+    ]
+  );
+
+  const anchorDragBoundFunc = useCallback(
+    (oldAbs: { x: number; y: number }, newAbs: { x: number; y: number }) => {
+      const ctx = transformDragRef.current;
+      if (!ctx) {
+        return newAbs;
+      }
+      return clampAnchorDragPosition(oldAbs, newAbs, ctx);
+    },
+    []
+  );
+
+  const syncLabelFromTransformer = useCallback(() => {
+    const transformer = transformerRef.current;
+    if (!transformer || transformer.nodes().length === 0) {
+      return;
+    }
+    const rect = transformer.getClientRect();
+    setSelectionLabelBounds({
+      height: rect.height / vp.zoom,
+      width: rect.width / vp.zoom,
+      x: (rect.x - artboardOffset.x) / vp.zoom,
+      y: (rect.y - artboardOffset.y) / vp.zoom,
+    });
+  }, [artboardOffset.x, artboardOffset.y, vp.zoom]);
+
+  const boundBoxFunc = useCallback(
+    (
+      oldBox: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        rotation: number;
+      },
+      newBox: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        rotation: number;
+      }
+    ) => {
+      const session = richTextCornerSessionRef.current;
+      const anchor = transformDragRef.current?.anchor ?? '';
+      let nextBox = newBox;
+      if (session && isRichTextHorizontalAnchor(anchor)) {
+        nextBox = boundRichTextBox(
+          session,
+          anchor,
+          oldBox,
+          newBox,
+          (() => {
+            const transformer = transformerRef.current;
+            const stage = transformer?.getStage();
+            const node = transformer?.nodes()[0] as Konva.Group | undefined;
+            const parent = node?.getParent();
+            if (!stage || !parent) {
+              return null;
+            }
+            const pointer = stage.getPointerPosition();
+            if (!pointer) {
+              return null;
+            }
+            return parent.getAbsoluteTransform().copy().invert().point(pointer);
+          })()
+        );
+      }
+
+      if (!anchor || anchor === 'rotater') {
+        return nextBox;
+      }
+
+      const snap = computeResizeSnap({
+        anchor,
+        artboard: { height: artboardHeight, width: artboardWidth },
+        box: nextBox,
+        marginBounds: showMargins ? pageMarginBounds : null,
+        others: getOtherSnapBounds(new Set(selectedLayerIdsRef.current)),
+        threshold: computeSnapThreshold(vp.zoom),
+      });
+      setSmartGuides({ guides: snap.guides, spacing: snap.spacing });
+      return snap.box;
+    },
+    [
+      artboardHeight,
+      artboardWidth,
+      getOtherSnapBounds,
+      pageMarginBounds,
+      showMargins,
+      vp.zoom,
+    ]
+  );
+
+  const scheduleRichTextLiveBake = useCallback(
+    (
+      layerId: string,
+      view: Extract<LayerPreviewDescriptor, { kind: 'richText' }>
+    ) => {
+      const node = nodeRefs.current.get(layerId);
+      if (!node) {
+        return;
+      }
+      runRichTextLiveBake(
+        createRichTextTransformRuntime(
+          layerId,
+          view,
+          layers.find(({ layer }) => layer.id === layerId)?.layer.transform,
+          node,
+          transformerRef.current,
+          transformDragRef.current?.anchor ?? null,
+          {
+            bakeInProgressRef: richTextBakeInProgressRef,
+            cornerBakeRafRef,
+            dragRef: transformDragRef,
+            nodeRefs: nodeRefs.current,
+            onUpdateSizeLabel: updateSizeLabelImperatively,
+            sessionRef: richTextCornerSessionRef,
+          }
+        )
+      );
+    },
+    [layers, updateSizeLabelImperatively]
+  );
+
+  useEffect(() => {
+    if (!selectedTransform) {
+      setSelectionLabelBounds(null);
+      return;
+    }
+    setSelectionLabelBounds({
+      height: selectedTransform.height,
+      width: selectedTransform.width,
+      x: selectedTransform.x,
+      y: selectedTransform.y,
+    });
+  }, [selectedTransform]);
+
+  useLayoutEffect(() => {
+    if (
+      !selectedPrimary ||
+      !selectedTransform ||
+      transformSessionActiveRef.current
+    ) {
+      return;
+    }
+    const nodes = selectedLayerIds
+      .map((layerId) => nodeRefs.current.get(layerId))
+      .filter((node): node is Konva.Group => Boolean(node));
+    attachTransformerToNodes(transformerRef.current, nodes);
+    syncLabelFromTransformer();
+  }, [
+    selectedLayerIds,
+    selectedPrimary,
+    selectedTransform,
+    syncLabelFromTransformer,
+  ]);
+
+  useEffect(() => {
+    if (!selectedPrimary) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      syncLabelFromTransformer();
+    });
+  }, [selectedPrimary, syncLabelFromTransformer]);
+
+  const sizeLabelText = selectionLabelBounds
+    ? `${Math.round(selectionLabelBounds.width)} × ${Math.round(selectionLabelBounds.height)} px`
+    : '';
+
+  useLayoutEffect(() => {
+    const label = sizeLabelRef.current;
+    if (!label) {
+      return;
+    }
+    const nextOffsetX = label.width() / 2;
+    setSizeLabelOffsetX((current) =>
+      current === nextOffsetX ? current : nextOffsetX
+    );
+  }, [sizeLabelText]);
+
+  const handleLayerTransform = useCallback(
+    (
+      layerId: string,
+      node: Konva.Group,
+      view: LayerPreviewDescriptor,
+      interactionKind: string | undefined
+    ) => {
+      if (
+        interactionKind === 'richText' &&
+        layerId === selectedLayerIdsRef.current[0]
+      ) {
+        if (!transformDragRef.current && transformerRef.current) {
+          transformDragRef.current = createTransformDragContext(
+            transformerRef.current
+          );
+        }
+        scheduleRichTextLiveBake(
+          layerId,
+          view as Extract<LayerPreviewDescriptor, { kind: 'richText' }>
+        );
+      } else if (layerId === selectedLayerIdsRef.current[0]) {
+        updateResizeGuides(node);
+        syncLabelFromTransformer();
+      }
+    },
+    [scheduleRichTextLiveBake, syncLabelFromTransformer, updateResizeGuides]
+  );
+
+  const completeLayerTransform = useCallback(
+    ({
+      layerId,
+      view,
+      transform,
+      node,
+      interactionKind,
+    }: {
+      layerId: string;
+      view: LayerPreviewDescriptor;
+      transform: NonNullable<SceneLayer['transform']>;
+      node: Konva.Group;
+      interactionKind: string | undefined;
+    }) => {
+      let nextTransform = bakeNodeTransform(transform, node);
+      let nextFontSize: number | undefined;
+
+      if (interactionKind === 'richText') {
+        const baked = bakeRichTextTransformEnd(
+          createRichTextTransformRuntime(
+            layerId,
+            view as Extract<LayerPreviewDescriptor, { kind: 'richText' }>,
+            transform,
+            node,
+            transformerRef.current,
+            transformDragRef.current?.anchor ?? null,
+            {
+              bakeInProgressRef: richTextBakeInProgressRef,
+              cornerBakeRafRef,
+              dragRef: transformDragRef,
+              nodeRefs: nodeRefs.current,
+              onUpdateSizeLabel: updateSizeLabelImperatively,
+              sessionRef: richTextCornerSessionRef,
+            }
+          ),
+          node
+        );
+        if (baked) {
+          nextTransform = baked.transform;
+          nextFontSize = baked.fontSize;
+        }
+      }
+
+      handleTransformEnd();
+      onTransformRef.current?.(layerId, {
+        fontSize: nextFontSize,
+        transform: nextTransform,
+      });
+      if (selectedLayerIdsRef.current.includes(layerId)) {
+        requestAnimationFrame(() => {
+          const nodes = selectedLayerIdsRef.current
+            .map((id) => nodeRefs.current.get(id))
+            .filter((entry): entry is Konva.Group => Boolean(entry));
+          attachTransformerToNodes(transformerRef.current, nodes);
+          syncLabelFromTransformer();
+        });
+      }
+    },
+    [handleTransformEnd, syncLabelFromTransformer, updateSizeLabelImperatively]
+  );
+
+  const interactionAnchors = selectedInteraction?.enabledAnchors?.();
+  const transformerEnabledAnchors = activeDragAnchor
+    ? activeDragAnchor === 'rotater'
+      ? []
+      : [activeDragAnchor]
+    : interactionAnchors
+      ? [...interactionAnchors]
+      : undefined;
+
+  const marginOverlayBounds =
+    showMargins && pageMarginBounds
+      ? {
+          height: pageMarginBounds.height,
+          width: pageMarginBounds.width,
+          x: pageMarginBounds.left,
+          y: pageMarginBounds.top,
+        }
+      : null;
+
+  return {
+    stageContainerRef,
+    viewport,
+    vp,
+    artboardOffset,
+    artboardGroupRef,
+    transformerRef,
+    sizeLabelRef,
+    nodeRefs,
+    selectedPrimary,
+    selectedLayerIdSet,
+    selectedLayerIds,
+    selectedTransform,
+    selectedInteraction,
+    editingLayerId,
+    transformSessionLayerId,
+    smartGuides,
+    selectionLabelBounds,
+    sizeLabelOffsetX,
+    sizeLabelText,
+    activeDragAnchor,
+    transformerEnabledAnchors,
+    marginOverlayBounds,
+    isLayerSelectable,
+    isLayerWritableCallback,
+    onSelectRef,
+    onDoubleClickRef,
+    onTransformRef,
+    layersRef,
+    dragSessionRef,
+    bumpViewport,
+    clearSmartGuides,
+    applyDragSnap,
+    handleTransformStart,
+    handleTransformEnd,
+    anchorDragBoundFunc,
+    boundBoxFunc,
+    syncLabelFromTransformer,
+    scheduleRichTextLiveBake,
+    updateResizeGuides,
+    handleLayerTransform,
+    completeLayerTransform,
+  };
+}
