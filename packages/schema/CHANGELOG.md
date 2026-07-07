@@ -1,5 +1,11 @@
 # @openenvx/schema
 
+## 0.1.3
+
+### Patch Changes
+
+- 60cfd11: fix: versioning
+
 ## 0.1.2
 
 ### Patch Changes

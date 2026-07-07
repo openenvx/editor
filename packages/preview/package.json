@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/preview",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Layer preview descriptor DSL for OpenEnvx renderers",
   "license": "MIT",
   "type": "module",

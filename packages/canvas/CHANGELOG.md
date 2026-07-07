@@ -1,5 +1,16 @@
 # @openenvx/canvas
 
+## 0.1.3
+
+### Patch Changes
+
+- 60cfd11: fix: versioning
+- Updated dependencies [60cfd11]
+  - @openenvx/core@0.1.3
+  - @openenvx/headless@0.1.3
+  - @openenvx/preview@0.1.3
+  - @openenvx/schema@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes

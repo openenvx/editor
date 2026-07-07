@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/canvas",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Canvas editor for OpenEnvx absolute layout pages",
   "license": "MIT",
   "type": "module",
