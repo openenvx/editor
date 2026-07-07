@@ -1,5 +1,13 @@
 # @openenvx/preview
 
+## 0.1.2
+
+### Patch Changes
+
+- 1479c36: fix: fix versioning
+- Updated dependencies [1479c36]
+  - @openenvx/schema@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

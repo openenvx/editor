@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/driver-image",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Image export driver placeholder for OpenEnvx",
   "license": "MIT",
   "type": "module",

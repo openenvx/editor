@@ -1,5 +1,11 @@
 # @openenvx/schema
 
+## 0.1.2
+
+### Patch Changes
+
+- 1479c36: fix: fix versioning
+
 ## 0.1.1
 
 ### Patch Changes
