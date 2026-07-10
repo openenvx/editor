@@ -7,7 +7,7 @@ import type { Transform } from '@openenvx/schema';
 import { createCanvasInspectorHostContext } from './canvas-inspector-path-context';
 import type { CanvasInspectorPathContextOptions } from './canvas-inspector-path-context';
 
-export interface CanvasInspectorHostContextHelpers {
+interface CanvasInspectorHostContextHelpers {
   api: WorkbenchApi;
   executeCommand: (commandId: string, args?: unknown) => Promise<boolean>;
 }

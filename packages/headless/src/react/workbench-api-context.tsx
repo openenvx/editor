@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import type { ReactNode } from 'react';
 
-import type { WorkbenchApi } from '../workbench-controller';
+import type { WorkbenchApi } from '../workbench-state';
 
 export interface WorkbenchContextValue {
   api: WorkbenchApi;

@@ -1,6 +1,6 @@
 import type { PluginManager } from '@openenvx/core';
 
-export function shouldIgnoreDeleteShortcut(event: KeyboardEvent): boolean {
+function shouldIgnoreDeleteShortcut(event: KeyboardEvent): boolean {
   if (event.key !== 'Delete' && event.key !== 'Backspace') {
     return false;
   }

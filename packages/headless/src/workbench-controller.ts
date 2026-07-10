@@ -44,16 +44,6 @@ import type {
   SceneSlice,
 } from './workbench-state-cache';
 
-export type {
-  LayerSurfaceItem,
-  ViewContainerDescriptor,
-  ViewDescriptor,
-  ViewTreeItem,
-  WorkbenchApi,
-  WorkbenchControllerOptions,
-  WorkbenchState,
-} from './workbench-state';
-
 type Listener = (state: WorkbenchState) => void;
 
 export class WorkbenchController {

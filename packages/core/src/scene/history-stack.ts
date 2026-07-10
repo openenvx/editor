@@ -1,6 +1,6 @@
 import type { SceneSnapshot } from '../scene/types';
 
-export const DEFAULT_HISTORY_DEPTH = 100;
+const DEFAULT_HISTORY_DEPTH = 100;
 
 export class HistoryStack {
   private past: SceneSnapshot[] = [];

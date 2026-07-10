@@ -22,7 +22,7 @@ import {
 
 import styles from './canvas-editor.module.css';
 
-export interface CanvasRichTextOverlayLayer {
+interface CanvasRichTextOverlayLayer {
   layer: Layer;
   view: LayerPreviewDescriptor;
 }

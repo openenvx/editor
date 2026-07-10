@@ -21,7 +21,7 @@ export interface LayerBoundingBox {
   height: number;
 }
 
-export function getLayerTransform(layer: Layer) {
+function getLayerTransform(layer: Layer) {
   return layer.transform ?? createDefaultTransform();
 }
 

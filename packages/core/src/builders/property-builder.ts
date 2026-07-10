@@ -268,7 +268,7 @@ export class PropertyBuilder implements FieldHost {
   }
 }
 
-export class PropertySectionBuilder {
+class PropertySectionBuilder {
   constructor(
     private readonly builder: PropertyBuilder,
     private readonly section: PropertySectionDescriptor

@@ -2,7 +2,7 @@ import type { CanvasLayerInteractionContribution } from '../contributions/canvas
 import type { CanvasLayerRendererContribution } from '../contributions/canvas-layer-renderer-contribution';
 import type { LayerPreviewRendererContribution } from '../contributions/layer-preview-renderer-contribution';
 
-export class CanvasLayerRendererRegistry {
+class CanvasLayerRendererRegistry {
   private readonly contributions = new Map<
     string,
     CanvasLayerRendererContribution
@@ -26,7 +26,7 @@ export class CanvasLayerRendererRegistry {
   }
 }
 
-export class LayerPreviewRendererRegistry {
+class LayerPreviewRendererRegistry {
   private readonly contributions = new Map<
     string,
     LayerPreviewRendererContribution
@@ -50,7 +50,7 @@ export class LayerPreviewRendererRegistry {
   }
 }
 
-export class CanvasLayerInteractionRegistry {
+class CanvasLayerInteractionRegistry {
   private readonly contributions = new Map<
     string,
     CanvasLayerInteractionContribution

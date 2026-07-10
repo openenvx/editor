@@ -16,7 +16,7 @@ export interface DocumentOpsDeps {
   getService: <T>(token: ServiceId<T>) => T | undefined;
 }
 
-export function hydrateAssets(
+function hydrateAssets(
   deps: DocumentOpsDeps,
   assets: Record<string, SceneAsset> | undefined
 ): void {
@@ -24,10 +24,7 @@ export function hydrateAssets(
   assetService?.hydrate?.(assets);
 }
 
-export function exportSceneAssets(
-  scene: Scene,
-  assets: AssetService | null
-): Scene {
+function exportSceneAssets(scene: Scene, assets: AssetService | null): Scene {
   if (!assets?.exportReferenced) {
     return scene;
   }

@@ -74,7 +74,7 @@ function pointerToParentLocal(
   return parent.getAbsoluteTransform().copy().invert().point(pointer);
 }
 
-export function measureRichTextHeightForView(
+function measureRichTextHeightForView(
   view: RichTextView,
   width: number,
   fontSize: number

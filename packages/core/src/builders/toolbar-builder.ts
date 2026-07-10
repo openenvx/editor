@@ -5,7 +5,7 @@ import type {
   ShellDropdownMenuItemDescriptor,
 } from './shell-dropdown';
 
-export interface ToolbarItemBase {
+interface ToolbarItemBase {
   id: string;
   when?: string;
   priority?: number;

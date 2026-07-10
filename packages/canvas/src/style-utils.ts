@@ -1,13 +1,13 @@
 import type { CornerRadius, Padding } from '@openenvx/schema';
 
-export const DEFAULT_CORNER_RADIUS: CornerRadius = {
+const DEFAULT_CORNER_RADIUS: CornerRadius = {
   topLeft: 0,
   topRight: 0,
   bottomRight: 0,
   bottomLeft: 0,
 };
 
-export const DEFAULT_PADDING: Padding = {
+const DEFAULT_PADDING: Padding = {
   top: 0,
   right: 0,
   bottom: 0,

@@ -205,7 +205,7 @@ export function moveLayerInTree(
   return result;
 }
 
-export interface LayerLocation {
+interface LayerLocation {
   parentLayers: Layer[];
   index: number;
   containerId: string | null;

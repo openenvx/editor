@@ -1,6 +1,6 @@
 import { useCallback, useRef, useSyncExternalStore } from 'react';
 
-import type { WorkbenchApi, WorkbenchState } from '../workbench-controller';
+import type { WorkbenchApi, WorkbenchState } from '../workbench-state';
 import { useWorkbenchContext } from './workbench-api-context';
 
 export function useWorkbenchSelector<T>(

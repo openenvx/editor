@@ -1,7 +1,3 @@
-import type { CanvasLayerRendererRegistration } from '../registry/canvas-registry-types';
-
-export type { CanvasLayerRendererRegistration };
-
 export interface CanvasLayerRendererHostProps {
   view: unknown;
   width: number;

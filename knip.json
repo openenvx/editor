@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignoreExportsUsedInFile": true,
+  "ignoreExportsUsedInFile": false,
   "ignoreDependencies": [
     "eslint-plugin-github",
     "eslint-plugin-sonarjs",
@@ -15,7 +15,7 @@
       "project": ["*.{js,ts}"]
     },
     "packages/core": {
-      "entry": ["src/index.ts!"],
+      "entry": ["src/index.ts!", "src/plugins/scene-plugin.ts!"],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "packages/headless": {
@@ -23,7 +23,13 @@
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "packages/canvas": {
-      "entry": ["src/index.ts!", "src/export-layers.ts!"],
+      "entry": [
+        "src/index.ts!",
+        "src/export-layers.ts!",
+        "src/plugin/canvas-basics-plugin.ts!",
+        "src/contributions/canvas-inspector-pane-contributions.ts!",
+        "src/contributions/canvas-shell-contributions.ts!"
+      ],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "packages/schema": {

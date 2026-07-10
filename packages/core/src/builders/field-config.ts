@@ -7,7 +7,7 @@ export interface NumericFieldConfig {
   unit?: string;
 }
 
-export interface PopupSubFieldDescriptor {
+interface PopupSubFieldDescriptor {
   key: string;
   kind: string;
   label: string;

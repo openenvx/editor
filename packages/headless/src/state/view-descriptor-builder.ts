@@ -53,7 +53,7 @@ export function buildViewContainer(
   };
 }
 
-export function buildView(
+function buildView(
   view: ViewContribution,
   ctx: ReturnType<PluginManager['createCommandContext']>,
   buildCtx: ReturnType<typeof createContributionBuildContext>

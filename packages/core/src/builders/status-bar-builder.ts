@@ -8,7 +8,7 @@ import type {
   ShellDropdownMenuItemDescriptor,
 } from './shell-dropdown';
 
-export interface StatusBarItemBase extends DescriptorItemBase {
+interface StatusBarItemBase extends DescriptorItemBase {
   alignment: 'left' | 'right';
 }
 

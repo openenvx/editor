@@ -53,7 +53,7 @@ export class CanvasRegistriesService implements CanvasRegistriesReader {
   }
 }
 
-export function getCanvasRegistriesService(
+function getCanvasRegistriesService(
   ctx: PluginContext
 ): CanvasRegistriesService | null {
   if (!ctx.services.has(CanvasRegistriesServiceId)) {

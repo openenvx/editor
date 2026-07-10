@@ -74,7 +74,7 @@ const MAX_ZOOM = 4;
 const DEFAULT_FIT_PADDING = 48;
 
 /** Exponential wheel-zoom rate (per pixel of normalized deltaY). Higher = faster. */
-export const WHEEL_ZOOM_SENSITIVITY = 0.01;
+const WHEEL_ZOOM_SENSITIVITY = 0.01;
 
 const WHEEL_DELTA_LINE_PIXELS = 16;
 

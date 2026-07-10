@@ -8,7 +8,7 @@ export interface OverlayDescriptor {
   visible: boolean;
 }
 
-export type OverlayContentDescriptor =
+type OverlayContentDescriptor =
   | { kind: 'text'; text: string }
   | { kind: 'command-list'; commandIds: string[] };
 

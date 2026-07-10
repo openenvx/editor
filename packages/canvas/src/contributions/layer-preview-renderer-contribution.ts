@@ -1,7 +1,3 @@
-import type { LayerPreviewRendererRegistration } from '../registry/canvas-registry-types';
-
-export type { LayerPreviewRendererRegistration };
-
 export interface LayerPreviewRendererHostProps {
   descriptor: unknown;
 }

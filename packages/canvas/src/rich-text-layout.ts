@@ -158,7 +158,7 @@ function tokenize(spans: StyledSpan[]): WordToken[] {
   return tokens;
 }
 
-export function buildRichTextFont(
+function buildRichTextFont(
   style: RichTextStyle,
   fontSize: number,
   fontFamily: string
@@ -168,7 +168,7 @@ export function buildRichTextFont(
   return `${fontStyle} ${weight} ${fontSize}px ${fontFamily}`;
 }
 
-export function measureRichTextWidth(
+function measureRichTextWidth(
   text: string,
   fontSize: number,
   fontFamily: string,

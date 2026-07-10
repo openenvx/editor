@@ -1,6 +1,5 @@
 import { createServiceId } from '@openenvx/core';
 import type { FontService } from '@openenvx/core';
-import type { Transform } from '@openenvx/schema';
 
 import type { CanvasClipboardService } from './clipboard/canvas-clipboard-service';
 import type { CanvasCommandRequestService } from './commands/canvas-command-request-service';
@@ -16,5 +15,3 @@ export const CanvasRegistriesServiceId =
 export const CanvasFontServiceId = createServiceId<FontService>('canvasFonts');
 export const CanvasPageResizeServiceId =
   createServiceId<PageResizeService>('canvasPageResize');
-
-export type { Transform };

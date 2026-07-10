@@ -16,7 +16,7 @@ export const RICH_TEXT_HORIZONTAL_ANCHORS = [
   'middle-right',
 ] as const;
 
-export type RichTextCornerAnchor = (typeof RICH_TEXT_CORNER_ANCHORS)[number];
+type RichTextCornerAnchor = (typeof RICH_TEXT_CORNER_ANCHORS)[number];
 export type RichTextHorizontalAnchor =
   (typeof RICH_TEXT_HORIZONTAL_ANCHORS)[number];
 export type RichTextResizeAnchor =
