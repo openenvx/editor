@@ -1,6 +1,6 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import type { Layer as SceneLayer } from '@openenvx/core';
 import { isLayerEditable, isLayerWritable } from '@openenvx/core';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { createDefaultTransform } from '@openenvx/schema';
 import type Konva from 'konva';
 import {
@@ -10,10 +10,23 @@ import {
   useMemo,
   useRef,
   useState,
-  type RefObject,
 } from 'react';
+import type { RefObject } from 'react';
 
 import { computeArtboardOffset } from '../artboard-offset';
+import { EMPTY_SMART_GUIDES } from '../canvas-stage-types';
+import type {
+  CanvasStageLayer,
+  CanvasStageProps,
+  DragSession,
+  SelectionBounds,
+  SmartGuideState,
+} from '../canvas-stage-types';
+import {
+  applyTransformerAnchorVisibility,
+  attachTransformerToNodes,
+  getInteraction,
+} from '../canvas-transformer-utils';
 import {
   bakeNodeTransform,
   clampAnchorDragPosition,
@@ -41,19 +54,6 @@ import {
 } from '../interactions/smart-guides';
 import type { SnapBounds } from '../interactions/smart-guides';
 import { isRichTextHorizontalAnchor } from '../rich-text-resize';
-import {
-  applyTransformerAnchorVisibility,
-  attachTransformerToNodes,
-  getInteraction,
-} from '../canvas-transformer-utils';
-import {
-  EMPTY_SMART_GUIDES,
-  type CanvasStageLayer,
-  type CanvasStageProps,
-  type DragSession,
-  type SelectionBounds,
-  type SmartGuideState,
-} from '../canvas-stage-types';
 import { ViewportController } from '../viewport';
 
 export interface CanvasStageController {
@@ -69,9 +69,7 @@ export interface CanvasStageController {
   selectedLayerIdSet: Set<string>;
   selectedLayerIds: string[];
   selectedTransform: SceneLayer['transform'] | null;
-  selectedInteraction:
-    | ReturnType<typeof getInteraction>
-    | undefined;
+  selectedInteraction: ReturnType<typeof getInteraction> | undefined;
   editingLayerId: string | null;
   transformSessionLayerId: string | null;
   smartGuides: SmartGuideState;

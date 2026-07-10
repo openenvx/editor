@@ -1,4 +1,3 @@
-import { createLayerPreviewBuilder } from '@openenvx/preview';
 import {
   createPropertyBuilder,
   DEFAULT_CORNER_RADIUS,
@@ -12,6 +11,7 @@ import type {
   Page,
   PropertySectionDescriptor,
 } from '@openenvx/core';
+import { createLayerPreviewBuilder } from '@openenvx/preview';
 import { createDefaultTransform } from '@openenvx/schema';
 import { z } from 'zod';
 

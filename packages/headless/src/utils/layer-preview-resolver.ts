@@ -1,6 +1,6 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { AssetServiceId } from '@openenvx/core';
 import type { PluginManager } from '@openenvx/core';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 
 export function resolveLayerPreview(
   view: LayerPreviewDescriptor,

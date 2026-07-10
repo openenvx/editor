@@ -1,5 +1,5 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { createServiceId } from '@openenvx/core';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import type { LengthUnit, Scene } from '@openenvx/schema';
 
 export type CanvasExportFormat = 'svg' | 'png' | 'jpg' | 'pdf';

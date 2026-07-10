@@ -1,5 +1,5 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import type { LayerRegistry } from '@openenvx/core';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import type { Layer, Scene } from '@openenvx/schema';
 
 export interface SvgBounds {

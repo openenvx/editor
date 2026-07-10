@@ -1,3 +1,3 @@
-import { createLibraryConfig } from '@openenvx/typescript-config/tsup.library'
+import { createLibraryConfig } from '@openenvx/typescript-config/tsup.library';
 
-export default createLibraryConfig()
+export default createLibraryConfig();

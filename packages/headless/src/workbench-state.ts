@@ -1,4 +1,3 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import type {
   CommandExecutionResult,
   CommandPaletteDescriptor,
@@ -24,6 +23,7 @@ import type {
   WorkbenchLayout,
   EditorService,
 } from '@openenvx/core';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 
 export interface ViewTreeItem {
   id: string;

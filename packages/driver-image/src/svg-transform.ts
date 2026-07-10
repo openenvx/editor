@@ -18,8 +18,7 @@ export function wrapLayerSvg(body: string, transform: Transform): string {
   }
 
   if (scaleX !== 1 || scaleY !== 1) {
-    parts.push(`translate(${cx} ${cy})`);
-    parts.push(`scale(${scaleX} ${scaleY})`);
+    parts.push(`translate(${cx} ${cy})`, `scale(${scaleX} ${scaleY})`);
     parts.push(`translate(${-cx} ${-cy})`);
   }
 

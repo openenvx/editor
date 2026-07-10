@@ -1,10 +1,10 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import {
   DEFAULT_CORNER_RADIUS,
   escapeAttr,
   escapeHtml,
   sanitizeHtml,
 } from '@openenvx/core';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 
 import type {
   PreviewKindSvgSerializer,

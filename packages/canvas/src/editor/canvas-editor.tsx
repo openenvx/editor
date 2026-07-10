@@ -1,7 +1,4 @@
-import type {
-  EditorPaneHostProps,
-  EditorViewportApi,
-} from '@openenvx/core';
+import type { EditorPaneHostProps, EditorViewportApi } from '@openenvx/core';
 import {
   isLayerEditable,
   isLayerWritable,

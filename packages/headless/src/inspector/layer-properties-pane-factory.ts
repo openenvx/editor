@@ -1,7 +1,4 @@
-import {
-  InspectorPaneDescriptor,
-  InspectorRowNode,
-} from '@openenvx/core';
+import { InspectorPaneDescriptor, InspectorRowNode } from '@openenvx/core';
 import type { PropertySectionDescriptor } from '@openenvx/core';
 
 import { InspectorPath } from './inspector-path';

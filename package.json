@@ -38,13 +38,7 @@
   },
   "catalogs": {
     "dev": {
-      "turbo": "^2.10.4",
       "typescript": "^6.0.3",
-      "@vitejs/plugin-react": "^4.5.2",
-      "vite": "^6.3.5",
-      "@testing-library/react": "^16.3.0",
-      "@testing-library/user-event": "^14.6.1",
-      "jsdom": "^26.1.0",
       "tsup": "^8.5.0"
     },
     "testing": {

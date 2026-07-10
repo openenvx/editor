@@ -23,10 +23,7 @@ import type {
   TreeItem,
 } from '@openenvx/core';
 import type { Page } from '@openenvx/schema';
-import {
-  getDefaultPageDimensions,
-  normalizeScene,
-} from '@openenvx/schema';
+import { getDefaultPageDimensions, normalizeScene } from '@openenvx/schema';
 
 import {
   CanvasClipboardServiceId,

@@ -1,11 +1,15 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import type { Layer as SceneLayer } from '@openenvx/core';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 
+import type {
+  GuideLine,
+  SnapBounds,
+  SpacingGuide,
+} from './interactions/smart-guides';
 import type {
   CanvasLayerInteractionRegistration,
   CanvasLayerRendererRegistration,
 } from './registry/canvas-registry-types';
-import type { GuideLine, SnapBounds, SpacingGuide } from './interactions/smart-guides';
 import type { ViewportController } from './viewport';
 
 export interface SelectionBounds {

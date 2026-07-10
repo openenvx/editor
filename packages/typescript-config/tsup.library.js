@@ -1,15 +1,11 @@
-import { defineConfig } from 'tsup'
+import { defineConfig } from 'tsup';
 
 /** @param {import('tsup').Options} [options] */
 export function createLibraryConfig(options = {}) {
-  const { esbuildOptions: userEsbuildOptions, ...rest } = options
+  const { esbuildOptions: userEsbuildOptions, ...rest } = options;
 
   return defineConfig({
-    entry: [
-      'src/**/*.{ts,tsx}',
-      '!src/**/*.test.{ts,tsx}',
-      '!src/**/*.d.ts',
-    ],
+    entry: ['src/**/*.{ts,tsx}', '!src/**/*.test.{ts,tsx}', '!src/**/*.d.ts'],
     format: ['esm'],
     dts: true,
     bundle: false,
@@ -18,13 +14,13 @@ export function createLibraryConfig(options = {}) {
     outDir: 'dist',
     tsconfig: 'tsconfig.json',
     esbuildOptions(esbuildOptions) {
-      esbuildOptions.packages = 'external'
+      esbuildOptions.packages = 'external';
       esbuildOptions.loader = {
         ...esbuildOptions.loader,
         '.css': 'copy',
-      }
-      userEsbuildOptions?.(esbuildOptions)
+      };
+      userEsbuildOptions?.(esbuildOptions);
     },
     ...rest,
-  })
+  });
 }

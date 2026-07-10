@@ -89,8 +89,7 @@ class MoveLayerRelativeCommand extends Command {
     super();
     this.direction = direction;
     this.id = direction === 'up' ? 'scene.moveUp' : 'scene.moveDown';
-    this.applyLabel =
-      direction === 'up' ? 'Move layer up' : 'Move layer down';
+    this.applyLabel = direction === 'up' ? 'Move layer up' : 'Move layer down';
   }
 
   canExecute(ctx: CommandContext): boolean {
@@ -107,9 +106,7 @@ class MoveLayerRelativeCommand extends Command {
     if (index === -1) {
       return false;
     }
-    return this.direction === 'up'
-      ? index > 0
-      : index < page.layers.length - 1;
+    return this.direction === 'up' ? index > 0 : index < page.layers.length - 1;
   }
 
   execute(ctx: CommandContext): void {

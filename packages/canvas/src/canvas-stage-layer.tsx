@@ -1,4 +1,3 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { createDefaultTransform } from '@openenvx/schema';
 import type Konva from 'konva';
 import { Group } from 'react-konva';
@@ -82,9 +81,7 @@ export function CanvasStageLayerGroup({
           return;
         }
         const additive =
-          event.evt.shiftKey ||
-          event.evt.metaKey ||
-          event.evt.ctrlKey;
+          event.evt.shiftKey || event.evt.metaKey || event.evt.ctrlKey;
         onSelectRef.current(layer.id, { additive });
       }}
       onContextMenu={() => {

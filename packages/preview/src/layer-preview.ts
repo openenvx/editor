@@ -1,8 +1,4 @@
-import type {
-  CornerRadius,
-  LayerShadow,
-  Padding,
-} from '@openenvx/schema';
+import type { CornerRadius, LayerShadow, Padding } from '@openenvx/schema';
 
 export type BuiltinLayerPreviewDescriptor =
   | { kind: 'image'; src: string; alt?: string }

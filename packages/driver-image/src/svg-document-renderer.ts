@@ -1,6 +1,6 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { getActivePage } from '@openenvx/core';
 import type { LayerRegistry } from '@openenvx/core';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import type { Layer, Page, Scene } from '@openenvx/schema';
 import {
   computePageExportDimensions,

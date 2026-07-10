@@ -1,4 +1,3 @@
-import { createLayerPreviewBuilder } from '@openenvx/preview';
 import { createPropertyBuilder, LayerDefinition } from '@openenvx/core';
 import type {
   CommandContext,
@@ -7,6 +6,7 @@ import type {
   Page,
   PropertySectionDescriptor,
 } from '@openenvx/core';
+import { createLayerPreviewBuilder } from '@openenvx/preview';
 import { createDefaultTransform } from '@openenvx/schema';
 import { z } from 'zod';
 

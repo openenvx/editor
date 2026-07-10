@@ -4,7 +4,10 @@
   "ignoreDependencies": [
     "eslint-plugin-github",
     "eslint-plugin-sonarjs",
-    "oxlint-plugin-react-doctor"
+    "oxlint-plugin-react-doctor",
+    "@fontsource/cormorant-garamond",
+    "@fontsource/inter",
+    "@fontsource/parisienne"
   ],
   "workspaces": {
     ".": {
@@ -13,33 +16,34 @@
     },
     "packages/core": {
       "entry": ["src/index.ts!"],
-      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "packages/headless": {
-      "entry": ["src/index.ts!"],
-      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+      "entry": ["src/index.ts!", "src/react/workbench-context.tsx!"],
+      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "packages/canvas": {
-      "entry": ["src/index.ts!"],
-      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+      "entry": ["src/index.ts!", "src/export-layers.ts!"],
+      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "packages/schema": {
       "entry": ["src/index.ts!"],
-      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "packages/preview": {
       "entry": ["src/index.ts!"],
-      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "packages/driver-image": {
       "entry": ["src/index.ts!"],
-      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "apps/demo-playground": {
       "entry": [
         "src/router.tsx",
         "src/routes/**/*.{ts,tsx}",
-        "src/components/**/*.{ts,tsx}"
+        "src/components/**/*.{ts,tsx}",
+        "src/styles.css"
       ],
       "project": ["src/**/*.{ts,tsx}"]
     }

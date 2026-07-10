@@ -1,5 +1,5 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { sanitizeHtml } from '@openenvx/core';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 
 import type { LayerPreviewRendererHostProps } from '../../contributions/layer-preview-renderer-contribution';
 

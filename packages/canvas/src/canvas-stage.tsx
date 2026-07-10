@@ -1,9 +1,14 @@
-import { Group, Label, Layer, Rect, Stage, Tag, Text, Transformer } from 'react-konva';
-
 import {
-  PageMarginOverlay,
-  SmartGuidesOverlay,
-} from './interactions/smart-guides-overlay';
+  Group,
+  Label,
+  Layer,
+  Rect,
+  Stage,
+  Tag,
+  Text,
+  Transformer,
+} from 'react-konva';
+
 import { CanvasStageLayerGroup } from './canvas-stage-layer';
 import {
   EMPTY_CANVAS_LAYER_INTERACTIONS,
@@ -11,6 +16,10 @@ import {
 } from './canvas-stage-types';
 import type { CanvasStageProps } from './canvas-stage-types';
 import { useCanvasStageController } from './hooks/use-canvas-stage-controller';
+import {
+  PageMarginOverlay,
+  SmartGuidesOverlay,
+} from './interactions/smart-guides-overlay';
 import { useCanvasThemeColors } from './use-canvas-theme-colors';
 import {
   computeWheelZoom,

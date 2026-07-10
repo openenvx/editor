@@ -1,5 +1,5 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { getActivePage, resolveEditorPaneKind } from '@openenvx/core';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 
 import { resolveLayerPreview } from '../utils/layer-preview-resolver';
 import type { EditorSlice } from '../workbench-state-cache';

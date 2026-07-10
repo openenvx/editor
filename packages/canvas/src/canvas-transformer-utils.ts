@@ -1,8 +1,6 @@
 import type Konva from 'konva';
 
-import type {
-  CanvasLayerInteractionRegistration,
-} from './registry/canvas-registry-types';
+import type { CanvasLayerInteractionRegistration } from './registry/canvas-registry-types';
 
 export function getInteraction(
   interactions: CanvasLayerInteractionRegistration[],

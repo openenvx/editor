@@ -1,7 +1,8 @@
-import type { ArtboardOffset } from '../artboard-offset';
-import type { ViewportState } from '../viewport';
 import type { Transform } from '@openenvx/schema';
 import type React from 'react';
+
+import type { ArtboardOffset } from '../artboard-offset';
+import type { ViewportState } from '../viewport';
 
 export interface LayerScreenBounds {
   left: number;

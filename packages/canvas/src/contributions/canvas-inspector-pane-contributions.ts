@@ -1,7 +1,4 @@
-import {
-  createInspectorPane,
-  InspectorPaneContribution,
-} from '@openenvx/core';
+import { createInspectorPane, InspectorPaneContribution } from '@openenvx/core';
 import type { ContributionBuildContext } from '@openenvx/core';
 import { InspectorPath } from '@openenvx/headless';
 import { PAGE_SIZE_PRESETS } from '@openenvx/schema';
