@@ -1,5 +1,11 @@
 # @openenvx/schema
 
+## 0.1.6
+
+### Patch Changes
+
+- 1e1bdf4: fix - bring back react
+
 ## 0.1.3
 
 ### Patch Changes

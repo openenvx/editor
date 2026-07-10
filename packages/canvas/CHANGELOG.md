@@ -1,5 +1,16 @@
 # @openenvx/canvas
 
+## 0.1.6
+
+### Patch Changes
+
+- 1e1bdf4: fix - bring back react
+- Updated dependencies [1e1bdf4]
+  - @openenvx/headless@0.1.6
+  - @openenvx/preview@0.1.6
+  - @openenvx/schema@0.1.6
+  - @openenvx/core@0.1.6
+
 ## 0.1.3
 
 ### Patch Changes
