@@ -1,0 +1,47 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": [
+    "eslint-plugin-github",
+    "eslint-plugin-sonarjs",
+    "oxlint-plugin-react-doctor"
+  ],
+  "workspaces": {
+    ".": {
+      "entry": ["package.json"],
+      "project": ["*.{js,ts}"]
+    },
+    "packages/core": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+    },
+    "packages/headless": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+    },
+    "packages/canvas": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+    },
+    "packages/schema": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+    },
+    "packages/preview": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+    },
+    "packages/driver-image": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts", "!src/**/*.test.ts"]
+    },
+    "apps/demo-playground": {
+      "entry": [
+        "src/router.tsx",
+        "src/routes/**/*.{ts,tsx}",
+        "src/components/**/*.{ts,tsx}"
+      ],
+      "project": ["src/**/*.{ts,tsx}"]
+    }
+  }
+}
