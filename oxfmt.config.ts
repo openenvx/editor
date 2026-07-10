@@ -13,5 +13,6 @@ export default defineConfig({
     '**/__tests__/**',
     '**/.changeset/**',
     '**/CHANGELOG.md',
+    '**/routeTree.gen.ts',
   ],
 });
