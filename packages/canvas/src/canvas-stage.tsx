@@ -1,3 +1,4 @@
+import { useLayoutEffect } from 'react';
 import {
   Group,
   Label,
@@ -16,10 +17,7 @@ import {
 } from './canvas-stage-types';
 import type { CanvasStageProps } from './canvas-stage-types';
 import { useCanvasStageController } from './hooks/use-canvas-stage-controller';
-import {
-  PageMarginOverlay,
-  SmartGuidesOverlay,
-} from './interactions/smart-guides-overlay';
+import { syncCanvasOverlays } from './stage/canvas-overlay-sync';
 import { useCanvasThemeColors } from './use-canvas-theme-colors';
 import {
   computeWheelZoom,
@@ -51,6 +49,7 @@ export function CanvasStage({
   viewportController,
   canvasLayerRenderers = EMPTY_CANVAS_LAYER_RENDERERS,
   canvasLayerInteractions = EMPTY_CANVAS_LAYER_INTERACTIONS,
+  stageInteraction = null,
   fontLoadRevision = 0,
 }: CanvasStageProps) {
   const controller = useCanvasStageController({
@@ -68,6 +67,7 @@ export function CanvasStage({
     pageMarginBounds,
     selectedLayerIds,
     showMargins,
+    stageInteraction,
     viewportController,
   });
 
@@ -77,18 +77,18 @@ export function CanvasStage({
     vp,
     artboardOffset,
     artboardGroupRef,
+    overlayGroupRef,
     transformerRef,
     sizeLabelRef,
     onSelectRef,
     bumpViewport,
-    smartGuides,
+    overlayPrimitives,
     editingLayerId: activeEditingLayerId,
     selectionLabelBounds,
     sizeLabelOffsetX,
     sizeLabelText,
     activeDragAnchor,
     transformerEnabledAnchors,
-    marginOverlayBounds,
     handleTransformStart,
     anchorDragBoundFunc,
     boundBoxFunc,
@@ -96,6 +96,18 @@ export function CanvasStage({
   } = controller;
 
   const themeColors = useCanvasThemeColors(stageContainerRef);
+
+  useLayoutEffect(() => {
+    const group = overlayGroupRef.current;
+    if (!group) {
+      return;
+    }
+    syncCanvasOverlays(group, overlayPrimitives, {
+      foreground: themeColors.foreground,
+      guideStroke: themeColors.smartGuide,
+      marginStroke: themeColors.pageMargin,
+    });
+  }, [overlayGroupRef, overlayPrimitives, themeColors]);
 
   if (containerWidth <= 0 || containerHeight <= 0) {
     return null;
@@ -168,10 +180,6 @@ export function CanvasStage({
               clipX={0}
               clipY={0}
             >
-              <PageMarginOverlay
-                bounds={marginOverlayBounds}
-                stroke={themeColors.pageMargin}
-              />
               {layers.map((entry) => (
                 <CanvasStageLayerGroup
                   canvasLayerInteractions={canvasLayerInteractions}
@@ -182,12 +190,7 @@ export function CanvasStage({
                   key={entry.layer.id}
                 />
               ))}
-              <SmartGuidesOverlay
-                foreground={themeColors.foreground}
-                guides={smartGuides.guides}
-                spacing={smartGuides.spacing}
-                stroke={themeColors.smartGuide}
-              />
+              <Group listening={false} ref={overlayGroupRef} />
             </Group>
             {!activeEditingLayerId ? (
               <Transformer

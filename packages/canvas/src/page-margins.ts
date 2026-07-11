@@ -1,12 +1,11 @@
 import type { Page } from '@openenvx/schema';
 import { findPresetForPage, toPx } from '@openenvx/schema';
 
-import { toSnapBounds } from './interactions/smart-guides';
-import type { SnapBounds } from './interactions/smart-guides';
+import type { CanvasRect } from './stage/canvas-stage-interaction';
 
 export const PRINT_MARGIN_MM = 10;
 
-export function computePageSafeBounds(page: Page): SnapBounds | null {
+export function computePageSafeBounds(page: Page): CanvasRect | null {
   if (!findPresetForPage(page)) {
     return null;
   }
@@ -20,7 +19,12 @@ export function computePageSafeBounds(page: Page): SnapBounds | null {
   if (inset * 2 >= width || inset * 2 >= height) {
     return null;
   }
-  return toSnapBounds(inset, inset, width - inset * 2, height - inset * 2);
+  return {
+    height: height - inset * 2,
+    width: width - inset * 2,
+    x: inset,
+    y: inset,
+  };
 }
 
 export function defaultShowMarginsForPage(page: Page): boolean {

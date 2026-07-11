@@ -14,11 +14,13 @@ OpenEnvx is an **open-source monorepo** for building opinionated visual editors 
 
 ### Packages
 
-- **`@xmazu/workbench-core`** - Scene model, plugins, commands, and contribution registries
-- **`@xmazu/workbench-headless`** - `WorkbenchController` and headless editor runtime
-- **`@xmazu/workbench-canvas`** - Canvas engine, layers, Konva stage, TipTap rich text, `CanvasBasicsPlugin`
-- **`@xmazu/workbench`** - React editor shell and layout chrome
-- **`@xmazu/driver-image`** - PNG, SVG, and PDF export driver
+- **`@openenvx/schema`** - Scene document model and page presets
+- **`@openenvx/preview`** - DOM preview rendering for layer types
+- **`@openenvx/core`** - Scene model, plugins, commands, and contribution registries
+- **`@openenvx/headless`** - `WorkbenchController` and headless editor runtime
+- **`@openenvx/canvas`** - Canvas engine, layers, Konva stage, TipTap rich text, `CanvasBasicsPlugin`
+- **`@openenvx/canvas-pro`** - Smart guides, alignment, distribution (closed source)
+- **`@openenvx/driver-image`** - PNG, SVG, and PDF export driver
 
 ---
 

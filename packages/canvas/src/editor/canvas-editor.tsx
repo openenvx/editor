@@ -25,6 +25,7 @@ import type {
   CanvasLayerInteractionRegistration,
   CanvasLayerRendererRegistration,
 } from '../registry/canvas-registry-types';
+import type { CanvasStageInteractionService } from '../stage/canvas-stage-interaction';
 import { useCanvasFontPreload } from '../use-canvas-font-preload';
 import { useContainerSize } from '../use-container-size';
 import { ViewportController } from '../viewport';
@@ -49,6 +50,7 @@ export interface CanvasEditorProps extends EditorPaneHostProps {
   selectedLayerIds: string[];
   canvasLayerRenderers: CanvasLayerRendererRegistration[];
   canvasLayerInteractions: CanvasLayerInteractionRegistration[];
+  stageInteraction?: CanvasStageInteractionService | null;
   onSelectLayer: (layerId: string, options?: CanvasSelectLayerOptions) => void;
   onTransformChange: (layerId: string, change: CanvasTransformChange) => void;
   onPropertyChange: (layerId: string, key: string, value: unknown) => void;
@@ -105,6 +107,7 @@ export const CanvasEditor = memo(
     selectedLayerIds,
     canvasLayerRenderers,
     canvasLayerInteractions,
+    stageInteraction,
     onSelectLayer,
     onTransformChange,
     onPropertyChange,
@@ -452,6 +455,7 @@ export const CanvasEditor = memo(
             artboardWidth={artboardWidth}
             canvasLayerInteractions={canvasLayerInteractions}
             canvasLayerRenderers={canvasLayerRenderers}
+            stageInteraction={stageInteraction}
             containerHeight={containerSize.height}
             containerWidth={containerSize.width}
             editingLayerId={editingLayerId}

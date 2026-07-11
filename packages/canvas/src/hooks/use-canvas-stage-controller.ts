@@ -14,13 +14,12 @@ import {
 import type { RefObject } from 'react';
 
 import { computeArtboardOffset } from '../artboard-offset';
-import { EMPTY_SMART_GUIDES } from '../canvas-stage-types';
+import { EMPTY_OVERLAY_PRIMITIVES } from '../canvas-stage-types';
 import type {
   CanvasStageLayer,
   CanvasStageProps,
   DragSession,
   SelectionBounds,
-  SmartGuideState,
 } from '../canvas-stage-types';
 import {
   applyTransformerAnchorVisibility,
@@ -44,16 +43,14 @@ import {
   startRichTextTransform,
 } from '../interactions/rich-text-transform-driver';
 import type { RichTextCornerSession } from '../interactions/rich-text-transform-driver';
-import {
-  computeDragSnap,
-  computeResizeSnap,
-  computeSnapThreshold,
-  snapBoundsFromTransform,
-  toSnapBounds,
-  unionSnapBounds,
-} from '../interactions/smart-guides';
-import type { SnapBounds } from '../interactions/smart-guides';
 import { isRichTextHorizontalAnchor } from '../rich-text-resize';
+import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
+import type {
+  CanvasLayerTransformRef,
+  CanvasRect,
+  CanvasStageInteractionService,
+} from '../stage/canvas-stage-interaction';
+import { unionCanvasRects } from '../stage/canvas-stage-interaction';
 import { ViewportController } from '../viewport';
 
 export interface CanvasStageController {
@@ -62,6 +59,7 @@ export interface CanvasStageController {
   vp: ReturnType<ViewportController['getViewport']>;
   artboardOffset: ReturnType<typeof computeArtboardOffset>;
   artboardGroupRef: RefObject<Konva.Group | null>;
+  overlayGroupRef: RefObject<Konva.Group | null>;
   transformerRef: RefObject<Konva.Transformer | null>;
   sizeLabelRef: RefObject<Konva.Label | null>;
   nodeRefs: RefObject<Map<string, Konva.Group>>;
@@ -72,18 +70,12 @@ export interface CanvasStageController {
   selectedInteraction: ReturnType<typeof getInteraction> | undefined;
   editingLayerId: string | null;
   transformSessionLayerId: string | null;
-  smartGuides: SmartGuideState;
+  overlayPrimitives: CanvasOverlayPrimitive[];
   selectionLabelBounds: SelectionBounds | null;
   sizeLabelOffsetX: number;
   sizeLabelText: string;
   activeDragAnchor: string | null;
   transformerEnabledAnchors: string[] | undefined;
-  marginOverlayBounds: {
-    height: number;
-    width: number;
-    x: number;
-    y: number;
-  } | null;
   isLayerSelectable: (layer: SceneLayer) => boolean;
   isLayerWritableCallback: (layer: SceneLayer) => boolean;
   onSelectRef: RefObject<CanvasStageProps['onSelectLayer']>;
@@ -92,7 +84,7 @@ export interface CanvasStageController {
   layersRef: RefObject<CanvasStageLayer[]>;
   dragSessionRef: RefObject<DragSession | null>;
   bumpViewport: () => void;
-  clearSmartGuides: () => void;
+  clearOverlays: () => void;
   applyDragSnap: (
     layerId: string,
     node: Konva.Group,
@@ -131,7 +123,7 @@ export interface CanvasStageController {
     layerId: string,
     view: Extract<LayerPreviewDescriptor, { kind: 'richText' }>
   ) => void;
-  updateResizeGuides: (node: Konva.Group) => void;
+  updateResizeGuides: () => void;
   handleLayerTransform: (
     layerId: string,
     node: Konva.Group,
@@ -163,6 +155,7 @@ export function useCanvasStageController({
   onViewportChange,
   viewportController: externalViewport,
   canvasLayerInteractions = [],
+  stageInteraction = null,
 }: Pick<
   CanvasStageProps,
   | 'containerWidth'
@@ -180,6 +173,7 @@ export function useCanvasStageController({
   | 'onViewportChange'
   | 'viewportController'
   | 'canvasLayerInteractions'
+  | 'stageInteraction'
 >): CanvasStageController {
   const stageContainerRef = useRef<HTMLDivElement>(null);
   const [internalViewport] = useState(() => new ViewportController());
@@ -188,8 +182,9 @@ export function useCanvasStageController({
   const [sizeLabelOffsetX, setSizeLabelOffsetX] = useState(0);
   const [selectionLabelBounds, setSelectionLabelBounds] =
     useState<SelectionBounds | null>(null);
-  const [smartGuides, setSmartGuides] =
-    useState<SmartGuideState>(EMPTY_SMART_GUIDES);
+  const [overlayPrimitives, setOverlayPrimitives] = useState<
+    CanvasOverlayPrimitive[]
+  >(EMPTY_OVERLAY_PRIMITIVES);
   const [transformSessionLayerId, setTransformSessionLayerId] = useState<
     string | null
   >(null);
@@ -197,6 +192,7 @@ export function useCanvasStageController({
   const transformSessionActiveRef = useRef(false);
   const transformerRef = useRef<Konva.Transformer>(null);
   const artboardGroupRef = useRef<Konva.Group>(null);
+  const overlayGroupRef = useRef<Konva.Group>(null);
   const transformDragRef = useRef<TransformDragContext | null>(null);
   const richTextCornerSessionRef = useRef<RichTextCornerSession | null>(null);
   const cornerBakeRafRef = useRef<number | null>(null);
@@ -210,6 +206,9 @@ export function useCanvasStageController({
   const onViewportRef = useRef(onViewportChange);
   const selectedLayerIdsRef = useRef(selectedLayerIds);
   const layersRef = useRef(layers);
+  const stageInteractionRef = useRef<CanvasStageInteractionService | null>(
+    stageInteraction
+  );
 
   onSelectRef.current = onSelectLayer;
   onDoubleClickRef.current = onLayerDoubleClick;
@@ -217,6 +216,7 @@ export function useCanvasStageController({
   onViewportRef.current = onViewportChange;
   selectedLayerIdsRef.current = selectedLayerIds;
   layersRef.current = layers;
+  stageInteractionRef.current = stageInteraction;
 
   const vp = viewport.getViewport();
   const selectedPrimary = selectedLayerIds[0] ?? null;
@@ -234,19 +234,53 @@ export function useCanvasStageController({
     vp.panY
   );
 
-  const clearSmartGuides = useCallback(() => {
-    setSmartGuides(EMPTY_SMART_GUIDES);
-  }, []);
+  const getMarginInset = useCallback(
+    (): CanvasRect | null => (showMargins ? pageMarginBounds : null),
+    [pageMarginBounds, showMargins]
+  );
 
-  const getOtherSnapBounds = useCallback(
-    (excludeIds: Set<string>): SnapBounds[] =>
+  const getOtherLayers = useCallback(
+    (excludeIds: Set<string>): CanvasLayerTransformRef[] =>
       layersRef.current
         .filter(({ layer }) => !excludeIds.has(layer.id))
-        .map(({ layer }) =>
-          snapBoundsFromTransform(layer.transform ?? createDefaultTransform())
-        ),
+        .map(({ layer }) => ({
+          layerType: layer.type,
+          transform: layer.transform ?? createDefaultTransform(),
+        })),
     []
   );
+
+  const refreshOverlays = useCallback(() => {
+    const interaction = stageInteractionRef.current;
+    const primitives: CanvasOverlayPrimitive[] = interaction?.buildOverlays
+      ? [
+          ...(interaction.buildOverlays({
+            artboard: { height: artboardHeight, width: artboardWidth },
+            zoom: vp.zoom,
+          }) ?? []),
+        ]
+      : [];
+    const marginInset = getMarginInset();
+    if (showMargins && marginInset) {
+      primitives.push({
+        dashed: true,
+        height: marginInset.height,
+        kind: 'rect',
+        strokeWidth: 1.5,
+        width: marginInset.width,
+        x: marginInset.x,
+        y: marginInset.y,
+      });
+    }
+    setOverlayPrimitives(
+      primitives.length > 0 ? primitives : EMPTY_OVERLAY_PRIMITIVES
+    );
+  }, [artboardHeight, artboardWidth, getMarginInset, showMargins, vp.zoom]);
+
+  const clearOverlays = useCallback(() => {
+    stageInteractionRef.current?.resetOverlayState?.();
+    refreshOverlays();
+  }, [refreshOverlays]);
 
   const bumpViewport = useCallback(() => {
     const next = viewport.getViewport();
@@ -280,6 +314,10 @@ export function useCanvasStageController({
       .filter((node): node is Konva.Group => Boolean(node));
     attachTransformerToNodes(transformerRef.current, nodes);
   }, [editingLayerId, selectedLayerIds]);
+
+  useEffect(() => {
+    refreshOverlays();
+  }, [refreshOverlays]);
 
   const selectedLayer = selectedPrimary
     ? layers.find(({ layer }) => layer.id === selectedPrimary)
@@ -321,16 +359,20 @@ export function useCanvasStageController({
       node: Konva.Group,
       transform: NonNullable<SceneLayer['transform']>
     ) => {
+      const interaction = stageInteractionRef.current;
       const session = dragSessionRef.current;
-      const threshold = computeSnapThreshold(vp.zoom);
       const artboard = { height: artboardHeight, width: artboardWidth };
-      const marginBounds = showMargins ? pageMarginBounds : null;
+      const marginInset = getMarginInset();
       const excludeIds = new Set(
         session && selectedLayerIdsRef.current.includes(layerId)
           ? selectedLayerIdsRef.current
           : [layerId]
       );
-      const others = getOtherSnapBounds(excludeIds);
+      const others = getOtherLayers(excludeIds);
+      const draggedLayer = layersRef.current.find(
+        (entry) => entry.layer.id === layerId
+      )?.layer;
+      const movingLayerType = draggedLayer?.type ?? 'unknown';
 
       if (
         session &&
@@ -343,7 +385,7 @@ export function useCanvasStageController({
         }
         const dx = node.x() - start.x;
         const dy = node.y() - start.y;
-        const proposedBounds = selectedLayerIdsRef.current
+        const proposedRects = selectedLayerIdsRef.current
           .map((id) => {
             const layerStart = session.starts.get(id);
             const layerTransform =
@@ -352,27 +394,27 @@ export function useCanvasStageController({
             if (!layerStart) {
               return null;
             }
-            return toSnapBounds(
-              layerStart.x + dx,
-              layerStart.y + dy,
-              layerTransform.width,
-              layerTransform.height
-            );
+            return {
+              height: layerTransform.height,
+              width: layerTransform.width,
+              x: layerStart.x + dx,
+              y: layerStart.y + dy,
+            };
           })
-          .filter((bounds): bounds is SnapBounds => bounds !== null);
-        const moving = unionSnapBounds(proposedBounds);
-        const snap = computeDragSnap({
+          .filter((rect): rect is CanvasRect => rect !== null);
+        const moving = unionCanvasRects(proposedRects);
+        const adjusted = interaction?.adjustDrag?.({
           artboard,
-          height: moving.height,
-          marginBounds,
+          marginInset,
+          moving: {
+            bounds: moving,
+            layerType: movingLayerType,
+          },
           others,
-          threshold,
-          width: moving.width,
-          x: moving.left,
-          y: moving.top,
+          zoom: vp.zoom,
         });
-        const snapDx = snap.x - moving.left;
-        const snapDy = snap.y - moving.top;
+        const snapDx = (adjusted?.x ?? moving.x) - moving.x;
+        const snapDy = (adjusted?.y ?? moving.y) - moving.y;
         for (const id of selectedLayerIdsRef.current) {
           const layerStart = session.starts.get(id);
           const targetNode = nodeRefs.current.get(id);
@@ -384,29 +426,36 @@ export function useCanvasStageController({
             y: layerStart.y + dy + snapDy,
           });
         }
-        setSmartGuides({ guides: snap.guides, spacing: snap.spacing });
+        refreshOverlays();
         return;
       }
 
-      const snap = computeDragSnap({
+      const adjusted = interaction?.adjustDrag?.({
         artboard,
-        height: transform.height,
-        marginBounds,
+        marginInset,
+        moving: {
+          bounds: {
+            height: transform.height,
+            width: transform.width,
+            x: node.x(),
+            y: node.y(),
+          },
+          layerType: movingLayerType,
+        },
         others,
-        threshold,
-        width: transform.width,
-        x: node.x(),
-        y: node.y(),
+        zoom: vp.zoom,
       });
-      node.position({ x: snap.x, y: snap.y });
-      setSmartGuides({ guides: snap.guides, spacing: snap.spacing });
+      if (adjusted) {
+        node.position({ x: adjusted.x, y: adjusted.y });
+      }
+      refreshOverlays();
     },
     [
       artboardHeight,
       artboardWidth,
-      getOtherSnapBounds,
-      pageMarginBounds,
-      showMargins,
+      getMarginInset,
+      getOtherLayers,
+      refreshOverlays,
       vp.zoom,
     ]
   );
@@ -472,7 +521,7 @@ export function useCanvasStageController({
     transformSessionActiveRef.current = false;
     setTransformSessionLayerId(null);
     setActiveDragAnchor(null);
-    clearSmartGuides();
+    clearOverlays();
     applyTransformerAnchorVisibility(
       transformerRef.current,
       null,
@@ -483,43 +532,14 @@ export function useCanvasStageController({
       cornerBakeRafRef,
       sessionRef: richTextCornerSessionRef,
     });
-  }, [clearSmartGuides]);
+  }, [clearOverlays]);
 
-  const updateResizeGuides = useCallback(
-    (node: Konva.Group) => {
-      const anchor = transformDragRef.current?.anchor ?? '';
-      if (!anchor || anchor === 'rotater') {
-        clearSmartGuides();
-        return;
-      }
-      const threshold = computeSnapThreshold(vp.zoom);
-      const excludeIds = new Set(selectedLayerIdsRef.current);
-      const snap = computeResizeSnap({
-        anchor,
-        artboard: { height: artboardHeight, width: artboardWidth },
-        box: {
-          height: node.height() * node.scaleY(),
-          rotation: node.rotation(),
-          width: node.width() * node.scaleX(),
-          x: node.x(),
-          y: node.y(),
-        },
-        marginBounds: showMargins ? pageMarginBounds : null,
-        others: getOtherSnapBounds(excludeIds),
-        threshold,
-      });
-      setSmartGuides({ guides: snap.guides, spacing: snap.spacing });
-    },
-    [
-      artboardHeight,
-      artboardWidth,
-      clearSmartGuides,
-      getOtherSnapBounds,
-      pageMarginBounds,
-      showMargins,
-      vp.zoom,
-    ]
-  );
+  const updateResizeGuides = useCallback(() => {
+    const anchor = transformDragRef.current?.anchor ?? '';
+    if (!anchor || anchor === 'rotater') {
+      clearOverlays();
+    }
+  }, [clearOverlays]);
 
   const anchorDragBoundFunc = useCallback(
     (oldAbs: { x: number; y: number }, newAbs: { x: number; y: number }) => {
@@ -563,6 +583,7 @@ export function useCanvasStageController({
         rotation: number;
       }
     ) => {
+      const interaction = stageInteractionRef.current;
       const session = richTextCornerSessionRef.current;
       const anchor = transformDragRef.current?.anchor ?? '';
       let nextBox = newBox;
@@ -593,23 +614,23 @@ export function useCanvasStageController({
         return nextBox;
       }
 
-      const snap = computeResizeSnap({
+      const adjusted = interaction?.adjustResize?.({
         anchor,
         artboard: { height: artboardHeight, width: artboardWidth },
         box: nextBox,
-        marginBounds: showMargins ? pageMarginBounds : null,
-        others: getOtherSnapBounds(new Set(selectedLayerIdsRef.current)),
-        threshold: computeSnapThreshold(vp.zoom),
+        marginInset: getMarginInset(),
+        others: getOtherLayers(new Set(selectedLayerIdsRef.current)),
+        zoom: vp.zoom,
       });
-      setSmartGuides({ guides: snap.guides, spacing: snap.spacing });
-      return snap.box;
+      refreshOverlays();
+      return adjusted?.box ?? nextBox;
     },
     [
       artboardHeight,
       artboardWidth,
-      getOtherSnapBounds,
-      pageMarginBounds,
-      showMargins,
+      getMarginInset,
+      getOtherLayers,
+      refreshOverlays,
       vp.zoom,
     ]
   );
@@ -723,7 +744,7 @@ export function useCanvasStageController({
           view as Extract<LayerPreviewDescriptor, { kind: 'richText' }>
         );
       } else if (layerId === selectedLayerIdsRef.current[0]) {
-        updateResizeGuides(node);
+        updateResizeGuides();
         syncLabelFromTransformer();
       }
     },
@@ -800,22 +821,13 @@ export function useCanvasStageController({
       ? [...interactionAnchors]
       : undefined;
 
-  const marginOverlayBounds =
-    showMargins && pageMarginBounds
-      ? {
-          height: pageMarginBounds.height,
-          width: pageMarginBounds.width,
-          x: pageMarginBounds.left,
-          y: pageMarginBounds.top,
-        }
-      : null;
-
   return {
     stageContainerRef,
     viewport,
     vp,
     artboardOffset,
     artboardGroupRef,
+    overlayGroupRef,
     transformerRef,
     sizeLabelRef,
     nodeRefs,
@@ -826,13 +838,12 @@ export function useCanvasStageController({
     selectedInteraction,
     editingLayerId,
     transformSessionLayerId,
-    smartGuides,
+    overlayPrimitives,
     selectionLabelBounds,
     sizeLabelOffsetX,
     sizeLabelText,
     activeDragAnchor,
     transformerEnabledAnchors,
-    marginOverlayBounds,
     isLayerSelectable,
     isLayerWritableCallback,
     onSelectRef,
@@ -841,7 +852,7 @@ export function useCanvasStageController({
     layersRef,
     dragSessionRef,
     bumpViewport,
-    clearSmartGuides,
+    clearOverlays,
     applyDragSnap,
     handleTransformStart,
     handleTransformEnd,

@@ -21,6 +21,7 @@
       "name": "demo-playground",
       "dependencies": {
         "@openenvx/canvas": "workspace:*",
+        "@openenvx/canvas-pro": "workspace:*",
         "@openenvx/headless": "workspace:*",
         "@tailwindcss/vite": "^4.1.18",
         "@tanstack/react-devtools": "latest",
@@ -77,6 +78,26 @@
       "peerDependencies": {
         "react": ">=18",
         "react-dom": ">=18",
+      },
+    },
+    "packages/canvas-pro": {
+      "name": "@openenvx/canvas-pro",
+      "version": "0.1.0",
+      "dependencies": {
+        "@openenvx/canvas": "workspace:*",
+        "@openenvx/core": "workspace:*",
+        "@openenvx/schema": "workspace:*",
+      },
+      "devDependencies": {
+        "@openenvx/typescript-config": "workspace:*",
+        "@types/react": "^19.2.3",
+        "react": "19.2.7",
+        "tsup": "catalog:dev",
+        "typescript": "catalog:dev",
+        "vitest": "catalog:testing",
+      },
+      "peerDependencies": {
+        "react": ">=18",
       },
     },
     "packages/core": {
@@ -402,6 +423,8 @@
     "@oozcitak/util": ["@oozcitak/util@10.0.0", "", {}, "sha512-hAX0pT/73190NLqBPPWSdBVGtbY6VOhWYK3qqHqtXQ1gK7kS2yz4+ivsN07hpJ6I3aeMtKP6J6npsEKOAzuTLA=="],
 
     "@openenvx/canvas": ["@openenvx/canvas@workspace:packages/canvas"],
+
+    "@openenvx/canvas-pro": ["@openenvx/canvas-pro@workspace:packages/canvas-pro"],
 
     "@openenvx/core": ["@openenvx/core@workspace:packages/core"],
 

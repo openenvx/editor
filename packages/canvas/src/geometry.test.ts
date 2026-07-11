@@ -2,7 +2,6 @@ import { createDefaultTransform } from '@openenvx/schema';
 import type Konva from "konva";
 import { describe, expect, it } from "vitest";
 
-import { alignTransforms } from "./align";
 import {
   applyTransformToNode,
   bakeNodeTransform,
@@ -258,13 +257,3 @@ describe("geometry", () => {
   });
 });
 
-describe("align", () => {
-  it("alignTransforms aligns left edges", () => {
-    const transforms = [
-      { ...createDefaultTransform(), width: 40, x: 10 },
-      { ...createDefaultTransform(), width: 20, x: 80 },
-    ];
-    const aligned = alignTransforms(transforms, "left");
-    expect(aligned.every((t) => t.x === 10)).toBeTruthy();
-  });
-});

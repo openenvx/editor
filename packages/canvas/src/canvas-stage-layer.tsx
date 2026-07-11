@@ -44,7 +44,7 @@ export function CanvasStageLayerGroup({
     layersRef,
     onTransformRef,
     applyDragSnap,
-    clearSmartGuides,
+    clearOverlays,
     syncLabelFromTransformer,
     handleLayerTransform,
     completeLayerTransform,
@@ -126,7 +126,7 @@ export function CanvasStageLayerGroup({
           });
         }
         dragSessionRef.current = null;
-        clearSmartGuides();
+        clearOverlays();
         if (selectedLayerIds.includes(layer.id)) {
           syncLabelFromTransformer();
         }

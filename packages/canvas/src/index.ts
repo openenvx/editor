@@ -29,12 +29,7 @@ export {
   normalizeNodeBeforeTransform,
   type TransformDragContext,
 } from './geometry';
-export {
-  alignTransforms,
-  distributeHorizontally,
-  getLayerBounds,
-  type AlignBounds,
-} from './align';
+export { getLayerBounds, type AlignBounds } from './align';
 export {
   CanvasStage,
   type CanvasSelectLayerOptions,
@@ -171,12 +166,23 @@ export {
   type CanvasTransformResult,
 } from './contributions/canvas-layer-interaction-contribution';
 export {
+  CanvasStageInteractionService,
+  unionCanvasRects,
+  type CanvasDragAdjustInput,
+  type CanvasLayerTransformRef,
+  type CanvasOverlayBuildContext,
+  type CanvasRect,
+  type CanvasResizeAdjustInput,
+} from './stage/canvas-stage-interaction';
+export type { CanvasOverlayPrimitive } from './stage/canvas-overlay-primitives';
+export {
   registerCanvasContribution,
   createCanvasRegistriesService,
   ensureCanvasRegistriesInstalled,
 } from './plugin/canvas-registry-service';
 export { useCanvasApi } from './hooks/use-canvas-api';
 export { useCanvasRegistries } from './hooks/use-canvas-registries';
+export { useCanvasStageInteraction } from './hooks/use-canvas-stage-interaction';
 export { createCanvasInspectorHostContextWithApi } from './inspector/create-canvas-inspector-host-context';
 export {
   CanvasClipboardServiceId,
@@ -184,6 +190,7 @@ export {
   CanvasFontServiceId,
   CanvasPageResizeServiceId,
   CanvasRegistriesServiceId,
+  CanvasStageInteractionServiceId,
 } from './canvas-service-tokens';
 export {
   CanvasDocumentExportServiceId,

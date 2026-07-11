@@ -10,6 +10,7 @@ import { memo } from 'react';
 
 import { useCanvasApi } from '../hooks/use-canvas-api';
 import { useCanvasRegistries } from '../hooks/use-canvas-registries';
+import { useCanvasStageInteraction } from '../hooks/use-canvas-stage-interaction';
 import { CanvasEditor } from './canvas-editor';
 import type { CanvasEditorProps } from './canvas-editor';
 
@@ -26,6 +27,7 @@ export const AbsoluteEditorPane = memo(
     const canvasApi = useCanvasApi();
     const { canvasLayerInteractions, canvasLayerRenderers } =
       useCanvasRegistries();
+    const stageInteraction = useCanvasStageInteraction();
     const layerSurface = layerSurfaceProp as LayerSurfaceItem[];
     if (!scene || !selection) {
       return null;
@@ -58,6 +60,7 @@ export const AbsoluteEditorPane = memo(
         artboardWidth={artboardWidth}
         canvasLayerInteractions={canvasLayerInteractions}
         canvasLayerRenderers={canvasLayerRenderers}
+        stageInteraction={stageInteraction}
         layerSurface={layerSurface}
         onContainerResize={onContainerResize}
         onExecuteCommand={executeCommand}

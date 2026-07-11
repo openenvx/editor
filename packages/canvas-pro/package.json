@@ -1,0 +1,41 @@
+{
+  "name": "@openenvx/canvas-pro",
+  "version": "0.1.0",
+  "description": "Pro canvas design tools for OpenEnvx — smart guides, alignment, distribution",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@openenvx/canvas": "workspace:*",
+    "@openenvx/core": "workspace:*",
+    "@openenvx/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@openenvx/typescript-config": "workspace:*",
+    "@types/react": "^19.2.3",
+    "react": "19.2.7",
+    "tsup": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:testing"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}
