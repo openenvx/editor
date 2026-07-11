@@ -58,15 +58,3 @@ ctx.register(
 ```
 
 The stage controller resolves the service via `useCanvasStageInteraction()` (full editor apps using `WorkbenchProvider`) or an optional `stageInteraction` prop on `CanvasStage` (standalone embed). `adjustDrag` and `adjustResize` return adjusted coordinates plus transient `overlays` primitives; `buildOverlays` is for static overlays only. Overlays are **primitive arrays** (`line`, `rect`, `label`) painted imperatively with Konva inside canvas.
-
-Reference implementation: `@openenvx/canvas-pro` (`SmartGuidesStageInteraction`).
-
-## Pro package
-
-Install `@openenvx/canvas-pro` and add `CanvasProPlugin` alongside `CanvasBasicsPlugin`:
-
-```ts
-plugins: [new CanvasBasicsPlugin(), new CanvasProPlugin()],
-```
-
-This registers smart guides, margin snap targets, and align/distribute commands. Page margin **drawing** is handled by OSS canvas when `showMargins` is enabled; pro adds snap-to-margin during drag and resize.

@@ -6,17 +6,17 @@ Instructions for coding agents working in the OpenEnvx monorepo.
 
 OpenEnvx is a composable visual editor framework: plugins register layers, commands, and UI contributions; a headless controller owns scene state; apps compose their own React shell. The monorepo uses **Bun** workspaces:
 
-| Path | Contents |
-| --- | --- |
-| `packages/*` | Publishable libraries (`core`, `canvas`, `headless`, …) and closed product packages (`canvas-pro`, …) |
-| `apps/*` | Demo apps (`demo-playground`, `docs`) |
-| `examples/*` | Example plugins (`image-plugin`) |
+| Path         | Contents                                                |
+| ------------ | ------------------------------------------------------- |
+| `packages/*` | Publishable libraries (`core`, `canvas`, `headless`, …) |
+| `apps/*`     | Demo apps (`demo-playground`, `docs`)                   |
+| `examples/*` | Example plugins (`image-plugin`)                        |
 
 ## Documentation map
 
 | Document | Use when |
 | --- | --- |
-| [Architecture.md](Architecture.md) | Package boundaries, OSS vs closed, contribution flow, where code belongs |
+| [Architecture.md](Architecture.md) | Package boundaries, contribution flow, where code belongs |
 | [apps/docs/extension-guide.md](apps/docs/extension-guide.md) | Plugin author API, contribution kinds |
 | [packages/canvas/README.md](packages/canvas/README.md) | Canvas OSS install and `CanvasBasicsPlugin` |
 
@@ -28,24 +28,22 @@ Read **Architecture.md** before placing new code.
 | --- | --- |
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, generic `EditorPaneContribution`, scene store, property builder |
 | `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchProvider`, `useWorkbenchContext` |
-| `@openenvx/canvas` | Konva stage, basic interactions, layer renderers, `CanvasBasicsPlugin`, editor panes |
-| `@openenvx/canvas-pro` | Smart guides, alignment, distribution, margin overlays — **closed / paid** |
+| `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasBasicsPlugin`, editor panes |
 
 ### Canvas rule (non-negotiable)
 
-**OSS canvas rendering and basic interactions go in `@openenvx/canvas`.** Sophisticated design tools (smart guides, align/distribute, margin overlays) go in `@openenvx/canvas-pro`. Never add canvas implementations to `core`.
+**All canvas rendering and interactions go in `@openenvx/canvas`.** Never add canvas implementations to `core`.
 
 | Do | Don't |
 | --- | --- |
 | Add a Konva renderer in `packages/canvas/src/renderers/` | Add canvas renderer types to `core` |
 | Register renderers via `registerCanvasContribution()` | Hardcode preview `kind` switches in app shell |
-| Add smart guides in `packages/canvas-pro` via `CanvasStageInteractionService` | Add smart-guides math under `packages/canvas` |
 | Add `AbsoluteEditorPane` in canvas | Put editor pane components in app shell |
 | Use `CanvasBasicsPlugin` for built-in canvas features | Create app-only canvas plugins without registering contributions |
 
 ## Licensing intent
 
-`core`, `headless`, `canvas`, and drivers are **OSS (MIT)**. `canvas-pro` is **closed source**. Keep the split clean so packages can ship under different licenses without refactors.
+`core`, `headless`, `canvas`, and drivers are **OSS (MIT)**.
 
 ## Code conventions
 
@@ -105,7 +103,6 @@ OSS packages publish to npm as `@openenvx/*`. See [README.md](README.md) and the
 
 - [ ] `bun run test` passes for affected packages
 - [ ] No new canvas code under `packages/core`
-- [ ] No sophisticated snap/align features under `packages/canvas` (use `canvas-pro`)
 - [ ] New files use kebab-case
 - [ ] No backward-compat shims for removed APIs
 - [ ] Architecture or extension docs updated if you changed package boundaries or plugin APIs

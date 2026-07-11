@@ -8,7 +8,6 @@ Package boundaries and contribution flow for the monorepo.
 | --- | --- | --- |
 | **Rendering-only** | `schema`, `canvas` | Embed `CanvasEditor` / `CanvasStage` in a custom React app with own state. No plugin host. |
 | **Editor backbone** | `core`, `headless`, optional `canvas`, `driver-*`, plugins | Full editor runtime (scene, commands, inspector descriptors) with a **custom UI shell**. See `apps/demo-playground`. |
-| **Pro design tools** | `canvas-pro` | Smart guides, alignment, distribution. Closed. Requires `CanvasProPlugin`. |
 
 **Hard rule:** All canvas code lives in `@openenvx/canvas`. Not in `core`.
 
@@ -18,7 +17,6 @@ Package boundaries and contribution flow for the monorepo.
 | --- | --- | --- | --- |
 | Foundation | `schema`, `preview`, `core` | OSS (MIT) | Scene model, generic plugin host, contribution registries for commands/layers/views |
 | OSS product | `headless`, `canvas`, `driver-*` | OSS (MIT) | Controller, canvas engine, export drivers |
-| Pro product | `canvas-pro` | Closed | Smart guides, align/distribute commands, margin overlay |
 
 ## What belongs in `@openenvx/canvas`
 
@@ -28,11 +26,9 @@ Package boundaries and contribution flow for the monorepo.
 - Canvas renderer / preview / interaction contributions, registries, and `Canvas*ServiceId` tokens
 - `CanvasRegistriesReader`, `PageResizeService`, `DEFAULT_CANVAS_LAYOUT`
 - `useCanvasRegistries()`, `useCanvasApi()` - React hooks for editor panes
-- `createCanvasInspectorHostContextWithApi()` - canvas-specific inspector path bindings
 - `CanvasBasicsPlugin` - registers layers, renderers, interactions, and the absolute editor pane
 - `registerCanvasContribution()` for third-party canvas renderers and snap providers
-- `CanvasStageInteractionService` — optional stage drag/resize adjustment + overlay primitives (implemented by `canvas-pro`)
-- `InspectorPaneContribution` - declarative inspector sections (canvas registers layout/layer/transform panes)
+- `CanvasStageInteractionService` — optional stage drag/resize adjustment + overlay primitives
 
 ## What belongs in `@openenvx/core`
 
@@ -125,7 +121,7 @@ Rules:
 ```mermaid
 flowchart LR
   subgraph plugins [Plugins]
-    Canvas[CanvasBasicsPlugin]
+    InspectorPlugin[InspectorPaneContribution]
   end
   subgraph corePkg [core]
     Builder[InspectorPaneBuilder]
@@ -135,21 +131,16 @@ flowchart LR
     GenericCtx[createInspectorHostContext]
     Factory[LayerPropertiesPaneFactory]
   end
-  subgraph canvasPkg [canvas]
-    CanvasCtx[createCanvasInspectorHostContextWithApi]
-  end
   subgraph app [demo-playground]
     Visitor[Inspector field renderers]
   end
-  Canvas -->|buildDescriptor| Builder
+  InspectorPlugin -->|buildDescriptor| Builder
   Builder --> Nodes
   headlessPkg -->|inspectorPanes on state| app
-  GenericCtx --> CanvasCtx
-  CanvasCtx --> Visitor
+  GenericCtx --> Visitor
   Factory -->|layer properties panes| headlessPkg
 ```
 
 1. Plugins subclass `InspectorPaneContribution` and implement `buildDescriptor()` using `createInspectorPane()`.
 2. `WorkbenchController` merges plugin panes + synthesized layer property panes into `state.inspectorPanes`.
-3. App inspector UI uses generic `createInspectorHostContext` or a canvas-composed factory.
-4. Canvas-specific paths (`selection.layer.transform.*`, `scene.activePage.*`) resolve in `@openenvx/canvas`.
+3. App inspector UI uses `createInspectorHostContext` from `@openenvx/headless`.

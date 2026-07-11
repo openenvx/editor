@@ -185,7 +185,6 @@ export {
 export { useCanvasApi } from './hooks/use-canvas-api';
 export { useCanvasRegistries } from './hooks/use-canvas-registries';
 export { useCanvasStageInteraction } from './hooks/use-canvas-stage-interaction';
-export { createCanvasInspectorHostContextWithApi } from './inspector/create-canvas-inspector-host-context';
 export {
   CanvasClipboardServiceId,
   CanvasCommandRequestServiceId,

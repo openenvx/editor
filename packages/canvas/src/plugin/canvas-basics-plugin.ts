@@ -64,7 +64,6 @@ import {
 import { AbsoluteEditorPaneContribution } from '../contributions/absolute-editor-pane-contribution';
 import { CanvasCommandPaletteItems } from '../contributions/canvas-command-palette';
 import { CanvasContextMenu } from '../contributions/canvas-context-menu';
-import { canvasInspectorPaneContributions } from '../contributions/canvas-inspector-pane-contributions';
 import {
   CanvasStatusBarContribution,
   CanvasToolbarContribution,
@@ -396,7 +395,6 @@ export class CanvasBasicsPlugin extends Plugin {
       new CanvasRectLayer(),
       new CanvasCircleLayer(),
       new AbsoluteEditorPaneContribution(),
-      ...canvasInspectorPaneContributions,
       new InsertCanvasTextCommand(),
       new InsertCanvasImageCommand(),
       new InsertCanvasRectCommand(),

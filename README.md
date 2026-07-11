@@ -19,7 +19,6 @@ OpenEnvx is an **open-source monorepo** for building opinionated visual editors 
 - **`@openenvx/core`** - Scene model, plugins, commands, and contribution registries
 - **`@openenvx/headless`** - `WorkbenchController` and headless editor runtime
 - **`@openenvx/canvas`** - Canvas engine, layers, Konva stage, TipTap rich text, `CanvasBasicsPlugin`
-- **`@openenvx/canvas-pro`** - Smart guides, alignment, distribution (closed source)
 - **`@openenvx/driver-image`** - PNG, SVG, and PDF export driver
 
 ---

@@ -27,7 +27,6 @@
         "src/index.ts!",
         "src/export-layers.ts!",
         "src/plugin/canvas-basics-plugin.ts!",
-        "src/contributions/canvas-inspector-pane-contributions.ts!",
         "src/contributions/canvas-shell-contributions.ts!"
       ],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
