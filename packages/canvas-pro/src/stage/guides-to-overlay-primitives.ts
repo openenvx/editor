@@ -3,7 +3,6 @@ import type { CanvasOverlayPrimitive } from '@openenvx/canvas';
 import type { GuideLine, SpacingGuide } from '../snap/smart-guides/types';
 
 const GUIDE_STROKE_WIDTH = 2;
-const CENTER_GUIDE_STROKE_WIDTH = 2;
 const SPACING_STROKE_WIDTH = 2;
 
 export function guidesToOverlayPrimitives(
@@ -22,9 +21,7 @@ export function guidesToOverlayPrimitives(
       dashed: !isCenterGuide,
       kind: 'line',
       points,
-      strokeWidth: isCenterGuide
-        ? CENTER_GUIDE_STROKE_WIDTH
-        : GUIDE_STROKE_WIDTH,
+      strokeWidth: GUIDE_STROKE_WIDTH,
     });
   }
 

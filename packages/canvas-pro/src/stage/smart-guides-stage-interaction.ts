@@ -1,9 +1,9 @@
-import {
+import type {
+  CanvasDragAdjustInput,
+  CanvasOverlayBuildContext,
+  CanvasOverlayPrimitive,
+  CanvasResizeAdjustInput,
   CanvasStageInteractionService,
-  type CanvasDragAdjustInput,
-  type CanvasOverlayBuildContext,
-  type CanvasOverlayPrimitive,
-  type CanvasResizeAdjustInput,
 } from '@openenvx/canvas';
 
 import { computeDragSnap } from '../snap/smart-guides/drag-snap';
@@ -13,11 +13,7 @@ import {
   snapBoundsFromTransform,
   toSnapBounds,
 } from '../snap/smart-guides/snap-bounds';
-import type {
-  GuideLine,
-  SnapBounds,
-  SpacingGuide,
-} from '../snap/smart-guides/types';
+import type { SnapBounds } from '../snap/smart-guides/types';
 import { guidesToOverlayPrimitives } from './guides-to-overlay-primitives';
 
 function boundsToSnapBounds(
@@ -40,16 +36,8 @@ function marginInsetToSnapBounds(
   );
 }
 
-export class SmartGuidesStageInteraction extends CanvasStageInteractionService {
-  private lastGuides: GuideLine[] = [];
-  private lastSpacing: SpacingGuide[] = [];
-
-  resetOverlayState(): void {
-    this.lastGuides = [];
-    this.lastSpacing = [];
-  }
-
-  adjustDrag(input: CanvasDragAdjustInput): { x: number; y: number } {
+export class SmartGuidesStageInteraction implements CanvasStageInteractionService {
+  adjustDrag(input: CanvasDragAdjustInput) {
     const result = computeDragSnap({
       artboard: input.artboard,
       marginBounds: marginInsetToSnapBounds(input.marginInset),
@@ -63,14 +51,14 @@ export class SmartGuidesStageInteraction extends CanvasStageInteractionService {
       })),
       threshold: computeSnapThreshold(input.zoom),
     });
-    this.lastGuides = result.guides;
-    this.lastSpacing = result.spacing;
-    return { x: result.x, y: result.y };
+    return {
+      overlays: guidesToOverlayPrimitives(result.guides, result.spacing),
+      x: result.x,
+      y: result.y,
+    };
   }
 
-  adjustResize(input: CanvasResizeAdjustInput): {
-    box: CanvasResizeAdjustInput['box'];
-  } {
+  adjustResize(input: CanvasResizeAdjustInput) {
     const result = computeResizeSnap({
       anchor: input.anchor,
       artboard: input.artboard,
@@ -81,12 +69,13 @@ export class SmartGuidesStageInteraction extends CanvasStageInteractionService {
       ),
       threshold: computeSnapThreshold(input.zoom),
     });
-    this.lastGuides = result.guides;
-    this.lastSpacing = result.spacing;
-    return { box: result.box };
+    return {
+      box: result.box,
+      overlays: guidesToOverlayPrimitives(result.guides, result.spacing),
+    };
   }
 
   buildOverlays(_ctx: CanvasOverlayBuildContext): CanvasOverlayPrimitive[] {
-    return guidesToOverlayPrimitives(this.lastGuides, this.lastSpacing);
+    return [];
   }
 }

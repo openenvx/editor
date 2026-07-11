@@ -29,22 +29,22 @@ OSS `@openenvx/canvas` does not include snapping or design-tool overlays. Option
 
 ```ts
 import {
-  CanvasStageInteractionService,
+  type CanvasStageInteractionService,
   CanvasStageInteractionServiceId,
 } from '@openenvx/canvas';
 import { SingletonServiceContribution } from '@openenvx/core';
 
-export class MyStageInteraction extends CanvasStageInteractionService {
+export class MyStageInteraction implements CanvasStageInteractionService {
   adjustDrag(input) {
-    return { x: input.moving.bounds.x, y: input.moving.bounds.y };
+    return {
+      overlays: [],
+      x: input.moving.bounds.x,
+      y: input.moving.bounds.y,
+    };
   }
 
-  buildOverlays(ctx) {
+  buildOverlays(_ctx) {
     return [{ kind: 'line', points: [0, 0, 100, 0] }];
-  }
-
-  resetOverlayState() {
-    // clear transient guide state between gestures
   }
 }
 
@@ -57,7 +57,7 @@ ctx.register(
 );
 ```
 
-The stage controller resolves the service via `useCanvasStageInteraction()` (full editor apps using `WorkbenchProvider`) or an optional `stageInteraction` prop on `CanvasStage` (standalone embed). Overlays are **primitive arrays** (`line`, `rect`, `label`) painted imperatively with Konva inside canvas.
+The stage controller resolves the service via `useCanvasStageInteraction()` (full editor apps using `WorkbenchProvider`) or an optional `stageInteraction` prop on `CanvasStage` (standalone embed). `adjustDrag` and `adjustResize` return adjusted coordinates plus transient `overlays` primitives; `buildOverlays` is for static overlays only. Overlays are **primitive arrays** (`line`, `rect`, `label`) painted imperatively with Konva inside canvas.
 
 Reference implementation: `@openenvx/canvas-pro` (`SmartGuidesStageInteraction`).
 

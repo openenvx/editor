@@ -20,7 +20,7 @@ plugins: [new CanvasBasicsPlugin(), new CanvasProPlugin()],
 
 ## Extension model
 
-Pro registers `SmartGuidesStageInteraction` via `CanvasStageInteractionServiceId`. The service extends OSS `CanvasStageInteractionService` and returns overlay primitives — no React components. See [extension guide](../../apps/docs/extension-guide.md).
+Pro registers `SmartGuidesStageInteraction` via `CanvasStageInteractionServiceId`. The service implements OSS `CanvasStageInteractionService` and returns overlay primitives — no React components. See [extension guide](../../apps/docs/extension-guide.md).
 
 ## License
 

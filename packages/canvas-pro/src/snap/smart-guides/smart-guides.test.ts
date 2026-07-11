@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { computeDragSnap } from '../snap/smart-guides/drag-snap';
-import { computeResizeSnap } from '../snap/smart-guides/resize-snap';
+import { SmartGuidesStageInteraction } from '../../stage/smart-guides-stage-interaction';
+import { computeDragSnap } from './drag-snap';
+import { computeResizeSnap } from './resize-snap';
 import {
   computeSnapThreshold,
   snapBoundsFromTransform,
   toSnapBounds,
-} from '../snap/smart-guides/snap-bounds';
-import type { SnapTarget } from '../snap/smart-guides/types';
+} from './snap-bounds';
+import type { SnapTarget } from './types';
 
 const RECT = 'canvas.rect';
 const TEXT = 'canvas.text';
@@ -61,6 +62,51 @@ describe('smart-guides', () => {
     });
     expect(result.x).toBe(145);
     expect(result.guides).toHaveLength(0);
+  });
+
+  it('snaps multi-select union bounds using full union width and height', () => {
+    const artboard = { height: 800, width: 600 };
+    const unionResult = computeDragSnap({
+      artboard,
+      moving: snapTarget(199, 100, 200, 100),
+      others: [],
+      threshold: 5,
+    });
+    const narrowResult = computeDragSnap({
+      artboard,
+      moving: snapTarget(199, 100, 50, 100),
+      others: [],
+      threshold: 5,
+    });
+    expect(unionResult.x).toBe(200);
+    expect(narrowResult.x).toBe(199);
+  });
+
+  it('adjustDrag snaps union bounds through stage interaction', () => {
+    const interaction = new SmartGuidesStageInteraction();
+    const unionResult = interaction.adjustDrag({
+      artboard: { height: 800, width: 600 },
+      marginInset: null,
+      moving: {
+        bounds: { height: 100, width: 200, x: 199, y: 100 },
+        layerType: RECT,
+      },
+      others: [],
+      zoom: 1,
+    });
+    const narrowResult = interaction.adjustDrag({
+      artboard: { height: 800, width: 600 },
+      marginInset: null,
+      moving: {
+        bounds: { height: 100, width: 50, x: 199, y: 100 },
+        layerType: RECT,
+      },
+      others: [],
+      zoom: 1,
+    });
+    expect(unionResult.x).toBe(200);
+    expect(narrowResult.x).toBe(199);
+    expect(unionResult.overlays.length).toBeGreaterThan(0);
   });
 
   it('detects equal horizontal spacing between three layers', () => {

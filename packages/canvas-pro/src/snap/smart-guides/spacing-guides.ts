@@ -1,4 +1,4 @@
-import { getCrossAxisAlignment, filterSameTypeAligned } from './axis-alignment';
+import { filterSameTypeAligned, getCrossAxisAlignment } from './axis-snap';
 import { toSnapBounds } from './snap-bounds';
 import type { SnapBounds, SnapTarget, SpacingGuide } from './types';
 

@@ -166,13 +166,15 @@ export {
   type CanvasTransformResult,
 } from './contributions/canvas-layer-interaction-contribution';
 export {
-  CanvasStageInteractionService,
   unionCanvasRects,
   type CanvasDragAdjustInput,
+  type CanvasDragAdjustResult,
   type CanvasLayerTransformRef,
   type CanvasOverlayBuildContext,
   type CanvasRect,
   type CanvasResizeAdjustInput,
+  type CanvasResizeAdjustResult,
+  type CanvasStageInteractionService,
 } from './stage/canvas-stage-interaction';
 export type { CanvasOverlayPrimitive } from './stage/canvas-overlay-primitives';
 export {

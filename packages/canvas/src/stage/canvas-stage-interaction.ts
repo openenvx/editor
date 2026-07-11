@@ -22,6 +22,12 @@ export interface CanvasDragAdjustInput {
   zoom: number;
 }
 
+export interface CanvasDragAdjustResult {
+  overlays: readonly CanvasOverlayPrimitive[];
+  x: number;
+  y: number;
+}
+
 export interface CanvasResizeAdjustInput {
   anchor: string;
   artboard: { height: number; width: number };
@@ -37,25 +43,26 @@ export interface CanvasResizeAdjustInput {
   zoom: number;
 }
 
+export interface CanvasResizeAdjustResult {
+  box: CanvasResizeAdjustInput['box'];
+  overlays: readonly CanvasOverlayPrimitive[];
+}
+
 export interface CanvasOverlayBuildContext {
   artboard: { height: number; width: number };
   zoom: number;
 }
 
-export abstract class CanvasStageInteractionService {
-  adjustDrag?(
-    input: CanvasDragAdjustInput
-  ): { x: number; y: number } | undefined;
+export interface CanvasStageInteractionService {
+  adjustDrag?(input: CanvasDragAdjustInput): CanvasDragAdjustResult | undefined;
 
   adjustResize?(
     input: CanvasResizeAdjustInput
-  ): { box: CanvasResizeAdjustInput['box'] } | undefined;
+  ): CanvasResizeAdjustResult | undefined;
 
   buildOverlays?(
     ctx: CanvasOverlayBuildContext
   ): readonly CanvasOverlayPrimitive[] | undefined;
-
-  resetOverlayState?(): void;
 }
 
 export function unionCanvasRects(rects: CanvasRect[]): CanvasRect {
