@@ -2,27 +2,13 @@ import {
   Command,
   getActivePage,
   InMemoryAssetService,
-  isLayerEditable,
-  isLayerLocked,
-  isLayerWritable,
   localize,
-  moveLayerRelativeToTarget,
   AssetServiceId,
-  LayerRegistryServiceId,
   Plugin,
   SimpleServiceContribution,
   SingletonServiceContribution,
-  TreeDataProvider,
-  ViewContainerContribution,
-  ViewContribution,
 } from '@openenvx/core';
-import type {
-  CommandContext,
-  Layer,
-  PluginContext,
-  TreeItem,
-} from '@openenvx/core';
-import type { Page } from '@openenvx/schema';
+import type { CommandContext, Layer, PluginContext } from '@openenvx/core';
 import { getDefaultPageDimensions, normalizeScene } from '@openenvx/schema';
 
 import {
@@ -61,13 +47,6 @@ import {
   CanvasZoomTo100Command,
   CanvasZoomToFitCommand,
 } from '../commands/canvas-zoom-commands';
-import { AbsoluteEditorPaneContribution } from '../contributions/absolute-editor-pane-contribution';
-import { CanvasCommandPaletteItems } from '../contributions/canvas-command-palette';
-import { CanvasContextMenu } from '../contributions/canvas-context-menu';
-import {
-  CanvasStatusBarContribution,
-  CanvasToolbarContribution,
-} from '../contributions/canvas-shell-contributions';
 import { canvasFontService } from '../fonts/canvas-font-service';
 import { CanvasI18nBundle } from '../i18n/canvas-i18n-bundle';
 import { CanvasCircleLayer } from '../layers/canvas-circle-layer';
@@ -225,155 +204,6 @@ export class UploadAssetCommand extends Command {
   }
 }
 
-class CanvasPagesTreeProvider extends TreeDataProvider<Page> {
-  getRootChildren(ctx: CommandContext): Page[] {
-    return ctx.scene.getScene().pages;
-  }
-
-  getChildren(): Page[] {
-    return [];
-  }
-
-  getTreeItem(page: Page, _ctx: CommandContext): TreeItem {
-    return {
-      icon: 'file',
-      id: page.id,
-      label: page.name?.trim() ? page.name : 'Page',
-    };
-  }
-
-  onSelect(page: Page, ctx: CommandContext): void {
-    ctx.scene.apply({
-      apply: (scene) => ({
-        ...scene,
-        activePageId: page.id,
-        selection: {
-          activePageId: page.id,
-          primaryLayerId: null,
-          selectedLayerIds: [],
-        },
-      }),
-      label: localize(ctx.services, 'canvas.history.selectPage', {
-        defaultValue: 'Select page',
-      }),
-    });
-  }
-}
-
-class CanvasLayersTreeProvider extends TreeDataProvider<Layer> {
-  getRootChildren(ctx: CommandContext): Layer[] {
-    return getActivePage(ctx.scene.getScene()).layers;
-  }
-
-  getChildren(_node: Layer): Layer[] {
-    return [];
-  }
-
-  getTreeItem(node: Layer, ctx: CommandContext): TreeItem {
-    const layers = ctx.services.has(LayerRegistryServiceId)
-      ? ctx.services.get(LayerRegistryServiceId)
-      : undefined;
-    const definition = layers?.get(node.type);
-    const configLocked = !isLayerEditable(node);
-    const runtimeLocked = isLayerLocked(node);
-    const tooltip = configLocked
-      ? 'This layer cannot be edited from the editor'
-      : runtimeLocked
-        ? 'Unlock layer (Mod+L)'
-        : 'Lock layer (Mod+L)';
-    return {
-      icon: definition?.treeIcon,
-      id: node.id,
-      label: definition?.treeLabel(node) ?? node.type.replace('canvas.', ''),
-      locked: configLocked || runtimeLocked,
-      lockedCommandId: configLocked ? undefined : 'scene.toggleLayerLock',
-      tooltip,
-    };
-  }
-
-  onSelect(node: Layer, ctx: CommandContext): void {
-    if (!isLayerEditable(node)) {
-      return;
-    }
-    ctx.scene.selectLayers([node.id], node.id);
-  }
-
-  canMove(
-    source: Layer,
-    target: Layer,
-    _position: 'before' | 'after' | 'inside'
-  ): boolean {
-    return (
-      source.id !== target.id &&
-      isLayerWritable(source) &&
-      isLayerWritable(target)
-    );
-  }
-
-  handleMove(
-    source: Layer,
-    target: Layer,
-    position: 'before' | 'after' | 'inside',
-    ctx: CommandContext
-  ): void {
-    const page = getActivePage(ctx.scene.getScene());
-    const effectivePosition = position === 'inside' ? 'after' : position;
-    ctx.scene.apply({
-      apply: (scene) => ({
-        ...scene,
-        pages: scene.pages.map((p) =>
-          p.id === page.id
-            ? {
-                ...p,
-                layers: moveLayerRelativeToTarget(
-                  p.layers,
-                  source.id,
-                  target.id,
-                  effectivePosition
-                ),
-              }
-            : p
-        ),
-      }),
-      label: localize(ctx.services, 'canvas.history.reorderLayer', {
-        defaultValue: 'Reorder layer',
-      }),
-    });
-  }
-}
-
-export class CanvasPagesView extends ViewContribution {
-  readonly id = 'canvas.pages';
-  readonly containerId = 'canvas.sidebar';
-  readonly name = 'Pages';
-  readonly viewOrder = 0;
-  readonly viewSelection = 'page' as const;
-
-  createProvider(): TreeDataProvider<Page> {
-    return new CanvasPagesTreeProvider();
-  }
-}
-
-export class CanvasLayersView extends ViewContribution {
-  readonly id = 'canvas.layers';
-  readonly containerId = 'canvas.sidebar';
-  readonly name = 'Layers';
-  readonly viewOrder = 10;
-
-  createProvider(): TreeDataProvider<Layer> {
-    return new CanvasLayersTreeProvider();
-  }
-}
-
-export class CanvasSidebarContainer extends ViewContainerContribution {
-  readonly id = 'canvas.sidebar';
-  readonly title = 'Layers';
-  readonly icon = 'layers';
-  readonly sidebarBehavior = 'panel' as const;
-  readonly sidebarGroup = 1;
-  readonly sidebarOrder = 10;
-}
-
 export class CanvasBasicsPlugin extends Plugin {
   readonly id = 'OpenEnvx.canvas-basics';
 
@@ -394,7 +224,6 @@ export class CanvasBasicsPlugin extends Plugin {
       new CanvasImageLayer(),
       new CanvasRectLayer(),
       new CanvasCircleLayer(),
-      new AbsoluteEditorPaneContribution(),
       new InsertCanvasTextCommand(),
       new InsertCanvasImageCommand(),
       new InsertCanvasRectCommand(),
@@ -417,13 +246,6 @@ export class CanvasBasicsPlugin extends Plugin {
       new DuplicateLayersShortcut(),
       new DeleteLayerShortcut(),
       new BackspaceDeleteLayerShortcut(),
-      new CanvasContextMenu(),
-      new CanvasCommandPaletteItems(),
-      new CanvasSidebarContainer(),
-      new CanvasPagesView(),
-      new CanvasLayersView(),
-      new CanvasStatusBarContribution(),
-      new CanvasToolbarContribution(),
       new CanvasZoomInCommand(),
       new CanvasZoomOutCommand(),
       new CanvasZoomTo100Command(),

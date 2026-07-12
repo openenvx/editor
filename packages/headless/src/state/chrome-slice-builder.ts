@@ -1,22 +1,25 @@
+import { createContributionBuildContext } from '@openenvx/core';
+
 import {
   buildCommandPalette,
   createCommandPaletteBuilder,
-  createContributionBuildContext,
+} from '../builders/command-palette-builder';
+import {
   createMenuBuilder,
-  createStatusBarBuilder,
-  createToolbarBuilder,
   filterMenuByWhen,
   mergeMenuContributions,
-} from '@openenvx/core';
-
+} from '../builders/menu-builder';
+import { createStatusBarBuilder } from '../builders/status-bar-builder';
+import { createToolbarBuilder } from '../builders/toolbar-builder';
 import type { ChromeSlice } from '../workbench-state-cache';
 import type { WorkbenchSliceContext } from './workbench-slice-context';
 
 export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
-  const registries = ctx.manager.getRegistries();
+  const coreRegistries = ctx.manager.getRegistries();
+  const workbenchRegistries = ctx.workbenchRegistries;
   const commandCtx = ctx.manager.createCommandContext();
   const canExecuteCommand = (commandId: string) =>
-    registries.commands.canExecute(commandId, commandCtx);
+    coreRegistries.commands.canExecute(commandId, commandCtx);
   const buildCtx = createContributionBuildContext(
     commandCtx.services,
     canExecuteCommand
@@ -27,7 +30,7 @@ export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
 
   const contextMenu = filterMenuByWhen(
     mergeMenuContributions(
-      registries.contextMenus.map((m) => {
+      workbenchRegistries.contextMenus.map((m) => {
         const b = createMenuBuilder();
         m.contribute(b, buildCtx);
         return b.build();
@@ -37,8 +40,8 @@ export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
   );
 
   const commandPalette = buildCommandPalette(
-    registries.commands.getAll().map((command) => command.id),
-    registries.commandPalette.map((contribution) => {
+    coreRegistries.commands.getAll().map((command) => command.id),
+    workbenchRegistries.commandPalette.map((contribution) => {
       const builder = createCommandPaletteBuilder();
       contribution.contribute(builder, buildCtx);
       return builder.build();
@@ -47,10 +50,10 @@ export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
     buildCtx.t
   );
 
-  const overlays = registries.overlays.map((o) => o.getOverlay());
+  const overlays = workbenchRegistries.overlays.map((o) => o.getOverlay());
 
   const statusBarBuilder = createStatusBarBuilder();
-  for (const contribution of registries.statusBars) {
+  for (const contribution of workbenchRegistries.statusBars) {
     contribution.contribute(statusBarBuilder, commandCtx);
   }
   const statusBar = statusBarBuilder
@@ -58,7 +61,7 @@ export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
     .filter((item) => evaluateWhen(item.when))
     .toSorted((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
 
-  const statusBarItemRenderers = registries.statusBarItemRenderers.map(
+  const statusBarItemRenderers = workbenchRegistries.statusBarItemRenderers.map(
     (renderer) => ({
       Component: renderer.Component,
       kind: renderer.kind,
@@ -66,7 +69,7 @@ export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
   );
 
   const toolbarBuilder = createToolbarBuilder();
-  for (const contribution of registries.toolbars) {
+  for (const contribution of workbenchRegistries.toolbars) {
     contribution.contribute(toolbarBuilder, commandCtx);
   }
   const toolbarItems = toolbarBuilder

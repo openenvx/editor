@@ -1,5 +1,4 @@
-import { Emitter } from '../runtime/emitter';
-import type { Event } from '../runtime/emitter';
+import { Emitter, type Event } from '@openenvx/core';
 
 export interface ShellUiService {
   readonly commandPaletteOpen: boolean;

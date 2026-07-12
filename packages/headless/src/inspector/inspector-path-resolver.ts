@@ -1,4 +1,4 @@
-import type { InspectorValuePath } from '@openenvx/core';
+import type { InspectorValuePath } from './inspector-value-path';
 
 export class InspectorValueHandle {
   constructor(

@@ -6,8 +6,8 @@ Package boundaries and contribution flow for the monorepo.
 
 | Tier | Packages | Who |
 | --- | --- | --- |
-| **Rendering-only** | `schema`, `canvas` | Embed `CanvasEditor` / `CanvasStage` in a custom React app with own state. No plugin host. |
-| **Editor backbone** | `core`, `headless`, optional `canvas`, `driver-*`, plugins | Full editor runtime (scene, commands, inspector descriptors) with a **custom UI shell**. See `apps/demo-playground`. |
+| **Rendering-only** | `schema`, `canvas` | Embed `CanvasStage` in a custom React app with own state. No plugin host. |
+| **Editor backbone** | `core`, `headless`, optional `canvas`, `driver-*`, plugins | Full editor runtime (scene, commands, layers) with a **custom UI shell**. See `apps/demo-playground`. |
 
 **Hard rule:** All canvas code lives in `@openenvx/canvas`. Not in `core`.
 
@@ -15,41 +15,44 @@ Package boundaries and contribution flow for the monorepo.
 
 | Tier | Packages | License (intent) | Responsibility |
 | --- | --- | --- | --- |
-| Foundation | `schema`, `preview`, `core` | OSS (MIT) | Scene model, generic plugin host, contribution registries for commands/layers/views |
-| OSS product | `headless`, `canvas`, `driver-*` | OSS (MIT) | Controller, canvas engine, export drivers |
+| Foundation | `schema`, `preview`, `core` | OSS (MIT) | Scene model, plugin host primitives (commands, layers, services, property field data) |
+| OSS product | `headless`, `canvas`, `driver-*` | OSS (MIT) | Workbench runtime, canvas engine, export drivers |
+| Enterprise | `canvas-pro`, `studio` | Proprietary | Workbench wiring for canvas, React shell renderers |
 
 ## What belongs in `@openenvx/canvas`
 
 - Konva stage, viewport, geometry, rich-text layout and resize
-- `CanvasEditor`, `AbsoluteEditorPane`, TipTap overlay
+- `CanvasEditor`, `CanvasHostProvider`, TipTap overlay
 - Canvas layer definitions, clipboard, canvas commands (`canvas.exportImage`, `canvas.setPagePreset`, …)
 - Canvas renderer / preview / interaction contributions, registries, and `Canvas*ServiceId` tokens
-- `CanvasRegistriesReader`, `PageResizeService`, `DEFAULT_CANVAS_LAYOUT`
-- `useCanvasRegistries()`, `useCanvasApi()` - React hooks for editor panes
-- `CanvasBasicsPlugin` - registers layers, renderers, interactions, and the absolute editor pane
+- `CanvasRegistriesReader`, `PageResizeService`
+- `useCanvasRegistries()`, `useCanvasApi()` — require `CanvasHostProvider` (app wires workbench or custom host)
+- `CanvasBasicsPlugin` - registers layers, renderers, interactions, and commands only (no workbench chrome)
 - `registerCanvasContribution()` for third-party canvas renderers and snap providers
 - `CanvasStageInteractionService` — optional stage drag/resize adjustment + overlay primitives
 
+Workbench chrome for canvas (toolbar, palette, sidebars, editor pane registration) lives in enterprise `@openenvx/canvas-pro`.
+
 ## What belongs in `@openenvx/core`
 
-- Generic contributions: `Command`, `LayerDefinition`, `View`, `EditorPane`, services
+- Plugin host primitives: `Command`, `LayerDefinition`, `Shortcut`, `ContextKey`, `Service`, `I18n`
 - `Plugin`, `PluginManager`, `registerContribution()`
-- **Inspector SDK** - `InspectorPaneBuilder`, layout node classes, `InspectorValuePath`, field kinds (`PropertyBuilder`)
-- Generic service ids (`AssetServiceId`, `PersistenceServiceId`, `LocalizationServiceId`) only
-- `LocalizationService`, `I18nContribution`, `localize()` - plugin-extensible message bundles and `t()` at descriptor build time
-- `InstantiationService` - service registry with `createServiceId` tokens, `registerSingleton`, and constructor `@ServiceId` injection
+- **Layer property data** — `PropertyBuilder`, `PropertyFieldDescriptor`, `PropertySectionDescriptor` (returned by `LayerDefinition.properties()`)
+- Generic service ids (`AssetServiceId`, `PersistenceServiceId`, `LocalizationServiceId`) and editor services (`EditorService`, `DocumentHostService`, `ThemeService`, …)
+- `LocalizationService`, `I18nContribution`, `localize()`
+- `InstantiationService` - service registry with `createServiceId` tokens
 - **No** canvas types, tokens, or registry contracts
-- **No** inspector path resolution for canvas-specific paths (transform, page preset)
+- **No** workbench UI contribution points (toolbar, palette, views, editor panes, inspector panes, field renderers)
 
 ## What belongs in `@openenvx/headless`
 
-- `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` - **canvas-agnostic** editor runtime
-- `WorkbenchProvider`, `useWorkbenchContext` (React bridge for OSS editor panes)
-- Generic `api.getService(token)` for optional plugin services
-- `createInspectorHostContext` - generic paths only (`selection.layer.data.*`, `command.*`)
-- `InspectorPathResolver` - maps opaque path strings to read/write handles
-- `LayerPropertiesPaneFactory` - synthesizes layer property panes into `inspectorPanes`
-- `InspectorPath` - path string helpers for plugin authors
+- `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` - workbench runtime
+- `WorkbenchPlugin`, `WorkbenchRegistries`, `WorkbenchPluginContext.registerWorkbench()` - workbench UI contribution registration
+- Workbench contribution points: `Toolbar`, `CommandPalette`, `ViewContainer`, `View`, `ContextMenu`, `StatusBar`, `Overlay`, `EditorPane`, `InspectorPane`, `FieldRenderer`
+- Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `InspectorPaneBuilder`
+- `WorkbenchLayout`, `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
+- `WorkbenchProvider`, `useWorkbenchContext` (React bridge)
+- `createInspectorHostContext`, `InspectorPathResolver`, `LayerPropertiesPaneFactory`, `InspectorPath`
 
 ## Contribution flow
 
@@ -57,46 +60,55 @@ Package boundaries and contribution flow for the monorepo.
 flowchart TB
   subgraph plugins [Plugins]
     CanvasBasics[CanvasBasicsPlugin]
+    CanvasPro[CanvasProPlugin]
     Custom[CustomPlugin]
   end
   subgraph canvasPkg [canvas]
     Registries[CanvasRegistriesService]
-    Hooks[useCanvasRegistries]
-    EditorPanes[AbsoluteEditorPane]
+    CanvasEditor[CanvasEditor]
   end
   subgraph coreHost [core]
     PluginHost[PluginManager]
   end
   subgraph headlessPkg [headless]
+    WbRegs[WorkbenchRegistries]
     Controller[WorkbenchController]
     State[WorkbenchState]
   end
   subgraph app [demo-playground]
-    Shell[PlaygroundShell]
     PaneHost[EditorPaneHost]
   end
-  CanvasBasics -->|ctx.register layers commands panes| PluginHost
+  CanvasBasics -->|ctx.register commands layers| PluginHost
   CanvasBasics -->|registerCanvasContribution| Registries
-  Custom -->|registerCanvasContribution| Registries
+  CanvasPro -->|registerWorkbench chrome editorPane| WbRegs
   Controller --> State
-  EditorPanes -->|useCanvasRegistries via api.getService| Registries
-  Shell --> PaneHost
-  PaneHost --> EditorPanes
+  PaneHost -->|CanvasHostProvider| CanvasEditor
+  PaneHost --> State
 ```
 
-1. `CanvasBasicsPlugin.activate()` installs `CanvasRegistriesService` and registers canvas contributions.
-2. `CanvasBasicsPlugin` also registers `AbsoluteEditorPaneContribution` via core `EditorPaneContribution`.
-3. `WorkbenchController` builds canvas-agnostic `WorkbenchState` (no registry arrays on state).
-4. Canvas editor panes resolve registries via `useCanvasRegistries()` → `api.getService(CanvasRegistriesServiceId)`.
-5. App shell (e.g. `demo-playground`) mounts the matching editor pane component from `state.editorPanes`.
+1. `CanvasBasicsPlugin` registers canvas engine contributions via core `ctx.register()` and canvas registries.
+2. Enterprise `CanvasProPlugin` registers workbench chrome via `ctx.registerWorkbench()` on a `WorkbenchPlugin`.
+3. `WorkbenchController` assembles core + workbench registries into `WorkbenchState`.
+4. App shell (`demo-playground`) wires `CanvasHostProvider` + `CanvasEditor`; studio/canvas-pro provide full chrome renderers.
+
+## Workbench layout defaults
+
+`DEFAULT_WORKBENCH_LAYOUT` in `@openenvx/headless` replaces the removed `DEFAULT_CANVAS_LAYOUT` from `@openenvx/canvas`.
+
+| Field | `DEFAULT_WORKBENCH_LAYOUT` | Legacy `DEFAULT_CANVAS_LAYOUT` |
+| --- | --- | --- |
+| `floatingToolbar` | `false` | `true` |
+| Other parts | all enabled | all enabled |
+
+Set `layout: { floatingToolbar: true }` on `WorkbenchController` when migrating toolbar items that use `when: 'workbench.floatingToolbar'`.
 
 ## Composable app layout
 
 ```
 PlaygroundShell
 ├── WorkbenchProvider          ← @openenvx/headless
-├── EditorPaneHost             → canvas editor panes
-├── PlaygroundToolbar
+├── EditorPaneHost             ← app-owned: CanvasHostProvider + CanvasEditor
+├── PlaygroundToolbar          ← app-owned
 └── Inspector / sidebars       ← app-owned React UI
 ```
 
@@ -111,10 +123,10 @@ Plugin author API: [apps/docs/extension-guide.md](apps/docs/extension-guide.md).
 
 Rules:
 
-- Plugin API surface = **classes extending `Contribution`**, not plain config objects.
-- Inspector layout = **class hierarchy + visitor** (`InspectorLayoutNode.accept(visitor)`), not JSON-style unions in core.
-- Builders (`PropertyBuilder`, `InspectorPaneBuilder`) = **classes** with fluent methods returning `this`.
-- React shell **consumes** OOP descriptors via visitors; it does not define editor-domain pane kinds.
+- Plugin API surface = **classes extending contribution base classes**, not plain config objects.
+- Inspector layout = **class hierarchy + visitor** (`InspectorLayoutNode.accept(visitor)`).
+- Layer properties use `PropertyBuilder` in core; workbench pane layout uses `InspectorPaneBuilder` in headless.
+- React shell **consumes** OOP descriptors via visitors.
 
 ## Inspector flow
 
@@ -124,23 +136,23 @@ flowchart LR
     InspectorPlugin[InspectorPaneContribution]
   end
   subgraph corePkg [core]
-    Builder[InspectorPaneBuilder]
-    Nodes[InspectorLayoutNode classes]
+    PropertyBuilder[PropertyBuilder]
   end
   subgraph headlessPkg [headless]
+    Builder[InspectorPaneBuilder]
     GenericCtx[createInspectorHostContext]
     Factory[LayerPropertiesPaneFactory]
   end
-  subgraph app [demo-playground]
+  subgraph app [studio / playground]
     Visitor[Inspector field renderers]
   end
   InspectorPlugin -->|buildDescriptor| Builder
-  Builder --> Nodes
+  PropertyBuilder -->|layer.properties| Factory
   headlessPkg -->|inspectorPanes on state| app
   GenericCtx --> Visitor
-  Factory -->|layer properties panes| headlessPkg
 ```
 
-1. Plugins subclass `InspectorPaneContribution` and implement `buildDescriptor()` using `createInspectorPane()`.
-2. `WorkbenchController` merges plugin panes + synthesized layer property panes into `state.inspectorPanes`.
-3. App inspector UI uses `createInspectorHostContext` from `@openenvx/headless`.
+1. Plugins subclass `InspectorPaneContribution` (headless) and implement `buildDescriptor()` using `createInspectorPane()`.
+2. `LayerDefinition.properties()` returns `PropertySectionDescriptor[]` from core `PropertyBuilder`.
+3. `WorkbenchController` merges plugin panes + synthesized layer property panes into `state.inspectorPanes`.
+4. App inspector UI uses `createInspectorHostContext` from `@openenvx/headless`.

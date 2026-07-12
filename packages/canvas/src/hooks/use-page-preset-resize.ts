@@ -1,8 +1,8 @@
-import { useWorkbenchContext } from '@openenvx/headless/react';
+import { useCanvasHost } from '../canvas-host-context';
 
 export function usePagePresetResize() {
-  const { executeCommand } = useWorkbenchContext();
+  const host = useCanvasHost();
 
   return (presetId: string) =>
-    executeCommand('canvas.resizePagePreset', { presetId });
+    host.executeCommand('canvas.resizePagePreset', { presetId });
 }

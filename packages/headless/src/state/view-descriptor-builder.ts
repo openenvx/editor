@@ -1,16 +1,16 @@
+import type { PluginManager } from '@openenvx/core';
+import { createContributionBuildContext } from '@openenvx/core';
+
 import {
   createMenuBuilder,
   filterMenuByCanExecute,
   filterMenuByWhen,
-} from '@openenvx/core';
+  type MenuItemDescriptor,
+} from '../builders/menu-builder';
 import type {
-  MenuItemDescriptor,
-  PluginManager,
   ViewContainerContribution,
   ViewContribution,
-  createContributionBuildContext,
-} from '@openenvx/core';
-
+} from '../contributions/view-contribution';
 import type {
   ViewContainerDescriptor,
   ViewDescriptor,

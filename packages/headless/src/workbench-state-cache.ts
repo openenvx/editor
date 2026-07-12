@@ -1,24 +1,26 @@
 import type {
-  CommandPaletteDescriptor,
   EditorInput,
-  EditorPaneRegistration,
-  FieldRendererRegistration,
-  InspectorPaneRegistration,
-  MenuItemDescriptor,
-  OverlayDescriptor,
   PropertySectionDescriptor,
   Scene,
   Selection,
-  StatusBarItemDescriptor,
-  StatusBarItemRendererRegistration,
-  ToolbarItemDescriptor,
-  WorkbenchLayout,
 } from '@openenvx/core';
 
+import type { CommandPaletteDescriptor } from './builders/command-palette-builder';
+import type { MenuItemDescriptor } from './builders/menu-builder';
+import type { StatusBarItemDescriptor } from './builders/status-bar-builder';
+import type { ToolbarItemDescriptor } from './builders/toolbar-builder';
+import type { OverlayDescriptor } from './contributions/overlay-contribution';
 import type {
   LayerSurfaceItem,
   ViewContainerDescriptor,
 } from './workbench-state';
+import type { EditorPaneRegistration } from './workbench/editor-pane-host-props';
+import type {
+  FieldRendererRegistration,
+  InspectorPaneRegistration,
+} from './workbench/inspector-pane-registration';
+import type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
+import type { WorkbenchLayout } from './workbench/workbench-layout';
 
 export type SliceName = 'scene' | 'editor' | 'chrome' | 'commands';
 

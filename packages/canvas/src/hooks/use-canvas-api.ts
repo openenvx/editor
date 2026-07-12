@@ -1,35 +1,36 @@
-import { useWorkbenchContext } from '@openenvx/headless/react';
 import type { Transform } from '@openenvx/schema';
 import { useCallback } from 'react';
 
+import { useCanvasHost } from '../canvas-host-context';
+
 export function useCanvasApi() {
-  const { api, executeCommand } = useWorkbenchContext();
+  const host = useCanvasHost();
 
   const setPageSize = useCallback(
     async (width: number, height: number) =>
-      executeCommand('canvas.setPageSize', { height, width }),
-    [executeCommand]
+      host.executeCommand('canvas.setPageSize', { height, width }),
+    [host]
   );
 
   const setPagePreset = useCallback(
     async (presetId: string) =>
-      executeCommand('canvas.setPagePreset', { presetId }),
-    [executeCommand]
+      host.executeCommand('canvas.setPagePreset', { presetId }),
+    [host]
   );
 
   const resizePagePreset = useCallback(
     async (presetId: string) =>
-      executeCommand('canvas.resizePagePreset', { presetId }),
-    [executeCommand]
+      host.executeCommand('canvas.resizePagePreset', { presetId }),
+    [host]
   );
 
   const updateLayerTransform = useCallback(
     async (layerId: string, transform: Transform) =>
-      executeCommand('canvas.updateLayerTransform', {
+      host.executeCommand('canvas.updateLayerTransform', {
         layerId,
         transform,
       }),
-    [executeCommand]
+    [host]
   );
 
   const updateRichTextTransform = useCallback(
@@ -37,16 +38,16 @@ export function useCanvasApi() {
       layerId: string,
       change: { fontSize: number; transform: Transform }
     ) =>
-      executeCommand('canvas.updateRichTextTransform', {
+      host.executeCommand('canvas.updateRichTextTransform', {
         fontSize: change.fontSize,
         layerId,
         transform: change.transform,
       }),
-    [executeCommand]
+    [host]
   );
 
   const exportImage = useCallback(async () => {
-    const { executed, result } = await api.runCommand<{
+    const { executed, result } = await host.runCommand<{
       mimeType: string;
       dataUrl: string;
     }>('canvas.exportImage');
@@ -54,7 +55,7 @@ export function useCanvasApi() {
       return null;
     }
     return result ?? null;
-  }, [api]);
+  }, [host]);
 
   return {
     exportImage,

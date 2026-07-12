@@ -1,4 +1,4 @@
-import type { PropertyFieldDescriptor } from '../builders/property-builder';
+import type { PropertyFieldDescriptor } from '@openenvx/core';
 
 /** Opaque path into the inspector host context. Convention documented in extension-guide. */
 export type InspectorValuePath = string;

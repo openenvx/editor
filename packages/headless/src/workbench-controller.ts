@@ -6,7 +6,6 @@ import {
   LayerRegistryServiceId,
   PluginManager,
   SceneStore,
-  DEFAULT_WORKBENCH_LAYOUT,
   updateLayerInTree,
   WorkbenchEvents,
 } from '@openenvx/core';
@@ -17,6 +16,7 @@ import type {
   ServiceId,
 } from '@openenvx/core';
 
+import { WorkbenchRegistries } from './registries/workbench-registries';
 import { buildChromeSlice } from './state/chrome-slice-builder';
 import { buildCommandsSlice } from './state/commands-slice-builder';
 import { EditorSliceBuilder } from './state/editor-slice-builder';
@@ -31,6 +31,7 @@ import {
   saveDocumentAs,
 } from './workbench-document-ops';
 import { attachWorkbenchKeybindings } from './workbench-keybindings';
+import { createWorkbenchPluginContext } from './workbench-plugin-context';
 import type {
   WorkbenchApi,
   WorkbenchControllerOptions,
@@ -43,6 +44,9 @@ import type {
   EditorSlice,
   SceneSlice,
 } from './workbench-state-cache';
+import { ShellUiServiceImpl } from './workbench/shell-ui-service';
+import { ShellUiServiceId } from './workbench/shell-ui-service-id';
+import { DEFAULT_WORKBENCH_LAYOUT } from './workbench/workbench-layout';
 
 type Listener = (state: WorkbenchState) => void;
 
@@ -59,6 +63,7 @@ export class WorkbenchController {
   private disposed = false;
   private detachKeybindings: (() => void) | null = null;
   private lastSeenContentRevision = -1;
+  private readonly workbenchRegistries = new WorkbenchRegistries();
 
   constructor(private readonly options: WorkbenchControllerOptions) {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
@@ -75,6 +80,7 @@ export class WorkbenchController {
       layout: this.layout,
       manager: this.manager,
       sceneStore: this.sceneStore,
+      workbenchRegistries: this.workbenchRegistries,
     };
   }
 
@@ -106,6 +112,7 @@ export class WorkbenchController {
       save: () => this.save(),
       saveAs: (uri) => this.saveAs(uri),
     });
+    services.registerInstance(ShellUiServiceId, new ShellUiServiceImpl());
   }
 
   private wireStateRefresh(): void {
@@ -180,7 +187,16 @@ export class WorkbenchController {
   }
 
   async start(): Promise<void> {
-    await this.manager.activateAll(this.options.plugins);
+    const { CoreI18nPlugin, ScenePlugin } = await import('@openenvx/core');
+    await this.manager.activate(new ScenePlugin());
+    await this.manager.activate(new CoreI18nPlugin());
+    for (const plugin of this.options.plugins) {
+      const ctx = createWorkbenchPluginContext(
+        this.manager.createPluginContext(),
+        this.workbenchRegistries
+      );
+      await this.manager.activateWithContext(plugin, ctx);
+    }
     this.stateCache.reset();
     this.lastSeenContentRevision = this.sceneStore.getContentRevision();
     this.stateCache.onSceneContentRevision(this.lastSeenContentRevision);
@@ -290,9 +306,7 @@ export class WorkbenchController {
   }
 
   selectViewItem(viewId: string, item: unknown): void {
-    const view = this.manager
-      .getRegistries()
-      .views.find((v) => v.id === viewId);
+    const view = this.workbenchRegistries.views.find((v) => v.id === viewId);
     if (!view) {
       return;
     }
@@ -307,9 +321,7 @@ export class WorkbenchController {
     target: unknown,
     position: 'before' | 'after' | 'inside'
   ): void {
-    const view = this.manager
-      .getRegistries()
-      .views.find((v) => v.id === viewId);
+    const view = this.workbenchRegistries.views.find((v) => v.id === viewId);
     if (!view) {
       return;
     }

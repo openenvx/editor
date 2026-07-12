@@ -1,20 +1,19 @@
 import {
   getActivePage,
   moveLayerRelativeToTarget,
-  Plugin,
+} from '@openenvx/core';
+import type { CommandContext, Layer } from '@openenvx/core';
+import { createDefaultTransform, normalizeScene } from '@openenvx/schema';
+import { describe, expect, it } from 'vitest';
+
+import {
   TreeDataProvider,
   ViewContainerContribution,
   ViewContribution,
-} from '@openenvx/core';
-import type {
-  CommandContext,
-  Layer,
-  PluginContext,
-  TreeItem,
-} from '@openenvx/core';
-import { WorkbenchController } from "@openenvx/headless";
-import { createDefaultTransform, normalizeScene } from '@openenvx/schema';
-import { describe, expect, it } from "vitest";
+} from './contributions/view-contribution';
+import { WorkbenchController } from './workbench-controller';
+import { WorkbenchPlugin } from './workbench-plugin';
+import type { WorkbenchPluginContext } from './workbench-plugin-context';
 
 class LayersTreeProvider extends TreeDataProvider<Layer> {
   getRootChildren(ctx: CommandContext): Layer[] {
@@ -25,18 +24,18 @@ class LayersTreeProvider extends TreeDataProvider<Layer> {
     return [];
   }
 
-  getTreeItem(node: Layer): TreeItem {
+  getTreeItem(node: Layer) {
     return { id: node.id, label: node.type };
   }
 
   handleMove(
     source: Layer,
     target: Layer,
-    position: "before" | "after" | "inside",
+    position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
     const page = getActivePage(ctx.scene.getScene());
-    const effectivePosition = position === "inside" ? "after" : position;
+    const effectivePosition = position === 'inside' ? 'after' : position;
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
@@ -54,15 +53,15 @@ class LayersTreeProvider extends TreeDataProvider<Layer> {
             : p
         ),
       }),
-      label: "Reorder layer",
+      label: 'Reorder layer',
     });
   }
 }
 
 class LayersView extends ViewContribution {
-  readonly id = "layers.tree";
-  readonly containerId = "layers";
-  readonly name = "Layers";
+  readonly id = 'layers.tree';
+  readonly containerId = 'layers';
+  readonly name = 'Layers';
 
   createProvider(): TreeDataProvider<Layer> {
     return new LayersTreeProvider();
@@ -70,66 +69,66 @@ class LayersView extends ViewContribution {
 }
 
 class LayersViewContainer extends ViewContainerContribution {
-  readonly id = "layers";
-  readonly title = "Layers";
+  readonly id = 'layers';
+  readonly title = 'Layers';
 }
 
-class LayersPlugin extends Plugin {
-  readonly id = "test.layers";
+class LayersPlugin extends WorkbenchPlugin {
+  readonly id = 'test.layers';
 
-  activate(ctx: PluginContext): void {
-    ctx.register(new LayersViewContainer(), new LayersView());
+  activateWorkbench(ctx: WorkbenchPluginContext): void {
+    ctx.registerWorkbench(new LayersViewContainer(), new LayersView());
   }
 }
 
-describe("moveViewItem", () => {
-  it("delegates to tree provider handleMove", async () => {
+describe('moveViewItem', () => {
+  it('delegates to tree provider handleMove', async () => {
     const controller = new WorkbenchController({
       initialScene: normalizeScene({
         pages: [
           {
-            id: "p1",
-            name: "Page",
-            layout: "absolute",
+            id: 'p1',
+            name: 'Page',
+            layout: 'absolute',
             layers: [
               {
-                id: "x",
-                type: "canvas.rect",
-                data: { fill: "#000000" },
+                id: 'x',
+                type: 'canvas.rect',
+                data: { fill: '#000000' },
                 transform: createDefaultTransform(),
               },
               {
-                id: "y",
-                type: "canvas.rect",
-                data: { fill: "#ffffff" },
+                id: 'y',
+                type: 'canvas.rect',
+                data: { fill: '#ffffff' },
                 transform: createDefaultTransform(),
               },
             ],
           },
         ],
-        activePageId: "p1",
+        activePageId: 'p1',
       }),
       plugins: [new LayersPlugin()],
     });
     await controller.start();
     controller.moveViewItem(
-      "layers.tree",
+      'layers.tree',
       {
-        id: "y",
-        type: "canvas.rect",
-        data: { fill: "#ffffff" },
+        id: 'y',
+        type: 'canvas.rect',
+        data: { fill: '#ffffff' },
         transform: createDefaultTransform(),
       },
       {
-        id: "x",
-        type: "canvas.rect",
-        data: { fill: "#000000" },
+        id: 'x',
+        type: 'canvas.rect',
+        data: { fill: '#000000' },
         transform: createDefaultTransform(),
       },
-      "before"
+      'before'
     );
     expect(
       controller.getState().scene.pages[0]!.layers.map((l) => l.id)
-    ).toStrictEqual(["y", "x"]);
+    ).toStrictEqual(['y', 'x']);
   });
 });

@@ -1,4 +1,4 @@
-import type { EditorViewportApi } from './editor-viewport-api';
+import type { EditorViewportApi } from '@openenvx/core';
 
 /** Props passed from workbench shell to registered editor pane components. */
 export interface EditorPaneHostProps {

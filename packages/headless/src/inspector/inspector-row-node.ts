@@ -1,4 +1,5 @@
-import type { PropertyFieldDescriptor } from '../builders/property-builder';
+import type { PropertyFieldDescriptor } from '@openenvx/core';
+
 import { InspectorLayoutNode } from './inspector-layout-node';
 import type { InspectorLayoutVisitor } from './inspector-layout-visitor';
 import type { InspectorValuePath } from './inspector-value-path';

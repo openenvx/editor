@@ -7,52 +7,8 @@ export { PluginManager, type PluginContext } from './core/plugin-manager';
 
 export { Command } from './contributions/command';
 export { LayerDefinition } from './contributions/layer-definition';
-export {
-  ViewContainerContribution,
-  ViewContribution,
-  TreeDataProvider,
-  type SidebarBehavior,
-  type TreeItem,
-} from './contributions/view-contribution';
-export { ContextMenuContribution } from './contributions/context-menu-contribution';
-export { CommandPaletteContribution } from './contributions/command-palette-contribution';
 export { ShortcutContribution } from './contributions/shortcut-contribution';
-export {
-  OverlayContribution,
-  type OverlayDescriptor,
-} from './contributions/overlay-contribution';
-export {
-  StatusBarContribution,
-  type StatusBarDropdownItemDescriptor,
-  type StatusBarItemDescriptor,
-  type StatusBarTextItemDescriptor,
-} from './contributions/status-bar-contribution';
-export {
-  ToolbarContribution,
-  type ToolbarCommandItemDescriptor,
-  type ToolbarDropdownItemDescriptor,
-  type ToolbarItemDescriptor,
-  type ToolbarSeparatorItemDescriptor,
-} from './contributions/toolbar-contribution';
-export { StatusBarItemRendererContribution } from './contributions/status-bar-item-renderer-contribution';
 export { ContextKeyContribution } from './contributions/context-key-contribution';
-export { EditorPaneContribution } from './contributions/editor-pane-contribution';
-export { InspectorPaneContribution } from './contributions/inspector-pane-contribution';
-export {
-  InspectorBlockNode,
-  InspectorInputGroupNode,
-  InspectorLayoutNode,
-  InspectorPaneBuilder,
-  InspectorPaneDescriptor,
-  InspectorRowNode,
-  createInspectorPane,
-} from './inspector';
-export type {
-  InspectorInputGroupCell,
-  InspectorLayoutVisitor,
-  InspectorValuePath,
-} from './inspector';
-export { FieldRendererContribution } from './contributions/field-renderer-contribution';
 export {
   ServiceContribution,
   SimpleServiceContribution,
@@ -142,46 +98,6 @@ export {
 export { type CommandContext } from './runtime/types';
 
 export {
-  MenuBuilder,
-  MenuItemBuilder,
-  createMenuBuilder,
-  filterMenuByWhen,
-  filterMenuByCanExecute,
-  isCommandMenuItem,
-  isRadioGroupMenuItem,
-  mergeMenuContributions,
-  type CommandMenuItemDescriptor,
-  type MenuItemDescriptor,
-  type SeparatorMenuItemDescriptor,
-  type SubmenuMenuItemDescriptor,
-  type RadioGroupMenuItemDescriptor,
-} from './builders/menu-builder';
-export {
-  type MenuChoice,
-  type MenuChoiceBindings,
-  type MenuChoiceProvider,
-} from './menu/menu-choice';
-export { MutableMenuChoiceProvider } from './menu/mutable-menu-choice-provider';
-export {
-  MenuChoiceRegistryId,
-  MenuChoiceRegistryImpl,
-  type MenuChoiceRegistry,
-} from './menu/menu-choice-registry';
-export {
-  CommandPaletteBuilder,
-  CommandPaletteItemBuilder,
-  buildCommandPalette,
-  createCommandPaletteBuilder,
-  humanizeCommandId,
-  COMMAND_PALETTE_ALL_TAB_ID,
-  type CommandPaletteCategoryDescriptor,
-  type CommandPaletteContributionBuild,
-  type CommandPaletteDescriptor,
-  type CommandPaletteItemDescriptor,
-  type CommandPaletteOverride,
-  type CommandPaletteTabDescriptor,
-} from './builders/command-palette-builder';
-export {
   PropertyBuilder,
   createPropertyBuilder,
   createPopupFieldsBuilder,
@@ -207,28 +123,6 @@ export {
   type PaddingValue,
   type ShadowValue,
 } from './builders/property-builder';
-export {
-  DescriptorBuilder,
-  type DescriptorItemBase,
-  type ShellItemOptions,
-} from './builders/descriptor-builder';
-export {
-  StatusBarBuilder,
-  createStatusBarBuilder,
-  isStatusBarDropdownItem,
-  type StatusBarDropdownOptions,
-} from './builders/status-bar-builder';
-export {
-  ToolbarBuilder,
-  createToolbarBuilder,
-  isToolbarDropdownItem,
-  type ToolbarCommandOptions,
-  type ToolbarDropdownOptions,
-} from './builders/toolbar-builder';
-export {
-  type ShellDropdownItemBase,
-  type ShellDropdownMenuItemDescriptor,
-} from './builders/shell-dropdown';
 export { type LayerPreviewContext } from './contributions/layer-preview-context';
 
 export { I18nContribution } from './i18n/i18n-contribution';
@@ -259,11 +153,6 @@ export {
   createContextKeyService,
 } from './workbench/context-key-service';
 export { EditorService, type EditorInput } from './workbench/editor-service';
-export {
-  WorkbenchPart,
-  DEFAULT_WORKBENCH_LAYOUT,
-  type WorkbenchLayout,
-} from './workbench/workbench-layout';
 export type { EditorViewportApi } from './workbench/editor-viewport-api';
 export {
   EditorHostKeys,
@@ -281,11 +170,6 @@ export {
   IconRegistryImpl,
   type IconRegistry,
 } from './workbench/icon-registry-service';
-export { ShellUiServiceId } from './workbench/shell-ui-service-id';
-export {
-  ShellUiServiceImpl,
-  type ShellUiService,
-} from './workbench/shell-ui-service';
 export { DocumentHostServiceId } from './workbench/document-host-service-id';
 export {
   MutableDocumentHostService,
@@ -295,15 +179,18 @@ export {
 } from './workbench/document-host-service';
 export { DocumentOperationsServiceId } from './workbench/document-operations-service-id';
 export { type DocumentOperationsService } from './workbench/document-operations-service';
-export type {
-  EditorPaneHostProps,
-  EditorPaneRegistration,
-} from './workbench/editor-pane-host-props';
-export type {
-  InspectorPaneRegistration,
-  FieldRendererRegistration,
-} from './workbench/inspector-pane-registration';
-export type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
+
+export {
+  type MenuChoice,
+  type MenuChoiceBindings,
+  type MenuChoiceProvider,
+} from './menu/menu-choice';
+export { MutableMenuChoiceProvider } from './menu/mutable-menu-choice-provider';
+export {
+  MenuChoiceRegistryId,
+  MenuChoiceRegistryImpl,
+  type MenuChoiceRegistry,
+} from './menu/menu-choice-registry';
 
 export {
   AssetServiceId,

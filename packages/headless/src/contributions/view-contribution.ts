@@ -1,8 +1,8 @@
+import type { CommandContext, ContributionBuildContext } from '@openenvx/core';
+
 import type { MenuBuilder } from '../builders/menu-builder';
-import { Contribution } from '../core/contribution';
-import { ContributionPoint } from '../core/contribution-point';
-import type { ContributionBuildContext } from '../i18n/localize';
-import type { CommandContext } from '../runtime/types';
+import { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
+import { WorkbenchContributionPoint } from '../workbench-contributions/workbench-contribution-point';
 
 export type SidebarBehavior = 'panel' | 'dropdown' | 'command';
 
@@ -42,8 +42,8 @@ export abstract class TreeDataProvider<TNode> {
   ): void;
 }
 
-export abstract class ViewContainerContribution extends Contribution {
-  readonly contributionPoint = ContributionPoint.ViewContainer;
+export abstract class ViewContainerContribution extends WorkbenchContribution {
+  readonly contributionPoint = WorkbenchContributionPoint.ViewContainer;
 
   abstract readonly id: string;
   abstract readonly title: string;
@@ -56,8 +56,8 @@ export abstract class ViewContainerContribution extends Contribution {
   contributeMenu?(builder: MenuBuilder, ctx: ContributionBuildContext): void;
 }
 
-export abstract class ViewContribution extends Contribution {
-  readonly contributionPoint = ContributionPoint.View;
+export abstract class ViewContribution extends WorkbenchContribution {
+  readonly contributionPoint = WorkbenchContributionPoint.View;
 
   abstract readonly id: string;
   abstract readonly containerId: string;

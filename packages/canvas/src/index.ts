@@ -149,7 +149,12 @@ export {
   PreviewRendererRegistryProvider,
   usePreviewRendererRegistry,
 } from './renderers/preview/preview-renderer-context';
-export { AbsoluteEditorPane } from './editor/absolute-editor-pane';
+export {
+  CanvasHostProvider,
+  useCanvasHost,
+  type CanvasHostApi,
+} from './canvas-host-context';
+export type { CanvasLayerSurfaceItem } from './layer-surface-item';
 export {
   CanvasLayerRendererContribution,
   type CanvasLayerRendererHostProps,
@@ -204,7 +209,6 @@ export {
   type CanvasPreviewSvgSerializer,
 } from './export/canvas-document-export-service';
 export { bytesToDataUrl, downloadBytes } from './export/bytes-to-data-url';
-export { DEFAULT_CANVAS_LAYOUT } from './default-canvas-layout';
 export type { PageResizeService } from './page-resize/page-resize-types';
 export type {
   CanvasRegistriesReader,

@@ -26,9 +26,9 @@ Read **Architecture.md** before placing new code.
 
 | Put it here | Examples |
 | --- | --- |
-| `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, generic `EditorPaneContribution`, scene store, property builder |
-| `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchProvider`, `useWorkbenchContext` |
-| `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasBasicsPlugin`, editor panes |
+| `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, scene store, `PropertyBuilder` |
+| `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchPlugin`, workbench contributions (`ToolbarContribution`, `EditorPaneContribution`, …), `InspectorPaneBuilder`, `WorkbenchProvider`, `useWorkbenchContext` |
+| `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasBasicsPlugin`, `CanvasEditor`, `CanvasHostProvider` |
 
 ### Canvas rule (non-negotiable)
 
@@ -38,8 +38,8 @@ Read **Architecture.md** before placing new code.
 | --- | --- |
 | Add a Konva renderer in `packages/canvas/src/renderers/` | Add canvas renderer types to `core` |
 | Register renderers via `registerCanvasContribution()` | Hardcode preview `kind` switches in app shell |
-| Add `AbsoluteEditorPane` in canvas | Put editor pane components in app shell |
-| Use `CanvasBasicsPlugin` for built-in canvas features | Create app-only canvas plugins without registering contributions |
+| Use `CanvasEditor` + `CanvasHostProvider` in the app shell | Put workbench-aware editor pane wiring in `@openenvx/canvas` |
+| Use `CanvasBasicsPlugin` for built-in canvas engine features | Create app-only canvas plugins without registering contributions |
 
 ## Licensing intent
 
@@ -81,7 +81,9 @@ Do not add migration shims, dual code paths, or fallbacks for removed APIs. Remo
 | Add canvas layer type | `packages/canvas/src/layers/` + register in `CanvasBasicsPlugin` |
 | Add custom preview `kind` | Canvas contribution class + `registerCanvasContribution(ctx, …)` |
 | Add shell UI chrome | `apps/demo-playground/src/` or your own app |
+| Wire canvas editor to workbench | App shell: `CanvasHostProvider` + `AbsoluteEditorPane` (see `apps/demo-playground`) |
 | Add generic plugin contribution | `packages/core` contribution + `ctx.register()` |
+| Add workbench UI contribution | `@openenvx/headless` + `ctx.registerWorkbench()` via `WorkbenchPlugin` |
 | Add flow layer type | `packages/canvas/src/layers/` |
 
 ## Commands

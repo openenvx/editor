@@ -1,14 +1,9 @@
-import type { EditorPaneHostProps, EditorViewportApi } from '@openenvx/core';
-import {
-  isLayerEditable,
-  isLayerWritable,
-  ContextKeyServiceId,
-} from '@openenvx/core';
-import type { LayerSurfaceItem } from '@openenvx/headless';
-import { useWorkbenchContext } from '@openenvx/headless/react';
+import type { EditorViewportApi } from '@openenvx/core';
+import { isLayerEditable, isLayerWritable } from '@openenvx/core';
 import type { Page } from '@openenvx/schema';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useCanvasHost } from '../canvas-host-context';
 import { CanvasStage } from '../canvas-stage';
 import type {
   CanvasSelectLayerOptions,
@@ -17,6 +12,7 @@ import type {
 import { captureClipboardDataTransferSync } from '../clipboard/read-external-clipboard';
 import { collectCanvasFontFamilies } from '../collect-canvas-font-families';
 import { useCanvasClipboardService } from '../hooks/use-canvas-clipboard-service';
+import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
 import {
   computePageSafeBounds,
   defaultShowMarginsForPage,
@@ -42,8 +38,8 @@ function isEditablePasteTarget(target: EventTarget | null): boolean {
   );
 }
 
-export interface CanvasEditorProps extends EditorPaneHostProps {
-  layerSurface: LayerSurfaceItem[];
+export interface CanvasEditorProps {
+  layerSurface: CanvasLayerSurfaceItem[];
   artboardWidth: number;
   artboardHeight: number;
   page: Page;
@@ -55,6 +51,9 @@ export interface CanvasEditorProps extends EditorPaneHostProps {
   onTransformChange: (layerId: string, change: CanvasTransformChange) => void;
   onPropertyChange: (layerId: string, key: string, value: unknown) => void;
   onExecuteCommand?: (commandId: string) => Promise<boolean>;
+  onZoomChange?: (zoomPercent: number) => void;
+  onContainerResize?: (size: { width: number; height: number }) => void;
+  onViewportApiReady?: (api: EditorViewportApi | null) => void;
 }
 
 function createViewportApi(
@@ -117,7 +116,7 @@ export const CanvasEditor = memo(
     onViewportApiReady,
   }: CanvasEditorProps) => {
     const canvasClipboardService = useCanvasClipboardService();
-    const { api } = useWorkbenchContext();
+    const host = useCanvasHost();
     const [containerRef, containerSize] = useContainerSize<HTMLDivElement>();
     const viewportRef = useRef<ViewportController | null>(null);
     const containerSizeRef = useRef(containerSize);
@@ -283,18 +282,14 @@ export const CanvasEditor = memo(
     const syncFocusedContext = useCallback(
       (focused: boolean) => {
         canvasClipboardService.setFocused(focused);
-        api
-          .getService(ContextKeyServiceId)
-          ?.setContext('canvas.focused', focused);
+        host.setContextKey('canvas.focused', focused);
       },
-      [api, canvasClipboardService]
+      [host, canvasClipboardService]
     );
 
     useEffect(() => {
-      api
-        .getService(ContextKeyServiceId)
-        ?.setContext('canvas.editingText', editingLayerId !== null);
-    }, [api, editingLayerId]);
+      host.setContextKey('canvas.editingText', editingLayerId !== null);
+    }, [host, editingLayerId]);
 
     useEffect(() => {
       canvasClipboardService.setEditingText(editingLayerId !== null);
@@ -302,17 +297,13 @@ export const CanvasEditor = memo(
 
     useEffect(() => {
       canvasClipboardService.setEditorActive(true);
-      api.getService(ContextKeyServiceId)?.setContext('canvas.focused', false);
+      host.setContextKey('canvas.focused', false);
       return () => {
         canvasClipboardService.setEditorActive(false);
-        api
-          .getService(ContextKeyServiceId)
-          ?.setContext('canvas.focused', false);
-        api
-          .getService(ContextKeyServiceId)
-          ?.setContext('canvas.editingText', false);
+        host.setContextKey('canvas.focused', false);
+        host.setContextKey('canvas.editingText', false);
       };
-    }, [api, canvasClipboardService]);
+    }, [host, canvasClipboardService]);
 
     useEffect(() => {
       canvasClipboardService.setStageHost(containerRef.current);
@@ -334,29 +325,29 @@ export const CanvasEditor = memo(
     }, [syncFocusedContext]);
 
     useEffect(() => {
-      const host = containerRef.current;
-      if (!host) {
+      const container = containerRef.current;
+      if (!container) {
         return;
       }
 
       const onMouseMove = (event: MouseEvent) => {
-        const rect = host.getBoundingClientRect();
+        const rect = container.getBoundingClientRect();
         canvasClipboardService.setLastPointer({
           screenX: event.clientX - rect.left,
           screenY: event.clientY - rect.top,
         });
       };
 
-      host.addEventListener('mousedown', handleStageMouseDown);
-      host.addEventListener('mouseenter', handleStageMouseEnter);
-      host.addEventListener('mouseleave', handleStageMouseLeave);
-      host.addEventListener('mousemove', onMouseMove);
+      container.addEventListener('mousedown', handleStageMouseDown);
+      container.addEventListener('mouseenter', handleStageMouseEnter);
+      container.addEventListener('mouseleave', handleStageMouseLeave);
+      container.addEventListener('mousemove', onMouseMove);
 
       return () => {
-        host.removeEventListener('mousedown', handleStageMouseDown);
-        host.removeEventListener('mouseenter', handleStageMouseEnter);
-        host.removeEventListener('mouseleave', handleStageMouseLeave);
-        host.removeEventListener('mousemove', onMouseMove);
+        container.removeEventListener('mousedown', handleStageMouseDown);
+        container.removeEventListener('mouseenter', handleStageMouseEnter);
+        container.removeEventListener('mouseleave', handleStageMouseLeave);
+        container.removeEventListener('mousemove', onMouseMove);
       };
     }, [
       canvasClipboardService,

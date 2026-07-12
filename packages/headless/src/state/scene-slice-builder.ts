@@ -10,10 +10,11 @@ import { buildViewContainer } from './view-descriptor-builder';
 import type { WorkbenchSliceContext } from './workbench-slice-context';
 
 export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
-  const registries = ctx.manager.getRegistries();
+  const coreRegistries = ctx.manager.getRegistries();
+  const workbenchRegistries = ctx.workbenchRegistries;
   const commandCtx = ctx.manager.createCommandContext();
   const canExecuteCommand = (commandId: string) =>
-    registries.commands.canExecute(commandId, commandCtx);
+    coreRegistries.commands.canExecute(commandId, commandCtx);
   const buildCtx = createContributionBuildContext(
     commandCtx.services,
     canExecuteCommand
@@ -26,17 +27,17 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
   const primaryLayer = getPrimaryLayer(scene);
   let properties: PropertySectionDescriptor[] | null = null;
   if (primaryLayer) {
-    const def = registries.layers.get(primaryLayer.type);
+    const def = coreRegistries.layers.get(primaryLayer.type);
     if (def) {
       properties = def.properties(commandCtx, primaryLayer);
     }
   }
 
-  const viewContainers = registries.viewContainers
+  const viewContainers = workbenchRegistries.viewContainers
     .map((container) =>
       buildViewContainer(
         container,
-        registries.views,
+        workbenchRegistries.views,
         commandCtx,
         evaluateWhen,
         buildCtx
@@ -45,7 +46,7 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
     .toSorted((a, b) => a.sidebarOrder - b.sidebarOrder);
 
   const inspectorPanes = [
-    ...registries.inspectorPanes
+    ...workbenchRegistries.inspectorPanes
       .map((pane) => pane.buildDescriptor(buildCtx))
       .filter((descriptor) => evaluateWhen(descriptor.when))
       .map((descriptor) => ({
@@ -66,7 +67,7 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
       : []),
   ].toSorted((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
 
-  const fieldRenderers = registries.fieldRenderers.map((renderer) => ({
+  const fieldRenderers = workbenchRegistries.fieldRenderers.map((renderer) => ({
     Component: renderer.Component,
     kind: renderer.kind,
   }));

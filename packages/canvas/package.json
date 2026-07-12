@@ -70,7 +70,6 @@
     "@fontsource/inter": "^5.2.8",
     "@fontsource/parisienne": "^5.2.8",
     "@openenvx/core": "workspace:*",
-    "@openenvx/headless": "workspace:*",
     "@openenvx/preview": "workspace:*",
     "@openenvx/schema": "workspace:*",
     "@tiptap/pm": "^3.27.3",

@@ -35,8 +35,6 @@ import {
 } from '../workbench/editor-viewport-service';
 import { IconRegistryImpl } from '../workbench/icon-registry-service';
 import { IconRegistryId } from '../workbench/icon-registry-service-id';
-import { ShellUiServiceImpl } from '../workbench/shell-ui-service';
-import { ShellUiServiceId } from '../workbench/shell-ui-service-id';
 import { ThemeServiceImpl } from '../workbench/theme-service';
 import { ThemeServiceId } from '../workbench/theme-service-id';
 
@@ -118,7 +116,6 @@ export class PluginManager {
     );
     services.registerInstance(ThemeServiceId, new ThemeServiceImpl());
     services.registerInstance(IconRegistryId, new IconRegistryImpl());
-    services.registerInstance(ShellUiServiceId, new ShellUiServiceImpl());
     services.registerInstance(
       DocumentHostServiceId,
       new MutableDocumentHostService()
@@ -215,10 +212,13 @@ export class PluginManager {
   }
 
   async activate(plugin: Plugin): Promise<void> {
+    await this.activateWithContext(plugin, this.createPluginContext());
+  }
+
+  async activateWithContext(plugin: Plugin, ctx: PluginContext): Promise<void> {
     if (this.lifecycle.isActivated(plugin.id)) {
       throw new Error(`Plugin already activated: ${plugin.id}`);
     }
-    const ctx = this.createPluginContext();
     await plugin.activate(ctx);
     this.lifecycle.markActivated(plugin);
     this.syncContextKeys();

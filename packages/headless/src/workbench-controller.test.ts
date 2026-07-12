@@ -1,26 +1,30 @@
 import { createLayerPreviewBuilder } from '@openenvx/preview';
 import {
   Command,
-  CommandPaletteContribution,
   createPropertyBuilder,
   LayerDefinition,
   Plugin,
-  ToolbarContribution,
 } from '@openenvx/core';
 import type {
   CommandContext,
-  CommandPaletteBuilder,
   Layer,
   LayerPreviewContext,
   Page,
   PluginContext,
   PropertySectionDescriptor,
-  ToolbarBuilder,
 } from '@openenvx/core';
 import { normalizeScene } from '@openenvx/schema';
 import { describe, expect, it, vi } from "vitest";
 
+import {
+  CommandPaletteContribution,
+} from './contributions/command-palette-contribution';
+import { ToolbarContribution } from './contributions/toolbar-contribution';
+import type { CommandPaletteBuilder } from './builders/command-palette-builder';
+import type { ToolbarBuilder } from './builders/toolbar-builder';
 import { WorkbenchController } from "./workbench-controller";
+import { WorkbenchPlugin } from './workbench-plugin';
+import type { WorkbenchPluginContext } from './workbench-plugin-context';
 
 class TestLayer extends LayerDefinition<{ text: string }> {
   readonly type = "test";
@@ -67,11 +71,12 @@ class PaletteCommand extends Command {
   execute(_ctx: CommandContext): void {}
 }
 
-class PalettePlugin extends Plugin {
+class PalettePlugin extends WorkbenchPlugin {
   readonly id = "palette";
 
-  activate(ctx: PluginContext): void {
-    ctx.register(new PaletteCommand(), new DemoPaletteContribution());
+  activateWorkbench(ctx: WorkbenchPluginContext): void {
+    ctx.register(new PaletteCommand());
+    ctx.registerWorkbench(new DemoPaletteContribution());
   }
 }
 
@@ -102,11 +107,11 @@ class DemoToolbarContribution extends ToolbarContribution {
   }
 }
 
-class ToolbarPlugin extends Plugin {
+class ToolbarPlugin extends WorkbenchPlugin {
   readonly id = 'toolbar';
 
-  activate(ctx: PluginContext): void {
-    ctx.register(new DemoToolbarContribution());
+  activateWorkbench(ctx: WorkbenchPluginContext): void {
+    ctx.registerWorkbench(new DemoToolbarContribution());
   }
 }
 

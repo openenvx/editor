@@ -1,6 +1,7 @@
-import type { InspectorValuePath, Scene } from '@openenvx/core';
+import type { Scene } from '@openenvx/core';
 
 import type { InspectorHostContext } from './inspector-path-resolver';
+import type { InspectorValuePath } from './inspector-value-path';
 
 export interface InspectorPathContextOptions {
   scene: Scene;

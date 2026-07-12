@@ -1,29 +1,32 @@
 import type {
   CommandExecutionResult,
-  CommandPaletteDescriptor,
   CommandService,
   EditorInput,
-  EditorPaneRegistration,
   EventBus,
-  FieldRendererRegistration,
-  InspectorPaneRegistration,
   Layer,
-  MenuItemDescriptor,
-  OverlayDescriptor,
   Plugin,
   PropertySectionDescriptor,
   Scene,
   SceneStore,
   Selection,
   ServiceId,
-  SidebarBehavior,
-  StatusBarItemDescriptor,
-  StatusBarItemRendererRegistration,
-  ToolbarItemDescriptor,
-  WorkbenchLayout,
   EditorService,
 } from '@openenvx/core';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
+
+import type { CommandPaletteDescriptor } from './builders/command-palette-builder';
+import type { MenuItemDescriptor } from './builders/menu-builder';
+import type { StatusBarItemDescriptor } from './builders/status-bar-builder';
+import type { ToolbarItemDescriptor } from './builders/toolbar-builder';
+import type { OverlayDescriptor } from './contributions/overlay-contribution';
+import type { SidebarBehavior } from './contributions/view-contribution';
+import type { EditorPaneRegistration } from './workbench/editor-pane-host-props';
+import type {
+  FieldRendererRegistration,
+  InspectorPaneRegistration,
+} from './workbench/inspector-pane-registration';
+import type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
+import type { WorkbenchLayout } from './workbench/workbench-layout';
 
 export interface ViewTreeItem {
   id: string;

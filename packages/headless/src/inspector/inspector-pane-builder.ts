@@ -1,10 +1,11 @@
-import { createPopupFieldsBuilder } from '../builders/popup-fields-builder';
-import type { PopupFieldsBuilder } from '../builders/popup-fields-builder';
-import type {
-  FieldAction,
-  NumericFieldConfig,
-  PropertyFieldDescriptor,
-} from '../builders/property-builder';
+import {
+  createPopupFieldsBuilder,
+  type FieldAction,
+  type NumericFieldConfig,
+  type PopupFieldsBuilder,
+  type PropertyFieldDescriptor,
+} from '@openenvx/core';
+
 import { InspectorBlockNode } from './inspector-block-node';
 import { InspectorInputGroupNode } from './inspector-input-group-node';
 import type { InspectorLayoutNode } from './inspector-layout-node';

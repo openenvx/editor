@@ -7,7 +7,8 @@ import type { WorkbenchSliceContext } from './workbench-slice-context';
 
 export class EditorSliceBuilder {
   build(ctx: WorkbenchSliceContext): EditorSlice {
-    const registries = ctx.manager.getRegistries();
+    const coreRegistries = ctx.manager.getRegistries();
+    const workbenchRegistries = ctx.workbenchRegistries;
     const commandCtx = ctx.manager.createCommandContext();
     const scene = ctx.sceneStore.getScene();
     const editor = ctx.editorService.getActiveEditor();
@@ -15,12 +16,12 @@ export class EditorSliceBuilder {
     const selectedIds = new Set(scene.selection.selectedLayerIds);
 
     const layerSurface = activePage.layers.map((layer) => {
-      const def = registries.layers.get(layer.type);
+      const def = coreRegistries.layers.get(layer.type);
       const previewCtx = {
         isSelected: selectedIds.has(layer.id),
         layerId: layer.id,
         model: def ? def.getModel(layer) : layer.data,
-        registry: registries.layers,
+        registry: coreRegistries.layers,
       };
       const view = resolveLayerPreview(
         def
@@ -37,7 +38,7 @@ export class EditorSliceBuilder {
     return {
       editor,
       editorPaneKind: resolveEditorPaneKind(scene),
-      editorPanes: registries.editorPanes.map((pane) => ({
+      editorPanes: workbenchRegistries.editorPanes.map((pane) => ({
         Component: pane.Component,
         editorPaneKind: pane.editorPaneKind,
       })),

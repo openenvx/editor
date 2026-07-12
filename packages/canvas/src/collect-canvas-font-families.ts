@@ -1,9 +1,8 @@
-import type { LayerSurfaceItem } from '@openenvx/headless';
-
 import { CANVAS_FONT_FAMILIES } from './fonts/canvas-font-catalog';
+import type { CanvasLayerSurfaceItem } from './layer-surface-item';
 
 export function collectCanvasFontFamilies(
-  layerSurface: LayerSurfaceItem[]
+  layerSurface: CanvasLayerSurfaceItem[]
 ): string[] {
   const fromLayers = layerSurface
     .filter((item) => item.layer.type === 'canvas.text')
