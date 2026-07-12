@@ -11,9 +11,9 @@
         "knip": "^6.26.0",
         "oxfmt": "^0.58.0",
         "oxlint": "^1.73.0",
-        "oxlint-plugin-react-doctor": "^0.7.4",
+        "oxlint-plugin-react-doctor": "^0.7.6",
         "turbo": "^2.10.4",
-        "typescript": "catalog:dev",
+        "typescript": "^6.0.3",
         "ultracite": "7.9.3",
       },
     },
@@ -45,7 +45,7 @@
     },
     "packages/canvas": {
       "name": "@openenvx/canvas",
-      "version": "1.0.0",
+      "version": "0.1.7",
       "dependencies": {
         "@fontsource/cormorant-garamond": "^5.2.11",
         "@fontsource/inter": "^5.2.8",
@@ -75,14 +75,14 @@
         "vitest": "catalog:testing",
       },
       "peerDependencies": {
-        "@openenvx/headless": ">=0.2.0",
+        "@openenvx/headless": ">=0.1.7",
         "react": ">=18",
         "react-dom": ">=18",
       },
     },
     "packages/core": {
       "name": "@openenvx/core",
-      "version": "1.0.0",
+      "version": "0.1.7",
       "dependencies": {
         "@openenvx/preview": "workspace:*",
         "@openenvx/schema": "workspace:*",
@@ -113,7 +113,7 @@
     },
     "packages/headless": {
       "name": "@openenvx/headless",
-      "version": "0.2.0",
+      "version": "0.1.7",
       "dependencies": {
         "@openenvx/core": "workspace:*",
         "@openenvx/preview": "workspace:*",
@@ -133,7 +133,7 @@
     },
     "packages/preview": {
       "name": "@openenvx/preview",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "dependencies": {
         "@openenvx/schema": "workspace:*",
       },
@@ -146,7 +146,7 @@
     },
     "packages/schema": {
       "name": "@openenvx/schema",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
         "tsup": "catalog:dev",

@@ -1,5 +1,16 @@
 # @openenvx/canvas
 
+## 0.1.7
+
+### Patch Changes
+
+- e5ec220: new interactions store
+- Updated dependencies [e5ec220]
+  - @openenvx/headless@0.1.7
+  - @openenvx/core@0.1.7
+  - @openenvx/preview@0.1.7
+  - @openenvx/schema@0.1.7
+
 ## 0.1.6
 
 ### Patch Changes
