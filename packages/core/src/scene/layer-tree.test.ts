@@ -1,7 +1,13 @@
 import type { Layer } from '@openenvx/schema';
 import { describe, expect, it } from "vitest";
 
-import { moveLayerRelativeToTarget, walkLayers, isLayerDescendant } from "./layer-tree";
+import type { Page } from "./types";
+import {
+  getLayerAncestorIds,
+  isLayerDescendant,
+  moveLayerRelativeToTarget,
+  walkLayers,
+} from "./layer-tree";
 
 describe("layer-tree", () => {
   const layers: Layer[] = [
@@ -34,5 +40,16 @@ describe("layer-tree", () => {
     expect(isLayerDescendant(layers, "c1", "a")).toBe(true);
     expect(isLayerDescendant(layers, "c1", "s1")).toBe(false);
     expect(isLayerDescendant(layers, "a", "c1")).toBe(false);
+  });
+
+  it("getLayerAncestorIds returns ancestor path for nested layers", () => {
+    const page: Page = {
+      id: "p1",
+      layers,
+      name: "Page",
+    };
+    expect(getLayerAncestorIds(page, "a")).toStrictEqual(["c1"]);
+    expect(getLayerAncestorIds(page, "c1")).toStrictEqual([]);
+    expect(getLayerAncestorIds(page, "missing")).toStrictEqual([]);
   });
 });

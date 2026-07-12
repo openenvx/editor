@@ -27,6 +27,13 @@ out/
 build
 dist
 
+# TypeScript emit artifacts in src (output belongs in dist/ only)
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts.map
+packages/*/src/**/*.d.ts
+!packages/**/css-modules.d.ts
+
 
 # Debug
 npm-debug.log*

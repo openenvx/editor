@@ -122,6 +122,7 @@ describe(WorkbenchController, () => {
     });
     await controller.start();
     const state = controller.getState();
+    expect(state.hoveredLayerId).toBeNull();
     expect(state.commandPalette.items.length).toBeGreaterThan(0);
     expect(
       state.commandPalette.items.some((item) => item.commandId === 'scene.undo')
@@ -496,5 +497,24 @@ describe(WorkbenchController, () => {
         },
       })
     ).toThrow(SceneValidationError);
+  });
+
+  it("setHoveredLayer updates state without rebuilding scene slice", async () => {
+    const controller = new WorkbenchController({
+      plugins: [new EmptyPlugin()],
+    });
+    await controller.start();
+    const cache = controller.getStateCacheForTest();
+    cache.rebuildCounts.scene = 0;
+
+    controller.api.setHoveredLayer("layer-a");
+    expect(controller.getState().hoveredLayerId).toBe("layer-a");
+    expect(cache.rebuildCounts.scene).toBe(0);
+
+    controller.api.setHoveredLayer("layer-a");
+    expect(cache.rebuildCounts.scene).toBe(0);
+
+    controller.api.setHoveredLayer(null);
+    expect(controller.getState().hoveredLayerId).toBeNull();
   });
 });

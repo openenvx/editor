@@ -44,10 +44,12 @@ export interface CanvasEditorProps {
   artboardHeight: number;
   page: Page;
   selectedLayerIds: string[];
+  hoveredLayerId?: string | null;
   canvasLayerRenderers: CanvasLayerRendererRegistration[];
   canvasLayerInteractions: CanvasLayerInteractionRegistration[];
   stageInteraction?: CanvasStageInteractionService | null;
   onSelectLayer: (layerId: string, options?: CanvasSelectLayerOptions) => void;
+  onHoverLayer?: (layerId: string | null) => void;
   onTransformChange: (layerId: string, change: CanvasTransformChange) => void;
   onPropertyChange: (layerId: string, key: string, value: unknown) => void;
   onExecuteCommand?: (commandId: string) => Promise<boolean>;
@@ -104,10 +106,12 @@ export const CanvasEditor = memo(
     artboardHeight,
     page,
     selectedLayerIds,
+    hoveredLayerId = null,
     canvasLayerRenderers,
     canvasLayerInteractions,
     stageInteraction,
     onSelectLayer,
+    onHoverLayer,
     onTransformChange,
     onPropertyChange,
     onExecuteCommand,
@@ -451,7 +455,9 @@ export const CanvasEditor = memo(
             containerWidth={containerSize.width}
             editingLayerId={editingLayerId}
             fontLoadRevision={fontLoadRevision}
+            hoveredLayerId={hoveredLayerId}
             layers={layerSurface}
+            onHoverLayer={onHoverLayer}
             onLayerDoubleClick={(layerId) => {
               const selectedLayer = layerSurface.find(
                 (item) => item.layer.id === layerId

@@ -66,7 +66,8 @@ export function CanvasStageLayerGroup({
       draggable={!isEditing && layerWritable}
       height={transform.height}
       key={layer.id}
-      listening={layerSelectable}
+      listening={true}
+      name={layer.id}
       onClick={(event) => {
         if (!layerSelectable) {
           return;

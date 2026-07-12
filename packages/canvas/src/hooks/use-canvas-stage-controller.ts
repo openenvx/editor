@@ -119,6 +119,8 @@ export interface CanvasStageController {
     rotation: number;
   };
   syncLabelFromTransformer: () => void;
+  handlePointerHover: () => void;
+  handlePointerLeave: () => void;
   scheduleRichTextLiveBake: (
     layerId: string,
     view: Extract<LayerPreviewDescriptor, { kind: 'richText' }>
@@ -146,10 +148,12 @@ export function useCanvasStageController({
   artboardHeight,
   layers,
   selectedLayerIds,
+  hoveredLayerId = null,
   editingLayerId = null,
   pageMarginBounds = null,
   showMargins = false,
   onSelectLayer,
+  onHoverLayer,
   onLayerDoubleClick,
   onTransformChange,
   onViewportChange,
@@ -164,10 +168,12 @@ export function useCanvasStageController({
   | 'artboardHeight'
   | 'layers'
   | 'selectedLayerIds'
+  | 'hoveredLayerId'
   | 'editingLayerId'
   | 'pageMarginBounds'
   | 'showMargins'
   | 'onSelectLayer'
+  | 'onHoverLayer'
   | 'onLayerDoubleClick'
   | 'onTransformChange'
   | 'onViewportChange'
@@ -198,6 +204,7 @@ export function useCanvasStageController({
   const nodeRefs = useRef<Map<string, Konva.Group>>(new Map());
   const dragSessionRef = useRef<DragSession | null>(null);
   const onSelectRef = useRef(onSelectLayer);
+  const onHoverRef = useRef(onHoverLayer);
   const onDoubleClickRef = useRef(onLayerDoubleClick);
   const onTransformRef = useRef(onTransformChange);
   const onViewportRef = useRef(onViewportChange);
@@ -208,12 +215,57 @@ export function useCanvasStageController({
   );
 
   onSelectRef.current = onSelectLayer;
+  onHoverRef.current = onHoverLayer;
   onDoubleClickRef.current = onLayerDoubleClick;
   onTransformRef.current = onTransformChange;
   onViewportRef.current = onViewportChange;
   selectedLayerIdsRef.current = selectedLayerIds;
   layersRef.current = layers;
   stageInteractionRef.current = stageInteraction;
+
+  const lastReportedHoverRef = useRef<string | null>(null);
+
+  const resolveHoveredLayerId = useCallback((stage: Konva.Stage | null) => {
+    if (!stage) {
+      return null;
+    }
+    const pos = stage.getPointerPosition();
+    if (!pos) {
+      return null;
+    }
+    const hit = stage.getIntersection(pos);
+    let current: Konva.Node | null = hit;
+    while (current) {
+      const id = current.name();
+      if (id && nodeRefs.current.has(id)) {
+        return id;
+      }
+      current = current.parent;
+    }
+    return null;
+  }, []);
+
+  const handlePointerHover = useCallback(() => {
+    const stage = artboardGroupRef.current?.getStage() ?? null;
+    const nextId = resolveHoveredLayerId(stage);
+    if (nextId === lastReportedHoverRef.current) {
+      return;
+    }
+    lastReportedHoverRef.current = nextId;
+    onHoverRef.current?.(nextId);
+  }, [resolveHoveredLayerId]);
+
+  const handlePointerLeave = useCallback(() => {
+    if (lastReportedHoverRef.current === null) {
+      return;
+    }
+    lastReportedHoverRef.current = null;
+    onHoverRef.current?.(null);
+  }, []);
+
+  useEffect(() => {
+    lastReportedHoverRef.current = hoveredLayerId;
+  }, [hoveredLayerId]);
 
   const vp = viewport.getViewport();
   const selectedPrimary = selectedLayerIds[0] ?? null;
@@ -739,6 +791,8 @@ export function useCanvasStageController({
     anchorDragBoundFunc,
     boundBoxFunc,
     syncLabelFromTransformer,
+    handlePointerHover,
+    handlePointerLeave,
     scheduleRichTextLiveBake,
     updateResizeGuides,
     handleLayerTransform,

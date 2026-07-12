@@ -45,10 +45,12 @@ export interface CanvasStageProps {
   artboardHeight: number;
   layers: CanvasStageLayer[];
   selectedLayerIds: string[];
+  hoveredLayerId?: string | null;
   editingLayerId?: string | null;
   pageMarginBounds?: CanvasRect | null;
   showMargins?: boolean;
   onSelectLayer: (layerId: string, options?: CanvasSelectLayerOptions) => void;
+  onHoverLayer?: (layerId: string | null) => void;
   onLayerDoubleClick?: (layerId: string) => void;
   onTransformChange?: (layerId: string, change: CanvasTransformChange) => void;
   onViewportChange?: (zoom: number) => void;

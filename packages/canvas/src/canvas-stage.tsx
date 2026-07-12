@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useMemo } from 'react';
 import {
   Group,
   Label,
@@ -10,6 +10,7 @@ import {
   Transformer,
 } from 'react-konva';
 
+import { CanvasHoverOutline } from './canvas-hover-outline';
 import { CanvasStageLayerGroup } from './canvas-stage-layer';
 import {
   EMPTY_CANVAS_LAYER_INTERACTIONS,
@@ -39,10 +40,12 @@ export function CanvasStage({
   artboardHeight,
   layers,
   selectedLayerIds,
+  hoveredLayerId = null,
   editingLayerId = null,
   pageMarginBounds = null,
   showMargins = false,
   onSelectLayer,
+  onHoverLayer,
   onLayerDoubleClick,
   onTransformChange,
   onViewportChange,
@@ -62,10 +65,12 @@ export function CanvasStage({
     layers,
     onLayerDoubleClick,
     onSelectLayer,
+    onHoverLayer,
     onTransformChange,
     onViewportChange,
     pageMarginBounds,
     selectedLayerIds,
+    hoveredLayerId,
     showMargins,
     stageInteraction,
     viewportController,
@@ -84,6 +89,7 @@ export function CanvasStage({
     bumpViewport,
     overlayPrimitives,
     editingLayerId: activeEditingLayerId,
+    selectedLayerIdSet,
     selectionLabelBounds,
     sizeLabelOffsetX,
     sizeLabelText,
@@ -93,9 +99,22 @@ export function CanvasStage({
     anchorDragBoundFunc,
     boundBoxFunc,
     syncLabelFromTransformer,
+    handlePointerHover,
+    handlePointerLeave,
   } = controller;
 
   const themeColors = useCanvasThemeColors(stageContainerRef);
+
+  const hoveredEntry = useMemo(() => {
+    if (
+      activeEditingLayerId ||
+      !hoveredLayerId ||
+      selectedLayerIdSet.has(hoveredLayerId)
+    ) {
+      return null;
+    }
+    return layers.find((entry) => entry.layer.id === hoveredLayerId) ?? null;
+  }, [activeEditingLayerId, hoveredLayerId, layers, selectedLayerIdSet]);
 
   useLayoutEffect(() => {
     const group = overlayGroupRef.current;
@@ -114,7 +133,11 @@ export function CanvasStage({
   }
 
   return (
-    <div ref={stageContainerRef} style={{ width: '100%', height: '100%' }}>
+    <div
+      onMouseLeave={handlePointerLeave}
+      ref={stageContainerRef}
+      style={{ width: '100%', height: '100%' }}
+    >
       <Stage
         height={containerHeight}
         onContextMenu={(event) => {
@@ -127,6 +150,7 @@ export function CanvasStage({
             onSelectRef.current('');
           }
         }}
+        onMouseMove={handlePointerHover}
         onWheel={(event) => {
           event.evt.preventDefault();
           const { ctrlKey, deltaMode, deltaX, deltaY } = event.evt;
@@ -209,6 +233,12 @@ export function CanvasStage({
                 rotateEnabled={
                   !activeDragAnchor || activeDragAnchor === 'rotater'
                 }
+              />
+            ) : null}
+            {hoveredEntry ? (
+              <CanvasHoverOutline
+                entry={hoveredEntry}
+                stroke={themeColors.selection}
               />
             ) : null}
             {selectionLabelBounds ? (

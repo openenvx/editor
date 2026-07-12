@@ -8,6 +8,7 @@ export interface CanvasThemeColors {
   foreground: string;
   pageMargin: string;
   selection: string;
+  selectionMuted: string;
   smartGuide: string;
 }
 
@@ -18,6 +19,7 @@ const DEFAULT_COLORS: CanvasThemeColors = {
   foreground: '#ffffff',
   pageMargin: '#a855f7',
   selection: '#3b82f6',
+  selectionMuted: 'rgba(59, 130, 246, 0.75)',
   smartGuide: '#ec4899',
 };
 
@@ -37,6 +39,7 @@ function readCanvasThemeColors(element: Element): CanvasThemeColors {
     foreground: read('--wb-foreground', DEFAULT_COLORS.foreground),
     pageMargin: read('--wb-page-margin', DEFAULT_COLORS.pageMargin),
     selection: read('--wb-selection', DEFAULT_COLORS.selection),
+    selectionMuted: read('--wb-selection-muted', DEFAULT_COLORS.selectionMuted),
     smartGuide: read('--wb-smart-guide', DEFAULT_COLORS.smartGuide),
   };
 }

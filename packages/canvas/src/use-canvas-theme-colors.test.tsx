@@ -13,6 +13,7 @@ function ThemeColorReader() {
       <span data-testid="border">{colors.artboardBorder}</span>
       <span data-testid="shadow">{colors.artboardShadow}</span>
       <span data-testid="selection">{colors.selection}</span>
+      <span data-testid="selection-muted">{colors.selectionMuted}</span>
       <span data-testid="foreground">{colors.foreground}</span>
     </div>
   );
@@ -27,6 +28,7 @@ describe('useCanvasThemeColors', () => {
       '--wb-artboard-border': '#d4d4d8',
       '--wb-artboard-shadow-color': 'rgba(0, 0, 0, 0.2)',
       '--wb-selection': '#2563eb',
+      '--wb-selection-muted': 'rgba(37, 99, 235, 0.5)',
       '--wb-foreground': '#18181b',
     };
     vi.spyOn(window, 'getComputedStyle').mockReturnValue({
@@ -40,6 +42,9 @@ describe('useCanvasThemeColors', () => {
       'rgba(0, 0, 0, 0.2)'
     );
     expect(screen.getByTestId('selection').textContent).toBe('#2563eb');
+    expect(screen.getByTestId('selection-muted').textContent).toBe(
+      'rgba(37, 99, 235, 0.5)'
+    );
     expect(screen.getByTestId('foreground').textContent).toBe('#18181b');
 
     vi.restoreAllMocks();
@@ -53,6 +58,9 @@ describe('useCanvasThemeColors', () => {
       'rgba(0, 0, 0, 0.35)'
     );
     expect(screen.getByTestId('selection').textContent).toBe('#3b82f6');
+    expect(screen.getByTestId('selection-muted').textContent).toBe(
+      'rgba(59, 130, 246, 0.75)'
+    );
     expect(screen.getByTestId('foreground').textContent).toBe('#ffffff');
   });
 });

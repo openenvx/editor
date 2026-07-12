@@ -49,6 +49,7 @@ export {
   type ContainerLayoutModel,
   findLayerById,
   findLayerPage,
+  getLayerAncestorIds,
   getContainerChildren,
   insertLayerIntoContainer,
   isContainerLayer,

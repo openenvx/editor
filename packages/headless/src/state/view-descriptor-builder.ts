@@ -107,5 +107,6 @@ function buildView(
     supportsReorder: typeof provider.handleMove === 'function',
     viewOrder: view.viewOrder ?? 0,
     viewSelection: view.viewSelection ?? 'layer',
+    viewHover: view.viewHover ?? 'layer',
   };
 }

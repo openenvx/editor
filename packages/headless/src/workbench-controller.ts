@@ -60,6 +60,7 @@ export class WorkbenchController {
   private readonly stateCache = new WorkbenchStateCache();
   private readonly editorSliceBuilder = new EditorSliceBuilder();
   private revision = 0;
+  private hoveredLayerId: string | null = null;
   private disposed = false;
   private detachKeybindings: (() => void) | null = null;
   private lastSeenContentRevision = -1;
@@ -178,6 +179,7 @@ export class WorkbenchController {
       scene: this.sceneStore,
       selectLayers: (layerIds, primaryLayerId) =>
         this.selectLayers(layerIds, primaryLayerId),
+      setHoveredLayer: (layerId) => this.setHoveredLayer(layerId),
       selectViewItem: (viewId, item) => this.selectViewItem(viewId, item),
       serializeScene: () => this.serializeScene(),
       undo: () => this.undo(),
@@ -274,6 +276,14 @@ export class WorkbenchController {
         ? primaryLayerId
         : editableIds[0];
     this.sceneStore.selectLayers(editableIds, validPrimary ?? null);
+  }
+
+  setHoveredLayer(layerId: string | null): void {
+    if (this.hoveredLayerId === layerId) {
+      return;
+    }
+    this.hoveredLayerId = layerId;
+    this.notify();
   }
 
   updateProperty(layerId: string, key: string, value: unknown): void {
@@ -421,6 +431,7 @@ export class WorkbenchController {
       editorPaneKind: editor.editorPaneKind,
       editorPanes: editor.editorPanes,
       fieldRenderers: scene.fieldRenderers,
+      hoveredLayerId: this.hoveredLayerId,
       inspectorPanes: scene.inspectorPanes,
       layerSurface: editor.layerSurface,
       layout: this.layout,

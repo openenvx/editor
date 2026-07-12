@@ -46,6 +46,7 @@ export {
   useCanvasViewport,
   type CanvasEditorProps,
 } from './editor/canvas-editor';
+export { AbsoluteEditorPane } from './editor/absolute-editor-pane';
 export { computeArtboardOffset, type ArtboardOffset } from './artboard-offset';
 export { useContainerSize, type ContainerSize } from './use-container-size';
 export {

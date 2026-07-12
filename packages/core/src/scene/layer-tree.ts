@@ -279,6 +279,16 @@ export function moveLayerRelativeToTarget(
   return roots;
 }
 
+export function getLayerAncestorIds(page: Page, layerId: string): string[] {
+  let ancestorIds: string[] = [];
+  walkLayers(page.layers, (layer, path) => {
+    if (layer.id === layerId) {
+      ancestorIds = path.map((ancestor) => ancestor.id);
+    }
+  });
+  return ancestorIds;
+}
+
 export function isLayerDescendant(
   layers: Layer[],
   ancestorId: string,

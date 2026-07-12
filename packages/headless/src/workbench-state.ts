@@ -46,6 +46,7 @@ export interface ViewDescriptor {
   name: string;
   viewOrder: number;
   viewSelection: 'layer' | 'page';
+  viewHover: 'layer' | 'page' | 'none';
   collapsible: boolean;
   initialCollapsed: boolean;
   items: ViewTreeItem[];
@@ -73,6 +74,7 @@ export interface WorkbenchState {
   revision: number;
   scene: Scene;
   selection: Selection;
+  hoveredLayerId: string | null;
   viewContainers: ViewContainerDescriptor[];
   properties: PropertySectionDescriptor[] | null;
   contextMenu: MenuItemDescriptor[];
@@ -113,6 +115,7 @@ export interface WorkbenchApi {
     position: 'before' | 'after' | 'inside'
   ) => void;
   selectLayers: (layerIds: string[], primaryLayerId?: string | null) => void;
+  setHoveredLayer: (layerId: string | null) => void;
   getService: <T>(token: ServiceId<T>) => T | undefined;
   undo: () => boolean;
   redo: () => boolean;

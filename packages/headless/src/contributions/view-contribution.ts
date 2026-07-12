@@ -65,6 +65,8 @@ export abstract class ViewContribution extends WorkbenchContribution {
   viewOrder?: number;
   /** Which scene id drives row selection highlight. Default: layer ids. */
   viewSelection?: 'layer' | 'page';
+  /** Which scene id drives row hover highlight. Default: layer ids. */
+  viewHover?: 'layer' | 'page' | 'none';
   collapsible?: boolean;
   initialCollapsed?: boolean;
 
