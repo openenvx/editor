@@ -4,6 +4,7 @@ import {
   createPropertyBuilder,
   LayerDefinition,
   Plugin,
+  WorkbenchEvents,
 } from '@openenvx/core';
 import type {
   CommandContext,
@@ -122,7 +123,7 @@ describe(WorkbenchController, () => {
     });
     await controller.start();
     const state = controller.getState();
-    expect(state.hoveredLayerId).toBeNull();
+    expect(state.interaction.hoveredLayerId).toBeNull();
     expect(state.commandPalette.items.length).toBeGreaterThan(0);
     expect(
       state.commandPalette.items.some((item) => item.commandId === 'scene.undo')
@@ -507,14 +508,31 @@ describe(WorkbenchController, () => {
     const cache = controller.getStateCacheForTest();
     cache.rebuildCounts.scene = 0;
 
+    const interactionHandler = vi.fn();
+    const dispose = controller.api.events.on(
+      WorkbenchEvents.DidChangeInteraction,
+      interactionHandler
+    );
+
     controller.api.setHoveredLayer("layer-a");
-    expect(controller.getState().hoveredLayerId).toBe("layer-a");
+    expect(controller.getState().interaction.hoveredLayerId).toBe("layer-a");
     expect(cache.rebuildCounts.scene).toBe(0);
+    expect(interactionHandler).toHaveBeenCalledTimes(1);
+    expect(interactionHandler).toHaveBeenLastCalledWith({
+      hoveredLayerId: "layer-a",
+    });
 
     controller.api.setHoveredLayer("layer-a");
     expect(cache.rebuildCounts.scene).toBe(0);
+    expect(interactionHandler).toHaveBeenCalledTimes(1);
 
     controller.api.setHoveredLayer(null);
-    expect(controller.getState().hoveredLayerId).toBeNull();
+    expect(controller.getState().interaction.hoveredLayerId).toBeNull();
+    expect(interactionHandler).toHaveBeenCalledTimes(2);
+    expect(interactionHandler).toHaveBeenLastCalledWith({
+      hoveredLayerId: null,
+    });
+
+    dispose();
   });
 });

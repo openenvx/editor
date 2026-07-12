@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/headless",
-  "version": "0.2.0",
+  "version": "0.1.6",
   "description": "Headless OpenEnvx controller - subscribe to UI state without a UI framework",
   "license": "MIT",
   "type": "module",

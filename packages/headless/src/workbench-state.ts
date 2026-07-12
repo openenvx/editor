@@ -3,6 +3,7 @@ import type {
   CommandService,
   EditorInput,
   EventBus,
+  InteractionState,
   Layer,
   Plugin,
   PropertySectionDescriptor,
@@ -74,7 +75,7 @@ export interface WorkbenchState {
   revision: number;
   scene: Scene;
   selection: Selection;
-  hoveredLayerId: string | null;
+  interaction: InteractionState;
   viewContainers: ViewContainerDescriptor[];
   properties: PropertySectionDescriptor[] | null;
   contextMenu: MenuItemDescriptor[];

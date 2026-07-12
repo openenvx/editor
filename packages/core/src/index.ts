@@ -82,6 +82,10 @@ export {
   type WorkbenchEventPayloads,
 } from './runtime/workbench-events';
 export {
+  createDefaultInteractionState,
+  type InteractionState,
+} from './runtime/interaction-state';
+export {
   createServiceId,
   getServiceDebugName,
   type ServiceId,

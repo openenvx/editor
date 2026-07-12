@@ -1,14 +1,5 @@
 # @openenvx/driver-image
 
-## 0.1.7
-
-### Patch Changes
-
-- Updated dependencies [f71b6f8]
-  - @openenvx/core@1.0.0
-  - @openenvx/headless@0.2.0
-  - @openenvx/canvas@1.0.0
-
 ## 0.1.6
 
 ### Patch Changes

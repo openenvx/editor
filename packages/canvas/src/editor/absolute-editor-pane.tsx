@@ -31,7 +31,7 @@ export const AbsoluteEditorPane = memo(
     const scene = useWorkbenchContextSelector((state) => state.scene);
     const selection = useWorkbenchContextSelector((state) => state.selection);
     const hoveredLayerId = useWorkbenchContextSelector(
-      (state) => state.hoveredLayerId
+      (state) => state.interaction.hoveredLayerId
     );
 
     const canvasHost = useMemo<CanvasHostApi>(

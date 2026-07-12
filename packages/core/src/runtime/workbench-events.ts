@@ -2,11 +2,13 @@ import type { SceneSnapshot, Selection } from '../scene/types';
 import type { EditorInput } from '../workbench/editor-service';
 import { Emitter } from './emitter';
 import type { Event } from './emitter';
+import type { InteractionState } from './interaction-state';
 
 export const WorkbenchEvents = {
   DidChangeActiveEditor: 'onDidChangeActiveEditor',
   DidChangeContext: 'onDidChangeContext',
   DidChangeDirty: 'onDidChangeDirty',
+  DidChangeInteraction: 'onDidChangeInteraction',
   DidChangeLocale: 'onDidChangeLocale',
   DidChangeScene: 'onDidChangeScene',
   DidChangeSelection: 'onDidChangeSelection',
@@ -20,6 +22,7 @@ export interface WorkbenchEventPayloads {
   [WorkbenchEvents.DidChangeActiveEditor]: EditorInput | null;
   [WorkbenchEvents.DidChangeContext]: void;
   [WorkbenchEvents.DidChangeDirty]: boolean;
+  [WorkbenchEvents.DidChangeInteraction]: InteractionState;
   [WorkbenchEvents.DidChangeLocale]: string;
   [WorkbenchEvents.DidChangeScene]: SceneSnapshot;
   [WorkbenchEvents.DidChangeSelection]: Selection;
@@ -42,6 +45,7 @@ export interface EventBus {
   readonly onDidChangeActiveEditor: Event<EditorInput | null>;
   readonly onDidChangeContext: Event<void>;
   readonly onDidChangeDirty: Event<boolean>;
+  readonly onDidChangeInteraction: Event<InteractionState>;
   readonly onDidChangeLocale: Event<string>;
   readonly onDidChangeScene: Event<SceneSnapshot>;
   readonly onDidChangeSelection: Event<Selection>;
@@ -55,6 +59,7 @@ export class WorkbenchEventService implements EventBus {
   private readonly activeEditorEmitter = new Emitter<EditorInput | null>();
   private readonly contextEmitter = new Emitter<void>();
   private readonly dirtyEmitter = new Emitter<boolean>();
+  private readonly interactionEmitter = new Emitter<InteractionState>();
   private readonly localeEmitter = new Emitter<string>();
   private readonly sceneEmitter = new Emitter<SceneSnapshot>();
   private readonly selectionEmitter = new Emitter<Selection>();
@@ -66,6 +71,7 @@ export class WorkbenchEventService implements EventBus {
   readonly onDidChangeActiveEditor = this.activeEditorEmitter.event;
   readonly onDidChangeContext = this.contextEmitter.event;
   readonly onDidChangeDirty = this.dirtyEmitter.event;
+  readonly onDidChangeInteraction = this.interactionEmitter.event;
   readonly onDidChangeLocale = this.localeEmitter.event;
   readonly onDidChangeScene = this.sceneEmitter.event;
   readonly onDidChangeSelection = this.selectionEmitter.event;
@@ -88,6 +94,11 @@ export class WorkbenchEventService implements EventBus {
       case WorkbenchEvents.DidChangeDirty: {
         return this.onDidChangeDirty(handler as (value: boolean) => void)
           .dispose;
+      }
+      case WorkbenchEvents.DidChangeInteraction: {
+        return this.onDidChangeInteraction(
+          handler as (value: InteractionState) => void
+        ).dispose;
       }
       case WorkbenchEvents.DidChangeLocale: {
         return this.onDidChangeLocale(handler as (value: string) => void)
@@ -139,6 +150,12 @@ export class WorkbenchEventService implements EventBus {
         );
         return;
       }
+      case WorkbenchEvents.DidChangeInteraction: {
+        this.interactionEmitter.fire(
+          payload as WorkbenchEventPayloads[typeof WorkbenchEvents.DidChangeInteraction]
+        );
+        return;
+      }
       case WorkbenchEvents.DidChangeLocale: {
         this.localeEmitter.fire(
           payload as WorkbenchEventPayloads[typeof WorkbenchEvents.DidChangeLocale]
@@ -174,6 +191,7 @@ export class WorkbenchEventService implements EventBus {
     this.activeEditorEmitter.dispose();
     this.contextEmitter.dispose();
     this.dirtyEmitter.dispose();
+    this.interactionEmitter.dispose();
     this.localeEmitter.dispose();
     this.sceneEmitter.dispose();
     this.selectionEmitter.dispose();

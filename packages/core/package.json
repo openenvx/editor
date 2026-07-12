@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/core",
-  "version": "1.0.0",
+  "version": "0.1.6",
   "description": "OpenEnvx foundation - scene model, plugins, commands, contributions",
   "license": "MIT",
   "type": "module",

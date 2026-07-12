@@ -1,5 +1,6 @@
 import type {
   EditorInput,
+  InteractionState,
   PropertySectionDescriptor,
   Scene,
   Selection,
@@ -22,7 +23,12 @@ import type {
 import type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
 import type { WorkbenchLayout } from './workbench/workbench-layout';
 
-export type SliceName = 'scene' | 'editor' | 'chrome' | 'commands';
+export type SliceName =
+  | 'scene'
+  | 'editor'
+  | 'chrome'
+  | 'commands'
+  | 'interaction';
 
 export interface SceneSlice {
   scene: Scene;
@@ -54,11 +60,14 @@ export interface CommandsSlice {
   commandStates: Record<string, { canExecute: boolean }>;
 }
 
+export type InteractionSlice = InteractionState;
+
 export interface SliceBuilders {
   buildSceneSlice: () => SceneSlice;
   buildEditorSlice: () => EditorSlice;
   buildChromeSlice: () => ChromeSlice;
   buildCommandsSlice: () => CommandsSlice;
+  buildInteractionSlice: () => InteractionSlice;
 }
 
 export class WorkbenchStateCache {
@@ -66,6 +75,7 @@ export class WorkbenchStateCache {
   private editorSlice: EditorSlice | null = null;
   private chromeSlice: ChromeSlice | null = null;
   private commandsSlice: CommandsSlice | null = null;
+  private interactionSlice: InteractionSlice | null = null;
   private readonly dirty = new Set<SliceName>();
   private lastContentRevision = -1;
 
@@ -74,6 +84,7 @@ export class WorkbenchStateCache {
     chrome: 0,
     commands: 0,
     editor: 0,
+    interaction: 0,
     scene: 0,
   };
 
@@ -82,6 +93,7 @@ export class WorkbenchStateCache {
     this.dirty.add('editor');
     this.dirty.add('chrome');
     this.dirty.add('commands');
+    this.dirty.add('interaction');
   }
 
   invalidateSceneContent(): void {
@@ -115,6 +127,10 @@ export class WorkbenchStateCache {
     this.dirty.add('commands');
   }
 
+  invalidateInteraction(): void {
+    this.dirty.add('interaction');
+  }
+
   onSceneContentRevision(contentRevision: number): void {
     this.lastContentRevision = contentRevision;
   }
@@ -128,6 +144,7 @@ export class WorkbenchStateCache {
     editor: EditorSlice;
     chrome: ChromeSlice;
     commands: CommandsSlice;
+    interaction: InteractionSlice;
   } {
     if (this.dirty.has('scene') || !this.sceneSlice) {
       this.sceneSlice = builders.buildSceneSlice();
@@ -145,6 +162,10 @@ export class WorkbenchStateCache {
       this.commandsSlice = builders.buildCommandsSlice();
       this.rebuildCounts.commands += 1;
     }
+    if (this.dirty.has('interaction') || !this.interactionSlice) {
+      this.interactionSlice = builders.buildInteractionSlice();
+      this.rebuildCounts.interaction += 1;
+    }
 
     this.dirty.clear();
 
@@ -152,6 +173,7 @@ export class WorkbenchStateCache {
       chrome: this.chromeSlice,
       commands: this.commandsSlice,
       editor: this.editorSlice,
+      interaction: this.interactionSlice,
       scene: this.sceneSlice,
     };
   }
@@ -161,11 +183,13 @@ export class WorkbenchStateCache {
     this.editorSlice = null;
     this.chromeSlice = null;
     this.commandsSlice = null;
+    this.interactionSlice = null;
     this.dirty.clear();
     this.lastContentRevision = -1;
     this.rebuildCounts.chrome = 0;
     this.rebuildCounts.commands = 0;
     this.rebuildCounts.editor = 0;
+    this.rebuildCounts.interaction = 0;
     this.rebuildCounts.scene = 0;
   }
 

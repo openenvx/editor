@@ -20,6 +20,7 @@ import { WorkbenchRegistries } from './registries/workbench-registries';
 import { buildChromeSlice } from './state/chrome-slice-builder';
 import { buildCommandsSlice } from './state/commands-slice-builder';
 import { EditorSliceBuilder } from './state/editor-slice-builder';
+import { InteractionStateStore } from './state/interaction-state-store';
 import { buildSceneSlice } from './state/scene-slice-builder';
 import type { WorkbenchSliceContext } from './state/workbench-slice-context';
 import { setNestedValue } from './utils/nested-value';
@@ -42,6 +43,7 @@ import type {
   ChromeSlice,
   CommandsSlice,
   EditorSlice,
+  InteractionSlice,
   SceneSlice,
 } from './workbench-state-cache';
 import { ShellUiServiceImpl } from './workbench/shell-ui-service';
@@ -59,8 +61,8 @@ export class WorkbenchController {
   private readonly eventDisposables: (() => void)[] = [];
   private readonly stateCache = new WorkbenchStateCache();
   private readonly editorSliceBuilder = new EditorSliceBuilder();
+  private readonly interactionState = new InteractionStateStore();
   private revision = 0;
-  private hoveredLayerId: string | null = null;
   private disposed = false;
   private detachKeybindings: (() => void) | null = null;
   private lastSeenContentRevision = -1;
@@ -152,7 +154,14 @@ export class WorkbenchController {
       events.on(WorkbenchEvents.DidChangeLocale, () => {
         this.stateCache.invalidateAll();
         this.notify();
-      })
+      }),
+      this.interactionState.onDidChange((state) => {
+        this.stateCache.invalidateInteraction();
+        this.manager
+          .getEvents()
+          .emit(WorkbenchEvents.DidChangeInteraction, state);
+        this.notify();
+      }).dispose
     );
   }
 
@@ -279,11 +288,7 @@ export class WorkbenchController {
   }
 
   setHoveredLayer(layerId: string | null): void {
-    if (this.hoveredLayerId === layerId) {
-      return;
-    }
-    this.hoveredLayerId = layerId;
-    this.notify();
+    this.interactionState.setHoveredLayer(layerId);
   }
 
   updateProperty(layerId: string, key: string, value: unknown): void {
@@ -387,6 +392,7 @@ export class WorkbenchController {
     }
     this.eventDisposables.length = 0;
     this.listeners.clear();
+    this.interactionState.dispose();
     this.manager.dispose();
   }
 
@@ -409,6 +415,7 @@ export class WorkbenchController {
       buildChromeSlice: () => buildChromeSlice(sliceCtx),
       buildCommandsSlice: () => buildCommandsSlice(sliceCtx),
       buildEditorSlice: () => this.editorSliceBuilder.build(sliceCtx),
+      buildInteractionSlice: () => this.interactionState.getState(),
       buildSceneSlice: () => buildSceneSlice(sliceCtx),
     });
 
@@ -420,8 +427,9 @@ export class WorkbenchController {
     editor: EditorSlice;
     chrome: ChromeSlice;
     commands: CommandsSlice;
+    interaction: InteractionSlice;
   }): WorkbenchState {
-    const { scene, editor, chrome, commands } = slices;
+    const { scene, editor, chrome, commands, interaction } = slices;
     return {
       commandPalette: chrome.commandPalette,
       commandStates: commands.commandStates,
@@ -431,7 +439,7 @@ export class WorkbenchController {
       editorPaneKind: editor.editorPaneKind,
       editorPanes: editor.editorPanes,
       fieldRenderers: scene.fieldRenderers,
-      hoveredLayerId: this.hoveredLayerId,
+      interaction,
       inspectorPanes: scene.inspectorPanes,
       layerSurface: editor.layerSurface,
       layout: this.layout,
