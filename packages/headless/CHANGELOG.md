@@ -1,5 +1,15 @@
 # @openenvx/headless
 
+## 0.1.8
+
+### Patch Changes
+
+- 181b8fc: Enhance canvas functionality with new layer management capabilities
+- Updated dependencies [181b8fc]
+  - @openenvx/schema@0.1.8
+  - @openenvx/core@0.1.8
+  - @openenvx/preview@0.1.8
+
 ## 0.1.7
 
 ### Patch Changes

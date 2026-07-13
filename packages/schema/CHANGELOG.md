@@ -1,5 +1,11 @@
 # @openenvx/schema
 
+## 0.1.8
+
+### Patch Changes
+
+- 181b8fc: Enhance canvas functionality with new layer management capabilities
+
 ## 0.1.7
 
 ### Patch Changes

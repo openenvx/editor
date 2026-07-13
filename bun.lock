@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "editor-core",
@@ -46,7 +45,7 @@
     },
     "packages/canvas": {
       "name": "@openenvx/canvas",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "dependencies": {
         "@fontsource/cormorant-garamond": "^5.2.11",
         "@fontsource/inter": "^5.2.8",
@@ -76,14 +75,14 @@
         "vitest": "catalog:testing",
       },
       "peerDependencies": {
-        "@openenvx/headless": ">=0.1.7",
+        "@openenvx/headless": ">=0.1.8",
         "react": ">=18",
         "react-dom": ">=18",
       },
     },
     "packages/core": {
       "name": "@openenvx/core",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "dependencies": {
         "@openenvx/preview": "workspace:*",
         "@openenvx/schema": "workspace:*",
@@ -97,7 +96,7 @@
     },
     "packages/driver-image": {
       "name": "@openenvx/driver-image",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "dependencies": {
         "@openenvx/canvas": "workspace:*",
         "@openenvx/core": "workspace:*",
@@ -114,7 +113,7 @@
     },
     "packages/headless": {
       "name": "@openenvx/headless",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "dependencies": {
         "@openenvx/core": "workspace:*",
         "@openenvx/preview": "workspace:*",
@@ -134,7 +133,7 @@
     },
     "packages/preview": {
       "name": "@openenvx/preview",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "dependencies": {
         "@openenvx/schema": "workspace:*",
       },
@@ -147,7 +146,7 @@
     },
     "packages/schema": {
       "name": "@openenvx/schema",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
         "tsup": "catalog:dev",
@@ -1485,7 +1484,7 @@
 
     "oxlint": ["oxlint@1.73.0", "", { "optionalDependencies": { "@oxlint/binding-android-arm-eabi": "1.73.0", "@oxlint/binding-android-arm64": "1.73.0", "@oxlint/binding-darwin-arm64": "1.73.0", "@oxlint/binding-darwin-x64": "1.73.0", "@oxlint/binding-freebsd-x64": "1.73.0", "@oxlint/binding-linux-arm-gnueabihf": "1.73.0", "@oxlint/binding-linux-arm-musleabihf": "1.73.0", "@oxlint/binding-linux-arm64-gnu": "1.73.0", "@oxlint/binding-linux-arm64-musl": "1.73.0", "@oxlint/binding-linux-ppc64-gnu": "1.73.0", "@oxlint/binding-linux-riscv64-gnu": "1.73.0", "@oxlint/binding-linux-riscv64-musl": "1.73.0", "@oxlint/binding-linux-s390x-gnu": "1.73.0", "@oxlint/binding-linux-x64-gnu": "1.73.0", "@oxlint/binding-linux-x64-musl": "1.73.0", "@oxlint/binding-openharmony-arm64": "1.73.0", "@oxlint/binding-win32-arm64-msvc": "1.73.0", "@oxlint/binding-win32-ia32-msvc": "1.73.0", "@oxlint/binding-win32-x64-msvc": "1.73.0" }, "peerDependencies": { "oxlint-tsgolint": ">=0.24.0", "vite-plus": "*" }, "optionalPeers": ["oxlint-tsgolint", "vite-plus"], "bin": { "oxlint": "bin/oxlint" } }, "sha512-u91G9TJzU6yqKWNZUYprQB07W7YvntZXaRxQ6CkoytepYhLWUXWsr1M8zUJ34VatNPuUAr3Z8GH+O2A331CluQ=="],
 
-    "oxlint-plugin-react-doctor": ["oxlint-plugin-react-doctor@0.7.6", "", { "dependencies": { "@typescript-eslint/types": "^8.59.3", "eslint-scope": "^9.1.2", "eslint-visitor-keys": "^5.0.1", "oxc-parser": "^0.138.0" } }, "sha512-oE01pROKCbxZ7mfHWXEZ27lw12ZWbWUe1p6OtgtRBtHWyNCqXi5MGYVsG7u3zlqG0i6k1UEYVvHrQvle2fJ1HQ=="],
+    "oxlint-plugin-react-doctor": ["oxlint-plugin-react-doctor@0.7.7", "", { "dependencies": { "@typescript-eslint/types": "^8.59.3", "eslint-scope": "^9.1.2", "eslint-visitor-keys": "^5.0.1", "oxc-parser": "^0.138.0" } }, "sha512-OMl/8k3rcxTSyMJWUL/pdq/ZZKFtv1F4kyM+AWYsj/YYaL/nftL/idrJOxyd2CuFa5Nrbz2DlK3QFRej1uwQ/Q=="],
 
     "p-filter": ["p-filter@2.1.0", "", { "dependencies": { "p-map": "^2.0.0" } }, "sha512-ZBxxZ5sL2HghephhpGAQdoskxplTwr7ICaehZwLIlfL6acuVgZPm8yBNuRAFBGEqtD/hmUeq9eqLg2ys9Xr/yw=="],
 
