@@ -64,9 +64,28 @@ All source files use **kebab-case** filenames.
 
 Match the surrounding package convention before creating files.
 
-### No backward compatibility
+### Type and interface naming
 
-Do not add migration shims, dual code paths, or fallbacks for removed APIs. Remove dead code instead of supporting legacy paths.
+Do **not** use Hungarian `I` prefixes on interfaces or type aliases.
+
+| Good                           | Bad                             |
+| ------------------------------ | ------------------------------- |
+| `interface RenderIrDocument`   | `interface IRenderIrDocument`   |
+| `interface ExportRunnerResult` | `interface IExportRunnerResult` |
+| `type ServerKnownPreviewKind`  | `type IServerKnownPreviewKind`  |
+
+- Prefer `interface` for object shapes; use `type` for unions and aliases.
+- Name interfaces and types in **PascalCase** without a leading `I`.
+- `bun run check:interface-names` enforces this in CI and pre-commit.
+
+### No backward compatibility until 1.0.0
+
+All packages are pre-1.0.0. Breaking API changes are expected and preferred over maintaining legacy paths.
+
+- Do **not** add migration shims, dual code paths, deprecated API fallbacks, or compatibility adapters for removed APIs.
+- **Remove** dead code when replacing an API instead of keeping the old path alive.
+- Do **not** run deprecation cycles — rename or replace in place and update callers in the same change.
+- After **1.0.0**, semver applies and breaking changes require a major version bump.
 
 ### Implementation discipline
 
@@ -106,5 +125,6 @@ OSS packages publish to npm as `@openenvx/*`. See [README.md](README.md) and the
 - [ ] `bun run test` passes for affected packages
 - [ ] No new canvas code under `packages/core`
 - [ ] New files use kebab-case
+- [ ] No `I`-prefixed interface or type alias names
 - [ ] No backward-compat shims for removed APIs
 - [ ] Architecture or extension docs updated if you changed package boundaries or plugin APIs

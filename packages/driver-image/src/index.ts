@@ -10,7 +10,10 @@ export {
   type SvgBounds,
   type SvgSerializeContext,
 } from './preview-kind-svg-serializer';
-export { registerBuiltinSvgSerializers } from './builtin-svg-serializers';
+export {
+  registerBuiltinSvgSerializers,
+  serializePreviewDescriptor,
+} from './builtin-svg-serializers';
 export { createSceneAssetResolver } from './resolve-scene-assets';
 export { rasterizeSvgToBytes, rasterizeSvgToPng } from './rasterize';
 export {
@@ -18,6 +21,16 @@ export {
   renderSvgDocumentFromOptions,
   type SvgDocumentRenderOptions,
 } from './svg-document-renderer';
+export {
+  flattenSceneToIR,
+  type FlattenSceneToIrOptions,
+} from './flatten-scene-to-ir';
+export {
+  IrRenderError,
+  renderIrDocument,
+  type IrDocumentRenderOptions,
+  type IrDocumentRenderResult,
+} from './ir-document-renderer';
 export { wrapLayerSvg } from './svg-transform';
 export {
   defaultFileName,
