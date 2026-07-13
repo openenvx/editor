@@ -1,7 +1,10 @@
 import type { Layer as SceneLayer } from '@openenvx/core';
-import { canSelectLayer, canTransformLayer } from '@openenvx/core';
+import {
+  canSelectLayer,
+  canTransformLayer,
+  getLayerChildren,
+} from '@openenvx/core';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
-import { createDefaultTransform } from '@openenvx/schema';
 import type Konva from 'konva';
 import {
   useCallback,
@@ -25,6 +28,7 @@ import {
   attachTransformerToNodes,
   getInteraction,
 } from '../canvas-transformer-utils';
+import { flattenStageLayers } from '../flatten-layer-surface';
 import {
   bakeNodeTransform,
   clampAnchorDragPosition,
@@ -42,6 +46,7 @@ import {
   startRichTextTransform,
 } from '../interactions/rich-text-transform-driver';
 import type { RichTextCornerSession } from '../interactions/rich-text-transform-driver';
+import { CANVAS_GROUP_LAYER_TYPE } from '../layers/canvas-group-layer';
 import { isRichTextHorizontalAnchor } from '../rich-text-resize';
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
 import type {
@@ -148,6 +153,7 @@ export function useCanvasStageController({
   artboardHeight,
   layers,
   selectedLayerIds,
+  primaryLayerId = null,
   hoveredLayerId = null,
   editingLayerId = null,
   pageMarginBounds = null,
@@ -168,6 +174,7 @@ export function useCanvasStageController({
   | 'artboardHeight'
   | 'layers'
   | 'selectedLayerIds'
+  | 'primaryLayerId'
   | 'hoveredLayerId'
   | 'editingLayerId'
   | 'pageMarginBounds'
@@ -209,7 +216,9 @@ export function useCanvasStageController({
   const onTransformRef = useRef(onTransformChange);
   const onViewportRef = useRef(onViewportChange);
   const selectedLayerIdsRef = useRef(selectedLayerIds);
-  const layersRef = useRef(layers);
+  const primaryLayerIdRef = useRef(primaryLayerId);
+  const flattenedLayers = useMemo(() => flattenStageLayers(layers), [layers]);
+  const layersRef = useRef(flattenedLayers);
   const stageInteractionRef = useRef<CanvasStageInteractionService | null>(
     stageInteraction
   );
@@ -220,7 +229,8 @@ export function useCanvasStageController({
   onTransformRef.current = onTransformChange;
   onViewportRef.current = onViewportChange;
   selectedLayerIdsRef.current = selectedLayerIds;
-  layersRef.current = layers;
+  primaryLayerIdRef.current = primaryLayerId;
+  layersRef.current = flattenedLayers;
   stageInteractionRef.current = stageInteraction;
 
   const lastReportedHoverRef = useRef<string | null>(null);
@@ -268,7 +278,7 @@ export function useCanvasStageController({
   }, [hoveredLayerId]);
 
   const vp = viewport.getViewport();
-  const selectedPrimary = selectedLayerIds[0] ?? null;
+  const selectedPrimary = primaryLayerId ?? selectedLayerIds[0] ?? null;
   const selectedLayerIdSet = useMemo(
     () => new Set(selectedLayerIds),
     [selectedLayerIds]
@@ -292,9 +302,9 @@ export function useCanvasStageController({
     (excludeIds: Set<string>): CanvasLayerTransformRef[] =>
       layersRef.current
         .filter(({ layer }) => !excludeIds.has(layer.id))
-        .map(({ layer }) => ({
+        .map(({ layer, absoluteTransform }) => ({
           layerType: layer.type,
-          transform: layer.transform ?? createDefaultTransform(),
+          transform: absoluteTransform,
         })),
     []
   );
@@ -357,7 +367,7 @@ export function useCanvasStageController({
   }, [editingLayerId, selectedLayerIds]);
 
   const selectedLayer = selectedPrimary
-    ? layers.find(({ layer }) => layer.id === selectedPrimary)
+    ? flattenedLayers.find(({ layer }) => layer.id === selectedPrimary)
     : null;
   const selectedTransform = selectedLayer?.layer.transform ?? null;
   const selectedInteraction = selectedLayer
@@ -580,7 +590,8 @@ export function useCanvasStageController({
         createRichTextTransformRuntime(
           layerId,
           view,
-          layers.find(({ layer }) => layer.id === layerId)?.layer.transform,
+          flattenedLayers.find(({ layer }) => layer.id === layerId)?.layer
+            .transform,
           node,
           transformerRef.current,
           transformDragRef.current?.anchor ?? null,
@@ -595,7 +606,7 @@ export function useCanvasStageController({
         )
       );
     },
-    [layers, updateSizeLabelImperatively]
+    [flattenedLayers, updateSizeLabelImperatively]
   );
 
   useEffect(() => {
@@ -655,6 +666,10 @@ export function useCanvasStageController({
     );
   }, [sizeLabelText]);
 
+  const isNonEmptyGroupSelected =
+    selectedLayer?.layer.type === CANVAS_GROUP_LAYER_TYPE &&
+    getLayerChildren(selectedLayer.layer).length > 0;
+
   const handleLayerTransform = useCallback(
     (
       layerId: string,
@@ -662,10 +677,9 @@ export function useCanvasStageController({
       view: LayerPreviewDescriptor,
       interactionKind: string | undefined
     ) => {
-      if (
-        interactionKind === 'richText' &&
-        layerId === selectedLayerIdsRef.current[0]
-      ) {
+      const transformPrimary =
+        primaryLayerIdRef.current ?? selectedLayerIdsRef.current[0] ?? null;
+      if (interactionKind === 'richText' && layerId === transformPrimary) {
         if (!transformDragRef.current && transformerRef.current) {
           transformDragRef.current = createTransformDragContext(
             transformerRef.current
@@ -675,7 +689,7 @@ export function useCanvasStageController({
           layerId,
           view as Extract<LayerPreviewDescriptor, { kind: 'richText' }>
         );
-      } else if (layerId === selectedLayerIdsRef.current[0]) {
+      } else if (layerId === transformPrimary) {
         updateResizeGuides();
         syncLabelFromTransformer();
       }
@@ -749,9 +763,11 @@ export function useCanvasStageController({
     ? activeDragAnchor === 'rotater'
       ? []
       : [activeDragAnchor]
-    : interactionAnchors
-      ? [...interactionAnchors]
-      : undefined;
+    : isNonEmptyGroupSelected
+      ? []
+      : interactionAnchors
+        ? [...interactionAnchors]
+        : undefined;
 
   return {
     stageContainerRef,

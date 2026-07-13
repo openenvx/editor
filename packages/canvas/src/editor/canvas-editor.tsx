@@ -11,6 +11,10 @@ import type {
 } from '../canvas-stage';
 import { captureClipboardDataTransferSync } from '../clipboard/read-external-clipboard';
 import { collectCanvasFontFamilies } from '../collect-canvas-font-families';
+import {
+  flattenLayerSurface,
+  findLayerSurfaceItem,
+} from '../flatten-layer-surface';
 import { useCanvasClipboardService } from '../hooks/use-canvas-clipboard-service';
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
 import {
@@ -44,6 +48,7 @@ export interface CanvasEditorProps {
   artboardHeight: number;
   page: Page;
   selectedLayerIds: string[];
+  primaryLayerId?: string | null;
   hoveredLayerId?: string | null;
   canvasLayerRenderers: CanvasLayerRendererRegistration[];
   canvasLayerInteractions: CanvasLayerInteractionRegistration[];
@@ -106,6 +111,7 @@ export const CanvasEditor = memo(
     artboardHeight,
     page,
     selectedLayerIds,
+    primaryLayerId = null,
     hoveredLayerId = null,
     canvasLayerRenderers,
     canvasLayerInteractions,
@@ -241,9 +247,14 @@ export const CanvasEditor = memo(
       viewport,
     ]);
 
+    const flatLayerSurface = useMemo(
+      () => flattenLayerSurface(layerSurface),
+      [layerSurface]
+    );
+
     const overlayLayers = useMemo(
       () =>
-        layerSurface.flatMap((item) => {
+        flatLayerSurface.flatMap((item) => {
           const interaction = canvasLayerInteractions.find(
             (entry) => entry.kind === item.view.kind
           );
@@ -251,12 +262,12 @@ export const CanvasEditor = memo(
             ? [{ layer: item.layer, view: item.view }]
             : [];
         }),
-      [canvasLayerInteractions, layerSurface]
+      [canvasLayerInteractions, flatLayerSurface]
     );
 
     const fontFamilies = useMemo(
-      () => collectCanvasFontFamilies(layerSurface),
-      [layerSurface]
+      () => collectCanvasFontFamilies(flatLayerSurface),
+      [flatLayerSurface]
     );
     const fontLoadRevision = useCanvasFontPreload(fontFamilies);
 
@@ -412,8 +423,9 @@ export const CanvasEditor = memo(
 
     const handleCommitEdit = useCallback(
       (layerId: string, html: string) => {
-        const selectedLayer = layerSurface.find(
-          (item) => item.layer.id === layerId
+        const selectedLayer = findLayerSurfaceItem(
+          layerSurface,
+          layerId
         )?.layer;
         if (selectedLayer && !canEditLayerData(selectedLayer)) {
           setEditingLayerId(null);
@@ -459,8 +471,9 @@ export const CanvasEditor = memo(
             layers={layerSurface}
             onHoverLayer={onHoverLayer}
             onLayerDoubleClick={(layerId) => {
-              const selectedLayer = layerSurface.find(
-                (item) => item.layer.id === layerId
+              const selectedLayer = findLayerSurfaceItem(
+                layerSurface,
+                layerId
               )?.layer;
               if (selectedLayer && !canEditLayerData(selectedLayer)) {
                 return;
@@ -473,8 +486,9 @@ export const CanvasEditor = memo(
                 onSelectLayer('');
                 return;
               }
-              const selectedLayer = layerSurface.find(
-                (item) => item.layer.id === layerId
+              const selectedLayer = findLayerSurfaceItem(
+                layerSurface,
+                layerId
               )?.layer;
               if (selectedLayer && !canSelectLayer(selectedLayer)) {
                 return;
@@ -487,6 +501,7 @@ export const CanvasEditor = memo(
             onTransformChange={onTransformChange}
             onViewportChange={handleViewportChange}
             pageMarginBounds={pageMarginBounds}
+            primaryLayerId={primaryLayerId}
             selectedLayerIds={selectedLayerIds}
             showMargins={showMargins}
             viewportController={viewport}

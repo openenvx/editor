@@ -133,6 +133,10 @@ const AbsoluteEditorPaneInner = memo(
             api.selectLayers([], null);
             return;
           }
+          if (options?.setPrimary) {
+            api.selectLayers(selection.selectedLayerIds, layerId);
+            return;
+          }
           if (options?.additive) {
             const current = selection.selectedLayerIds;
             if (current.includes(layerId)) {
@@ -152,6 +156,7 @@ const AbsoluteEditorPaneInner = memo(
         onViewportApiReady={onViewportApiReady}
         onZoomChange={onZoomChange}
         page={page}
+        primaryLayerId={selection.primaryLayerId}
         selectedLayerIds={selection.selectedLayerIds}
         stageInteraction={stageInteraction}
       />

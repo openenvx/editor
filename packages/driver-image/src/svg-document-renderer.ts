@@ -1,10 +1,9 @@
 import { getActivePage } from '@openenvx/core';
 import type { LayerRegistry } from '@openenvx/core';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
-import type { Layer, Page, Scene } from '@openenvx/schema';
+import type { Layer, Page, Scene, Transform } from '@openenvx/schema';
 import {
   computePageExportDimensions,
-  createDefaultTransform,
   resolvePageBackground,
 } from '@openenvx/schema';
 
@@ -12,6 +11,7 @@ import {
   registerBuiltinSvgSerializers,
   serializePreviewDescriptor,
 } from './builtin-svg-serializers';
+import { flattenLayersForExport } from './flatten-layers-for-export';
 import type { PreviewKindSvgSerializerRegistry } from './preview-kind-svg-serializer';
 import { getDefaultSerializerRegistry } from './preview-kind-svg-serializer';
 import { createSceneAssetResolver } from './resolve-scene-assets';
@@ -45,6 +45,7 @@ function resolveLayerPreviewForExport(
 
 function renderLayerSvg(
   layer: Layer,
+  transform: Transform,
   layerRegistry: LayerRegistry,
   serializers: PreviewKindSvgSerializerRegistry,
   scene: Scene,
@@ -57,7 +58,6 @@ function renderLayerSvg(
     return '';
   }
 
-  const transform = layer.transform ?? createDefaultTransform();
   const previewCtx = {
     isSelected: false,
     layerId: layer.id,
@@ -110,10 +110,11 @@ export function renderSvgDocument(
   const serializers =
     options.serializers ?? getDefaultSerializerRegistryWithBuiltins();
 
-  const bodies = page.layers
-    .map((layer) =>
+  const bodies = flattenLayersForExport(page.layers)
+    .map(({ layer, transform }) =>
       renderLayerSvg(
         layer,
+        transform,
         layerRegistry,
         serializers,
         scene,

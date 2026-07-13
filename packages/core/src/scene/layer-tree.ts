@@ -18,8 +18,43 @@ export function getContainerChildren(layer: Layer): Layer[] {
   if (!isContainerLayer(layer)) {
     return [];
   }
-  const data = layer.data as ContainerLayoutModel;
-  return Array.isArray(data.children) ? data.children : [];
+  return getLayerChildren(layer);
+}
+
+export function hasChildLayers(layer: Layer): boolean {
+  const data = layer.data;
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+  return (
+    'children' in data &&
+    Array.isArray((data as { children: unknown }).children)
+  );
+}
+
+export function getLayerChildren(layer: Layer): Layer[] {
+  if (!hasChildLayers(layer)) {
+    return [];
+  }
+  const data = layer.data as { children: Layer[] };
+  return data.children;
+}
+
+function mapLayerChildren(
+  layer: Layer,
+  mapper: (layers: Layer[]) => Layer[]
+): Layer {
+  if (!hasChildLayers(layer)) {
+    return layer;
+  }
+  const data = layer.data as { children: Layer[] };
+  return {
+    ...layer,
+    data: {
+      ...data,
+      children: mapper(data.children ?? []),
+    },
+  };
 }
 
 export function walkLayers(
@@ -29,8 +64,8 @@ export function walkLayers(
 ): void {
   for (const layer of layers) {
     visitor(layer, path);
-    if (isContainerLayer(layer)) {
-      walkLayers(getContainerChildren(layer), visitor, [...path, layer]);
+    if (hasChildLayers(layer)) {
+      walkLayers(getLayerChildren(layer), visitor, [...path, layer]);
     }
   }
 }
@@ -81,17 +116,7 @@ export function mapLayers(
 ): Layer[] {
   return layers.map((layer) => {
     const next = mapper(layer);
-    if (isContainerLayer(next)) {
-      const data = next.data as ContainerLayoutModel;
-      return {
-        ...next,
-        data: {
-          ...data,
-          children: mapLayers(data.children ?? [], mapper),
-        },
-      };
-    }
-    return next;
+    return mapLayerChildren(next, (children) => mapLayers(children, mapper));
   });
 }
 
@@ -104,36 +129,20 @@ export function updateLayerInTree(
     if (layer.id === layerId) {
       return updater(layer);
     }
-    if (isContainerLayer(layer)) {
-      const data = layer.data as ContainerLayoutModel;
-      return {
-        ...layer,
-        data: {
-          ...data,
-          children: updateLayerInTree(data.children ?? [], layerId, updater),
-        },
-      };
-    }
-    return layer;
+    return mapLayerChildren(layer, (children) =>
+      updateLayerInTree(children, layerId, updater)
+    );
   });
 }
 
 export function removeLayerFromTree(layers: Layer[], layerId: string): Layer[] {
   return layers
     .filter((layer) => layer.id !== layerId)
-    .map((layer) => {
-      if (!isContainerLayer(layer)) {
-        return layer;
-      }
-      const data = layer.data as ContainerLayoutModel;
-      return {
-        ...layer,
-        data: {
-          ...data,
-          children: removeLayerFromTree(data.children ?? [], layerId),
-        },
-      };
-    });
+    .map((layer) =>
+      mapLayerChildren(layer, (children) =>
+        removeLayerFromTree(children, layerId)
+      )
+    );
 }
 
 export function insertLayerIntoContainer(
@@ -144,7 +153,7 @@ export function insertLayerIntoContainer(
 ): Layer[] {
   return layers.map((layer) => {
     if (layer.id === containerId && isContainerLayer(layer)) {
-      const data = layer.data as ContainerLayoutModel;
+      const data = layer.data as { children: Layer[] };
       const children = [...(data.children ?? [])];
       const at = index ?? children.length;
       children.splice(at, 0, child);
@@ -153,22 +162,9 @@ export function insertLayerIntoContainer(
         data: { ...data, children },
       };
     }
-    if (isContainerLayer(layer)) {
-      const data = layer.data as ContainerLayoutModel;
-      return {
-        ...layer,
-        data: {
-          ...data,
-          children: insertLayerIntoContainer(
-            data.children ?? [],
-            containerId,
-            child,
-            index
-          ),
-        },
-      };
-    }
-    return layer;
+    return mapLayerChildren(layer, (children) =>
+      insertLayerIntoContainer(children, containerId, child, index)
+    );
   });
 }
 
@@ -221,8 +217,8 @@ export function findLayerLocation(
     return { containerId, index, parentLayers: layers };
   }
   for (const layer of layers) {
-    if (isContainerLayer(layer)) {
-      const children = getContainerChildren(layer);
+    if (hasChildLayers(layer)) {
+      const children = getLayerChildren(layer);
       const nested = findLayerLocation(children, layerId, layer.id);
       if (nested) {
         return nested;
@@ -264,7 +260,7 @@ export function moveLayerRelativeToTarget(
 
   if (targetLoc.containerId) {
     return updateLayerInTree(without, targetLoc.containerId, (container) => {
-      const data = container.data as ContainerLayoutModel;
+      const data = container.data as { children: Layer[] };
       const children = [...(data.children ?? [])];
       children.splice(insertIndex, 0, moving!);
       return {

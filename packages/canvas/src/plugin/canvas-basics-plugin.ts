@@ -42,6 +42,11 @@ import {
 } from '../commands/canvas-api-commands';
 import { CanvasCommandRequestService } from '../commands/canvas-command-request-service';
 import {
+  GroupSelectionCommand,
+  InsertCanvasGroupCommand,
+  UngroupSelectionCommand,
+} from '../commands/canvas-group-commands';
+import {
   CanvasZoomInCommand,
   CanvasZoomOutCommand,
   CanvasZoomResetCommand,
@@ -51,6 +56,7 @@ import {
 import { canvasFontService } from '../fonts/canvas-font-service';
 import { CanvasI18nBundle } from '../i18n/canvas-i18n-bundle';
 import { CanvasCircleLayer } from '../layers/canvas-circle-layer';
+import { CanvasGroupLayer } from '../layers/canvas-group-layer';
 import { CanvasImageLayer } from '../layers/canvas-image-layer';
 import { CanvasRectLayer } from '../layers/canvas-rect-layer';
 import { CanvasTextLayer } from '../layers/canvas-text-layer';
@@ -230,10 +236,14 @@ export class CanvasBasicsPlugin extends Plugin {
       new CanvasImageLayer(),
       new CanvasRectLayer(),
       new CanvasCircleLayer(),
+      new CanvasGroupLayer(),
       new InsertCanvasTextCommand(),
       new InsertCanvasImageCommand(),
       new InsertCanvasRectCommand(),
       new InsertCanvasCircleCommand(),
+      new InsertCanvasGroupCommand(),
+      new GroupSelectionCommand(),
+      new UngroupSelectionCommand(),
       new ResizePagePresetCommand(),
       new SetPageSizeCommand(),
       new SetPagePresetCommand(),
@@ -356,8 +366,8 @@ export function createCanvasDemoScene() {
     ],
     selection: {
       activePageId: 'canvas-page',
-      primaryLayerId: 'text',
-      selectedLayerIds: ['text'],
+      primaryLayerId: null,
+      selectedLayerIds: [],
     },
   });
 }

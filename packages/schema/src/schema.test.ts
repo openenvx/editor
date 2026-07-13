@@ -17,4 +17,41 @@ describe("schema", () => {
     expect(scene.activePageId).toBe("p1");
     expect(scene.selection.activePageId).toBe("p1");
   });
+
+  it("accepts nested layer ids in selection", () => {
+    const scene = normalizeScene({
+      activePageId: "p1",
+      pages: [
+        {
+          id: "p1",
+          layout: "absolute",
+          name: "Page",
+          width: 800,
+          height: 600,
+          layers: [
+            {
+              data: {
+                children: [
+                  {
+                    id: "child-1",
+                    type: "canvas.rect",
+                    data: { fill: "#000" },
+                  },
+                ],
+              },
+              id: "group-1",
+              type: "canvas.group",
+            },
+          ],
+        },
+      ],
+      selection: {
+        activePageId: "p1",
+        primaryLayerId: "child-1",
+        selectedLayerIds: ["child-1"],
+      },
+    });
+
+    expect(validateScene(scene).valid).toBe(true);
+  });
 });

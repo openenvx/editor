@@ -1,11 +1,12 @@
 import { createDefaultTransform } from '@openenvx/schema';
 import type Konva from 'konva';
-import { Group } from 'react-konva';
+import { Group, Rect } from 'react-konva';
 
 import { CanvasLayerContent } from './canvas-layer-content';
 import type { CanvasStageLayer } from './canvas-stage-types';
 import { getInteraction } from './canvas-transformer-utils';
 import type { CanvasStageController } from './hooks/use-canvas-stage-controller';
+import { CANVAS_GROUP_LAYER_TYPE } from './layers/canvas-group-layer';
 import type {
   CanvasLayerInteractionRegistration,
   CanvasLayerRendererRegistration,
@@ -26,7 +27,7 @@ export function CanvasStageLayerGroup({
   canvasLayerInteractions,
   fontLoadRevision,
 }: CanvasStageLayerGroupProps) {
-  const { layer, view } = entry;
+  const { layer, view, children } = entry;
   const transform = layer.transform ?? createDefaultTransform();
   const interaction = getInteraction(canvasLayerInteractions, view.kind);
   const {
@@ -50,6 +51,7 @@ export function CanvasStageLayerGroup({
     completeLayerTransform,
   } = controller;
 
+  const isGroupLayer = layer.type === CANVAS_GROUP_LAYER_TYPE;
   const isEditing = editingLayerId === layer.id;
   const isImperativeTransformTarget =
     transformSessionLayerId === layer.id &&
@@ -69,6 +71,7 @@ export function CanvasStageLayerGroup({
       listening={true}
       name={layer.id}
       onClick={(event) => {
+        event.cancelBubble = true;
         if (!layerSelectable) {
           return;
         }
@@ -139,6 +142,7 @@ export function CanvasStageLayerGroup({
         }
       }}
       onDragStart={() => {
+        onSelectRef.current(layer.id, { setPrimary: true });
         if (!selectedLayerIdSet.has(layer.id) || selectedLayerIds.length <= 1) {
           dragSessionRef.current = null;
           return;
@@ -193,14 +197,35 @@ export function CanvasStageLayerGroup({
       x={transform.x}
       y={transform.y}
     >
-      <CanvasLayerContent
-        canvasLayerRenderers={canvasLayerRenderers}
-        fontLoadRevision={fontLoadRevision}
-        height={transform.height}
-        hidden={isHiddenDuringEdit || isImperativeTransformTarget}
-        view={view}
-        width={transform.width}
-      />
+      {isGroupLayer ? (
+        <Rect
+          dash={[6, 4]}
+          height={transform.height}
+          listening={true}
+          stroke="#6366f1"
+          strokeWidth={1}
+          width={transform.width}
+        />
+      ) : (
+        <CanvasLayerContent
+          canvasLayerRenderers={canvasLayerRenderers}
+          fontLoadRevision={fontLoadRevision}
+          height={transform.height}
+          hidden={isHiddenDuringEdit || isImperativeTransformTarget}
+          view={view}
+          width={transform.width}
+        />
+      )}
+      {children?.map((childEntry) => (
+        <CanvasStageLayerGroup
+          canvasLayerInteractions={canvasLayerInteractions}
+          canvasLayerRenderers={canvasLayerRenderers}
+          controller={controller}
+          entry={childEntry}
+          fontLoadRevision={fontLoadRevision}
+          key={childEntry.layer.id}
+        />
+      ))}
     </Group>
   );
 }

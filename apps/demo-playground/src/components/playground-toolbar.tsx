@@ -5,6 +5,9 @@ const TOOLBAR_ACTIONS = [
   { commandId: 'canvas.insertImage', label: 'Add Image' },
   { commandId: 'canvas.insertRect', label: 'Add Rect' },
   { commandId: 'canvas.insertCircle', label: 'Add Circle' },
+  { commandId: 'canvas.insertGroup', label: 'Add Group' },
+  { commandId: 'canvas.groupSelection', label: 'Group Selection' },
+  { commandId: 'canvas.ungroup', label: 'Ungroup' },
 ] as const;
 
 const EXPORT_ACTIONS = [

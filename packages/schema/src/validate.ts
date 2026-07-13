@@ -1,9 +1,34 @@
 import { LAYER_WRITE_MODES, SCHEMA_VERSION } from './types';
-import type { Scene } from './types';
+import type { Layer, Page, Scene } from './types';
 
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
+}
+
+function layerExistsOnPage(page: Page, layerId: string): boolean {
+  let exists = false;
+
+  function walk(layers: Layer[]): void {
+    for (const layer of layers) {
+      if (layer.id === layerId) {
+        exists = true;
+        return;
+      }
+      const data = layer.data;
+      if (
+        data &&
+        typeof data === 'object' &&
+        'children' in data &&
+        Array.isArray((data as { children: unknown }).children)
+      ) {
+        walk((data as { children: Layer[] }).children);
+      }
+    }
+  }
+
+  walk(page.layers ?? []);
+  return exists;
 }
 
 export function validateScene(scene: Scene): ValidationResult {
@@ -64,9 +89,8 @@ export function validateScene(scene: Scene): ValidationResult {
   if (scene.selection) {
     const page = scene.pages.find((p) => p.id === scene.selection.activePageId);
     if (page) {
-      const ids = new Set(page.layers.map((l) => l.id));
       for (const id of scene.selection.selectedLayerIds) {
-        if (!ids.has(id)) {
+        if (!layerExistsOnPage(page, id)) {
           errors.push(`selection references unknown layer: ${id}`);
         }
       }

@@ -17,6 +17,7 @@ import {
   EMPTY_CANVAS_LAYER_RENDERERS,
 } from './canvas-stage-types';
 import type { CanvasStageProps } from './canvas-stage-types';
+import { flattenStageLayers } from './flatten-layer-surface';
 import { useCanvasStageController } from './hooks/use-canvas-stage-controller';
 import { syncCanvasOverlays } from './stage/canvas-overlay-sync';
 import { useCanvasThemeColors } from './use-canvas-theme-colors';
@@ -40,6 +41,7 @@ export function CanvasStage({
   artboardHeight,
   layers,
   selectedLayerIds,
+  primaryLayerId = null,
   hoveredLayerId = null,
   editingLayerId = null,
   pageMarginBounds = null,
@@ -70,6 +72,7 @@ export function CanvasStage({
     onViewportChange,
     pageMarginBounds,
     selectedLayerIds,
+    primaryLayerId,
     hoveredLayerId,
     showMargins,
     stageInteraction,
@@ -105,6 +108,8 @@ export function CanvasStage({
 
   const themeColors = useCanvasThemeColors(stageContainerRef);
 
+  const flattenedLayers = useMemo(() => flattenStageLayers(layers), [layers]);
+
   const hoveredEntry = useMemo(() => {
     if (
       activeEditingLayerId ||
@@ -113,8 +118,15 @@ export function CanvasStage({
     ) {
       return null;
     }
-    return layers.find((entry) => entry.layer.id === hoveredLayerId) ?? null;
-  }, [activeEditingLayerId, hoveredLayerId, layers, selectedLayerIdSet]);
+    return (
+      flattenedLayers.find((entry) => entry.layer.id === hoveredLayerId) ?? null
+    );
+  }, [
+    activeEditingLayerId,
+    flattenedLayers,
+    hoveredLayerId,
+    selectedLayerIdSet,
+  ]);
 
   useLayoutEffect(() => {
     const group = overlayGroupRef.current;

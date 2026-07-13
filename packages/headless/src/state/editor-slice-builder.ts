@@ -1,9 +1,20 @@
-import { getActivePage, resolveEditorPaneKind } from '@openenvx/core';
+import {
+  getActivePage,
+  getLayerChildren,
+  resolveEditorPaneKind,
+} from '@openenvx/core';
+import type { Layer } from '@openenvx/core';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
 
 import { resolveLayerPreview } from '../utils/layer-preview-resolver';
 import type { EditorSlice } from '../workbench-state-cache';
 import type { WorkbenchSliceContext } from './workbench-slice-context';
+
+interface LayerSurfaceItem {
+  layer: Layer;
+  view: LayerPreviewDescriptor;
+  children?: LayerSurfaceItem[];
+}
 
 export class EditorSliceBuilder {
   build(ctx: WorkbenchSliceContext): EditorSlice {
@@ -15,7 +26,7 @@ export class EditorSliceBuilder {
     const activePage = getActivePage(scene);
     const selectedIds = new Set(scene.selection.selectedLayerIds);
 
-    const layerSurface = activePage.layers.map((layer) => {
+    const buildSurfaceItem = (layer: Layer): LayerSurfaceItem => {
       const def = coreRegistries.layers.get(layer.type);
       const previewCtx = {
         isSelected: selectedIds.has(layer.id),
@@ -32,8 +43,17 @@ export class EditorSliceBuilder {
             },
         commandCtx
       );
-      return { layer, view };
-    });
+      const childLayers = getLayerChildren(layer);
+      const children =
+        childLayers.length > 0
+          ? childLayers.map((child) => buildSurfaceItem(child))
+          : undefined;
+      return { layer, view, children };
+    };
+
+    const layerSurface = activePage.layers.map((layer) =>
+      buildSurfaceItem(layer)
+    );
 
     return {
       editor,

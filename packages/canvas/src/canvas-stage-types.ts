@@ -26,11 +26,13 @@ export interface DragSession {
 
 export interface CanvasSelectLayerOptions {
   additive?: boolean;
+  setPrimary?: boolean;
 }
 
 export interface CanvasStageLayer {
   layer: SceneLayer;
   view: LayerPreviewDescriptor;
+  children?: CanvasStageLayer[];
 }
 
 export interface CanvasTransformChange {
@@ -45,6 +47,7 @@ export interface CanvasStageProps {
   artboardHeight: number;
   layers: CanvasStageLayer[];
   selectedLayerIds: string[];
+  primaryLayerId?: string | null;
   hoveredLayerId?: string | null;
   editingLayerId?: string | null;
   pageMarginBounds?: CanvasRect | null;

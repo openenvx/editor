@@ -61,6 +61,8 @@ export {
   findLayerPage,
   getLayerAncestorIds,
   getContainerChildren,
+  getLayerChildren,
+  hasChildLayers,
   insertLayerIntoContainer,
   isContainerLayer,
   layerExistsOnPage,

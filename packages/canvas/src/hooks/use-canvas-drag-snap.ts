@@ -4,7 +4,8 @@ import type Konva from 'konva';
 import { useCallback } from 'react';
 import type { RefObject } from 'react';
 
-import type { CanvasStageLayer, DragSession } from '../canvas-stage-types';
+import type { DragSession } from '../canvas-stage-types';
+import type { FlattenedStageLayer } from '../flatten-layer-surface';
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
 import type {
   CanvasLayerTransformRef,
@@ -31,7 +32,7 @@ export function useCanvasDragSnap({
   dragSessionRef: RefObject<DragSession | null>;
   getMarginInset: () => CanvasRect | null;
   getOtherLayers: (excludeIds: Set<string>) => CanvasLayerTransformRef[];
-  layersRef: RefObject<CanvasStageLayer[]>;
+  layersRef: RefObject<FlattenedStageLayer[]>;
   nodeRefs: RefObject<Map<string, Konva.Group>>;
   selectedLayerIdsRef: RefObject<string[]>;
   setInteractionOverlays: (
@@ -75,17 +76,23 @@ export function useCanvasDragSnap({
         const proposedRects = selectedLayerIdsRef.current
           .map((id) => {
             const layerStart = session.starts.get(id);
-            const layerTransform =
-              layersRef.current.find((entry) => entry.layer.id === id)?.layer
-                .transform ?? createDefaultTransform();
+            const entry = layersRef.current.find(
+              (item) => item.layer.id === id
+            );
+            const relativeTransform =
+              entry?.layer.transform ?? createDefaultTransform();
+            const absoluteTransform =
+              entry?.absoluteTransform ?? relativeTransform;
             if (!layerStart) {
               return null;
             }
             return {
-              height: layerTransform.height,
-              width: layerTransform.width,
-              x: layerStart.x + dx,
-              y: layerStart.y + dy,
+              height: relativeTransform.height,
+              width: relativeTransform.width,
+              x:
+                absoluteTransform.x + (layerStart.x + dx - relativeTransform.x),
+              y:
+                absoluteTransform.y + (layerStart.y + dy - relativeTransform.y),
             };
           })
           .filter((rect): rect is CanvasRect => rect !== null);
@@ -119,15 +126,19 @@ export function useCanvasDragSnap({
         return;
       }
 
+      const entry = layersRef.current.find((item) => item.layer.id === layerId);
+      const relativeTransform = entry?.layer.transform ?? transform;
+      const absoluteTransform = entry?.absoluteTransform ?? relativeTransform;
+
       const adjusted = interaction?.adjustDrag?.({
         artboard,
         marginInset,
         moving: {
           bounds: {
-            height: transform.height,
-            width: transform.width,
-            x: node.x(),
-            y: node.y(),
+            height: relativeTransform.height,
+            width: relativeTransform.width,
+            x: absoluteTransform.x + (node.x() - relativeTransform.x),
+            y: absoluteTransform.y + (node.y() - relativeTransform.y),
           },
           layerType: movingLayerType,
         },

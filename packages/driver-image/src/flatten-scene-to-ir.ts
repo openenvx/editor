@@ -18,6 +18,7 @@ import {
   registerBuiltinSvgSerializers,
   serializePreviewDescriptor,
 } from './builtin-svg-serializers';
+import { flattenLayersForExport } from './flatten-layers-for-export';
 import type { PreviewKindSvgSerializerRegistry } from './preview-kind-svg-serializer';
 import { getDefaultSerializerRegistry } from './preview-kind-svg-serializer';
 import { createSceneAssetResolver } from './resolve-scene-assets';
@@ -127,42 +128,43 @@ export function flattenSceneToIR(
   const resolveAsset = createSceneAssetResolver(scene);
   const { width, height } = resolvePagePixelDimensions(page);
 
-  const nodes: RenderIrNode[] = page.layers.map((layer) => {
-    const transform = layer.transform ?? createDefaultTransform();
-    const def = layerRegistry.get(layer.type);
+  const nodes: RenderIrNode[] = flattenLayersForExport(page.layers).map(
+    ({ layer, transform }) => {
+      const def = layerRegistry.get(layer.type);
 
-    if (!def) {
+      if (!def) {
+        return {
+          descriptor: {
+            kind: 'placeholder',
+            text: `Unknown layer: ${layer.type}`,
+          },
+          id: layer.id,
+          transform,
+        };
+      }
+
+      const previewCtx = {
+        isSelected: false,
+        layerId: layer.id,
+        model: def.getModel(layer),
+        registry: layerRegistry,
+      };
+
       return {
-        descriptor: {
-          kind: 'placeholder',
-          text: `Unknown layer: ${layer.type}`,
-        },
+        descriptor: flattenDescriptor(
+          def.renderPreview(previewCtx),
+          layer,
+          scene,
+          pageId,
+          layerRegistry,
+          resolveAsset,
+          serializers
+        ),
         id: layer.id,
         transform,
       };
     }
-
-    const previewCtx = {
-      isSelected: false,
-      layerId: layer.id,
-      model: def.getModel(layer),
-      registry: layerRegistry,
-    };
-
-    return {
-      descriptor: flattenDescriptor(
-        def.renderPreview(previewCtx),
-        layer,
-        scene,
-        pageId,
-        layerRegistry,
-        resolveAsset,
-        serializers
-      ),
-      id: layer.id,
-      transform,
-    };
-  });
+  );
 
   return {
     assets: scene.assets as RenderIrDocument['assets'],

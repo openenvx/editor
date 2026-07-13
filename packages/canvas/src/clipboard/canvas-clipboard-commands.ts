@@ -1,4 +1,9 @@
-import { getActivePage, canInsertLayers, localize } from '@openenvx/core';
+import {
+  getActivePage,
+  canInsertLayers,
+  findLayerById,
+  localize,
+} from '@openenvx/core';
 import type { CommandContext, Layer } from '@openenvx/core';
 import { createDefaultTransform } from '@openenvx/schema';
 
@@ -33,9 +38,10 @@ function isCanvasClipboardActive(service: CanvasClipboardService): boolean {
 }
 
 function getSelectedLayers(ctx: CommandContext): Layer[] {
-  const page = getActivePage(ctx.scene.getScene());
-  const selectedIds = new Set(ctx.selection.selectedLayerIds);
-  return page.layers.filter((layer) => selectedIds.has(layer.id));
+  const scene = ctx.scene.getScene();
+  return ctx.selection.selectedLayerIds
+    .map((id) => findLayerById(scene, id))
+    .filter((layer): layer is Layer => layer !== null);
 }
 
 function insertCanvasLayers(
@@ -245,9 +251,10 @@ export async function executeDuplicateLayers(
   }
 
   const page = getActivePage(ctx.scene.getScene());
-  const indices = selected.map((layer) =>
-    page.layers.findIndex((entry) => entry.id === layer.id)
-  );
+  const indices = selected.map((layer) => {
+    const rootIndex = page.layers.findIndex((entry) => entry.id === layer.id);
+    return rootIndex !== -1 ? rootIndex : page.layers.length;
+  });
   const insertIndex = Math.max(...indices) + 1;
   const clones = offsetLayers(
     cloneLayers(selected),
