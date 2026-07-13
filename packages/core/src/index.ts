@@ -39,6 +39,16 @@ export {
   resolveEditorPaneKind,
 } from './scene/types';
 export {
+  buildFrozenLayerSnapshot,
+  canDeleteLayer,
+  canDuplicateLayer,
+  canEditLayerData,
+  canInsertLayers,
+  canReorderLayer,
+  canResizePage,
+  canSelectLayer,
+  canTransformLayer,
+  getLayerWriteMode,
   isLayerEditable,
   isLayerLocked,
   isLayerWritable,

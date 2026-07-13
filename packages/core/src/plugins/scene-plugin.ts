@@ -4,9 +4,10 @@ import { Plugin } from '../core/plugin';
 import type { PluginContext } from '../core/plugin-manager';
 import type { CommandContext } from '../runtime/types';
 import {
+  canDeleteLayer,
+  canReorderLayer,
   isLayerEditable,
   isLayerLocked,
-  isLayerWritable,
 } from '../scene/layer-editability';
 import {
   findLayerById,
@@ -50,7 +51,7 @@ export class DeleteLayerCommand extends Command {
     const scene = ctx.scene.getScene();
     return ctx.selection.selectedLayerIds.every((id) => {
       const layer = findLayerById(scene, id);
-      return layer && isLayerWritable(layer);
+      return layer && canDeleteLayer(layer, scene);
     });
   }
 
@@ -99,7 +100,7 @@ class MoveLayerRelativeCommand extends Command {
       return false;
     }
     const layer = page.layers.find((l) => l.id === id);
-    if (!layer || !isLayerWritable(layer)) {
+    if (!layer || !canReorderLayer(layer)) {
       return false;
     }
     const index = page.layers.indexOf(layer);
@@ -161,7 +162,7 @@ export class MoveLayerCommand extends Command {
     }
     const scene = ctx.scene.getScene();
     const layer = findLayerById(scene, moveArgs.layerId);
-    if (!layer || !isLayerWritable(layer)) {
+    if (!layer || !canReorderLayer(layer)) {
       return false;
     }
     const page = getActivePage(scene);

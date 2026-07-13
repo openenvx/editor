@@ -1,4 +1,4 @@
-import { SCHEMA_VERSION } from './types';
+import { LAYER_WRITE_MODES, SCHEMA_VERSION } from './types';
 import type { Scene } from './types';
 
 export interface ValidationResult {
@@ -46,7 +46,19 @@ export function validateScene(scene: Scene): ValidationResult {
       if (!layer.type) {
         errors.push(`layer ${layer.id}: type is required`);
       }
+      if (
+        layer.writeMode &&
+        !LAYER_WRITE_MODES.includes(
+          layer.writeMode as (typeof LAYER_WRITE_MODES)[number]
+        )
+      ) {
+        errors.push(`layer ${layer.id}: invalid writeMode`);
+      }
     }
+  }
+
+  if (scene.templatePolicy && scene.templatePolicy.version !== 1) {
+    errors.push('templatePolicy.version must be 1');
   }
 
   if (scene.selection) {

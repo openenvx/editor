@@ -1,11 +1,14 @@
 export {
+  LAYER_WRITE_MODES,
   SCHEMA_VERSION,
   type CornerRadius,
   type EditorPaneKind,
+  type FrozenLayerSnapshot,
   type Layer,
   type LayerBorder,
   type LayerShadow,
   type LayerStyle,
+  type LayerWriteMode,
   type LengthUnit,
   type Padding,
   type Page,
@@ -15,6 +18,7 @@ export {
   type SceneAssetInline,
   type SceneSnapshot,
   type Selection,
+  type TemplatePolicy,
   type Transform,
 } from './types';
 

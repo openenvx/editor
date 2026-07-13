@@ -1,5 +1,8 @@
 import {
   Command,
+  canResizePage,
+  canTransformLayer,
+  findLayerById,
   getActivePage,
   getPrimaryLayer,
   localize,
@@ -53,11 +56,22 @@ function getDocumentExporter(
   return ctx.services.get(CanvasDocumentExportServiceId);
 }
 
+function canTransformLayerById(ctx: CommandContext, layerId: string): boolean {
+  const layer = findLayerById(ctx.scene.getScene(), layerId);
+  return layer ? canTransformLayer(layer) : false;
+}
+
+function canTransformPrimaryLayer(ctx: CommandContext): boolean {
+  const layer = getPrimaryLayer(ctx.scene.getScene());
+  return layer ? canTransformLayer(layer) : false;
+}
+
 export class SetPageSizeCommand extends Command {
   readonly id = 'canvas.setPageSize';
 
   canExecute(ctx: CommandContext): boolean {
-    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+    const scene = ctx.scene.getScene();
+    return getActivePage(scene).layout === 'absolute' && canResizePage(scene);
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -93,7 +107,8 @@ export class SetPagePresetCommand extends Command {
   readonly id = 'canvas.setPagePreset';
 
   canExecute(ctx: CommandContext): boolean {
-    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+    const scene = ctx.scene.getScene();
+    return getActivePage(scene).layout === 'absolute' && canResizePage(scene);
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -139,6 +154,9 @@ export class ResizePagePresetCommand extends Command {
     if (getActivePage(ctx.scene.getScene()).layout !== 'absolute') {
       return false;
     }
+    if (!canResizePage(ctx.scene.getScene())) {
+      return false;
+    }
     return Boolean((args as PagePresetArgs | undefined)?.presetId);
   }
 
@@ -155,10 +173,17 @@ export class UpdateLayerTransformCommand extends Command {
   readonly id = 'canvas.updateLayerTransform';
 
   canExecute(ctx: CommandContext, args?: unknown): boolean {
-    if (args) {
-      return true;
+    const layerArgs = args as LayerTransformArgs | undefined;
+    if (layerArgs?.layerId) {
+      return canTransformLayerById(ctx, layerArgs.layerId);
     }
-    return getCommandRequests(ctx).hasQueuedTransformUpdate();
+
+    const queued = getCommandRequests(ctx).peekQueuedTransformUpdate();
+    if (queued) {
+      return canTransformLayerById(ctx, queued.layerId);
+    }
+
+    return false;
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -176,7 +201,7 @@ export class RotateLayerLeftCommand extends Command {
   readonly id = 'canvas.rotateLeft';
 
   canExecute(ctx: CommandContext): boolean {
-    return Boolean(getPrimaryLayer(ctx.scene.getScene())?.transform);
+    return canTransformPrimaryLayer(ctx);
   }
 
   execute(ctx: CommandContext): void {
@@ -188,7 +213,7 @@ export class RotateLayerRightCommand extends Command {
   readonly id = 'canvas.rotateRight';
 
   canExecute(ctx: CommandContext): boolean {
-    return Boolean(getPrimaryLayer(ctx.scene.getScene())?.transform);
+    return canTransformPrimaryLayer(ctx);
   }
 
   execute(ctx: CommandContext): void {
@@ -200,10 +225,17 @@ export class UpdateRichTextTransformCommand extends Command {
   readonly id = 'canvas.updateRichTextTransform';
 
   canExecute(ctx: CommandContext, args?: unknown): boolean {
-    if (args) {
-      return true;
+    const richArgs = args as RichTextTransformArgs | undefined;
+    if (richArgs?.layerId) {
+      return canTransformLayerById(ctx, richArgs.layerId);
     }
-    return getCommandRequests(ctx).hasQueuedRichTextTransformUpdate();
+
+    const queued = getCommandRequests(ctx).peekQueuedRichTextTransformUpdate();
+    if (queued) {
+      return canTransformLayerById(ctx, queued.layerId);
+    }
+
+    return false;
   }
 
   execute(ctx: CommandContext, args?: unknown): void {

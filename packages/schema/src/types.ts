@@ -52,13 +52,36 @@ export interface Transform {
   scaleY?: number;
 }
 
+export const LAYER_WRITE_MODES = [
+  'locked',
+  'free',
+  'content',
+  'properties',
+] as const;
+
+export type LayerWriteMode = (typeof LAYER_WRITE_MODES)[number];
+
+export interface FrozenLayerSnapshot {
+  data?: unknown;
+  transform?: Transform;
+}
+
+export interface TemplatePolicy {
+  version: 1;
+  allowInsertLayers: boolean;
+  allowDeleteLayers: boolean;
+  allowDuplicateLayers: boolean;
+  allowPageResize: boolean;
+  frozenLayers?: Record<string, FrozenLayerSnapshot>;
+}
+
 export interface Layer {
   id: string;
   type: string;
   data: unknown;
   transform?: Transform;
   style?: LayerStyle;
-  editable?: boolean;
+  writeMode?: LayerWriteMode;
   locked?: boolean;
 }
 
@@ -97,6 +120,7 @@ export interface Scene {
   activePageId: string;
   selection: Selection;
   assets?: Record<string, SceneAsset>;
+  templatePolicy?: TemplatePolicy;
 }
 
 export interface SceneSnapshot {

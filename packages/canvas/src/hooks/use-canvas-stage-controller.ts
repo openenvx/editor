@@ -1,5 +1,5 @@
 import type { Layer as SceneLayer } from '@openenvx/core';
-import { isLayerEditable, isLayerWritable } from '@openenvx/core';
+import { canSelectLayer, canTransformLayer } from '@openenvx/core';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { createDefaultTransform } from '@openenvx/schema';
 import type Konva from 'konva';
@@ -365,11 +365,11 @@ export function useCanvasStageController({
     : undefined;
 
   const isLayerSelectable = useCallback(
-    (layer: SceneLayer) => isLayerEditable(layer),
+    (layer: SceneLayer) => canSelectLayer(layer),
     []
   );
   const isLayerWritableCallback = useCallback(
-    (layer: SceneLayer) => isLayerWritable(layer),
+    (layer: SceneLayer) => canTransformLayer(layer),
     []
   );
   const isRichTextSelected = selectedInteraction?.kind === 'richText';

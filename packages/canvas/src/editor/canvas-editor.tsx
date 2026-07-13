@@ -1,5 +1,5 @@
 import type { EditorViewportApi } from '@openenvx/core';
-import { isLayerEditable, isLayerWritable } from '@openenvx/core';
+import { canEditLayerData, canSelectLayer } from '@openenvx/core';
 import type { Page } from '@openenvx/schema';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -415,7 +415,7 @@ export const CanvasEditor = memo(
         const selectedLayer = layerSurface.find(
           (item) => item.layer.id === layerId
         )?.layer;
-        if (selectedLayer && !isLayerWritable(selectedLayer)) {
+        if (selectedLayer && !canEditLayerData(selectedLayer)) {
           setEditingLayerId(null);
           return;
         }
@@ -462,7 +462,7 @@ export const CanvasEditor = memo(
               const selectedLayer = layerSurface.find(
                 (item) => item.layer.id === layerId
               )?.layer;
-              if (selectedLayer && !isLayerWritable(selectedLayer)) {
+              if (selectedLayer && !canEditLayerData(selectedLayer)) {
                 return;
               }
               setEditingLayerId(layerId);
@@ -476,7 +476,7 @@ export const CanvasEditor = memo(
               const selectedLayer = layerSurface.find(
                 (item) => item.layer.id === layerId
               )?.layer;
-              if (selectedLayer && !isLayerEditable(selectedLayer)) {
+              if (selectedLayer && !canSelectLayer(selectedLayer)) {
                 return;
               }
               if (editingLayerId && layerId !== editingLayerId) {

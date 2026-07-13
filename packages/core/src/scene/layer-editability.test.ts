@@ -1,69 +1,232 @@
 import { describe, expect, it } from 'vitest';
 
-import { isLayerEditable, isLayerLocked, isLayerWritable } from './layer-editability';
-import type { Layer } from './types';
+import {
+  buildFrozenLayerSnapshot,
+  canDeleteLayer,
+  canDuplicateLayer,
+  canEditLayerData,
+  canInsertLayers,
+  canSelectLayer,
+  canTransformLayer,
+  getLayerWriteMode,
+  isLayerEditable,
+  isLayerLocked,
+  isLayerWritable,
+} from './layer-editability';
+import type { Layer, Scene } from './types';
 
 function createLayer(overrides: Partial<Layer> = {}): Layer {
   return {
     data: {},
-    editable: overrides.editable ?? true,
     id: 'layer-1',
     locked: overrides.locked ?? false,
     type: 'canvas.text',
+    writeMode: overrides.writeMode ?? 'free',
     ...overrides,
   };
 }
 
+function createScene(overrides: Partial<Scene> = {}): Scene {
+  return {
+    activePageId: 'page-1',
+    pages: [
+      {
+        id: 'page-1',
+        layers: [],
+        layout: 'absolute',
+        name: 'Page',
+        height: 100,
+        width: 100,
+      },
+    ],
+    schemaVersion: 1,
+    selection: {
+      activePageId: 'page-1',
+      primaryLayerId: null,
+      selectedLayerIds: [],
+    },
+    ...overrides,
+  };
+}
+
+describe('getLayerWriteMode', () => {
+  it('defaults to free when writeMode is missing', () => {
+    expect(getLayerWriteMode(createLayer({ writeMode: undefined }))).toBe(
+      'free'
+    );
+  });
+
+  it('returns explicit writeMode', () => {
+    expect(getLayerWriteMode(createLayer({ writeMode: 'content' }))).toBe(
+      'content'
+    );
+  });
+});
+
 describe('isLayerEditable', () => {
-  it('returns true when editable is undefined (default behavior)', () => {
-    const layer = createLayer({ editable: undefined });
-    expect(isLayerEditable(layer)).toBe(true);
+  it('returns false for locked writeMode', () => {
+    expect(isLayerEditable(createLayer({ writeMode: 'locked' }))).toBe(false);
   });
 
-  it('returns true when editable is true', () => {
-    const layer = createLayer({ editable: true });
-    expect(isLayerEditable(layer)).toBe(true);
+  it('returns true for content writeMode', () => {
+    expect(isLayerEditable(createLayer({ writeMode: 'content' }))).toBe(true);
+  });
+});
+
+describe('canSelectLayer', () => {
+  it('returns false for locked layers', () => {
+    expect(canSelectLayer(createLayer({ writeMode: 'locked' }))).toBe(false);
   });
 
-  it('returns false when editable is false', () => {
-    const layer = createLayer({ editable: false });
-    expect(isLayerEditable(layer)).toBe(false);
+  it('returns true for content layers', () => {
+    expect(canSelectLayer(createLayer({ writeMode: 'content' }))).toBe(true);
+  });
+});
+
+describe('canTransformLayer', () => {
+  it('allows only free mode', () => {
+    expect(canTransformLayer(createLayer({ writeMode: 'free' }))).toBe(true);
+    expect(canTransformLayer(createLayer({ writeMode: 'content' }))).toBe(false);
+    expect(canTransformLayer(createLayer({ writeMode: 'properties' }))).toBe(
+      false
+    );
+  });
+
+  it('returns false when runtime locked', () => {
+    expect(
+      canTransformLayer(createLayer({ writeMode: 'free', locked: true }))
+    ).toBe(false);
+  });
+});
+
+describe('canEditLayerData', () => {
+  it('allows content and properties modes', () => {
+    expect(canEditLayerData(createLayer({ writeMode: 'content' }))).toBe(true);
+    expect(canEditLayerData(createLayer({ writeMode: 'properties' }))).toBe(
+      true
+    );
+    expect(canEditLayerData(createLayer({ writeMode: 'locked' }))).toBe(false);
+  });
+});
+
+describe('templatePolicy', () => {
+  it('blocks delete when allowDeleteLayers is false', () => {
+    const scene = createScene({
+      templatePolicy: {
+        allowDeleteLayers: false,
+        allowDuplicateLayers: true,
+        allowInsertLayers: true,
+        allowPageResize: true,
+        version: 1,
+      },
+    });
+
+    expect(canDeleteLayer(createLayer({ writeMode: 'free' }), scene)).toBe(
+      false
+    );
+  });
+
+  it('blocks insert when allowInsertLayers is false', () => {
+    const scene = createScene({
+      templatePolicy: {
+        allowDeleteLayers: true,
+        allowDuplicateLayers: true,
+        allowInsertLayers: false,
+        allowPageResize: true,
+        version: 1,
+      },
+    });
+
+    expect(canInsertLayers(scene)).toBe(false);
+  });
+
+  it('blocks duplicate when allowDuplicateLayers is false', () => {
+    const scene = createScene({
+      templatePolicy: {
+        allowDeleteLayers: true,
+        allowDuplicateLayers: false,
+        allowInsertLayers: true,
+        allowPageResize: true,
+        version: 1,
+      },
+    });
+
+    expect(canDuplicateLayer(createLayer({ writeMode: 'free' }), scene)).toBe(
+      false
+    );
+  });
+});
+
+describe('buildFrozenLayerSnapshot', () => {
+  it('freezes data and transform for locked layers', () => {
+    const scene = createScene({
+      pages: [
+        {
+          id: 'page-1',
+          layers: [
+            createLayer({
+              data: { html: '<p>x</p>' },
+              id: 'bg',
+              transform: { height: 10, opacity: 1, rotation: 0, width: 10, x: 1, y: 2 },
+              writeMode: 'locked',
+            }),
+          ],
+          layout: 'absolute',
+          name: 'Page',
+          height: 100,
+          width: 100,
+        },
+      ],
+    });
+
+    const frozen = buildFrozenLayerSnapshot(scene);
+    expect(frozen.bg?.data).toEqual({ html: '<p>x</p>' });
+    expect(frozen.bg?.transform).toEqual({
+      height: 10,
+      opacity: 1,
+      rotation: 0,
+      width: 10,
+      x: 1,
+      y: 2,
+    });
+  });
+
+  it('freezes transform only for properties layers', () => {
+    const scene = createScene({
+      pages: [
+        {
+          id: 'page-1',
+          layers: [
+            createLayer({
+              data: { foregroundColor: '#000' },
+              id: 'qr',
+              transform: { height: 10, opacity: 1, rotation: 0, width: 10, x: 0, y: 0 },
+              type: 'wedding.qr',
+              writeMode: 'properties',
+            }),
+          ],
+          layout: 'absolute',
+          name: 'Page',
+          height: 100,
+          width: 100,
+        },
+      ],
+    });
+
+    const frozen = buildFrozenLayerSnapshot(scene);
+    expect(frozen.qr?.data).toBeUndefined();
+    expect(frozen.qr?.transform).toBeDefined();
   });
 });
 
 describe('isLayerLocked', () => {
-  it('returns false when locked is undefined or false', () => {
-    expect(isLayerLocked(createLayer({ locked: undefined }))).toBe(false);
-    expect(isLayerLocked(createLayer({ locked: false }))).toBe(false);
-  });
-
   it('returns true when locked is true', () => {
     expect(isLayerLocked(createLayer({ locked: true }))).toBe(true);
   });
 });
 
 describe('isLayerWritable', () => {
-  it('returns true when editable and not locked', () => {
-    expect(isLayerWritable(createLayer({ editable: true, locked: false }))).toBe(
-      true
-    );
-  });
-
-  it('returns false when locked', () => {
-    expect(isLayerWritable(createLayer({ editable: true, locked: true }))).toBe(
-      false
-    );
-  });
-
-  it('returns false when config-locked (editable false)', () => {
-    expect(isLayerWritable(createLayer({ editable: false, locked: false }))).toBe(
-      false
-    );
-  });
-
-  it('returns false when both config-locked and runtime-locked', () => {
-    expect(isLayerWritable(createLayer({ editable: false, locked: true }))).toBe(
-      false
-    );
+  it('returns false when writeMode is locked', () => {
+    expect(isLayerWritable(createLayer({ writeMode: 'locked' }))).toBe(false);
   });
 });

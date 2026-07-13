@@ -1,3 +1,4 @@
+import type { LayerWriteMode } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import { EditorService } from '../workbench/editor-service';
@@ -58,14 +59,14 @@ function createContext(
 
 function createLayer(
   id: string,
-  editable = true,
+  writeMode: LayerWriteMode = 'free',
   locked = false
 ): Layer {
   return {
     id,
     type: 'canvas.text',
     data: { html: '<p>x</p>' },
-    editable,
+    writeMode,
     locked,
   };
 }
@@ -80,7 +81,7 @@ describe('ScenePlugin delete command', () => {
 
   it('cannot execute when any selected layer is config-locked', () => {
     const ctx = createContext(
-      [createLayer('a'), createLayer('b', false)],
+      [createLayer('a'), createLayer('b', 'locked')],
       ['a', 'b']
     );
     expect(deleteCommand.canExecute(ctx)).toBe(false);
@@ -88,7 +89,7 @@ describe('ScenePlugin delete command', () => {
 
   it('cannot execute when any selected layer is runtime-locked', () => {
     const ctx = createContext(
-      [createLayer('a'), createLayer('b', true, true)],
+      [createLayer('a'), createLayer('b', 'free', true)],
       ['a', 'b']
     );
     expect(deleteCommand.canExecute(ctx)).toBe(false);
@@ -106,7 +107,7 @@ describe('ScenePlugin move up/down commands', () => {
 
   it('move up disabled when primary layer is config-locked', () => {
     const ctx = createContext(
-      [createLayer('a'), createLayer('b', false)],
+      [createLayer('a'), createLayer('b', 'locked')],
       ['b'],
       'b'
     );
@@ -115,7 +116,7 @@ describe('ScenePlugin move up/down commands', () => {
 
   it('move up disabled when primary layer is runtime-locked', () => {
     const ctx = createContext(
-      [createLayer('a'), createLayer('b', true, true)],
+      [createLayer('a'), createLayer('b', 'free', true)],
       ['b'],
       'b'
     );
@@ -124,7 +125,7 @@ describe('ScenePlugin move up/down commands', () => {
 
   it('move down disabled when primary layer is not writable', () => {
     const ctx = createContext(
-      [createLayer('a', true, true), createLayer('b')],
+      [createLayer('a', 'free', true), createLayer('b')],
       ['a'],
       'a'
     );
@@ -155,7 +156,7 @@ describe('ScenePlugin move layer command', () => {
 
   it('cannot execute when target layer is config-locked', () => {
     const ctx = createContext(
-      [createLayer('a', false), createLayer('b')],
+      [createLayer('a', 'locked'), createLayer('b')],
       ['a'],
       'a'
     );
@@ -166,7 +167,7 @@ describe('ScenePlugin move layer command', () => {
 
   it('cannot execute when target layer is runtime-locked', () => {
     const ctx = createContext(
-      [createLayer('a', true, true), createLayer('b')],
+      [createLayer('a', 'free', true), createLayer('b')],
       ['a'],
       'a'
     );
@@ -196,7 +197,7 @@ describe('ScenePlugin toggle layer lock command', () => {
   });
 
   it('cannot execute when selected layer is config-locked', () => {
-    const ctx = createContext([createLayer('a', false)], ['a'], 'a');
+    const ctx = createContext([createLayer('a', 'locked')], ['a'], 'a');
     expect(toggleLock.canExecute(ctx)).toBe(false);
   });
 
@@ -206,7 +207,7 @@ describe('ScenePlugin toggle layer lock command', () => {
   });
 
   it('can execute when selected layer is already runtime-locked', () => {
-    const ctx = createContext([createLayer('a', true, true)], ['a'], 'a');
+    const ctx = createContext([createLayer('a', 'free', true)], ['a'], 'a');
     expect(toggleLock.canExecute(ctx)).toBe(true);
   });
 

@@ -1,8 +1,9 @@
 import {
+  canEditLayerData,
+  canSelectLayer,
   DocumentOperationsServiceId,
   EditorService,
   findLayerById,
-  isLayerEditable,
   LayerRegistryServiceId,
   PluginManager,
   SceneStore,
@@ -130,7 +131,13 @@ export class WorkbenchController {
         } else {
           this.stateCache.invalidateSelectionOnly(
             snapshot.scene,
-            snapshot.contentRevision
+            snapshot.contentRevision,
+            () => {
+              const { properties, inspectorPanes } = buildSceneSlice(
+                this.sliceContext
+              );
+              return { properties, inspectorPanes };
+            }
           );
         }
         this.notify();
@@ -274,7 +281,7 @@ export class WorkbenchController {
     const currentScene = this.sceneStore.getScene();
     const editableIds = layerIds.filter((id) => {
       const targetLayer = findLayerById(currentScene, id);
-      return targetLayer && isLayerEditable(targetLayer);
+      return targetLayer && canSelectLayer(targetLayer);
     });
     if (editableIds.length === 0) {
       this.sceneStore.selectLayers([], null);
@@ -294,7 +301,7 @@ export class WorkbenchController {
   updateProperty(layerId: string, key: string, value: unknown): void {
     const currentScene = this.sceneStore.getScene();
     const targetLayer = findLayerById(currentScene, layerId);
-    if (!targetLayer || !isLayerEditable(targetLayer)) {
+    if (!targetLayer || !canEditLayerData(targetLayer)) {
       return;
     }
     this.sceneStore.apply({

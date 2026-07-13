@@ -26,6 +26,13 @@ export class CanvasCommandRequestService {
     return this.pendingTransform !== null;
   }
 
+  peekQueuedTransformUpdate(): {
+    layerId: string;
+    transform: Transform;
+  } | null {
+    return this.pendingTransform;
+  }
+
   queueRichTextTransformUpdate(
     layerId: string,
     change: { fontSize: number; transform: Transform }
@@ -45,5 +52,13 @@ export class CanvasCommandRequestService {
 
   hasQueuedRichTextTransformUpdate(): boolean {
     return this.pendingRichTextTransform !== null;
+  }
+
+  peekQueuedRichTextTransformUpdate(): {
+    layerId: string;
+    fontSize: number;
+    transform: Transform;
+  } | null {
+    return this.pendingRichTextTransform;
   }
 }

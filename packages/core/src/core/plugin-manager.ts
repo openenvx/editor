@@ -133,12 +133,12 @@ export class PluginManager {
       this.scene.onDidChangeScene(() => {
         const snapshot = this.scene.getSnapshot();
         this.editor.updateScene(snapshot.scene, snapshot.contentRevision);
+        this.syncContextKeys();
         this.events.emit(WorkbenchEvents.DidChangeScene, snapshot);
         this.events.emit(
           WorkbenchEvents.DidChangeSelection,
           snapshot.scene.selection
         );
-        this.syncContextKeys();
       })
     );
     this.disposables.add(

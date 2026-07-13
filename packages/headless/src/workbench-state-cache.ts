@@ -102,9 +102,21 @@ export class WorkbenchStateCache {
     this.dirty.add('commands');
   }
 
-  invalidateSelectionOnly(scene: Scene, contentRevision: number): void {
+  invalidateSelectionOnly(
+    scene: Scene,
+    contentRevision: number,
+    rebuildSelectionDerived?: () => Pick<
+      SceneSlice,
+      'properties' | 'inspectorPanes'
+    >
+  ): void {
     if (this.sceneSlice && contentRevision === this.lastContentRevision) {
-      const patch = { scene, selection: scene.selection };
+      const derived = rebuildSelectionDerived?.();
+      const patch = {
+        scene,
+        selection: scene.selection,
+        ...derived,
+      };
       this.sceneSlice = { ...this.sceneSlice, ...patch };
     } else {
       this.dirty.add('scene');

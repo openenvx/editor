@@ -1,5 +1,6 @@
 import {
   Command,
+  canInsertLayers,
   getActivePage,
   InMemoryAssetService,
   localize,
@@ -88,11 +89,16 @@ function insertCanvasLayer(ctx: CommandContext, layer: Layer): void {
   });
 }
 
+function canInsertOnActivePage(ctx: CommandContext): boolean {
+  const scene = ctx.scene.getScene();
+  return getActivePage(scene).layout === 'absolute' && canInsertLayers(scene);
+}
+
 export class InsertCanvasTextCommand extends Command {
   readonly id = 'canvas.insertText';
 
   canExecute(ctx: CommandContext): boolean {
-    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+    return canInsertOnActivePage(ctx);
   }
 
   execute(ctx: CommandContext): void {
@@ -109,7 +115,7 @@ export class InsertCanvasImageCommand extends Command {
   readonly id = 'canvas.insertImage';
 
   canExecute(ctx: CommandContext): boolean {
-    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+    return canInsertOnActivePage(ctx);
   }
 
   execute(ctx: CommandContext): void {
@@ -126,7 +132,7 @@ export class InsertCanvasRectCommand extends Command {
   readonly id = 'canvas.insertRect';
 
   canExecute(ctx: CommandContext): boolean {
-    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+    return canInsertOnActivePage(ctx);
   }
 
   execute(ctx: CommandContext): void {
@@ -143,7 +149,7 @@ export class InsertCanvasCircleCommand extends Command {
   readonly id = 'canvas.insertCircle';
 
   canExecute(ctx: CommandContext): boolean {
-    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+    return canInsertOnActivePage(ctx);
   }
 
   execute(ctx: CommandContext): void {
@@ -161,7 +167,7 @@ export class UploadAssetCommand extends Command {
   private static readonly maxBytes = 10 * 1024 * 1024;
 
   canExecute(ctx: CommandContext): boolean {
-    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+    return canInsertOnActivePage(ctx);
   }
 
   async execute(ctx: CommandContext): Promise<void> {

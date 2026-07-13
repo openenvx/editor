@@ -1,13 +1,14 @@
 import {
+  canDuplicateLayer,
+  canSelectLayer,
   Command,
-  isLayerEditable,
-  isLayerWritable,
   ShortcutContribution,
 } from '@openenvx/core';
 import type { CommandContext } from '@openenvx/core';
 
 import {
   canExecuteCanvasClipboard,
+  canExecuteExternalPaste,
   canExecuteInternalPaste,
   executeCopyLayers,
   executeDuplicateLayers,
@@ -28,7 +29,7 @@ function canExecuteWithSelection(ctx: CommandContext): boolean {
       scene.pages
         .find((page) => page.id === scene.activePageId)
         ?.layers.find((l) => l.id === id) ?? null;
-    return layer && isLayerEditable(layer);
+    return layer && canSelectLayer(layer);
   });
 }
 
@@ -42,7 +43,7 @@ function canExecuteWithWritableSelection(ctx: CommandContext): boolean {
       scene.pages
         .find((page) => page.id === scene.activePageId)
         ?.layers.find((l) => l.id === id) ?? null;
-    return layer && isLayerWritable(layer);
+    return layer && canDuplicateLayer(layer, scene);
   });
 }
 
@@ -74,7 +75,7 @@ export class PasteExternalLayersCommand extends Command {
   readonly id = 'canvas.pasteExternal';
 
   canExecute(ctx: CommandContext): boolean {
-    return canExecuteCanvasClipboard(ctx);
+    return canExecuteExternalPaste(ctx);
   }
 
   async execute(ctx: CommandContext): Promise<void> {

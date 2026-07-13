@@ -1,4 +1,4 @@
-import { isLayerWritable } from '@openenvx/core';
+import { canEditLayerData } from '@openenvx/core';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import type { Layer } from '@openenvx/schema';
 import { createDefaultTransform } from '@openenvx/schema';
@@ -83,7 +83,7 @@ export const CanvasRichTextOverlay = memo(
       if (!editingLayer || editingLayer.view.kind !== 'richText') {
         return null;
       }
-      if (!isLayerWritable(editingLayer.layer)) {
+      if (!canEditLayerData(editingLayer.layer)) {
         return null;
       }
 

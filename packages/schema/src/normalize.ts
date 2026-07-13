@@ -1,6 +1,14 @@
 import { findPresetForPage, getDefaultPageDimensions } from './page-presets';
 import { SCHEMA_VERSION } from './types';
-import type { Layer, Page, Scene, SceneAsset, Selection } from './types';
+import type {
+  Layer,
+  LayerWriteMode,
+  Page,
+  Scene,
+  SceneAsset,
+  Selection,
+  TemplatePolicy,
+} from './types';
 
 export function createDefaultTransform(): NonNullable<Layer['transform']> {
   return {
@@ -59,13 +67,43 @@ export function normalizeScene(input: Partial<Scene>): Scene {
       ? input.activePageId
       : pages[0]!.id;
 
-  return {
+  const scene: Scene = {
     activePageId,
     assets: normalizeAssets(input.assets),
     pages,
     schemaVersion: input.schemaVersion ?? SCHEMA_VERSION,
     selection: normalizeSelection(input.selection, activePageId, pages),
   };
+
+  const templatePolicy = normalizeTemplatePolicy(input.templatePolicy);
+  if (templatePolicy) {
+    scene.templatePolicy = templatePolicy;
+  }
+
+  return scene;
+}
+
+function normalizeTemplatePolicy(
+  policy: Partial<TemplatePolicy> | undefined
+): TemplatePolicy | undefined {
+  if (!policy) {
+    return undefined;
+  }
+
+  return {
+    allowDeleteLayers: policy.allowDeleteLayers ?? true,
+    allowDuplicateLayers: policy.allowDuplicateLayers ?? true,
+    allowInsertLayers: policy.allowInsertLayers ?? true,
+    allowPageResize: policy.allowPageResize ?? true,
+    version: 1,
+    ...(policy.frozenLayers
+      ? { frozenLayers: { ...policy.frozenLayers } }
+      : {}),
+  };
+}
+
+function resolveLayerWriteMode(layer: Partial<Layer>): LayerWriteMode {
+  return layer.writeMode ?? 'free';
 }
 
 function normalizeAssets(
@@ -128,12 +166,13 @@ function normalizePage(page: Partial<Page>): Page {
 
 function normalizeLayer(layer: Partial<Layer>): Layer {
   const data = normalizeLayerData(layer.type ?? 'unknown', layer.data ?? {});
+  const writeMode = resolveLayerWriteMode(layer);
   return {
     data,
-    editable: layer.editable ?? true,
     id: layer.id ?? crypto.randomUUID(),
     locked: layer.locked ?? false,
     type: layer.type ?? 'unknown',
+    writeMode,
     ...(layer.transform
       ? { transform: { ...createDefaultTransform(), ...layer.transform } }
       : {}),

@@ -5,6 +5,7 @@ import {
   Plugin,
 } from '@openenvx/core';
 import type {
+  ContributionBuildContext,
   Layer,
   LayerPreviewContext,
   Page,
@@ -15,7 +16,11 @@ import { createLayerPreviewBuilder } from '@openenvx/preview';
 import { normalizeScene } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
+import { InspectorPaneContribution } from './contributions/inspector-pane-contribution';
+import { createInspectorPane } from './inspector/inspector-pane-builder';
 import { WorkbenchController } from './workbench-controller';
+import { WorkbenchPlugin } from './workbench-plugin';
+import type { WorkbenchPluginContext } from './workbench-plugin-context';
 
 class TestLayer extends LayerDefinition<{ text: string }> {
   readonly type = 'test';
@@ -86,6 +91,49 @@ function createSceneWithLayers() {
   });
 }
 
+class LayerSelectedInspectorPane extends InspectorPaneContribution {
+  readonly id = 'test.layer-selected';
+  readonly title = 'Layer Selected';
+
+  buildDescriptor(_ctx: ContributionBuildContext) {
+    return createInspectorPane(this.id, this.title)
+      .when('scene.layerSelected')
+      .row('Label', { key: 'label', kind: 'text', label: 'Label' })
+      .build();
+  }
+}
+
+class InspectorWorkbenchPlugin extends WorkbenchPlugin {
+  readonly id = 'inspector';
+
+  activateWorkbench(ctx: WorkbenchPluginContext): void {
+    ctx.register(new TestLayer());
+    ctx.registerWorkbench(new LayerSelectedInspectorPane());
+  }
+}
+
+function createAbsoluteSceneWithoutSelection() {
+  return normalizeScene({
+    activePageId: 'p1',
+    pages: [
+      {
+        id: 'p1',
+        name: 'Page',
+        layout: 'absolute',
+        layers: [
+          { id: 'a', type: 'test', data: { text: 'A' } },
+          { id: 'b', type: 'test', data: { text: 'B' } },
+        ],
+      },
+    ],
+    selection: {
+      activePageId: 'p1',
+      primaryLayerId: null,
+      selectedLayerIds: [],
+    },
+  });
+}
+
 describe('WorkbenchStateCache', () => {
   it('does not rebuild scene slice on selection-only change', async () => {
     const controller = new WorkbenchController({
@@ -146,5 +194,31 @@ describe('WorkbenchStateCache', () => {
     controller.updateProperty('a', 'text', 'updated');
 
     expect(cache.rebuildCounts.scene).toBe(sceneRebuildsBefore + 1);
+  });
+
+  it('updates inspectorPanes on selection-only changes without full scene rebuild', async () => {
+    const controller = new WorkbenchController({
+      initialScene: createAbsoluteSceneWithoutSelection(),
+      plugins: [new InspectorWorkbenchPlugin()],
+    });
+    await controller.start();
+    const cache = controller.getStateCacheForTest();
+    const sceneRebuildsBefore = cache.rebuildCounts.scene;
+
+    const paneIds = () =>
+      controller
+        .getState()
+        .inspectorPanes.map((pane) => pane.id)
+        .filter((id) => id === 'test.layer-selected');
+
+    expect(paneIds()).toEqual([]);
+
+    controller.selectLayers(['a'], 'a');
+    expect(cache.rebuildCounts.scene).toBe(sceneRebuildsBefore);
+    expect(paneIds()).toEqual(['test.layer-selected']);
+
+    controller.selectLayers([], null);
+    expect(cache.rebuildCounts.scene).toBe(sceneRebuildsBefore);
+    expect(paneIds()).toEqual([]);
   });
 });

@@ -1,4 +1,4 @@
-import { getActivePage, localize } from '@openenvx/core';
+import { getActivePage, canInsertLayers, localize } from '@openenvx/core';
 import type { CommandContext, Layer } from '@openenvx/core';
 import { createDefaultTransform } from '@openenvx/schema';
 
@@ -187,7 +187,8 @@ export async function executePasteExternalLayers(
 }
 
 export function canExecuteCanvasClipboard(ctx: CommandContext): boolean {
-  const page = getActivePage(ctx.scene.getScene());
+  const scene = ctx.scene.getScene();
+  const page = getActivePage(scene);
   if (page.layout !== 'absolute') {
     return false;
   }
@@ -195,9 +196,19 @@ export function canExecuteCanvasClipboard(ctx: CommandContext): boolean {
   return service ? isCanvasClipboardActive(service) : false;
 }
 
+export function canExecuteExternalPaste(ctx: CommandContext): boolean {
+  return (
+    canExecuteCanvasClipboard(ctx) && canInsertLayers(ctx.scene.getScene())
+  );
+}
+
 export function canExecuteInternalPaste(ctx: CommandContext): boolean {
   const service = getClipboardService(ctx);
-  return canExecuteCanvasClipboard(ctx) && Boolean(service?.hasInternal());
+  return (
+    canExecuteCanvasClipboard(ctx) &&
+    canInsertLayers(ctx.scene.getScene()) &&
+    Boolean(service?.hasInternal())
+  );
 }
 
 export async function executeCopyLayers(ctx: CommandContext): Promise<void> {
