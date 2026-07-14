@@ -27,6 +27,7 @@ export {
   createTransformDragContext,
   createTransformDragContextFromOrigin,
   normalizeNodeBeforeTransform,
+  pointerToParentLocal,
   type TransformDragContext,
 } from './geometry';
 export { getLayerBounds, type AlignBounds } from './align';
@@ -87,7 +88,17 @@ export {
   isRichTextHorizontalAnchor,
   type RichTextResizeSession,
 } from './rich-text-resize';
-export { applyRichTextToGroup } from './rich-text-konva-driver';
+export {
+  boundImageCornerBox,
+  IMAGE_CORNER_ANCHORS,
+  IMAGE_EDGE_ANCHORS,
+  isImageCornerAnchor,
+  isImageEdgeAnchor,
+  type ImageCornerAnchor,
+  type ImageEdgeAnchor,
+} from './image-resize';
+export { ImageCanvasInteraction } from './interactions/image-canvas-interaction';
+export { useLoadedImage } from './renderers/image-canvas-renderer';
 export {
   CANVAS_FONT_CATALOG,
   CANVAS_FONT_FAMILIES,
@@ -167,6 +178,11 @@ export {
 export {
   CanvasLayerInteractionContribution,
   toCanvasLayerInteractionRegistration,
+  type CanvasHandleDragContext,
+  type CanvasHandleLayoutContext,
+  type CanvasInteractionLayoutContext,
+  type CanvasTransformModifiers,
+  type HandleDescriptor,
   type CanvasTransformBox,
   type CanvasTransformContext,
   type CanvasTransformResult,
@@ -187,6 +203,8 @@ export {
   registerCanvasContribution,
   createCanvasRegistriesService,
   ensureCanvasRegistriesInstalled,
+  type CanvasContribution,
+  type RegisterCanvasContributionOptions,
 } from './plugin/canvas-registry-service';
 export { useCanvasApi } from './hooks/use-canvas-api';
 export { useCanvasRegistries } from './hooks/use-canvas-registries';
@@ -216,6 +234,7 @@ export type {
   CanvasRegistriesSnapshot,
 } from './registry/canvas-registries-reader';
 export type {
+  CanvasLayerActivateContext,
   CanvasLayerInteractionRegistration,
   CanvasLayerRendererRegistration,
   LayerPreviewRendererRegistration,

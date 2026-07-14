@@ -97,6 +97,7 @@ export {
   createDefaultInteractionState,
   type InteractionState,
 } from './runtime/interaction-state';
+export type { ExternalStore } from './runtime/external-store';
 export {
   createServiceId,
   getServiceDebugName,

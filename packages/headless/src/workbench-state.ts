@@ -3,6 +3,7 @@ import type {
   CommandService,
   EditorInput,
   EventBus,
+  ExternalStore,
   InteractionState,
   Layer,
   Plugin,
@@ -95,7 +96,7 @@ export interface WorkbenchState {
   layout: WorkbenchLayout;
 }
 
-export interface WorkbenchApi {
+export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   commands: CommandService;
   scene: SceneStore;
   editor: EditorService;
@@ -126,7 +127,6 @@ export interface WorkbenchApi {
   revert: () => void;
   serializeScene: () => Scene;
   loadScene: (scene: Scene) => void;
-  getState: () => WorkbenchState;
 }
 
 export interface WorkbenchControllerOptions {

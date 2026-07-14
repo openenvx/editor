@@ -25,8 +25,13 @@ export function useCanvasApi() {
   );
 
   const updateLayerTransform = useCallback(
-    async (layerId: string, transform: Transform) =>
+    async (
+      layerId: string,
+      transform: Transform,
+      options?: { dataPatch?: Record<string, unknown> }
+    ) =>
       host.executeCommand('canvas.updateLayerTransform', {
+        dataPatch: options?.dataPatch,
         layerId,
         transform,
       }),

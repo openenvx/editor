@@ -1,4 +1,5 @@
 import type Konva from 'konva';
+import type { RefObject } from 'react';
 
 import type { CanvasLayerInteractionRegistration } from './registry/canvas-registry-types';
 
@@ -7,6 +8,12 @@ export function getInteraction(
   kind: string
 ): CanvasLayerInteractionRegistration | undefined {
   return interactions.find((entry) => entry.kind === kind);
+}
+
+export function getInteractionAnchors(
+  interaction: CanvasLayerInteractionRegistration | undefined
+): readonly string[] | null | undefined {
+  return interaction?.enabledAnchors?.();
 }
 
 export function attachTransformerToNodes(
@@ -19,6 +26,21 @@ export function attachTransformerToNodes(
   transformer.nodes(nodes);
   transformer.forceUpdate();
   transformer.getLayer()?.batchDraw();
+}
+
+export function reattachTransformerFromSelection(
+  nodeRefs: RefObject<Map<string, Konva.Group>>,
+  selectedLayerIdsRef: RefObject<string[]>,
+  transformerRef: RefObject<Konva.Transformer | null>,
+  syncLabelFromTransformer: () => void
+): void {
+  requestAnimationFrame(() => {
+    const nodes = (selectedLayerIdsRef.current ?? [])
+      .map((id) => nodeRefs.current?.get(id))
+      .filter((entryNode): entryNode is Konva.Group => Boolean(entryNode));
+    attachTransformerToNodes(transformerRef.current, nodes);
+    syncLabelFromTransformer();
+  });
 }
 
 const DEFAULT_TRANSFORMER_ANCHORS = [

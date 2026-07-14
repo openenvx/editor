@@ -40,6 +40,10 @@ export interface CanvasPreviewSvgSerializer {
   toSvgFragment(descriptor: LayerPreviewDescriptor, ctx: unknown): string;
 }
 
+interface CanvasPreviewSerializerRegisterOptions {
+  override?: boolean;
+}
+
 export interface CanvasDocumentExportService {
   exportDocument(
     scene: Scene,
@@ -47,7 +51,10 @@ export interface CanvasDocumentExportService {
     options: CanvasExportOptions
   ): Promise<CanvasExportResult>;
   supportsFormat(format: CanvasExportFormat): boolean;
-  registerPreviewSerializer(serializer: CanvasPreviewSvgSerializer): void;
+  registerPreviewSerializer(
+    serializer: CanvasPreviewSvgSerializer,
+    options?: CanvasPreviewSerializerRegisterOptions
+  ): void;
 }
 
 export const CanvasDocumentExportServiceId =

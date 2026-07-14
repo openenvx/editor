@@ -204,9 +204,4 @@ export class WorkbenchStateCache {
     this.rebuildCounts.interaction = 0;
     this.rebuildCounts.scene = 0;
   }
-
-  /** @internal */
-  getSceneSliceForTest(): SceneSlice | null {
-    return this.sceneSlice;
-  }
 }

@@ -1,16 +1,26 @@
 import type {
+  CanvasHandleDragContext,
+  CanvasHandleLayoutContext,
+  CanvasLayerActivateContext,
   CanvasLayerInteractionRegistration,
   CanvasTransformBox,
   CanvasTransformContext,
   CanvasTransformResult,
+  HandleDescriptor,
 } from '../registry/canvas-registry-types';
 
 export type {
+  CanvasHandleDragContext,
+  CanvasHandleLayoutContext,
+  CanvasInteractionLayoutContext,
+  CanvasLayerActivateContext,
   CanvasLayerInteractionRegistration,
   CanvasTransformBox,
   CanvasTransformContext,
+  CanvasTransformModifiers,
   CanvasTransformResult,
-};
+  HandleDescriptor,
+} from '../registry/canvas-registry-types';
 
 export function toCanvasLayerInteractionRegistration(
   contribution: CanvasLayerInteractionContribution
@@ -23,10 +33,19 @@ export function toCanvasLayerInteractionRegistration(
     hideContentDuringTransform:
       contribution.hideContentDuringTransform?.bind(contribution),
     kind: contribution.kind,
+    layoutHandles: contribution.layoutHandles?.bind(contribution),
     onDoubleClick: contribution.onDoubleClick?.bind(contribution),
+    onLayerActivate: contribution.onLayerActivate?.bind(contribution),
+    onLayerDeactivate: contribution.onLayerDeactivate?.bind(contribution),
+    onHandleDragEnd: contribution.onHandleDragEnd?.bind(contribution),
+    onHandleDragMove: contribution.onHandleDragMove?.bind(contribution),
+    onHandleDragStart: contribution.onHandleDragStart?.bind(contribution),
     onTransform: contribution.onTransform?.bind(contribution),
     onTransformEnd: contribution.onTransformEnd?.bind(contribution),
     onTransformStart: contribution.onTransformStart?.bind(contribution),
+    opensEditorOnReselect:
+      contribution.opensEditorOnReselect?.bind(contribution),
+    providesHandles: contribution.providesHandles?.bind(contribution),
     usesEditOverlay: contribution.usesEditOverlay,
   };
 }
@@ -38,6 +57,10 @@ export abstract class CanvasLayerInteractionContribution {
 
   enabledAnchors?(): readonly string[] | null;
 
+  providesHandles?(view: unknown): boolean;
+
+  layoutHandles?(ctx: CanvasHandleLayoutContext): HandleDescriptor[];
+
   onTransformStart?(ctx: CanvasTransformContext): void;
 
   onTransform?(ctx: CanvasTransformContext): void;
@@ -47,8 +70,18 @@ export abstract class CanvasLayerInteractionContribution {
   boundBoxFunc?(
     ctx: CanvasTransformContext,
     oldBox: CanvasTransformBox,
-    newBox: CanvasTransformBox
+    newBox: CanvasTransformBox,
+    pointerParentLocal?: { x: number; y: number } | null
   ): CanvasTransformBox;
+
+  onHandleDragStart?(ctx: CanvasHandleDragContext): void;
+
+  onHandleDragMove?(
+    ctx: CanvasHandleDragContext,
+    pointerParentLocal: { x: number; y: number }
+  ): void;
+
+  onHandleDragEnd?(ctx: CanvasHandleDragContext): CanvasTransformResult | void;
 
   hideContentDuringTransform?(layerId: string): boolean;
 
@@ -56,6 +89,12 @@ export abstract class CanvasLayerInteractionContribution {
     editingLayerId: string | null,
     layerId: string
   ): boolean;
+
+  opensEditorOnReselect?(view: unknown): boolean;
+
+  onLayerActivate?(ctx: CanvasLayerActivateContext): void;
+
+  onLayerDeactivate?(layerId: string): void;
 
   onDoubleClick?(layerId: string): void;
 }

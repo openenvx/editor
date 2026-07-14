@@ -33,6 +33,7 @@ interface PagePresetArgs {
 }
 
 interface LayerTransformArgs {
+  dataPatch?: Record<string, unknown>;
   layerId: string;
   transform: Transform;
 }
@@ -193,7 +194,12 @@ export class UpdateLayerTransformCommand extends Command {
     if (!update) {
       return;
     }
-    applyLayerTransform(ctx, update.layerId, update.transform);
+    applyLayerTransform(
+      ctx,
+      update.layerId,
+      update.transform,
+      update.dataPatch
+    );
   }
 }
 
@@ -300,17 +306,39 @@ export class ExportImageCommand extends Command {
 function applyLayerTransform(
   ctx: CommandContext,
   layerId: string,
-  transform: Transform
+  transform: Transform,
+  dataPatch?: Record<string, unknown>
 ): void {
   ctx.scene.apply({
     apply: (scene) => ({
       ...scene,
       pages: scene.pages.map((page) => ({
         ...page,
-        layers: updateLayerInTree(page.layers, layerId, (layer) => ({
-          ...layer,
-          transform,
-        })),
+        layers: updateLayerInTree(page.layers, layerId, (layer) => {
+          if (!dataPatch) {
+            return {
+              ...layer,
+              transform,
+            };
+          }
+
+          const data =
+            typeof layer.data === 'object' && layer.data !== null
+              ? { ...(layer.data as Record<string, unknown>) }
+              : {};
+          for (const [key, value] of Object.entries(dataPatch)) {
+            if (value === undefined) {
+              delete data[key];
+            } else {
+              data[key] = value;
+            }
+          }
+          return {
+            ...layer,
+            data,
+            transform,
+          };
+        }),
       })),
     }),
     label: localize(ctx.services, 'canvas.history.updateTransform', {

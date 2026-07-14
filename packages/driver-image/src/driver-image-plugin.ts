@@ -4,8 +4,11 @@ import type { PluginContext } from '@openenvx/core';
 
 import { registerBuiltinSvgSerializers } from './builtin-svg-serializers';
 import { ImageDocumentExportService } from './image-document-export-service';
-import { getDefaultSerializerRegistry } from './preview-kind-svg-serializer';
-import type { PreviewKindSvgSerializer } from './preview-kind-svg-serializer';
+import {
+  getDefaultSerializerRegistry,
+  type PreviewKindSvgSerializer,
+  type PreviewKindSvgSerializerRegisterOptions,
+} from './preview-kind-svg-serializer';
 
 export class DriverImagePlugin extends Plugin {
   readonly id = 'driver-image';
@@ -24,8 +27,9 @@ export class DriverImagePlugin extends Plugin {
 
 export function registerPreviewKindSvgSerializer(
   ctx: PluginContext,
-  serializer: PreviewKindSvgSerializer
+  serializer: PreviewKindSvgSerializer,
+  options?: PreviewKindSvgSerializerRegisterOptions
 ): void {
   const service = ctx.services.get(CanvasDocumentExportServiceId);
-  service.registerPreviewSerializer(serializer);
+  service.registerPreviewSerializer(serializer, options);
 }

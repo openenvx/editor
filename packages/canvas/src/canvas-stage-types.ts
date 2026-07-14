@@ -38,6 +38,7 @@ export interface CanvasStageLayer {
 export interface CanvasTransformChange {
   transform: SceneLayer['transform'];
   fontSize?: number;
+  dataPatch?: Record<string, unknown>;
 }
 
 export interface CanvasStageProps {
