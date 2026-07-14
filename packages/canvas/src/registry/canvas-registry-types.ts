@@ -67,9 +67,17 @@ export interface CanvasTransformResult {
   dataPatch?: Record<string, unknown>;
 }
 
+export interface CanvasLayerActivateContext {
+  layerId: string;
+  node: unknown;
+  transform: Transform;
+  view: unknown;
+}
+
 export interface CanvasLayerInteractionRegistration {
   kind: string;
   usesEditOverlay?: boolean;
+  opensEditorOnReselect?: (view: unknown) => boolean;
   enabledAnchors?: () => readonly string[] | null;
   providesHandles?: (view: unknown) => boolean;
   layoutHandles?: (ctx: CanvasHandleLayoutContext) => HandleDescriptor[];
@@ -97,5 +105,7 @@ export interface CanvasLayerInteractionRegistration {
     editingLayerId: string | null,
     layerId: string
   ) => boolean;
+  onLayerActivate?: (ctx: CanvasLayerActivateContext) => void;
+  onLayerDeactivate?: (layerId: string) => void;
   onDoubleClick?: (layerId: string) => void;
 }

@@ -16,6 +16,7 @@ import { flattenStageLayers } from '../flatten-layer-surface';
 import {
   getActiveDragAnchor,
   getActiveHandleAnchor,
+  getInteractionPreviewLayerId,
 } from '../interactions/canvas-interaction-mode';
 import { CANVAS_GROUP_LAYER_TYPE } from '../layers/canvas-group-layer';
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
@@ -61,6 +62,7 @@ export interface CanvasStageShell {
   sizeLabelText: string;
   activeDragAnchor: string | null;
   activeHandleAnchor: string | null;
+  interactionPreviewLayerId: string | null;
   transformerEnabledAnchors: string[] | undefined;
   handleLayouts: ReturnType<typeof useHandleDragSession>['handleLayouts'];
   showHandles: boolean;
@@ -399,6 +401,31 @@ export function useCanvasStageRuntime(
 
   const activeDragAnchor = getActiveDragAnchor(interactionMode);
   const activeHandleAnchor = getActiveHandleAnchor(interactionMode);
+  const interactionPreviewLayerId =
+    getInteractionPreviewLayerId(interactionMode);
+
+  const previousPrimaryRef = useRef<string | null>(selectedPrimary);
+  useEffect(() => {
+    const previousPrimary = previousPrimaryRef.current;
+    if (
+      previousPrimary &&
+      previousPrimary !== selectedPrimary &&
+      runtime.getInteractionPreviewLayerId() === previousPrimary
+    ) {
+      const previousLayer = flattenedLayers.find(
+        ({ layer }) => layer.id === previousPrimary
+      );
+      if (previousLayer) {
+        const previousInteraction = getInteraction(
+          canvasLayerInteractions,
+          previousLayer.view.kind
+        );
+        previousInteraction?.onLayerDeactivate?.(previousPrimary);
+      }
+      runtime.exitInteractionPreview();
+    }
+    previousPrimaryRef.current = selectedPrimary;
+  }, [canvasLayerInteractions, flattenedLayers, runtime, selectedPrimary]);
 
   const { transformerEnabledAnchors } = useTransformerAttachment({
     activeDragAnchor,
@@ -418,6 +445,7 @@ export function useCanvasStageRuntime(
   return {
     activeDragAnchor,
     activeHandleAnchor,
+    interactionPreviewLayerId,
     anchorDragBoundFunc,
     artboardGroupRef,
     artboardOffset,

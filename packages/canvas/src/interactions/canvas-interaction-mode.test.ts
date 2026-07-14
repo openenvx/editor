@@ -3,10 +3,12 @@ import { describe, expect, it } from 'vitest';
 import {
   canStartHandleDrag,
   canStartLayerDrag,
+  canStartLayerPreview,
   canStartTransform,
   getActiveDragAnchor,
   getActiveHandleAnchor,
   getDragSession,
+  getInteractionPreviewLayerId,
   getTransformSessionLayerId,
   reduceInteractionMode,
   type CanvasInteractionMode,
@@ -125,6 +127,35 @@ describe('reduceInteractionMode', () => {
       idle
     );
   });
+
+  it('starts layer preview from idle and ends back to idle', () => {
+    const preview = reduceInteractionMode(idle, {
+      layerId: 'layer-a',
+      type: 'layerPreviewStart',
+    });
+    expect(preview).toEqual({ layerId: 'layer-a', type: 'layerPreview' });
+    expect(
+      reduceInteractionMode(preview, { type: 'layerPreviewEnd' })
+    ).toEqual(idle);
+  });
+
+  it('starts handle drag from layer preview for the same layer', () => {
+    const preview: CanvasInteractionMode = {
+      layerId: 'layer-a',
+      type: 'layerPreview',
+    };
+    expect(
+      reduceInteractionMode(preview, {
+        anchor: 'middle-right',
+        layerId: 'layer-a',
+        type: 'handleDragStart',
+      })
+    ).toEqual({
+      anchor: 'middle-right',
+      layerId: 'layer-a',
+      type: 'handleDrag',
+    });
+  });
 });
 
 describe('interaction mode getters', () => {
@@ -171,6 +202,16 @@ describe('interaction mode getters', () => {
     ).toEqual(dragSession);
     expect(getDragSession(idle)).toBeNull();
   });
+
+  it('reads interaction preview layer id only while previewing', () => {
+    expect(
+      getInteractionPreviewLayerId({
+        layerId: 'layer-a',
+        type: 'layerPreview',
+      })
+    ).toBe('layer-a');
+    expect(getInteractionPreviewLayerId(idle)).toBeNull();
+  });
 });
 
 describe('interaction mode guards', () => {
@@ -182,8 +223,19 @@ describe('interaction mode guards', () => {
     expect(canStartLayerDrag(idle)).toBe(true);
     expect(canStartTransform(idle)).toBe(true);
     expect(canStartHandleDrag(idle)).toBe(true);
+    expect(canStartLayerPreview(idle)).toBe(true);
     expect(canStartLayerDrag(busy)).toBe(false);
     expect(canStartTransform(busy)).toBe(false);
     expect(canStartHandleDrag(busy)).toBe(false);
+    expect(canStartLayerPreview(busy)).toBe(false);
+  });
+
+  it('allows handle drag while layer preview is active', () => {
+    const preview: CanvasInteractionMode = {
+      layerId: 'layer-a',
+      type: 'layerPreview',
+    };
+    expect(canStartHandleDrag(preview)).toBe(true);
+    expect(canStartLayerPreview(preview)).toBe(false);
   });
 });

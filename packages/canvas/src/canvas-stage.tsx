@@ -99,6 +99,7 @@ export function CanvasStage({
     sizeLabelText,
     activeDragAnchor,
     activeHandleAnchor,
+    interactionPreviewLayerId,
     transformerEnabledAnchors,
     handleLayouts,
     showHandles,
@@ -245,7 +246,9 @@ export function CanvasStage({
               ))}
               <Group listening={false} ref={overlayGroupRef} />
             </Group>
-            {!editingLayerId && !activeHandleAnchor ? (
+            {!editingLayerId &&
+            !activeHandleAnchor &&
+            !interactionPreviewLayerId ? (
               <Transformer
                 anchorDragBoundFunc={anchorDragBoundFunc}
                 borderStroke={themeColors.selection}

@@ -234,6 +234,7 @@ export type {
   CanvasRegistriesSnapshot,
 } from './registry/canvas-registries-reader';
 export type {
+  CanvasLayerActivateContext,
   CanvasLayerInteractionRegistration,
   CanvasLayerRendererRegistration,
   LayerPreviewRendererRegistration,

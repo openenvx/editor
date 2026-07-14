@@ -15,6 +15,7 @@ import {
   getActiveDragAnchor,
   getActiveHandleAnchor,
   getDragSession,
+  getInteractionPreviewLayerId,
   getTransformSessionLayerId,
   reduceInteractionMode,
   type CanvasInteractionEvent,
@@ -113,6 +114,18 @@ export class CanvasStageRuntime {
 
   getActiveHandleAnchor(): string | null {
     return getActiveHandleAnchor(this.mode);
+  }
+
+  getInteractionPreviewLayerId(): string | null {
+    return getInteractionPreviewLayerId(this.mode);
+  }
+
+  enterInteractionPreview(layerId: string): void {
+    this.dispatch({ layerId, type: 'layerPreviewStart' });
+  }
+
+  exitInteractionPreview(): void {
+    this.dispatch({ type: 'layerPreviewEnd' });
   }
 
   registerNode(layerId: string, node: Konva.Group | null): void {

@@ -1,6 +1,7 @@
 import type {
   CanvasHandleDragContext,
   CanvasHandleLayoutContext,
+  CanvasLayerActivateContext,
   CanvasLayerInteractionRegistration,
   CanvasTransformBox,
   CanvasTransformContext,
@@ -12,6 +13,7 @@ export type {
   CanvasHandleDragContext,
   CanvasHandleLayoutContext,
   CanvasInteractionLayoutContext,
+  CanvasLayerActivateContext,
   CanvasLayerInteractionRegistration,
   CanvasTransformBox,
   CanvasTransformContext,
@@ -33,12 +35,16 @@ export function toCanvasLayerInteractionRegistration(
     kind: contribution.kind,
     layoutHandles: contribution.layoutHandles?.bind(contribution),
     onDoubleClick: contribution.onDoubleClick?.bind(contribution),
+    onLayerActivate: contribution.onLayerActivate?.bind(contribution),
+    onLayerDeactivate: contribution.onLayerDeactivate?.bind(contribution),
     onHandleDragEnd: contribution.onHandleDragEnd?.bind(contribution),
     onHandleDragMove: contribution.onHandleDragMove?.bind(contribution),
     onHandleDragStart: contribution.onHandleDragStart?.bind(contribution),
     onTransform: contribution.onTransform?.bind(contribution),
     onTransformEnd: contribution.onTransformEnd?.bind(contribution),
     onTransformStart: contribution.onTransformStart?.bind(contribution),
+    opensEditorOnReselect:
+      contribution.opensEditorOnReselect?.bind(contribution),
     providesHandles: contribution.providesHandles?.bind(contribution),
     usesEditOverlay: contribution.usesEditOverlay,
   };
@@ -83,6 +89,12 @@ export abstract class CanvasLayerInteractionContribution {
     editingLayerId: string | null,
     layerId: string
   ): boolean;
+
+  opensEditorOnReselect?(view: unknown): boolean;
+
+  onLayerActivate?(ctx: CanvasLayerActivateContext): void;
+
+  onLayerDeactivate?(layerId: string): void;
 
   onDoubleClick?(layerId: string): void;
 }

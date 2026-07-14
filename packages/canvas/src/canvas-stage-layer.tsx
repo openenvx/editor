@@ -13,6 +13,33 @@ import type {
 } from './registry/canvas-registry-types';
 import type { CanvasStageRuntime } from './stage/canvas-stage-runtime';
 
+function tryActivateLayerInteraction(input: {
+  interaction: CanvasLayerInteractionRegistration | undefined;
+  layerId: string;
+  layerWritable: boolean;
+  runtime: CanvasStageRuntime;
+  transform: import('@openenvx/schema').Transform;
+  view: unknown;
+}): boolean {
+  const { interaction, layerId, layerWritable, runtime, transform, view } =
+    input;
+  if (!interaction?.opensEditorOnReselect?.(view) || !layerWritable) {
+    return false;
+  }
+  const node = runtime.nodeRefs.current?.get(layerId);
+  if (!node) {
+    return false;
+  }
+  runtime.enterInteractionPreview(layerId);
+  interaction.onLayerActivate?.({
+    layerId,
+    node,
+    transform,
+    view,
+  });
+  return true;
+}
+
 export interface CanvasStageLayerGroupProps {
   entry: CanvasStageLayer;
   runtimeRef: RefObject<CanvasStageRuntime | null>;
@@ -47,9 +74,16 @@ export function CanvasStageLayerGroup({
 
   const isGroupLayer = layer.type === CANVAS_GROUP_LAYER_TYPE;
   const isEditing = editingLayerId === layer.id;
+  const interactionPreviewLayerId =
+    runtime?.getInteractionPreviewLayerId() ?? null;
   const isImperativeTransformTarget =
     transformSessionLayerId === layer.id &&
     interaction?.hideContentDuringTransform?.(layer.id) === true;
+  const isInteractionPreviewTarget =
+    interactionPreviewLayerId === layer.id &&
+    interaction?.hideContentDuringTransform?.(layer.id) === true;
+  const hideImperativeContent =
+    isImperativeTransformTarget || isInteractionPreviewTarget;
   const isHiddenDuringEdit =
     interaction?.hideContentDuringEdit?.(editingLayerId, layer.id) ?? false;
   const layerSelectable = runtime?.isLayerSelectable(layer) ?? false;
@@ -76,6 +110,19 @@ export function CanvasStageLayerGroup({
           runtime.openLayerEditor(layer.id);
           return;
         }
+        if (
+          layer.id === selectedPrimary &&
+          tryActivateLayerInteraction({
+            interaction,
+            layerId: layer.id,
+            layerWritable,
+            runtime,
+            transform,
+            view,
+          })
+        ) {
+          return;
+        }
         const additive =
           event.evt.shiftKey || event.evt.metaKey || event.evt.ctrlKey;
         runtime.selectLayer(layer.id, { additive });
@@ -92,7 +139,16 @@ export function CanvasStageLayerGroup({
         }
         if (interaction?.usesEditOverlay) {
           runtime.openLayerEditor(layer.id);
+          return;
         }
+        tryActivateLayerInteraction({
+          interaction,
+          layerId: layer.id,
+          layerWritable,
+          runtime,
+          transform,
+          view,
+        });
       }}
       onDragEnd={() => {
         if (!runtime || !layerWritable) {
@@ -170,7 +226,7 @@ export function CanvasStageLayerGroup({
           canvasLayerRenderers={canvasLayerRenderers}
           fontLoadRevision={fontLoadRevision}
           height={transform.height}
-          hidden={isHiddenDuringEdit || isImperativeTransformTarget}
+          hidden={isHiddenDuringEdit || hideImperativeContent}
           view={view}
           width={transform.width}
         />

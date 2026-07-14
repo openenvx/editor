@@ -7,7 +7,8 @@ export type CanvasInteractionMode =
   | { type: 'idle' }
   | { type: 'dragging'; session: DragSessionPayload }
   | { type: 'transforming'; layerId: string; anchor: string | null }
-  | { type: 'handleDrag'; layerId: string; anchor: string };
+  | { type: 'handleDrag'; layerId: string; anchor: string }
+  | { type: 'layerPreview'; layerId: string };
 
 export type CanvasInteractionEvent =
   | { type: 'layerDragStart'; session: DragSessionPayload }
@@ -16,6 +17,8 @@ export type CanvasInteractionEvent =
   | { type: 'transformEnd' }
   | { type: 'handleDragStart'; layerId: string; anchor: string }
   | { type: 'handleDragEnd' }
+  | { type: 'layerPreviewStart'; layerId: string }
+  | { type: 'layerPreviewEnd' }
   | { type: 'forceIdle' };
 
 export function getTransformSessionLayerId(
@@ -54,6 +57,15 @@ export function getDragSession(
   return null;
 }
 
+export function getInteractionPreviewLayerId(
+  mode: CanvasInteractionMode
+): string | null {
+  if (mode.type === 'layerPreview') {
+    return mode.layerId;
+  }
+  return null;
+}
+
 export function canStartLayerDrag(mode: CanvasInteractionMode): boolean {
   return mode.type === 'idle';
 }
@@ -63,6 +75,10 @@ export function canStartTransform(mode: CanvasInteractionMode): boolean {
 }
 
 export function canStartHandleDrag(mode: CanvasInteractionMode): boolean {
+  return mode.type === 'idle' || mode.type === 'layerPreview';
+}
+
+export function canStartLayerPreview(mode: CanvasInteractionMode): boolean {
   return mode.type === 'idle';
 }
 
@@ -107,6 +123,9 @@ export function reduceInteractionMode(
       if (!canStartHandleDrag(mode)) {
         return mode;
       }
+      if (mode.type === 'layerPreview' && mode.layerId !== event.layerId) {
+        return mode;
+      }
       return {
         anchor: event.anchor,
         layerId: event.layerId,
@@ -116,6 +135,20 @@ export function reduceInteractionMode(
 
     case 'handleDragEnd': {
       if (mode.type !== 'handleDrag') {
+        return mode;
+      }
+      return { type: 'idle' };
+    }
+
+    case 'layerPreviewStart': {
+      if (!canStartLayerPreview(mode)) {
+        return mode;
+      }
+      return { layerId: event.layerId, type: 'layerPreview' };
+    }
+
+    case 'layerPreviewEnd': {
+      if (mode.type !== 'layerPreview') {
         return mode;
       }
       return { type: 'idle' };
