@@ -1,5 +1,11 @@
 # @openenvx/schema
 
+## 0.1.10
+
+### Patch Changes
+
+- 1a89b04: feat: add Workbench views and tree provider contributions
+
 ## 0.1.9
 
 ### Patch Changes

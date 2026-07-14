@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/canvas",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Canvas editor for OpenEnvx absolute layout pages",
   "license": "MIT",
   "type": "module",
@@ -94,7 +94,7 @@
     "vitest": "catalog:testing"
   },
   "peerDependencies": {
-    "@openenvx/headless": ">=0.1.9",
+    "@openenvx/headless": ">=0.1.10",
     "react": ">=18",
     "react-dom": ">=18"
   },

@@ -1,5 +1,14 @@
 # @openenvx/core
 
+## 0.1.10
+
+### Patch Changes
+
+- 1a89b04: feat: add Workbench views and tree provider contributions
+- Updated dependencies [1a89b04]
+  - @openenvx/preview@0.1.10
+  - @openenvx/schema@0.1.10
+
 ## 0.1.9
 
 ### Patch Changes

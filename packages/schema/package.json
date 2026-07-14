@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/schema",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Canonical Scene JSON schema for OpenEnvx",
   "license": "MIT",
   "type": "module",
