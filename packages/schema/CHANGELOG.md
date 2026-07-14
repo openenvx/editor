@@ -1,5 +1,11 @@
 # @openenvx/schema
 
+## 0.1.9
+
+### Patch Changes
+
+- e7dbaa2: new contribution for canvas
+
 ## 0.1.8
 
 ### Patch Changes

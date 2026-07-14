@@ -1,5 +1,17 @@
 # @openenvx/driver-image
 
+## 0.1.9
+
+### Patch Changes
+
+- e7dbaa2: new contribution for canvas
+- Updated dependencies [e7dbaa2]
+  - @openenvx/headless@0.1.9
+  - @openenvx/preview@0.1.9
+  - @openenvx/canvas@0.1.9
+  - @openenvx/core@0.1.9
+  - @openenvx/schema@0.1.9
+
 ## 0.1.8
 
 ### Patch Changes
