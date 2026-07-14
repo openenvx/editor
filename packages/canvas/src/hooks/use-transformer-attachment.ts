@@ -1,5 +1,5 @@
 import type Konva from 'konva';
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useMemo } from 'react';
 import type { RefObject } from 'react';
 
 import {
@@ -87,15 +87,17 @@ export function useTransformerAttachment({
   ]);
 
   const interactionAnchors = getInteractionAnchors(selectedInteraction);
-  const transformerEnabledAnchors = activeDragAnchor
-    ? activeDragAnchor === 'rotater'
-      ? []
-      : [activeDragAnchor]
-    : isNonEmptyGroupSelected
-      ? []
-      : interactionAnchors
-        ? [...interactionAnchors]
-        : undefined;
+  const transformerEnabledAnchors = useMemo((): string[] | undefined => {
+    if (activeDragAnchor) {
+      return activeDragAnchor === 'rotater' ? [] : [activeDragAnchor];
+    }
+    if (isNonEmptyGroupSelected) {
+      return [];
+    }
+    if (interactionAnchors) {
+      return [...interactionAnchors];
+    }
+  }, [activeDragAnchor, interactionAnchors, isNonEmptyGroupSelected]);
 
   return {
     transformerEnabledAnchors,

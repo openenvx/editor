@@ -10,10 +10,11 @@ import {
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
 import { getDefaultPageDimensions } from '@openenvx/schema';
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 
 import { CanvasHostProvider } from '../canvas-host-context';
 import type { CanvasHostApi } from '../canvas-host-context';
+import type { CanvasSelectLayerOptions } from '../canvas-stage-types';
 import { useCanvasApi } from '../hooks/use-canvas-api';
 import { useCanvasRegistries } from '../hooks/use-canvas-registries';
 import { useCanvasStageInteraction } from '../hooks/use-canvas-stage-interaction';
@@ -97,24 +98,68 @@ const AbsoluteEditorPaneInner = memo(
     const artboardWidth = page.width ?? defaultDimensions.width;
     const artboardHeight = page.height ?? defaultDimensions.height;
 
-    const handleTransformChange: CanvasEditorProps['onTransformChange'] = (
-      layerId,
-      change
-    ) => {
-      if (!change.transform) {
-        return;
-      }
-      if (change.fontSize !== undefined) {
-        void canvasApi.updateRichTextTransform(layerId, {
-          fontSize: change.fontSize,
-          transform: change.transform,
+    const handleTransformChange = useCallback<
+      CanvasEditorProps['onTransformChange']
+    >(
+      (layerId, change) => {
+        if (!change.transform) {
+          return;
+        }
+        if (change.fontSize !== undefined) {
+          void canvasApi.updateRichTextTransform(layerId, {
+            fontSize: change.fontSize,
+            transform: change.transform,
+          });
+          return;
+        }
+        void canvasApi.updateLayerTransform(layerId, change.transform, {
+          dataPatch: change.dataPatch,
         });
-        return;
-      }
-      void canvasApi.updateLayerTransform(layerId, change.transform, {
-        dataPatch: change.dataPatch,
-      });
-    };
+      },
+      [canvasApi]
+    );
+
+    const handleHoverLayer = useCallback(
+      (layerId: string | null) => {
+        api.setHoveredLayer(layerId);
+      },
+      [api]
+    );
+
+    const handlePropertyChange = useCallback(
+      (layerId: string, key: string, value: unknown) => {
+        api.updateProperty(layerId, key, value);
+      },
+      [api]
+    );
+
+    const handleSelectLayer = useCallback(
+      (layerId: string, options?: CanvasSelectLayerOptions) => {
+        if (!layerId) {
+          api.selectLayers([], null);
+          return;
+        }
+        if (options?.setPrimary) {
+          api.selectLayers(selection.selectedLayerIds, layerId);
+          return;
+        }
+        if (options?.additive) {
+          const current = selection.selectedLayerIds;
+          if (current.includes(layerId)) {
+            const next = current.filter((id) => id !== layerId);
+            api.selectLayers(next, next[0] ?? null);
+            return;
+          }
+          api.selectLayers(
+            [...current, layerId],
+            selection.primaryLayerId ?? layerId
+          );
+          return;
+        }
+        api.selectLayers([layerId], layerId);
+      },
+      [api, selection.primaryLayerId, selection.selectedLayerIds]
+    );
 
     return (
       <CanvasEditor
@@ -126,34 +171,9 @@ const AbsoluteEditorPaneInner = memo(
         layerSurface={layerSurface}
         onContainerResize={onContainerResize}
         onExecuteCommand={executeCommand}
-        onHoverLayer={(layerId) => api.setHoveredLayer(layerId)}
-        onPropertyChange={(layerId, key, value) => {
-          api.updateProperty(layerId, key, value);
-        }}
-        onSelectLayer={(layerId, options) => {
-          if (!layerId) {
-            api.selectLayers([], null);
-            return;
-          }
-          if (options?.setPrimary) {
-            api.selectLayers(selection.selectedLayerIds, layerId);
-            return;
-          }
-          if (options?.additive) {
-            const current = selection.selectedLayerIds;
-            if (current.includes(layerId)) {
-              const next = current.filter((id) => id !== layerId);
-              api.selectLayers(next, next[0] ?? null);
-              return;
-            }
-            api.selectLayers(
-              [...current, layerId],
-              selection.primaryLayerId ?? layerId
-            );
-            return;
-          }
-          api.selectLayers([layerId], layerId);
-        }}
+        onHoverLayer={handleHoverLayer}
+        onPropertyChange={handlePropertyChange}
+        onSelectLayer={handleSelectLayer}
         onTransformChange={handleTransformChange}
         onViewportApiReady={onViewportApiReady}
         onZoomChange={onZoomChange}

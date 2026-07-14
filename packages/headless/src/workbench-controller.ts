@@ -183,7 +183,7 @@ export class WorkbenchController {
       registerServiceInstance: (id, instance) =>
         this.registerServiceInstance(id, instance),
       getService: (token) => this.getService(token),
-      getState: () => this.getState(),
+      getSnapshot: () => this.getState(),
       loadScene: (scene) => this.loadScene(scene),
       moveViewItem: (viewId, source, target, position) =>
         this.moveViewItem(viewId, source, target, position),

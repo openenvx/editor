@@ -437,6 +437,42 @@ export const CanvasEditor = memo(
       [onPropertyChange, layerSurface]
     );
 
+    const handleLayerDoubleClick = useCallback(
+      (layerId: string) => {
+        const selectedLayer = findLayerSurfaceItem(
+          layerSurface,
+          layerId
+        )?.layer;
+        if (selectedLayer && !canEditLayerData(selectedLayer)) {
+          return;
+        }
+        setEditingLayerId(layerId);
+      },
+      [layerSurface]
+    );
+
+    const handleSelectLayer = useCallback(
+      (layerId: string, options?: CanvasSelectLayerOptions) => {
+        if (!layerId) {
+          setEditingLayerId(null);
+          onSelectLayer('');
+          return;
+        }
+        const selectedLayer = findLayerSurfaceItem(
+          layerSurface,
+          layerId
+        )?.layer;
+        if (selectedLayer && !canSelectLayer(selectedLayer)) {
+          return;
+        }
+        if (editingLayerId && layerId !== editingLayerId) {
+          setEditingLayerId(null);
+        }
+        onSelectLayer(layerId, options);
+      },
+      [editingLayerId, layerSurface, onSelectLayer]
+    );
+
     return (
       <div className={styles.host}>
         <div
@@ -470,34 +506,8 @@ export const CanvasEditor = memo(
             hoveredLayerId={hoveredLayerId}
             layers={layerSurface}
             onHoverLayer={onHoverLayer}
-            onLayerDoubleClick={(layerId) => {
-              const selectedLayer = findLayerSurfaceItem(
-                layerSurface,
-                layerId
-              )?.layer;
-              if (selectedLayer && !canEditLayerData(selectedLayer)) {
-                return;
-              }
-              setEditingLayerId(layerId);
-            }}
-            onSelectLayer={(layerId, options) => {
-              if (!layerId) {
-                setEditingLayerId(null);
-                onSelectLayer('');
-                return;
-              }
-              const selectedLayer = findLayerSurfaceItem(
-                layerSurface,
-                layerId
-              )?.layer;
-              if (selectedLayer && !canSelectLayer(selectedLayer)) {
-                return;
-              }
-              if (editingLayerId && layerId !== editingLayerId) {
-                setEditingLayerId(null);
-              }
-              onSelectLayer(layerId, options);
-            }}
+            onLayerDoubleClick={handleLayerDoubleClick}
+            onSelectLayer={handleSelectLayer}
             onTransformChange={onTransformChange}
             onViewportChange={handleViewportChange}
             pageMarginBounds={pageMarginBounds}

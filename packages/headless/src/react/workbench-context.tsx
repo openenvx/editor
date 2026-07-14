@@ -8,3 +8,5 @@ export {
   useWorkbenchContextSelector,
   useWorkbenchSelector,
 } from './use-workbench-selector';
+
+export { useStoreSelector } from './use-store-selector';

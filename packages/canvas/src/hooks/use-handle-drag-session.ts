@@ -39,7 +39,6 @@ export interface UseHandleDragSessionInput {
     transform: NonNullable<SceneLayer['transform']>
   ) => NonNullable<SceneLayer['transform']>;
   isLayerWritableCallback: (layer: SceneLayer) => boolean;
-  liveTransformOverrides: Map<string, Transform>;
   nodeRefs: RefObject<Map<string, Konva.Group>>;
   onTransformRef: RefObject<CanvasStageProps['onTransformChange']>;
   onHandleDragCleared?: () => void;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { computeArtboardOffset } from '../artboard-offset';
 import { ViewportController } from '../viewport';
@@ -27,14 +27,26 @@ export function useCanvasStageViewport({
   onViewportRef.current = onViewportChange;
 
   const vp = viewport.getViewport();
-  const artboardOffset = computeArtboardOffset(
-    containerWidth,
-    containerHeight,
-    artboardWidth,
-    artboardHeight,
-    vp.zoom,
-    vp.panX,
-    vp.panY
+  const artboardOffset = useMemo(
+    () =>
+      computeArtboardOffset(
+        containerWidth,
+        containerHeight,
+        artboardWidth,
+        artboardHeight,
+        vp.zoom,
+        vp.panX,
+        vp.panY
+      ),
+    [
+      artboardHeight,
+      artboardWidth,
+      containerHeight,
+      containerWidth,
+      vp.panX,
+      vp.panY,
+      vp.zoom,
+    ]
   );
 
   const bumpViewport = useCallback(() => {

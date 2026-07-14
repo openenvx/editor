@@ -1,23 +1,13 @@
 import type { Layer as SceneLayer } from '@openenvx/core';
 import { canTransformLayer, getLayerChildren } from '@openenvx/core';
+import { useStoreSelector } from '@openenvx/headless/react';
 import type Konva from 'konva';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useSyncExternalStore,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';
 
 import type { CanvasStageProps, SelectionBounds } from '../canvas-stage-types';
 import { getInteraction } from '../canvas-transformer-utils';
 import { flattenStageLayers } from '../flatten-layer-surface';
-import {
-  getActiveDragAnchor,
-  getActiveHandleAnchor,
-  getInteractionPreviewLayerId,
-} from '../interactions/canvas-interaction-mode';
 import { CANVAS_GROUP_LAYER_TYPE } from '../layers/canvas-group-layer';
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
 import type {
@@ -29,6 +19,12 @@ import {
   createCanvasStageRuntime,
   type CanvasStageRuntime,
 } from '../stage/canvas-stage-runtime';
+import {
+  selectActiveDragAnchor,
+  selectActiveHandleAnchor,
+  selectInteractionPreviewLayerId,
+  selectTransformSessionLayerId,
+} from '../stage/canvas-stage-selectors';
 import type { ViewportController } from '../viewport';
 import { useCanvasDragSnap } from './use-canvas-drag-snap';
 import { useCanvasHover } from './use-canvas-hover';
@@ -36,14 +32,13 @@ import { useCanvasOverlays } from './use-canvas-overlays';
 import { useCanvasStageViewport } from './use-canvas-stage-viewport';
 import { useHandleDragSession } from './use-handle-drag-session';
 import { useLayerTransformSession } from './use-layer-transform-session';
-import { useLiveTransformOverrides } from './use-live-transform-overrides';
 import { useSelectionLabel } from './use-selection-label';
 import { useTransformModifiers } from './use-transform-modifiers';
 import { useTransformerAttachment } from './use-transformer-attachment';
 
 export interface CanvasStageShell {
   stageContainerRef: RefObject<HTMLDivElement | null>;
-  runtimeRef: RefObject<CanvasStageRuntime | null>;
+  runtime: CanvasStageRuntime;
   viewport: ViewportController;
   vp: ReturnType<ViewportController['getViewport']>;
   artboardOffset: ReturnType<
@@ -56,13 +51,16 @@ export interface CanvasStageShell {
   onSelectRef: RefObject<CanvasStageProps['onSelectLayer'] | undefined>;
   bumpViewport: () => void;
   overlayPrimitives: CanvasOverlayPrimitive[];
+  flattenedLayers: ReturnType<typeof flattenStageLayers>;
   selectedLayerIdSet: Set<string>;
+  selectedPrimary: string | null;
   selectionLabelBounds: SelectionBounds | null;
   sizeLabelOffsetX: number;
   sizeLabelText: string;
   activeDragAnchor: string | null;
   activeHandleAnchor: string | null;
   interactionPreviewLayerId: string | null;
+  transformSessionLayerId: string | null;
   transformerEnabledAnchors: string[] | undefined;
   handleLayouts: ReturnType<typeof useHandleDragSession>['handleLayouts'];
   showHandles: boolean;
@@ -138,6 +136,10 @@ export function useCanvasStageRuntime(
   const selectedLayerIdsRef = useRef(selectedLayerIds);
   const primaryLayerIdRef = useRef(primaryLayerId);
   const flattenedLayers = useMemo(() => flattenStageLayers(layers), [layers]);
+  const flattenedLayerById = useMemo(
+    () => new Map(flattenedLayers.map((entry) => [entry.layer.id, entry])),
+    [flattenedLayers]
+  );
   const stageInteractionRef = useRef<CanvasStageInteractionService | null>(
     stageInteraction
   );
@@ -146,9 +148,16 @@ export function useCanvasStageRuntime(
   runtime.onDoubleClickRef.current = onLayerDoubleClick;
   runtime.onTransformRef.current = onTransformChange;
   runtime.layersRef.current = flattenedLayers;
+  runtime.selectedLayerIdsRef.current = selectedLayerIds;
   selectedLayerIdsRef.current = selectedLayerIds;
   primaryLayerIdRef.current = primaryLayerId;
   stageInteractionRef.current = stageInteraction;
+
+  const selectedLayerIdSet = useMemo(
+    () => new Set(selectedLayerIds),
+    [selectedLayerIds]
+  );
+  runtime.selectedLayerIdSetRef.current = selectedLayerIdSet;
 
   const { artboardOffset, bumpViewport, viewport, vp } = useCanvasStageViewport(
     {
@@ -162,13 +171,8 @@ export function useCanvasStageRuntime(
   );
 
   const selectedPrimary = primaryLayerId ?? selectedLayerIds[0] ?? null;
-  const selectedLayerIdSet = useMemo(
-    () => new Set(selectedLayerIds),
-    [selectedLayerIds]
-  );
-
   const selectedLayer = selectedPrimary
-    ? flattenedLayers.find(({ layer }) => layer.id === selectedPrimary)
+    ? flattenedLayerById.get(selectedPrimary)
     : undefined;
   const selectedTransform = selectedLayer?.layer.transform ?? null;
   const selectedInteraction = selectedLayer
@@ -243,13 +247,6 @@ export function useCanvasStageRuntime(
     []
   );
 
-  const {
-    getLayerTransform,
-    liveTransformOverrides,
-    setLiveTransformOverride,
-    setLiveTransformOverrides,
-  } = useLiveTransformOverrides();
-
   const { getTransformModifiers } = useTransformModifiers();
 
   const isNonEmptyGroupSelected =
@@ -279,7 +276,6 @@ export function useCanvasStageRuntime(
     handleTransformStart: startTransformSession,
     setTransformSessionLayerId,
     transformSessionActiveRef,
-    transformSessionLayerId,
   } = useLayerTransformSession({
     artboardHeight,
     artboardWidth,
@@ -298,8 +294,8 @@ export function useCanvasStageRuntime(
     selectedPrimary,
     setActiveDragAnchor,
     setInteractionOverlays,
-    setLiveTransformOverride,
-    setLiveTransformOverrides,
+    setLiveTransformOverride: runtime.setLiveTransformOverride.bind(runtime),
+    setLiveTransformOverrides: runtime.setLiveTransformOverrides.bind(runtime),
     stageInteractionRef,
     syncLabelFromTransformer,
     transformerRef,
@@ -311,12 +307,25 @@ export function useCanvasStageRuntime(
     startTransformSession();
   }, [startTransformSession]);
 
+  const activeDragAnchor = useStoreSelector(runtime, selectActiveDragAnchor);
+  const activeHandleAnchor = useStoreSelector(
+    runtime,
+    selectActiveHandleAnchor
+  );
+  const interactionPreviewLayerId = useStoreSelector(
+    runtime,
+    selectInteractionPreviewLayerId
+  );
+  const transformSessionLayerId = useStoreSelector(
+    runtime,
+    selectTransformSessionLayerId
+  );
+
   useEffect(() => {
     runtime.bindLayerHandlers({
       applyDragSnap,
       clearOverlays,
       completeLayerTransform,
-      getLayerTransform,
       handleLayerTransform,
       syncLabelFromTransformer,
     });
@@ -324,7 +333,6 @@ export function useCanvasStageRuntime(
     applyDragSnap,
     clearOverlays,
     completeLayerTransform,
-    getLayerTransform,
     handleLayerTransform,
     runtime,
     syncLabelFromTransformer,
@@ -341,9 +349,8 @@ export function useCanvasStageRuntime(
     clearOverlays,
     editingLayerId,
     flattenedLayers,
-    getLayerTransform,
+    getLayerTransform: runtime.getLayerTransform.bind(runtime),
     isLayerWritableCallback,
-    liveTransformOverrides,
     nodeRefs: runtime.nodeRefs,
     onTransformRef: runtime.onTransformRef,
     onHandleDragCleared: () => {
@@ -356,8 +363,8 @@ export function useCanvasStageRuntime(
     selectedPrimary,
     selectedTransform,
     setInteractionOverlays,
-    setLiveTransformOverride,
-    setLiveTransformOverrides,
+    setLiveTransformOverride: runtime.setLiveTransformOverride.bind(runtime),
+    setLiveTransformOverrides: runtime.setLiveTransformOverrides.bind(runtime),
     setSelectionLabelBounds,
     setTransformSessionLayerId,
     syncLabelFromTransformer,
@@ -381,17 +388,6 @@ export function useCanvasStageRuntime(
     runtime.onHandleDragEnd();
   }, [endHandleDrag, runtime]);
 
-  const interactionMode = useSyncExternalStore(
-    (listener) => runtime.subscribe(listener),
-    () => runtime.getSnapshot(),
-    () => runtime.getSnapshot()
-  );
-
-  const activeDragAnchor = getActiveDragAnchor(interactionMode);
-  const activeHandleAnchor = getActiveHandleAnchor(interactionMode);
-  const interactionPreviewLayerId =
-    getInteractionPreviewLayerId(interactionMode);
-
   const previousPrimaryRef = useRef<string | null>(selectedPrimary);
   useEffect(() => {
     const previousPrimary = previousPrimaryRef.current;
@@ -400,9 +396,7 @@ export function useCanvasStageRuntime(
       previousPrimary !== selectedPrimary &&
       runtime.getInteractionPreviewLayerId() === previousPrimary
     ) {
-      const previousLayer = flattenedLayers.find(
-        ({ layer }) => layer.id === previousPrimary
-      );
+      const previousLayer = flattenedLayerById.get(previousPrimary);
       if (previousLayer) {
         const previousInteraction = getInteraction(
           canvasLayerInteractions,
@@ -413,7 +407,7 @@ export function useCanvasStageRuntime(
       runtime.exitInteractionPreview();
     }
     previousPrimaryRef.current = selectedPrimary;
-  }, [canvasLayerInteractions, flattenedLayers, runtime, selectedPrimary]);
+  }, [canvasLayerInteractions, flattenedLayerById, runtime, selectedPrimary]);
 
   const { transformerEnabledAnchors } = useTransformerAttachment({
     activeDragAnchor,
@@ -433,12 +427,12 @@ export function useCanvasStageRuntime(
   return {
     activeDragAnchor,
     activeHandleAnchor,
-    interactionPreviewLayerId,
     anchorDragBoundFunc,
     artboardGroupRef,
     artboardOffset,
     boundBoxFunc,
     bumpViewport,
+    flattenedLayers,
     handleHandlePointerDown,
     handleHandlePointerMove,
     handleHandlePointerUp,
@@ -446,11 +440,13 @@ export function useCanvasStageRuntime(
     handlePointerHover,
     handlePointerLeave,
     handleTransformStart,
+    interactionPreviewLayerId,
     onSelectRef: runtime.onSelectRef,
     overlayGroupRef,
     overlayPrimitives,
-    runtimeRef,
+    runtime,
     selectedLayerIdSet,
+    selectedPrimary,
     selectionLabelBounds,
     showHandles,
     sizeLabelOffsetX,
@@ -458,6 +454,7 @@ export function useCanvasStageRuntime(
     sizeLabelText,
     stageContainerRef,
     syncLabelFromTransformer,
+    transformSessionLayerId,
     transformerEnabledAnchors,
     transformerRef,
     viewport,

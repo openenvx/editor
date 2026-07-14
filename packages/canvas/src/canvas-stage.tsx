@@ -18,7 +18,6 @@ import {
   EMPTY_CANVAS_LAYER_RENDERERS,
 } from './canvas-stage-types';
 import type { CanvasStageProps } from './canvas-stage-types';
-import { flattenStageLayers } from './flatten-layer-surface';
 import { useCanvasStageRuntime } from './hooks/use-canvas-stage-runtime';
 import { syncCanvasOverlays } from './stage/canvas-overlay-sync';
 import { useCanvasThemeColors } from './use-canvas-theme-colors';
@@ -82,7 +81,7 @@ export function CanvasStage({
 
   const {
     stageContainerRef,
-    runtimeRef,
+    runtime,
     viewport,
     vp,
     artboardOffset,
@@ -93,7 +92,9 @@ export function CanvasStage({
     onSelectRef,
     bumpViewport,
     overlayPrimitives,
+    flattenedLayers,
     selectedLayerIdSet,
+    selectedPrimary,
     selectionLabelBounds,
     sizeLabelOffsetX,
     sizeLabelText,
@@ -115,8 +116,6 @@ export function CanvasStage({
   } = shell;
 
   const themeColors = useCanvasThemeColors(stageContainerRef);
-
-  const flattenedLayers = useMemo(() => flattenStageLayers(layers), [layers]);
 
   const hoveredEntry = useMemo(() => {
     if (
@@ -239,9 +238,8 @@ export function CanvasStage({
                   entry={entry}
                   fontLoadRevision={fontLoadRevision}
                   key={entry.layer.id}
-                  primaryLayerId={primaryLayerId}
-                  runtimeRef={runtimeRef}
-                  selectedLayerIds={selectedLayerIds}
+                  runtime={runtime}
+                  selectedPrimary={selectedPrimary}
                 />
               ))}
               <Group listening={false} ref={overlayGroupRef} />

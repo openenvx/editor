@@ -1,7 +1,12 @@
-import type { Layer as SceneLayer } from '@openenvx/core';
-import { canSelectLayer, canTransformLayer } from '@openenvx/core';
+import {
+  canSelectLayer,
+  canTransformLayer,
+  type ExternalStore,
+  type Layer as SceneLayer,
+} from '@openenvx/core';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { createDefaultTransform } from '@openenvx/schema';
+import type { Transform } from '@openenvx/schema';
 import type Konva from 'konva';
 import type { RefObject } from 'react';
 
@@ -21,6 +26,11 @@ import {
   type CanvasInteractionEvent,
   type CanvasInteractionMode,
 } from '../interactions/canvas-interaction-mode';
+import { selectLayerTransform } from './canvas-stage-selectors';
+import {
+  createCanvasStageSnapshot,
+  type CanvasStageSnapshot,
+} from './canvas-stage-snapshot';
 
 export interface CanvasStageRuntimeLayerBindings {
   applyDragSnap: (
@@ -36,10 +46,6 @@ export interface CanvasStageRuntimeLayerBindings {
     node: Konva.Group;
     interactionKind: string | undefined;
   }) => void;
-  getLayerTransform: (
-    layerId: string,
-    transform: NonNullable<SceneLayer['transform']>
-  ) => NonNullable<SceneLayer['transform']>;
   handleLayerTransform: (
     layerId: string,
     node: Konva.Group,
@@ -49,7 +55,7 @@ export interface CanvasStageRuntimeLayerBindings {
   syncLabelFromTransformer: () => void;
 }
 
-export class CanvasStageRuntime {
+export class CanvasStageRuntime implements ExternalStore<CanvasStageSnapshot> {
   readonly nodeRefs: RefObject<Map<string, Konva.Group>> = {
     current: new Map(),
   };
@@ -57,6 +63,12 @@ export class CanvasStageRuntime {
   readonly dragSessionRef: RefObject<DragSession | null> = { current: null };
 
   readonly layersRef: RefObject<FlattenedStageLayer[]> = { current: [] };
+
+  readonly selectedLayerIdsRef: RefObject<string[]> = { current: [] };
+
+  readonly selectedLayerIdSetRef: RefObject<Set<string>> = {
+    current: new Set(),
+  };
 
   readonly onSelectRef: RefObject<
     CanvasStageProps['onSelectLayer'] | undefined
@@ -73,23 +85,63 @@ export class CanvasStageRuntime {
 
   private mode: CanvasInteractionMode = { type: 'idle' };
 
-  private listeners = new Set<() => void>();
+  private liveTransforms = new Map<string, Transform>();
+
+  private cachedSnapshot: CanvasStageSnapshot = createCanvasStageSnapshot({
+    mode: this.mode,
+    liveTransforms: this.liveTransforms,
+  });
+
+  private listeners = new Set<(snapshot: CanvasStageSnapshot) => void>();
 
   private layerBindings: CanvasStageRuntimeLayerBindings | null = null;
 
-  subscribe(listener: () => void): () => void {
+  private registerNodeCallbacks = new Map<
+    string,
+    (node: Konva.Group | null) => void
+  >();
+
+  subscribe(listener: (snapshot: CanvasStageSnapshot) => void): () => void {
     this.listeners.add(listener);
+    listener(this.cachedSnapshot);
     return () => {
       this.listeners.delete(listener);
     };
   }
 
-  getSnapshot(): CanvasInteractionMode {
-    return this.mode;
+  getSnapshot(): CanvasStageSnapshot {
+    return this.cachedSnapshot;
   }
 
   bindLayerHandlers(bindings: CanvasStageRuntimeLayerBindings): void {
     this.layerBindings = bindings;
+  }
+
+  setLiveTransformOverride(layerId: string, transform: Transform | null): void {
+    const next = new Map(this.liveTransforms);
+    if (transform) {
+      next.set(layerId, transform);
+    } else {
+      next.delete(layerId);
+    }
+    this.liveTransforms = next;
+    this.invalidateSnapshot();
+  }
+
+  setLiveTransformOverrides(overrides: Map<string, Transform>): void {
+    this.liveTransforms = new Map(overrides);
+    this.invalidateSnapshot();
+  }
+
+  getRegisterNode(layerId: string): (node: Konva.Group | null) => void {
+    let callback = this.registerNodeCallbacks.get(layerId);
+    if (!callback) {
+      callback = (node) => {
+        this.registerNode(layerId, node);
+      };
+      this.registerNodeCallbacks.set(layerId, callback);
+    }
+    return callback;
   }
 
   dispatch(event: CanvasInteractionEvent): void {
@@ -99,9 +151,7 @@ export class CanvasStageRuntime {
     }
     this.mode = nextMode;
     this.dragSessionRef.current = getDragSession(nextMode);
-    for (const listener of this.listeners) {
-      listener();
-    }
+    this.invalidateSnapshot();
   }
 
   getTransformSessionLayerId(): string | null {
@@ -131,6 +181,7 @@ export class CanvasStageRuntime {
   registerNode(layerId: string, node: Konva.Group | null): void {
     if (!node) {
       this.nodeRefs.current?.delete(layerId);
+      this.registerNodeCallbacks.delete(layerId);
       return;
     }
     this.nodeRefs.current?.set(layerId, node);
@@ -156,16 +207,13 @@ export class CanvasStageRuntime {
     layerId: string,
     transform: NonNullable<SceneLayer['transform']>
   ): NonNullable<SceneLayer['transform']> {
-    return (
-      this.layerBindings?.getLayerTransform(layerId, transform) ?? transform
-    );
+    return selectLayerTransform(this.cachedSnapshot, layerId, transform);
   }
 
-  onLayerDragStart(
-    layerId: string,
-    selectedLayerIds: string[],
-    selectedLayerIdSet: Set<string>
-  ): void {
+  onLayerDragStart(layerId: string): void {
+    const selectedLayerIds = this.selectedLayerIdsRef.current ?? [];
+    const selectedLayerIdSet = this.selectedLayerIdSetRef.current ?? new Set();
+
     this.selectLayer(layerId, { setPrimary: true });
 
     if (!selectedLayerIdSet.has(layerId) || selectedLayerIds.length <= 1) {
@@ -190,20 +238,18 @@ export class CanvasStageRuntime {
   onLayerDragMove(
     layerId: string,
     node: Konva.Group,
-    transform: NonNullable<SceneLayer['transform']>,
-    selectedLayerIds: string[]
+    transform: NonNullable<SceneLayer['transform']>
   ): void {
+    const selectedLayerIds = this.selectedLayerIdsRef.current ?? [];
     this.layerBindings?.applyDragSnap(layerId, node, transform);
     if (selectedLayerIds.includes(layerId)) {
       this.layerBindings?.syncLabelFromTransformer();
     }
   }
 
-  onLayerDragEnd(
-    layerId: string,
-    selectedLayerIds: string[],
-    selectedLayerIdSet: Set<string>
-  ): void {
+  onLayerDragEnd(layerId: string): void {
+    const selectedLayerIds = this.selectedLayerIdsRef.current ?? [];
+    const selectedLayerIdSet = this.selectedLayerIdSetRef.current ?? new Set();
     const session = this.dragSessionRef.current;
     const isGroupDragTarget =
       selectedLayerIdSet.has(layerId) && selectedLayerIds.length > 1;
@@ -289,6 +335,16 @@ export class CanvasStageRuntime {
   forceIdle(): void {
     this.dragSessionRef.current = null;
     this.dispatch({ type: 'forceIdle' });
+  }
+
+  private invalidateSnapshot(): void {
+    this.cachedSnapshot = createCanvasStageSnapshot({
+      liveTransforms: this.liveTransforms,
+      mode: this.mode,
+    });
+    for (const listener of this.listeners) {
+      listener(this.cachedSnapshot);
+    }
   }
 }
 
