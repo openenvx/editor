@@ -1,32 +1,24 @@
 import type { CommandPaletteContribution } from '../contributions/command-palette-contribution';
 import type { ContextMenuContribution } from '../contributions/context-menu-contribution';
-import type { EditorPaneContribution } from '../contributions/editor-pane-contribution';
-import type { FieldRendererContribution } from '../contributions/field-renderer-contribution';
 import type { InspectorPaneContribution } from '../contributions/inspector-pane-contribution';
 import type { OverlayContribution } from '../contributions/overlay-contribution';
 import type { StatusBarContribution } from '../contributions/status-bar-contribution';
-import type { StatusBarItemRendererContribution } from '../contributions/status-bar-item-renderer-contribution';
 import type { ToolbarContribution } from '../contributions/toolbar-contribution';
 import type {
   ViewContainerContribution,
   ViewContribution,
 } from '../contributions/view-contribution';
-import type { ViewTreeProviderContribution } from '../contributions/view-tree-provider-contribution';
 import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
 
 export class WorkbenchRegistries {
   readonly viewContainers: ViewContainerContribution[] = [];
   readonly views: ViewContribution[] = [];
-  readonly viewTreeProviders: ViewTreeProviderContribution[] = [];
   readonly contextMenus: ContextMenuContribution[] = [];
   readonly commandPalette: CommandPaletteContribution[] = [];
   readonly overlays: OverlayContribution[] = [];
   readonly statusBars: StatusBarContribution[] = [];
-  readonly statusBarItemRenderers: StatusBarItemRendererContribution[] = [];
   readonly toolbars: ToolbarContribution[] = [];
-  readonly editorPanes: EditorPaneContribution[] = [];
   readonly inspectorPanes: InspectorPaneContribution[] = [];
-  readonly fieldRenderers: FieldRendererContribution[] = [];
 }
 
 export function registerWorkbenchContribution(
@@ -40,12 +32,6 @@ export function registerWorkbenchContribution(
     }
     case 'view': {
       registries.views.push(contribution as ViewContribution);
-      break;
-    }
-    case 'viewTreeProvider': {
-      registries.viewTreeProviders.push(
-        contribution as ViewTreeProviderContribution
-      );
       break;
     }
     case 'contextMenu': {
@@ -66,26 +52,12 @@ export function registerWorkbenchContribution(
       registries.statusBars.push(contribution as StatusBarContribution);
       break;
     }
-    case 'statusBarItemRenderer': {
-      registries.statusBarItemRenderers.push(
-        contribution as StatusBarItemRendererContribution
-      );
-      break;
-    }
     case 'toolbar': {
       registries.toolbars.push(contribution as ToolbarContribution);
       break;
     }
-    case 'editorPane': {
-      registries.editorPanes.push(contribution as EditorPaneContribution);
-      break;
-    }
     case 'inspectorPane': {
       registries.inspectorPanes.push(contribution as InspectorPaneContribution);
-      break;
-    }
-    case 'fieldRenderer': {
-      registries.fieldRenderers.push(contribution as FieldRendererContribution);
       break;
     }
     default: {

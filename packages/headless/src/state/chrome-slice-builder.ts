@@ -61,12 +61,13 @@ export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
     .filter((item) => evaluateWhen(item.when))
     .toSorted((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
 
-  const statusBarItemRenderers = workbenchRegistries.statusBarItemRenderers.map(
-    (renderer) => ({
-      Component: renderer.Component,
-      kind: renderer.kind,
-    })
-  );
+  const statusBarItemRenderers =
+    ctx.providerRegistries.statusBarItemRendererRegistry
+      .entries()
+      .map(([kind, Component]) => ({
+        Component,
+        kind,
+      }));
 
   const toolbarBuilder = createToolbarBuilder();
   for (const contribution of workbenchRegistries.toolbars) {

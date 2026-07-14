@@ -45,6 +45,7 @@ Workbench chrome for canvas (toolbar, palette, sidebars, editor pane registratio
 - Generic service ids (`AssetServiceId`, `PersistenceServiceId`, `LocalizationServiceId`) and editor services (`EditorService`, `DocumentHostService`, `ThemeService`, …)
 - `LocalizationService`, `I18nContribution`, `localize()`
 - `InstantiationService` - service registry with `createServiceId` tokens
+- **Provider/Registry tier** — `Registry<K, V>` keyed runtime registrations (distinct from static contributions and DI services)
 - **No** canvas types, tokens, or registry contracts
 - **No** workbench UI contribution points (toolbar, palette, views, editor panes, inspector panes, field renderers)
 
@@ -52,7 +53,9 @@ Workbench chrome for canvas (toolbar, palette, sidebars, editor pane registratio
 
 - `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` - workbench runtime
 - `WorkbenchPlugin`, `WorkbenchRegistries`, `WorkbenchPluginContext.registerWorkbench()` - workbench UI contribution registration
-- Workbench contribution points: `Toolbar`, `CommandPalette`, `ViewContainer`, `View`, `ContextMenu`, `StatusBar`, `Overlay`, `EditorPane`, `InspectorPane`, `FieldRenderer`
+- `WorkbenchPluginContext.registerTreeDataProvider()`, `registerFieldRenderer()`, `registerStatusBarItemRenderer()`, `registerEditorPane()` - runtime provider registries
+- Workbench contribution points: `Toolbar`, `CommandPalette`, `ViewContainer`, `View`, `ContextMenu`, `StatusBar`, `Overlay`, `InspectorPane`
+- Provider registries: `ViewProviderRegistry`, `FieldRendererRegistry`, `StatusBarItemRendererRegistry`, `EditorPaneRegistry`
 - Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `InspectorPaneBuilder`
 - `WorkbenchLayout`, `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
 - `WorkbenchProvider`, `useWorkbenchContext` (React bridge)

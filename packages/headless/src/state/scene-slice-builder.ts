@@ -38,7 +38,7 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
       buildViewContainer(
         container,
         workbenchRegistries.views,
-        ctx.viewProviderRegistry,
+        ctx.providerRegistries.viewProviderRegistry,
         commandCtx,
         evaluateWhen,
         buildCtx
@@ -68,10 +68,12 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
       : []),
   ].toSorted((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
 
-  const fieldRenderers = workbenchRegistries.fieldRenderers.map((renderer) => ({
-    Component: renderer.Component,
-    kind: renderer.kind,
-  }));
+  const fieldRenderers = ctx.providerRegistries.fieldRendererRegistry
+    .entries()
+    .map(([kind, Component]) => ({
+      Component,
+      kind,
+    }));
 
   return {
     fieldRenderers,

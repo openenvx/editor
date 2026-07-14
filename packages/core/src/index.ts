@@ -165,6 +165,7 @@ export {
   LayerRegistry,
   registerContribution,
 } from './registries/registries';
+export { Registry, type RegistryDuplicatePolicy } from './registries/registry';
 
 export {
   ContextKeyService,

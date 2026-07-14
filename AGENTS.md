@@ -27,7 +27,7 @@ Read **Architecture.md** before placing new code.
 | Put it here | Examples |
 | --- | --- |
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, scene store, `PropertyBuilder` |
-| `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchPlugin`, workbench contributions (`ToolbarContribution`, `EditorPaneContribution`, …), `InspectorPaneBuilder`, `WorkbenchProvider`, `useWorkbenchContext` |
+| `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchPlugin`, workbench contributions (`ToolbarContribution`, `InspectorPaneContribution`, …), provider registries (`registerFieldRenderer`, …), `InspectorPaneBuilder`, `WorkbenchProvider`, `useWorkbenchContext` |
 | `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasBasicsPlugin`, `CanvasEditor`, `CanvasHostProvider` |
 
 ### Canvas rule (non-negotiable)

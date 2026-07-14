@@ -19,7 +19,6 @@ interface LayerSurfaceItem {
 export class EditorSliceBuilder {
   build(ctx: WorkbenchSliceContext): EditorSlice {
     const coreRegistries = ctx.manager.getRegistries();
-    const workbenchRegistries = ctx.workbenchRegistries;
     const commandCtx = ctx.manager.createCommandContext();
     const scene = ctx.sceneStore.getScene();
     const editor = ctx.editorService.getActiveEditor();
@@ -58,10 +57,12 @@ export class EditorSliceBuilder {
     return {
       editor,
       editorPaneKind: resolveEditorPaneKind(scene),
-      editorPanes: workbenchRegistries.editorPanes.map((pane) => ({
-        Component: pane.Component,
-        editorPaneKind: pane.editorPaneKind,
-      })),
+      editorPanes: ctx.providerRegistries.editorPaneRegistry
+        .entries()
+        .map(([editorPaneKind, Component]) => ({
+          Component,
+          editorPaneKind,
+        })),
       layerSurface,
     };
   }

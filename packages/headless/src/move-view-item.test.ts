@@ -11,7 +11,6 @@ import {
   ViewContainerContribution,
   ViewContribution,
 } from './contributions/view-contribution';
-import { ViewTreeProviderContribution } from './contributions/view-tree-provider-contribution';
 import { ViewProviderRegistryImpl } from './registries/view-provider-registry';
 import { WorkbenchController } from './workbench-controller';
 import { WorkbenchPlugin } from './workbench-plugin';
@@ -71,23 +70,12 @@ class LayersViewContainer extends ViewContainerContribution {
   readonly title = 'Layers';
 }
 
-class LayersTreeProviderContribution extends ViewTreeProviderContribution {
-  readonly viewId = 'layers.tree';
-
-  createProvider(): TreeDataProvider<Layer> {
-    return new LayersTreeProvider();
-  }
-}
-
 class LayersPlugin extends WorkbenchPlugin {
   readonly id = 'test.layers';
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
-    ctx.registerWorkbench(
-      new LayersViewContainer(),
-      new LayersView(),
-      new LayersTreeProviderContribution()
-    );
+    ctx.registerWorkbench(new LayersViewContainer(), new LayersView());
+    ctx.registerTreeDataProvider('layers.tree', new LayersTreeProvider());
   }
 }
 
@@ -151,23 +139,12 @@ describe('view when clause', () => {
     readonly when = 'test.showHiddenView';
   }
 
-  class HiddenTreeProviderContribution extends ViewTreeProviderContribution {
-    readonly viewId = 'hidden.view';
-
-    createProvider(): TreeDataProvider<Layer> {
-      return new LayersTreeProvider();
-    }
-  }
-
   class HiddenViewPlugin extends WorkbenchPlugin {
     readonly id = 'test.hidden-view';
 
     activateWorkbench(ctx: WorkbenchPluginContext): void {
-      ctx.registerWorkbench(
-        new LayersViewContainer(),
-        new HiddenView(),
-        new HiddenTreeProviderContribution()
-      );
+      ctx.registerWorkbench(new LayersViewContainer(), new HiddenView());
+      ctx.registerTreeDataProvider('hidden.view', new LayersTreeProvider());
     }
   }
 
@@ -193,53 +170,17 @@ describe('view when clause', () => {
   });
 });
 
-describe('ViewTreeProviderContribution primary and order', () => {
-  class BuiltinTreeProviderContribution extends ViewTreeProviderContribution {
-    readonly viewId = 'layers.tree';
-
-    createProvider(): TreeDataProvider<Layer> {
-      return new LayersTreeProvider();
-    }
-  }
-
-  class CustomPrimaryTreeProviderContribution extends ViewTreeProviderContribution {
-    readonly viewId = 'layers.tree';
-    readonly primary = true;
-
-    createProvider(): TreeDataProvider<Layer> {
-      return new LayersTreeProvider();
-    }
-  }
-
-  class OrderedTreeProviderContribution extends ViewTreeProviderContribution {
-    readonly viewId = 'layers.tree';
-    readonly order = 0;
-
-    createProvider(): TreeDataProvider<Layer> {
-      return new LayersTreeProvider();
-    }
-  }
-
-  class HighOrderTreeProviderContribution extends ViewTreeProviderContribution {
-    readonly viewId = 'layers.tree';
-    readonly order = 10;
-
-    createProvider(): TreeDataProvider<Layer> {
-      return new LayersTreeProvider();
-    }
-  }
-
-  it('prefers primary contribution over default registration', async () => {
+describe('registerTreeDataProvider primary and order', () => {
+  it('prefers primary registration over default registration', async () => {
     class PrimaryPlugin extends WorkbenchPlugin {
       readonly id = 'test.primary';
 
       activateWorkbench(ctx: WorkbenchPluginContext): void {
-        ctx.registerWorkbench(
-          new LayersViewContainer(),
-          new LayersView(),
-          new BuiltinTreeProviderContribution(),
-          new CustomPrimaryTreeProviderContribution()
-        );
+        ctx.registerWorkbench(new LayersViewContainer(), new LayersView());
+        ctx.registerTreeDataProvider('layers.tree', new LayersTreeProvider());
+        ctx.registerTreeDataProvider('layers.tree', new LayersTreeProvider(), {
+          primary: true,
+        });
       }
     }
 
@@ -266,12 +207,13 @@ describe('ViewTreeProviderContribution primary and order', () => {
       readonly id = 'test.order';
 
       activateWorkbench(ctx: WorkbenchPluginContext): void {
-        ctx.registerWorkbench(
-          new LayersViewContainer(),
-          new LayersView(),
-          new HighOrderTreeProviderContribution(),
-          new OrderedTreeProviderContribution()
-        );
+        ctx.registerWorkbench(new LayersViewContainer(), new LayersView());
+        ctx.registerTreeDataProvider('layers.tree', new LayersTreeProvider(), {
+          order: 10,
+        });
+        ctx.registerTreeDataProvider('layers.tree', new LayersTreeProvider(), {
+          order: 0,
+        });
       }
     }
 

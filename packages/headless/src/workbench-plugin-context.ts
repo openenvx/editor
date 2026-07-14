@@ -1,7 +1,8 @@
 import type { PluginContext } from '@openenvx/core';
 
-import { ViewTreeProviderContribution } from './contributions/view-tree-provider-contribution';
-import type { ViewProviderRegistry } from './registries/view-provider-registry';
+import type { TreeDataProvider } from './contributions/view-contribution';
+import type { ViewProviderRegisterOptions } from './registries/view-provider-registry';
+import type { WorkbenchProviderRegistries } from './registries/workbench-provider-registries';
 import {
   registerWorkbenchContribution,
   type WorkbenchRegistries,
@@ -10,12 +11,20 @@ import type { WorkbenchContribution } from './workbench-contributions/workbench-
 
 export interface WorkbenchPluginContext extends PluginContext {
   registerWorkbench(...contributions: WorkbenchContribution[]): void;
+  registerTreeDataProvider(
+    viewId: string,
+    provider: TreeDataProvider<unknown>,
+    options?: ViewProviderRegisterOptions
+  ): void;
+  registerFieldRenderer(kind: string, component: unknown): void;
+  registerStatusBarItemRenderer(kind: string, component: unknown): void;
+  registerEditorPane(editorPaneKind: string, component: unknown): void;
 }
 
 export function createWorkbenchPluginContext(
   base: PluginContext,
   workbenchRegistries: WorkbenchRegistries,
-  viewProviderRegistry: ViewProviderRegistry
+  providerRegistries: WorkbenchProviderRegistries
 ): WorkbenchPluginContext {
   return {
     commands: base.commands,
@@ -26,17 +35,26 @@ export function createWorkbenchPluginContext(
     registerWorkbench(...contributions: WorkbenchContribution[]): void {
       for (const contribution of contributions) {
         registerWorkbenchContribution(workbenchRegistries, contribution);
-        if (contribution instanceof ViewTreeProviderContribution) {
-          viewProviderRegistry.registerTreeDataProvider(
-            contribution.viewId,
-            contribution.createProvider(),
-            {
-              order: contribution.order,
-              primary: contribution.primary,
-            }
-          );
-        }
       }
+    },
+    registerTreeDataProvider(viewId, provider, options) {
+      providerRegistries.viewProviderRegistry.registerTreeDataProvider(
+        viewId,
+        provider,
+        options
+      );
+    },
+    registerFieldRenderer(kind, component) {
+      providerRegistries.fieldRendererRegistry.register(kind, component);
+    },
+    registerStatusBarItemRenderer(kind, component) {
+      providerRegistries.statusBarItemRendererRegistry.register(
+        kind,
+        component
+      );
+    },
+    registerEditorPane(editorPaneKind, component) {
+      providerRegistries.editorPaneRegistry.register(editorPaneKind, component);
     },
     scene: base.scene,
     services: base.services,

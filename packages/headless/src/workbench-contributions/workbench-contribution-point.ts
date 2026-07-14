@@ -2,14 +2,10 @@
 export enum WorkbenchContributionPoint {
   ViewContainer = 'viewContainer',
   View = 'view',
-  ViewTreeProvider = 'viewTreeProvider',
   ContextMenu = 'contextMenu',
   Overlay = 'overlay',
   StatusBar = 'statusBar',
-  StatusBarItemRenderer = 'statusBarItemRenderer',
-  EditorPane = 'editorPane',
   InspectorPane = 'inspectorPane',
-  FieldRenderer = 'fieldRenderer',
   CommandPalette = 'commandPalette',
   Toolbar = 'toolbar',
 }

@@ -30,7 +30,6 @@ export {
   type SidebarBehavior,
   type TreeItem,
 } from './contributions/view-contribution';
-export { ViewTreeProviderContribution } from './contributions/view-tree-provider-contribution';
 export {
   createWorkbenchPluginContext,
   type WorkbenchPluginContext,
@@ -39,8 +38,6 @@ export { WorkbenchPlugin } from './workbench-plugin';
 
 export { CommandPaletteContribution } from './contributions/command-palette-contribution';
 export { ContextMenuContribution } from './contributions/context-menu-contribution';
-export { EditorPaneContribution } from './contributions/editor-pane-contribution';
-export { FieldRendererContribution } from './contributions/field-renderer-contribution';
 export { InspectorPaneContribution } from './contributions/inspector-pane-contribution';
 export {
   OverlayContribution,
@@ -52,7 +49,6 @@ export {
   type StatusBarItemDescriptor,
   type StatusBarTextItemDescriptor,
 } from './contributions/status-bar-contribution';
-export { StatusBarItemRendererContribution } from './contributions/status-bar-item-renderer-contribution';
 export {
   ToolbarContribution,
   type ToolbarCommandItemDescriptor,

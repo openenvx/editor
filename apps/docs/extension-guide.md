@@ -41,19 +41,16 @@ class MyWorkbenchPlugin extends WorkbenchPlugin {
 
 ### Workbench views (VS Code-style)
 
-Views use the same **declare / register** split as VS Code (`contributes.views` + tree provider), via two contribution classes:
+Views use the same **declare / register** split as VS Code: view metadata is a static contribution (`contributes.views` ↔ `ViewContribution`), while the tree data is a **runtime registration** against a view id (`vscode.window.registerTreeDataProvider` ↔ `ctx.registerTreeDataProvider`). The tree data provider is a data-layer concern, not a contribution point.
 
-1. **Declare** view metadata — `ViewContribution` (`id`, `containerId`, `name`, optional `when`).
-2. **Register** tree data — `ViewTreeProviderContribution` (`viewId`, optional `primary`, optional `order`).
-
-Both register through `registerWorkbench()` — no option objects.
+1. **Declare** view metadata — `ViewContribution` (`id`, `containerId`, `name`, optional `when`) via `ctx.registerWorkbench()`.
+2. **Register** tree data — `ctx.registerTreeDataProvider(viewId, provider, options?)` (optional `primary`, `order`).
 
 ```ts
 import {
   TreeDataProvider,
   ViewContainerContribution,
   ViewContribution,
-  ViewTreeProviderContribution,
   WorkbenchPlugin,
 } from '@openenvx/headless';
 
@@ -76,43 +73,44 @@ class MyTreeProvider extends TreeDataProvider<MyNode> {
   }
 }
 
-class MyTreeProviderContribution extends ViewTreeProviderContribution {
-  readonly viewId = 'my.view';
-  createProvider() {
-    return new MyTreeProvider();
-  }
-}
-
 class MyViewPlugin extends WorkbenchPlugin {
   readonly id = 'my.view';
 
   activateWorkbench(ctx) {
-    ctx.registerWorkbench(
-      new MyViewContainer(),
-      new MyView(),
-      new MyTreeProviderContribution()
-    );
+    ctx.registerWorkbench(new MyViewContainer(), new MyView());
+    ctx.registerTreeDataProvider('my.view', new MyTreeProvider());
   }
 }
 ```
 
 **Hide a view** — omit its plugin from `plugins[]` (composition), or set `when` on the declaration and drive the context key from your plugin.
 
-**Replace a tree** — contribute a provider class with `primary` or `order` on the class:
+**Replace a tree** — register a provider with `primary` or `order`:
 
 ```ts
-class MyPagesTreeProviderContribution extends ViewTreeProviderContribution {
-  readonly viewId = 'canvas.pages';
-  readonly primary = true;
-  createProvider() { return new MyPagesTreeProvider(); }
-}
-
 activateWorkbench(ctx) {
-  ctx.registerWorkbench(new MyPagesTreeProviderContribution());
+  ctx.registerWorkbench(new MyViewContainer(), new MyView());
+  ctx.registerTreeDataProvider('canvas.pages', new MyPagesTreeProvider(), {
+    primary: true,
+  });
 }
 ```
 
 Resolution matches Spring `@Primary` / `@Order`: primary beats non-primary; among equals, lower `order` wins. Multiple primaries at the same order is an error.
+
+### Workbench renderer providers
+
+Renderer implementations are runtime provider registrations, not contribution points. Register them in `activateWorkbench()`:
+
+```ts
+activateWorkbench(ctx) {
+  ctx.registerFieldRenderer('color', ColorFieldRenderer);
+  ctx.registerStatusBarItemRenderer('dropdown', StatusBarDropdownRenderer);
+  ctx.registerEditorPane('absolute', AbsoluteEditorPane);
+}
+```
+
+Duplicate kinds overwrite earlier registrations so enterprise plugins activating later can replace OSS defaults.
 
 Enterprise `@openenvx/canvas-pro` ships composable sidebar plugins: `CanvasSidebarPlugin`, `CanvasPagesPlugin`, `CanvasLayersPlugin`. Use `DEFAULT_CANVAS_PRO_PLUGINS` for the full bundle, or compose your own list and omit `CanvasPagesPlugin` to hide Pages.
 

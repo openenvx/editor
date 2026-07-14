@@ -6,6 +6,7 @@ import {
   findLayerById,
   LayerRegistryServiceId,
   PluginManager,
+  Registry,
   SceneStore,
   updateLayerInTree,
   WorkbenchEvents,
@@ -18,6 +19,7 @@ import type {
 } from '@openenvx/core';
 
 import { ViewProviderRegistryImpl } from './registries/view-provider-registry';
+import type { WorkbenchProviderRegistries } from './registries/workbench-provider-registries';
 import { WorkbenchRegistries } from './registries/workbench-registries';
 import { buildChromeSlice } from './state/chrome-slice-builder';
 import { buildCommandsSlice } from './state/commands-slice-builder';
@@ -69,7 +71,12 @@ export class WorkbenchController {
   private detachKeybindings: (() => void) | null = null;
   private lastSeenContentRevision = -1;
   private readonly workbenchRegistries = new WorkbenchRegistries();
-  private readonly viewProviderRegistry = new ViewProviderRegistryImpl();
+  private readonly providerRegistries: WorkbenchProviderRegistries = {
+    editorPaneRegistry: new Registry<string, unknown>('overwrite'),
+    fieldRendererRegistry: new Registry<string, unknown>('overwrite'),
+    statusBarItemRendererRegistry: new Registry<string, unknown>('overwrite'),
+    viewProviderRegistry: new ViewProviderRegistryImpl(),
+  };
 
   constructor(private readonly options: WorkbenchControllerOptions) {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
@@ -85,8 +92,8 @@ export class WorkbenchController {
       editorService: this.editorService,
       layout: this.layout,
       manager: this.manager,
+      providerRegistries: this.providerRegistries,
       sceneStore: this.sceneStore,
-      viewProviderRegistry: this.viewProviderRegistry,
       workbenchRegistries: this.workbenchRegistries,
     };
   }
@@ -215,7 +222,7 @@ export class WorkbenchController {
       const ctx = createWorkbenchPluginContext(
         this.manager.createPluginContext(),
         this.workbenchRegistries,
-        this.viewProviderRegistry
+        this.providerRegistries
       );
       await this.manager.activateWithContext(plugin, ctx);
     }
@@ -332,7 +339,7 @@ export class WorkbenchController {
   }
 
   selectViewItem(viewId: string, item: unknown): void {
-    const provider = this.viewProviderRegistry.get(viewId);
+    const provider = this.providerRegistries.viewProviderRegistry.get(viewId);
     if (!provider) {
       return;
     }
@@ -346,7 +353,7 @@ export class WorkbenchController {
     target: unknown,
     position: 'before' | 'after' | 'inside'
   ): void {
-    const provider = this.viewProviderRegistry.get(viewId);
+    const provider = this.providerRegistries.viewProviderRegistry.get(viewId);
     if (!provider) {
       return;
     }
