@@ -40,6 +40,19 @@ describe('canvas-stage-selectors', () => {
     ).toBe(false);
   });
 
+  it('selectLayerHideContent hides handle-drag targets', () => {
+    const snapshot = createCanvasStageSnapshot({
+      mode: { anchor: 'middle-right', layerId: 'layer-1', type: 'handleDrag' },
+    });
+
+    expect(
+      selectLayerHideContent(snapshot, 'layer-1', {
+        hideContentDuringTransform: () => true,
+        kind: 'image',
+      }, null)
+    ).toBe(true);
+  });
+
   it('selectLayerSlice composes transform and interaction flags', () => {
     const base = createDefaultTransform();
     const snapshot = createCanvasStageSnapshot({

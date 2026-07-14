@@ -110,4 +110,19 @@ describe('useStoreSelector', () => {
 
     expect(result.current).toEqual({ count: 2 });
   });
+
+  it('re-evaluates selector when external deps change without a store update', () => {
+    const store = createTestStore({ count: 1, label: 'a' });
+    let external = 10;
+    const { result, rerender } = renderHook(() =>
+      useStoreSelector(store, (state) => state.count + external)
+    );
+
+    expect(result.current).toBe(11);
+
+    external = 20;
+    rerender();
+
+    expect(result.current).toBe(21);
+  });
 });

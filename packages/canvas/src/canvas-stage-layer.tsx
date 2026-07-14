@@ -38,13 +38,13 @@ function tryActivateLayerInteraction(input: {
   if (!node) {
     return false;
   }
-  runtime.enterInteractionPreview(layerId);
   interaction.onLayerActivate?.({
     layerId,
     node,
     transform,
     view,
   });
+  runtime.enterInteractionPreview(layerId);
   return true;
 }
 

@@ -375,10 +375,10 @@ export function useCanvasStageRuntime(
 
   const handleHandlePointerDown = useCallback(
     (anchor: string) => {
+      startHandleDrag(anchor);
       if (selectedPrimary) {
         runtime.onHandleDragStart(selectedPrimary, anchor);
       }
-      startHandleDrag(anchor);
     },
     [runtime, selectedPrimary, startHandleDrag]
   );

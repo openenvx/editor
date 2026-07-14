@@ -50,11 +50,8 @@ export function useStoreSelector<T, S>(
       return null;
     }
     const state = store.getSnapshot();
-    const prev = snapshotRef.current;
-    if (prev && prev.state === state) {
-      return prev.selected;
-    }
     const nextSelected = selectorRef.current(state);
+    const prev = snapshotRef.current;
     if (prev && isEqualRef.current(prev.selected, nextSelected)) {
       snapshotRef.current = { selected: prev.selected, state };
       return prev.selected;
