@@ -139,16 +139,17 @@ export function CanvasStageLayerGroup({
         }
         if (interaction?.usesEditOverlay) {
           runtime.openLayerEditor(layer.id);
-          return;
+        } else {
+          tryActivateLayerInteraction({
+            interaction,
+            layerId: layer.id,
+            layerWritable,
+            runtime,
+            transform,
+            view,
+          });
         }
-        tryActivateLayerInteraction({
-          interaction,
-          layerId: layer.id,
-          layerWritable,
-          runtime,
-          transform,
-          view,
-        });
+        interaction?.onDoubleClick?.(layer.id);
       }}
       onDragEnd={() => {
         if (!runtime || !layerWritable) {

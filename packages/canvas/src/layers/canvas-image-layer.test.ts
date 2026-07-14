@@ -53,4 +53,28 @@ describe('CanvasImageLayer', () => {
       src: 'asset://image.png',
     });
   });
+
+  it('keeps canonical kind and src authoritative over passthrough collisions', () => {
+    const layer = new CanvasImageLayer();
+    const scene = normalizeScene({
+      activePageId: 'p1',
+      pages: [{ id: 'p1', layout: 'absolute', layers: [], name: 'Page' }],
+    });
+    const created = layer.createDefault('image-1', scene.pages[0]!);
+    const view = layer.renderPreview({
+      isSelected: false,
+      layerId: created.id,
+      model: {
+        alt: 'Alt',
+        assetRef: 'asset://image.png',
+        kind: 'shape',
+        src: 'asset://other.png',
+      },
+    });
+    expect(view).toEqual({
+      alt: 'Alt',
+      kind: 'image',
+      src: 'asset://image.png',
+    });
+  });
 });

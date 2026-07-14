@@ -61,10 +61,10 @@ export class CanvasImageLayer extends LayerDefinition<CanvasImageModel> {
   renderPreview(ctx: LayerPreviewContext<CanvasImageModel>) {
     const { assetRef, alt, ...rest } = ctx.model;
     return {
+      ...rest,
       alt: alt ?? 'Image',
       kind: 'image' as const,
       src: assetRef,
-      ...rest,
     };
   }
 }

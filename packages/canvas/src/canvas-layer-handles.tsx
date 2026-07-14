@@ -38,8 +38,8 @@ export function CanvasLayerHandles({
               rotation={handle.rotation}
               stroke={stroke}
               strokeWidth={1}
-              x={handle.x + radius}
-              y={handle.y + radius}
+              x={handle.x + handle.width / 2}
+              y={handle.y + handle.height / 2}
             />
           );
         }

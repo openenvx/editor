@@ -63,6 +63,7 @@ export function useTransformerAttachment({
     if (
       !selectedPrimary ||
       !selectedTransform ||
+      editingLayerId ||
       transformSessionActiveRef.current ||
       activeHandleAnchor
     ) {
@@ -75,6 +76,7 @@ export function useTransformerAttachment({
     syncLabelFromTransformer();
   }, [
     activeHandleAnchor,
+    editingLayerId,
     nodeRefs,
     selectedLayerIds,
     selectedPrimary,

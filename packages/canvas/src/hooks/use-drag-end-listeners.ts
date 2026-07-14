@@ -1,8 +1,8 @@
 import type Konva from 'konva';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 
-import { attachTransformerToNodes } from '../canvas-transformer-utils';
+import { reattachTransformerFromSelection } from '../canvas-transformer-utils';
 
 export interface UseDragEndListenersInput {
   clearHandleDragState: (options?: { clearLiveOverrides?: boolean }) => void;
@@ -38,15 +38,12 @@ export function useDragEndListeners({
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         clearHandleDragState();
-        requestAnimationFrame(() => {
-          const nodes = (selectedLayerIdsRef.current ?? [])
-            .map((id) => nodeRefs.current?.get(id))
-            .filter((entryNode): entryNode is Konva.Group =>
-              Boolean(entryNode)
-            );
-          attachTransformerToNodes(transformerRef.current, nodes);
-          syncLabelFromTransformer();
-        });
+        reattachTransformerFromSelection(
+          nodeRefs,
+          selectedLayerIdsRef,
+          transformerRef,
+          syncLabelFromTransformer
+        );
       }
     };
 
@@ -69,6 +66,13 @@ export function useDragEndListeners({
     syncLabelFromTransformer,
     transformerRef,
   ]);
+
+  useEffect(
+    () => () => {
+      detachEndDragListeners();
+    },
+    [detachEndDragListeners]
+  );
 
   return {
     attachEndDragListeners,

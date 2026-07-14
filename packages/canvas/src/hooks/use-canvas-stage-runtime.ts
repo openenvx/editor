@@ -238,18 +238,6 @@ export function useCanvasStageRuntime(
     onHoverLayer,
   });
 
-  useEffect(() => {
-    if (!editingLayerId) {
-      return;
-    }
-    const node = runtime.nodeRefs.current?.get(editingLayerId);
-    if (!node) {
-      return;
-    }
-    node.destroyChildren();
-    node.getLayer()?.batchDraw();
-  }, [editingLayerId, runtime]);
-
   const isLayerWritableCallback = useCallback(
     (layer: SceneLayer) => canTransformLayer(layer),
     []

@@ -28,7 +28,8 @@ Package boundaries and contribution flow for the monorepo.
 - `CanvasRegistriesReader`, `PageResizeService`
 - `useCanvasRegistries()`, `useCanvasApi()` — require `CanvasHostProvider` (app wires workbench or custom host)
 - `CanvasBasicsPlugin` - registers layers, renderers, interactions, and commands only (no workbench chrome)
-- `registerCanvasContribution()` for third-party canvas renderers, interactions, and snap providers
+- `registerCanvasContribution()` for third-party canvas renderers, interactions, and layer preview renderers
+- Snap/design-tool overlay behavior is registered separately as a `CanvasStageInteractionService`
 - **Per-kind override** — enterprise plugins can replace OSS `canvasLayerRenderers`, `canvasLayerInteractions`, `layerPreviewRenderers`, and driver-image SVG serializers via `{ override: true }`
 - **Generic layer handles** — `CanvasLayerInteractionContribution` can provide custom handles (`providesHandles`, `layoutHandles`, `onHandleDrag*`) painted by OSS `CanvasStage`
 - **`dataPatch` on `canvas.updateLayerTransform`** — optional enterprise data commits alongside transform updates (`dataPatch` merges into `layer.data`)

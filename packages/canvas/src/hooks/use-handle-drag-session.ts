@@ -7,7 +7,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 
 import type { CanvasStageProps, SelectionBounds } from '../canvas-stage-types';
-import { attachTransformerToNodes } from '../canvas-transformer-utils';
+import { reattachTransformerFromSelection } from '../canvas-transformer-utils';
 import { pointerToParentLocal } from '../geometry';
 import type {
   CanvasHandleDragContext,
@@ -197,13 +197,12 @@ export function useHandleDragSession({
       });
     }
 
-    requestAnimationFrame(() => {
-      const nodes = (selectedLayerIdsRef.current ?? [])
-        .map((id) => nodeRefs.current?.get(id))
-        .filter((entryNode): entryNode is Konva.Group => Boolean(entryNode));
-      attachTransformerToNodes(transformerRef.current, nodes);
-      syncLabelFromTransformer();
-    });
+    reattachTransformerFromSelection(
+      nodeRefs,
+      selectedLayerIdsRef,
+      transformerRef,
+      syncLabelFromTransformer
+    );
   }, [
     canvasLayerInteractions,
     clearHandleDragState,
@@ -337,6 +336,8 @@ export function useHandleDragSession({
       return;
     }
 
+    let nextLiveTransform: Transform | null = null;
+    let liveTransformApplied = false;
     target.interaction.onHandleDragMove(
       createHandleDragContext({
         anchor: drag.anchor,
@@ -345,13 +346,19 @@ export function useHandleDragSession({
         node: target.node,
         originTransform: drag.originTransform,
         setInteractionOverlays,
-        setLiveTransformOverride,
+        setLiveTransformOverride: (layerId, transform) => {
+          nextLiveTransform = transform;
+          liveTransformApplied = true;
+          setLiveTransformOverride(layerId, transform);
+        },
         zoom: vpZoom,
       }),
       pointer
     );
 
-    const liveTransform = getLayerTransform(drag.layerId, drag.originTransform);
+    const liveTransform = liveTransformApplied
+      ? (nextLiveTransform ?? drag.originTransform)
+      : getLayerTransform(drag.layerId, drag.originTransform);
     setSelectionLabelBounds({
       height: liveTransform.height,
       width: liveTransform.width,

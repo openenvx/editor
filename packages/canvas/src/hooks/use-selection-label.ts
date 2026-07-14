@@ -80,9 +80,12 @@ export function useSelectionLabel({
     if (!selectedPrimary) {
       return;
     }
-    requestAnimationFrame(() => {
+    const frame = requestAnimationFrame(() => {
       syncLabelFromTransformer();
     });
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [selectedPrimary, syncLabelFromTransformer]);
 
   const sizeLabelText = selectionLabelBounds
