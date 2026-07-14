@@ -31,11 +31,18 @@ export interface PreviewKindSvgSerializer {
   ): string;
 }
 
+export interface PreviewKindSvgSerializerRegisterOptions {
+  override?: boolean;
+}
+
 export class PreviewKindSvgSerializerRegistry {
   private readonly serializers = new Map<string, PreviewKindSvgSerializer>();
 
-  register(serializer: PreviewKindSvgSerializer): void {
-    if (this.serializers.has(serializer.kind)) {
+  register(
+    serializer: PreviewKindSvgSerializer,
+    options?: PreviewKindSvgSerializerRegisterOptions
+  ): void {
+    if (this.serializers.has(serializer.kind) && !options?.override) {
       throw new Error(
         `Preview SVG serializer already registered: ${serializer.kind}`
       );

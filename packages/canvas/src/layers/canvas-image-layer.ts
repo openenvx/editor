@@ -6,14 +6,15 @@ import type {
   Page,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@openenvx/preview';
 import { createDefaultTransform } from '@openenvx/schema';
 import { z } from 'zod';
 
-export const canvasImageSchema = z.object({
-  alt: z.string().optional(),
-  assetRef: z.string(),
-});
+export const canvasImageSchema = z
+  .object({
+    alt: z.string().optional(),
+    assetRef: z.string(),
+  })
+  .passthrough();
 
 export type CanvasImageModel = z.infer<typeof canvasImageSchema>;
 
@@ -58,9 +59,12 @@ export class CanvasImageLayer extends LayerDefinition<CanvasImageModel> {
   }
 
   renderPreview(ctx: LayerPreviewContext<CanvasImageModel>) {
-    return createLayerPreviewBuilder().image(
-      ctx.model.assetRef,
-      ctx.model.alt ?? 'Image'
-    );
+    const { assetRef, alt, ...rest } = ctx.model;
+    return {
+      alt: alt ?? 'Image',
+      kind: 'image' as const,
+      src: assetRef,
+      ...rest,
+    };
   }
 }

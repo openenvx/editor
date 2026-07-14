@@ -1,19 +1,27 @@
 import type { Transform } from '@openenvx/schema';
 
 export class CanvasCommandRequestService {
-  private pendingTransform: { layerId: string; transform: Transform } | null =
-    null;
+  private pendingTransform: {
+    dataPatch?: Record<string, unknown>;
+    layerId: string;
+    transform: Transform;
+  } | null = null;
   private pendingRichTextTransform: {
     layerId: string;
     fontSize: number;
     transform: Transform;
   } | null = null;
 
-  queueTransformUpdate(layerId: string, transform: Transform): void {
-    this.pendingTransform = { layerId, transform };
+  queueTransformUpdate(
+    layerId: string,
+    transform: Transform,
+    dataPatch?: Record<string, unknown>
+  ): void {
+    this.pendingTransform = { dataPatch, layerId, transform };
   }
 
   takeQueuedTransformUpdate(): {
+    dataPatch?: Record<string, unknown>;
     layerId: string;
     transform: Transform;
   } | null {
@@ -27,6 +35,7 @@ export class CanvasCommandRequestService {
   }
 
   peekQueuedTransformUpdate(): {
+    dataPatch?: Record<string, unknown>;
     layerId: string;
     transform: Transform;
   } | null {

@@ -5,6 +5,8 @@ import { Image as KonvaImage, Rect } from 'react-konva';
 import type { CanvasLayerRendererHostProps } from '../contributions/canvas-layer-renderer-contribution';
 import { useLoadedImage } from './use-loaded-image';
 
+export { useLoadedImage } from './use-loaded-image';
+
 type ImageView = Extract<LayerPreviewDescriptor, { kind: 'image' }>;
 
 export const ImageCanvasRenderer = memo(

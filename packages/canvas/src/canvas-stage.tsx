@@ -11,6 +11,7 @@ import {
 } from 'react-konva';
 
 import { CanvasHoverOutline } from './canvas-hover-outline';
+import { CanvasLayerHandles } from './canvas-layer-handles';
 import { CanvasStageLayerGroup } from './canvas-stage-layer';
 import {
   EMPTY_CANVAS_LAYER_INTERACTIONS,
@@ -18,7 +19,7 @@ import {
 } from './canvas-stage-types';
 import type { CanvasStageProps } from './canvas-stage-types';
 import { flattenStageLayers } from './flatten-layer-surface';
-import { useCanvasStageController } from './hooks/use-canvas-stage-controller';
+import { useCanvasStageRuntime } from './hooks/use-canvas-stage-runtime';
 import { syncCanvasOverlays } from './stage/canvas-overlay-sync';
 import { useCanvasThemeColors } from './use-canvas-theme-colors';
 import {
@@ -57,7 +58,7 @@ export function CanvasStage({
   stageInteraction = null,
   fontLoadRevision = 0,
 }: CanvasStageProps) {
-  const controller = useCanvasStageController({
+  const shell = useCanvasStageRuntime({
     artboardHeight,
     artboardWidth,
     canvasLayerInteractions,
@@ -81,6 +82,7 @@ export function CanvasStage({
 
   const {
     stageContainerRef,
+    runtimeRef,
     viewport,
     vp,
     artboardOffset,
@@ -91,20 +93,25 @@ export function CanvasStage({
     onSelectRef,
     bumpViewport,
     overlayPrimitives,
-    editingLayerId: activeEditingLayerId,
     selectedLayerIdSet,
     selectionLabelBounds,
     sizeLabelOffsetX,
     sizeLabelText,
     activeDragAnchor,
+    activeHandleAnchor,
     transformerEnabledAnchors,
+    handleLayouts,
+    showHandles,
+    handleHandlePointerDown,
+    handleHandlePointerMove,
+    handleHandlePointerUp,
     handleTransformStart,
     anchorDragBoundFunc,
     boundBoxFunc,
     syncLabelFromTransformer,
     handlePointerHover,
     handlePointerLeave,
-  } = controller;
+  } = shell;
 
   const themeColors = useCanvasThemeColors(stageContainerRef);
 
@@ -112,7 +119,7 @@ export function CanvasStage({
 
   const hoveredEntry = useMemo(() => {
     if (
-      activeEditingLayerId ||
+      editingLayerId ||
       !hoveredLayerId ||
       selectedLayerIdSet.has(hoveredLayerId)
     ) {
@@ -121,12 +128,7 @@ export function CanvasStage({
     return (
       flattenedLayers.find((entry) => entry.layer.id === hoveredLayerId) ?? null
     );
-  }, [
-    activeEditingLayerId,
-    flattenedLayers,
-    hoveredLayerId,
-    selectedLayerIdSet,
-  ]);
+  }, [editingLayerId, flattenedLayers, hoveredLayerId, selectedLayerIdSet]);
 
   useLayoutEffect(() => {
     const group = overlayGroupRef.current;
@@ -154,15 +156,27 @@ export function CanvasStage({
         height={containerHeight}
         onContextMenu={(event) => {
           if (event.target === event.target.getStage()) {
-            onSelectRef.current('');
+            onSelectRef.current?.('');
           }
         }}
         onMouseDown={(event) => {
           if (event.target === event.target.getStage()) {
-            onSelectRef.current('');
+            onSelectRef.current?.('');
           }
         }}
-        onMouseMove={handlePointerHover}
+        onMouseMove={() => {
+          handlePointerHover();
+          handleHandlePointerMove();
+        }}
+        onMouseUp={() => {
+          handleHandlePointerUp();
+        }}
+        onTouchEnd={() => {
+          handleHandlePointerUp();
+        }}
+        onTouchMove={() => {
+          handleHandlePointerMove();
+        }}
         onWheel={(event) => {
           event.evt.preventDefault();
           const { ctrlKey, deltaMode, deltaX, deltaY } = event.evt;
@@ -220,15 +234,18 @@ export function CanvasStage({
                 <CanvasStageLayerGroup
                   canvasLayerInteractions={canvasLayerInteractions}
                   canvasLayerRenderers={canvasLayerRenderers}
-                  controller={controller}
+                  editingLayerId={editingLayerId}
                   entry={entry}
                   fontLoadRevision={fontLoadRevision}
                   key={entry.layer.id}
+                  primaryLayerId={primaryLayerId}
+                  runtimeRef={runtimeRef}
+                  selectedLayerIds={selectedLayerIds}
                 />
               ))}
               <Group listening={false} ref={overlayGroupRef} />
             </Group>
-            {!activeEditingLayerId ? (
+            {!editingLayerId && !activeHandleAnchor ? (
               <Transformer
                 anchorDragBoundFunc={anchorDragBoundFunc}
                 borderStroke={themeColors.selection}
@@ -245,6 +262,13 @@ export function CanvasStage({
                 rotateEnabled={
                   !activeDragAnchor || activeDragAnchor === 'rotater'
                 }
+              />
+            ) : null}
+            {showHandles ? (
+              <CanvasLayerHandles
+                handles={handleLayouts}
+                onHandlePointerDown={handleHandlePointerDown}
+                stroke={themeColors.selection}
               />
             ) : null}
             {hoveredEntry ? (

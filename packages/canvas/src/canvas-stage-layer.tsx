@@ -1,20 +1,24 @@
 import { createDefaultTransform } from '@openenvx/schema';
 import type Konva from 'konva';
+import type { RefObject } from 'react';
 import { Group, Rect } from 'react-konva';
 
 import { CanvasLayerContent } from './canvas-layer-content';
 import type { CanvasStageLayer } from './canvas-stage-types';
 import { getInteraction } from './canvas-transformer-utils';
-import type { CanvasStageController } from './hooks/use-canvas-stage-controller';
 import { CANVAS_GROUP_LAYER_TYPE } from './layers/canvas-group-layer';
 import type {
   CanvasLayerInteractionRegistration,
   CanvasLayerRendererRegistration,
 } from './registry/canvas-registry-types';
+import type { CanvasStageRuntime } from './stage/canvas-stage-runtime';
 
 export interface CanvasStageLayerGroupProps {
   entry: CanvasStageLayer;
-  controller: CanvasStageController;
+  runtimeRef: RefObject<CanvasStageRuntime | null>;
+  selectedLayerIds: string[];
+  primaryLayerId: string | null;
+  editingLayerId: string | null;
   canvasLayerRenderers: CanvasLayerRendererRegistration[];
   canvasLayerInteractions: CanvasLayerInteractionRegistration[];
   fontLoadRevision: number;
@@ -22,34 +26,24 @@ export interface CanvasStageLayerGroupProps {
 
 export function CanvasStageLayerGroup({
   entry,
-  controller,
+  runtimeRef,
+  selectedLayerIds,
+  primaryLayerId,
+  editingLayerId,
   canvasLayerRenderers,
   canvasLayerInteractions,
   fontLoadRevision,
 }: CanvasStageLayerGroupProps) {
+  const runtime = runtimeRef.current;
   const { layer, view, children } = entry;
-  const transform = layer.transform ?? createDefaultTransform();
+  const baseTransform = layer.transform ?? createDefaultTransform();
+  const transform =
+    runtime?.getLayerTransform(layer.id, baseTransform) ?? baseTransform;
   const interaction = getInteraction(canvasLayerInteractions, view.kind);
-  const {
-    editingLayerId,
-    transformSessionLayerId,
-    selectedPrimary,
-    selectedLayerIds,
-    selectedLayerIdSet,
-    isLayerSelectable,
-    isLayerWritableCallback,
-    onSelectRef,
-    onDoubleClickRef,
-    nodeRefs,
-    dragSessionRef,
-    layersRef,
-    onTransformRef,
-    applyDragSnap,
-    clearOverlays,
-    syncLabelFromTransformer,
-    handleLayerTransform,
-    completeLayerTransform,
-  } = controller;
+
+  const selectedPrimary = primaryLayerId ?? selectedLayerIds[0] ?? null;
+  const selectedLayerIdSet = new Set(selectedLayerIds);
+  const transformSessionLayerId = runtime?.getTransformSessionLayerId() ?? null;
 
   const isGroupLayer = layer.type === CANVAS_GROUP_LAYER_TYPE;
   const isEditing = editingLayerId === layer.id;
@@ -58,21 +52,19 @@ export function CanvasStageLayerGroup({
     interaction?.hideContentDuringTransform?.(layer.id) === true;
   const isHiddenDuringEdit =
     interaction?.hideContentDuringEdit?.(editingLayerId, layer.id) ?? false;
-  const layerSelectable = isLayerSelectable(layer);
-  const layerWritable = isLayerWritableCallback(layer);
-  const isGroupDragTarget =
-    selectedLayerIdSet.has(layer.id) && selectedLayerIds.length > 1;
+  const layerSelectable = runtime?.isLayerSelectable(layer) ?? false;
+  const layerWritable = runtime?.isLayerWritable(layer) ?? false;
 
   return (
     <Group
-      draggable={!isEditing && layerWritable}
+      draggable={!isEditing && layerWritable && !isImperativeTransformTarget}
       height={transform.height}
       key={layer.id}
       listening={true}
       name={layer.id}
       onClick={(event) => {
         event.cancelBubble = true;
-        if (!layerSelectable) {
+        if (!runtime || !layerSelectable) {
           return;
         }
         if (
@@ -81,115 +73,82 @@ export function CanvasStageLayerGroup({
           editingLayerId !== layer.id &&
           layerWritable
         ) {
-          onDoubleClickRef.current?.(layer.id);
+          runtime.openLayerEditor(layer.id);
           return;
         }
         const additive =
           event.evt.shiftKey || event.evt.metaKey || event.evt.ctrlKey;
-        onSelectRef.current(layer.id, { additive });
+        runtime.selectLayer(layer.id, { additive });
       }}
       onContextMenu={() => {
-        if (!layerSelectable) {
+        if (!runtime || !layerSelectable) {
           return;
         }
-        onSelectRef.current(layer.id);
+        runtime.selectLayer(layer.id);
       }}
       onDblClick={() => {
-        if (!layerSelectable || !layerWritable) {
+        if (!runtime || !layerSelectable || !layerWritable) {
           return;
         }
         if (interaction?.usesEditOverlay) {
-          onDoubleClickRef.current?.(layer.id);
+          runtime.openLayerEditor(layer.id);
         }
       }}
       onDragEnd={() => {
-        if (!layerWritable) {
+        if (!runtime || !layerWritable) {
           return;
         }
-        const session = dragSessionRef.current;
-        const movedIds =
-          session && session.layerId === layer.id && isGroupDragTarget
-            ? selectedLayerIds
-            : [layer.id];
-        for (const movedId of movedIds) {
-          const node = nodeRefs.current?.get(movedId);
-          const movedLayer = layersRef.current?.find(
-            (item) => item.layer.id === movedId
-          )?.layer;
-          if (!node || !movedLayer) {
-            continue;
-          }
-          const movedTransform =
-            movedLayer.transform ?? createDefaultTransform();
-          onTransformRef.current?.(movedId, {
-            transform: {
-              ...movedTransform,
-              x: node.x(),
-              y: node.y(),
-            },
-          });
-        }
-        dragSessionRef.current = null;
-        clearOverlays();
-        if (selectedLayerIds.includes(layer.id)) {
-          syncLabelFromTransformer();
-        }
+        runtime.onLayerDragEnd(layer.id, selectedLayerIds, selectedLayerIdSet);
       }}
       onDragMove={(event) => {
-        applyDragSnap(layer.id, event.target as Konva.Group, transform);
-        if (selectedLayerIds.includes(layer.id)) {
-          syncLabelFromTransformer();
+        if (!runtime) {
+          return;
         }
+        runtime.onLayerDragMove(
+          layer.id,
+          event.target as Konva.Group,
+          transform,
+          selectedLayerIds
+        );
       }}
       onDragStart={() => {
-        onSelectRef.current(layer.id, { setPrimary: true });
-        if (!selectedLayerIdSet.has(layer.id) || selectedLayerIds.length <= 1) {
-          dragSessionRef.current = null;
+        if (!runtime) {
           return;
         }
-        const starts = new Map<string, { x: number; y: number }>();
-        for (const id of selectedLayerIds) {
-          const node = nodeRefs.current?.get(id);
-          if (!node) {
-            continue;
-          }
-          starts.set(id, { x: node.x(), y: node.y() });
-        }
-        dragSessionRef.current = { layerId: layer.id, starts };
+        runtime.onLayerDragStart(
+          layer.id,
+          selectedLayerIds,
+          selectedLayerIdSet
+        );
       }}
       onTransform={(event) => {
-        if (!layerWritable) {
+        if (!runtime) {
           return;
         }
-        handleLayerTransform(
+        runtime.onLayerTransform(
           layer.id,
           event.target as Konva.Group,
           view,
-          interaction?.kind
+          interaction?.kind,
+          layerWritable
         );
       }}
       onTransformEnd={(event) => {
-        if (!layerWritable) {
+        if (!runtime) {
           return;
         }
-        completeLayerTransform({
+        runtime.onLayerTransformEnd({
           interactionKind: interaction?.kind,
           layerId: layer.id,
           node: event.target as Konva.Group,
-          transform,
+          transform: baseTransform,
           view,
+          writable: layerWritable,
         });
       }}
       opacity={transform.opacity}
       ref={(node) => {
-        if (!nodeRefs.current) {
-          return;
-        }
-        if (node) {
-          nodeRefs.current.set(layer.id, node);
-        } else {
-          nodeRefs.current.delete(layer.id);
-        }
+        runtime?.registerNode(layer.id, node);
       }}
       rotation={transform.rotation}
       visible={!isEditing}
@@ -220,10 +179,13 @@ export function CanvasStageLayerGroup({
         <CanvasStageLayerGroup
           canvasLayerInteractions={canvasLayerInteractions}
           canvasLayerRenderers={canvasLayerRenderers}
-          controller={controller}
+          editingLayerId={editingLayerId}
           entry={childEntry}
           fontLoadRevision={fontLoadRevision}
           key={childEntry.layer.id}
+          primaryLayerId={primaryLayerId}
+          runtimeRef={runtimeRef}
+          selectedLayerIds={selectedLayerIds}
         />
       ))}
     </Group>

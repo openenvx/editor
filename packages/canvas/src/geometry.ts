@@ -194,6 +194,17 @@ function toAbsoluteOffset(
   };
 }
 
+export function pointerToParentLocal(
+  stage: Konva.Stage,
+  parent: Konva.Container
+): { x: number; y: number } | null {
+  const pointer = stage.getPointerPosition();
+  if (!pointer) {
+    return null;
+  }
+  return parent.getAbsoluteTransform().copy().invert().point(pointer);
+}
+
 export function clampAnchorDragPosition(
   oldAbs: { x: number; y: number },
   newAbs: { x: number; y: number },

@@ -8,28 +8,39 @@ import {
 } from '../contributions/canvas-layer-interaction-contribution';
 import { CanvasLayerRendererContribution } from '../contributions/canvas-layer-renderer-contribution';
 import { LayerPreviewRendererContribution } from '../contributions/layer-preview-renderer-contribution';
-import { CanvasRegistries } from '../registries/canvas-registries';
+import {
+  CanvasRegistries,
+  type CanvasRegistryRegisterOptions,
+} from '../registries/canvas-registries';
 import type { CanvasRegistriesReader } from '../registry/canvas-registries-reader';
+
+export type CanvasContribution =
+  | CanvasLayerRendererContribution
+  | LayerPreviewRendererContribution
+  | CanvasLayerInteractionContribution;
 
 export class CanvasRegistriesService implements CanvasRegistriesReader {
   constructor(private readonly registries: CanvasRegistries) {}
 
   registerCanvasLayerRenderer(
-    contribution: CanvasLayerRendererContribution
+    contribution: CanvasLayerRendererContribution,
+    options?: CanvasRegistryRegisterOptions
   ): void {
-    this.registries.canvasLayerRenderers.register(contribution);
+    this.registries.canvasLayerRenderers.register(contribution, options);
   }
 
   registerLayerPreviewRenderer(
-    contribution: LayerPreviewRendererContribution
+    contribution: LayerPreviewRendererContribution,
+    options?: CanvasRegistryRegisterOptions
   ): void {
-    this.registries.layerPreviewRenderers.register(contribution);
+    this.registries.layerPreviewRenderers.register(contribution, options);
   }
 
   registerCanvasLayerInteraction(
-    contribution: CanvasLayerInteractionContribution
+    contribution: CanvasLayerInteractionContribution,
+    options?: CanvasRegistryRegisterOptions
   ): void {
-    this.registries.canvasLayerInteractions.register(contribution);
+    this.registries.canvasLayerInteractions.register(contribution, options);
   }
 
   getSnapshot() {
@@ -77,29 +88,34 @@ export function ensureCanvasRegistriesInstalled(
   return service;
 }
 
+export interface RegisterCanvasContributionOptions {
+  override?: boolean;
+}
+
 export function registerCanvasContribution(
   ctx: PluginContext,
-  ...contributions: (
-    | CanvasLayerRendererContribution
-    | LayerPreviewRendererContribution
-    | CanvasLayerInteractionContribution
-  )[]
+  contributions: CanvasContribution | CanvasContribution[],
+  options?: RegisterCanvasContributionOptions
 ): void {
   const service = ensureCanvasRegistriesInstalled(ctx);
+  const entries = Array.isArray(contributions)
+    ? contributions
+    : [contributions];
+  const registerOptions = options?.override ? { override: true } : undefined;
 
-  for (const contribution of contributions) {
+  for (const contribution of entries) {
     if (contribution instanceof CanvasLayerRendererContribution) {
-      service.registerCanvasLayerRenderer(contribution);
+      service.registerCanvasLayerRenderer(contribution, registerOptions);
       continue;
     }
 
     if (contribution instanceof LayerPreviewRendererContribution) {
-      service.registerLayerPreviewRenderer(contribution);
+      service.registerLayerPreviewRenderer(contribution, registerOptions);
       continue;
     }
 
     if (contribution instanceof CanvasLayerInteractionContribution) {
-      service.registerCanvasLayerInteraction(contribution);
+      service.registerCanvasLayerInteraction(contribution, registerOptions);
       continue;
     }
 

@@ -222,13 +222,11 @@ export class CanvasBasicsPlugin extends Plugin {
   activate(ctx: PluginContext): void {
     ensureCanvasRegistriesInstalled(ctx);
 
-    for (const contribution of [
+    registerCanvasContribution(ctx, [
       ...builtinCanvasRendererContributions,
       ...builtinLayerPreviewRendererContributions,
       ...builtinCanvasInteractionContributions,
-    ]) {
-      registerCanvasContribution(ctx, contribution);
-    }
+    ]);
 
     ctx.register(
       new CanvasI18nBundle(),

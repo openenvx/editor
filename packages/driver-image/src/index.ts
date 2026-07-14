@@ -7,6 +7,7 @@ export {
   PreviewKindSvgSerializerRegistry,
   getDefaultSerializerRegistry,
   type PreviewKindSvgSerializer,
+  type PreviewKindSvgSerializerRegisterOptions,
   type SvgBounds,
   type SvgSerializeContext,
 } from './preview-kind-svg-serializer';

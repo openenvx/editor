@@ -111,7 +111,9 @@ const AbsoluteEditorPaneInner = memo(
         });
         return;
       }
-      void canvasApi.updateLayerTransform(layerId, change.transform);
+      void canvasApi.updateLayerTransform(layerId, change.transform, {
+        dataPatch: change.dataPatch,
+      });
     };
 
     return (

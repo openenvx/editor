@@ -46,19 +46,92 @@ Register canvas contributions from a plugin `activate()` hook:
 ```ts
 import { registerCanvasContribution } from '@openenvx/canvas';
 
-registerCanvasContribution(
-  ctx,
+registerCanvasContribution(ctx, [
   new MyCanvasRendererContribution(),
   new MyLayerPreviewRendererContribution(),
-  new MyCanvasInteractionContribution()
-);
+  new MyCanvasInteractionContribution(),
+]);
 ```
 
 | Contribution | Registry slot | Scope |
 | --- | --- | --- |
 | `CanvasLayerRendererContribution` | `canvasLayerRenderers` | Per `kind` — Konva node for a layer type |
 | `LayerPreviewRendererContribution` | `layerPreviewRenderers` | Per `kind` — DOM preview for a layer type |
-| `CanvasLayerInteractionContribution` | `canvasLayerInteractions` | Per `kind` — transformer anchors, edit overlay |
+| `CanvasLayerInteractionContribution` | `canvasLayerInteractions` | Per `kind` — transformer anchors, edit overlay, custom handles |
+
+## Overriding built-in contributions
+
+OSS builtins register first. Enterprise plugins activate later and can **override** a per-kind renderer or interaction:
+
+```ts
+import { registerCanvasContribution } from '@openenvx/canvas';
+
+registerCanvasContribution(
+  ctx,
+  [
+    new ProImageCanvasRendererContribution(),
+    new ProImageInteractionContribution(),
+  ],
+  { override: true }
+);
+```
+
+For SVG export, override the preview-kind serializer from `@openenvx/driver-image`:
+
+```ts
+import { registerPreviewKindSvgSerializer } from '@openenvx/driver-image';
+
+registerPreviewKindSvgSerializer(ctx, new ProImageSvgSerializer(), {
+  override: true,
+});
+```
+
+## Generic layer handles
+
+Contributions can register custom selection handles (crop edges, vector points, etc.) without OSS knowing the feature:
+
+```ts
+class ProImageInteraction extends ImageCanvasInteraction {
+  providesHandles(view) {
+    return hasActiveCrop(view);
+  }
+
+  layoutHandles(ctx) {
+    return layoutCropHandles(ctx.transform, ctx.zoom);
+  }
+
+  onHandleDragMove(ctx, pointer) {
+    // update live transform + drag overlays
+    ctx.setOverlays?.([{ kind: 'rect', ...frame }]);
+  }
+
+  onHandleDragEnd(ctx) {
+    return {
+      transform: nextTransform,
+      dataPatch: { crop: nextCrop },
+    };
+  }
+}
+```
+
+OSS `CanvasStage` renders `HandleDescriptor[]` and routes pointer events back to the contribution.
+
+## Committing enterprise layer data
+
+Pass an optional `dataPatch` to `useCanvasApi().updateLayerTransform` when a transform also changes opaque `layer.data` fields:
+
+```ts
+await canvasApi.updateLayerTransform(layerId, nextTransform, {
+  dataPatch: { crop: nextCrop },
+});
+
+// Clear a field:
+await canvasApi.updateLayerTransform(layerId, nextTransform, {
+  dataPatch: { crop: undefined },
+});
+```
+
+Layer definitions can forward unknown data through `renderPreview` (passthrough schema) so enterprise renderers/serializers read extra preview fields without OSS naming them.
 
 ## Stage interaction service (optional)
 

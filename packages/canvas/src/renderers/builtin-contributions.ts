@@ -1,5 +1,6 @@
 import { CanvasLayerRendererContribution } from '../contributions/canvas-layer-renderer-contribution';
 import { LayerPreviewRendererContribution } from '../contributions/layer-preview-renderer-contribution';
+import { ImageCanvasInteraction } from '../interactions/image-canvas-interaction';
 import { RichTextCanvasInteraction } from '../interactions/rich-text-canvas-interaction';
 import { EllipseCanvasRenderer } from './ellipse-canvas-renderer';
 import { ImageCanvasRenderer } from './image-canvas-renderer';
@@ -79,5 +80,6 @@ export const builtinLayerPreviewRendererContributions = [
 ];
 
 export const builtinCanvasInteractionContributions = [
+  new ImageCanvasInteraction(),
   new RichTextCanvasInteraction(),
 ];

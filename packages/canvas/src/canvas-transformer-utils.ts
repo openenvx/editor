@@ -9,6 +9,12 @@ export function getInteraction(
   return interactions.find((entry) => entry.kind === kind);
 }
 
+export function getInteractionAnchors(
+  interaction: CanvasLayerInteractionRegistration | undefined
+): readonly string[] | null | undefined {
+  return interaction?.enabledAnchors?.();
+}
+
 export function attachTransformerToNodes(
   transformer: Konva.Transformer | null,
   nodes: Konva.Group[]

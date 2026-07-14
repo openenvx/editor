@@ -14,7 +14,10 @@ import {
 } from '@openenvx/schema';
 
 import { defaultFileName, mimeTypeForFormat } from './export-mime';
-import type { PreviewKindSvgSerializerRegistry } from './preview-kind-svg-serializer';
+import type {
+  PreviewKindSvgSerializerRegistry,
+  PreviewKindSvgSerializerRegisterOptions,
+} from './preview-kind-svg-serializer';
 import { rasterizeSvgToBytes } from './rasterize';
 import { renderSvgDocument } from './svg-document-renderer';
 
@@ -56,8 +59,11 @@ export class ImageDocumentExportService implements CanvasDocumentExportService {
     return format === 'svg' || format === 'png' || format === 'jpg';
   }
 
-  registerPreviewSerializer(serializer: CanvasPreviewSvgSerializer): void {
-    this.serializers.register(serializer);
+  registerPreviewSerializer(
+    serializer: CanvasPreviewSvgSerializer,
+    options?: PreviewKindSvgSerializerRegisterOptions
+  ): void {
+    this.serializers.register(serializer, options);
   }
 
   async exportDocument(
