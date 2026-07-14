@@ -39,6 +39,83 @@ class MyWorkbenchPlugin extends WorkbenchPlugin {
 }
 ```
 
+### Workbench views (VS Code-style)
+
+Views use the same **declare / register** split as VS Code (`contributes.views` + tree provider), via two contribution classes:
+
+1. **Declare** view metadata — `ViewContribution` (`id`, `containerId`, `name`, optional `when`).
+2. **Register** tree data — `ViewTreeProviderContribution` (`viewId`, optional `primary`, optional `order`).
+
+Both register through `registerWorkbench()` — no option objects.
+
+```ts
+import {
+  TreeDataProvider,
+  ViewContainerContribution,
+  ViewContribution,
+  ViewTreeProviderContribution,
+  WorkbenchPlugin,
+} from '@openenvx/headless';
+
+class MyView extends ViewContribution {
+  readonly id = 'my.view';
+  readonly containerId = 'my.sidebar';
+  readonly name = 'My View';
+  when = 'myApp.showView'; // optional — same evaluator as toolbar/menu when clauses
+}
+
+class MyTreeProvider extends TreeDataProvider<MyNode> {
+  getRootChildren(ctx) {
+    return [];
+  }
+  getChildren() {
+    return [];
+  }
+  getTreeItem(node) {
+    return { id: node.id, label: node.label };
+  }
+}
+
+class MyTreeProviderContribution extends ViewTreeProviderContribution {
+  readonly viewId = 'my.view';
+  createProvider() {
+    return new MyTreeProvider();
+  }
+}
+
+class MyViewPlugin extends WorkbenchPlugin {
+  readonly id = 'my.view';
+
+  activateWorkbench(ctx) {
+    ctx.registerWorkbench(
+      new MyViewContainer(),
+      new MyView(),
+      new MyTreeProviderContribution()
+    );
+  }
+}
+```
+
+**Hide a view** — omit its plugin from `plugins[]` (composition), or set `when` on the declaration and drive the context key from your plugin.
+
+**Replace a tree** — contribute a provider class with `primary` or `order` on the class:
+
+```ts
+class MyPagesTreeProviderContribution extends ViewTreeProviderContribution {
+  readonly viewId = 'canvas.pages';
+  readonly primary = true;
+  createProvider() { return new MyPagesTreeProvider(); }
+}
+
+activateWorkbench(ctx) {
+  ctx.registerWorkbench(new MyPagesTreeProviderContribution());
+}
+```
+
+Resolution matches Spring `@Primary` / `@Order`: primary beats non-primary; among equals, lower `order` wins. Multiple primaries at the same order is an error.
+
+Enterprise `@openenvx/canvas-pro` ships composable sidebar plugins: `CanvasSidebarPlugin`, `CanvasPagesPlugin`, `CanvasLayersPlugin`. Use `DEFAULT_CANVAS_PRO_PLUGINS` for the full bundle, or compose your own list and omit `CanvasPagesPlugin` to hide Pages.
+
 ## Contribution kinds
 
 Register canvas contributions from a plugin `activate()` hook:

@@ -17,6 +17,7 @@ import type {
   ServiceId,
 } from '@openenvx/core';
 
+import { ViewProviderRegistryImpl } from './registries/view-provider-registry';
 import { WorkbenchRegistries } from './registries/workbench-registries';
 import { buildChromeSlice } from './state/chrome-slice-builder';
 import { buildCommandsSlice } from './state/commands-slice-builder';
@@ -68,6 +69,7 @@ export class WorkbenchController {
   private detachKeybindings: (() => void) | null = null;
   private lastSeenContentRevision = -1;
   private readonly workbenchRegistries = new WorkbenchRegistries();
+  private readonly viewProviderRegistry = new ViewProviderRegistryImpl();
 
   constructor(private readonly options: WorkbenchControllerOptions) {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
@@ -84,6 +86,7 @@ export class WorkbenchController {
       layout: this.layout,
       manager: this.manager,
       sceneStore: this.sceneStore,
+      viewProviderRegistry: this.viewProviderRegistry,
       workbenchRegistries: this.workbenchRegistries,
     };
   }
@@ -211,7 +214,8 @@ export class WorkbenchController {
     for (const plugin of this.options.plugins) {
       const ctx = createWorkbenchPluginContext(
         this.manager.createPluginContext(),
-        this.workbenchRegistries
+        this.workbenchRegistries,
+        this.viewProviderRegistry
       );
       await this.manager.activateWithContext(plugin, ctx);
     }
@@ -328,11 +332,10 @@ export class WorkbenchController {
   }
 
   selectViewItem(viewId: string, item: unknown): void {
-    const view = this.workbenchRegistries.views.find((v) => v.id === viewId);
-    if (!view) {
+    const provider = this.viewProviderRegistry.get(viewId);
+    if (!provider) {
       return;
     }
-    const provider = view.createProvider();
     const ctx = this.manager.createCommandContext();
     provider.onSelect?.(item, ctx);
   }
@@ -343,11 +346,10 @@ export class WorkbenchController {
     target: unknown,
     position: 'before' | 'after' | 'inside'
   ): void {
-    const view = this.workbenchRegistries.views.find((v) => v.id === viewId);
-    if (!view) {
+    const provider = this.viewProviderRegistry.get(viewId);
+    if (!provider) {
       return;
     }
-    const provider = view.createProvider();
     const ctx = this.manager.createCommandContext();
     if (provider.canMove && !provider.canMove(source, target, position)) {
       return;

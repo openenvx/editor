@@ -24,6 +24,14 @@ export { WorkbenchContributionPoint } from './workbench-contributions/workbench-
 export { WorkbenchContribution } from './workbench-contributions/workbench-contribution';
 export { WorkbenchRegistries } from './registries/workbench-registries';
 export {
+  ViewContainerContribution,
+  ViewContribution,
+  TreeDataProvider,
+  type SidebarBehavior,
+  type TreeItem,
+} from './contributions/view-contribution';
+export { ViewTreeProviderContribution } from './contributions/view-tree-provider-contribution';
+export {
   createWorkbenchPluginContext,
   type WorkbenchPluginContext,
 } from './workbench-plugin-context';
@@ -52,13 +60,6 @@ export {
   type ToolbarItemDescriptor,
   type ToolbarSeparatorItemDescriptor,
 } from './contributions/toolbar-contribution';
-export {
-  ViewContainerContribution,
-  ViewContribution,
-  TreeDataProvider,
-  type SidebarBehavior,
-  type TreeItem,
-} from './contributions/view-contribution';
 
 export {
   MenuBuilder,

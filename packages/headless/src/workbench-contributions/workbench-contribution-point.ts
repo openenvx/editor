@@ -2,6 +2,7 @@
 export enum WorkbenchContributionPoint {
   ViewContainer = 'viewContainer',
   View = 'view',
+  ViewTreeProvider = 'viewTreeProvider',
   ContextMenu = 'contextMenu',
   Overlay = 'overlay',
   StatusBar = 'statusBar',

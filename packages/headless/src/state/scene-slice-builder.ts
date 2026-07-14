@@ -38,6 +38,7 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
       buildViewContainer(
         container,
         workbenchRegistries.views,
+        ctx.viewProviderRegistry,
         commandCtx,
         evaluateWhen,
         buildCtx

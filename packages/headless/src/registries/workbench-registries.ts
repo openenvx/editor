@@ -11,11 +11,13 @@ import type {
   ViewContainerContribution,
   ViewContribution,
 } from '../contributions/view-contribution';
+import type { ViewTreeProviderContribution } from '../contributions/view-tree-provider-contribution';
 import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
 
 export class WorkbenchRegistries {
   readonly viewContainers: ViewContainerContribution[] = [];
   readonly views: ViewContribution[] = [];
+  readonly viewTreeProviders: ViewTreeProviderContribution[] = [];
   readonly contextMenus: ContextMenuContribution[] = [];
   readonly commandPalette: CommandPaletteContribution[] = [];
   readonly overlays: OverlayContribution[] = [];
@@ -38,6 +40,12 @@ export function registerWorkbenchContribution(
     }
     case 'view': {
       registries.views.push(contribution as ViewContribution);
+      break;
+    }
+    case 'viewTreeProvider': {
+      registries.viewTreeProviders.push(
+        contribution as ViewTreeProviderContribution
+      );
       break;
     }
     case 'contextMenu': {

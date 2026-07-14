@@ -11,6 +11,8 @@ import {
   ViewContainerContribution,
   ViewContribution,
 } from './contributions/view-contribution';
+import { ViewTreeProviderContribution } from './contributions/view-tree-provider-contribution';
+import { ViewProviderRegistryImpl } from './registries/view-provider-registry';
 import { WorkbenchController } from './workbench-controller';
 import { WorkbenchPlugin } from './workbench-plugin';
 import type { WorkbenchPluginContext } from './workbench-plugin-context';
@@ -62,10 +64,6 @@ class LayersView extends ViewContribution {
   readonly id = 'layers.tree';
   readonly containerId = 'layers';
   readonly name = 'Layers';
-
-  createProvider(): TreeDataProvider<Layer> {
-    return new LayersTreeProvider();
-  }
 }
 
 class LayersViewContainer extends ViewContainerContribution {
@@ -73,11 +71,23 @@ class LayersViewContainer extends ViewContainerContribution {
   readonly title = 'Layers';
 }
 
+class LayersTreeProviderContribution extends ViewTreeProviderContribution {
+  readonly viewId = 'layers.tree';
+
+  createProvider(): TreeDataProvider<Layer> {
+    return new LayersTreeProvider();
+  }
+}
+
 class LayersPlugin extends WorkbenchPlugin {
   readonly id = 'test.layers';
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
-    ctx.registerWorkbench(new LayersViewContainer(), new LayersView());
+    ctx.registerWorkbench(
+      new LayersViewContainer(),
+      new LayersView(),
+      new LayersTreeProviderContribution()
+    );
   }
 }
 
@@ -130,5 +140,203 @@ describe('moveViewItem', () => {
     expect(
       controller.getState().scene.pages[0]!.layers.map((l) => l.id)
     ).toStrictEqual(['y', 'x']);
+  });
+});
+
+describe('view when clause', () => {
+  class HiddenView extends ViewContribution {
+    readonly id = 'hidden.view';
+    readonly containerId = 'layers';
+    readonly name = 'Hidden';
+    readonly when = 'test.showHiddenView';
+  }
+
+  class HiddenTreeProviderContribution extends ViewTreeProviderContribution {
+    readonly viewId = 'hidden.view';
+
+    createProvider(): TreeDataProvider<Layer> {
+      return new LayersTreeProvider();
+    }
+  }
+
+  class HiddenViewPlugin extends WorkbenchPlugin {
+    readonly id = 'test.hidden-view';
+
+    activateWorkbench(ctx: WorkbenchPluginContext): void {
+      ctx.registerWorkbench(
+        new LayersViewContainer(),
+        new HiddenView(),
+        new HiddenTreeProviderContribution()
+      );
+    }
+  }
+
+  it('omits views when when clause is false', async () => {
+    const controller = new WorkbenchController({
+      initialScene: normalizeScene({
+        pages: [
+          {
+            id: 'p1',
+            name: 'Page',
+            layout: 'absolute',
+            layers: [],
+          },
+        ],
+        activePageId: 'p1',
+      }),
+      plugins: [new HiddenViewPlugin()],
+    });
+    await controller.start();
+    const containers = controller.getState().viewContainers;
+    expect(containers).toHaveLength(1);
+    expect(containers[0]!.views).toStrictEqual([]);
+  });
+});
+
+describe('ViewTreeProviderContribution primary and order', () => {
+  class BuiltinTreeProviderContribution extends ViewTreeProviderContribution {
+    readonly viewId = 'layers.tree';
+
+    createProvider(): TreeDataProvider<Layer> {
+      return new LayersTreeProvider();
+    }
+  }
+
+  class CustomPrimaryTreeProviderContribution extends ViewTreeProviderContribution {
+    readonly viewId = 'layers.tree';
+    readonly primary = true;
+
+    createProvider(): TreeDataProvider<Layer> {
+      return new LayersTreeProvider();
+    }
+  }
+
+  class OrderedTreeProviderContribution extends ViewTreeProviderContribution {
+    readonly viewId = 'layers.tree';
+    readonly order = 0;
+
+    createProvider(): TreeDataProvider<Layer> {
+      return new LayersTreeProvider();
+    }
+  }
+
+  class HighOrderTreeProviderContribution extends ViewTreeProviderContribution {
+    readonly viewId = 'layers.tree';
+    readonly order = 10;
+
+    createProvider(): TreeDataProvider<Layer> {
+      return new LayersTreeProvider();
+    }
+  }
+
+  it('prefers primary contribution over default registration', async () => {
+    class PrimaryPlugin extends WorkbenchPlugin {
+      readonly id = 'test.primary';
+
+      activateWorkbench(ctx: WorkbenchPluginContext): void {
+        ctx.registerWorkbench(
+          new LayersViewContainer(),
+          new LayersView(),
+          new BuiltinTreeProviderContribution(),
+          new CustomPrimaryTreeProviderContribution()
+        );
+      }
+    }
+
+    const controller = new WorkbenchController({
+      initialScene: normalizeScene({
+        pages: [
+          {
+            id: 'p1',
+            name: 'Page',
+            layout: 'absolute',
+            layers: [],
+          },
+        ],
+        activePageId: 'p1',
+      }),
+      plugins: [new PrimaryPlugin()],
+    });
+    await controller.start();
+    expect(controller.getState().viewContainers[0]!.views).toHaveLength(1);
+  });
+
+  it('prefers lower order when no primary is set', async () => {
+    class OrderPlugin extends WorkbenchPlugin {
+      readonly id = 'test.order';
+
+      activateWorkbench(ctx: WorkbenchPluginContext): void {
+        ctx.registerWorkbench(
+          new LayersViewContainer(),
+          new LayersView(),
+          new HighOrderTreeProviderContribution(),
+          new OrderedTreeProviderContribution()
+        );
+      }
+    }
+
+    const controller = new WorkbenchController({
+      initialScene: normalizeScene({
+        pages: [
+          {
+            id: 'p1',
+            name: 'Page',
+            layout: 'absolute',
+            layers: [],
+          },
+        ],
+        activePageId: 'p1',
+      }),
+      plugins: [new OrderPlugin()],
+    });
+    await controller.start();
+    expect(controller.getState().viewContainers[0]!.views).toHaveLength(1);
+  });
+});
+
+describe('ViewProviderRegistryImpl', () => {
+  it('allows multiple registrations for the same view id', () => {
+    const registry = new ViewProviderRegistryImpl();
+    const first = new LayersTreeProvider();
+    const second = new LayersTreeProvider();
+    registry.registerTreeDataProvider('layers.tree', first);
+    registry.registerTreeDataProvider('layers.tree', second);
+    expect(registry.get('layers.tree')).toBe(first);
+  });
+
+  it('prefers lower order when no primary is set', () => {
+    const registry = new ViewProviderRegistryImpl();
+    const low = new LayersTreeProvider();
+    const high = new LayersTreeProvider();
+    registry.registerTreeDataProvider('layers.tree', high, { order: 10 });
+    registry.registerTreeDataProvider('layers.tree', low, { order: 0 });
+    expect(registry.get('layers.tree')).toBe(low);
+  });
+
+  it('prefers primary over non-primary regardless of order', () => {
+    const registry = new ViewProviderRegistryImpl();
+    const builtin = new LayersTreeProvider();
+    const custom = new LayersTreeProvider();
+    registry.registerTreeDataProvider('layers.tree', builtin, { order: 0 });
+    registry.registerTreeDataProvider('layers.tree', custom, {
+      order: 100,
+      primary: true,
+    });
+    expect(registry.get('layers.tree')).toBe(custom);
+  });
+
+  it('throws when multiple primaries share the same order', () => {
+    const registry = new ViewProviderRegistryImpl();
+    registry.registerTreeDataProvider('layers.tree', new LayersTreeProvider(), {
+      primary: true,
+      order: 0,
+    });
+    registry.registerTreeDataProvider('layers.tree', new LayersTreeProvider(), {
+      primary: true,
+      order: 0,
+    });
+    expect(() => registry.get('layers.tree')).toThrow(
+      'Multiple primary TreeDataProvider registrations with order 0 for one view'
+    );
   });
 });

@@ -69,6 +69,5 @@ export abstract class ViewContribution extends WorkbenchContribution {
   viewHover?: 'layer' | 'page' | 'none';
   collapsible?: boolean;
   initialCollapsed?: boolean;
-
-  abstract createProvider(): TreeDataProvider<unknown>;
+  when?: string;
 }

@@ -10,7 +10,9 @@ import {
 import type {
   ViewContainerContribution,
   ViewContribution,
+  TreeDataProvider,
 } from '../contributions/view-contribution';
+import type { ViewProviderRegistry } from '../registries/view-provider-registry';
 import type {
   ViewContainerDescriptor,
   ViewDescriptor,
@@ -20,14 +22,22 @@ import type {
 export function buildViewContainer(
   container: ViewContainerContribution,
   views: ViewContribution[],
+  viewProviderRegistry: ViewProviderRegistry,
   ctx: ReturnType<PluginManager['createCommandContext']>,
   evaluateWhen: (when?: string) => boolean,
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): ViewContainerDescriptor {
   const containerViews = views
     .filter((v) => v.containerId === container.id)
+    .filter((v) => evaluateWhen(v.when))
     .toSorted((a, b) => (a.viewOrder ?? 0) - (b.viewOrder ?? 0))
-    .map((view) => buildView(view, ctx, buildCtx));
+    .map((view) => {
+      const provider = viewProviderRegistry.get(view.id);
+      if (!provider) {
+        return buildEmptyView(view, buildCtx);
+      }
+      return buildView(view, provider, ctx, buildCtx);
+    });
 
   const sidebarBehavior = container.sidebarBehavior ?? 'panel';
   let menuItems: MenuItemDescriptor[] | undefined;
@@ -53,12 +63,30 @@ export function buildViewContainer(
   };
 }
 
+function buildEmptyView(
+  view: ViewContribution,
+  buildCtx: ReturnType<typeof createContributionBuildContext>
+): ViewDescriptor {
+  return {
+    collapsible: view.collapsible ?? true,
+    containerId: view.containerId,
+    id: view.id,
+    initialCollapsed: view.initialCollapsed ?? false,
+    items: [],
+    name: buildCtx.t(`view.${view.id}.name`, view.name),
+    supportsReorder: false,
+    viewOrder: view.viewOrder ?? 0,
+    viewSelection: view.viewSelection ?? 'layer',
+    viewHover: view.viewHover ?? 'layer',
+  };
+}
+
 function buildView(
   view: ViewContribution,
+  provider: TreeDataProvider<unknown>,
   ctx: ReturnType<PluginManager['createCommandContext']>,
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): ViewDescriptor {
-  const provider = view.createProvider();
   const items: ViewTreeItem[] = [];
   const walk = (nodes: unknown[], depth: number) => {
     for (const node of nodes) {
