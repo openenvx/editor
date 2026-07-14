@@ -1,5 +1,11 @@
 # @openenvx/schema
 
+## 0.1.11
+
+### Patch Changes
+
+- 9aa5b06: refactor: streamline Workbench provider registrations and remove deprecated contributions
+
 ## 0.1.10
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @openenvx/headless
 
+## 0.1.11
+
+### Patch Changes
+
+- 9aa5b06: refactor: streamline Workbench provider registrations and remove deprecated contributions
+- Updated dependencies [9aa5b06]
+  - @openenvx/core@0.1.11
+  - @openenvx/preview@0.1.11
+  - @openenvx/schema@0.1.11
+
 ## 0.1.10
 
 ### Patch Changes
