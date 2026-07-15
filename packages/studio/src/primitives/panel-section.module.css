@@ -1,0 +1,36 @@
+.root {
+  border-bottom: var(--wb-hairline);
+}
+
+.root:last-child {
+  border-bottom: none;
+}
+
+.header,
+.headerStatic {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px var(--wb-space-3);
+  color: var(--wb-foreground);
+  font-size: var(--wb-text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-align: left;
+}
+
+.header {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.chevron {
+  flex-shrink: 0;
+  margin-right: var(--wb-space-2);
+  color: var(--wb-muted-foreground);
+}
+
+.body {
+  padding: 0 var(--wb-space-3) var(--wb-space-3);
+}

@@ -1,0 +1,26 @@
+.shimmer {
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    var(--wb-muted-foreground, #71717a) 0%,
+    var(--wb-foreground, #18181b) 40%,
+    var(--wb-muted-foreground, #71717a) 80%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation-name: shimmer;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@openenvx/agent-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port 8789",
+    "deploy": "wrangler deploy",
+    "build": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.7.6",
+    "@mastra/ai-sdk": "^1.0.0",
+    "@mastra/cloudflare-d1": "^1.1.1",
+    "@mastra/core": "^1.1.0",
+    "@mastra/memory": "^1.23.0",
+    "@openenvx/agent": "workspace:*",
+    "@openrouter/ai-sdk-provider": "^1.0.0",
+    "ai": "^6.0.0",
+    "hono": "^4.12.28",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250710.0",
+    "@openenvx/typescript-config": "workspace:*",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10",
+    "wrangler": "^4.24.0"
+  }
+}

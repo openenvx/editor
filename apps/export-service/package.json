@@ -1,0 +1,27 @@
+{
+  "name": "@openenvx/export-service",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port 8788",
+    "deploy": "wrangler deploy",
+    "build": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.7.6",
+    "@openenvx/driver-image": "workspace:*",
+    "@openenvx/preview": "workspace:*",
+    "@openenvx/schema": "workspace:*",
+    "hono": "^4.12.28",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250710.0",
+    "@openenvx/typescript-config": "file:../../packages/typescript-config",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10",
+    "wrangler": "^4.24.0"
+  }
+}

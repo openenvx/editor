@@ -1,0 +1,50 @@
+.root {
+  display: block;
+  width: 100%;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wb-space-2);
+  width: 100%;
+  height: var(--wb-icon-button-size);
+  padding: var(--wb-space-1) 10px;
+  border: none;
+  border-radius: var(--wb-radius-control);
+  background: var(--wb-muted);
+  color: var(--wb-foreground);
+  font-size: var(--wb-text-sm);
+  box-shadow: var(--wb-shadow-control);
+  cursor: pointer;
+}
+
+.trigger:hover {
+  box-shadow: var(--wb-shadow-control-hover);
+}
+
+.trigger:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--wb-muted-foreground);
+}
+
+.optionSelected {
+  background: var(--wb-muted);
+}
+
+.viewport {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-space-1);
+}
+
+.panel[data-state='closed'] {
+  display: none;
+  pointer-events: none;
+}

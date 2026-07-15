@@ -1,0 +1,9 @@
+name = "openenvx-agent"
+main = "src/index.ts"
+compatibility_date = "2025-03-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "openenvx-agent"
+database_id = "local-openenvx-agent" # replace with real D1 UUID before deploy

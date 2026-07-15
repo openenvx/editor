@@ -1,0 +1,42 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-0-5);
+  padding: var(--wb-space-1);
+  border-radius: var(--wb-radius-lg);
+  background: var(--wb-popover);
+  box-shadow: var(--wb-shadow-float);
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  margin: 0 var(--wb-space-0-5);
+  background: var(--wb-divider-color);
+}
+
+.zoomTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wb-space-1);
+  min-width: 56px;
+  height: var(--wb-icon-button-size-lg);
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--wb-radius-control);
+  background: var(--wb-muted);
+  color: var(--wb-foreground);
+  font-family: var(--wb-font-mono);
+  font-size: var(--wb-text-xs);
+  box-shadow: var(--wb-shadow-xs);
+  cursor: pointer;
+}
+
+.zoomTrigger:hover,
+.zoomTrigger[data-state='open'] {
+  box-shadow: var(--wb-shadow-sm);
+}
+
+.zoomChevron {
+  color: var(--wb-muted-foreground);
+}

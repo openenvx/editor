@@ -1,0 +1,22 @@
+.content {
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  max-width: 240px;
+  min-height: var(--wb-control-height);
+  padding: var(--wb-space-1) var(--wb-space-2);
+  border-radius: var(--wb-radius-md);
+  background: var(--wb-popover);
+  box-shadow: var(--wb-shadow-float);
+  font-family: var(--wb-font);
+  font-size: var(--wb-text-xs);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--wb-foreground);
+  pointer-events: none;
+  user-select: none;
+}
+
+.arrow {
+  fill: var(--wb-popover);
+}

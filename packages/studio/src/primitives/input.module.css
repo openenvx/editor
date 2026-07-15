@@ -1,0 +1,39 @@
+.root {
+  width: 100%;
+  height: var(--wb-control-height);
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--wb-radius-control);
+  background: var(--wb-muted);
+  color: var(--wb-foreground);
+  font-size: var(--wb-text-sm);
+  box-shadow: var(--wb-shadow-control);
+}
+
+.root:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+.root::placeholder {
+  color: var(--wb-muted-foreground);
+}
+
+.number {
+  font-family: var(--wb-font-mono);
+  font-size: var(--wb-text-mono);
+  text-align: right;
+}
+
+.color {
+  height: var(--wb-control-height);
+  padding: var(--wb-space-1);
+  cursor: pointer;
+}
+
+.textarea {
+  height: auto;
+  min-height: 64px;
+  padding: var(--wb-space-2);
+  resize: vertical;
+}

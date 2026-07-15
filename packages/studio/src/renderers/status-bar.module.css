@@ -1,0 +1,37 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 24px;
+  padding: 0 var(--wb-space-3);
+  font-size: var(--wb-text-xs);
+  border-top: var(--wb-hairline);
+  background: var(--wb-background);
+}
+
+.left,
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-3);
+  min-width: 0;
+}
+
+.item {
+  border: none;
+  background: transparent;
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.item:hover {
+  color: var(--wb-foreground);
+}
+
+.selection {
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+  white-space: nowrap;
+}

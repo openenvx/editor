@@ -1,0 +1,117 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+.content {
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-space-0-5);
+  min-width: 200px;
+  padding: var(--wb-space-1);
+  border-radius: var(--wb-radius-md);
+  background: var(--wb-popover);
+  box-shadow: var(--wb-shadow-float);
+  font-family: var(--wb-font);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wb-space-6);
+  width: 100%;
+  min-height: var(--wb-control-height);
+  padding: 0 var(--wb-space-2);
+  border: none;
+  border-radius: var(--wb-radius-sm);
+  background: transparent;
+  color: var(--wb-foreground);
+  font-size: var(--wb-text-sm);
+  font-weight: 400;
+  line-height: 1;
+  cursor: default;
+  text-align: left;
+  outline: none;
+  user-select: none;
+}
+
+.item[data-highlighted],
+.item:hover:not(:disabled):not([data-disabled]) {
+  background: var(--wb-muted);
+}
+
+.item:disabled,
+.item[data-disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+}
+
+.shortcut {
+  flex-shrink: 0;
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.separator {
+  flex-shrink: 0;
+  height: 1px;
+  margin: var(--wb-space-0-5) 0;
+  background: var(--wb-divider-color);
+}
+
+.subTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wb-space-2);
+}
+
+.subTriggerIcon {
+  flex-shrink: 0;
+  color: var(--wb-muted-foreground);
+}
+
+.subContent {
+  z-index: 51;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-space-0-5);
+  min-width: 140px;
+  padding: var(--wb-space-1);
+  border-radius: var(--wb-radius-md);
+  background: var(--wb-popover);
+  box-shadow: var(--wb-shadow-float);
+  font-family: var(--wb-font);
+}
+
+.subContent[data-state='closed'] {
+  display: none;
+  pointer-events: none;
+}
+
+.content[data-state='closed'] {
+  display: none;
+  pointer-events: none;
+}
+
+.itemSelected {
+  color: var(--wb-foreground);
+}
+
+.itemCheck {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  color: var(--wb-muted-foreground);
+}

@@ -1,0 +1,13 @@
+.root {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--wb-space-3, 12px);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  padding: var(--wb-space-1, 4px) 0;
+  font-size: var(--wb-text-sm, 12px);
+}

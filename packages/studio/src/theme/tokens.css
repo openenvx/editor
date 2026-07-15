@@ -1,0 +1,283 @@
+/* Theme-agnostic tokens — shared by every [data-owb-theme] scope. */
+[data-owb-theme] {
+  /* Typography */
+  --wb-text-xs: 11px;
+  --wb-text-sm: 12px;
+  --wb-text-base: 13px;
+  --wb-text-mono: 12px;
+  --wb-font: Geist, Inter, system-ui, -apple-system, sans-serif;
+  --wb-font-mono: Geist Mono, ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Spacing */
+  --wb-space-0-5: 2px;
+  --wb-space-1: 4px;
+  --wb-space-2: 8px;
+  --wb-space-3: 12px;
+  --wb-space-4: 16px;
+  --wb-space-5: 20px;
+  --wb-space-6: 24px;
+
+  /* Radius */
+  --wb-radius-sm: 6px;
+  --wb-radius-md: 8px;
+  --wb-radius-control: 8px;
+  --wb-radius-lg: 12px;
+  --wb-radius-full: 9999px;
+
+  /* Control sizes */
+  --wb-control-height: 28px;
+  --wb-icon-button-size: 28px;
+  --wb-icon-button-size-lg: 32px;
+
+  /* Layout */
+  --wb-topbar-height: 40px;
+  --wb-activity-bar-width: 56px;
+  --wb-sidebar-width: 240px;
+  --wb-inspector-width: 280px;
+  --wb-layer-row-height: 28px;
+  --wb-tree-indent: 8px;
+  --wb-tree-base-padding: 8px;
+}
+
+[data-owb-theme='light'] {
+  /* Surfaces — soft zinc chrome; canvas field lifts the white artboard */
+  --wb-background: #f6f6f8;
+  --wb-canvas-field: #e4e4e9;
+  --wb-card: #ffffff;
+  --wb-popover: #ffffff;
+  --wb-inspector-popover: #ffffff;
+  --wb-muted: #ececef;
+  --wb-border: #d4d4d8;
+  --wb-chrome-button: #ffffff;
+  --wb-sidebar-segment-active: #ffffff;
+  --wb-sidebar-row-selected: #dbeafe;
+  --wb-sidebar-row-hovered: rgb(59 130 246 / 18%);
+
+  /* Text */
+  --wb-foreground: #18181b;
+  --wb-muted-foreground: #71717a;
+
+  /* Actions */
+  --wb-primary: #18181b;
+  --wb-primary-foreground: #fafafa;
+  --wb-selection: #3b82f6;
+  --wb-selection-muted: rgb(59 130 246 / 50%);
+  --wb-smart-guide: #ec4899;
+  --wb-page-margin: #a855f7;
+  --wb-destructive: #dc2626;
+  --wb-artboard: #ffffff;
+  --wb-artboard-border: #d4d4d8;
+
+  /* Overlays */
+  --wb-hover-overlay: rgb(0 0 0 / 4%);
+  --wb-active-overlay: rgb(0 0 0 / 6%);
+  --wb-divider-color: rgb(0 0 0 / 8%);
+  --wb-border-subtle: rgb(0 0 0 / 10%);
+  --wb-backdrop-overlay: rgb(0 0 0 / 60%);
+
+  /* Elevation */
+  --wb-shadow-xs: 0 0 0 1px rgb(0 0 0 / 6%);
+  --wb-shadow-sm: 0 0 0 1px rgb(0 0 0 / 8%);
+  --wb-segment-active-ring: 0 0 0 1px rgb(0 0 0 / 10%);
+  --wb-shadow-md: 0 1px 2px rgb(0 0 0 / 10%), 0 0 0 1px rgb(0 0 0 / 6%);
+  --wb-shadow-float: 0 8px 24px rgb(0 0 0 / 12%), 0 0 0 1px rgb(0 0 0 / 8%);
+  --wb-shadow-control: none;
+  --wb-shadow-control-hover: none;
+  --wb-shadow-control-focus: 0 0 0 4px #e5e5e5;
+  --wb-shadow-focus: 0 0 0 4px #e5e5e5;
+  --wb-shadow-artboard: 0 4px 32px rgb(0 0 0 / 16%);
+  --wb-artboard-shadow-color: rgba(0, 0, 0, 0.16);
+
+  /* Hairline dividers */
+  --wb-hairline: 1px solid rgb(0 0 0 / 6%);
+  --wb-divider: 1px solid rgb(0 0 0 / 8%);
+}
+
+[data-owb-theme='dark'] {
+  /* Surfaces — unified black chrome per shadcn/designer editor */
+  --wb-background: #09090b;
+  --wb-canvas-field: #111113;
+  --wb-card: #18181b;
+  --wb-popover: #1c1c1f;
+  --wb-inspector-popover: #09090b;
+  --wb-muted: #27272a;
+  --wb-border: #3f3f46;
+  --wb-chrome-button: #27272a;
+  --wb-sidebar-segment-active: #18181b;
+  --wb-sidebar-row-selected: #3f3f46;
+  --wb-sidebar-row-hovered: rgb(59 130 246 / 22%);
+
+  /* Text */
+  --wb-foreground: #fafafa;
+  --wb-muted-foreground: #a1a1aa;
+
+  /* Actions */
+  --wb-primary: #fafafa;
+  --wb-primary-foreground: #09090b;
+  --wb-selection: #3b82f6;
+  --wb-selection-muted: rgb(59 130 246 / 50%);
+  --wb-smart-guide: #ec4899;
+  --wb-page-margin: #a855f7;
+  --wb-destructive: #dc2626;
+  --wb-artboard: #ffffff;
+  --wb-artboard-border: #e5e7eb;
+
+  /* Overlays */
+  --wb-hover-overlay: rgb(255 255 255 / 4%);
+  --wb-active-overlay: rgb(255 255 255 / 6%);
+  --wb-divider-color: rgb(255 255 255 / 8%);
+  --wb-border-subtle: rgb(255 255 255 / 12%);
+  --wb-backdrop-overlay: rgb(0 0 0 / 60%);
+
+  /* Elevation */
+  --wb-shadow-xs: 0 0 0 1px rgb(255 255 255 / 6%);
+  --wb-shadow-sm: 0 0 0 1px rgb(255 255 255 / 10%);
+  --wb-segment-active-ring: 0 0 0 1px rgb(255 255 255 / 14%);
+  --wb-shadow-md: 0 1px 2px rgb(0 0 0 / 40%), 0 0 0 1px rgb(255 255 255 / 6%);
+  --wb-shadow-float:
+    0 8px 24px rgb(0 0 0 / 55%), 0 0 0 1px rgb(255 255 255 / 10%);
+  --wb-shadow-control: 0 0 0 1px rgb(255 255 255 / 6%);
+  --wb-shadow-control-hover: 0 0 0 1px rgb(255 255 255 / 10%);
+  --wb-shadow-control-focus:
+    0 0 0 2px var(--wb-background), 0 0 0 4px rgb(255 255 255 / 28%);
+  --wb-shadow-focus:
+    0 0 0 2px var(--wb-background), 0 0 0 4px rgb(255 255 255 / 28%);
+  --wb-shadow-artboard: 0 4px 32px rgb(0 0 0 / 45%);
+  --wb-artboard-shadow-color: rgba(0, 0, 0, 0.45);
+
+  /* Hairline dividers */
+  --wb-hairline: 1px solid rgb(255 255 255 / 6%);
+  --wb-divider: 1px solid rgb(255 255 255 / 8%);
+}
+
+[data-owb-theme],
+[data-owb-theme] * {
+  box-sizing: border-box;
+}
+
+[data-owb-theme] button,
+[data-owb-theme] input,
+[data-owb-theme] select,
+[data-owb-theme] textarea {
+  font-family: inherit;
+}
+
+@keyframes wb-overlay-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes wb-overlay-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes wb-overlay-in-from-top {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes wb-overlay-out-to-top {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-8px);
+  }
+}
+
+@keyframes wb-overlay-in-from-bottom {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes wb-overlay-out-to-bottom {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+}
+
+@keyframes wb-overlay-in-from-left {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateX(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+@keyframes wb-overlay-out-to-left {
+  from {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateX(-8px);
+  }
+}
+
+@keyframes wb-overlay-in-from-right {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateX(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+@keyframes wb-overlay-out-to-right {
+  from {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateX(8px);
+  }
+}

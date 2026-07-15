@@ -1,0 +1,83 @@
+.root {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--wb-control-height);
+  border-radius: var(--wb-radius-control);
+  background: var(--wb-muted);
+  box-shadow: var(--wb-shadow-control);
+  overflow: hidden;
+}
+
+.root:focus-within {
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+.handle {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--wb-muted-foreground);
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.handle:hover,
+.handleActive {
+  color: var(--wb-foreground);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 10px 0 0;
+  border: none;
+  background: transparent;
+  color: var(--wb-foreground);
+  font-family: var(--wb-font-mono);
+  font-size: var(--wb-text-mono);
+  text-align: right;
+}
+
+.input:focus-visible {
+  outline: none;
+}
+
+.unit {
+  flex-shrink: 0;
+  padding-right: 10px;
+  font-size: var(--wb-text-xs);
+  color: var(--wb-muted-foreground);
+}
+
+.compact {
+  height: 24px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.compact:focus-within {
+  box-shadow: none;
+}
+
+.compact .handle {
+  width: 20px;
+}
+
+.compact .input {
+  padding-right: 4px;
+}
+
+.handleLabel {
+  font-size: var(--wb-text-xs);
+  color: var(--wb-muted-foreground);
+  letter-spacing: -0.05em;
+}

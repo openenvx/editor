@@ -1,0 +1,129 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-space-2);
+  width: 100%;
+  min-width: 0;
+}
+
+.picker {
+  width: 100%;
+  height: 120px;
+}
+
+.picker [class~='react-colorful__saturation'] {
+  border-radius: var(--wb-radius-control) var(--wb-radius-control) 0 0;
+}
+
+.picker [class~='react-colorful__hue'],
+.picker [class~='react-colorful__alpha'] {
+  height: 10px;
+  margin-top: var(--wb-space-1);
+  border-radius: var(--wb-radius-full);
+}
+
+.picker [class~='react-colorful__pointer'] {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+}
+
+.formatTabs {
+  display: flex;
+  gap: var(--wb-space-0-5);
+  padding: 2px;
+  border-radius: var(--wb-radius-control);
+  background: var(--wb-muted);
+}
+
+.formatTab {
+  flex: 1;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: calc(var(--wb-radius-control) - 2px);
+  background: transparent;
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.formatTab:hover {
+  color: var(--wb-foreground);
+}
+
+.formatTabActive {
+  background: var(--wb-card);
+  color: var(--wb-foreground);
+  box-shadow: var(--wb-shadow-xs);
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-1);
+}
+
+.triggerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-2);
+}
+
+.rgbaRow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--wb-space-1);
+}
+
+.monoInput {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--wb-font-mono);
+  font-size: var(--wb-text-mono);
+}
+
+.channelInput {
+  min-width: 0;
+  padding: 0 6px;
+  font-family: var(--wb-font-mono);
+  font-size: var(--wb-text-mono);
+  text-align: center;
+}
+
+.alphaInput {
+  width: 44px;
+  flex-shrink: 0;
+  padding: 0 6px;
+  font-family: var(--wb-font-mono);
+  font-size: var(--wb-text-mono);
+  text-align: right;
+}
+
+.alphaSuffix {
+  flex-shrink: 0;
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+}
+
+.swatchButton {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: var(--wb-radius-sm);
+  box-shadow: var(--wb-shadow-control);
+  cursor: pointer;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+}
+
+.panelInput {
+  width: 100%;
+}

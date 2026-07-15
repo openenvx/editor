@@ -1,0 +1,71 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  font-family: var(--wb-font);
+  color: var(--wb-foreground);
+  background: var(--wb-background);
+}
+
+.topBar {
+  flex-shrink: 0;
+  height: var(--wb-topbar-height);
+  border-bottom: var(--wb-hairline);
+  background: var(--wb-background);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.primarySidebar {
+  flex-shrink: 0;
+  width: auto;
+  border-right: var(--wb-hairline);
+  background: var(--wb-background);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--wb-canvas-field);
+}
+
+.inspector {
+  flex-shrink: 0;
+  width: var(--wb-inspector-width);
+  border-left: var(--wb-hairline);
+  background: var(--wb-background);
+  min-height: 0;
+  overflow: auto;
+}
+
+.statusBar {
+  flex-shrink: 0;
+  border-top: var(--wb-hairline);
+  background: var(--wb-background);
+}
+
+.editorSplit {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.previewPanel {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  border-left: var(--wb-hairline);
+  background: var(--wb-background);
+}

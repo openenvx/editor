@@ -1,0 +1,59 @@
+.root {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--wb-space-1, 4px);
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wb-space-2, 8px);
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--wb-muted-foreground, #71717a);
+  font-family: inherit;
+  font-size: var(--wb-text-sm, 12px);
+  line-height: 1.4;
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+
+.trigger:hover {
+  color: var(--wb-foreground, #18181b);
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.triggerLabel {
+  min-width: 0;
+  text-align: left;
+}
+
+.chevron {
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.content {
+  margin: 0 0 0 6px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-left: var(--wb-space-3, 12px);
+  border-left: 1px solid var(--wb-border-subtle, rgb(0 0 0 / 10%));
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: var(--wb-text-sm, 12px);
+  line-height: 1.5;
+  color: var(--wb-muted-foreground, #71717a);
+}

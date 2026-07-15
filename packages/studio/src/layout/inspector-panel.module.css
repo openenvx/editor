@@ -1,0 +1,11 @@
+.inspector {
+  height: 100%;
+  overflow: auto;
+}
+
+.empty {
+  padding: var(--wb-space-4);
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-sm);
+  text-align: center;
+}

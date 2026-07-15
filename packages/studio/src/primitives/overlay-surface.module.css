@@ -1,0 +1,51 @@
+.surface {
+  transform-origin: var(
+    --radix-popover-content-transform-origin,
+    var(--radix-dropdown-menu-content-transform-origin, center)
+  );
+}
+
+.surface[data-state='open'] {
+  animation: wb-overlay-in 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.surface[data-state='closed'] {
+  animation: wb-overlay-out 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+.surface[data-side='top'][data-state='open'] {
+  animation-name: wb-overlay-in-from-bottom;
+}
+
+.surface[data-side='top'][data-state='closed'] {
+  animation: wb-overlay-out-to-bottom 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+.surface[data-side='bottom'][data-state='open'] {
+  animation-name: wb-overlay-in-from-top;
+}
+
+.surface[data-side='bottom'][data-state='closed'] {
+  animation: wb-overlay-out-to-top 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+.surface[data-side='left'][data-state='open'] {
+  animation-name: wb-overlay-in-from-right;
+}
+
+.surface[data-side='left'][data-state='closed'] {
+  animation: wb-overlay-out-to-left 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+.surface[data-side='right'][data-state='open'] {
+  animation-name: wb-overlay-in-from-left;
+}
+
+.surface[data-side='right'][data-state='closed'] {
+  animation: wb-overlay-out-to-right 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}

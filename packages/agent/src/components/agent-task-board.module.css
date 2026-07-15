@@ -1,0 +1,102 @@
+.board {
+  margin: 0 12px 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--wb-border, #e2e2e8);
+  border-radius: 8px;
+  background: var(--wb-surface, #fff);
+}
+
+.header {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--wb-muted-foreground, #6b6b76);
+  margin-bottom: 6px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--wb-background, #f6f6f8);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--wb-muted-foreground, #6b6b76);
+  flex-shrink: 0;
+}
+
+.body {
+  min-width: 0;
+  flex: 1;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--wb-foreground, #1a1a1f);
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--wb-muted-foreground, #6b6b76);
+}
+
+.summary {
+  margin: 2px 0 0;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--wb-muted-foreground, #6b6b76);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-running .badge {
+  color: #2563eb;
+}
+
+.status-complete .badge {
+  color: #15803d;
+}
+
+.status-error .badge {
+  color: #b91c1c;
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

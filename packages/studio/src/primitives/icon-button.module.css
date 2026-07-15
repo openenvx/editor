@@ -1,0 +1,49 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--wb-icon-button-size);
+  height: var(--wb-icon-button-size);
+  padding: 0;
+  border: none;
+  border-radius: var(--wb-radius-control);
+  background: transparent;
+  color: var(--wb-muted-foreground);
+  cursor: pointer;
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
+}
+
+.sm {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--wb-radius-sm);
+  background: var(--wb-muted);
+  box-shadow: var(--wb-shadow-xs);
+}
+
+.sm:hover:not(:disabled) {
+  background: var(--wb-muted);
+  box-shadow: var(--wb-shadow-sm);
+}
+
+.root:hover:not(:disabled) {
+  background: var(--wb-hover-overlay);
+  color: var(--wb-foreground);
+}
+
+.root:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-focus);
+}
+
+.root:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.active {
+  background: var(--wb-active-overlay);
+  color: var(--wb-foreground);
+}

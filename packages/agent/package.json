@@ -1,0 +1,50 @@
+{
+  "name": "@openenvx/agent",
+  "version": "0.1.0",
+  "description": "OpenEnvx AI agent sidebar — chat panel, proposal apply, and workbench plugin",
+  "license": "UNLICENSED",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "import": "./dist/schemas/index.js",
+      "default": "./dist/schemas/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/ dist/",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ai-sdk/react": "^3.0.0",
+    "@openenvx/core": "workspace:*",
+    "@openenvx/headless": "workspace:*",
+    "@openenvx/schema": "workspace:*",
+    "ai": "^6.0.0",
+    "lucide-react": "1.23.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@openenvx/typescript-config": "workspace:*",
+    "@types/react": "^19.2.3",
+    "@xmazu/openenvxee-studio": "workspace:*",
+    "react": "19.2.7",
+    "tsup": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:testing"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

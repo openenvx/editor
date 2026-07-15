@@ -1,0 +1,198 @@
+.row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--wb-space-2);
+}
+
+.row + .row {
+  margin-top: var(--wb-space-2);
+}
+
+.label {
+  font-size: var(--wb-text-sm);
+  color: var(--wb-muted-foreground);
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-2);
+  min-width: 0;
+  height: var(--wb-control-height);
+  padding: 0 var(--wb-space-3);
+  border-radius: var(--wb-radius-control);
+  background: var(--wb-muted);
+  box-shadow: var(--wb-shadow-control);
+}
+
+.field:focus-within {
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--wb-muted-foreground);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--wb-foreground);
+  font-family: var(--wb-font-mono);
+  font-size: var(--wb-text-mono);
+  text-align: left;
+}
+
+.input:focus-visible {
+  outline: none;
+}
+
+.steppers {
+  display: flex;
+  gap: var(--wb-space-1);
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--wb-control-height);
+  height: var(--wb-control-height);
+  padding: 0;
+  border: none;
+  border-radius: var(--wb-radius-control);
+  background: var(--wb-muted);
+  color: var(--wb-foreground);
+  box-shadow: var(--wb-shadow-control);
+  cursor: pointer;
+}
+
+.stepper:hover {
+  box-shadow: var(--wb-shadow-control-hover);
+}
+
+.stepper:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+/* Popup action row — matches shadcn/designer inspector popover */
+.popup {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--wb-space-2);
+  min-width: 0;
+}
+
+.popupLabel {
+  flex-shrink: 0;
+  width: 72px;
+  height: var(--wb-control-height);
+  display: flex;
+  align-items: center;
+  font-size: var(--wb-text-xs);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--wb-muted-foreground);
+}
+
+.popupControls {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  gap: var(--wb-space-1);
+  min-width: 0;
+}
+
+.popupInputGroup {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.popupIcon {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--wb-control-height) - 2px);
+  height: calc(var(--wb-control-height) - 2px);
+  color: var(--wb-muted-foreground);
+  pointer-events: none;
+}
+
+.popupIcon svg {
+  width: 12px;
+  height: 12px;
+}
+
+.popupNumber {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-1);
+}
+
+.popupField {
+  width: 56px;
+  max-width: 56px;
+  flex-shrink: 0;
+  height: var(--wb-control-height);
+  padding: 0 var(--wb-space-2);
+  border: none;
+  border-radius: var(--wb-radius-md);
+  background: var(--wb-muted);
+  color: var(--wb-foreground);
+  font-size: var(--wb-text-xs);
+  box-shadow: var(--wb-shadow-control);
+}
+
+.popupFieldWithIcon {
+  width: 84px;
+  max-width: 84px;
+  padding-left: calc(var(--wb-control-height) + 2px);
+}
+
+.popupField:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+.popupSteppers {
+  display: flex;
+  gap: var(--wb-space-1);
+}
+
+.popupStepper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--wb-control-height);
+  height: var(--wb-control-height);
+  padding: 0;
+  border: none;
+  border-radius: var(--wb-radius-md);
+  background: var(--wb-muted);
+  color: var(--wb-foreground);
+  box-shadow: var(--wb-shadow-control);
+  cursor: pointer;
+}
+
+.popupStepper:hover {
+  box-shadow: var(--wb-shadow-control-hover);
+}
+
+.popupStepper:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-control-focus);
+}

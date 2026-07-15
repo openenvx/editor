@@ -1,0 +1,42 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wb-space-1);
+  height: 28px;
+  padding: 0 var(--wb-space-2);
+  border: none;
+  border-radius: var(--wb-radius-full);
+  background: var(--wb-muted);
+  color: var(--wb-foreground);
+  font-family: var(--wb-font-mono);
+  font-size: var(--wb-text-xs);
+  cursor: pointer;
+}
+
+.trigger:hover {
+  background: var(--wb-active-overlay);
+}
+
+.statusTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 20px;
+  padding: 0 var(--wb-space-1);
+  border: none;
+  border-radius: var(--wb-radius-sm);
+  background: transparent;
+  color: var(--wb-muted-foreground);
+  font-family: var(--wb-font-mono);
+  font-size: var(--wb-text-xs);
+  cursor: pointer;
+}
+
+.statusTrigger:hover {
+  color: var(--wb-foreground);
+  background: var(--wb-hover-overlay);
+}
+
+.chevron {
+  opacity: 0.7;
+}

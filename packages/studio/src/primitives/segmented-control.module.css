@@ -1,0 +1,87 @@
+.root {
+  display: inline-flex;
+  gap: 0;
+  padding: 3px;
+  border-radius: var(--wb-radius-md);
+  background: var(--wb-muted);
+}
+
+.inspector {
+  width: 100%;
+  gap: 2px;
+  padding: 2px;
+}
+
+.tabs {
+  width: 100%;
+  padding: 3px;
+  border-radius: var(--wb-radius-md);
+  background: var(--wb-muted);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wb-space-1);
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: var(--wb-radius-sm);
+  background: transparent;
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.inspector .option {
+  flex: 1;
+  height: 26px;
+  padding: 0;
+}
+
+.tabs .option {
+  flex: 1;
+  height: 26px;
+  padding: 0 var(--wb-space-2);
+}
+
+.option:hover {
+  color: var(--wb-foreground);
+}
+
+.optionActive {
+  background: var(--wb-sidebar-segment-active);
+  color: var(--wb-foreground);
+  box-shadow: var(--wb-segment-active-ring);
+}
+
+.inspector .optionActive {
+  background: var(--wb-background);
+  box-shadow: var(--wb-shadow-xs);
+}
+
+.tabs .optionActive {
+  background: var(--wb-sidebar-segment-active);
+  border-color: var(--wb-border-subtle);
+  box-shadow: none;
+}
+
+.fullWidth {
+  display: flex;
+  width: 100%;
+}
+
+.fullWidth .option {
+  flex: 1;
+  text-align: center;
+}
+
+.iconOnly {
+  padding: 0;
+}

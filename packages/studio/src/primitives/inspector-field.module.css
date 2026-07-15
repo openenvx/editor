@@ -1,0 +1,63 @@
+.controlRow {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-1);
+  min-width: 0;
+}
+
+.inputGrow {
+  flex: 1;
+  min-width: 0;
+}
+
+.swatch {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: var(--wb-radius-sm);
+  box-shadow: var(--wb-shadow-control);
+  cursor: pointer;
+}
+
+.swatchHidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.iconAction {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--wb-radius-sm);
+}
+
+.popoverTrigger {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--wb-radius-sm);
+}
+
+.popupField {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--wb-space-1);
+  margin: 0;
+  min-width: 0;
+}
+
+.popupFieldFull {
+  grid-column: 1 / -1;
+}
+
+.popupStepperField {
+  width: 100%;
+}
+
+.popupColorField {
+  width: 100%;
+}

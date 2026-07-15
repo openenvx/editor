@@ -1,0 +1,72 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wb-space-2);
+  width: 100%;
+  height: var(--wb-icon-button-size);
+  padding: var(--wb-space-1) 10px;
+  border: none;
+  border-radius: var(--wb-radius-control);
+  background: var(--wb-muted);
+  color: var(--wb-foreground);
+  font-size: var(--wb-text-sm);
+  box-shadow: var(--wb-shadow-control);
+  cursor: pointer;
+}
+
+.trigger:hover {
+  box-shadow: var(--wb-shadow-control-hover);
+}
+
+.trigger:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+.value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--wb-muted-foreground);
+}
+
+.panel {
+  width: min(260px, var(--radix-popover-content-available-width, 260px));
+  padding: 0;
+}
+
+.panelBody {
+  padding: 0;
+}
+
+.itemCheck {
+  flex-shrink: 0;
+  color: var(--wb-muted-foreground);
+  opacity: 0;
+}
+
+.itemCheckVisible {
+  opacity: 1;
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

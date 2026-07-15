@@ -1,0 +1,48 @@
+.group {
+  display: flex;
+  width: 100%;
+  border-radius: var(--wb-radius-control);
+  background: var(--wb-muted);
+  box-shadow: var(--wb-shadow-control);
+  overflow: hidden;
+}
+
+.group:focus-within {
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+.cell {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--wb-space-2);
+  min-width: 0;
+  padding: var(--wb-space-1) 10px;
+}
+
+.cell + .cell {
+  border-left: var(--wb-divider);
+}
+
+.label {
+  flex-shrink: 0;
+  font-size: var(--wb-text-xs);
+  color: var(--wb-muted-foreground);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--wb-foreground);
+  font-family: var(--wb-font-mono);
+  font-size: var(--wb-text-mono);
+  text-align: right;
+}
+
+.input:focus-visible {
+  outline: none;
+}
