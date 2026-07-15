@@ -167,7 +167,9 @@ export function PopoverContent({
         )}
         collisionPadding={collisionPadding}
         onCloseAutoFocus={(event) => event.preventDefault()}
-        onFocusOutside={(event) => event.preventDefault()}
+        onFocusOutside={
+          isInspector ? (event) => event.preventDefault() : undefined
+        }
         onOpenAutoFocus={onOpenAutoFocus}
         side={resolvedSide}
         sideOffset={SIDE_OFFSET}

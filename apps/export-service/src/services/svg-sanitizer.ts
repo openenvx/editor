@@ -15,18 +15,3 @@ export function sanitizeRawSvg(svg: string): string {
     .replaceAll(EXTERNAL_HREF_PATTERN, '')
     .replaceAll(EXTERNAL_URL_PATTERN, '');
 }
-
-export function countRawSvgBytes(document: {
-  nodes: { descriptor: { kind: string; svg?: string } }[];
-}): number {
-  let total = 0;
-  for (const node of document.nodes) {
-    if (
-      node.descriptor.kind === 'raw' &&
-      typeof node.descriptor.svg === 'string'
-    ) {
-      total += new TextEncoder().encode(node.descriptor.svg).byteLength;
-    }
-  }
-  return total;
-}

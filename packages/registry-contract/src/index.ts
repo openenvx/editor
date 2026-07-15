@@ -1,6 +1,5 @@
 export {
   DEFAULT_REGISTRY_SCOPE,
-  REGISTRY_SCOPE,
   isPackageInScope,
   isRegistryTokenClaims,
   type RegistryLicenseType,

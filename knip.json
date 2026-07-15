@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignoreExportsUsedInFile": false,
+  "ignoreExportsUsedInFile": true,
   "ignoreDependencies": [
     "eslint-plugin-github",
     "eslint-plugin-sonarjs",
@@ -42,6 +42,21 @@
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
+    "packages/agent": {
+      "entry": ["src/index.ts!", "src/schemas/index.ts!"],
+      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
+    },
+    "packages/studio": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts", "!src/**/*.test.tsx"]
+    },
+    "packages/canvas-pro": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
+    },
+    "packages/registry-contract": {
+      "project": ["src/**/*.{ts,tsx}"]
+    },
     "apps/demo-playground": {
       "entry": [
         "src/router.tsx",
@@ -49,6 +64,18 @@
         "src/components/**/*.{ts,tsx}",
         "src/styles.css"
       ],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "apps/agent-service": {
+      "entry": ["src/**/*.test.ts"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "apps/export-service": {
+      "entry": ["src/**/*.test.ts"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "apps/canvas-demo": {
+      "entry": ["src/**/*.test.ts"],
       "project": ["src/**/*.{ts,tsx}"]
     }
   }

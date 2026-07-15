@@ -13,6 +13,3 @@ export const chatRequestSchema = z.object({
   threadId: z.string().min(1).optional(),
   autoApply: z.boolean().optional(),
 });
-
-export type ChatMessage = z.infer<typeof chatMessageSchema>;
-export type ChatRequest = z.infer<typeof chatRequestSchema>;

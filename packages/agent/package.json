@@ -38,7 +38,6 @@
   "devDependencies": {
     "@openenvx/typescript-config": "workspace:*",
     "@types/react": "^19.2.3",
-    "@xmazu/openenvxee-studio": "workspace:*",
     "react": "19.2.7",
     "tsup": "catalog:dev",
     "typescript": "catalog:dev",

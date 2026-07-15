@@ -13,7 +13,6 @@
     "@hono/zod-validator": "^0.7.6",
     "@openenvx/driver-image": "workspace:*",
     "@openenvx/preview": "workspace:*",
-    "@openenvx/schema": "workspace:*",
     "hono": "^4.12.28",
     "zod": "4.4.3"
   },

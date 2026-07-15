@@ -21,6 +21,3 @@ export const patchThreadBodySchema = z.object({
 export const deleteThreadQuerySchema = z.object({
   sceneId: z.string().min(1),
 });
-
-export type CreateThreadBody = z.infer<typeof createThreadBodySchema>;
-export type PatchThreadBody = z.infer<typeof patchThreadBodySchema>;

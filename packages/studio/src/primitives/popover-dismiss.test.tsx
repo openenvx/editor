@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -40,7 +40,7 @@ describe('Popover dismiss', () => {
       expect(screen.getByText('Picker')).toBeTruthy();
     });
 
-    fireEvent.pointerDown(screen.getByTestId('canvas'), { button: 0 });
+    await user.click(screen.getByTestId('canvas'));
     await waitFor(() => {
       expect(screen.queryByText('Picker')).toBeNull();
     });
@@ -73,7 +73,7 @@ describe('Popover dismiss', () => {
       expect(screen.getByText('Options')).toBeTruthy();
     });
 
-    fireEvent.pointerDown(screen.getByTestId('canvas'), { button: 0 });
+    await user.click(screen.getByTestId('canvas'));
     await waitFor(() => {
       expect(screen.queryByText('Options')).toBeNull();
     });

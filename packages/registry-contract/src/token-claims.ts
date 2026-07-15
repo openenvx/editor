@@ -1,8 +1,5 @@
-/** Default scope when REGISTRY_SCOPE env is unset (licensing tokens, docs). */
+/** Default scope when registry scope env is unset (licensing tokens, docs). */
 export const DEFAULT_REGISTRY_SCOPE = '@openenvxee';
-
-/** @deprecated Use DEFAULT_REGISTRY_SCOPE */
-export const REGISTRY_SCOPE = DEFAULT_REGISTRY_SCOPE;
 
 export type RegistryLicenseType = 'subscription' | 'perpetual';
 

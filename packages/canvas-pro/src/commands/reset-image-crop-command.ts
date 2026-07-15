@@ -52,14 +52,3 @@ export class ResetImageCropCommand extends Command {
     });
   }
 }
-
-export function primaryLayerHasActiveCrop(ctx: CommandContext): boolean {
-  const layer = getPrimaryLayer(ctx.scene.getScene());
-  if (!layer || layer.type !== 'canvas.image') {
-    return false;
-  }
-  const data = layer.data as Record<string, unknown>;
-  return hasActiveCrop(
-    readImageCrop({ crop: data.crop, kind: 'image', src: '' })
-  );
-}
