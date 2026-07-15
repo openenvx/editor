@@ -28,13 +28,15 @@ export interface AgentThread {
 }
 
 function sceneIdStorageKey(editorUri: string): string {
-  const scope = editorUri.replace(/[^a-zA-Z0-9_-]+/g, '-') || 'default';
+  const scope = editorUri.replaceAll(/[^a-zA-Z0-9_-]+/g, '-') || 'default';
   return `${SCENE_ID_STORAGE_PREFIX}${scope}`;
 }
 
 function readOrCreateSceneId(editorUri: string): string {
   if (typeof localStorage === 'undefined') {
-    return editorUri.replace(/[^a-zA-Z0-9_-]+/g, '-') || `scene-${Date.now()}`;
+    return (
+      editorUri.replaceAll(/[^a-zA-Z0-9_-]+/g, '-') || `scene-${Date.now()}`
+    );
   }
   const key = sceneIdStorageKey(editorUri);
   const existing = localStorage.getItem(key);
@@ -42,7 +44,7 @@ function readOrCreateSceneId(editorUri: string): string {
     return existing;
   }
   const created =
-    editorUri.replace(/[^a-zA-Z0-9_-]+/g, '-') ||
+    editorUri.replaceAll(/[^a-zA-Z0-9_-]+/g, '-') ||
     `scene-${crypto.randomUUID()}`;
   localStorage.setItem(key, created);
   return created;

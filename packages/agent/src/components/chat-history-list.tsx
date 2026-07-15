@@ -41,15 +41,15 @@ export interface ChatHistoryListProps {
   onDelete: (threadId: string) => void;
 }
 
-export const ChatHistoryList = memo(function ChatHistoryList({
-  threads,
-  activeThreadId,
-  disabled = false,
-  onNewChat,
-  onSelect,
-  onDelete,
-}: ChatHistoryListProps) {
-  return (
+export const ChatHistoryList = memo(
+  ({
+    threads,
+    activeThreadId,
+    disabled = false,
+    onNewChat,
+    onSelect,
+    onDelete,
+  }: ChatHistoryListProps) => (
     <div className={styles.root}>
       <div className={styles.header}>
         <span className={styles.headerLabel}>History</span>
@@ -73,7 +73,9 @@ export const ChatHistoryList = memo(function ChatHistoryList({
               <li key={thread.id}>
                 <div
                   className={
-                    isActive ? `${styles.item} ${styles.itemActive}` : styles.item
+                    isActive
+                      ? `${styles.item} ${styles.itemActive}`
+                      : styles.item
                   }
                 >
                   <button
@@ -103,5 +105,5 @@ export const ChatHistoryList = memo(function ChatHistoryList({
         </ul>
       )}
     </div>
-  );
-});
+  )
+);

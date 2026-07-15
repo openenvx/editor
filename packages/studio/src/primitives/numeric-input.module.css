@@ -76,7 +76,7 @@
   padding-right: 4px;
 }
 
-.handleLabel {
+.scrubGrip {
   font-size: var(--wb-text-xs);
   color: var(--wb-muted-foreground);
   letter-spacing: -0.05em;

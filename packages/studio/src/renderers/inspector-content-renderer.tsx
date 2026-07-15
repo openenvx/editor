@@ -106,7 +106,7 @@ function createInspectorLayoutVisitor(
             field={node.field}
             layerData={context.layerData}
             layerId={context.layerId}
-            onCommand={context.onCommand}
+            onCommand={(command) => context.onCommand(command)}
             onUpdate={(_key, nextValue) => {
               handle.write(nextValue);
             }}

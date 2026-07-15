@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { WorkbenchApi } from '@openenvx/headless';
 
 import { proposedChangeSchema } from '../schemas/proposed-changes';
+import { applyProposedChanges } from './apply-proposal';
 
 vi.mock('@openenvx/core', () => ({
   findLayerById: vi.fn(),
@@ -30,8 +31,6 @@ vi.mock('@openenvx/schema', () => ({
     scaleY: 1,
   }),
 }));
-
-import { applyProposedChanges } from './apply-proposal';
 
 describe('proposedChangeSchema', () => {
   it('accepts executeCommand changes', () => {

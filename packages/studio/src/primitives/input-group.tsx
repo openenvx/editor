@@ -29,7 +29,7 @@ export function InputGroup({ fields, className }: InputGroupProps) {
               id={cell.id}
               max={cell.field.numeric.max}
               min={cell.field.numeric.min}
-              onChange={cell.onChange}
+              onChange={(value) => cell.onChange(value)}
               precision={cell.field.numeric.precision}
               scrub
               step={cell.field.numeric.step}

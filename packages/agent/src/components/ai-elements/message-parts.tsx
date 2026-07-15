@@ -1,6 +1,14 @@
 import type { UIMessage } from 'ai';
 import { getToolName, isReasoningUIPart, isToolUIPart } from 'ai';
-import { Bot, BookOpen, LayoutTemplate, Network, Palette, Sparkles, Wrench } from 'lucide-react';
+import {
+  Bot,
+  BookOpen,
+  LayoutTemplate,
+  Network,
+  Palette,
+  Sparkles,
+  Wrench,
+} from 'lucide-react';
 import { memo } from 'react';
 
 import {

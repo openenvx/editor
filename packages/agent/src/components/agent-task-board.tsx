@@ -1,14 +1,8 @@
-import {
-  Bot,
-  LayoutTemplate,
-  Loader2,
-  Palette,
-  Sparkles,
-} from 'lucide-react';
+import { Bot, LayoutTemplate, Loader2, Palette, Sparkles } from 'lucide-react';
 import { memo } from 'react';
 
-import type { AgentTaskEvent } from '../schemas/proposed-changes';
 import { cn } from '../lib/cn';
+import type { AgentTaskEvent } from '../schemas/proposed-changes';
 
 import styles from './agent-task-board.module.css';
 
@@ -28,16 +22,21 @@ function agentIcon(agentId: string) {
 
 function statusLabel(status: AgentTaskEvent['status']): string {
   switch (status) {
-    case 'pending':
+    case 'pending': {
       return 'Pending';
-    case 'running':
+    }
+    case 'running': {
       return 'Running';
-    case 'complete':
+    }
+    case 'complete': {
       return 'Done';
-    case 'error':
+    }
+    case 'error': {
       return 'Error';
-    default:
+    }
+    default: {
       return status;
+    }
   }
 }
 

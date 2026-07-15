@@ -18,20 +18,18 @@ export const Shimmer = memo(
     duration = 2,
     style,
     ...props
-  }: ShimmerProps) => 
-    (
-      <Component
-        className={cn(styles.shimmer, className)}
-        style={{
-          ...style,
-          animationDuration: `${duration}s`,
-        }}
-        {...props}
-      >
-        {children}
-      </Component>
-    )
-  
+  }: ShimmerProps) => (
+    <Component
+      className={cn(styles.shimmer, className)}
+      style={{
+        ...style,
+        animationDuration: `${duration}s`,
+      }}
+      {...props}
+    >
+      {children}
+    </Component>
+  )
 );
 
 Shimmer.displayName = 'Shimmer';

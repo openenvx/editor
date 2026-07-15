@@ -176,7 +176,7 @@ export function NumericInput({
           type="button"
         >
           {handleIcon ?? (
-            <span aria-hidden className={styles.handleLabel}>
+            <span aria-hidden className={styles.scrubGrip}>
               ::
             </span>
           )}

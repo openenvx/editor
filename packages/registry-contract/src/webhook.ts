@@ -1,3 +1,5 @@
+import { timingSafeEqual } from 'node:crypto';
+
 export interface EntitlementWebhookPayload {
   jti: string;
   revoked?: boolean;
@@ -38,10 +40,7 @@ export async function verifyWebhookSignature(
     return false;
   }
 
-  let mismatch = 0;
-  for (let index = 0; index < expected.length; index += 1) {
-    mismatch |= expected.codePointAt(index) ^ signature.codePointAt(index);
-  }
-
-  return mismatch === 0;
+  const a = Buffer.from(expected);
+  const b = Buffer.from(signature);
+  return timingSafeEqual(a, b);
 }

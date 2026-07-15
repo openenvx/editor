@@ -19,10 +19,7 @@ export {
   type SelectLayersChange,
   type UpdatePropertyChange,
 } from './proposed-changes';
-export {
-  DEFAULT_THREAD_TITLE,
-  truncateThreadTitle,
-} from './thread-title';
+export { DEFAULT_THREAD_TITLE, truncateThreadTitle } from './thread-title';
 export {
   buildLayerFromChange,
   normalizeCreateLayerChange,

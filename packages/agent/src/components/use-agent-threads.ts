@@ -19,9 +19,8 @@ import {
 } from '../client/agent-service-client';
 
 function sortThreadsByUpdatedAt(threads: AgentThread[]): AgentThread[] {
-  return [...threads].sort(
-    (a, b) =>
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  return [...threads].toSorted(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
   );
 }
 
@@ -82,7 +81,14 @@ export function useAgentThreads({
       writeActiveThreadId(sceneId, threadId);
       threadIdRef.current = threadId;
     },
-    [agentServiceUrl, onResetEphemeral, sceneId, statusRef, stopRef]
+    [
+      agentServiceUrl,
+      onResetEphemeral,
+      sceneId,
+      statusRef,
+      stopRef,
+      threadIdRef,
+    ]
   );
 
   const activateThreadRef = useRef(activateThread);
@@ -167,7 +173,7 @@ export function useAgentThreads({
     writeActiveThreadId(sceneId, created.id);
     threadIdRef.current = created.id;
     return created.id;
-  }, [agentServiceUrl, sceneId]);
+  }, [agentServiceUrl, sceneId, threadIdRef]);
 
   const handleNewChat = useCallback(async () => {
     if (!agentServiceUrl || historyBusy) {
@@ -220,11 +226,7 @@ export function useAgentThreads({
       }
       setHistoryBusy(true);
       try {
-        const deleted = await deleteThread(
-          agentServiceUrl,
-          threadId,
-          sceneId
-        );
+        const deleted = await deleteThread(agentServiceUrl, threadId, sceneId);
         if (!deleted) {
           return;
         }

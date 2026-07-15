@@ -13,7 +13,6 @@ export function Button({
   className,
   variant = 'default',
   size = 'default',
-  type = 'button',
   ...props
 }: ButtonProps) {
   return (
@@ -27,8 +26,8 @@ export function Button({
         size === 'icon' && styles.icon,
         className
       )}
-      type={type}
       {...props}
+      type="button"
     />
   );
 }

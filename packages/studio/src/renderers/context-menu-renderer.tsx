@@ -97,7 +97,7 @@ export function ContextMenuRenderer({ items, children }: Props) {
   );
 
   if (items.length === 0) {
-    return <>{children}</>;
+    return children;
   }
 
   return (

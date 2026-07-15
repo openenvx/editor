@@ -37,32 +37,27 @@ type ActivityItemButtonProps = {
 const ActivityItemButton = forwardRef<
   HTMLButtonElement,
   ActivityItemButtonProps
->(
-  (
-    { container, isActive, onClick, className, type = 'button', ...props },
-    ref
-  ) => (
-    <button
-      {...props}
-      aria-label={container.title}
-      aria-pressed={isActive}
-      className={cn(
-        styles.activityItem,
-        isActive && styles.activityItemActive,
-        className
-      )}
-      onClick={onClick}
-      ref={ref}
-      title={container.title}
-      type={type}
-    >
-      <span className={styles.activityIconWrap}>
-        <WorkbenchIcon id={container.icon} size={16} />
-      </span>
-      <span className={styles.activityLabel}>{container.title}</span>
-    </button>
-  )
-);
+>(({ container, isActive, onClick, className, ...props }, ref) => (
+  <button
+    {...props}
+    aria-label={container.title}
+    aria-pressed={isActive}
+    className={cn(
+      styles.activityItem,
+      isActive && styles.activityItemActive,
+      className
+    )}
+    onClick={onClick}
+    ref={ref}
+    title={container.title}
+    type="button"
+  >
+    <span className={styles.activityIconWrap}>
+      <WorkbenchIcon id={container.icon} size={16} />
+    </span>
+    <span className={styles.activityLabel}>{container.title}</span>
+  </button>
+));
 
 export function ActivitySidebar({
   viewContainers,

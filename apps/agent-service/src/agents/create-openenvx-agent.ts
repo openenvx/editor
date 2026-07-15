@@ -4,12 +4,12 @@ import type { Memory } from '@mastra/memory';
 import { AGENT_COMMAND_CATALOG } from '@openenvx/agent/schemas';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 
-import { createDesignSubagent } from './subagents/design-agent';
-import { createLayoutSubagent } from './subagents/layout-agent';
-import { createStyleSubagent } from './subagents/style-agent';
 import { createProposalTools } from '../tools/proposal-tools';
 import { createSceneTools } from '../tools/scene-tools';
 import { createParallelSpecialistsTool } from '../workflows/parallel-specialists';
+import { createDesignSubagent } from './subagents/design-agent';
+import { createLayoutSubagent } from './subagents/layout-agent';
+import { createStyleSubagent } from './subagents/style-agent';
 
 export { formatSceneContext } from '../scene/scene-summary';
 
@@ -50,7 +50,7 @@ function buildReasoningExtraBody(
   options: Pick<CreateAgentOptions, 'reasoningEffort' | 'reasoningMaxTokens'>
 ): { reasoning: { max_tokens: number } | { effort: ReasoningEffort } } {
   if (
-    options.reasoningMaxTokens != null &&
+    typeof options.reasoningMaxTokens === 'number' &&
     Number.isFinite(options.reasoningMaxTokens) &&
     options.reasoningMaxTokens > 0
   ) {

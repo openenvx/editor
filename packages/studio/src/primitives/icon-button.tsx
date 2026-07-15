@@ -11,7 +11,7 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
 }
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ className, active, size = 'default', type = 'button', ...props }, ref) => (
+  ({ className, active, size = 'default', ...props }, ref) => (
     <button
       className={cn(
         styles.root,
@@ -20,8 +20,8 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         className
       )}
       ref={ref}
-      type={type}
       {...props}
+      type="button"
     />
   )
 );

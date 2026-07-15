@@ -39,11 +39,9 @@ export function MessageContent({
 export type MessageResponseProps = HTMLAttributes<HTMLDivElement>;
 
 export const MessageResponse = memo(
-  ({ className, children, ...props }: MessageResponseProps) => 
-    (
-      <div className={cn(styles.response, className)} {...props}>
-        {children}
-      </div>
-    )
-  
+  ({ className, children, ...props }: MessageResponseProps) => (
+    <div className={cn(styles.response, className)} {...props}>
+      {children}
+    </div>
+  )
 );

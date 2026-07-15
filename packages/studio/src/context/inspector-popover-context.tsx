@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef } from 'react';
+import { createContext, useContext, useMemo, useRef } from 'react';
 import type { ReactNode, RefObject } from 'react';
 
 interface InspectorPopoverContextValue {
@@ -16,8 +16,9 @@ export function InspectorPopoverProvider({
   className?: string;
 }) {
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const value = useMemo(() => ({ panelRef }), []);
   return (
-    <InspectorPopoverContext.Provider value={{ panelRef }}>
+    <InspectorPopoverContext.Provider value={value}>
       <div className={className} ref={panelRef}>
         {children}
       </div>

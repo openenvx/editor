@@ -1,3 +1,5 @@
+import { AgentChatPlugin } from './plugin/agent-plugin';
+
 export { AgentChatPlugin } from './plugin/agent-plugin';
 export { AgentChatContainer } from './contributions/agent-sidebar-contribution';
 export { ChatPanel } from './components/chat-panel';
@@ -18,7 +20,5 @@ export {
   DEFAULT_THREAD_TITLE,
   truncateThreadTitle,
 } from './schemas/thread-title';
-
-import { AgentChatPlugin } from './plugin/agent-plugin';
 
 export const DEFAULT_AGENT_PLUGINS = [new AgentChatPlugin()];

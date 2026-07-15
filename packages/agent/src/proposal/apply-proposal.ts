@@ -67,10 +67,11 @@ function applyPropertyChangeToScene(
 
 function countLayers(scene: Scene): number {
   let count = 0;
+  const increment = () => {
+    count += 1;
+  };
   for (const page of scene.pages) {
-    walkLayers(page.layers, () => {
-      count += 1;
-    });
+    walkLayers(page.layers, increment);
   }
   return count;
 }
@@ -95,11 +96,7 @@ function applyCreateLayerToScene(
       if (change.parentId) {
         return {
           ...page,
-          layers: insertLayerIntoContainer(
-            page.layers,
-            change.parentId,
-            layer
-          ),
+          layers: insertLayerIntoContainer(page.layers, change.parentId, layer),
         };
       }
       return {

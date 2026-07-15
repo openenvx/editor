@@ -9,7 +9,7 @@ const studioRoot = path.resolve(monorepoRoot, 'packages/studio');
 
 const agentRoot = path.resolve(monorepoRoot, 'packages/agent');
 
-export default defineConfig(({ command }) => ({
+export default defineConfig(() => ({
   plugins: [react()],
   resolve: {
     dedupe: [

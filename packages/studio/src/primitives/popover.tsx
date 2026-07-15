@@ -1,6 +1,5 @@
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import {
-  cloneElement,
   createContext,
   useCallback,
   useContext,
@@ -67,12 +66,7 @@ export function Popover({
 }
 
 export interface PopoverTriggerProps {
-  children: ReactElement<{
-    className?: string;
-    onClick?: (event: React.MouseEvent) => void;
-    onPointerDown?: (event: React.PointerEvent) => void;
-    'aria-expanded'?: boolean;
-  }>;
+  children: ReactElement;
   className?: string;
 }
 
@@ -80,16 +74,16 @@ export function PopoverTrigger({ children, className }: PopoverTriggerProps) {
   const config = useContext(PopoverConfigContext);
 
   return (
-    <PopoverPrimitive.Trigger asChild>
-      {cloneElement(children, {
-        className: cn(styles.root, className, children.props.className),
-        onClick: (event: React.MouseEvent) => {
-          children.props.onClick?.(event);
-          if (config && !config.closeOnTriggerClick && config.open) {
-            event.preventDefault();
-          }
-        },
-      })}
+    <PopoverPrimitive.Trigger
+      asChild
+      className={cn(styles.root, className)}
+      onClick={(event: React.MouseEvent) => {
+        if (config && !config.closeOnTriggerClick && config.open) {
+          event.preventDefault();
+        }
+      }}
+    >
+      {children}
     </PopoverPrimitive.Trigger>
   );
 }

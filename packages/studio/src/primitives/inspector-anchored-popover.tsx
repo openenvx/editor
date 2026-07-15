@@ -1,4 +1,5 @@
-import { cloneElement, useRef } from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { useRef } from 'react';
 import type { ReactNode } from 'react';
 
 import { useInspectorPopoverPanel } from '../context/inspector-popover-context';
@@ -43,9 +44,7 @@ export function InspectorAnchoredPopover({
       open={open}
     >
       <PopoverTrigger>
-        {cloneElement(trigger, {
-          ref: triggerRef,
-        } as Partial<(typeof trigger)['props']>)}
+        <Slot ref={triggerRef}>{trigger}</Slot>
       </PopoverTrigger>
       {open && anchorRect ? (
         <PopoverAnchor

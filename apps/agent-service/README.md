@@ -28,7 +28,7 @@ Local D1 is configured in `wrangler.toml` (`binding = "DB"`). Wrangler creates a
 ## Endpoints
 
 | Method | Path | Description |
-| ------ | ---- | ----------- |
+| --- | --- | --- |
 | GET | `/health` | Liveness check |
 | POST | `/api/agent/chat` | Streaming chat with optional scene context |
 | GET | `/api/agent/threads?sceneId=` | List conversation threads for a scene |
@@ -56,19 +56,19 @@ Thread routes return **503** when the D1 `DB` binding is not configured. PATCH/D
 
 ## Secrets
 
-| Name                              | Description                                                                 |
-| --------------------------------- | --------------------------------------------------------------------------- |
-| `OPENROUTER_API_KEY`              | OpenRouter API key (required)                                               |
-| `OPENROUTER_MODEL`                | Model id, e.g. `anthropic/claude-sonnet-4` (optional)                       |
-| `OPENROUTER_REASONING_EFFORT`     | Cap thinking: `none` \| `minimal` \| `low` (default) \| `medium` \| `high`… |
-| `OPENROUTER_REASONING_MAX_TOKENS` | Optional hard reasoning token budget (overrides effort when set)            |
+| Name | Description |
+| --- | --- |
+| `OPENROUTER_API_KEY` | OpenRouter API key (required) |
+| `OPENROUTER_MODEL` | Model id, e.g. `anthropic/claude-sonnet-4` (optional) |
+| `OPENROUTER_REASONING_EFFORT` | Cap thinking: `none` \| `minimal` \| `low` (default) \| `medium` \| `high`… |
+| `OPENROUTER_REASONING_MAX_TOKENS` | Optional hard reasoning token budget (overrides effort when set) |
 
 Reasoning models (e.g. `z-ai/glm-5.2`) can spend a long time on extended thinking. Use `OPENROUTER_REASONING_EFFORT=none` to disable it, or `low` / a max-token budget to keep latency interactive. Note: some models only support a subset of effort levels (`glm-5.2` supports `high` / `xhigh`, plus disable via `none`).
 
 ## Bindings
 
-| Binding | Type | Description              |
-| ------- | ---- | ------------------------ |
+| Binding | Type | Description               |
+| ------- | ---- | ------------------------- |
 | `DB`    | D1   | Mastra Memory persistence |
 
 Local `wrangler.toml` uses `database_id = "local-openenvx-agent"` for `wrangler dev`. For Cloudflare deploy, create a real D1 database and replace `database_id` with the UUID from `wrangler d1 create openenvx-agent`.

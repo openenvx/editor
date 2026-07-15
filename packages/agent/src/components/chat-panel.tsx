@@ -95,10 +95,10 @@ export const ChatPanel = memo(() => {
   const [activeTasks, setActiveTasks] = useState<AgentTaskEvent[]>([]);
   const autoAppliedRef = useRef<string | null>(null);
   const titledThreadIdsRef = useRef<Set<string>>(new Set());
-  const stopRef = useRef<() => void>(() => undefined);
+  const stopRef = useRef<() => void>(() => {});
   const statusRef = useRef<string>('ready');
   const threadIdRef = useRef<string | null>(null);
-  const setMessagesRef = useRef<(messages: UIMessage[]) => void>(() => undefined);
+  const setMessagesRef = useRef<(messages: UIMessage[]) => void>(() => {});
 
   const resetEphemeralState = useCallback(() => {
     setPendingProposal(null);
@@ -228,7 +228,6 @@ export const ChatPanel = memo(() => {
         return () => clearTimeout(timer);
       }
     }
-    return undefined;
   }, [activeTasks, status]);
 
   // Auto-title "New chat" threads from the first user message.
@@ -256,13 +255,7 @@ export const ChatPanel = memo(() => {
 
     titledThreadIdsRef.current.add(activeThreadId);
     void applyThreadTitle(activeThreadId, truncateThreadTitle(text));
-  }, [
-    activeThreadId,
-    agentServiceUrl,
-    applyThreadTitle,
-    messages,
-    threads,
-  ]);
+  }, [activeThreadId, agentServiceUrl, applyThreadTitle, messages, threads]);
 
   const handleSubmit = useCallback(
     async ({ text }: { text: string }) => {

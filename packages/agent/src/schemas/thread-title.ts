@@ -1,10 +1,7 @@
 export const DEFAULT_THREAD_TITLE = 'New chat';
 
-export function truncateThreadTitle(
-  text: string,
-  maxLength = 48
-): string {
-  const trimmed = text.trim().replace(/\s+/g, ' ');
+export function truncateThreadTitle(text: string, maxLength = 48): string {
+  const trimmed = text.trim().replaceAll(/\s+/g, ' ');
   if (!trimmed) {
     return DEFAULT_THREAD_TITLE;
   }

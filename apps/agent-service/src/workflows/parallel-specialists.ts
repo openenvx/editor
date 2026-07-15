@@ -49,8 +49,10 @@ async function runSpecialist(options: {
     const result = await agent.generate(prompt);
     const advice = result.text ?? '';
     const summary =
-      advice.split('\n').find((line) => line.trim().length > 0)?.slice(0, 120) ??
-      `${label} complete`;
+      advice
+        .split('\n')
+        .find((line) => line.trim().length > 0)
+        ?.slice(0, 120) ?? `${label} complete`;
 
     emitAgentTask(requestToken, {
       taskId,

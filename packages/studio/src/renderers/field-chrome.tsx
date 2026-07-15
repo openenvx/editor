@@ -46,7 +46,7 @@ export function FieldChrome({
   const [popupOpen, setPopupOpen] = useState(false);
 
   if (!hasPopup && !hasActions) {
-    return <>{children}</>;
+    return children;
   }
 
   const popupFields = popup

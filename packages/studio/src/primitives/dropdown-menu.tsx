@@ -1,6 +1,6 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronRight } from 'lucide-react';
-import { cloneElement, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 
 import { useThemeScope } from '../context/theme-context';
@@ -65,10 +65,11 @@ export function DropdownMenuTrigger({
   className,
 }: DropdownMenuTriggerProps) {
   return (
-    <DropdownMenuPrimitive.Trigger asChild>
-      {cloneElement(children, {
-        className: cn(styles.root, className, children.props.className),
-      })}
+    <DropdownMenuPrimitive.Trigger
+      asChild
+      className={cn(styles.root, className)}
+    >
+      {children}
     </DropdownMenuPrimitive.Trigger>
   );
 }
@@ -249,7 +250,7 @@ export function DropdownMenuGroups({ groups }: DropdownMenuGroupsProps) {
             <DropdownMenuItem
               disabled={item.disabled}
               key={item.id}
-              onSelect={item.onSelect}
+              onSelect={() => item.onSelect?.()}
               shortcut={item.shortcut}
             >
               {item.label}

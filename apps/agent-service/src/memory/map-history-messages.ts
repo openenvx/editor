@@ -10,14 +10,14 @@ export { DEFAULT_THREAD_TITLE, truncateThreadTitle };
 export interface HistoryUiMessage {
   id: string;
   role: 'user' | 'assistant' | 'system';
-  parts: Array<{ type: string; [key: string]: unknown }>;
+  parts: { type: string; [key: string]: unknown }[];
 }
 
 interface MastraHistoryMessage {
   id: string;
   role: string;
   content?: {
-    parts?: Array<{ type: string; text?: string; [key: string]: unknown }>;
+    parts?: { type: string; text?: string; [key: string]: unknown }[];
     content?: string;
   };
 }
@@ -30,9 +30,11 @@ export function stripSceneContextSuffix(text: string): string {
   return text.slice(0, index).trimEnd();
 }
 
-function mapPart(
-  part: { type: string; text?: string; [key: string]: unknown }
-): { type: string; [key: string]: unknown } {
+function mapPart(part: {
+  type: string;
+  text?: string;
+  [key: string]: unknown;
+}): { type: string; [key: string]: unknown } {
   if (part.type === 'text' && typeof part.text === 'string') {
     return {
       ...part,

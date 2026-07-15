@@ -1,3 +1,10 @@
+import { CanvasProPlugin } from './plugin/canvas-pro-plugin';
+import {
+  CanvasLayersPlugin,
+  CanvasPagesPlugin,
+  CanvasSidebarPlugin,
+} from './plugin/canvas-sidebar-plugins';
+
 export { alignTransforms, distributeHorizontally } from './align/align';
 export {
   AlignLayersBottomCommand,
@@ -47,13 +54,6 @@ export {
   readImageCrop,
   type NormalizedCrop,
 } from './crop/normalized-crop';
-
-import { CanvasProPlugin } from './plugin/canvas-pro-plugin';
-import {
-  CanvasLayersPlugin,
-  CanvasPagesPlugin,
-  CanvasSidebarPlugin,
-} from './plugin/canvas-sidebar-plugins';
 
 export const DEFAULT_CANVAS_PRO_PLUGINS = [
   new CanvasProPlugin(),
