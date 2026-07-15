@@ -1,4 +1,4 @@
-import type { PluginManager } from '@openenvx/core';
+import type { CommandContext } from '@openenvx/core';
 import { createContributionBuildContext } from '@openenvx/core';
 
 import {
@@ -23,7 +23,7 @@ export function buildViewContainer(
   container: ViewContainerContribution,
   views: ViewContribution[],
   viewProviderRegistry: ViewProviderRegistry,
-  ctx: ReturnType<PluginManager['createCommandContext']>,
+  ctx: CommandContext,
   evaluateWhen: (when?: string) => boolean,
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): ViewContainerDescriptor {
@@ -84,7 +84,7 @@ function buildEmptyView(
 function buildView(
   view: ViewContribution,
   provider: TreeDataProvider<unknown>,
-  ctx: ReturnType<PluginManager['createCommandContext']>,
+  ctx: CommandContext,
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): ViewDescriptor {
   const items: ViewTreeItem[] = [];

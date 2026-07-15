@@ -15,16 +15,16 @@ import type { ChromeSlice } from '../workbench-state-cache';
 import type { WorkbenchSliceContext } from './workbench-slice-context';
 
 export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
-  const coreRegistries = ctx.manager.getRegistries();
+  const coreRegistries = ctx.coreRegistries;
   const workbenchRegistries = ctx.workbenchRegistries;
-  const commandCtx = ctx.manager.createCommandContext();
+  const commandCtx = ctx.runtime.createCommandContext();
   const canExecuteCommand = (commandId: string) =>
     coreRegistries.commands.canExecute(commandId, commandCtx);
   const buildCtx = createContributionBuildContext(
     commandCtx.services,
     canExecuteCommand
   );
-  const contextKeyService = ctx.manager.getContextKeys();
+  const contextKeyService = ctx.runtime.getContextKeys();
   const evaluateWhen = (when: string | undefined) =>
     contextKeyService.evaluate(when);
 

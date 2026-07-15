@@ -1,4 +1,4 @@
-import type { PluginManager } from '@openenvx/core';
+import type { EditorRuntime, Registries } from '@openenvx/core';
 
 function shouldIgnoreDeleteShortcut(event: KeyboardEvent): boolean {
   if (event.key !== 'Delete' && event.key !== 'Backspace') {
@@ -39,7 +39,8 @@ function isEditableKeyTarget(target: EventTarget | null): boolean {
 }
 
 export function attachWorkbenchKeybindings(
-  manager: PluginManager
+  coreRegistries: Registries,
+  runtime: EditorRuntime
 ): (() => void) | null {
   if (typeof window === 'undefined') {
     return null;
@@ -50,17 +51,15 @@ export function attachWorkbenchKeybindings(
       return;
     }
     const evaluateWhen = (when: string | undefined) =>
-      manager.getContextKeys().evaluate(when);
-    const ctx = manager.createCommandContext();
-    manager
-      .getRegistries()
-      .keybindings.handleKeyDown(
-        event,
-        manager.getRegistries().commands,
-        ctx,
-        manager.getEvents(),
-        evaluateWhen
-      );
+      runtime.getContextKeys().evaluate(when);
+    const ctx = runtime.createCommandContext();
+    coreRegistries.keybindings.handleKeyDown(
+      event,
+      coreRegistries.commands,
+      ctx,
+      runtime.getEvents(),
+      evaluateWhen
+    );
   };
 
   window.addEventListener('keydown', handler);

@@ -4,20 +4,18 @@ import type { LayerDefinition } from '../contributions/layer-definition';
 import type { ServiceContribution } from '../contributions/service-contribution';
 import type { ShortcutContribution } from '../contributions/shortcut-contribution';
 import type { Contribution } from '../core/contribution';
+import type { EditorRuntime } from '../core/editor-runtime';
 import { I18nBundleRegistry } from '../i18n/i18n-bundle-registry';
 import type { I18nContribution } from '../i18n/i18n-contribution';
 import { LocalizationServiceId } from '../i18n/localization-service-id';
 import { CommandService } from '../runtime/command-service';
-import { InstantiationService } from '../runtime/instantiation-service';
 import { KeybindingService } from '../runtime/keybinding-service';
 
 export class Registries {
   readonly commands = new CommandService();
   readonly keybindings = new KeybindingService();
   readonly layers = new LayerRegistry();
-  readonly contextKeys: ContextKeyContribution[] = [];
   readonly i18nContributions: I18nContribution[] = [];
-  readonly services = new InstantiationService();
 }
 
 export class LayerRegistry {
@@ -41,8 +39,10 @@ export class LayerRegistry {
 
 export function registerContribution(
   registries: Registries,
-  contribution: Contribution
+  contribution: Contribution,
+  runtime: EditorRuntime
 ): void {
+  const { services } = runtime;
   switch (contribution.contributionPoint) {
     case 'command': {
       registries.commands.register(contribution as Command);
@@ -57,19 +57,21 @@ export function registerContribution(
       break;
     }
     case 'contextKey': {
-      registries.contextKeys.push(contribution as ContextKeyContribution);
+      runtime.registerContextKeyContribution(
+        contribution as ContextKeyContribution
+      );
       break;
     }
     case 'service': {
       const service = contribution as ServiceContribution;
-      registries.services.registerFactory(service.token, service.getFactory());
+      services.registerFactory(service.token, service.getFactory());
       break;
     }
     case 'i18n': {
       const i18n = contribution as I18nContribution;
       registries.i18nContributions.push(i18n);
-      if (registries.services.has(LocalizationServiceId)) {
-        const localization = registries.services.get(LocalizationServiceId);
+      if (services.has(LocalizationServiceId)) {
+        const localization = services.get(LocalizationServiceId);
         const registry = new I18nBundleRegistry(i18n.sourceId, localization);
         i18n.contribute(registry);
       }

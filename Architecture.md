@@ -40,7 +40,9 @@ Workbench chrome for canvas (toolbar, palette, sidebars, editor pane registratio
 ## What belongs in `@openenvx/core`
 
 - Plugin host primitives: `Command`, `LayerDefinition`, `Shortcut`, `ContextKey`, `Service`, `I18n`
-- `Plugin`, `PluginManager`, `registerContribution()`
+- `Plugin`, `PluginManager`, `EditorRuntime`, `registerContribution()`
+- `EditorRuntime` — owns the DI container (`InstantiationService`), core service bootstrap, event bus, context-key contributions, sync, and `createCommandContext()`
+- `PluginManager` — plugin lifecycle and contribution routing only; receives `EditorRuntime` via injection
 - **Layer property data** — `PropertyBuilder`, `PropertyFieldDescriptor`, `PropertySectionDescriptor` (returned by `LayerDefinition.properties()`)
 - Generic service ids (`AssetServiceId`, `PersistenceServiceId`, `LocalizationServiceId`) and editor services (`EditorService`, `DocumentHostService`, `ThemeService`, …)
 - `LocalizationService`, `I18nContribution`, `localize()`
@@ -51,7 +53,8 @@ Workbench chrome for canvas (toolbar, palette, sidebars, editor pane registratio
 
 ## What belongs in `@openenvx/headless`
 
-- `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` - workbench runtime
+- `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` - workbench runtime; owns `EditorRuntime` and injects it into `PluginManager`
+- `bootstrapWorkbenchServices()` - registers headless-specific DI services on an `EditorRuntime`
 - `WorkbenchPlugin`, `WorkbenchRegistries`, `WorkbenchPluginContext.registerWorkbench()` - workbench UI contribution registration
 - `WorkbenchPluginContext.registerTreeDataProvider()`, `registerFieldRenderer()`, `registerStatusBarItemRenderer()`, `registerEditorPane()` - runtime provider registries
 - Workbench contribution points: `Toolbar`, `CommandPalette`, `ViewContainer`, `View`, `ContextMenu`, `StatusBar`, `Overlay`, `InspectorPane`
@@ -75,6 +78,7 @@ flowchart TB
     CanvasEditor[CanvasEditor]
   end
   subgraph coreHost [core]
+    Runtime[EditorRuntime]
     PluginHost[PluginManager]
   end
   subgraph headlessPkg [headless]

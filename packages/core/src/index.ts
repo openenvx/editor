@@ -4,6 +4,7 @@ export { ContributionPoint } from './core/contribution-point';
 export { Contribution } from './core/contribution';
 export { Plugin } from './core/plugin';
 export { PluginManager, type PluginContext } from './core/plugin-manager';
+export { EditorRuntime } from './core/editor-runtime';
 
 export { Command } from './contributions/command';
 export { LayerDefinition } from './contributions/layer-definition';

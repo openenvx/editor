@@ -1,10 +1,9 @@
-import { AssetServiceId } from '@openenvx/core';
-import type { PluginManager } from '@openenvx/core';
+import { AssetServiceId, type CommandContext } from '@openenvx/core';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
 
 export function resolveLayerPreview(
   view: LayerPreviewDescriptor,
-  ctx: ReturnType<PluginManager['createCommandContext']>
+  ctx: CommandContext
 ): LayerPreviewDescriptor {
   if (view.kind !== 'image' || typeof view.src !== 'string') {
     return view;

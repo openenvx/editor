@@ -8,10 +8,48 @@ How to extend the OpenEnvx canvas engine with plugins.
 | --- | --- |
 | `@openenvx/canvas` | Canvas engine: layers, commands, Konva renderers, `CanvasEditor` |
 | `@openenvx/headless` | Workbench runtime: `WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()` |
+| `@openenvx/core` | Editor host: `EditorRuntime`, `PluginManager`, `registerContribution()` |
 | Your app / `demo-playground` | Wire canvas to workbench via `CanvasHostProvider` + app-owned toolbar/sidebars |
 | `@openenvx/canvas-pro` (enterprise) | Pre-built canvas workbench chrome: toolbar, palette, layers sidebar, editor pane registration |
 
 `CanvasBasicsPlugin` registers engine contributions only. For a full editor UX, either wire chrome in your app shell (see `apps/demo-playground`) or use enterprise `@openenvx/canvas-pro`.
+
+### Custom editor host (without `WorkbenchController`)
+
+If you build your own shell instead of `@openenvx/headless`, compose the core host like this:
+
+```ts
+import {
+  EditorRuntime,
+  PluginManager,
+  SceneStore,
+  EditorService,
+  registerContribution,
+} from '@openenvx/core';
+
+const scene = new SceneStore(initialScene);
+const editor = new EditorService();
+const runtime = new EditorRuntime(scene, editor);
+const manager = new PluginManager(runtime);
+
+// Register workbench-specific services on runtime.services before activating plugins.
+// See bootstrapWorkbenchServices() in @openenvx/headless for the headless defaults.
+
+await manager.activateCorePlugins();
+for (const plugin of plugins) {
+  await manager.activate(plugin);
+}
+
+const ctx = runtime.createCommandContext();
+await manager
+  .getRegistries()
+  .commands.execute('my.command', ctx, runtime.getEvents());
+
+// On shutdown:
+runtime.dispose();
+```
+
+Plugin contributions register through `PluginContext.register()`, which routes to `registerContribution(registries, contribution, runtime)`. Context-key contributions are stored on `EditorRuntime` and synced after each plugin activation.
 
 ### Wiring canvas in a workbench app
 

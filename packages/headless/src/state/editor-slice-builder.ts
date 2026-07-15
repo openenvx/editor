@@ -18,10 +18,10 @@ interface LayerSurfaceItem {
 
 export class EditorSliceBuilder {
   build(ctx: WorkbenchSliceContext): EditorSlice {
-    const coreRegistries = ctx.manager.getRegistries();
-    const commandCtx = ctx.manager.createCommandContext();
-    const scene = ctx.sceneStore.getScene();
-    const editor = ctx.editorService.getActiveEditor();
+    const coreRegistries = ctx.coreRegistries;
+    const commandCtx = ctx.runtime.createCommandContext();
+    const scene = ctx.runtime.getScene().getScene();
+    const editor = ctx.runtime.getEditor().getActiveEditor();
     const activePage = getActivePage(scene);
     const selectedIds = new Set(scene.selection.selectedLayerIds);
 

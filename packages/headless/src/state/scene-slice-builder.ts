@@ -10,17 +10,17 @@ import { buildViewContainer } from './view-descriptor-builder';
 import type { WorkbenchSliceContext } from './workbench-slice-context';
 
 export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
-  const coreRegistries = ctx.manager.getRegistries();
+  const coreRegistries = ctx.coreRegistries;
   const workbenchRegistries = ctx.workbenchRegistries;
-  const commandCtx = ctx.manager.createCommandContext();
+  const commandCtx = ctx.runtime.createCommandContext();
   const canExecuteCommand = (commandId: string) =>
     coreRegistries.commands.canExecute(commandId, commandCtx);
   const buildCtx = createContributionBuildContext(
     commandCtx.services,
     canExecuteCommand
   );
-  const scene = ctx.sceneStore.getScene();
-  const contextKeyService = ctx.manager.getContextKeys();
+  const scene = ctx.runtime.getScene().getScene();
+  const contextKeyService = ctx.runtime.getContextKeys();
   const evaluateWhen = (when: string | undefined) =>
     contextKeyService.evaluate(when);
 

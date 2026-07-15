@@ -1,4 +1,6 @@
 export { WorkbenchController } from './workbench-controller';
+export { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
+export type { WorkbenchServiceDeps } from './bootstrap-workbench-services';
 export {
   type WorkbenchApi,
   type WorkbenchControllerOptions,

@@ -1,10 +1,9 @@
 import {
   canEditLayerData,
   canSelectLayer,
-  DocumentOperationsServiceId,
+  EditorRuntime,
   EditorService,
   findLayerById,
-  LayerRegistryServiceId,
   PluginManager,
   Registry,
   SceneStore,
@@ -18,6 +17,7 @@ import type {
   ServiceId,
 } from '@openenvx/core';
 
+import { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
 import { ViewProviderRegistryImpl } from './registries/view-provider-registry';
 import type { WorkbenchProviderRegistries } from './registries/workbench-provider-registries';
 import { WorkbenchRegistries } from './registries/workbench-registries';
@@ -50,8 +50,6 @@ import type {
   InteractionSlice,
   SceneSlice,
 } from './workbench-state-cache';
-import { ShellUiServiceImpl } from './workbench/shell-ui-service';
-import { ShellUiServiceId } from './workbench/shell-ui-service-id';
 import { DEFAULT_WORKBENCH_LAYOUT } from './workbench/workbench-layout';
 
 type Listener = (state: WorkbenchState) => void;
@@ -59,6 +57,7 @@ type Listener = (state: WorkbenchState) => void;
 export class WorkbenchController {
   private readonly sceneStore: SceneStore;
   private readonly editorService = new EditorService();
+  private readonly runtime: EditorRuntime;
   private readonly manager: PluginManager;
   private readonly layout: WorkbenchSliceContext['layout'];
   private readonly listeners = new Set<Listener>();
@@ -81,7 +80,8 @@ export class WorkbenchController {
   constructor(private readonly options: WorkbenchControllerOptions) {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
     this.sceneStore = new SceneStore(options.initialScene);
-    this.manager = new PluginManager(this.sceneStore, this.editorService);
+    this.runtime = new EditorRuntime(this.sceneStore, this.editorService);
+    this.manager = new PluginManager(this.runtime);
     this.registerCoreServices();
     this.syncLayoutContextKeys();
     this.wireStateRefresh();
@@ -89,11 +89,10 @@ export class WorkbenchController {
 
   private get sliceContext(): WorkbenchSliceContext {
     return {
-      editorService: this.editorService,
+      coreRegistries: this.manager.getRegistries(),
       layout: this.layout,
-      manager: this.manager,
       providerRegistries: this.providerRegistries,
-      sceneStore: this.sceneStore,
+      runtime: this.runtime,
       workbenchRegistries: this.workbenchRegistries,
     };
   }
@@ -107,7 +106,7 @@ export class WorkbenchController {
   }
 
   private syncLayoutContextKeys(): void {
-    const keys = this.manager.getContextKeys();
+    const keys = this.runtime.getContextKeys();
     keys.setContext('workbench.floatingToolbar', this.layout.floatingToolbar);
     keys.setContext('workbench.statusBar', this.layout.statusBar);
     keys.setContext('workbench.primarySidebar', this.layout.primarySidebar);
@@ -116,21 +115,15 @@ export class WorkbenchController {
   }
 
   private registerCoreServices(): void {
-    const services = this.manager.getRegistries().services;
-    services.registerInstance(
-      LayerRegistryServiceId,
-      this.manager.getRegistries().layers
-    );
-    services.registerInstance(DocumentOperationsServiceId, {
+    bootstrapWorkbenchServices(this.runtime, this.manager.getRegistries(), {
       openDocument: (uri) => this.openDocument(uri),
       save: () => this.save(),
       saveAs: (uri) => this.saveAs(uri),
     });
-    services.registerInstance(ShellUiServiceId, new ShellUiServiceImpl());
   }
 
   private wireStateRefresh(): void {
-    const events = this.manager.getEvents();
+    const events = this.runtime.getEvents();
     this.eventDisposables.push(
       events.on(WorkbenchEvents.DidChangeScene, (snapshot) => {
         const prevContentRevision = this.lastSeenContentRevision;
@@ -174,7 +167,7 @@ export class WorkbenchController {
       }),
       this.interactionState.onDidChange((state) => {
         this.stateCache.invalidateInteraction();
-        this.manager
+        this.runtime
           .getEvents()
           .emit(WorkbenchEvents.DidChangeInteraction, state);
         this.notify();
@@ -186,7 +179,7 @@ export class WorkbenchController {
     return {
       commands: this.manager.getRegistries().commands,
       editor: this.editorService,
-      events: this.manager.getEvents(),
+      events: this.runtime.getEvents(),
       executeCommand: (id, args) => this.executeCommand(id, args),
       runCommand: (id, args) => this.runCommand(id, args),
       subscribe: (listener) => this.subscribe(listener),
@@ -215,9 +208,7 @@ export class WorkbenchController {
   }
 
   async start(): Promise<void> {
-    const { CoreI18nPlugin, ScenePlugin } = await import('@openenvx/core');
-    await this.manager.activate(new ScenePlugin());
-    await this.manager.activate(new CoreI18nPlugin());
+    await this.manager.activateCorePlugins();
     for (const plugin of this.options.plugins) {
       const ctx = createWorkbenchPluginContext(
         this.manager.createPluginContext(),
@@ -238,7 +229,10 @@ export class WorkbenchController {
       },
       this.sceneStore.getContentRevision()
     );
-    this.detachKeybindings = attachWorkbenchKeybindings(this.manager);
+    this.detachKeybindings = attachWorkbenchKeybindings(
+      this.manager.getRegistries(),
+      this.runtime
+    );
     this.notify();
   }
 
@@ -251,13 +245,13 @@ export class WorkbenchController {
     commandId: string,
     args?: unknown
   ): Promise<CommandExecutionResult<T>> {
-    const ctx = this.manager.createCommandContext();
+    const ctx = this.runtime.createCommandContext();
     return this.manager
       .getRegistries()
       .commands.execute(
         commandId,
         ctx,
-        this.manager.getEvents(),
+        this.runtime.getEvents(),
         args
       ) as Promise<CommandExecutionResult<T>>;
   }
@@ -275,7 +269,7 @@ export class WorkbenchController {
   }
 
   getService<T>(token: ServiceId<T>): T | undefined {
-    const services = this.manager.getRegistries().services;
+    const services = this.runtime.services;
     if (!services.has(token)) {
       return undefined;
     }
@@ -283,7 +277,7 @@ export class WorkbenchController {
   }
 
   registerServiceInstance<T>(id: ServiceId<T>, instance: T): void {
-    this.manager.getRegistries().services.registerInstance(id, instance);
+    this.runtime.services.registerInstance(id, instance);
     this.stateCache.invalidateChrome();
     this.notify();
   }
@@ -343,7 +337,7 @@ export class WorkbenchController {
     if (!provider) {
       return;
     }
-    const ctx = this.manager.createCommandContext();
+    const ctx = this.runtime.createCommandContext();
     provider.onSelect?.(item, ctx);
   }
 
@@ -357,7 +351,7 @@ export class WorkbenchController {
     if (!provider) {
       return;
     }
-    const ctx = this.manager.createCommandContext();
+    const ctx = this.runtime.createCommandContext();
     if (provider.canMove && !provider.canMove(source, target, position)) {
       return;
     }
@@ -409,7 +403,7 @@ export class WorkbenchController {
     this.eventDisposables.length = 0;
     this.listeners.clear();
     this.interactionState.dispose();
-    this.manager.dispose();
+    this.runtime.dispose();
   }
 
   /** @internal */
