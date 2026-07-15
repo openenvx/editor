@@ -55,8 +55,6 @@ import { DEFAULT_WORKBENCH_LAYOUT } from './workbench/workbench-layout';
 type Listener = (state: WorkbenchState) => void;
 
 export class WorkbenchController {
-  private readonly sceneStore: SceneStore;
-  private readonly editorService = new EditorService();
   private readonly runtime: EditorRuntime;
   private readonly manager: PluginManager;
   private readonly layout: WorkbenchSliceContext['layout'];
@@ -79,8 +77,10 @@ export class WorkbenchController {
 
   constructor(private readonly options: WorkbenchControllerOptions) {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
-    this.sceneStore = new SceneStore(options.initialScene);
-    this.runtime = new EditorRuntime(this.sceneStore, this.editorService);
+    this.runtime = new EditorRuntime(
+      new SceneStore(options.initialScene),
+      new EditorService()
+    );
     this.manager = new PluginManager(this.runtime);
     this.registerCoreServices();
     this.syncLayoutContextKeys();
@@ -99,9 +99,9 @@ export class WorkbenchController {
 
   private get documentOpsDeps() {
     return {
-      editorService: this.editorService,
+      editorService: this.runtime.getEditor(),
       getService: <T>(token: ServiceId<T>) => this.getService(token),
-      sceneStore: this.sceneStore,
+      sceneStore: this.runtime.getScene(),
     };
   }
 
@@ -178,7 +178,7 @@ export class WorkbenchController {
   get api(): WorkbenchApi {
     return {
       commands: this.manager.getRegistries().commands,
-      editor: this.editorService,
+      editor: this.runtime.getEditor(),
       events: this.runtime.getEvents(),
       executeCommand: (id, args) => this.executeCommand(id, args),
       runCommand: (id, args) => this.runCommand(id, args),
@@ -195,7 +195,7 @@ export class WorkbenchController {
       save: (saveFn) => this.save(saveFn),
       saveAs: (uri) => this.saveAs(uri),
       openDocument: (uri) => this.openDocument(uri),
-      scene: this.sceneStore,
+      scene: this.runtime.getScene(),
       selectLayers: (layerIds, primaryLayerId) =>
         this.selectLayers(layerIds, primaryLayerId),
       setHoveredLayer: (layerId) => this.setHoveredLayer(layerId),
@@ -218,16 +218,17 @@ export class WorkbenchController {
       await this.manager.activateWithContext(plugin, ctx);
     }
     this.stateCache.reset();
-    this.lastSeenContentRevision = this.sceneStore.getContentRevision();
+    const sceneStore = this.runtime.getScene();
+    this.lastSeenContentRevision = sceneStore.getContentRevision();
     this.stateCache.onSceneContentRevision(this.lastSeenContentRevision);
-    this.editorService.open(
+    this.runtime.getEditor().open(
       {
         isDirty: false,
-        scene: this.sceneStore.getScene(),
+        scene: sceneStore.getScene(),
         title: this.options.editorTitle ?? 'Untitled',
         uri: this.options.editorUri ?? 'untitled://scene',
       },
-      this.sceneStore.getContentRevision()
+      sceneStore.getContentRevision()
     );
     this.detachKeybindings = attachWorkbenchKeybindings(
       this.manager.getRegistries(),
@@ -283,20 +284,21 @@ export class WorkbenchController {
   }
 
   selectLayers(layerIds: string[], primaryLayerId?: string | null): void {
-    const currentScene = this.sceneStore.getScene();
+    const sceneStore = this.runtime.getScene();
+    const currentScene = sceneStore.getScene();
     const editableIds = layerIds.filter((id) => {
       const targetLayer = findLayerById(currentScene, id);
       return targetLayer && canSelectLayer(targetLayer);
     });
     if (editableIds.length === 0) {
-      this.sceneStore.selectLayers([], null);
+      sceneStore.selectLayers([], null);
       return;
     }
     const validPrimary =
       primaryLayerId && editableIds.includes(primaryLayerId)
         ? primaryLayerId
         : editableIds[0];
-    this.sceneStore.selectLayers(editableIds, validPrimary ?? null);
+    sceneStore.selectLayers(editableIds, validPrimary ?? null);
   }
 
   setHoveredLayer(layerId: string | null): void {
@@ -304,12 +306,13 @@ export class WorkbenchController {
   }
 
   updateProperty(layerId: string, key: string, value: unknown): void {
-    const currentScene = this.sceneStore.getScene();
+    const sceneStore = this.runtime.getScene();
+    const currentScene = sceneStore.getScene();
     const targetLayer = findLayerById(currentScene, layerId);
     if (!targetLayer || !canEditLayerData(targetLayer)) {
       return;
     }
-    this.sceneStore.apply({
+    sceneStore.apply({
       apply: (scene) => ({
         ...scene,
         pages: scene.pages.map((page) => ({
@@ -359,11 +362,11 @@ export class WorkbenchController {
   }
 
   undo(): boolean {
-    return this.sceneStore.undo();
+    return this.runtime.getScene().undo();
   }
 
   redo(): boolean {
-    return this.sceneStore.redo();
+    return this.runtime.getScene().redo();
   }
 
   async save(saveFn?: (input: EditorInput) => Promise<void>): Promise<void> {
@@ -383,7 +386,7 @@ export class WorkbenchController {
   }
 
   serializeScene(): Scene {
-    return structuredClone(this.sceneStore.getScene());
+    return structuredClone(this.runtime.getScene().getScene());
   }
 
   loadScene(scene: Scene): void {
