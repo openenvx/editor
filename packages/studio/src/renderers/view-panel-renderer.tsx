@@ -5,7 +5,7 @@ import type {
   ViewTreeItem,
 } from '@openenvx/headless';
 import { Eye, EyeOff, Lock, LockOpen } from 'lucide-react';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import {
@@ -133,26 +133,134 @@ function isItemVisible(
   return true;
 }
 
+function TreeItemRenameInput({
+  initialValue,
+  placeholder,
+  onCommit,
+  onCancel,
+}: {
+  initialValue: string;
+  placeholder: string;
+  onCommit: (value: string) => void;
+  onCancel: () => void;
+}) {
+  const [value, setValue] = useState(initialValue);
+  const doneRef = useRef(false);
+
+  const finish = (next: 'commit' | 'cancel') => {
+    if (doneRef.current) {
+      return;
+    }
+    doneRef.current = true;
+    if (next === 'commit') {
+      onCommit(value);
+    } else {
+      onCancel();
+    }
+  };
+
+  return (
+    <input
+      aria-label={placeholder}
+      autoFocus
+      className={styles.treeItemRenameInput}
+      onBlur={() => finish('commit')}
+      onChange={(event) => setValue(event.target.value)}
+      onClick={(event) => event.stopPropagation()}
+      onFocus={(event) => event.currentTarget.select()}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          event.stopPropagation();
+          finish('commit');
+        } else if (event.key === 'Escape') {
+          event.preventDefault();
+          event.stopPropagation();
+          finish('cancel');
+        }
+      }}
+      onPointerDown={(event) => event.stopPropagation()}
+      placeholder={placeholder}
+      type="text"
+      value={value}
+    />
+  );
+}
+
+function TreeItemLabel({
+  item,
+  isSelected,
+  isRenaming,
+  onSelect,
+  onStartRename,
+  onCommitRename,
+  onCancelRename,
+}: {
+  item: ViewTreeItem;
+  isSelected: boolean;
+  isRenaming: boolean;
+  onSelect: () => void;
+  onStartRename: () => void;
+  onCommitRename: (value: string) => void;
+  onCancelRename: () => void;
+}) {
+  if (isRenaming) {
+    return (
+      <TreeItemRenameInput
+        initialValue={item.editLabel ?? ''}
+        onCancel={onCancelRename}
+        onCommit={onCommitRename}
+        placeholder={item.label}
+      />
+    );
+  }
+
+  return (
+    <button
+      className={styles.treeItemLabel}
+      onClick={() => {
+        if (isSelected && item.renameCommandId) {
+          onStartRename();
+          return;
+        }
+        onSelect();
+      }}
+      title={item.tooltip ?? undefined}
+      type="button"
+    >
+      {item.label}
+    </button>
+  );
+}
+
 function StaticTreeRow({
   item,
   isSelected,
   isHovered,
   isCollapsed,
+  isRenaming,
   onSelect,
   onToggleCollapsed,
   onToggleLock,
   onToggleVisibility,
   onHover,
+  onStartRename,
+  onCommitRename,
+  onCancelRename,
 }: {
   item: ViewTreeItem;
   isSelected: boolean;
   isHovered: boolean;
   isCollapsed: boolean;
+  isRenaming: boolean;
   onSelect: () => void;
   onToggleCollapsed: () => void;
   onToggleLock?: () => void;
   onToggleVisibility?: () => void;
   onHover?: () => void;
+  onStartRename: () => void;
+  onCommitRename: (value: string) => void;
+  onCancelRename: () => void;
 }) {
   return (
     <div
@@ -179,14 +287,15 @@ function StaticTreeRow({
         <span className={styles.treeToggleSpacer} />
       )}
       <TreeItemIcon icon={item.icon} />
-      <button
-        className={styles.treeItemLabel}
-        onClick={onSelect}
-        type="button"
-        title={item.tooltip ?? undefined}
-      >
-        {item.label}
-      </button>
+      <TreeItemLabel
+        isRenaming={isRenaming}
+        isSelected={isSelected}
+        item={item}
+        onCancelRename={onCancelRename}
+        onCommitRename={onCommitRename}
+        onSelect={onSelect}
+        onStartRename={onStartRename}
+      />
       <VisibilityButton
         item={item}
         onSelect={onSelect}
@@ -219,6 +328,7 @@ function ViewPanelBody({
   scene: Scene;
 }) {
   const { api } = useWorkbenchContext();
+  const [renamingId, setRenamingId] = useState<string | null>(null);
 
   useViewTreeHoverSync(view, hoveredLayerId, scene, setCollapsed);
 
@@ -257,15 +367,35 @@ function ViewPanelBody({
     [api, publishHover]
   );
 
+  const commitRename = useCallback(
+    (item: ViewTreeItem, value: string) => {
+      setRenamingId(null);
+      if (!item.renameCommandId) {
+        return;
+      }
+      void api.executeCommand(item.renameCommandId, {
+        id: item.id,
+        name: value,
+      });
+    },
+    [api]
+  );
+
+  const cancelRename = useCallback(() => {
+    setRenamingId(null);
+  }, []);
+
   const renderRowContent = useCallback(
     ({
       item,
       isCollapsed,
+      isSelected,
       onToggleCollapsed,
       onSelect,
     }: {
       item: ViewTreeItem;
       isCollapsed: boolean;
+      isSelected: boolean;
       onToggleCollapsed: () => void;
       onSelect: () => void;
     }) => (
@@ -286,13 +416,15 @@ function ViewPanelBody({
           <span className={styles.treeToggleSpacer} />
         )}
         <TreeItemIcon icon={item.icon} />
-        <button
-          className={styles.treeItemLabel}
-          onClick={onSelect}
-          type="button"
-        >
-          {item.label}
-        </button>
+        <TreeItemLabel
+          isRenaming={renamingId === item.id}
+          isSelected={isSelected}
+          item={item}
+          onCancelRename={cancelRename}
+          onCommitRename={(value) => commitRename(item, value)}
+          onSelect={onSelect}
+          onStartRename={() => setRenamingId(item.id)}
+        />
         <VisibilityButton
           item={item}
           onSelect={onSelect}
@@ -313,7 +445,7 @@ function ViewPanelBody({
         />
       </>
     ),
-    [api]
+    [api, cancelRename, commitRename, renamingId]
   );
 
   if (view.supportsReorder) {
@@ -350,11 +482,15 @@ function ViewPanelBody({
           <StaticTreeRow
             isCollapsed={isCollapsed}
             isHovered={isHovered}
+            isRenaming={renamingId === item.id}
             isSelected={isSelected}
             item={item}
             key={item.id}
+            onCancelRename={cancelRename}
+            onCommitRename={(value) => commitRename(item, value)}
             onHover={() => handleHoverItem(item.id)}
             onSelect={() => api.selectViewItem(view.id, item.source)}
+            onStartRename={() => setRenamingId(item.id)}
             onToggleCollapsed={() => toggleCollapsed(item.id)}
             onToggleLock={() => {
               if (item.lockedCommandId) {

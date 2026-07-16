@@ -16,8 +16,8 @@ export abstract class LayerDefinition<TModel = unknown> extends Contribution {
 
   abstract readonly treeDisplayName: string;
 
-  treeLabel(_layer: Layer): string {
-    return this.treeDisplayName;
+  treeLabel(layer: Layer): string {
+    return layer.name?.trim() || this.treeDisplayName;
   }
 
   abstract createDefault(id: string, page: Page): Layer;

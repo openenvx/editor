@@ -238,6 +238,10 @@
               "description": "Whether the layer is locked.",
               "type": "boolean"
             },
+            "name": {
+              "description": "Optional display name; falls back to the layer type label.",
+              "type": "string"
+            },
             "style": {
               "description": "Visual style overrides.",
               "type": "object",
@@ -585,6 +589,10 @@
               "description": "Whether the layer is locked.",
               "type": "boolean"
             },
+            "name": {
+              "description": "Optional display name; falls back to the layer type label.",
+              "type": "string"
+            },
             "style": {
               "description": "Visual style overrides.",
               "type": "object",
@@ -831,6 +839,10 @@
               "default": false,
               "description": "Whether the layer is locked.",
               "type": "boolean"
+            },
+            "name": {
+              "description": "Optional display name; falls back to the layer type label.",
+              "type": "string"
             },
             "style": {
               "description": "Visual style overrides.",
@@ -1099,6 +1111,10 @@
               "description": "Whether the layer is locked.",
               "type": "boolean"
             },
+            "name": {
+              "description": "Optional display name; falls back to the layer type label.",
+              "type": "string"
+            },
             "style": {
               "description": "Visual style overrides.",
               "type": "object",
@@ -1349,6 +1365,10 @@
               "description": "Whether the layer is locked.",
               "type": "boolean"
             },
+            "name": {
+              "description": "Optional display name; falls back to the layer type label.",
+              "type": "string"
+            },
             "style": {
               "description": "Visual style overrides.",
               "type": "object",
@@ -1595,6 +1615,10 @@
               "default": false,
               "description": "Whether the layer is locked.",
               "type": "boolean"
+            },
+            "name": {
+              "description": "Optional display name; falls back to the layer type label.",
+              "type": "string"
             },
             "style": {
               "description": "Visual style overrides.",

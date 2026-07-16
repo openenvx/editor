@@ -62,6 +62,10 @@ function build(o: typeof z.object) {
   const layerBase = {
     id: z.string().describe('Unique layer identifier.'),
     locked: z.boolean().default(false).describe('Whether the layer is locked.'),
+    name: z
+      .string()
+      .optional()
+      .describe('Optional display name; falls back to the layer type label.'),
     style: layerStyle.optional().describe('Visual style overrides.'),
     transform: transform.optional().describe('Absolute transform box.'),
     visible: z

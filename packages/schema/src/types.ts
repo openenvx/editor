@@ -130,6 +130,8 @@ export interface CanvasGroupData {
 
 export interface LayerBase {
   id: string;
+  /** Optional display name in the layers tree. Absent/empty falls back to type label. */
+  name?: string;
   transform?: Transform;
   style?: LayerStyle;
   writeMode?: LayerWriteMode;

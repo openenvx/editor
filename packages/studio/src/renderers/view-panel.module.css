@@ -81,6 +81,21 @@
   padding: 0;
 }
 
+.treeItemRenameInput {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--wb-border);
+  border-radius: var(--wb-radius-sm, 2px);
+  background: var(--wb-background);
+  color: inherit;
+  font-size: var(--wb-text-sm);
+  font-family: inherit;
+  line-height: inherit;
+  padding: 0 2px;
+  margin: 0;
+  outline: none;
+}
+
 .treeItemIcon {
   flex-shrink: 0;
   color: var(--wb-muted-foreground);

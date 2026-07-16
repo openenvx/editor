@@ -10,6 +10,8 @@ import {
   AddPageCommand,
   DuplicatePageCommand,
   RemovePageCommand,
+  RenameLayerCommand,
+  RenamePageCommand,
   UndoCommand,
 } from './scene-plugin';
 
@@ -185,5 +187,94 @@ describe('ScenePlugin page commands', () => {
     expect(activeIds).toHaveLength(1);
     expect(activeIds[0]).toBe(ctx.scene.getActivePageId());
     expect(ctx.scene.getScene().pages).toHaveLength(2);
+  });
+});
+
+describe('ScenePlugin rename commands', () => {
+  const renamePage = new RenamePageCommand();
+  const renameLayer = new RenameLayerCommand();
+  const undo = new UndoCommand();
+
+  it('renamePage updates the page name', () => {
+    const ctx = createContext({
+      schemaVersion: 1,
+      pages: [createPage({ id: 'page-1', name: 'Page 1' })],
+    });
+    renamePage.execute(ctx, { id: 'page-1', name: 'Cover' });
+    expect(ctx.scene.getScene().pages[0]?.name).toBe('Cover');
+  });
+
+  it('renamePage no-ops on blank or unchanged name', () => {
+    const ctx = createContext({
+      schemaVersion: 1,
+      pages: [createPage({ id: 'page-1', name: 'Page 1' })],
+    });
+    renamePage.execute(ctx, { id: 'page-1', name: '   ' });
+    expect(ctx.scene.getScene().pages[0]?.name).toBe('Page 1');
+    renamePage.execute(ctx, { id: 'page-1', name: 'Page 1' });
+    expect(ctx.scene.canUndo()).toBe(false);
+  });
+
+  it('renamePage is undoable', () => {
+    const ctx = createContext({
+      schemaVersion: 1,
+      pages: [createPage({ id: 'page-1', name: 'Page 1' })],
+    });
+    renamePage.execute(ctx, { id: 'page-1', name: 'Cover' });
+    undo.execute(ctx);
+    expect(ctx.scene.getScene().pages[0]?.name).toBe('Page 1');
+  });
+
+  it('renameLayer sets a custom name', () => {
+    const ctx = createContext({
+      schemaVersion: 1,
+      pages: [
+        createPage({
+          layers: [{ id: 'rect-1', type: 'canvas.rect', data: { fill: '#f00' } }],
+        }),
+      ],
+    });
+    renameLayer.execute(ctx, { id: 'rect-1', name: 'Hero' });
+    expect(ctx.scene.getScene().pages[0]?.layers[0]?.name).toBe('Hero');
+  });
+
+  it('renameLayer clears name when blank', () => {
+    const ctx = createContext({
+      schemaVersion: 1,
+      pages: [
+        createPage({
+          layers: [
+            {
+              id: 'rect-1',
+              type: 'canvas.rect',
+              name: 'Hero',
+              data: { fill: '#f00' },
+            },
+          ],
+        }),
+      ],
+    });
+    renameLayer.execute(ctx, { id: 'rect-1', name: '  ' });
+    expect(ctx.scene.getScene().pages[0]?.layers[0]?.name).toBeUndefined();
+  });
+
+  it('renameLayer no-ops when name is unchanged', () => {
+    const ctx = createContext({
+      schemaVersion: 1,
+      pages: [
+        createPage({
+          layers: [
+            {
+              id: 'rect-1',
+              type: 'canvas.rect',
+              name: 'Hero',
+              data: { fill: '#f00' },
+            },
+          ],
+        }),
+      ],
+    });
+    renameLayer.execute(ctx, { id: 'rect-1', name: 'Hero' });
+    expect(ctx.scene.canUndo()).toBe(false);
   });
 });

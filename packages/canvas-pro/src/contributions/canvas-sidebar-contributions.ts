@@ -29,9 +29,11 @@ export class CanvasPagesTreeProvider extends TreeDataProvider<Page> {
 
   getTreeItem(page: Page, _ctx: CommandContext): TreeItem {
     return {
+      editLabel: page.name ?? '',
       icon: 'file',
       id: page.id,
       label: page.name?.trim() ? page.name : 'Page',
+      renameCommandId: 'scene.renamePage',
     };
   }
 
@@ -94,11 +96,13 @@ export class CanvasLayersTreeProvider extends TreeDataProvider<Layer> {
         ? 'Unlock layer (Mod+L)'
         : 'Lock layer (Mod+L)';
     return {
+      editLabel: node.name ?? '',
       icon: definition?.treeIcon,
       id: node.id,
       label: definition?.treeLabel(node) ?? node.type.replace('canvas.', ''),
       locked: configLocked || runtimeLocked,
       lockedCommandId: configLocked ? undefined : 'scene.toggleLayerLock',
+      renameCommandId: 'scene.renameLayer',
       tooltip,
       visible: layerVisible,
       visibilityCommandId: configLocked

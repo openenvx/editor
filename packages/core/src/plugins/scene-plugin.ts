@@ -414,6 +414,98 @@ export class DuplicatePageCommand extends Command {
   }
 }
 
+export interface RenamePageArgs {
+  id: string;
+  name: string;
+}
+
+export class RenamePageCommand extends Command {
+  readonly id = 'scene.renamePage';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    const renameArgs = args as RenamePageArgs | undefined;
+    if (!renameArgs?.id || typeof renameArgs.name !== 'string') {
+      return false;
+    }
+    return ctx.scene.getScene().pages.some((p) => p.id === renameArgs.id);
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const renameArgs = args as RenamePageArgs | undefined;
+    if (!renameArgs?.id || typeof renameArgs.name !== 'string') {
+      return;
+    }
+    const trimmed = renameArgs.name.trim();
+    if (!trimmed) {
+      return;
+    }
+    const page = ctx.scene.getScene().pages.find((p) => p.id === renameArgs.id);
+    if (!page || page.name === trimmed) {
+      return;
+    }
+    ctx.scene.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: scene.pages.map((p) =>
+          p.id === renameArgs.id ? { ...p, name: trimmed } : p
+        ),
+      }),
+      label: 'Rename page',
+    });
+  }
+}
+
+export interface RenameLayerArgs {
+  id: string;
+  name: string;
+}
+
+export class RenameLayerCommand extends Command {
+  readonly id = 'scene.renameLayer';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    const renameArgs = args as RenameLayerArgs | undefined;
+    if (!renameArgs?.id || typeof renameArgs.name !== 'string') {
+      return false;
+    }
+    return Boolean(findLayerById(ctx.scene.getScene(), renameArgs.id));
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const renameArgs = args as RenameLayerArgs | undefined;
+    if (!renameArgs?.id || typeof renameArgs.name !== 'string') {
+      return;
+    }
+    const scene = ctx.scene.getScene();
+    const layer = findLayerById(scene, renameArgs.id);
+    if (!layer) {
+      return;
+    }
+    const trimmed = renameArgs.name.trim();
+    const nextName = trimmed || undefined;
+    const currentName = layer.name?.trim() || undefined;
+    if (currentName === nextName) {
+      return;
+    }
+    ctx.scene.apply({
+      apply: (currentScene) => ({
+        ...currentScene,
+        pages: currentScene.pages.map((page) => ({
+          ...page,
+          layers: updateLayerInTree(page.layers, renameArgs.id, (l) => {
+            if (nextName === undefined) {
+              const { name: _removed, ...rest } = l;
+              return rest as typeof l;
+            }
+            return { ...l, name: nextName };
+          }),
+        })),
+      }),
+      label: 'Rename layer',
+    });
+  }
+}
+
 class UndoShortcut extends ShortcutContribution {
   readonly keybinding = 'Mod+Z';
   readonly commandId = 'scene.undo';
@@ -456,6 +548,8 @@ export class ScenePlugin extends Plugin {
       new AddPageCommand(),
       new RemovePageCommand(),
       new DuplicatePageCommand(),
+      new RenamePageCommand(),
+      new RenameLayerCommand(),
       new UndoShortcut(),
       new RedoShortcut(),
       new MoveUpShortcut(),

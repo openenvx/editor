@@ -49,6 +49,7 @@ interface TreeDndListProps {
   renderRowContent: (props: {
     item: ViewTreeItem;
     isCollapsed: boolean;
+    isSelected: boolean;
     onToggleCollapsed: () => void;
     onSelect: () => void;
   }) => React.ReactNode;
@@ -109,6 +110,7 @@ const DraggableTreeRow = memo(
       >
         {renderRowContent({
           isCollapsed,
+          isSelected,
           item,
           onSelect,
           onToggleCollapsed,

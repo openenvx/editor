@@ -95,22 +95,26 @@ function buildView(
       if (childrenResult instanceof Promise) {
         items.push({
           depth,
+          editLabel: treeItem.editLabel,
           hasChildren: true,
           icon: treeItem.icon,
           id: treeItem.id,
           label: treeItem.label,
+          renameCommandId: treeItem.renameCommandId,
           source: node,
         });
         continue;
       }
       items.push({
         depth,
+        editLabel: treeItem.editLabel,
         hasChildren: childrenResult.length > 0,
         icon: treeItem.icon,
         id: treeItem.id,
         label: treeItem.label,
         locked: treeItem.locked,
         lockedCommandId: treeItem.lockedCommandId,
+        renameCommandId: treeItem.renameCommandId,
         source: node,
         tooltip: treeItem.tooltip,
         visible: treeItem.visible,

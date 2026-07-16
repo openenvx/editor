@@ -17,6 +17,10 @@ export interface TreeItem {
   /** When false, the row is dimmed (layer hidden). Absent/true = visible. */
   visible?: boolean;
   visibilityCommandId?: string;
+  /** When set, a second click on the selected label starts inline rename. */
+  renameCommandId?: string;
+  /** Raw stored name for the rename input (may be empty). */
+  editLabel?: string;
 }
 
 export abstract class TreeDataProvider<TNode> {

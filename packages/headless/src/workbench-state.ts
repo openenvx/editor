@@ -43,6 +43,8 @@ export interface ViewTreeItem {
   tooltip?: string;
   visible?: boolean;
   visibilityCommandId?: string;
+  renameCommandId?: string;
+  editLabel?: string;
 }
 
 export interface ViewDescriptor {

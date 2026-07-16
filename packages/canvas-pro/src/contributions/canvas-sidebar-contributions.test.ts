@@ -209,4 +209,17 @@ describe('CanvasPagesTreeProvider', () => {
     expect(provider.canMove?.(a, b, 'before')).toBe(true);
     expect(provider.canMove?.(a, b, 'inside')).toBe(false);
   });
+
+  it('exposes rename command and edit label', () => {
+    const provider = new CanvasPagesTreeProvider();
+    const item = provider.getTreeItem(
+      { id: 'a', name: 'Cover', layout: 'flow', layers: [] },
+      {} as CommandContext
+    );
+    expect(item).toMatchObject({
+      editLabel: 'Cover',
+      label: 'Cover',
+      renameCommandId: 'scene.renamePage',
+    });
+  });
 });
