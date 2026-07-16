@@ -47,4 +47,22 @@ describe('flattenLayersForExport', () => {
     expect(flattened[1]?.layer.id).toBe('child-2');
     expect(flattened[1]?.transform).toMatchObject({ x: 140, y: 230 });
   });
+
+  it('skips hidden layers and their subtrees', () => {
+    const flattened = flattenLayersForExport([
+      { ...rectLayer('visible', 0, 0, 10, 10), visible: true },
+      { ...rectLayer('hidden', 20, 20, 10, 10), visible: false },
+      {
+        data: {
+          children: [rectLayer('hidden-child', 5, 5, 10, 10)],
+        },
+        id: 'hidden-group',
+        transform: createDefaultTransform(),
+        type: 'canvas.group',
+        visible: false,
+      },
+    ]);
+
+    expect(flattened.map((entry) => entry.layer.id)).toEqual(['visible']);
+  });
 });

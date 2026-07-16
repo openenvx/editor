@@ -54,6 +54,8 @@ export default {
   'property.alignRight': 'Prawo',
   'layer.unlock': 'Odblokuj warstwę',
   'layer.lock': 'Zablokuj warstwę',
+  'layer.hide': 'Ukryj warstwę',
+  'layer.show': 'Pokaż warstwę',
   'theme.light': 'Jasny',
   'theme.dark': 'Ciemny',
   'locale.en': 'Angielski',

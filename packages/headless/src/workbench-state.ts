@@ -41,6 +41,8 @@ export interface ViewTreeItem {
   locked?: boolean;
   lockedCommandId?: string;
   tooltip?: string;
+  visible?: boolean;
+  visibilityCommandId?: string;
 }
 
 export interface ViewDescriptor {

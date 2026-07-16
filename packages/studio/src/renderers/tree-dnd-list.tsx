@@ -20,6 +20,7 @@ import {
   treePaddingLeft,
 } from './tree-dnd-utils';
 import type { DropProjection } from './tree-dnd-utils';
+import { treeItemClassName } from './tree-item-class-name';
 
 import styles from './view-panel.module.css';
 
@@ -86,20 +87,14 @@ const DraggableTreeRow = memo(
       disabled: item.locked,
     });
 
-    const className = [
-      styles.treeItem,
-      isSelected ? styles.treeItemSelected : '',
-      isHovered ? styles.treeItemHovered : '',
-      isDragging ? styles.treeItemDragging : '',
-      isDragActive && !isDragging ? styles.treeItemPassive : '',
-      item.locked ? styles.treeItemLocked : '',
-    ]
-      .filter(Boolean)
-      .join(' ');
-
     return (
       <div
-        className={className}
+        className={treeItemClassName(item, {
+          isDragActive,
+          isDragging,
+          isHovered,
+          isSelected,
+        })}
         onContextMenu={() => {
           onSelect();
         }}

@@ -425,6 +425,11 @@
               ],
               "additionalProperties": false
             },
+            "visible": {
+              "default": true,
+              "description": "Whether the layer is visible on canvas and in export.",
+              "type": "boolean"
+            },
             "writeMode": {
               "default": "free",
               "description": "Template write permission mode.",
@@ -561,6 +566,7 @@
           "required": [
             "id",
             "locked",
+            "visible",
             "writeMode",
             "data",
             "type"
@@ -765,6 +771,11 @@
                 "y"
               ],
               "additionalProperties": false
+            },
+            "visible": {
+              "default": true,
+              "description": "Whether the layer is visible on canvas and in export.",
+              "type": "boolean"
             },
             "writeMode": {
               "default": "free",
@@ -802,6 +813,7 @@
           "required": [
             "id",
             "locked",
+            "visible",
             "writeMode",
             "data",
             "type"
@@ -1006,6 +1018,11 @@
                 "y"
               ],
               "additionalProperties": false
+            },
+            "visible": {
+              "default": true,
+              "description": "Whether the layer is visible on canvas and in export.",
+              "type": "boolean"
             },
             "writeMode": {
               "default": "free",
@@ -1063,6 +1080,7 @@
           "required": [
             "id",
             "locked",
+            "visible",
             "writeMode",
             "data",
             "type"
@@ -1267,6 +1285,11 @@
                 "y"
               ],
               "additionalProperties": false
+            },
+            "visible": {
+              "default": true,
+              "description": "Whether the layer is visible on canvas and in export.",
+              "type": "boolean"
             },
             "writeMode": {
               "default": "free",
@@ -1307,6 +1330,7 @@
           "required": [
             "id",
             "locked",
+            "visible",
             "writeMode",
             "data",
             "type"
@@ -1511,6 +1535,11 @@
                 "y"
               ],
               "additionalProperties": false
+            },
+            "visible": {
+              "default": true,
+              "description": "Whether the layer is visible on canvas and in export.",
+              "type": "boolean"
             },
             "writeMode": {
               "default": "free",
@@ -1548,6 +1577,7 @@
           "required": [
             "id",
             "locked",
+            "visible",
             "writeMode",
             "data",
             "type"
@@ -1753,6 +1783,11 @@
               ],
               "additionalProperties": false
             },
+            "visible": {
+              "default": true,
+              "description": "Whether the layer is visible on canvas and in export.",
+              "type": "boolean"
+            },
             "writeMode": {
               "default": "free",
               "description": "Template write permission mode.",
@@ -1775,6 +1810,7 @@
           "required": [
             "id",
             "locked",
+            "visible",
             "writeMode",
             "data",
             "type"

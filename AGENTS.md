@@ -17,10 +17,11 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | Document | Use when |
 | --- | --- |
 | [Architecture.md](Architecture.md) | Package boundaries, contribution flow, where code belongs |
+| [FEATURES.md](FEATURES.md) | Product capability matrix, Polotno gap tracking, what we should still offer |
 | [apps/docs/extension-guide.md](apps/docs/extension-guide.md) | Plugin author API, contribution kinds |
 | [packages/canvas/README.md](packages/canvas/README.md) | Canvas OSS install and `CanvasBasicsPlugin` |
 
-Read **Architecture.md** before placing new code.
+Read **Architecture.md** before placing new code. Update **FEATURES.md** when adding or removing a user-facing editor capability.
 
 ## Package placement (hard rules)
 
@@ -128,3 +129,4 @@ OSS packages publish to npm as `@openenvx/*`. See [README.md](README.md) and the
 - [ ] No `I`-prefixed interface or type alias names
 - [ ] No backward-compat shims for removed APIs
 - [ ] Architecture or extension docs updated if you changed package boundaries or plugin APIs
+- [ ] [FEATURES.md](FEATURES.md) updated if you added, removed, or materially changed a user-facing editor capability

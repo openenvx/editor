@@ -113,6 +113,8 @@ function buildView(
         lockedCommandId: treeItem.lockedCommandId,
         source: node,
         tooltip: treeItem.tooltip,
+        visible: treeItem.visible,
+        visibilityCommandId: treeItem.visibilityCommandId,
       });
       if (childrenResult.length > 0) {
         walk(childrenResult, depth + 1);

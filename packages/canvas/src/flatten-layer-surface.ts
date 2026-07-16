@@ -38,6 +38,9 @@ export function flattenStageLayers(
   const parent = parentTransform ?? createDefaultTransform();
   const result: FlattenedStageLayer[] = [];
   for (const layer of layers) {
+    if (layer.layer.visible === false) {
+      continue;
+    }
     const layerTransform = layer.layer.transform ?? createDefaultTransform();
     const absoluteTransform = composeTransforms(parent, layerTransform);
     result.push({ ...layer, absoluteTransform });

@@ -14,6 +14,9 @@ export interface TreeItem {
   locked?: boolean;
   tooltip?: string;
   lockedCommandId?: string;
+  /** When false, the row is dimmed (layer hidden). Absent/true = visible. */
+  visible?: boolean;
+  visibilityCommandId?: string;
 }
 
 export abstract class TreeDataProvider<TNode> {

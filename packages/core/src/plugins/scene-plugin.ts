@@ -8,6 +8,7 @@ import {
   canReorderLayer,
   isLayerEditable,
   isLayerLocked,
+  isLayerVisible,
 } from '../scene/layer-editability';
 import {
   findLayerById,
@@ -240,6 +241,53 @@ export class ToggleLayerLockCommand extends Command {
   }
 }
 
+export class ToggleLayerVisibilityCommand extends Command {
+  readonly id = 'scene.toggleLayerVisibility';
+
+  canExecute(ctx: CommandContext): boolean {
+    const id = ctx.selection.primaryLayerId;
+    if (!id) {
+      return false;
+    }
+    const scene = ctx.scene.getScene();
+    const layer = findLayerById(scene, id);
+    return layer ? isLayerEditable(layer) : false;
+  }
+
+  execute(ctx: CommandContext): void {
+    const id = ctx.selection.primaryLayerId;
+    if (!id) {
+      return;
+    }
+    const scene = ctx.scene.getScene();
+    const layer = findLayerById(scene, id);
+    if (!layer || !isLayerEditable(layer)) {
+      return;
+    }
+    const nextVisible = !isLayerVisible(layer);
+    ctx.scene.apply({
+      apply: (currentScene) => ({
+        ...currentScene,
+        pages: currentScene.pages.map((page) => ({
+          ...page,
+          layers: updateLayerInTree(page.layers, id, (l) => ({
+            ...l,
+            visible: nextVisible,
+          })),
+        })),
+      }),
+      label: nextVisible ? 'Show layer' : 'Hide layer',
+    });
+    if (!nextVisible) {
+      const selection = ctx.scene.getSelection();
+      const remaining = selection.selectedLayerIds.filter(
+        (selectedId) => selectedId !== id
+      );
+      ctx.scene.selectLayers(remaining, remaining[0] ?? null);
+    }
+  }
+}
+
 class UndoShortcut extends ShortcutContribution {
   readonly keybinding = 'Mod+Z';
   readonly commandId = 'scene.undo';
@@ -278,6 +326,7 @@ export class ScenePlugin extends Plugin {
       new MoveDownCommand(),
       new MoveLayerCommand(),
       new ToggleLayerLockCommand(),
+      new ToggleLayerVisibilityCommand(),
       new UndoShortcut(),
       new RedoShortcut(),
       new MoveUpShortcut(),

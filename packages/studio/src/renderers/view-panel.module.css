@@ -134,6 +134,10 @@
   cursor: not-allowed;
 }
 
+.treeItemHidden {
+  opacity: 0.55;
+}
+
 .treeLockButton {
   display: inline-flex;
   align-items: center;

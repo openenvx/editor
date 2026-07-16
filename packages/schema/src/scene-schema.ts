@@ -64,6 +64,10 @@ function build(o: typeof z.object) {
     locked: z.boolean().default(false).describe('Whether the layer is locked.'),
     style: layerStyle.optional().describe('Visual style overrides.'),
     transform: transform.optional().describe('Absolute transform box.'),
+    visible: z
+      .boolean()
+      .default(true)
+      .describe('Whether the layer is visible on canvas and in export.'),
     writeMode: z
       .enum(['locked', 'free', 'content', 'properties'])
       .default('free')

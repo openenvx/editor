@@ -61,7 +61,7 @@ describe('canvas-stage-selectors', () => {
     });
 
     expect(
-      selectLayerSlice(snapshot, 'layer-1', base, undefined, null, true)
+      selectLayerSlice(snapshot, 'layer-1', base, undefined, null, true, true)
     ).toEqual({
       draggable: true,
       hideContent: false,
@@ -77,9 +77,31 @@ describe('canvas-stage-selectors', () => {
     });
 
     expect(
-      selectLayerSlice(snapshot, 'layer-1', base, undefined, null, true)
+      selectLayerSlice(snapshot, 'layer-1', base, undefined, null, true, true)
     ).toMatchObject({
       draggable: false,
+    });
+  });
+
+  it('selectLayerSlice hides non-visible layers', () => {
+    const base = createDefaultTransform();
+    const snapshot = createCanvasStageSnapshot({
+      mode: { type: 'idle' },
+    });
+
+    expect(
+      selectLayerSlice(
+        snapshot,
+        'layer-1',
+        base,
+        undefined,
+        null,
+        true,
+        false
+      )
+    ).toMatchObject({
+      draggable: false,
+      visible: false,
     });
   });
 });

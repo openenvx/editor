@@ -13,6 +13,7 @@ import {
   MoveLayerCommand,
   MoveUpCommand,
   ToggleLayerLockCommand,
+  ToggleLayerVisibilityCommand,
 } from './scene-plugin';
 
 function createScene(layers: Layer[]) {
@@ -212,5 +213,37 @@ describe('ScenePlugin toggle layer lock command', () => {
     expect(ctx.scene.getScene().pages[0]!.layers[0]!.locked).toBe(true);
     toggleLock.execute(ctx);
     expect(ctx.scene.getScene().pages[0]!.layers[0]!.locked).toBe(false);
+  });
+});
+
+describe('ScenePlugin toggle layer visibility command', () => {
+  const toggleVisibility = new ToggleLayerVisibilityCommand();
+
+  it('cannot execute when no layer is selected', () => {
+    const ctx = createContext([createLayer('a')], []);
+    expect(toggleVisibility.canExecute(ctx)).toBe(false);
+  });
+
+  it('cannot execute when selected layer is config-locked', () => {
+    const ctx = createContext([createLayer('a', 'locked')], ['a'], 'a');
+    expect(toggleVisibility.canExecute(ctx)).toBe(false);
+  });
+
+  it('hides the selected layer and clears it from selection', () => {
+    const ctx = createContext([createLayer('a'), createLayer('b')], ['a'], 'a');
+    expect(ctx.scene.getScene().pages[0]!.layers[0]!.visible).toBe(true);
+    toggleVisibility.execute(ctx);
+    expect(ctx.scene.getScene().pages[0]!.layers[0]!.visible).toBe(false);
+    expect(ctx.scene.getSelection().selectedLayerIds).toEqual([]);
+    expect(ctx.scene.getSelection().primaryLayerId).toBeNull();
+  });
+
+  it('shows a hidden layer when selected again', () => {
+    const layers = [createLayer('a'), createLayer('b')];
+    layers[0]!.visible = false;
+    const ctx = createContext(layers, ['a'], 'a');
+    toggleVisibility.execute(ctx);
+    expect(ctx.scene.getScene().pages[0]!.layers[0]!.visible).toBe(true);
+    expect(ctx.scene.getSelection().primaryLayerId).toBe('a');
   });
 });

@@ -72,6 +72,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
   const interaction = getInteraction(canvasLayerInteractions, view.kind);
   const layerWritable = canTransformLayer(layer);
   const layerSelectable = canSelectLayer(layer);
+  const layerVisible = layer.visible !== false;
 
   const slice = useStoreSelector(
     runtime,
@@ -82,7 +83,8 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
         baseTransform,
         interaction,
         editingLayerId,
-        layerWritable
+        layerWritable,
+        layerVisible
       ),
     shallowSliceEqual
   );
@@ -222,7 +224,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
       draggable={draggable}
       height={transform.height}
       key={layer.id}
-      listening={true}
+      listening={layerVisible}
       name={layer.id}
       onClick={handleClick}
       onContextMenu={handleContextMenu}

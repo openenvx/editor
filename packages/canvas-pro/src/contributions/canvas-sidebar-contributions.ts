@@ -2,6 +2,7 @@ import {
   getContainerChildren,
   isLayerEditable,
   isLayerLocked,
+  isLayerVisible,
   isLayerWritable,
   localize,
   moveLayerRelativeToTarget,
@@ -67,6 +68,7 @@ export class CanvasLayersTreeProvider extends TreeDataProvider<Layer> {
     const definition = layers?.get(node.type);
     const configLocked = !isLayerEditable(node);
     const runtimeLocked = isLayerLocked(node);
+    const layerVisible = isLayerVisible(node);
     const tooltip = configLocked
       ? 'This layer cannot be edited from the editor'
       : runtimeLocked
@@ -79,6 +81,10 @@ export class CanvasLayersTreeProvider extends TreeDataProvider<Layer> {
       locked: configLocked || runtimeLocked,
       lockedCommandId: configLocked ? undefined : 'scene.toggleLayerLock',
       tooltip,
+      visible: layerVisible,
+      visibilityCommandId: configLocked
+        ? undefined
+        : 'scene.toggleLayerVisibility',
     };
   }
 

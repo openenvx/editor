@@ -27,6 +27,9 @@ export function flattenLayersForExport(
   const result: FlattenedExportLayer[] = [];
 
   for (const layer of layers) {
+    if (layer.visible === false) {
+      continue;
+    }
     const layerTransform = layer.transform ?? createDefaultTransform();
     const absoluteTransform = composeTransforms(parent, layerTransform);
     const children = getLayerChildren(layer);

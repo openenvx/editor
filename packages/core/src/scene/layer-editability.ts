@@ -18,6 +18,10 @@ export function isLayerLocked(layer: Layer): boolean {
   return layer.locked === true;
 }
 
+export function isLayerVisible(layer: Layer): boolean {
+  return layer.visible !== false;
+}
+
 export function isLayerWritable(layer: Layer): boolean {
   return isLayerEditable(layer) && !isLayerLocked(layer);
 }

@@ -134,6 +134,8 @@ export interface LayerBase {
   style?: LayerStyle;
   writeMode?: LayerWriteMode;
   locked?: boolean;
+  /** When false, the layer is hidden on canvas and in export. Absent/true = visible. */
+  visible?: boolean;
 }
 
 export interface CanvasRectLayer extends LayerBase {

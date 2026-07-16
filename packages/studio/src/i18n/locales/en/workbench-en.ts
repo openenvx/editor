@@ -54,6 +54,8 @@ export default {
   'property.alignRight': 'Right',
   'layer.unlock': 'Unlock layer',
   'layer.lock': 'Lock layer',
+  'layer.hide': 'Hide layer',
+  'layer.show': 'Show layer',
   'theme.light': 'Light',
   'theme.dark': 'Dark',
   'locale.en': 'English',

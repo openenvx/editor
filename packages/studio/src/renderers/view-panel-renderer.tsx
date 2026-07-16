@@ -4,7 +4,7 @@ import type {
   ViewDescriptor,
   ViewTreeItem,
 } from '@openenvx/headless';
-import { Lock, LockOpen } from 'lucide-react';
+import { Eye, EyeOff, Lock, LockOpen } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
@@ -19,6 +19,7 @@ import { PanelSection } from '../primitives/panel-section';
 import { Tooltip } from '../primitives/tooltip';
 import { TreeDndList } from './tree-dnd-list';
 import { treePaddingLeft } from './tree-dnd-utils';
+import { treeItemClassName } from './tree-item-class-name';
 
 import styles from './view-panel.module.css';
 
@@ -71,6 +72,44 @@ function LockButton({
   );
 }
 
+function VisibilityButton({
+  item,
+  onSelect,
+  onToggle,
+}: {
+  item: ViewTreeItem;
+  onSelect: () => void;
+  onToggle: () => void;
+}) {
+  const { t } = useWorkbenchTranslation();
+  if (!item.visibilityCommandId) {
+    return null;
+  }
+  const isVisible = item.visible !== false;
+  const Icon = isVisible ? Eye : EyeOff;
+  const tooltip = isVisible ? t('layer.hide') : t('layer.show');
+  return (
+    <Tooltip content={tooltip} side="top" align="center">
+      <button
+        aria-label={tooltip}
+        className={
+          isVisible
+            ? styles.treeLockButton
+            : `${styles.treeLockButton} ${styles.treeLockButtonVisible}`
+        }
+        onClick={(event) => {
+          event.stopPropagation();
+          onSelect();
+          onToggle();
+        }}
+        type="button"
+      >
+        <Icon aria-hidden className={styles.treeItemTrailing} size={12} />
+      </button>
+    </Tooltip>
+  );
+}
+
 function isItemVisible(
   items: ViewTreeItem[],
   index: number,
@@ -102,6 +141,7 @@ function StaticTreeRow({
   onSelect,
   onToggleCollapsed,
   onToggleLock,
+  onToggleVisibility,
   onHover,
 }: {
   item: ViewTreeItem;
@@ -111,20 +151,12 @@ function StaticTreeRow({
   onSelect: () => void;
   onToggleCollapsed: () => void;
   onToggleLock?: () => void;
+  onToggleVisibility?: () => void;
   onHover?: () => void;
 }) {
-  const className = [
-    styles.treeItem,
-    isSelected ? styles.treeItemSelected : '',
-    isHovered ? styles.treeItemHovered : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
   return (
     <div
-      className={
-        item.locked ? `${className} ${styles.treeItemLocked}` : className
-      }
+      className={treeItemClassName(item, { isHovered, isSelected })}
       onContextMenu={() => {
         onSelect();
       }}
@@ -155,6 +187,11 @@ function StaticTreeRow({
       >
         {item.label}
       </button>
+      <VisibilityButton
+        item={item}
+        onSelect={onSelect}
+        onToggle={() => onToggleVisibility?.()}
+      />
       <LockButton
         item={item}
         onSelect={onSelect}
@@ -256,6 +293,15 @@ function ViewPanelBody({
         >
           {item.label}
         </button>
+        <VisibilityButton
+          item={item}
+          onSelect={onSelect}
+          onToggle={() => {
+            if (item.visibilityCommandId) {
+              void api.executeCommand(item.visibilityCommandId);
+            }
+          }}
+        />
         <LockButton
           item={item}
           onSelect={onSelect}
@@ -313,6 +359,11 @@ function ViewPanelBody({
             onToggleLock={() => {
               if (item.lockedCommandId) {
                 void api.executeCommand(item.lockedCommandId);
+              }
+            }}
+            onToggleVisibility={() => {
+              if (item.visibilityCommandId) {
+                void api.executeCommand(item.visibilityCommandId);
               }
             }}
           />
