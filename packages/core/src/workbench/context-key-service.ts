@@ -59,6 +59,7 @@ export class ContextKeyService {
 
     set('scene.layerSelected', selectedLayerIds.length > 0);
     set('scene.multiSelect', selectedLayerIds.length > 1);
+    set('scene.multiPage', input.scene.pages.length > 1);
     set('page.layout', page.layout);
     set('page.layoutAbsolute', page.layout === 'absolute');
     set('page.layoutFlow', page.layout === 'flow');

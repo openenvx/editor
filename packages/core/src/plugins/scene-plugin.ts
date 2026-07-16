@@ -5,6 +5,7 @@ import type { PluginContext } from '../core/plugin-manager';
 import type { CommandContext } from '../runtime/types';
 import {
   canDeleteLayer,
+  canInsertLayers,
   canReorderLayer,
   isLayerEditable,
   isLayerLocked,
@@ -14,7 +15,15 @@ import {
   findLayerById,
   removeLayerFromTree,
   updateLayerInTree,
+  walkLayers,
 } from '../scene/layer-tree';
+import {
+  createBlankPageLike,
+  createPageId,
+  duplicatePageModel,
+  duplicatePageName,
+  nextPageName,
+} from '../scene/page-ops';
 import { reorderLayers, moveLayerToIndex } from '../scene/scene-store';
 import { getActivePage } from '../scene/types';
 
@@ -288,6 +297,123 @@ export class ToggleLayerVisibilityCommand extends Command {
   }
 }
 
+export class AddPageCommand extends Command {
+  readonly id = 'scene.addPage';
+
+  canExecute(ctx: CommandContext): boolean {
+    return canInsertLayers(ctx.scene.getScene());
+  }
+
+  execute(ctx: CommandContext): void {
+    if (!this.canExecute(ctx)) {
+      return;
+    }
+    const source = ctx.scene.getActivePage();
+    const pages = ctx.scene.getScene().pages;
+    const newId = createPageId();
+    const page = createBlankPageLike(
+      source,
+      newId,
+      nextPageName(pages.map((p) => p.name))
+    );
+    ctx.scene.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: [...scene.pages, page],
+      }),
+      activePageId: newId,
+      label: 'Add page',
+    });
+  }
+}
+
+export class RemovePageCommand extends Command {
+  readonly id = 'scene.removePage';
+
+  canExecute(ctx: CommandContext): boolean {
+    const scene = ctx.scene.getScene();
+    if (scene.pages.length <= 1) {
+      return false;
+    }
+    if (scene.templatePolicy?.allowDeleteLayers === false) {
+      return false;
+    }
+    const page = ctx.scene.getActivePage();
+    let allowed = true;
+    walkLayers(page.layers, (layer) => {
+      if (!canDeleteLayer(layer, scene)) {
+        allowed = false;
+      }
+    });
+    return allowed;
+  }
+
+  execute(ctx: CommandContext): void {
+    if (!this.canExecute(ctx)) {
+      return;
+    }
+    const scene = ctx.scene.getScene();
+    const activePageId = ctx.scene.getActivePageId();
+    const index = scene.pages.findIndex((p) => p.id === activePageId);
+    if (index === -1) {
+      return;
+    }
+    const neighbor = scene.pages[index - 1] ?? scene.pages[index + 1];
+    if (!neighbor) {
+      return;
+    }
+    ctx.scene.apply({
+      apply: (current) => ({
+        ...current,
+        pages: current.pages.filter((p) => p.id !== activePageId),
+      }),
+      activePageId: neighbor.id,
+      label: 'Delete page',
+    });
+  }
+}
+
+export class DuplicatePageCommand extends Command {
+  readonly id = 'scene.duplicatePage';
+
+  canExecute(ctx: CommandContext): boolean {
+    const scene = ctx.scene.getScene();
+    if (!canInsertLayers(scene)) {
+      return false;
+    }
+    if (scene.templatePolicy?.allowDuplicateLayers === false) {
+      return false;
+    }
+    return true;
+  }
+
+  execute(ctx: CommandContext): void {
+    if (!this.canExecute(ctx)) {
+      return;
+    }
+    const source = ctx.scene.getActivePage();
+    const newId = createPageId();
+    const page = duplicatePageModel(
+      source,
+      newId,
+      duplicatePageName(source.name)
+    );
+    ctx.scene.apply({
+      apply: (scene) => {
+        const index = scene.pages.findIndex((p) => p.id === source.id);
+        if (index === -1) {
+          return { ...scene, pages: [...scene.pages, page] };
+        }
+        const pages = [...scene.pages];
+        pages.splice(index + 1, 0, page);
+        return { ...scene, pages };
+      },
+      activePageId: newId,
+      label: 'Duplicate page',
+    });
+  }
+}
+
 class UndoShortcut extends ShortcutContribution {
   readonly keybinding = 'Mod+Z';
   readonly commandId = 'scene.undo';
@@ -327,6 +453,9 @@ export class ScenePlugin extends Plugin {
       new MoveLayerCommand(),
       new ToggleLayerLockCommand(),
       new ToggleLayerVisibilityCommand(),
+      new AddPageCommand(),
+      new RemovePageCommand(),
+      new DuplicatePageCommand(),
       new UndoShortcut(),
       new RedoShortcut(),
       new MoveUpShortcut(),

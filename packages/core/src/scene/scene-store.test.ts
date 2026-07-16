@@ -90,6 +90,34 @@ describe(SceneStore, () => {
     expect(store.getSelection().selectedLayerIds).toStrictEqual(["b"]);
     expect(store.getSelection().primaryLayerId).toBe("b");
   });
+
+  it("applies activePageId atomically with the scene transaction", () => {
+    const store = new SceneStore({
+      schemaVersion: 1,
+      pages: [
+        { id: "a", name: "A", layout: "flow", layers: [] },
+        { id: "b", name: "B", layout: "flow", layers: [] },
+        { id: "c", name: "C", layout: "flow", layers: [] },
+      ],
+    });
+    store.setActivePage("c");
+    const snapshots: string[] = [];
+    store.subscribe((snap) => {
+      snapshots.push(snap.editorState.activePageId);
+    });
+    snapshots.length = 0;
+    store.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: scene.pages.filter((p) => p.id !== "c"),
+      }),
+      activePageId: "b",
+      label: "Delete page",
+    });
+    expect(snapshots).toStrictEqual(["b"]);
+    expect(store.getActivePageId()).toBe("b");
+    expect(store.getScene().pages.map((p) => p.id)).toStrictEqual(["a", "b"]);
+  });
 });
 
 describe(moveLayerToIndex, () => {

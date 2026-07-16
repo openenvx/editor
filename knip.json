@@ -47,8 +47,15 @@
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "packages/studio": {
-      "entry": ["src/index.ts!"],
-      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts", "!src/**/*.test.tsx"]
+      "entry": ["src/index.ts!", "tsup.config.ts", "build-dts.ts"],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "tsup.config.ts",
+        "build-dts.ts",
+        "!src/**/*.test.ts",
+        "!src/**/*.test.tsx"
+      ],
+      "ignoreDependencies": ["zod"]
     },
     "packages/canvas-pro": {
       "entry": ["src/index.ts!"],

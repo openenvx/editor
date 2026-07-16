@@ -27,6 +27,23 @@ describe('clone-layers-for-paste', () => {
     expect(cloned[0]!.transform?.x).toBe(0);
   });
 
+  it('remaps nested group children ids', () => {
+    const layers: Layer[] = [
+      {
+        id: 'group-1',
+        type: 'canvas.group',
+        data: {
+          children: [makeLayer('child-1', 0, 0, 10, 10)],
+        },
+        transform: createDefaultTransform(),
+      },
+    ];
+    const cloned = cloneLayers(layers);
+    const children = (cloned[0]!.data as { children: Layer[] }).children;
+    expect(cloned[0]!.id).not.toBe('group-1');
+    expect(children[0]!.id).not.toBe('child-1');
+  });
+
   it('computes bounding box across layers', () => {
     const layers = [
       makeLayer('a', 10, 20, 100, 50),

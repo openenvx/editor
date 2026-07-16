@@ -7,5 +7,16 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@openenvx/typescript-config"]
+  "ignore": [
+    "@openenvx/typescript-config",
+    "@openenvx/schema",
+    "@openenvx/preview",
+    "@openenvx/core",
+    "@openenvx/headless",
+    "@openenvx/canvas",
+    "@openenvx/driver-image",
+    "@xmazu/openenvxee-canvas-pro",
+    "@openenvx/agent",
+    "@openenvxee/registry-contract"
+  ]
 }

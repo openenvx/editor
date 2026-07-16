@@ -170,7 +170,19 @@ export class SceneStore {
     const snapshot = this.getSnapshot();
     this.history.push(snapshot);
     this.scene = normalizeScene(transaction.apply(cloneScene(this.scene)));
-    this.syncEditorStateToScene();
+    if (transaction.activePageId) {
+      this.editorState = normalizeEditorState(
+        {
+          activePageId: transaction.activePageId,
+          primaryLayerId: null,
+          selectedLayerIds: [],
+        },
+        this.scene.pages[0]!.id,
+        this.scene
+      );
+    } else {
+      this.syncEditorStateToScene();
+    }
     this.bumpContentRevision();
     this.notify();
   }

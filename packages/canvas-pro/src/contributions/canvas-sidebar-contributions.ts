@@ -6,6 +6,7 @@ import {
   isLayerWritable,
   localize,
   moveLayerRelativeToTarget,
+  movePageRelativeToTarget,
   LayerRegistryServiceId,
 } from '@openenvx/core';
 import type { CommandContext, Layer } from '@openenvx/core';
@@ -35,18 +36,36 @@ export class CanvasPagesTreeProvider extends TreeDataProvider<Page> {
   }
 
   onSelect(page: Page, ctx: CommandContext): void {
+    ctx.scene.setActivePage(page.id);
+  }
+
+  canMove(
+    source: Page,
+    target: Page,
+    position: 'before' | 'after' | 'inside'
+  ): boolean {
+    return source.id !== target.id && position !== 'inside';
+  }
+
+  handleMove(
+    source: Page,
+    target: Page,
+    position: 'before' | 'after' | 'inside',
+    ctx: CommandContext
+  ): void {
+    const effectivePosition = position === 'inside' ? 'after' : position;
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        activePageId: page.id,
-        selection: {
-          activePageId: page.id,
-          primaryLayerId: null,
-          selectedLayerIds: [],
-        },
+        pages: movePageRelativeToTarget(
+          scene.pages,
+          source.id,
+          target.id,
+          effectivePosition
+        ),
       }),
-      label: localize(ctx.services, 'canvas.history.selectPage', {
-        defaultValue: 'Select page',
+      label: localize(ctx.services, 'canvas.history.reorderPage', {
+        defaultValue: 'Reorder page',
       }),
     });
   }

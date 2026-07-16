@@ -149,8 +149,8 @@ export class WorkbenchStateCache {
   }
 
   assemble(
-    revision: number,
-    layout: WorkbenchLayout,
+    _revision: number,
+    _layout: WorkbenchLayout,
     builders: SliceBuilders
   ): {
     scene: SceneSlice;

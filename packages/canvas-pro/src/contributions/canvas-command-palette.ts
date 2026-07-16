@@ -41,5 +41,22 @@ export class CanvasCommandPaletteItems extends CommandPaletteContribution {
       .tab('assets')
       .keywords('import', 'file');
     builder.item('canvas.pasteExternal').hide();
+
+    builder
+      .item('scene.addPage')
+      .label(ctx.t('canvas.command.addPage', 'Add page'))
+      .category('canvas')
+      .keywords('page', 'new');
+    builder
+      .item('scene.duplicatePage')
+      .label(ctx.t('canvas.command.duplicatePage', 'Duplicate page'))
+      .category('canvas')
+      .keywords('page', 'copy');
+    builder
+      .item('scene.removePage')
+      .label(ctx.t('canvas.command.removePage', 'Delete page'))
+      .category('canvas')
+      .keywords('page', 'delete')
+      .when('scene.multiPage');
   }
 }

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Page } from "./types";
 import {
+  cloneLayerTree,
   getLayerAncestorIds,
   isLayerDescendant,
   moveLayerRelativeToTarget,
@@ -99,5 +100,30 @@ describe("layer-tree", () => {
     const child = (groupLayer?.data as { children: Layer[] } | undefined)
       ?.children[0];
     expect(child?.data).toStrictEqual({ fill: "#fff" });
+  });
+
+  it("cloneLayerTree remaps ids including nested children", () => {
+    const groupLayers: Layer[] = [
+      {
+        data: {
+          children: [
+            {
+              id: "child-1",
+              type: "canvas.rect",
+              data: { fill: "#000" },
+            },
+          ],
+        },
+        id: "group-1",
+        type: "canvas.group",
+      },
+    ];
+    const cloned = cloneLayerTree(groupLayers);
+    expect(cloned).toHaveLength(1);
+    expect(cloned[0]!.id).not.toBe("group-1");
+    const children = (cloned[0]!.data as { children: Layer[] }).children;
+    expect(children).toHaveLength(1);
+    expect(children[0]!.id).not.toBe("child-1");
+    expect(children[0]!.data).toStrictEqual({ fill: "#000" });
   });
 });

@@ -31,5 +31,17 @@ export class CanvasContextMenu extends ContextMenuContribution {
       .item('canvas.resetImageCrop')
       .label(ctx.t('canvas.command.resetImageCrop', 'Reset crop'))
       .when('scene.layerSelected');
+    builder
+      .item('scene.addPage')
+      .label(ctx.t('canvas.command.addPage', 'Add page'))
+      .when('!scene.layerSelected');
+    builder
+      .item('scene.duplicatePage')
+      .label(ctx.t('canvas.command.duplicatePage', 'Duplicate page'))
+      .when('!scene.layerSelected');
+    builder
+      .item('scene.removePage')
+      .label(ctx.t('canvas.command.removePage', 'Delete page'))
+      .when('!scene.layerSelected && scene.multiPage');
   }
 }

@@ -24,6 +24,12 @@ export interface SceneSnapshot {
 export interface SceneTransaction {
   label: string;
   apply(scene: Scene): Scene;
+  /**
+   * When set, editor focus switches to this page in the same history step
+   * (clears layer selection). Avoids an intermediate notify from a follow-up
+   * `setActivePage` after content mutation.
+   */
+  activePageId?: string;
 }
 
 export function cloneScene(scene: Scene): Scene {

@@ -3,6 +3,14 @@
   "include": ["src", "../typescript-config/css-modules.d.ts"],
   "compilerOptions": {
     "jsx": "react-jsx",
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "paths": {
+      "@openenvx/core": ["../core/src/index.ts"],
+      "@openenvx/headless": ["../headless/src/index.ts"],
+      "@openenvx/headless/react": ["../headless/src/react/workbench-context.tsx"],
+      "@openenvx/schema": ["../schema/src/index.ts"],
+      "@openenvx/preview": ["../preview/src/index.ts"]
+    }
   }
 }

@@ -19,7 +19,7 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | [Architecture.md](Architecture.md) | Package boundaries, contribution flow, where code belongs |
 | [FEATURES.md](FEATURES.md) | Product capability matrix, Polotno gap tracking, what we should still offer |
 | [apps/docs/extension-guide.md](apps/docs/extension-guide.md) | Plugin author API, contribution kinds |
-| [packages/canvas/README.md](packages/canvas/README.md) | Canvas OSS install and `CanvasBasicsPlugin` |
+| [packages/canvas/README.md](packages/canvas/README.md) | Canvas install and `CanvasBasicsPlugin` |
 
 Read **Architecture.md** before placing new code. Update **FEATURES.md** when adding or removing a user-facing editor capability.
 
@@ -42,9 +42,11 @@ Read **Architecture.md** before placing new code. Update **FEATURES.md** when ad
 | Use `CanvasEditor` + `CanvasHostProvider` in the app shell | Put workbench-aware editor pane wiring in `@openenvx/canvas` |
 | Use `CanvasBasicsPlugin` for built-in canvas engine features | Create app-only canvas plugins without registering contributions |
 
-## Licensing intent
+## Licensing / publishing intent
 
-`core`, `headless`, `canvas`, and drivers are **OSS (MIT)**.
+Internal workspace libraries (`core`, `headless`, `schema`, `preview`, `canvas`, `driver-image`, …) are **private** and not published. Their `exports` use **TypeScript `src/` for runtime** (`import` / `development`) so Vite/Bun apps hot-reload without rebuilding, and **`dist/*.d.ts` for `types`** so Node services (`tsc`) do not typecheck browser source.
+
+Only **`@xmazu/openenvxee-studio`** is published; its build bundles the `@openenvx/*` workspace packages it needs into `dist`. Locally, studio’s `exports` include a `development` condition that resolves to `src/` so the demo can HMR studio too.
 
 ## Code conventions
 
@@ -119,7 +121,7 @@ bun run changeset     # create a release changeset
 
 ## Publishing
 
-OSS packages publish to npm as `@openenvx/*`. See [README.md](README.md) and the `publish-packages` script in root `package.json`.
+Only `packages/studio` (`@xmazu/openenvxee-studio`) is published (private registry via `publishConfig`). See [README.md](README.md) and the `publish-packages` script in root `package.json`.
 
 ## Before you finish
 

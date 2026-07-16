@@ -49,7 +49,7 @@ function applyBoxToNode(
 }
 
 function toLiveTransform(
-  session: ImageCropSession,
+  _session: ImageCropSession,
   box: {
     height: number;
     rotation: number;

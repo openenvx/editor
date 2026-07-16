@@ -29,7 +29,7 @@ Baseline competitor: [Polotno SDK](https://polotno.com/) drag-and-drop canvas (z
 | Layers panel (organize / reorder / lock / hide) | **Done** | Pro UI + OSS model | `packages/schema` (`visible`), `packages/core/src/plugins/scene-plugin.ts` (`scene.toggleLayerLock`, `scene.toggleLayerVisibility`), `packages/canvas-pro` layers panel, canvas stage + export skip hidden | Reorder, lock, and hide/show with schema `visible`. Hidden layers are non-interactive and omitted from export. |
 | Snap to grid / guides / alignment | **Partial** | Pro | `packages/canvas-pro/src/snap/smart-guides/`, `packages/canvas-pro/src/stage/smart-guides-stage-interaction.ts`, `packages/canvas-pro/src/commands/align-layers-commands.ts` | Smart guides + align/distribute: yes. **Snap-to-grid: no. User-placed guides: no.** |
 | Grid controls | **Missing** | — | Studio has toolbar i18n/icon stubs only (`packages/studio`) | No canvas grid overlay, grid size setting, or snap-to-grid. |
-| Multi-page / artboards | **Partial** | OSS model + Pro UI | `packages/schema` (`Scene.pages`), `packages/core/src/scene/scene-store.ts` (`setActivePage`), `packages/canvas-pro` Pages sidebar | Multi-page document + switch page: yes. **Add / delete / duplicate page commands: missing.** |
+| Multi-page / artboards | **Done** | OSS model + Pro UI | `packages/schema` (`Scene.pages`), `packages/core` (`setActivePage`, `scene.addPage` / `removePage` / `duplicatePage`), `packages/canvas-pro` Pages sidebar | Multi-page document, switch page, add / delete / duplicate / drag-reorder. Page rename UI not first-class. |
 | Bleed and trim | **Partial** | OSS overlay | `packages/canvas/src/page-margins.ts` (`PRINT_MARGIN_MM = 10`), canvas-pro page margin overlay | Fixed 10 mm safe/print margin. **No bleed, trim marks, or crop-mark export.** |
 | Rulers and measurements | **Partial** | OSS + Pro | `packages/canvas/src/hooks/use-selection-label.ts`, canvas-pro inspector panes (x/y/w/h/rotate) | Selection size label + numeric inspector. **No rulers.** |
 | Undo / redo history | **Done** | OSS | `packages/core/src/scene/history-stack.ts`, `packages/core/src/scene/scene-store.ts`, `packages/core/src/plugins/scene-plugin.ts` (`scene.undo` / `scene.redo`) | Snapshot history (depth 100). |
@@ -58,7 +58,7 @@ OpenEnvx should not stop at parity. These are existing or planned edges.
 
 | Differentiator | Status | Target packages | Notes |
 | --- | --- | --- | --- |
-| Full page CRUD UX | **Planned** | `packages/core`, `packages/canvas-pro` | Add / delete / duplicate / reorder pages as first-class commands + UI. |
+| Full page CRUD UX | **Done** | `packages/core`, `packages/canvas-pro` | Add / delete / duplicate / reorder pages as first-class commands + Pages sidebar / palette / context menu. |
 | Layer visibility | **Done** | `packages/schema`, `packages/core`, canvas-pro layers UI, canvas stage, driver-image export | Schema `visible` + `scene.toggleLayerVisibility` + layers panel eye toggle; hidden layers skipped in render/export. |
 | Grid overlay + snap-to-grid | **Planned** | `packages/canvas` (+ pro chrome) | Configurable grid size; snap on/off; toolbar control. |
 | User guides + rulers | **Planned** | `packages/canvas`, `packages/canvas-pro` | Rulers, drag-out guides, measurement affordances. |
@@ -76,7 +76,7 @@ Gaps and differentiators grouped by priority. Implement in separate PRs; update 
 ### P0 — Polotno parity blockers for a credible design editor
 
 - ~~**Layer visibility**~~ **Done** — schema `visible`; `scene.toggleLayerVisibility`; canvas-pro eye toggle; stage + export skip hidden.
-- **Page CRUD** — `scene.addPage` / `removePage` / `duplicatePage` (and reorder) in `packages/core`; wire Pages sidebar actions in `packages/canvas-pro`.
+- ~~**Page CRUD**~~ **Done** — `scene.addPage` / `removePage` / `duplicatePage`; Pages sidebar select + drag reorder; palette / context menu.
 - **Grid overlay + snap-to-grid** — viewport grid drawing + snap math in `packages/canvas`; optional toolbar toggle in studio / canvas-pro.
 - **Rulers** — ruler chrome + cursor/position indicators in `packages/canvas` (or canvas-pro stage chrome).
 

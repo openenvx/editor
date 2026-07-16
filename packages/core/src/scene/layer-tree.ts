@@ -120,6 +120,28 @@ export function mapLayers(
   });
 }
 
+/** Create a stable layer id from a layer type stem. */
+export function createLayerId(type: string): string {
+  const stem = type.replace(/^canvas\./, '') || 'layer';
+  return `${stem}-${crypto.randomUUID()}`;
+}
+
+/** Deep-clone a layer tree, assigning new ids to every node (including nested children). */
+export function cloneLayerTree(layers: Layer[]): Layer[] {
+  return layers.map((layer) => {
+    const cloned = structuredClone(layer);
+    cloned.id = createLayerId(layer.type);
+    if (hasChildLayers(cloned)) {
+      const data = cloned.data as { children: Layer[] };
+      cloned.data = {
+        ...data,
+        children: cloneLayerTree(data.children ?? []),
+      };
+    }
+    return cloned;
+  });
+}
+
 export function updateLayerInTree(
   layers: Layer[],
   layerId: string,

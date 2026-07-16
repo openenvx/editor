@@ -4,22 +4,21 @@
   "description": "Headless OpenEnvx controller - subscribe to UI state without a UI framework",
   "license": "MIT",
   "type": "module",
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./react": {
+      "development": "./src/react/workbench-context.tsx",
       "types": "./dist/react/workbench-context.d.ts",
-      "import": "./dist/react/workbench-context.js",
-      "default": "./dist/react/workbench-context.js"
+      "import": "./src/react/workbench-context.tsx",
+      "default": "./src/react/workbench-context.tsx"
     }
   },
   "scripts": {
@@ -51,7 +50,5 @@
     "url": "https://github.com/openenvx/openenvx/issues"
   },
   "homepage": "https://openenvx.dev",
-  "publishConfig": {
-    "access": "public"
-  }
+  "private": true
 }

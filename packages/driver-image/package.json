@@ -4,17 +4,15 @@
   "description": "Image export driver placeholder for OpenEnvx",
   "license": "MIT",
   "type": "module",
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
     }
   },
   "scripts": {
@@ -43,7 +41,5 @@
     "url": "https://github.com/openenvx/openenvx/issues"
   },
   "homepage": "https://openenvx.dev",
-  "publishConfig": {
-    "access": "public"
-  }
+  "private": true
 }

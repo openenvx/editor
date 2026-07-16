@@ -20,6 +20,28 @@ describe("ContextKeyService", () => {
 
     expect(keys.evaluate("page.layoutFlow")).toBeTruthy();
     expect(keys.evaluate("scene.layerSelected")).toBeFalsy();
+    expect(keys.evaluate("scene.multiPage")).toBeFalsy();
     expect(keys.evaluate("page.layoutFlow && editor.hasActiveEditor")).toBeTruthy();
+  });
+
+  it("sets scene.multiPage when more than one page exists", () => {
+    const scene = normalizeScene({
+      pages: [
+        { id: "a", name: "A", layout: "flow", layers: [] },
+        { id: "b", name: "B", layout: "flow", layers: [] },
+      ],
+    });
+    const keys = createContextKeyService();
+    keys.syncSceneKeys({
+      hasActiveEditor: true,
+      isDirty: false,
+      scene,
+      selection: {
+        activePageId: "a",
+        primaryLayerId: null,
+        selectedLayerIds: [],
+      },
+    });
+    expect(keys.evaluate("scene.multiPage")).toBeTruthy();
   });
 });

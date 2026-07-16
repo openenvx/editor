@@ -1,17 +1,11 @@
+import { cloneLayerTree, createLayerId } from '@openenvx/core';
 import type { Layer } from '@openenvx/schema';
 import { createDefaultTransform } from '@openenvx/schema';
 
-export function createLayerId(type: string): string {
-  const stem = type.replace('canvas.', '') || 'layer';
-  return `${stem}-${crypto.randomUUID()}`;
-}
+export { createLayerId };
 
 export function cloneLayers(layers: Layer[]): Layer[] {
-  return layers.map((layer) => {
-    const cloned = structuredClone(layer);
-    cloned.id = createLayerId(layer.type);
-    return cloned;
-  });
+  return cloneLayerTree(layers);
 }
 
 export interface LayerBoundingBox {

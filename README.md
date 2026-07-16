@@ -10,9 +10,11 @@ Scene-first data model. VS Code-style plugin contributions. Compose only what yo
 
 ## What is OpenEnvx?
 
-OpenEnvx is an **open-source monorepo** for building opinionated visual editors - canvas, commands, inspector, and export drivers wired through a plugin host.
+OpenEnvx is a monorepo for building opinionated visual editors - canvas, commands, inspector, and export drivers wired through a plugin host.
 
 ### Packages
+
+Workspace libraries (private, not published — runtime `exports` → TypeScript `src/` for HMR; `types` → `dist/*.d.ts` for Node `tsc`):
 
 - **`@openenvx/schema`** - Scene document model and page presets
 - **`@openenvx/preview`** - DOM preview rendering for layer types
@@ -20,6 +22,10 @@ OpenEnvx is an **open-source monorepo** for building opinionated visual editors 
 - **`@openenvx/headless`** - `WorkbenchController` and headless editor runtime
 - **`@openenvx/canvas`** - Canvas engine, layers, Konva stage, TipTap rich text, `CanvasBasicsPlugin`
 - **`@openenvx/driver-image`** - PNG, SVG, and PDF export driver
+
+Published package:
+
+- **`@xmazu/openenvxee-studio`** - React workbench UI; bundles the `@openenvx/*` libraries it needs
 
 ---
 
@@ -39,4 +45,4 @@ OpenEnvx is an **open-source monorepo** for building opinionated visual editors 
 
 ---
 
-MIT License · [GitHub](https://github.com/openenvx/openenvx)
+[GitHub](https://github.com/openenvx/openenvx)

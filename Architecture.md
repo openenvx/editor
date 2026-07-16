@@ -2,12 +2,13 @@
 
 Package boundaries and contribution flow for the monorepo.
 
-## OSS client tiers
+## Client tiers (monorepo)
 
 | Tier | Packages | Who |
 | --- | --- | --- |
 | **Rendering-only** | `schema`, `canvas` | Embed `CanvasStage` in a custom React app with own state. No plugin host. |
 | **Editor backbone** | `core`, `headless`, optional `canvas`, `driver-*`, plugins | Full editor runtime (scene, commands, layers) with a **custom UI shell**. See `apps/demo-playground`. |
+| **Published product** | `studio` | Only published package; bundles needed `@openenvx/*` workspace libs into its `dist`. |
 
 **Hard rule:** All canvas code lives in `@openenvx/canvas`. Not in `core`.
 
@@ -25,11 +26,11 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 
 ## Package tiers
 
-| Tier | Packages | License (intent) | Responsibility |
+| Tier | Packages | License / publish (intent) | Responsibility |
 | --- | --- | --- | --- |
-| Foundation | `schema`, `preview`, `core` | OSS (MIT) | Scene model (Zod + JSON Schema), plugin host primitives (commands, layers, services, property field data) |
-| OSS product | `headless`, `canvas`, `driver-*` | OSS (MIT) | Workbench runtime, canvas engine, export drivers |
-| Enterprise | `canvas-pro`, `studio` | Proprietary | Workbench wiring for canvas, React shell renderers |
+| Foundation | `schema`, `preview`, `core` | Private (workspace) | Scene model (Zod + JSON Schema), plugin host primitives (commands, layers, services, property field data) |
+| Product libs | `headless`, `canvas`, `driver-*` | Private (workspace) | Workbench runtime, canvas engine, export drivers |
+| Published UI | `studio` (+ `canvas-pro` internal) | Proprietary; only `studio` published | React shell renderers; studio bundles inlined `@openenvx/*` deps |
 
 ## What belongs in `@openenvx/canvas`
 

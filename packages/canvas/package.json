@@ -4,61 +4,68 @@
   "description": "Canvas editor for OpenEnvx absolute layout pages",
   "license": "MIT",
   "type": "module",
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./document-export": {
+      "development": "./src/export/canvas-document-export-service.ts",
       "types": "./dist/export/canvas-document-export-service.d.ts",
-      "import": "./dist/export/canvas-document-export-service.js",
-      "default": "./dist/export/canvas-document-export-service.js"
+      "import": "./src/export/canvas-document-export-service.ts",
+      "default": "./src/export/canvas-document-export-service.ts"
     },
     "./export-bytes": {
+      "development": "./src/export/bytes-to-data-url.ts",
       "types": "./dist/export/bytes-to-data-url.d.ts",
-      "import": "./dist/export/bytes-to-data-url.js",
-      "default": "./dist/export/bytes-to-data-url.js"
+      "import": "./src/export/bytes-to-data-url.ts",
+      "default": "./src/export/bytes-to-data-url.ts"
     },
     "./export-layers": {
+      "development": "./src/export-layers.ts",
       "types": "./dist/export-layers.d.ts",
-      "import": "./dist/export-layers.js",
-      "default": "./dist/export-layers.js"
+      "import": "./src/export-layers.ts",
+      "default": "./src/export-layers.ts"
     },
     "./registry": {
+      "development": "./src/plugin/canvas-registry-service.ts",
       "types": "./dist/plugin/canvas-registry-service.d.ts",
-      "import": "./dist/plugin/canvas-registry-service.js",
-      "default": "./dist/plugin/canvas-registry-service.js"
+      "import": "./src/plugin/canvas-registry-service.ts",
+      "default": "./src/plugin/canvas-registry-service.ts"
     },
     "./contributions/layer-preview-renderer-contribution": {
+      "development": "./src/contributions/layer-preview-renderer-contribution.ts",
       "types": "./dist/contributions/layer-preview-renderer-contribution.d.ts",
-      "import": "./dist/contributions/layer-preview-renderer-contribution.js",
-      "default": "./dist/contributions/layer-preview-renderer-contribution.js"
+      "import": "./src/contributions/layer-preview-renderer-contribution.ts",
+      "default": "./src/contributions/layer-preview-renderer-contribution.ts"
     },
     "./artboard-offset": {
+      "development": "./src/artboard-offset.ts",
       "types": "./dist/artboard-offset.d.ts",
-      "import": "./dist/artboard-offset.js",
-      "default": "./dist/artboard-offset.js"
+      "import": "./src/artboard-offset.ts",
+      "default": "./src/artboard-offset.ts"
     },
     "./rich-text-layout": {
+      "development": "./src/rich-text-layout.ts",
       "types": "./dist/rich-text-layout.d.ts",
-      "import": "./dist/rich-text-layout.js",
-      "default": "./dist/rich-text-layout.js"
+      "import": "./src/rich-text-layout.ts",
+      "default": "./src/rich-text-layout.ts"
     },
     "./rich-text-typography": {
+      "development": "./src/rich-text-typography.ts",
       "types": "./dist/rich-text-typography.d.ts",
-      "import": "./dist/rich-text-typography.js",
-      "default": "./dist/rich-text-typography.js"
+      "import": "./src/rich-text-typography.ts",
+      "default": "./src/rich-text-typography.ts"
     },
     "./fonts.css": {
-      "import": "./dist/fonts.css",
-      "default": "./dist/fonts.css"
+      "development": "./src/fonts/fonts.css",
+      "import": "./src/fonts/fonts.css",
+      "default": "./src/fonts/fonts.css"
     }
   },
   "scripts": {
@@ -107,7 +114,5 @@
     "url": "https://github.com/openenvx/openenvx/issues"
   },
   "homepage": "https://openenvx.dev",
-  "publishConfig": {
-    "access": "public"
-  }
+  "private": true
 }

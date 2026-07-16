@@ -61,6 +61,8 @@ export { clampTransformSize, MIN_LAYER_SIZE } from './scene/transform-utils';
 export {
   CONTAINER_LAYER_TYPE,
   type ContainerLayoutModel,
+  cloneLayerTree,
+  createLayerId,
   findLayerById,
   findLayerPage,
   getLayerAncestorIds,
@@ -79,6 +81,12 @@ export {
   updateLayerInTree,
   walkLayers,
 } from './scene/layer-tree';
+export {
+  createBlankPageLike,
+  createPageId,
+  duplicatePageModel,
+  movePageRelativeToTarget,
+} from './scene/page-ops';
 
 export { CommandService } from './runtime/command-service';
 export type { CommandExecutionResult } from './runtime/command-result';
