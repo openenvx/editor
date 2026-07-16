@@ -29,6 +29,7 @@ import {
 import type { CanvasLayerInteractionRegistration } from '../registry/canvas-registry-types';
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
 import type {
+  CanvasGridSnapConfig,
   CanvasLayerTransformRef,
   CanvasRect,
   CanvasStageInteractionService,
@@ -38,6 +39,7 @@ export interface UseLayerTransformSessionInput {
   artboardHeight: number;
   artboardWidth: number;
   flattenedLayers: { layer: SceneLayer; view: LayerPreviewDescriptor }[];
+  getGridConfig: () => CanvasGridSnapConfig | null;
   getMarginInset: () => CanvasRect | null;
   getOtherLayers: (excludeIds: Set<string>) => CanvasLayerTransformRef[];
   getTransformModifiers: () => {
@@ -84,6 +86,7 @@ export function useLayerTransformSession({
   artboardHeight,
   artboardWidth,
   flattenedLayers,
+  getGridConfig,
   getMarginInset,
   getOtherLayers,
   getTransformModifiers,
@@ -275,6 +278,7 @@ export function useLayerTransformSession({
         anchor,
         artboard: { height: artboardHeight, width: artboardWidth },
         box: nextBox,
+        grid: getGridConfig(),
         marginInset: getMarginInset(),
         others: getOtherLayers(new Set(selectedLayerIdsRef.current)),
         zoom: vpZoom,
@@ -287,6 +291,7 @@ export function useLayerTransformSession({
     [
       artboardHeight,
       artboardWidth,
+      getGridConfig,
       getMarginInset,
       getOtherLayers,
       getTransformModifiers,

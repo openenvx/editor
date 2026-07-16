@@ -86,6 +86,12 @@ export class CanvasToolbarContribution extends ToolbarContribution {
         priority: 11,
       })
       .separator('canvas-toolbar-separator-2', { priority: 20 })
+      .command('canvas-toolbar-grid', {
+        commandId: 'canvas.toggleGrid',
+        icon: 'grid',
+        labelKey: 'toolbar.grid',
+        priority: 20,
+      })
       .dropdown('canvas-toolbar-zoom', {
         items: CANVAS_ZOOM_DROPDOWN_ITEMS,
         labelBinding: 'editorZoomPercent',

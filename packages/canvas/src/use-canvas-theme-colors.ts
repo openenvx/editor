@@ -6,6 +6,7 @@ export interface CanvasThemeColors {
   artboardBorder: string;
   artboardShadow: string;
   foreground: string;
+  grid: string;
   pageMargin: string;
   selection: string;
   selectionMuted: string;
@@ -17,6 +18,7 @@ const DEFAULT_COLORS: CanvasThemeColors = {
   artboardBorder: '#e5e7eb',
   artboardShadow: 'rgba(0, 0, 0, 0.35)',
   foreground: '#ffffff',
+  grid: 'rgba(0, 0, 0, 0.08)',
   pageMargin: '#a855f7',
   selection: '#3b82f6',
   selectionMuted: 'rgba(59, 130, 246, 0.75)',
@@ -37,6 +39,7 @@ function readCanvasThemeColors(element: Element): CanvasThemeColors {
       DEFAULT_COLORS.artboardShadow
     ),
     foreground: read('--wb-foreground', DEFAULT_COLORS.foreground),
+    grid: read('--wb-grid', DEFAULT_COLORS.grid),
     pageMargin: read('--wb-page-margin', DEFAULT_COLORS.pageMargin),
     selection: read('--wb-selection', DEFAULT_COLORS.selection),
     selectionMuted: read('--wb-selection-muted', DEFAULT_COLORS.selectionMuted),

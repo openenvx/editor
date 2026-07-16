@@ -4,6 +4,7 @@ import type { Page } from '@openenvx/schema';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useCanvasHost } from '../canvas-host-context';
+import { CanvasGridSettingsServiceId } from '../canvas-service-tokens';
 import { CanvasStage } from '../canvas-stage';
 import type {
   CanvasSelectLayerOptions,
@@ -15,6 +16,10 @@ import {
   flattenLayerSurface,
   findLayerSurfaceItem,
 } from '../flatten-layer-surface';
+import {
+  DEFAULT_CANVAS_GRID_SIZE,
+  type CanvasGridSettingsSnapshot,
+} from '../grid/canvas-grid-settings';
 import { useCanvasClipboardService } from '../hooks/use-canvas-clipboard-service';
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
 import {
@@ -134,9 +139,23 @@ export const CanvasEditor = memo(
     const [showMargins, setShowMargins] = useState(() =>
       defaultShowMarginsForPage(page)
     );
+    const [gridSettings, setGridSettings] =
+      useState<CanvasGridSettingsSnapshot>(() => ({
+        enabled: false,
+        size: DEFAULT_CANVAS_GRID_SIZE,
+      }));
     const [, setViewportTick] = useState(0);
 
     const pageMarginBounds = useMemo(() => computePageSafeBounds(page), [page]);
+    const gridService = host.getService(CanvasGridSettingsServiceId);
+
+    useEffect(() => {
+      if (!gridService) {
+        return;
+      }
+      setGridSettings(gridService.getSnapshot());
+      return gridService.subscribe(setGridSettings);
+    }, [gridService]);
 
     containerSizeRef.current = containerSize;
 
@@ -481,17 +500,39 @@ export const CanvasEditor = memo(
           role="application"
           tabIndex={-1}
         >
-          {pageMarginBounds ? (
-            <button
-              aria-pressed={showMargins}
-              className={
-                showMargins ? styles.marginToggleActive : styles.marginToggle
-              }
-              onClick={() => setShowMargins((current) => !current)}
-              type="button"
-            >
-              Margins
-            </button>
+          {gridService || pageMarginBounds ? (
+            <div className={styles.chromeToggles}>
+              {gridService ? (
+                <button
+                  aria-pressed={gridSettings.enabled}
+                  className={
+                    gridSettings.enabled
+                      ? styles.chromeToggleActive
+                      : styles.chromeToggle
+                  }
+                  onClick={() => {
+                    void host.executeCommand('canvas.toggleGrid');
+                  }}
+                  type="button"
+                >
+                  Grid
+                </button>
+              ) : null}
+              {pageMarginBounds ? (
+                <button
+                  aria-pressed={showMargins}
+                  className={
+                    showMargins
+                      ? styles.marginToggleActive
+                      : styles.marginToggle
+                  }
+                  onClick={() => setShowMargins((current) => !current)}
+                  type="button"
+                >
+                  Margins
+                </button>
+              ) : null}
+            </div>
           ) : null}
           <CanvasStage
             artboardHeight={artboardHeight}
@@ -503,6 +544,7 @@ export const CanvasEditor = memo(
             containerWidth={containerSize.width}
             editingLayerId={editingLayerId}
             fontLoadRevision={fontLoadRevision}
+            gridSize={gridSettings.size}
             hoveredLayerId={hoveredLayerId}
             layers={layerSurface}
             onHoverLayer={onHoverLayer}
@@ -513,6 +555,7 @@ export const CanvasEditor = memo(
             pageMarginBounds={pageMarginBounds}
             primaryLayerId={primaryLayerId}
             selectedLayerIds={selectedLayerIds}
+            showGrid={gridSettings.enabled}
             showMargins={showMargins}
             viewportController={viewport}
           />

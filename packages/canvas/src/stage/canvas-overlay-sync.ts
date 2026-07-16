@@ -46,6 +46,30 @@ export function syncCanvasOverlays(
       continue;
     }
 
+    if (primitive.kind === 'grid') {
+      const { height, size, width } = primitive;
+      group.add(
+        new Konva.Shape({
+          listening: false,
+          sceneFunc: (context, shape) => {
+            context.beginPath();
+            for (let x = 0; x <= width; x += size) {
+              context.moveTo(x, 0);
+              context.lineTo(x, height);
+            }
+            for (let y = 0; y <= height; y += size) {
+              context.moveTo(0, y);
+              context.lineTo(width, y);
+            }
+            context.strokeShape(shape);
+          },
+          stroke: theme.gridStroke,
+          strokeWidth: 1,
+        })
+      );
+      continue;
+    }
+
     const label = new Konva.Label({
       listening: false,
       x: primitive.x,

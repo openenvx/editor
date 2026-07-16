@@ -46,6 +46,8 @@ export function CanvasStage({
   editingLayerId = null,
   pageMarginBounds = null,
   showMargins = false,
+  showGrid = false,
+  gridSize = 8,
   onSelectLayer,
   onHoverLayer,
   onLayerDoubleClick,
@@ -75,6 +77,8 @@ export function CanvasStage({
     primaryLayerId,
     hoveredLayerId,
     showMargins,
+    showGrid,
+    gridSize,
     stageInteraction,
     viewportController,
   });
@@ -137,6 +141,7 @@ export function CanvasStage({
     }
     syncCanvasOverlays(group, overlayPrimitives, {
       foreground: themeColors.foreground,
+      gridStroke: themeColors.grid,
       guideStroke: themeColors.smartGuide,
       marginStroke: themeColors.pageMargin,
     });

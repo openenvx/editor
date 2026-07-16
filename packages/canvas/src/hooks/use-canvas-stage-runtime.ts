@@ -91,6 +91,8 @@ export function useCanvasStageRuntime(
     | 'editingLayerId'
     | 'pageMarginBounds'
     | 'showMargins'
+    | 'showGrid'
+    | 'gridSize'
     | 'onSelectLayer'
     | 'onHoverLayer'
     | 'onLayerDoubleClick'
@@ -113,6 +115,8 @@ export function useCanvasStageRuntime(
     editingLayerId = null,
     pageMarginBounds = null,
     showMargins = false,
+    showGrid = false,
+    gridSize = 8,
     onSelectLayer,
     onHoverLayer,
     onLayerDoubleClick,
@@ -200,6 +204,11 @@ export function useCanvasStageRuntime(
     [pageMarginBounds, showMargins]
   );
 
+  const getGridConfig = useCallback(
+    () => (showGrid ? { enabled: true as const, size: gridSize } : null),
+    [gridSize, showGrid]
+  );
+
   const getOtherLayers = useCallback(
     (excludeIds: Set<string>): CanvasLayerTransformRef[] =>
       runtime.layersRef.current
@@ -216,6 +225,8 @@ export function useCanvasStageRuntime(
       artboardHeight,
       artboardWidth,
       getMarginInset,
+      gridSize,
+      showGrid,
       showMargins,
       stageInteractionRef,
       zoom: vp.zoom,
@@ -225,6 +236,7 @@ export function useCanvasStageRuntime(
     artboardHeight,
     artboardWidth,
     dragSessionRef: runtime.dragSessionRef,
+    getGridConfig,
     getMarginInset,
     getOtherLayers,
     layersRef: runtime.layersRef,
@@ -281,6 +293,7 @@ export function useCanvasStageRuntime(
     artboardWidth,
     clearOverlays,
     flattenedLayers,
+    getGridConfig,
     getMarginInset,
     getOtherLayers,
     getTransformModifiers,

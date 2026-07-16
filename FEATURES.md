@@ -27,8 +27,8 @@ Baseline competitor: [Polotno SDK](https://polotno.com/) drag-and-drop canvas (z
 | Drag-and-drop editing (move / resize) | **Done** | OSS | `packages/canvas/src/canvas-stage-layer.tsx`, `packages/canvas/src/canvas-stage.tsx`, `packages/canvas/src/interactions/layer-transform-strategy.ts`, `packages/canvas/src/commands/canvas-api-commands.ts` | Pixel-level move/resize via Konva + Transformer. |
 | Zoom and pan | **Done** | OSS | `packages/canvas/src/viewport.ts`, `packages/canvas/src/commands/canvas-zoom-commands.ts`, `packages/core/src/workbench/editor-viewport-service.ts` | Wheel pan, ctrl/pinch zoom, zoom-to-fit commands. Dedicated pan-tool UX is secondary. |
 | Layers panel (organize / reorder / lock / hide) | **Done** | Pro UI + OSS model | `packages/schema` (`visible`, optional `name`), `packages/core/src/plugins/scene-plugin.ts` (`scene.toggleLayerLock`, `scene.toggleLayerVisibility`, `scene.renameLayer`), `packages/canvas-pro` layers panel, canvas stage + export skip hidden | Reorder, lock, hide/show, and inline rename (custom `name` or type label). Hidden layers are non-interactive and omitted from export. |
-| Snap to grid / guides / alignment | **Partial** | Pro | `packages/canvas-pro/src/snap/smart-guides/`, `packages/canvas-pro/src/stage/smart-guides-stage-interaction.ts`, `packages/canvas-pro/src/commands/align-layers-commands.ts` | Smart guides + align/distribute: yes. **Snap-to-grid: no. User-placed guides: no.** |
-| Grid controls | **Missing** | — | Studio has toolbar i18n/icon stubs only (`packages/studio`) | No canvas grid overlay, grid size setting, or snap-to-grid. |
+| Snap to grid / guides / alignment | **Partial** | Pro | `packages/canvas-pro/src/snap/smart-guides/`, `packages/canvas/src/snap/grid-snap.ts`, `packages/canvas-pro/src/stage/smart-guides-stage-interaction.ts`, `packages/canvas-pro/src/commands/align-layers-commands.ts` | Smart guides + align/distribute + snap-to-grid (8px, toggle with overlay). **User-placed guides: no.** |
+| Grid controls | **Partial** | OSS + Pro | `packages/canvas` (`CanvasGridSettings`, overlay), studio/canvas-pro toolbar | Overlay + snap toggle (`canvas.toggleGrid`); fixed 8px size. **No grid size picker.** |
 | Multi-page / artboards | **Done** | OSS model + Pro UI | `packages/schema` (`Scene.pages`), `packages/core` (`setActivePage`, `scene.addPage` / `removePage` / `duplicatePage` / `renamePage`), `packages/canvas-pro` Pages sidebar | Multi-page document, switch page, add / delete / duplicate / drag-reorder / inline rename. |
 | Bleed and trim | **Partial** | OSS overlay | `packages/canvas/src/page-margins.ts` (`PRINT_MARGIN_MM = 10`), canvas-pro page margin overlay | Fixed 10 mm safe/print margin. **No bleed, trim marks, or crop-mark export.** |
 | Rulers and measurements | **Partial** | OSS + Pro | `packages/canvas/src/hooks/use-selection-label.ts`, canvas-pro inspector panes (x/y/w/h/rotate) | Selection size label + numeric inspector. **No rulers.** |
@@ -60,7 +60,7 @@ OpenEnvx should not stop at parity. These are existing or planned edges.
 | --- | --- | --- | --- |
 | Full page CRUD UX | **Done** | `packages/core`, `packages/canvas-pro` | Add / delete / duplicate / rename / reorder pages as first-class commands + Pages sidebar / palette / context menu. |
 | Layer visibility | **Done** | `packages/schema`, `packages/core`, canvas-pro layers UI, canvas stage, driver-image export | Schema `visible` + `scene.toggleLayerVisibility` + layers panel eye toggle; hidden layers skipped in render/export. |
-| Grid overlay + snap-to-grid | **Planned** | `packages/canvas` (+ pro chrome) | Configurable grid size; snap on/off; toolbar control. |
+| Grid overlay + snap-to-grid | **Done** | `packages/canvas` (+ pro chrome) | Fixed 8px grid; overlay + snap toggle (`canvas.toggleGrid`); smart guides win over grid when both hit. |
 | User guides + rulers | **Planned** | `packages/canvas`, `packages/canvas-pro` | Rulers, drag-out guides, measurement affordances. |
 | True bleed / trim / crop marks | **Planned** | `packages/schema`, `packages/canvas`, `apps/export-service` | Print-production boundaries in schema + export. |
 | Video layer + timeline | **Planned** | `packages/schema`, `packages/canvas` | First-class `canvas.video` (and later animation timeline). |
@@ -77,7 +77,7 @@ Gaps and differentiators grouped by priority. Implement in separate PRs; update 
 
 - ~~**Layer visibility**~~ **Done** — schema `visible`; `scene.toggleLayerVisibility`; canvas-pro eye toggle; stage + export skip hidden.
 - ~~**Page CRUD**~~ **Done** — `scene.addPage` / `removePage` / `duplicatePage`; Pages sidebar select + drag reorder; palette / context menu.
-- **Grid overlay + snap-to-grid** — viewport grid drawing + snap math in `packages/canvas`; optional toolbar toggle in studio / canvas-pro.
+- ~~**Grid overlay + snap-to-grid**~~ **Done** — `CanvasGridSettings` + `canvas.toggleGrid`; OSS overlay (`kind: 'grid'`) + snap math; pro toolbar; composed with smart guides.
 - **Rulers** — ruler chrome + cursor/position indicators in `packages/canvas` (or canvas-pro stage chrome).
 
 ### P1 — Production and media parity

@@ -53,6 +53,8 @@ export interface CanvasStageProps {
   editingLayerId?: string | null;
   pageMarginBounds?: CanvasRect | null;
   showMargins?: boolean;
+  showGrid?: boolean;
+  gridSize?: number;
   onSelectLayer: (layerId: string, options?: CanvasSelectLayerOptions) => void;
   onHoverLayer?: (layerId: string | null) => void;
   onLayerDoubleClick?: (layerId: string) => void;

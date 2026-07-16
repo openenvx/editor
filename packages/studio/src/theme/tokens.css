@@ -64,6 +64,7 @@
   --wb-selection-muted: rgb(59 130 246 / 50%);
   --wb-smart-guide: #ec4899;
   --wb-page-margin: #a855f7;
+  --wb-grid: rgb(0 0 0 / 10%);
   --wb-destructive: #dc2626;
   --wb-artboard: #ffffff;
   --wb-artboard-border: #d4d4d8;
@@ -118,6 +119,7 @@
   --wb-selection-muted: rgb(59 130 246 / 50%);
   --wb-smart-guide: #ec4899;
   --wb-page-margin: #a855f7;
+  --wb-grid: rgb(0 0 0 / 10%);
   --wb-destructive: #dc2626;
   --wb-artboard: #ffffff;
   --wb-artboard-border: #e5e7eb;

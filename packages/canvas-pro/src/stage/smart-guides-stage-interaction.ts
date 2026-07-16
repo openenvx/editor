@@ -5,6 +5,10 @@ import type {
   CanvasResizeAdjustInput,
   CanvasStageInteractionService,
 } from '@openenvx/canvas';
+import {
+  applyGridSnapToDragPosition,
+  applyGridSnapToResizeBox,
+} from '@openenvx/canvas';
 
 import { computeDragSnap } from '../snap/smart-guides/drag-snap';
 import { computeResizeSnap } from '../snap/smart-guides/resize-snap';
@@ -51,10 +55,24 @@ export class SmartGuidesStageInteraction implements CanvasStageInteractionServic
       })),
       threshold: computeSnapThreshold(input.zoom),
     });
+
+    let { x, y } = result;
+    if (input.grid?.enabled) {
+      const gridSnapped = applyGridSnapToDragPosition({
+        originalX: input.moving.bounds.x,
+        originalY: input.moving.bounds.y,
+        size: input.grid.size,
+        snappedX: x,
+        snappedY: y,
+      });
+      x = gridSnapped.x;
+      y = gridSnapped.y;
+    }
+
     return {
       overlays: guidesToOverlayPrimitives(result.guides, result.spacing),
-      x: result.x,
-      y: result.y,
+      x,
+      y,
     };
   }
 
@@ -69,8 +87,19 @@ export class SmartGuidesStageInteraction implements CanvasStageInteractionServic
       ),
       threshold: computeSnapThreshold(input.zoom),
     });
+
+    let { box } = result;
+    if (input.grid?.enabled) {
+      box = applyGridSnapToResizeBox({
+        anchor: input.anchor,
+        original: input.box,
+        size: input.grid.size,
+        snapped: box,
+      });
+    }
+
     return {
-      box: result.box,
+      box,
       overlays: guidesToOverlayPrimitives(result.guides, result.spacing),
     };
   }

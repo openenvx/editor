@@ -191,6 +191,7 @@ export {
   unionCanvasRects,
   type CanvasDragAdjustInput,
   type CanvasDragAdjustResult,
+  type CanvasGridSnapConfig,
   type CanvasLayerTransformRef,
   type CanvasOverlayBuildContext,
   type CanvasRect,
@@ -199,6 +200,19 @@ export {
   type CanvasStageInteractionService,
 } from './stage/canvas-stage-interaction';
 export type { CanvasOverlayPrimitive } from './stage/canvas-overlay-primitives';
+export {
+  applyGridSnapToDragPosition,
+  applyGridSnapToResizeBox,
+  snapPointToGrid,
+  snapValueToGrid,
+} from './snap/grid-snap';
+export {
+  CanvasGridSettings,
+  DEFAULT_CANVAS_GRID_SIZE,
+  type CanvasGridSettingsListener,
+  type CanvasGridSettingsSnapshot,
+} from './grid/canvas-grid-settings';
+export { composeCanvasOverlays } from './hooks/use-canvas-overlays';
 export {
   registerCanvasContribution,
   createCanvasRegistriesService,
@@ -213,6 +227,7 @@ export {
   CanvasClipboardServiceId,
   CanvasCommandRequestServiceId,
   CanvasFontServiceId,
+  CanvasGridSettingsServiceId,
   CanvasPageResizeServiceId,
   CanvasRegistriesServiceId,
   CanvasStageInteractionServiceId,

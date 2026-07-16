@@ -18,6 +18,7 @@ function createSessionHookInput() {
       artboardWidth: 600,
       clearOverlays: vi.fn(),
       flattenedLayers: [],
+      getGridConfig: () => null,
       getMarginInset: () => null,
       getOtherLayers: () => [],
       getTransformModifiers: () => ({ alt: false, meta: false, shift: false }),

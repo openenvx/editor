@@ -15,6 +15,12 @@ export type CanvasOverlayPrimitive =
       y: number;
     }
   | {
+      height: number;
+      kind: 'grid';
+      size: number;
+      width: number;
+    }
+  | {
       kind: 'label';
       text: string;
       x: number;
@@ -23,6 +29,7 @@ export type CanvasOverlayPrimitive =
 
 export interface CanvasOverlayTheme {
   foreground: string;
+  gridStroke: string;
   guideStroke: string;
   marginStroke: string;
 }

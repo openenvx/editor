@@ -86,6 +86,7 @@ describe('smart-guides', () => {
     const interaction = new SmartGuidesStageInteraction();
     const unionResult = interaction.adjustDrag({
       artboard: { height: 800, width: 600 },
+      grid: null,
       marginInset: null,
       moving: {
         bounds: { height: 100, width: 200, x: 199, y: 100 },
@@ -96,6 +97,7 @@ describe('smart-guides', () => {
     });
     const narrowResult = interaction.adjustDrag({
       artboard: { height: 800, width: 600 },
+      grid: null,
       marginInset: null,
       moving: {
         bounds: { height: 100, width: 50, x: 199, y: 100 },
@@ -107,6 +109,54 @@ describe('smart-guides', () => {
     expect(unionResult.x).toBe(200);
     expect(narrowResult.x).toBe(199);
     expect(unionResult.overlays.length).toBeGreaterThan(0);
+  });
+
+  it('adjustDrag snaps to grid when no guide hit', () => {
+    const interaction = new SmartGuidesStageInteraction();
+    const result = interaction.adjustDrag({
+      artboard: { height: 800, width: 600 },
+      grid: { enabled: true, size: 8 },
+      marginInset: null,
+      moving: {
+        bounds: { height: 50, width: 50, x: 13, y: 21 },
+        layerType: RECT,
+      },
+      others: [],
+      zoom: 1,
+    });
+    expect(result.x).toBe(16);
+    expect(result.y).toBe(24);
+    expect(result.overlays).toHaveLength(0);
+  });
+
+  it('adjustDrag prefers smart guides over grid', () => {
+    const interaction = new SmartGuidesStageInteraction();
+    const result = interaction.adjustDrag({
+      artboard: { height: 800, width: 600 },
+      grid: { enabled: true, size: 8 },
+      marginInset: null,
+      moving: {
+        bounds: { height: 60, width: 80, x: 102, y: 21 },
+        layerType: RECT,
+      },
+      others: [
+        {
+          layerType: RECT,
+          transform: {
+            height: 60,
+            opacity: 1,
+            rotation: 0,
+            width: 80,
+            x: 100,
+            y: 200,
+          },
+        },
+      ],
+      zoom: 1,
+    });
+    expect(result.x).toBe(100);
+    expect(result.y).toBe(24);
+    expect(result.overlays.length).toBeGreaterThan(0);
   });
 
   it('detects equal horizontal spacing between three layers', () => {

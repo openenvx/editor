@@ -8,6 +8,7 @@ import type { DragSession } from '../canvas-stage-types';
 import type { FlattenedStageLayer } from '../flatten-layer-surface';
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
 import type {
+  CanvasGridSnapConfig,
   CanvasLayerTransformRef,
   CanvasRect,
   CanvasStageInteractionService,
@@ -18,6 +19,7 @@ export function useCanvasDragSnap({
   artboardHeight,
   artboardWidth,
   dragSessionRef,
+  getGridConfig,
   getMarginInset,
   getOtherLayers,
   layersRef,
@@ -30,6 +32,7 @@ export function useCanvasDragSnap({
   artboardHeight: number;
   artboardWidth: number;
   dragSessionRef: RefObject<DragSession | null>;
+  getGridConfig: () => CanvasGridSnapConfig | null;
   getMarginInset: () => CanvasRect | null;
   getOtherLayers: (excludeIds: Set<string>) => CanvasLayerTransformRef[];
   layersRef: RefObject<FlattenedStageLayer[]>;
@@ -99,6 +102,7 @@ export function useCanvasDragSnap({
         const moving = unionCanvasRects(proposedRects);
         const adjusted = interaction?.adjustDrag?.({
           artboard,
+          grid: getGridConfig(),
           marginInset,
           moving: {
             bounds: moving,
@@ -132,6 +136,7 @@ export function useCanvasDragSnap({
 
       const adjusted = interaction?.adjustDrag?.({
         artboard,
+        grid: getGridConfig(),
         marginInset,
         moving: {
           bounds: {
@@ -154,6 +159,7 @@ export function useCanvasDragSnap({
       artboardHeight,
       artboardWidth,
       dragSessionRef,
+      getGridConfig,
       getMarginInset,
       getOtherLayers,
       layersRef,

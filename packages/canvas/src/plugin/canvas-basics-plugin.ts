@@ -15,6 +15,7 @@ import {
   CanvasClipboardServiceId,
   CanvasCommandRequestServiceId,
   CanvasFontServiceId,
+  CanvasGridSettingsServiceId,
   CanvasPageResizeServiceId,
 } from '../canvas-service-tokens';
 import {
@@ -40,6 +41,7 @@ import {
   RotateLayerRightCommand,
 } from '../commands/canvas-api-commands';
 import { CanvasCommandRequestService } from '../commands/canvas-command-request-service';
+import { ToggleCanvasGridCommand } from '../commands/canvas-grid-commands';
 import {
   GroupSelectionCommand,
   InsertCanvasGroupCommand,
@@ -53,6 +55,7 @@ import {
   CanvasZoomToFitCommand,
 } from '../commands/canvas-zoom-commands';
 import { canvasFontService } from '../fonts/canvas-font-service';
+import { CanvasGridSettings } from '../grid/canvas-grid-settings';
 import { CanvasI18nBundle } from '../i18n/canvas-i18n-bundle';
 import { CanvasCircleLayer } from '../layers/canvas-circle-layer';
 import { CanvasGroupLayer } from '../layers/canvas-group-layer';
@@ -266,6 +269,7 @@ export class CanvasBasicsPlugin extends Plugin {
       new CanvasZoomTo100Command(),
       new CanvasZoomToFitCommand(),
       new CanvasZoomResetCommand(),
+      new ToggleCanvasGridCommand(),
       new SingletonServiceContribution(AssetServiceId, InMemoryAssetService),
       new SingletonServiceContribution(
         CanvasCommandRequestServiceId,
@@ -274,6 +278,10 @@ export class CanvasBasicsPlugin extends Plugin {
       new SingletonServiceContribution(
         CanvasClipboardServiceId,
         CanvasClipboardService
+      ),
+      new SingletonServiceContribution(
+        CanvasGridSettingsServiceId,
+        CanvasGridSettings
       ),
       new SimpleServiceContribution(CanvasPageResizeServiceId, () => ({
         resizeSceneToPreset: resizeSceneToPagePreset,

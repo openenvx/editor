@@ -20,9 +20,26 @@ function createMarginOverlay(marginInset: CanvasRect): CanvasOverlayPrimitive {
   };
 }
 
-function composeCanvasOverlays(input: {
+function createGridOverlay(input: {
+  artboardHeight: number;
+  artboardWidth: number;
+  gridSize: number;
+}): CanvasOverlayPrimitive {
+  return {
+    height: input.artboardHeight,
+    kind: 'grid',
+    size: input.gridSize,
+    width: input.artboardWidth,
+  };
+}
+
+export function composeCanvasOverlays(input: {
+  artboardHeight: number;
+  artboardWidth: number;
+  gridSize: number;
   interactionOverlays?: readonly CanvasOverlayPrimitive[];
   marginInset: CanvasRect | null;
+  showGrid: boolean;
   showMargins: boolean;
   staticOverlays?: readonly CanvasOverlayPrimitive[];
 }): CanvasOverlayPrimitive[] {
@@ -30,6 +47,15 @@ function composeCanvasOverlays(input: {
     ...(input.staticOverlays ?? []),
     ...(input.interactionOverlays ?? []),
   ];
+  if (input.showGrid && input.gridSize > 0) {
+    primitives.unshift(
+      createGridOverlay({
+        artboardHeight: input.artboardHeight,
+        artboardWidth: input.artboardWidth,
+        gridSize: input.gridSize,
+      })
+    );
+  }
   if (input.showMargins && input.marginInset) {
     primitives.push(createMarginOverlay(input.marginInset));
   }
@@ -40,6 +66,8 @@ export function useCanvasOverlays({
   artboardHeight,
   artboardWidth,
   getMarginInset,
+  gridSize,
+  showGrid,
   showMargins,
   stageInteractionRef,
   zoom,
@@ -47,6 +75,8 @@ export function useCanvasOverlays({
   artboardHeight: number;
   artboardWidth: number;
   getMarginInset: () => CanvasRect | null;
+  gridSize: number;
+  showGrid: boolean;
   showMargins: boolean;
   stageInteractionRef: RefObject<CanvasStageInteractionService | null>;
   zoom: number;
@@ -70,14 +100,26 @@ export function useCanvasOverlays({
     (interactionOverlays?: readonly CanvasOverlayPrimitive[]) => {
       setOverlayPrimitives(
         composeCanvasOverlays({
+          artboardHeight,
+          artboardWidth,
+          gridSize,
           interactionOverlays,
           marginInset: getMarginInset(),
+          showGrid,
           showMargins,
           staticOverlays: getStaticOverlays(),
         })
       );
     },
-    [getMarginInset, getStaticOverlays, showMargins]
+    [
+      artboardHeight,
+      artboardWidth,
+      getMarginInset,
+      getStaticOverlays,
+      gridSize,
+      showGrid,
+      showMargins,
+    ]
   );
 
   const clearOverlays = useCallback(() => {
