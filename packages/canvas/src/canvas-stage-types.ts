@@ -5,6 +5,7 @@ import type {
   CanvasLayerInteractionRegistration,
   CanvasLayerRendererRegistration,
 } from './registry/canvas-registry-types';
+import type { UserGuide } from './rulers/canvas-ruler-guides-settings';
 import type { CanvasOverlayPrimitive } from './stage/canvas-overlay-primitives';
 import type {
   CanvasRect,
@@ -55,6 +56,7 @@ export interface CanvasStageProps {
   showMargins?: boolean;
   showGrid?: boolean;
   gridSize?: number;
+  userGuides?: readonly UserGuide[];
   onSelectLayer: (layerId: string, options?: CanvasSelectLayerOptions) => void;
   onHoverLayer?: (layerId: string | null) => void;
   onLayerDoubleClick?: (layerId: string) => void;

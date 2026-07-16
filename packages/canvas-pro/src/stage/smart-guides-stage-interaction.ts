@@ -54,6 +54,7 @@ export class SmartGuidesStageInteraction implements CanvasStageInteractionServic
         layerType: entry.layerType,
       })),
       threshold: computeSnapThreshold(input.zoom),
+      userGuides: input.userGuides,
     });
 
     let { x, y } = result;
@@ -86,6 +87,7 @@ export class SmartGuidesStageInteraction implements CanvasStageInteractionServic
         snapBoundsFromTransform(entry.transform)
       ),
       threshold: computeSnapThreshold(input.zoom),
+      userGuides: input.userGuides,
     });
 
     let { box } = result;

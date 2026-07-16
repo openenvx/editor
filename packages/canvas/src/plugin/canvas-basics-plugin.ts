@@ -17,6 +17,7 @@ import {
   CanvasFontServiceId,
   CanvasGridSettingsServiceId,
   CanvasPageResizeServiceId,
+  CanvasRulerGuidesSettingsServiceId,
 } from '../canvas-service-tokens';
 import {
   CopyLayersCommand,
@@ -48,6 +49,10 @@ import {
   UngroupSelectionCommand,
 } from '../commands/canvas-group-commands';
 import {
+  ClearCanvasGuidesCommand,
+  ToggleCanvasRulersCommand,
+} from '../commands/canvas-ruler-commands';
+import {
   CanvasZoomInCommand,
   CanvasZoomOutCommand,
   CanvasZoomResetCommand,
@@ -68,6 +73,7 @@ import {
   builtinCanvasRendererContributions,
   builtinLayerPreviewRendererContributions,
 } from '../renderers/builtin-contributions';
+import { CanvasRulerGuidesSettings } from '../rulers/canvas-ruler-guides-settings';
 import {
   ensureCanvasRegistriesInstalled,
   registerCanvasContribution,
@@ -222,6 +228,7 @@ export class UploadAssetCommand extends Command {
 
 export class CanvasBasicsPlugin extends Plugin {
   readonly id = 'OpenEnvx.canvas-basics';
+  private unsubGuidePrune: (() => void) | null = null;
 
   activate(ctx: PluginContext): void {
     ensureCanvasRegistriesInstalled(ctx);
@@ -270,6 +277,8 @@ export class CanvasBasicsPlugin extends Plugin {
       new CanvasZoomToFitCommand(),
       new CanvasZoomResetCommand(),
       new ToggleCanvasGridCommand(),
+      new ToggleCanvasRulersCommand(),
+      new ClearCanvasGuidesCommand(),
       new SingletonServiceContribution(AssetServiceId, InMemoryAssetService),
       new SingletonServiceContribution(
         CanvasCommandRequestServiceId,
@@ -283,6 +292,10 @@ export class CanvasBasicsPlugin extends Plugin {
         CanvasGridSettingsServiceId,
         CanvasGridSettings
       ),
+      new SingletonServiceContribution(
+        CanvasRulerGuidesSettingsServiceId,
+        CanvasRulerGuidesSettings
+      ),
       new SimpleServiceContribution(CanvasPageResizeServiceId, () => ({
         resizeSceneToPreset: resizeSceneToPagePreset,
       })),
@@ -291,9 +304,19 @@ export class CanvasBasicsPlugin extends Plugin {
         () => canvasFontService
       )
     );
+
+    this.unsubGuidePrune = ctx.scene.subscribe((snapshot) => {
+      const guides = ctx.services.get(CanvasRulerGuidesSettingsServiceId);
+      if (!guides) {
+        return;
+      }
+      guides.pruneToPageIds(snapshot.scene.pages.map((page) => page.id));
+    });
   }
 
   deactivate(ctx: PluginContext): void {
+    this.unsubGuidePrune?.();
+    this.unsubGuidePrune = null;
     const assets = ctx.services.get(AssetServiceId);
     if ('dispose' in assets && typeof assets.dispose === 'function') {
       assets.dispose();

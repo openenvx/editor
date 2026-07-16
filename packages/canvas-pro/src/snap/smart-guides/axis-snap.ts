@@ -11,7 +11,8 @@ interface AxisSnapInput {
 export function collectXTargets(
   artboard: { width: number },
   others: SnapBounds[],
-  marginBounds?: SnapBounds | null
+  marginBounds?: SnapBounds | null,
+  userGuideXs?: readonly number[]
 ): number[] {
   const targets = new Set<number>([0, artboard.width / 2, artboard.width]);
   if (marginBounds) {
@@ -24,13 +25,19 @@ export function collectXTargets(
     targets.add(bounds.centerX);
     targets.add(bounds.right);
   }
+  if (userGuideXs) {
+    for (const x of userGuideXs) {
+      targets.add(x);
+    }
+  }
   return [...targets];
 }
 
 export function collectYTargets(
   artboard: { height: number },
   others: SnapBounds[],
-  marginBounds?: SnapBounds | null
+  marginBounds?: SnapBounds | null,
+  userGuideYs?: readonly number[]
 ): number[] {
   const targets = new Set<number>([0, artboard.height / 2, artboard.height]);
   if (marginBounds) {
@@ -42,6 +49,11 @@ export function collectYTargets(
     targets.add(bounds.top);
     targets.add(bounds.centerY);
     targets.add(bounds.bottom);
+  }
+  if (userGuideYs) {
+    for (const y of userGuideYs) {
+      targets.add(y);
+    }
   }
   return [...targets];
 }

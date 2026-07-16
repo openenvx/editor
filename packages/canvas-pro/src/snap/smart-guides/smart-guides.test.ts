@@ -235,6 +235,37 @@ describe('smart-guides', () => {
     expect(result.box.x).toBe(100);
   });
 
+  it('snaps drag to a user-placed vertical guide', () => {
+    const result = computeDragSnap({
+      artboard: { height: 800, width: 600 },
+      moving: snapTarget(148, 40, 50, 50),
+      others: [],
+      threshold: 5,
+      userGuides: { xs: [150], ys: [] },
+    });
+    expect(result.x).toBe(150);
+    expect(result.guides.some((guide) => guide.orientation === 'v')).toBe(true);
+  });
+
+  it('snaps resize left edge to a user-placed vertical guide', () => {
+    const result = computeResizeSnap({
+      anchor: 'middle-left',
+      artboard: { height: 800, width: 600 },
+      box: {
+        height: 100,
+        rotation: 0,
+        width: 100,
+        x: 148,
+        y: 100,
+      },
+      others: [],
+      threshold: 5,
+      userGuides: { xs: [150], ys: [] },
+    });
+    expect(result.box.x).toBe(150);
+    expect(result.box.width).toBe(98);
+  });
+
   it('snapBoundsFromTransform maps transform to bounds', () => {
     const bounds = snapBoundsFromTransform({
       height: 80,

@@ -13,6 +13,7 @@ export function computeDragSnap(input: {
   moving: SnapTarget;
   others: SnapTarget[];
   threshold: number;
+  userGuides?: { xs: number[]; ys: number[] } | null;
 }): SnapResult {
   const { bounds: movingBounds } = input.moving;
   const othersBounds = input.others.map((target) => target.bounds);
@@ -22,14 +23,24 @@ export function computeDragSnap(input: {
     allBounds,
     artboard: input.artboard,
     moving: movingBounds,
-    targets: collectXTargets(input.artboard, othersBounds, input.marginBounds),
+    targets: collectXTargets(
+      input.artboard,
+      othersBounds,
+      input.marginBounds,
+      input.userGuides?.xs
+    ),
     threshold: input.threshold,
   });
   const ySnap = findBestAxisSnap('y', {
     allBounds,
     artboard: input.artboard,
     moving: movingBounds,
-    targets: collectYTargets(input.artboard, othersBounds, input.marginBounds),
+    targets: collectYTargets(
+      input.artboard,
+      othersBounds,
+      input.marginBounds,
+      input.userGuides?.ys
+    ),
     threshold: input.threshold,
   });
 

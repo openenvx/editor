@@ -198,6 +198,7 @@ export {
   type CanvasResizeAdjustInput,
   type CanvasResizeAdjustResult,
   type CanvasStageInteractionService,
+  type CanvasUserGuidesSnapConfig,
 } from './stage/canvas-stage-interaction';
 export type { CanvasOverlayPrimitive } from './stage/canvas-overlay-primitives';
 export {
@@ -212,6 +213,22 @@ export {
   type CanvasGridSettingsListener,
   type CanvasGridSettingsSnapshot,
 } from './grid/canvas-grid-settings';
+export {
+  CanvasRulerGuidesSettings,
+  type CanvasRulerGuidesSettingsListener,
+  type CanvasRulerGuidesSettingsSnapshot,
+  type UserGuide,
+  type UserGuideOrientation,
+} from './rulers/canvas-ruler-guides-settings';
+export {
+  artboardToScreenPoint,
+  buildRulerTicks,
+  computeRulerTickStep,
+  isGuideWithinArtboard,
+  RULER_SIZE_PX,
+  screenToArtboardPoint,
+  userGuidesToSnapAxes,
+} from './rulers/ruler-math';
 export { composeCanvasOverlays } from './hooks/use-canvas-overlays';
 export {
   registerCanvasContribution,
@@ -230,6 +247,7 @@ export {
   CanvasGridSettingsServiceId,
   CanvasPageResizeServiceId,
   CanvasRegistriesServiceId,
+  CanvasRulerGuidesSettingsServiceId,
   CanvasStageInteractionServiceId,
 } from './canvas-service-tokens';
 export {

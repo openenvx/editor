@@ -1,4 +1,5 @@
 .host {
+  position: relative;
   flex: 1;
   min-width: 0;
   min-height: 0;
@@ -12,6 +13,8 @@
   flex: 1;
   min-width: 0;
   min-height: 0;
+  width: 100%;
+  height: 100%;
   outline: none;
 }
 
@@ -104,9 +107,14 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  z-index: 3;
+  /* Above ruler guide hit targets (z-index 5 on the frame). */
+  z-index: 6;
   display: flex;
   gap: 8px;
+}
+
+.chromeTogglesWithRulers {
+  top: 32px;
 }
 
 .chromeToggle,

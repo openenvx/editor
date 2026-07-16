@@ -30,6 +30,7 @@ export function computeResizeSnap(input: {
   marginBounds?: SnapBounds | null;
   others: SnapBounds[];
   threshold: number;
+  userGuides?: { xs: number[]; ys: number[] } | null;
 }): ResizeSnapResult {
   const moving = toSnapBounds(
     input.box.x,
@@ -51,7 +52,8 @@ export function computeResizeSnap(input: {
       targets: collectXTargets(
         input.artboard,
         input.others,
-        input.marginBounds
+        input.marginBounds,
+        input.userGuides?.xs
       ),
       threshold: input.threshold,
     });
@@ -87,7 +89,8 @@ export function computeResizeSnap(input: {
       targets: collectYTargets(
         input.artboard,
         input.others,
-        input.marginBounds
+        input.marginBounds,
+        input.userGuides?.ys
       ),
       threshold: input.threshold,
     });

@@ -9,6 +9,7 @@ import type { CanvasStageProps, SelectionBounds } from '../canvas-stage-types';
 import { getInteraction } from '../canvas-transformer-utils';
 import { flattenStageLayers } from '../flatten-layer-surface';
 import { CANVAS_GROUP_LAYER_TYPE } from '../layers/canvas-group-layer';
+import { userGuidesToSnapAxes } from '../rulers/ruler-math';
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
 import type {
   CanvasLayerTransformRef,
@@ -93,6 +94,7 @@ export function useCanvasStageRuntime(
     | 'showMargins'
     | 'showGrid'
     | 'gridSize'
+    | 'userGuides'
     | 'onSelectLayer'
     | 'onHoverLayer'
     | 'onLayerDoubleClick'
@@ -117,6 +119,7 @@ export function useCanvasStageRuntime(
     showMargins = false,
     showGrid = false,
     gridSize = 8,
+    userGuides,
     onSelectLayer,
     onHoverLayer,
     onLayerDoubleClick,
@@ -209,6 +212,13 @@ export function useCanvasStageRuntime(
     [gridSize, showGrid]
   );
 
+  const getUserGuidesConfig = useCallback(() => {
+    if (!userGuides || userGuides.length === 0) {
+      return null;
+    }
+    return userGuidesToSnapAxes(userGuides);
+  }, [userGuides]);
+
   const getOtherLayers = useCallback(
     (excludeIds: Set<string>): CanvasLayerTransformRef[] =>
       runtime.layersRef.current
@@ -239,6 +249,7 @@ export function useCanvasStageRuntime(
     getGridConfig,
     getMarginInset,
     getOtherLayers,
+    getUserGuidesConfig,
     layersRef: runtime.layersRef,
     nodeRefs: runtime.nodeRefs,
     selectedLayerIdsRef,
@@ -296,6 +307,7 @@ export function useCanvasStageRuntime(
     getGridConfig,
     getMarginInset,
     getOtherLayers,
+    getUserGuidesConfig,
     getTransformModifiers,
     isRichTextSelected,
     nodeRefs: runtime.nodeRefs,

@@ -4,7 +4,10 @@ import type { Page } from '@openenvx/schema';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useCanvasHost } from '../canvas-host-context';
-import { CanvasGridSettingsServiceId } from '../canvas-service-tokens';
+import {
+  CanvasGridSettingsServiceId,
+  CanvasRulerGuidesSettingsServiceId,
+} from '../canvas-service-tokens';
 import { CanvasStage } from '../canvas-stage';
 import type {
   CanvasSelectLayerOptions,
@@ -30,6 +33,13 @@ import type {
   CanvasLayerInteractionRegistration,
   CanvasLayerRendererRegistration,
 } from '../registry/canvas-registry-types';
+import type {
+  CanvasRulerGuidesSettingsSnapshot,
+  UserGuide,
+  UserGuideOrientation,
+} from '../rulers/canvas-ruler-guides-settings';
+import { CanvasRulers } from '../rulers/canvas-rulers';
+import { RULER_SIZE_PX } from '../rulers/ruler-math';
 import type { CanvasStageInteractionService } from '../stage/canvas-stage-interaction';
 import { useCanvasFontPreload } from '../use-canvas-font-preload';
 import { useContainerSize } from '../use-container-size';
@@ -144,10 +154,18 @@ export const CanvasEditor = memo(
         enabled: false,
         size: DEFAULT_CANVAS_GRID_SIZE,
       }));
+    const [rulerSettings, setRulerSettings] =
+      useState<CanvasRulerGuidesSettingsSnapshot>(() => ({
+        guidesByPageId: {},
+        showRulers: true,
+      }));
     const [, setViewportTick] = useState(0);
 
     const pageMarginBounds = useMemo(() => computePageSafeBounds(page), [page]);
     const gridService = host.getService(CanvasGridSettingsServiceId);
+    const rulerGuidesService = host.getService(
+      CanvasRulerGuidesSettingsServiceId
+    );
 
     useEffect(() => {
       if (!gridService) {
@@ -156,6 +174,40 @@ export const CanvasEditor = memo(
       setGridSettings(gridService.getSnapshot());
       return gridService.subscribe(setGridSettings);
     }, [gridService]);
+
+    useEffect(() => {
+      if (!rulerGuidesService) {
+        return;
+      }
+      setRulerSettings(rulerGuidesService.getSnapshot());
+      return rulerGuidesService.subscribe(setRulerSettings);
+    }, [rulerGuidesService]);
+
+    const pageGuides = useMemo(
+      (): readonly UserGuide[] => rulerSettings.guidesByPageId[page.id] ?? [],
+      [page.id, rulerSettings.guidesByPageId]
+    );
+
+    const handleAddGuide = useCallback(
+      (guide: { orientation: UserGuideOrientation; position: number }) => {
+        rulerGuidesService?.addGuide(page.id, guide);
+      },
+      [page.id, rulerGuidesService]
+    );
+
+    const handleMoveGuide = useCallback(
+      (guideId: string, position: number) => {
+        rulerGuidesService?.moveGuide(page.id, guideId, position);
+      },
+      [page.id, rulerGuidesService]
+    );
+
+    const handleRemoveGuide = useCallback(
+      (guideId: string) => {
+        rulerGuidesService?.removeGuide(page.id, guideId);
+      },
+      [page.id, rulerGuidesService]
+    );
 
     containerSizeRef.current = containerSize;
 
@@ -177,6 +229,8 @@ export const CanvasEditor = memo(
       height: artboardHeight,
       width: artboardWidth,
     });
+    const showRulers = Boolean(rulerGuidesService) && rulerSettings.showRulers;
+    const prevShowRulersRef = useRef(showRulers);
 
     useEffect(() => {
       onContainerResize?.(containerSize);
@@ -206,6 +260,19 @@ export const CanvasEditor = memo(
       onContainerResize,
       viewport,
     ]);
+
+    // Ruler gutters move/resize the stage host; compensate pan so the
+    // artboard stays visually stable relative to the editor frame.
+    useEffect(() => {
+      const prev = prevShowRulersRef.current;
+      prevShowRulersRef.current = showRulers;
+      if (prev === showRulers || !fitApplied.current) {
+        return;
+      }
+      const delta = (showRulers ? -1 : 1) * (RULER_SIZE_PX / 2);
+      viewport.pan(delta, delta);
+      handleViewportChange(viewport.getViewport().zoom);
+    }, [handleViewportChange, showRulers, viewport]);
 
     useEffect(() => {
       if (containerSize.width <= 0 || containerSize.height <= 0) {
@@ -494,83 +561,119 @@ export const CanvasEditor = memo(
 
     return (
       <div className={styles.host}>
-        <div
-          className={styles.stageHost}
-          ref={containerRef}
-          role="application"
-          tabIndex={-1}
+        <CanvasRulers
+          artboardHeight={artboardHeight}
+          artboardWidth={artboardWidth}
+          containerHeight={containerSize.height}
+          containerWidth={containerSize.width}
+          guides={pageGuides}
+          onAddGuide={handleAddGuide}
+          onMoveGuide={handleMoveGuide}
+          onRemoveGuide={handleRemoveGuide}
+          panX={viewportState.panX}
+          panY={viewportState.panY}
+          showRulers={showRulers}
+          zoom={viewportState.zoom}
         >
-          {gridService || pageMarginBounds ? (
-            <div className={styles.chromeToggles}>
-              {gridService ? (
-                <button
-                  aria-pressed={gridSettings.enabled}
-                  className={
-                    gridSettings.enabled
-                      ? styles.chromeToggleActive
-                      : styles.chromeToggle
-                  }
-                  onClick={() => {
-                    void host.executeCommand('canvas.toggleGrid');
-                  }}
-                  type="button"
-                >
-                  Grid
-                </button>
-              ) : null}
-              {pageMarginBounds ? (
-                <button
-                  aria-pressed={showMargins}
-                  className={
-                    showMargins
-                      ? styles.marginToggleActive
-                      : styles.marginToggle
-                  }
-                  onClick={() => setShowMargins((current) => !current)}
-                  type="button"
-                >
-                  Margins
-                </button>
-              ) : null}
-            </div>
-          ) : null}
-          <CanvasStage
-            artboardHeight={artboardHeight}
-            artboardWidth={artboardWidth}
-            canvasLayerInteractions={canvasLayerInteractions}
-            canvasLayerRenderers={canvasLayerRenderers}
-            stageInteraction={stageInteraction}
-            containerHeight={containerSize.height}
-            containerWidth={containerSize.width}
-            editingLayerId={editingLayerId}
-            fontLoadRevision={fontLoadRevision}
-            gridSize={gridSettings.size}
-            hoveredLayerId={hoveredLayerId}
-            layers={layerSurface}
-            onHoverLayer={onHoverLayer}
-            onLayerDoubleClick={handleLayerDoubleClick}
-            onSelectLayer={handleSelectLayer}
-            onTransformChange={onTransformChange}
-            onViewportChange={handleViewportChange}
-            pageMarginBounds={pageMarginBounds}
-            primaryLayerId={primaryLayerId}
-            selectedLayerIds={selectedLayerIds}
-            showGrid={gridSettings.enabled}
-            showMargins={showMargins}
-            viewportController={viewport}
-          />
-          <CanvasRichTextOverlay
-            artboardHeight={artboardHeight}
-            artboardWidth={artboardWidth}
-            canvasLayerInteractions={canvasLayerInteractions}
-            containerHeight={containerSize.height}
-            containerWidth={containerSize.width}
-            editingLayerId={editingLayerId}
-            layers={overlayLayers}
-            onCommitEdit={handleCommitEdit}
-            viewport={viewportState}
-          />
-        </div>
+          <div
+            className={styles.stageHost}
+            ref={containerRef}
+            role="application"
+            tabIndex={-1}
+          >
+            <CanvasStage
+              artboardHeight={artboardHeight}
+              artboardWidth={artboardWidth}
+              canvasLayerInteractions={canvasLayerInteractions}
+              canvasLayerRenderers={canvasLayerRenderers}
+              stageInteraction={stageInteraction}
+              containerHeight={containerSize.height}
+              containerWidth={containerSize.width}
+              editingLayerId={editingLayerId}
+              fontLoadRevision={fontLoadRevision}
+              gridSize={gridSettings.size}
+              hoveredLayerId={hoveredLayerId}
+              layers={layerSurface}
+              onHoverLayer={onHoverLayer}
+              onLayerDoubleClick={handleLayerDoubleClick}
+              onSelectLayer={handleSelectLayer}
+              onTransformChange={onTransformChange}
+              onViewportChange={handleViewportChange}
+              pageMarginBounds={pageMarginBounds}
+              primaryLayerId={primaryLayerId}
+              selectedLayerIds={selectedLayerIds}
+              showGrid={gridSettings.enabled}
+              showMargins={showMargins}
+              userGuides={pageGuides}
+              viewportController={viewport}
+            />
+            <CanvasRichTextOverlay
+              artboardHeight={artboardHeight}
+              artboardWidth={artboardWidth}
+              canvasLayerInteractions={canvasLayerInteractions}
+              containerHeight={containerSize.height}
+              containerWidth={containerSize.width}
+              editingLayerId={editingLayerId}
+              layers={overlayLayers}
+              onCommitEdit={handleCommitEdit}
+              viewport={viewportState}
+            />
+          </div>
+        </CanvasRulers>
+        {gridService || pageMarginBounds || rulerGuidesService ? (
+          <div
+            className={
+              showRulers
+                ? `${styles.chromeToggles} ${styles.chromeTogglesWithRulers}`
+                : styles.chromeToggles
+            }
+          >
+            {rulerGuidesService ? (
+              <button
+                aria-pressed={rulerSettings.showRulers}
+                className={
+                  rulerSettings.showRulers
+                    ? styles.chromeToggleActive
+                    : styles.chromeToggle
+                }
+                onClick={() => {
+                  void host.executeCommand('canvas.toggleRulers');
+                }}
+                type="button"
+              >
+                Rulers
+              </button>
+            ) : null}
+            {gridService ? (
+              <button
+                aria-pressed={gridSettings.enabled}
+                className={
+                  gridSettings.enabled
+                    ? styles.chromeToggleActive
+                    : styles.chromeToggle
+                }
+                onClick={() => {
+                  void host.executeCommand('canvas.toggleGrid');
+                }}
+                type="button"
+              >
+                Grid
+              </button>
+            ) : null}
+            {pageMarginBounds ? (
+              <button
+                aria-pressed={showMargins}
+                className={
+                  showMargins ? styles.marginToggleActive : styles.marginToggle
+                }
+                onClick={() => setShowMargins((current) => !current)}
+                type="button"
+              >
+                Margins
+              </button>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     );
   }

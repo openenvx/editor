@@ -92,11 +92,17 @@ export class CanvasToolbarContribution extends ToolbarContribution {
         labelKey: 'toolbar.grid',
         priority: 20,
       })
+      .command('canvas-toolbar-rulers', {
+        commandId: 'canvas.toggleRulers',
+        icon: 'ruler',
+        labelKey: 'toolbar.rulers',
+        priority: 21,
+      })
       .dropdown('canvas-toolbar-zoom', {
         items: CANVAS_ZOOM_DROPDOWN_ITEMS,
         labelBinding: 'editorZoomPercent',
         labelSuffix: '%',
-        priority: 21,
+        priority: 22,
         when: 'workbench.floatingToolbar',
       });
   }

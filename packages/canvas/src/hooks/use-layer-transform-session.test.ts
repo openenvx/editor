@@ -21,6 +21,7 @@ function createSessionHookInput() {
       getGridConfig: () => null,
       getMarginInset: () => null,
       getOtherLayers: () => [],
+      getUserGuidesConfig: () => null,
       getTransformModifiers: () => ({ alt: false, meta: false, shift: false }),
       isRichTextSelected: false,
       nodeRefs,

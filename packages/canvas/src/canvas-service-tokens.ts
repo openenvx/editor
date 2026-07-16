@@ -6,6 +6,7 @@ import type { CanvasCommandRequestService } from './commands/canvas-command-requ
 import type { CanvasGridSettings } from './grid/canvas-grid-settings';
 import type { PageResizeService } from './page-resize/page-resize-types';
 import type { CanvasRegistriesReader } from './registry/canvas-registries-reader';
+import type { CanvasRulerGuidesSettings } from './rulers/canvas-ruler-guides-settings';
 import type { CanvasStageInteractionService } from './stage/canvas-stage-interaction';
 
 export const CanvasClipboardServiceId =
@@ -21,3 +22,5 @@ export const CanvasPageResizeServiceId =
   createServiceId<PageResizeService>('canvasPageResize');
 export const CanvasGridSettingsServiceId =
   createServiceId<CanvasGridSettings>('canvasGridSettings');
+export const CanvasRulerGuidesSettingsServiceId =
+  createServiceId<CanvasRulerGuidesSettings>('canvasRulerGuidesSettings');

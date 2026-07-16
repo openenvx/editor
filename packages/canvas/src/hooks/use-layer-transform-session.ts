@@ -33,6 +33,7 @@ import type {
   CanvasLayerTransformRef,
   CanvasRect,
   CanvasStageInteractionService,
+  CanvasUserGuidesSnapConfig,
 } from '../stage/canvas-stage-interaction';
 
 export interface UseLayerTransformSessionInput {
@@ -42,6 +43,7 @@ export interface UseLayerTransformSessionInput {
   getGridConfig: () => CanvasGridSnapConfig | null;
   getMarginInset: () => CanvasRect | null;
   getOtherLayers: (excludeIds: Set<string>) => CanvasLayerTransformRef[];
+  getUserGuidesConfig: () => CanvasUserGuidesSnapConfig | null;
   getTransformModifiers: () => {
     shift: boolean;
     alt: boolean;
@@ -89,6 +91,7 @@ export function useLayerTransformSession({
   getGridConfig,
   getMarginInset,
   getOtherLayers,
+  getUserGuidesConfig,
   getTransformModifiers,
   isRichTextSelected,
   nodeRefs,
@@ -281,6 +284,7 @@ export function useLayerTransformSession({
         grid: getGridConfig(),
         marginInset: getMarginInset(),
         others: getOtherLayers(new Set(selectedLayerIdsRef.current)),
+        userGuides: getUserGuidesConfig(),
         zoom: vpZoom,
       });
       if (adjusted) {
@@ -294,6 +298,7 @@ export function useLayerTransformSession({
       getGridConfig,
       getMarginInset,
       getOtherLayers,
+      getUserGuidesConfig,
       getTransformModifiers,
       selectedLayerIdsRef,
       sessionRefs,

@@ -48,6 +48,7 @@ export function CanvasStage({
   showMargins = false,
   showGrid = false,
   gridSize = 8,
+  userGuides,
   onSelectLayer,
   onHoverLayer,
   onLayerDoubleClick,
@@ -79,6 +80,7 @@ export function CanvasStage({
     showMargins,
     showGrid,
     gridSize,
+    userGuides,
     stageInteraction,
     viewportController,
   });

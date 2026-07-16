@@ -12,6 +12,7 @@ import type {
   CanvasLayerTransformRef,
   CanvasRect,
   CanvasStageInteractionService,
+  CanvasUserGuidesSnapConfig,
 } from '../stage/canvas-stage-interaction';
 import { unionCanvasRects } from '../stage/canvas-stage-interaction';
 
@@ -22,6 +23,7 @@ export function useCanvasDragSnap({
   getGridConfig,
   getMarginInset,
   getOtherLayers,
+  getUserGuidesConfig,
   layersRef,
   nodeRefs,
   selectedLayerIdsRef,
@@ -35,6 +37,7 @@ export function useCanvasDragSnap({
   getGridConfig: () => CanvasGridSnapConfig | null;
   getMarginInset: () => CanvasRect | null;
   getOtherLayers: (excludeIds: Set<string>) => CanvasLayerTransformRef[];
+  getUserGuidesConfig: () => CanvasUserGuidesSnapConfig | null;
   layersRef: RefObject<FlattenedStageLayer[]>;
   nodeRefs: RefObject<Map<string, Konva.Group>>;
   selectedLayerIdsRef: RefObject<string[]>;
@@ -109,6 +112,7 @@ export function useCanvasDragSnap({
             layerType: movingLayerType,
           },
           others,
+          userGuides: getUserGuidesConfig(),
           zoom,
         });
         const snapDx = (adjusted?.x ?? moving.x) - moving.x;
@@ -148,6 +152,7 @@ export function useCanvasDragSnap({
           layerType: movingLayerType,
         },
         others,
+        userGuides: getUserGuidesConfig(),
         zoom,
       });
       if (adjusted) {
@@ -162,6 +167,7 @@ export function useCanvasDragSnap({
       getGridConfig,
       getMarginInset,
       getOtherLayers,
+      getUserGuidesConfig,
       layersRef,
       nodeRefs,
       selectedLayerIdsRef,

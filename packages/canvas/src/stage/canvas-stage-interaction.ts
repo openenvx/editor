@@ -19,12 +19,18 @@ export interface CanvasGridSnapConfig {
   size: number;
 }
 
+export interface CanvasUserGuidesSnapConfig {
+  xs: number[];
+  ys: number[];
+}
+
 export interface CanvasDragAdjustInput {
   artboard: { height: number; width: number };
   grid: CanvasGridSnapConfig | null;
   marginInset: CanvasRect | null;
   moving: { bounds: CanvasRect; layerType: string };
   others: CanvasLayerTransformRef[];
+  userGuides?: CanvasUserGuidesSnapConfig | null;
   zoom: number;
 }
 
@@ -47,6 +53,7 @@ export interface CanvasResizeAdjustInput {
   grid: CanvasGridSnapConfig | null;
   marginInset: CanvasRect | null;
   others: CanvasLayerTransformRef[];
+  userGuides?: CanvasUserGuidesSnapConfig | null;
   zoom: number;
 }
 
