@@ -2,6 +2,12 @@
 
 How to extend the OpenEnvx canvas engine with plugins.
 
+## Scene document (`@openenvx/schema`)
+
+The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@openenvx/schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
+
+Backend services depend on `@openenvx/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it), and `apps/export-service` imports overlapping leaf schemas (`paddingSchema`, `layerStyleShadowSchema`, …) into its Render IR request schema while keeping Render-IR-specific document shapes local.
+
 ## OSS vs enterprise shell
 
 | Package | Responsibility |

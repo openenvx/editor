@@ -11,6 +11,11 @@ describe("ContextKeyService", () => {
       hasActiveEditor: true,
       isDirty: false,
       scene,
+      selection: {
+        activePageId: scene.pages[0]!.id,
+        primaryLayerId: null,
+        selectedLayerIds: [],
+      },
     });
 
     expect(keys.evaluate("page.layoutFlow")).toBeTruthy();

@@ -5,7 +5,12 @@ import {
   WorkbenchEventService,
 } from '@openenvx/core';
 import type { CommandContext } from '@openenvx/core';
-import { createDefaultTransform, normalizeScene } from '@openenvx/schema';
+import {
+  createDefaultTransform,
+  normalizeSceneSnapshot,
+  type EditorState,
+  type Scene,
+} from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -16,18 +21,21 @@ import {
 import { groupRootLayers } from '../scene/group-layers';
 
 function createContext(sceneStore: SceneStore): CommandContext {
-  const scene = sceneStore.getScene();
   return {
     editor: new EditorService(),
     events: new WorkbenchEventService(),
     scene: sceneStore,
-    selection: scene.selection,
+    selection: sceneStore.getSelection(),
     services: new InstantiationService(),
   };
 }
 
+function createStore(scene: Scene, editorState: EditorState) {
+  return new SceneStore(scene, editorState);
+}
+
 describe('canvas group commands', () => {
-  const baseScene = normalizeScene({
+  const baseSnapshot = normalizeSceneSnapshot({
     activePageId: 'page-1',
     pages: [
       {
@@ -65,16 +73,11 @@ describe('canvas group commands', () => {
   });
 
   it('insertGroup appends a canvas.group layer', () => {
-    const store = new SceneStore(
-      normalizeScene({
-        ...baseScene,
-        selection: {
-          activePageId: 'page-1',
-          primaryLayerId: null,
-          selectedLayerIds: [],
-        },
-      })
-    );
+    const store = createStore(baseSnapshot.scene, {
+      activePageId: 'page-1',
+      primaryLayerId: null,
+      selectedLayerIds: [],
+    });
     const ctx = createContext(store);
     const command = new InsertCanvasGroupCommand();
     expect(command.canExecute(ctx)).toBe(true);
@@ -86,7 +89,7 @@ describe('canvas group commands', () => {
   });
 
   it('groupSelection wraps selected root layers', () => {
-    const store = new SceneStore(baseScene);
+    const store = createStore(baseSnapshot.scene, baseSnapshot.editorState);
     const ctx = createContext(store);
     const command = new GroupSelectionCommand();
     expect(command.canExecute(ctx)).toBe(true);
@@ -95,8 +98,9 @@ describe('canvas group commands', () => {
     expect(page?.layers).toHaveLength(1);
     const groupLayer = page?.layers[0];
     expect(groupLayer?.type).toBe('canvas.group');
-    const children = (groupLayer?.data as { children: { id: string }[] } | undefined)
-      ?.children ?? [];
+    const children =
+      (groupLayer?.data as { children: { id: string }[] } | undefined)
+        ?.children ?? [];
     expect(children.map((child) => child.id)).toStrictEqual([
       'rect-1',
       'rect-2',
@@ -105,21 +109,23 @@ describe('canvas group commands', () => {
 
   it('ungroup restores children to root', () => {
     const groupedLayers = groupRootLayers(
-      baseScene.pages[0]!.layers,
+      baseSnapshot.scene.pages[0]!.layers,
       ['rect-1', 'rect-2'],
       'group-1',
-      baseScene.pages[0]!
+      baseSnapshot.scene.pages[0]!
     );
-    const store = new SceneStore(
-      normalizeScene({
-        ...baseScene,
-        pages: [{ ...baseScene.pages[0]!, layers: groupedLayers }],
-        selection: {
-          activePageId: 'page-1',
-          primaryLayerId: 'group-1',
-          selectedLayerIds: ['group-1'],
-        },
-      })
+    const store = createStore(
+      {
+        ...baseSnapshot.scene,
+        pages: [
+          { ...baseSnapshot.scene.pages[0]!, layers: groupedLayers },
+        ],
+      },
+      {
+        activePageId: 'page-1',
+        primaryLayerId: 'group-1',
+        selectedLayerIds: ['group-1'],
+      }
     );
     const ctx = createContext(store);
     const command = new UngroupSelectionCommand();

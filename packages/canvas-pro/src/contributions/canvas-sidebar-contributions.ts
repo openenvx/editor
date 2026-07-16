@@ -1,5 +1,4 @@
 import {
-  getActivePage,
   getContainerChildren,
   isLayerEditable,
   isLayerLocked,
@@ -54,7 +53,7 @@ export class CanvasPagesTreeProvider extends TreeDataProvider<Page> {
 
 export class CanvasLayersTreeProvider extends TreeDataProvider<Layer> {
   getRootChildren(ctx: CommandContext): Layer[] {
-    return getActivePage(ctx.scene.getScene()).layers;
+    return ctx.scene.getActivePage().layers;
   }
 
   getChildren(node: Layer): Layer[] {
@@ -108,7 +107,7 @@ export class CanvasLayersTreeProvider extends TreeDataProvider<Layer> {
     position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
-    const page = getActivePage(ctx.scene.getScene());
+    const page = ctx.scene.getActivePage();
     const effectivePosition = position === 'inside' ? 'after' : position;
     ctx.scene.apply({
       apply: (scene) => ({

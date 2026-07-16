@@ -17,6 +17,7 @@ export class ContextKeySynchronizer {
       hasActiveEditor: this.editor.getActiveEditor() !== null,
       isDirty: this.editor.getActiveEditor()?.isDirty ?? false,
       scene: this.scene.getScene(),
+      selection: this.scene.getSelection(),
     });
   }
 }

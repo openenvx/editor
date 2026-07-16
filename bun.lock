@@ -28,6 +28,7 @@
         "@mastra/core": "^1.1.0",
         "@mastra/memory": "^1.23.0",
         "@openenvx/agent": "workspace:*",
+        "@openenvx/schema": "workspace:*",
         "@openrouter/ai-sdk-provider": "^1.0.0",
         "ai": "^6.0.0",
         "hono": "^4.12.28",
@@ -102,6 +103,7 @@
         "@hono/zod-validator": "^0.7.6",
         "@openenvx/driver-image": "workspace:*",
         "@openenvx/preview": "workspace:*",
+        "@openenvx/schema": "workspace:*",
         "hono": "^4.12.28",
         "zod": "4.4.3",
       },
@@ -274,6 +276,9 @@
     "packages/schema": {
       "name": "@openenvx/schema",
       "version": "0.1.11",
+      "dependencies": {
+        "zod": "4.4.3",
+      },
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
         "tsup": "catalog:dev",

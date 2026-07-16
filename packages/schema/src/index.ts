@@ -1,8 +1,21 @@
 export {
+  BUILTIN_LAYER_TYPES,
   LAYER_WRITE_MODES,
   SCHEMA_VERSION,
+  type BuiltinLayerType,
+  type CanvasCircleData,
+  type CanvasCircleLayer,
+  type CanvasGroupData,
+  type CanvasGroupLayer,
+  type CanvasImageData,
+  type CanvasImageLayer,
+  type CanvasRectData,
+  type CanvasRectLayer,
+  type CanvasTextData,
+  type CanvasTextLayer,
   type CornerRadius,
   type EditorPaneKind,
+  type EditorState,
   type FrozenLayerSnapshot,
   type Layer,
   type LayerBorder,
@@ -13,6 +26,7 @@ export {
   type Padding,
   type Page,
   type PageLayout,
+  type PluginLayer,
   type Scene,
   type SceneAsset,
   type SceneAssetInline,
@@ -34,12 +48,17 @@ export {
 } from './page-presets';
 
 export {
+  createDefaultEditorState,
   createDefaultPage,
-  createDefaultSelection,
   createDefaultTransform,
   createEmptyScene,
+  createEmptySceneSnapshot,
+  normalizeEditorState,
   normalizeScene,
+  normalizeSceneSnapshot,
 } from './normalize';
+
+export { pruneEditorState } from './editor-state';
 
 export {
   computePageExportDimensions,
@@ -54,4 +73,30 @@ export {
   type PageExportOptions,
 } from './page-export';
 
-export { validateScene, type ValidationResult } from './validate';
+export {
+  assertValidScene,
+  parseValidEditorState,
+  parseValidScene,
+  parseValidSceneSnapshot,
+  validateEditorState,
+  validateScene,
+  validateSceneSnapshot,
+  type ValidateMode,
+  type ValidationError,
+  type ValidationResult,
+} from './validate';
+
+export {
+  editorStateSchemaCanonical,
+  editorStateSchemaLenient,
+  layerStyleShadowSchema,
+  leafSchemas,
+  paddingSchema,
+  sceneSchemaCanonical,
+  sceneSchemaLenient,
+  sceneSnapshotSchemaCanonical,
+  sceneSnapshotSchemaLenient,
+  transformSchema,
+} from './scene-schema';
+
+export { cloneDropNulls } from './clone-drop-nulls';

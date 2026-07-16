@@ -1,7 +1,4 @@
-import {
-  createContributionBuildContext,
-  getPrimaryLayer,
-} from '@openenvx/core';
+import { createContributionBuildContext } from '@openenvx/core';
 import type { PropertySectionDescriptor } from '@openenvx/core';
 
 import { LayerPropertiesPaneFactory } from '../inspector/layer-properties-pane-factory';
@@ -19,12 +16,14 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
     commandCtx.services,
     canExecuteCommand
   );
-  const scene = ctx.runtime.getScene().getScene();
+  const store = ctx.runtime.getScene();
+  const scene = store.getScene();
+  const selection = store.getSelection();
   const contextKeyService = ctx.runtime.getContextKeys();
   const evaluateWhen = (when: string | undefined) =>
     contextKeyService.evaluate(when);
 
-  const primaryLayer = getPrimaryLayer(scene);
+  const primaryLayer = store.getPrimaryLayer();
   let properties: PropertySectionDescriptor[] | null = null;
   if (primaryLayer) {
     const def = coreRegistries.layers.get(primaryLayer.type);
@@ -80,7 +79,7 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
     inspectorPanes,
     properties,
     scene,
-    selection: scene.selection,
+    selection,
     viewContainers,
   };
 }

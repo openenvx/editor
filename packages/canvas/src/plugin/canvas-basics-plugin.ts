@@ -1,7 +1,6 @@
 import {
   Command,
   canInsertLayers,
-  getActivePage,
   InMemoryAssetService,
   localize,
   AssetServiceId,
@@ -76,28 +75,30 @@ function createLayerId(type: string): string {
 }
 
 function insertCanvasLayer(ctx: CommandContext, layer: Layer): void {
-  const page = getActivePage(ctx.scene.getScene());
+  const page = ctx.scene.getActivePage();
   ctx.scene.apply({
     apply: (scene) => ({
       ...scene,
       pages: scene.pages.map((p) =>
         p.id === page.id ? { ...p, layers: [...p.layers, layer] } : p
       ),
-      selection: {
-        activePageId: page.id,
-        selectedLayerIds: [layer.id],
-        primaryLayerId: layer.id,
-      },
     }),
     label: localize(ctx.services, 'canvas.history.insertLayer', {
       defaultValue: 'Insert layer',
     }),
   });
+  ctx.scene.setSelection({
+    activePageId: page.id,
+    primaryLayerId: layer.id,
+    selectedLayerIds: [layer.id],
+  });
 }
 
 function canInsertOnActivePage(ctx: CommandContext): boolean {
   const scene = ctx.scene.getScene();
-  return getActivePage(scene).layout === 'absolute' && canInsertLayers(scene);
+  return (
+    ctx.scene.getActivePage().layout === 'absolute' && canInsertLayers(scene)
+  );
 }
 
 export class InsertCanvasTextCommand extends Command {
@@ -108,7 +109,7 @@ export class InsertCanvasTextCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = getActivePage(ctx.scene.getScene());
+    const page = ctx.scene.getActivePage();
     const layer = new CanvasTextLayer().createDefault(
       createLayerId('text'),
       page
@@ -125,7 +126,7 @@ export class InsertCanvasImageCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = getActivePage(ctx.scene.getScene());
+    const page = ctx.scene.getActivePage();
     const layer = new CanvasImageLayer().createDefault(
       createLayerId('image'),
       page
@@ -142,7 +143,7 @@ export class InsertCanvasRectCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = getActivePage(ctx.scene.getScene());
+    const page = ctx.scene.getActivePage();
     const layer = new CanvasRectLayer().createDefault(
       createLayerId('rect'),
       page
@@ -159,7 +160,7 @@ export class InsertCanvasCircleCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = getActivePage(ctx.scene.getScene());
+    const page = ctx.scene.getActivePage();
     const layer = new CanvasCircleLayer().createDefault(
       createLayerId('circle'),
       page
@@ -203,7 +204,7 @@ export class UploadAssetCommand extends Command {
           return;
         }
         const assetRef = await assets.upload!(file);
-        const page = getActivePage(ctx.scene.getScene());
+        const page = ctx.scene.getActivePage();
         const layer = new CanvasImageLayer().createDefault(
           createLayerId('image'),
           page
@@ -296,7 +297,6 @@ export function createCanvasDemoScene() {
   const { width: pageWidth, height: pageHeight } = getDefaultPageDimensions();
 
   return normalizeScene({
-    activePageId: 'canvas-page',
     pages: [
       {
         id: 'canvas-page',
@@ -362,10 +362,5 @@ export function createCanvasDemoScene() {
         ],
       },
     ],
-    selection: {
-      activePageId: 'canvas-page',
-      primaryLayerId: null,
-      selectedLayerIds: [],
-    },
   });
 }

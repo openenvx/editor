@@ -1,6 +1,6 @@
 import { Emitter } from '../runtime/emitter';
 import type { Event } from '../runtime/emitter';
-import type { Scene } from '../scene/types';
+import type { Scene, Selection } from '../scene/types';
 
 export class ContextKeyService {
   private readonly keys = new Map<string, boolean | string | number>();
@@ -39,15 +39,16 @@ export class ContextKeyService {
 
   syncSceneKeys(input: {
     scene: Scene;
+    selection: Selection;
     isDirty: boolean;
     hasActiveEditor: boolean;
     customKeys?: Record<string, boolean | string | number>;
   }): boolean {
     const page =
       input.scene.pages.find(
-        (entry) => entry.id === input.scene.activePageId
+        (entry) => entry.id === input.selection.activePageId
       ) ?? input.scene.pages[0]!;
-    const { selectedLayerIds } = input.scene.selection;
+    const { selectedLayerIds } = input.selection;
 
     let changed = false;
     const set = (key: string, value: boolean | string | number) => {

@@ -4,7 +4,6 @@ import {
   canTransformLayer,
   findLayerById,
   getActivePage,
-  getPrimaryLayer,
   localize,
   updateLayerInTree,
 } from '@openenvx/core';
@@ -63,7 +62,7 @@ function canTransformLayerById(ctx: CommandContext, layerId: string): boolean {
 }
 
 function canTransformPrimaryLayer(ctx: CommandContext): boolean {
-  const layer = getPrimaryLayer(ctx.scene.getScene());
+  const layer = ctx.scene.getPrimaryLayer();
   return layer ? canTransformLayer(layer) : false;
 }
 
@@ -80,7 +79,7 @@ export class SetPageSizeCommand extends Command {
     if (!size) {
       return;
     }
-    const activePageId = ctx.scene.getScene().activePageId;
+    const activePageId = ctx.scene.getActivePageId();
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
@@ -152,7 +151,7 @@ export class ResizePagePresetCommand extends Command {
   readonly id = 'canvas.resizePagePreset';
 
   canExecute(ctx: CommandContext, args?: unknown): boolean {
-    if (getActivePage(ctx.scene.getScene()).layout !== 'absolute') {
+    if (ctx.scene.getActivePage().layout !== 'absolute') {
       return false;
     }
     if (!canResizePage(ctx.scene.getScene())) {
@@ -348,7 +347,7 @@ function applyLayerTransform(
 }
 
 function adjustLayerRotation(ctx: CommandContext, delta: number): void {
-  const layer = getPrimaryLayer(ctx.scene.getScene());
+  const layer = ctx.scene.getPrimaryLayer();
   if (!layer?.transform) {
     return;
   }

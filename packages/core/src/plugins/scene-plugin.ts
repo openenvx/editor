@@ -57,9 +57,10 @@ export class DeleteLayerCommand extends Command {
 
   execute(ctx: CommandContext): void {
     const ids = new Set(ctx.selection.selectedLayerIds);
+    const activePageId = ctx.selection.activePageId;
     ctx.scene.apply({
       apply: (scene) => {
-        const page = getActivePage(scene);
+        const page = getActivePage(scene, activePageId);
         let layers = page.layers;
         for (const id of ids) {
           layers = removeLayerFromTree(layers, id);
@@ -69,14 +70,14 @@ export class DeleteLayerCommand extends Command {
           pages: scene.pages.map((p) =>
             p.id === page.id ? { ...p, layers } : p
           ),
-          selection: {
-            ...scene.selection,
-            selectedLayerIds: [],
-            primaryLayerId: null,
-          },
         };
       },
       label: 'Delete layers',
+    });
+    ctx.scene.setSelection({
+      activePageId,
+      primaryLayerId: null,
+      selectedLayerIds: [],
     });
   }
 }
@@ -94,7 +95,7 @@ class MoveLayerRelativeCommand extends Command {
   }
 
   canExecute(ctx: CommandContext): boolean {
-    const page = getActivePage(ctx.scene.getScene());
+    const page = ctx.scene.getActivePage();
     const id = ctx.selection.primaryLayerId;
     if (!id) {
       return false;
@@ -115,9 +116,10 @@ class MoveLayerRelativeCommand extends Command {
     if (!id) {
       return;
     }
+    const activePageId = ctx.selection.activePageId;
     ctx.scene.apply({
       apply: (scene) => {
-        const page = getActivePage(scene);
+        const page = getActivePage(scene, activePageId);
         return {
           ...scene,
           pages: scene.pages.map((p) =>
@@ -165,7 +167,7 @@ export class MoveLayerCommand extends Command {
     if (!layer || !canReorderLayer(layer)) {
       return false;
     }
-    const page = getActivePage(scene);
+    const page = getActivePage(scene, ctx.selection.activePageId);
     return page.layers.some((l) => l.id === moveArgs.layerId);
   }
 
@@ -176,7 +178,7 @@ export class MoveLayerCommand extends Command {
     }
     ctx.scene.apply({
       apply: (scene) => {
-        const page = getActivePage(scene);
+        const page = getActivePage(scene, ctx.selection.activePageId);
         return {
           ...scene,
           pages: scene.pages.map((p) =>

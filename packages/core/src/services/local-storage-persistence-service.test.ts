@@ -1,4 +1,8 @@
-import { createEmptyScene } from '@openenvx/schema';
+import {
+  createEmptyScene,
+  createEmptySceneSnapshot,
+  type SceneSnapshot,
+} from '@openenvx/schema';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { LocalStoragePersistenceService } from './local-storage-persistence-service';
@@ -34,12 +38,14 @@ describe('LocalStoragePersistenceService', () => {
     (globalThis as Record<string, unknown>).localStorage = originalLocalStorage;
   });
 
-  it('saves and loads a scene by uri', async () => {
-    const scene = createEmptyScene();
-    await service.save('doc://test', scene);
+  it('saves and loads a scene snapshot by uri', async () => {
+    const snapshot = createEmptySceneSnapshot();
+    await service.save('doc://test', snapshot);
     const loaded = await service.load('doc://test');
-    expect(loaded.activePageId).toBe(scene.activePageId);
-    expect(loaded.schemaVersion).toBe(scene.schemaVersion);
+    expect(loaded.editorState.activePageId).toBe(
+      snapshot.editorState.activePageId
+    );
+    expect(loaded.scene.schemaVersion).toBe(snapshot.scene.schemaVersion);
   });
 
   it('throws when loading a missing uri', async () => {
@@ -49,38 +55,49 @@ describe('LocalStoragePersistenceService', () => {
   });
 
   it('deletes and lists documents', async () => {
-    await service.save('doc://a', createEmptyScene());
-    await service.save('doc://b', createEmptyScene());
+    await service.save('doc://a', createEmptySceneSnapshot());
+    await service.save('doc://b', createEmptySceneSnapshot());
     expect(service.list()).toEqual(['doc://a', 'doc://b']);
     service.delete('doc://a');
     expect(service.list()).toEqual(['doc://b']);
   });
 
   it('saves and loads a scene with assets', async () => {
-    const scene = {
-      ...createEmptyScene(),
-      assets: {
-        img1: { data: 'eHk=', encoding: 'base64' as const, mimeType: 'image/png' },
+    const snapshot: SceneSnapshot = {
+      editorState: {
+        activePageId: 'page-1',
+        primaryLayerId: null,
+        selectedLayerIds: [],
       },
-      pages: [
-        {
-          ...createEmptyScene().pages[0]!,
-          layers: [
-            {
-              data: { assetRef: 'asset://img1' },
-              id: '1',
-              type: 'image',
-            },
-          ],
+      scene: {
+        ...createEmptyScene(),
+        assets: {
+          img1: {
+            data: 'eHk=',
+            encoding: 'base64' as const,
+            mimeType: 'image/png',
+          },
         },
-      ],
+        pages: [
+          {
+            ...createEmptyScene().pages[0]!,
+            layers: [
+              {
+                data: { assetRef: 'asset://img1' },
+                id: '1',
+                type: 'image',
+              },
+            ],
+          },
+        ],
+      },
     };
-    await service.save('doc://assets', scene);
+    await service.save('doc://assets', snapshot);
     const loaded = await service.load('doc://assets');
-    expect(loaded.assets).toEqual({
+    expect(loaded.scene.assets).toEqual({
       img1: { data: 'eHk=', encoding: 'base64', mimeType: 'image/png' },
     });
-    expect(loaded.pages[0]!.layers[0]!.data).toEqual({
+    expect(loaded.scene.pages[0]!.layers[0]!.data).toEqual({
       assetRef: 'asset://img1',
     });
   });

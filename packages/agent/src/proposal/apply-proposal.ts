@@ -78,9 +78,10 @@ function countLayers(scene: Scene): number {
 
 function applyCreateLayerToScene(
   scene: Scene,
-  change: CreateLayerChange
+  change: CreateLayerChange,
+  activePageId?: string
 ): { scene: Scene; applied: boolean } {
-  const pageId = scene.activePageId ?? scene.pages[0]?.id;
+  const pageId = activePageId ?? scene.pages[0]?.id;
   if (!pageId) {
     return { scene, applied: false };
   }
@@ -121,17 +122,6 @@ function applyDeleteLayersToScene(scene: Scene, layerIds: string[]): Scene {
       }
       return { ...page, layers };
     }),
-    selection: {
-      activePageId: scene.selection.activePageId,
-      selectedLayerIds: scene.selection.selectedLayerIds.filter(
-        (id) => !ids.has(id)
-      ),
-      primaryLayerId:
-        scene.selection.primaryLayerId &&
-        ids.has(scene.selection.primaryLayerId)
-          ? null
-          : scene.selection.primaryLayerId,
-    },
   };
 }
 
@@ -170,11 +160,12 @@ export async function applyProposedChanges(
   if (createChanges.length > 0) {
     let createApplied = 0;
     let createSkipped = 0;
+    const activePageId = api.scene.getActivePageId();
     api.scene.apply({
       apply: (scene) => {
         let next = scene;
         for (const change of createChanges) {
-          const result = applyCreateLayerToScene(next, change);
+          const result = applyCreateLayerToScene(next, change, activePageId);
           next = result.scene;
           if (result.applied) {
             createApplied += 1;
@@ -218,9 +209,21 @@ export async function applyProposedChanges(
 
   if (deleteChanges.length > 0) {
     const layerIds = deleteChanges.flatMap((change) => change.layerIds);
+    const deleted = new Set(layerIds);
     api.scene.apply({
       apply: (scene) => applyDeleteLayersToScene(scene, layerIds),
       label: summary ?? 'Agent delete layers',
+    });
+    const selection = api.scene.getSelection();
+    api.scene.setSelection({
+      ...selection,
+      primaryLayerId:
+        selection.primaryLayerId && deleted.has(selection.primaryLayerId)
+          ? null
+          : selection.primaryLayerId,
+      selectedLayerIds: selection.selectedLayerIds.filter(
+        (id) => !deleted.has(id)
+      ),
     });
     applied += deleteChanges.length;
   }

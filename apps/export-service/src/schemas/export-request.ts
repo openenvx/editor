@@ -1,10 +1,12 @@
 import { RENDER_IR_VERSION } from '@openenvx/preview';
+import { layerStyleShadowSchema, paddingSchema } from '@openenvx/schema';
 import { z } from 'zod';
 
 export const exportFormatSchema = z.enum(['svg', 'png', 'jpg', 'pdf']);
 
 export const exportModeSchema = z.enum(['strict', 'lenient']);
 
+/** Render-IR transform — stricter than Scene (positive size, opacity range). */
 const transformSchema = z.object({
   height: z.number().positive(),
   opacity: z.number().min(0).max(1),
@@ -26,19 +28,7 @@ const cornerRadiusSchema = z.union([
   }),
 ]);
 
-const paddingSchema = z.object({
-  bottom: z.number(),
-  left: z.number(),
-  right: z.number(),
-  top: z.number(),
-});
-
-const layerShadowSchema = z.object({
-  blur: z.number(),
-  color: z.string(),
-  offsetX: z.number(),
-  offsetY: z.number(),
-});
+const layerShadowSchema = layerStyleShadowSchema;
 
 const rectDescriptorSchema = z.object({
   cornerRadius: cornerRadiusSchema.optional(),

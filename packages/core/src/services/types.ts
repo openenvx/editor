@@ -1,3 +1,5 @@
+import type { SceneSnapshot as PersistedSceneSnapshot } from '@openenvx/schema';
+
 import type { Scene, SceneAsset } from '../scene/types';
 
 export interface AssetService {
@@ -19,7 +21,7 @@ export interface FontService {
 }
 
 export interface PersistenceService {
-  save(uri: string, scene: Scene): Promise<void>;
-  load(uri: string): Promise<Scene>;
+  save(uri: string, snapshot: PersistedSceneSnapshot): Promise<void>;
+  load(uri: string): Promise<PersistedSceneSnapshot>;
   list?(): Promise<string[]> | string[];
 }

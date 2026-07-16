@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 describe("schema units", () => {
   it("normalizes page unit and dpi", () => {
     const scene = normalizeScene({
-      activePageId: "p1",
       pages: [
         {
           id: "p1",
@@ -23,7 +22,6 @@ describe("schema units", () => {
 
   it("normalizes nested container children", () => {
     const scene = normalizeScene({
-      activePageId: "p1",
       pages: [
         {
           id: "p1",

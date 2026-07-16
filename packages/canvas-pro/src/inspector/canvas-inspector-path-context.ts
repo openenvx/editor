@@ -1,4 +1,4 @@
-import { clampTransformSize, getPrimaryLayer } from '@openenvx/core';
+import { clampTransformSize, findLayerById } from '@openenvx/core';
 import type {
   InspectorValuePath,
   InspectorHostContext,
@@ -20,7 +20,9 @@ export function createCanvasInspectorHostContext(
   const base = createInspectorHostContext(options);
   const { scene, selectedLayerId, updateLayerTransform, executeCommand } =
     options;
-  const primaryLayer = getPrimaryLayer(scene);
+  const primaryLayer = selectedLayerId
+    ? findLayerById(scene, selectedLayerId)
+    : null;
 
   return {
     layerData: base.layerData,

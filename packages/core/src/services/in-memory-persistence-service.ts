@@ -1,21 +1,20 @@
-import { normalizeScene } from '@openenvx/schema';
-import type { Scene } from '@openenvx/schema';
+import { normalizeSceneSnapshot, type SceneSnapshot } from '@openenvx/schema';
 
 import type { PersistenceService } from './types';
 
 export class InMemoryPersistenceService implements PersistenceService {
-  private readonly documents = new Map<string, Scene>();
+  private readonly documents = new Map<string, SceneSnapshot>();
 
-  async save(uri: string, scene: Scene): Promise<void> {
-    this.documents.set(uri, structuredClone(scene));
+  async save(uri: string, snapshot: SceneSnapshot): Promise<void> {
+    this.documents.set(uri, structuredClone(snapshot));
   }
 
-  async load(uri: string): Promise<Scene> {
-    const scene = this.documents.get(uri);
-    if (!scene) {
+  async load(uri: string): Promise<SceneSnapshot> {
+    const snapshot = this.documents.get(uri);
+    if (!snapshot) {
       throw new Error(`Document not found: ${uri}`);
     }
-    return normalizeScene(structuredClone(scene));
+    return normalizeSceneSnapshot(structuredClone(snapshot));
   }
 
   clear(): void {

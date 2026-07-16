@@ -14,7 +14,7 @@ import type {
   PluginContext,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import { normalizeScene } from '@openenvx/schema';
+import { normalizeScene, normalizeSceneSnapshot } from '@openenvx/schema';
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -143,7 +143,7 @@ describe(WorkbenchController, () => {
   });
 
   it("reuses cached command palette when selection changes without context key changes", async () => {
-    const scene = normalizeScene({
+    const snapshot = normalizeSceneSnapshot({
       activePageId: "p1",
       pages: [
         {
@@ -163,7 +163,8 @@ describe(WorkbenchController, () => {
       },
     });
     const controller = new WorkbenchController({
-      initialScene: scene,
+      initialEditorState: snapshot.editorState,
+      initialScene: snapshot.scene,
       plugins: [new LayerPlugin()],
     });
     await controller.start();

@@ -1,8 +1,4 @@
-import {
-  getActivePage,
-  getLayerChildren,
-  resolveEditorPaneKind,
-} from '@openenvx/core';
+import { getLayerChildren, resolveEditorPaneKind } from '@openenvx/core';
 import type { Layer } from '@openenvx/core';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
 
@@ -20,10 +16,12 @@ export class EditorSliceBuilder {
   build(ctx: WorkbenchSliceContext): EditorSlice {
     const coreRegistries = ctx.coreRegistries;
     const commandCtx = ctx.runtime.createCommandContext();
-    const scene = ctx.runtime.getScene().getScene();
+    const store = ctx.runtime.getScene();
+    const scene = store.getScene();
     const editor = ctx.runtime.getEditor().getActiveEditor();
-    const activePage = getActivePage(scene);
-    const selectedIds = new Set(scene.selection.selectedLayerIds);
+    const activePage = store.getActivePage();
+    const selectedIds = new Set(store.getSelection().selectedLayerIds);
+    const activePageId = store.getActivePageId();
 
     const buildSurfaceItem = (layer: Layer): LayerSurfaceItem => {
       const def = coreRegistries.layers.get(layer.type);
@@ -56,7 +54,7 @@ export class EditorSliceBuilder {
 
     return {
       editor,
-      editorPaneKind: resolveEditorPaneKind(scene),
+      editorPaneKind: resolveEditorPaneKind(scene, activePageId),
       editorPanes: ctx.providerRegistries.editorPaneRegistry
         .entries()
         .map(([editorPaneKind, Component]) => ({

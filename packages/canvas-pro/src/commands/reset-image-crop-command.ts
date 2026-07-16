@@ -1,9 +1,4 @@
-import {
-  Command,
-  getPrimaryLayer,
-  localize,
-  updateLayerInTree,
-} from '@openenvx/core';
+import { Command, localize, updateLayerInTree } from '@openenvx/core';
 import type { CommandContext } from '@openenvx/core';
 
 import { hasActiveCrop, readImageCrop } from '../crop/normalized-crop';
@@ -12,7 +7,7 @@ export class ResetImageCropCommand extends Command {
   readonly id = 'canvas.resetImageCrop';
 
   canExecute(ctx: CommandContext): boolean {
-    const layer = getPrimaryLayer(ctx.scene.getScene());
+    const layer = ctx.scene.getPrimaryLayer();
     if (!layer || layer.type !== 'canvas.image') {
       return false;
     }
@@ -23,7 +18,7 @@ export class ResetImageCropCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const layer = getPrimaryLayer(ctx.scene.getScene());
+    const layer = ctx.scene.getPrimaryLayer();
     if (!layer) {
       return;
     }

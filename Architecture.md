@@ -11,11 +11,23 @@ Package boundaries and contribution flow for the monorepo.
 
 **Hard rule:** All canvas code lives in `@openenvx/canvas`. Not in `core`.
 
+## `@openenvx/schema` (Scene document)
+
+Canonical **content** Scene JSON is authored once in Zod v4 (`sceneSchemaLenient` / `sceneSchemaCanonical`). Defaults, `validateScene` / `normalizeScene`, and the published `scene.schema.json` (for LLMs and other SDKs) all come from that schema.
+
+| Concept | Role |
+| --- | --- |
+| `Scene` | Content only: `schemaVersion`, `pages`, optional `assets` / `templatePolicy` |
+| `EditorState` | UI state: `activePageId`, `selectedLayerIds`, `primaryLayerId` |
+| `SceneSnapshot` | Persisted pair `{ scene, editorState }` |
+
+Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circle`, `canvas.group`) have typed `data`; unknown plugin types use an escape hatch. Import JSON Schema via `@openenvx/schema/scene.schema.json`.
+
 ## Package tiers
 
 | Tier | Packages | License (intent) | Responsibility |
 | --- | --- | --- | --- |
-| Foundation | `schema`, `preview`, `core` | OSS (MIT) | Scene model, plugin host primitives (commands, layers, services, property field data) |
+| Foundation | `schema`, `preview`, `core` | OSS (MIT) | Scene model (Zod + JSON Schema), plugin host primitives (commands, layers, services, property field data) |
 | OSS product | `headless`, `canvas`, `driver-*` | OSS (MIT) | Workbench runtime, canvas engine, export drivers |
 | Enterprise | `canvas-pro`, `studio` | Proprietary | Workbench wiring for canvas, React shell renderers |
 

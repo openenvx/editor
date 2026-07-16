@@ -32,7 +32,7 @@ export class CanvasStatusBarContribution extends StatusBarContribution {
       .text('Unsaved', { id: 'canvas-unsaved', when: 'editor.dirty' });
 
     const scene = ctx.scene.getScene();
-    const { selectedLayerIds, primaryLayerId } = scene.selection;
+    const { selectedLayerIds, primaryLayerId } = ctx.selection;
     if (selectedLayerIds.length !== 1 || !primaryLayerId) {
       return;
     }

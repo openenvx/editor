@@ -53,12 +53,13 @@ function insertCanvasLayers(
     return;
   }
 
-  const page = getActivePage(ctx.scene.getScene());
+  const page = ctx.scene.getActivePage();
   const insertIndex = options?.insertIndex ?? page.layers.length;
+  const activePageId = page.id;
 
   ctx.scene.apply({
     apply: (scene) => {
-      const activePage = getActivePage(scene);
+      const activePage = getActivePage(scene, activePageId);
       const nextLayers = [...activePage.layers];
       nextLayers.splice(insertIndex, 0, ...layers);
       return {
@@ -66,11 +67,6 @@ function insertCanvasLayers(
         pages: scene.pages.map((entry) =>
           entry.id === activePage.id ? { ...entry, layers: nextLayers } : entry
         ),
-        selection: {
-          activePageId: activePage.id,
-          selectedLayerIds: layers.map((layer) => layer.id),
-          primaryLayerId: layers[0]?.id ?? null,
-        },
       };
     },
     label:
@@ -78,6 +74,11 @@ function insertCanvasLayers(
       localize(ctx.services, 'canvas.history.insertLayer', {
         defaultValue: 'Insert layers',
       }),
+  });
+  ctx.scene.setSelection({
+    activePageId,
+    primaryLayerId: layers[0]?.id ?? null,
+    selectedLayerIds: layers.map((layer) => layer.id),
   });
 }
 
@@ -94,7 +95,7 @@ async function layersFromExternalPayload(
   anchor: { x: number; y: number },
   payload: ExternalClipboardPayload
 ): Promise<Layer[] | null> {
-  const page = getActivePage(ctx.scene.getScene());
+  const page = ctx.scene.getActivePage();
 
   if (payload.kind === 'text') {
     const layer = new CanvasTextLayer().createDefault(
@@ -250,7 +251,7 @@ export async function executeDuplicateLayers(
     return;
   }
 
-  const page = getActivePage(ctx.scene.getScene());
+  const page = ctx.scene.getActivePage();
   const indices = selected.map((layer) => {
     const rootIndex = page.layers.findIndex((entry) => entry.id === layer.id);
     return rootIndex !== -1 ? rootIndex : page.layers.length;

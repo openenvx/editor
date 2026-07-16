@@ -1,19 +1,18 @@
-import { normalizeScene } from '@openenvx/schema';
-import type { Scene } from '@openenvx/schema';
+import { normalizeSceneSnapshot, type SceneSnapshot } from '@openenvx/schema';
 
 import type { PersistenceService } from './types';
 
 const KEY_PREFIX = 'owb:doc:';
 
 export class LocalStoragePersistenceService implements PersistenceService {
-  async save(uri: string, scene: Scene): Promise<void> {
+  async save(uri: string, snapshot: SceneSnapshot): Promise<void> {
     if (typeof localStorage === 'undefined') {
       throw new TypeError('localStorage is not available');
     }
-    localStorage.setItem(KEY_PREFIX + uri, JSON.stringify(scene));
+    localStorage.setItem(KEY_PREFIX + uri, JSON.stringify(snapshot));
   }
 
-  async load(uri: string): Promise<Scene> {
+  async load(uri: string): Promise<SceneSnapshot> {
     if (typeof localStorage === 'undefined') {
       throw new TypeError('localStorage is not available');
     }
@@ -21,7 +20,7 @@ export class LocalStoragePersistenceService implements PersistenceService {
     if (raw === null) {
       throw new Error(`Document not found: ${uri}`);
     }
-    return normalizeScene(JSON.parse(raw));
+    return normalizeSceneSnapshot(JSON.parse(raw));
   }
 
   delete(uri: string): void {

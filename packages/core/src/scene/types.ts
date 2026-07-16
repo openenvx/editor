@@ -1,20 +1,23 @@
-import type { Layer, Scene } from '@openenvx/schema';
+import type { EditorState, Layer, Scene } from '@openenvx/schema';
 
 import { walkLayers } from './layer-tree';
 
 export type {
   EditorPaneKind,
+  EditorState,
   Layer,
   Page,
   PageLayout,
   Scene,
   SceneAsset,
+  SceneSnapshot as SchemaSceneSnapshot,
   Selection,
   Transform,
 } from '@openenvx/schema';
 
 export interface SceneSnapshot {
   scene: Scene;
+  editorState: EditorState;
   contentRevision: number;
 }
 
@@ -27,15 +30,20 @@ export function cloneScene(scene: Scene): Scene {
   return structuredClone(scene);
 }
 
-export function getActivePage(scene: Scene) {
-  return (
-    scene.pages.find((p) => p.id === scene.activePageId) ?? scene.pages[0]!
-  );
+export function cloneEditorState(state: EditorState): EditorState {
+  return structuredClone(state);
 }
 
-export function getPrimaryLayer(scene: Scene) {
-  const page = getActivePage(scene);
-  const { primaryLayerId } = scene.selection;
+export function getActivePage(scene: Scene, activePageId?: string) {
+  if (activePageId) {
+    return scene.pages.find((p) => p.id === activePageId) ?? scene.pages[0]!;
+  }
+  return scene.pages[0]!;
+}
+
+export function getPrimaryLayer(scene: Scene, editorState: EditorState) {
+  const page = getActivePage(scene, editorState.activePageId);
+  const { primaryLayerId } = editorState;
   if (!primaryLayerId) {
     return null;
   }
@@ -52,6 +60,9 @@ export function getPrimaryLayer(scene: Scene) {
   return found;
 }
 
-export function resolveEditorPaneKind(scene: Scene): string {
-  return getActivePage(scene).layout;
+export function resolveEditorPaneKind(
+  scene: Scene,
+  activePageId: string
+): string {
+  return getActivePage(scene, activePageId).layout;
 }

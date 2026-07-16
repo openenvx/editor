@@ -27,7 +27,7 @@ function canExecuteWithSelection(ctx: CommandContext): boolean {
   return ctx.selection.selectedLayerIds.every((id) => {
     const layer =
       scene.pages
-        .find((page) => page.id === scene.activePageId)
+        .find((page) => page.id === ctx.selection.activePageId)
         ?.layers.find((l) => l.id === id) ?? null;
     return layer && canSelectLayer(layer);
   });
@@ -41,7 +41,7 @@ function canExecuteWithWritableSelection(ctx: CommandContext): boolean {
   return ctx.selection.selectedLayerIds.every((id) => {
     const layer =
       scene.pages
-        .find((page) => page.id === scene.activePageId)
+        .find((page) => page.id === ctx.selection.activePageId)
         ?.layers.find((l) => l.id === id) ?? null;
     return layer && canDuplicateLayer(layer, scene);
   });

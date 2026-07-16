@@ -1,3 +1,6 @@
+import type { Layer, Scene } from '@openenvx/schema';
+import { validateScene } from '@openenvx/schema';
+
 export interface LayerSummary {
   id: string;
   type: string;
@@ -20,6 +23,16 @@ export interface PageSummary {
   layerCount: number;
 }
 
+export interface SceneContextInput {
+  scene?: Scene | Record<string, unknown>;
+  selection?: {
+    activePageId?: string;
+    selectedLayerIds?: string[];
+    primaryLayerId?: string | null;
+  };
+  activePageId?: string | null;
+}
+
 function layerName(data: Record<string, unknown>): string | undefined {
   if (typeof data.name === 'string') {
     return data.name;
@@ -30,7 +43,7 @@ function layerName(data: Record<string, unknown>): string | undefined {
   return undefined;
 }
 
-function summarizeLayer(layer: Record<string, unknown>): LayerSummary {
+function summarizeLayer(layer: Layer | Record<string, unknown>): LayerSummary {
   const data =
     typeof layer.data === 'object' && layer.data !== null
       ? (layer.data as Record<string, unknown>)
@@ -87,8 +100,18 @@ function collectLayers(layers: unknown[], result: LayerSummary[]): void {
   }
 }
 
+export function isValidSceneContext(
+  sceneContext: SceneContextInput | Record<string, unknown>
+): boolean {
+  const scene = sceneContext.scene;
+  if (scene === undefined) {
+    return false;
+  }
+  return validateScene(scene).valid;
+}
+
 export function buildLayerSummary(
-  sceneContext: Record<string, unknown>
+  sceneContext: SceneContextInput | Record<string, unknown>
 ): LayerSummary[] {
   const scene = sceneContext.scene;
   if (typeof scene !== 'object' || scene === null) {
@@ -114,7 +137,7 @@ export function buildLayerSummary(
 }
 
 export function buildPageSummaries(
-  sceneContext: Record<string, unknown>
+  sceneContext: SceneContextInput | Record<string, unknown>
 ): PageSummary[] {
   const scene = sceneContext.scene;
   if (typeof scene !== 'object' || scene === null) {
@@ -145,7 +168,7 @@ export function buildPageSummaries(
 
 /** Compact always-on scene context for the agent (no full scene JSON dump). */
 export function formatSceneContext(
-  sceneContext: Record<string, unknown>
+  sceneContext: SceneContextInput | Record<string, unknown>
 ): string {
   const layerSummary = buildLayerSummary(sceneContext);
   const pages = buildPageSummaries(sceneContext);
@@ -170,7 +193,7 @@ export function formatSceneContext(
 }
 
 export function findLayerRecord(
-  sceneContext: Record<string, unknown>,
+  sceneContext: SceneContextInput | Record<string, unknown>,
   layerId: string
 ): Record<string, unknown> | null {
   const scene = sceneContext.scene;
@@ -220,7 +243,7 @@ export function findLayerRecord(
 }
 
 export function findPageRecord(
-  sceneContext: Record<string, unknown>,
+  sceneContext: SceneContextInput | Record<string, unknown>,
   pageId: string
 ): Record<string, unknown> | null {
   const scene = sceneContext.scene;

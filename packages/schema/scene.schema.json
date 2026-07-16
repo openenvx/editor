@@ -1,0 +1,1787 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "assets": {
+      "description": "Inline assets keyed by id.",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string",
+            "description": "Base64-encoded asset bytes."
+          },
+          "encoding": {
+            "type": "string",
+            "const": "base64"
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "MIME type of the asset."
+          }
+        },
+        "required": [
+          "data",
+          "encoding",
+          "mimeType"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "pages": {
+      "default": [],
+      "description": "Pages in the scene (at least one after normalize).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "backgroundColor": {
+            "description": "Artboard background for export.",
+            "type": "string"
+          },
+          "dpi": {
+            "description": "Dots per inch for print.",
+            "type": "number"
+          },
+          "height": {
+            "description": "Page height in page units.",
+            "type": "number"
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique page identifier."
+          },
+          "layers": {
+            "default": [],
+            "description": "Top-level layers on the page.",
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema0"
+            }
+          },
+          "layout": {
+            "default": "flow",
+            "description": "Page layout mode.",
+            "type": "string",
+            "enum": [
+              "flow",
+              "absolute"
+            ]
+          },
+          "name": {
+            "default": "Page 1",
+            "description": "Display name.",
+            "type": "string"
+          },
+          "presetId": {
+            "description": "ISO page size preset id.",
+            "type": "string"
+          },
+          "unit": {
+            "default": "px",
+            "description": "Length unit for page dimensions.",
+            "type": "string",
+            "enum": [
+              "px",
+              "mm",
+              "in",
+              "cm",
+              "pt"
+            ]
+          },
+          "width": {
+            "description": "Page width in page units.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "layers",
+          "layout",
+          "name",
+          "unit"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "schemaVersion": {
+      "default": 2,
+      "description": "Schema version for compatibility.",
+      "type": "number"
+    },
+    "templatePolicy": {
+      "type": "object",
+      "properties": {
+        "allowDeleteLayers": {
+          "default": true,
+          "type": "boolean"
+        },
+        "allowDuplicateLayers": {
+          "default": true,
+          "type": "boolean"
+        },
+        "allowInsertLayers": {
+          "default": true,
+          "type": "boolean"
+        },
+        "allowPageResize": {
+          "default": true,
+          "type": "boolean"
+        },
+        "frozenLayers": {
+          "description": "Frozen layer snapshots keyed by layer id.",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "data": {},
+              "transform": {
+                "type": "object",
+                "properties": {
+                  "height": {
+                    "default": 100,
+                    "description": "Height in pixels.",
+                    "type": "number"
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Opacity (0-1).",
+                    "type": "number"
+                  },
+                  "rotation": {
+                    "default": 0,
+                    "description": "Rotation in degrees.",
+                    "type": "number"
+                  },
+                  "scaleX": {
+                    "default": 1,
+                    "description": "Horizontal scale.",
+                    "type": "number"
+                  },
+                  "scaleY": {
+                    "default": 1,
+                    "description": "Vertical scale.",
+                    "type": "number"
+                  },
+                  "width": {
+                    "default": 200,
+                    "description": "Width in pixels.",
+                    "type": "number"
+                  },
+                  "x": {
+                    "default": 0,
+                    "description": "X position in pixels.",
+                    "type": "number"
+                  },
+                  "y": {
+                    "default": 0,
+                    "description": "Y position in pixels.",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "height",
+                  "opacity",
+                  "rotation",
+                  "scaleX",
+                  "scaleY",
+                  "width",
+                  "x",
+                  "y"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "version": {
+          "default": 1,
+          "type": "number",
+          "const": 1
+        }
+      },
+      "required": [
+        "allowDeleteLayers",
+        "allowDuplicateLayers",
+        "allowInsertLayers",
+        "allowPageResize",
+        "version"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "pages",
+    "schemaVersion"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique layer identifier."
+            },
+            "locked": {
+              "default": false,
+              "description": "Whether the layer is locked.",
+              "type": "boolean"
+            },
+            "style": {
+              "description": "Visual style overrides.",
+              "type": "object",
+              "properties": {
+                "border": {
+                  "description": "Layer border.",
+                  "type": "object",
+                  "properties": {
+                    "color": {
+                      "type": "string",
+                      "description": "Border color."
+                    },
+                    "width": {
+                      "type": "number",
+                      "description": "Border width in pixels."
+                    }
+                  },
+                  "required": [
+                    "color",
+                    "width"
+                  ],
+                  "additionalProperties": false
+                },
+                "cornerRadius": {
+                  "description": "Per-corner radius.",
+                  "type": "object",
+                  "properties": {
+                    "bottomLeft": {
+                      "type": "number",
+                      "description": "Bottom-left corner radius in pixels."
+                    },
+                    "bottomRight": {
+                      "type": "number",
+                      "description": "Bottom-right corner radius in pixels."
+                    },
+                    "topLeft": {
+                      "type": "number",
+                      "description": "Top-left corner radius in pixels."
+                    },
+                    "topRight": {
+                      "type": "number",
+                      "description": "Top-right corner radius in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottomLeft",
+                    "bottomRight",
+                    "topLeft",
+                    "topRight"
+                  ],
+                  "additionalProperties": false
+                },
+                "fill": {
+                  "description": "Fill color.",
+                  "type": "string"
+                },
+                "flipH": {
+                  "description": "Horizontal flip.",
+                  "type": "boolean"
+                },
+                "flipV": {
+                  "description": "Vertical flip.",
+                  "type": "boolean"
+                },
+                "padding": {
+                  "description": "Inner padding.",
+                  "type": "object",
+                  "properties": {
+                    "bottom": {
+                      "type": "number",
+                      "description": "Bottom padding in pixels."
+                    },
+                    "left": {
+                      "type": "number",
+                      "description": "Left padding in pixels."
+                    },
+                    "right": {
+                      "type": "number",
+                      "description": "Right padding in pixels."
+                    },
+                    "top": {
+                      "type": "number",
+                      "description": "Top padding in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottom",
+                    "left",
+                    "right",
+                    "top"
+                  ],
+                  "additionalProperties": false
+                },
+                "shadow": {
+                  "description": "Drop shadow.",
+                  "type": "object",
+                  "properties": {
+                    "blur": {
+                      "type": "number",
+                      "description": "Shadow blur radius in pixels."
+                    },
+                    "color": {
+                      "type": "string",
+                      "description": "Shadow color."
+                    },
+                    "offsetX": {
+                      "type": "number",
+                      "description": "Shadow horizontal offset in pixels."
+                    },
+                    "offsetY": {
+                      "type": "number",
+                      "description": "Shadow vertical offset in pixels."
+                    },
+                    "spread": {
+                      "type": "number",
+                      "description": "Shadow spread in pixels."
+                    }
+                  },
+                  "required": [
+                    "blur",
+                    "color",
+                    "offsetX",
+                    "offsetY",
+                    "spread"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "transform": {
+              "description": "Absolute transform box.",
+              "type": "object",
+              "properties": {
+                "height": {
+                  "default": 100,
+                  "description": "Height in pixels.",
+                  "type": "number"
+                },
+                "opacity": {
+                  "default": 1,
+                  "description": "Opacity (0-1).",
+                  "type": "number"
+                },
+                "rotation": {
+                  "default": 0,
+                  "description": "Rotation in degrees.",
+                  "type": "number"
+                },
+                "scaleX": {
+                  "default": 1,
+                  "description": "Horizontal scale.",
+                  "type": "number"
+                },
+                "scaleY": {
+                  "default": 1,
+                  "description": "Vertical scale.",
+                  "type": "number"
+                },
+                "width": {
+                  "default": 200,
+                  "description": "Width in pixels.",
+                  "type": "number"
+                },
+                "x": {
+                  "default": 0,
+                  "description": "X position in pixels.",
+                  "type": "number"
+                },
+                "y": {
+                  "default": 0,
+                  "description": "Y position in pixels.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "height",
+                "opacity",
+                "rotation",
+                "scaleX",
+                "scaleY",
+                "width",
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "writeMode": {
+              "default": "free",
+              "description": "Template write permission mode.",
+              "type": "string",
+              "enum": [
+                "locked",
+                "free",
+                "content",
+                "properties"
+              ]
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "cornerRadius": {
+                  "type": "object",
+                  "properties": {
+                    "bottomLeft": {
+                      "type": "number",
+                      "description": "Bottom-left corner radius in pixels."
+                    },
+                    "bottomRight": {
+                      "type": "number",
+                      "description": "Bottom-right corner radius in pixels."
+                    },
+                    "topLeft": {
+                      "type": "number",
+                      "description": "Top-left corner radius in pixels."
+                    },
+                    "topRight": {
+                      "type": "number",
+                      "description": "Top-right corner radius in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottomLeft",
+                    "bottomRight",
+                    "topLeft",
+                    "topRight"
+                  ],
+                  "additionalProperties": false
+                },
+                "fill": {
+                  "default": "#3b82f6",
+                  "description": "Fill color.",
+                  "type": "string"
+                },
+                "flipH": {
+                  "type": "boolean"
+                },
+                "flipV": {
+                  "type": "boolean"
+                },
+                "padding": {
+                  "type": "object",
+                  "properties": {
+                    "bottom": {
+                      "type": "number",
+                      "description": "Bottom padding in pixels."
+                    },
+                    "left": {
+                      "type": "number",
+                      "description": "Left padding in pixels."
+                    },
+                    "right": {
+                      "type": "number",
+                      "description": "Right padding in pixels."
+                    },
+                    "top": {
+                      "type": "number",
+                      "description": "Top padding in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottom",
+                    "left",
+                    "right",
+                    "top"
+                  ],
+                  "additionalProperties": false
+                },
+                "shadow": {
+                  "type": "object",
+                  "properties": {
+                    "blur": {
+                      "type": "number",
+                      "description": "Shadow blur radius in pixels."
+                    },
+                    "color": {
+                      "type": "string",
+                      "description": "Shadow color."
+                    },
+                    "offsetX": {
+                      "type": "number",
+                      "description": "Shadow horizontal offset in pixels."
+                    },
+                    "offsetY": {
+                      "type": "number",
+                      "description": "Shadow vertical offset in pixels."
+                    },
+                    "spread": {
+                      "type": "number",
+                      "description": "Shadow spread in pixels."
+                    }
+                  },
+                  "required": [
+                    "blur",
+                    "color",
+                    "offsetX",
+                    "offsetY",
+                    "spread"
+                  ],
+                  "additionalProperties": false
+                },
+                "stroke": {
+                  "description": "Stroke color.",
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "description": "Stroke width in pixels.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "fill"
+              ],
+              "additionalProperties": false
+            },
+            "type": {
+              "type": "string",
+              "const": "canvas.rect"
+            }
+          },
+          "required": [
+            "id",
+            "locked",
+            "writeMode",
+            "data",
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique layer identifier."
+            },
+            "locked": {
+              "default": false,
+              "description": "Whether the layer is locked.",
+              "type": "boolean"
+            },
+            "style": {
+              "description": "Visual style overrides.",
+              "type": "object",
+              "properties": {
+                "border": {
+                  "description": "Layer border.",
+                  "type": "object",
+                  "properties": {
+                    "color": {
+                      "type": "string",
+                      "description": "Border color."
+                    },
+                    "width": {
+                      "type": "number",
+                      "description": "Border width in pixels."
+                    }
+                  },
+                  "required": [
+                    "color",
+                    "width"
+                  ],
+                  "additionalProperties": false
+                },
+                "cornerRadius": {
+                  "description": "Per-corner radius.",
+                  "type": "object",
+                  "properties": {
+                    "bottomLeft": {
+                      "type": "number",
+                      "description": "Bottom-left corner radius in pixels."
+                    },
+                    "bottomRight": {
+                      "type": "number",
+                      "description": "Bottom-right corner radius in pixels."
+                    },
+                    "topLeft": {
+                      "type": "number",
+                      "description": "Top-left corner radius in pixels."
+                    },
+                    "topRight": {
+                      "type": "number",
+                      "description": "Top-right corner radius in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottomLeft",
+                    "bottomRight",
+                    "topLeft",
+                    "topRight"
+                  ],
+                  "additionalProperties": false
+                },
+                "fill": {
+                  "description": "Fill color.",
+                  "type": "string"
+                },
+                "flipH": {
+                  "description": "Horizontal flip.",
+                  "type": "boolean"
+                },
+                "flipV": {
+                  "description": "Vertical flip.",
+                  "type": "boolean"
+                },
+                "padding": {
+                  "description": "Inner padding.",
+                  "type": "object",
+                  "properties": {
+                    "bottom": {
+                      "type": "number",
+                      "description": "Bottom padding in pixels."
+                    },
+                    "left": {
+                      "type": "number",
+                      "description": "Left padding in pixels."
+                    },
+                    "right": {
+                      "type": "number",
+                      "description": "Right padding in pixels."
+                    },
+                    "top": {
+                      "type": "number",
+                      "description": "Top padding in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottom",
+                    "left",
+                    "right",
+                    "top"
+                  ],
+                  "additionalProperties": false
+                },
+                "shadow": {
+                  "description": "Drop shadow.",
+                  "type": "object",
+                  "properties": {
+                    "blur": {
+                      "type": "number",
+                      "description": "Shadow blur radius in pixels."
+                    },
+                    "color": {
+                      "type": "string",
+                      "description": "Shadow color."
+                    },
+                    "offsetX": {
+                      "type": "number",
+                      "description": "Shadow horizontal offset in pixels."
+                    },
+                    "offsetY": {
+                      "type": "number",
+                      "description": "Shadow vertical offset in pixels."
+                    },
+                    "spread": {
+                      "type": "number",
+                      "description": "Shadow spread in pixels."
+                    }
+                  },
+                  "required": [
+                    "blur",
+                    "color",
+                    "offsetX",
+                    "offsetY",
+                    "spread"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "transform": {
+              "description": "Absolute transform box.",
+              "type": "object",
+              "properties": {
+                "height": {
+                  "default": 100,
+                  "description": "Height in pixels.",
+                  "type": "number"
+                },
+                "opacity": {
+                  "default": 1,
+                  "description": "Opacity (0-1).",
+                  "type": "number"
+                },
+                "rotation": {
+                  "default": 0,
+                  "description": "Rotation in degrees.",
+                  "type": "number"
+                },
+                "scaleX": {
+                  "default": 1,
+                  "description": "Horizontal scale.",
+                  "type": "number"
+                },
+                "scaleY": {
+                  "default": 1,
+                  "description": "Vertical scale.",
+                  "type": "number"
+                },
+                "width": {
+                  "default": 200,
+                  "description": "Width in pixels.",
+                  "type": "number"
+                },
+                "x": {
+                  "default": 0,
+                  "description": "X position in pixels.",
+                  "type": "number"
+                },
+                "y": {
+                  "default": 0,
+                  "description": "Y position in pixels.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "height",
+                "opacity",
+                "rotation",
+                "scaleX",
+                "scaleY",
+                "width",
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "writeMode": {
+              "default": "free",
+              "description": "Template write permission mode.",
+              "type": "string",
+              "enum": [
+                "locked",
+                "free",
+                "content",
+                "properties"
+              ]
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "alt": {
+                  "description": "Alt text.",
+                  "type": "string"
+                },
+                "assetRef": {
+                  "type": "string",
+                  "description": "Asset URL or scene asset id."
+                }
+              },
+              "required": [
+                "assetRef"
+              ],
+              "additionalProperties": {}
+            },
+            "type": {
+              "type": "string",
+              "const": "canvas.image"
+            }
+          },
+          "required": [
+            "id",
+            "locked",
+            "writeMode",
+            "data",
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique layer identifier."
+            },
+            "locked": {
+              "default": false,
+              "description": "Whether the layer is locked.",
+              "type": "boolean"
+            },
+            "style": {
+              "description": "Visual style overrides.",
+              "type": "object",
+              "properties": {
+                "border": {
+                  "description": "Layer border.",
+                  "type": "object",
+                  "properties": {
+                    "color": {
+                      "type": "string",
+                      "description": "Border color."
+                    },
+                    "width": {
+                      "type": "number",
+                      "description": "Border width in pixels."
+                    }
+                  },
+                  "required": [
+                    "color",
+                    "width"
+                  ],
+                  "additionalProperties": false
+                },
+                "cornerRadius": {
+                  "description": "Per-corner radius.",
+                  "type": "object",
+                  "properties": {
+                    "bottomLeft": {
+                      "type": "number",
+                      "description": "Bottom-left corner radius in pixels."
+                    },
+                    "bottomRight": {
+                      "type": "number",
+                      "description": "Bottom-right corner radius in pixels."
+                    },
+                    "topLeft": {
+                      "type": "number",
+                      "description": "Top-left corner radius in pixels."
+                    },
+                    "topRight": {
+                      "type": "number",
+                      "description": "Top-right corner radius in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottomLeft",
+                    "bottomRight",
+                    "topLeft",
+                    "topRight"
+                  ],
+                  "additionalProperties": false
+                },
+                "fill": {
+                  "description": "Fill color.",
+                  "type": "string"
+                },
+                "flipH": {
+                  "description": "Horizontal flip.",
+                  "type": "boolean"
+                },
+                "flipV": {
+                  "description": "Vertical flip.",
+                  "type": "boolean"
+                },
+                "padding": {
+                  "description": "Inner padding.",
+                  "type": "object",
+                  "properties": {
+                    "bottom": {
+                      "type": "number",
+                      "description": "Bottom padding in pixels."
+                    },
+                    "left": {
+                      "type": "number",
+                      "description": "Left padding in pixels."
+                    },
+                    "right": {
+                      "type": "number",
+                      "description": "Right padding in pixels."
+                    },
+                    "top": {
+                      "type": "number",
+                      "description": "Top padding in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottom",
+                    "left",
+                    "right",
+                    "top"
+                  ],
+                  "additionalProperties": false
+                },
+                "shadow": {
+                  "description": "Drop shadow.",
+                  "type": "object",
+                  "properties": {
+                    "blur": {
+                      "type": "number",
+                      "description": "Shadow blur radius in pixels."
+                    },
+                    "color": {
+                      "type": "string",
+                      "description": "Shadow color."
+                    },
+                    "offsetX": {
+                      "type": "number",
+                      "description": "Shadow horizontal offset in pixels."
+                    },
+                    "offsetY": {
+                      "type": "number",
+                      "description": "Shadow vertical offset in pixels."
+                    },
+                    "spread": {
+                      "type": "number",
+                      "description": "Shadow spread in pixels."
+                    }
+                  },
+                  "required": [
+                    "blur",
+                    "color",
+                    "offsetX",
+                    "offsetY",
+                    "spread"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "transform": {
+              "description": "Absolute transform box.",
+              "type": "object",
+              "properties": {
+                "height": {
+                  "default": 100,
+                  "description": "Height in pixels.",
+                  "type": "number"
+                },
+                "opacity": {
+                  "default": 1,
+                  "description": "Opacity (0-1).",
+                  "type": "number"
+                },
+                "rotation": {
+                  "default": 0,
+                  "description": "Rotation in degrees.",
+                  "type": "number"
+                },
+                "scaleX": {
+                  "default": 1,
+                  "description": "Horizontal scale.",
+                  "type": "number"
+                },
+                "scaleY": {
+                  "default": 1,
+                  "description": "Vertical scale.",
+                  "type": "number"
+                },
+                "width": {
+                  "default": 200,
+                  "description": "Width in pixels.",
+                  "type": "number"
+                },
+                "x": {
+                  "default": 0,
+                  "description": "X position in pixels.",
+                  "type": "number"
+                },
+                "y": {
+                  "default": 0,
+                  "description": "Y position in pixels.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "height",
+                "opacity",
+                "rotation",
+                "scaleX",
+                "scaleY",
+                "width",
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "writeMode": {
+              "default": "free",
+              "description": "Template write permission mode.",
+              "type": "string",
+              "enum": [
+                "locked",
+                "free",
+                "content",
+                "properties"
+              ]
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "align": {
+                  "type": "string",
+                  "enum": [
+                    "left",
+                    "center",
+                    "right"
+                  ]
+                },
+                "fill": {
+                  "type": "string"
+                },
+                "fontFamily": {
+                  "type": "string"
+                },
+                "fontSize": {
+                  "type": "number"
+                },
+                "html": {
+                  "default": "<p>Text</p>",
+                  "description": "Rich text HTML.",
+                  "type": "string"
+                },
+                "letterSpacing": {
+                  "type": "number"
+                },
+                "lineHeight": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "html"
+              ],
+              "additionalProperties": false
+            },
+            "type": {
+              "type": "string",
+              "const": "canvas.text"
+            }
+          },
+          "required": [
+            "id",
+            "locked",
+            "writeMode",
+            "data",
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique layer identifier."
+            },
+            "locked": {
+              "default": false,
+              "description": "Whether the layer is locked.",
+              "type": "boolean"
+            },
+            "style": {
+              "description": "Visual style overrides.",
+              "type": "object",
+              "properties": {
+                "border": {
+                  "description": "Layer border.",
+                  "type": "object",
+                  "properties": {
+                    "color": {
+                      "type": "string",
+                      "description": "Border color."
+                    },
+                    "width": {
+                      "type": "number",
+                      "description": "Border width in pixels."
+                    }
+                  },
+                  "required": [
+                    "color",
+                    "width"
+                  ],
+                  "additionalProperties": false
+                },
+                "cornerRadius": {
+                  "description": "Per-corner radius.",
+                  "type": "object",
+                  "properties": {
+                    "bottomLeft": {
+                      "type": "number",
+                      "description": "Bottom-left corner radius in pixels."
+                    },
+                    "bottomRight": {
+                      "type": "number",
+                      "description": "Bottom-right corner radius in pixels."
+                    },
+                    "topLeft": {
+                      "type": "number",
+                      "description": "Top-left corner radius in pixels."
+                    },
+                    "topRight": {
+                      "type": "number",
+                      "description": "Top-right corner radius in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottomLeft",
+                    "bottomRight",
+                    "topLeft",
+                    "topRight"
+                  ],
+                  "additionalProperties": false
+                },
+                "fill": {
+                  "description": "Fill color.",
+                  "type": "string"
+                },
+                "flipH": {
+                  "description": "Horizontal flip.",
+                  "type": "boolean"
+                },
+                "flipV": {
+                  "description": "Vertical flip.",
+                  "type": "boolean"
+                },
+                "padding": {
+                  "description": "Inner padding.",
+                  "type": "object",
+                  "properties": {
+                    "bottom": {
+                      "type": "number",
+                      "description": "Bottom padding in pixels."
+                    },
+                    "left": {
+                      "type": "number",
+                      "description": "Left padding in pixels."
+                    },
+                    "right": {
+                      "type": "number",
+                      "description": "Right padding in pixels."
+                    },
+                    "top": {
+                      "type": "number",
+                      "description": "Top padding in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottom",
+                    "left",
+                    "right",
+                    "top"
+                  ],
+                  "additionalProperties": false
+                },
+                "shadow": {
+                  "description": "Drop shadow.",
+                  "type": "object",
+                  "properties": {
+                    "blur": {
+                      "type": "number",
+                      "description": "Shadow blur radius in pixels."
+                    },
+                    "color": {
+                      "type": "string",
+                      "description": "Shadow color."
+                    },
+                    "offsetX": {
+                      "type": "number",
+                      "description": "Shadow horizontal offset in pixels."
+                    },
+                    "offsetY": {
+                      "type": "number",
+                      "description": "Shadow vertical offset in pixels."
+                    },
+                    "spread": {
+                      "type": "number",
+                      "description": "Shadow spread in pixels."
+                    }
+                  },
+                  "required": [
+                    "blur",
+                    "color",
+                    "offsetX",
+                    "offsetY",
+                    "spread"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "transform": {
+              "description": "Absolute transform box.",
+              "type": "object",
+              "properties": {
+                "height": {
+                  "default": 100,
+                  "description": "Height in pixels.",
+                  "type": "number"
+                },
+                "opacity": {
+                  "default": 1,
+                  "description": "Opacity (0-1).",
+                  "type": "number"
+                },
+                "rotation": {
+                  "default": 0,
+                  "description": "Rotation in degrees.",
+                  "type": "number"
+                },
+                "scaleX": {
+                  "default": 1,
+                  "description": "Horizontal scale.",
+                  "type": "number"
+                },
+                "scaleY": {
+                  "default": 1,
+                  "description": "Vertical scale.",
+                  "type": "number"
+                },
+                "width": {
+                  "default": 200,
+                  "description": "Width in pixels.",
+                  "type": "number"
+                },
+                "x": {
+                  "default": 0,
+                  "description": "X position in pixels.",
+                  "type": "number"
+                },
+                "y": {
+                  "default": 0,
+                  "description": "Y position in pixels.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "height",
+                "opacity",
+                "rotation",
+                "scaleX",
+                "scaleY",
+                "width",
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "writeMode": {
+              "default": "free",
+              "description": "Template write permission mode.",
+              "type": "string",
+              "enum": [
+                "locked",
+                "free",
+                "content",
+                "properties"
+              ]
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "fill": {
+                  "default": "#22c55e",
+                  "description": "Fill color.",
+                  "type": "string"
+                },
+                "stroke": {
+                  "type": "string"
+                },
+                "strokeWidth": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "fill"
+              ],
+              "additionalProperties": false
+            },
+            "type": {
+              "type": "string",
+              "const": "canvas.circle"
+            }
+          },
+          "required": [
+            "id",
+            "locked",
+            "writeMode",
+            "data",
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique layer identifier."
+            },
+            "locked": {
+              "default": false,
+              "description": "Whether the layer is locked.",
+              "type": "boolean"
+            },
+            "style": {
+              "description": "Visual style overrides.",
+              "type": "object",
+              "properties": {
+                "border": {
+                  "description": "Layer border.",
+                  "type": "object",
+                  "properties": {
+                    "color": {
+                      "type": "string",
+                      "description": "Border color."
+                    },
+                    "width": {
+                      "type": "number",
+                      "description": "Border width in pixels."
+                    }
+                  },
+                  "required": [
+                    "color",
+                    "width"
+                  ],
+                  "additionalProperties": false
+                },
+                "cornerRadius": {
+                  "description": "Per-corner radius.",
+                  "type": "object",
+                  "properties": {
+                    "bottomLeft": {
+                      "type": "number",
+                      "description": "Bottom-left corner radius in pixels."
+                    },
+                    "bottomRight": {
+                      "type": "number",
+                      "description": "Bottom-right corner radius in pixels."
+                    },
+                    "topLeft": {
+                      "type": "number",
+                      "description": "Top-left corner radius in pixels."
+                    },
+                    "topRight": {
+                      "type": "number",
+                      "description": "Top-right corner radius in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottomLeft",
+                    "bottomRight",
+                    "topLeft",
+                    "topRight"
+                  ],
+                  "additionalProperties": false
+                },
+                "fill": {
+                  "description": "Fill color.",
+                  "type": "string"
+                },
+                "flipH": {
+                  "description": "Horizontal flip.",
+                  "type": "boolean"
+                },
+                "flipV": {
+                  "description": "Vertical flip.",
+                  "type": "boolean"
+                },
+                "padding": {
+                  "description": "Inner padding.",
+                  "type": "object",
+                  "properties": {
+                    "bottom": {
+                      "type": "number",
+                      "description": "Bottom padding in pixels."
+                    },
+                    "left": {
+                      "type": "number",
+                      "description": "Left padding in pixels."
+                    },
+                    "right": {
+                      "type": "number",
+                      "description": "Right padding in pixels."
+                    },
+                    "top": {
+                      "type": "number",
+                      "description": "Top padding in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottom",
+                    "left",
+                    "right",
+                    "top"
+                  ],
+                  "additionalProperties": false
+                },
+                "shadow": {
+                  "description": "Drop shadow.",
+                  "type": "object",
+                  "properties": {
+                    "blur": {
+                      "type": "number",
+                      "description": "Shadow blur radius in pixels."
+                    },
+                    "color": {
+                      "type": "string",
+                      "description": "Shadow color."
+                    },
+                    "offsetX": {
+                      "type": "number",
+                      "description": "Shadow horizontal offset in pixels."
+                    },
+                    "offsetY": {
+                      "type": "number",
+                      "description": "Shadow vertical offset in pixels."
+                    },
+                    "spread": {
+                      "type": "number",
+                      "description": "Shadow spread in pixels."
+                    }
+                  },
+                  "required": [
+                    "blur",
+                    "color",
+                    "offsetX",
+                    "offsetY",
+                    "spread"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "transform": {
+              "description": "Absolute transform box.",
+              "type": "object",
+              "properties": {
+                "height": {
+                  "default": 100,
+                  "description": "Height in pixels.",
+                  "type": "number"
+                },
+                "opacity": {
+                  "default": 1,
+                  "description": "Opacity (0-1).",
+                  "type": "number"
+                },
+                "rotation": {
+                  "default": 0,
+                  "description": "Rotation in degrees.",
+                  "type": "number"
+                },
+                "scaleX": {
+                  "default": 1,
+                  "description": "Horizontal scale.",
+                  "type": "number"
+                },
+                "scaleY": {
+                  "default": 1,
+                  "description": "Vertical scale.",
+                  "type": "number"
+                },
+                "width": {
+                  "default": 200,
+                  "description": "Width in pixels.",
+                  "type": "number"
+                },
+                "x": {
+                  "default": 0,
+                  "description": "X position in pixels.",
+                  "type": "number"
+                },
+                "y": {
+                  "default": 0,
+                  "description": "Y position in pixels.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "height",
+                "opacity",
+                "rotation",
+                "scaleX",
+                "scaleY",
+                "width",
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "writeMode": {
+              "default": "free",
+              "description": "Template write permission mode.",
+              "type": "string",
+              "enum": [
+                "locked",
+                "free",
+                "content",
+                "properties"
+              ]
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "children": {
+                  "default": [],
+                  "description": "Child layers in this group.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema0"
+                  }
+                }
+              },
+              "required": [
+                "children"
+              ],
+              "additionalProperties": false
+            },
+            "type": {
+              "type": "string",
+              "const": "canvas.group"
+            }
+          },
+          "required": [
+            "id",
+            "locked",
+            "writeMode",
+            "data",
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique layer identifier."
+            },
+            "locked": {
+              "default": false,
+              "description": "Whether the layer is locked.",
+              "type": "boolean"
+            },
+            "style": {
+              "description": "Visual style overrides.",
+              "type": "object",
+              "properties": {
+                "border": {
+                  "description": "Layer border.",
+                  "type": "object",
+                  "properties": {
+                    "color": {
+                      "type": "string",
+                      "description": "Border color."
+                    },
+                    "width": {
+                      "type": "number",
+                      "description": "Border width in pixels."
+                    }
+                  },
+                  "required": [
+                    "color",
+                    "width"
+                  ],
+                  "additionalProperties": false
+                },
+                "cornerRadius": {
+                  "description": "Per-corner radius.",
+                  "type": "object",
+                  "properties": {
+                    "bottomLeft": {
+                      "type": "number",
+                      "description": "Bottom-left corner radius in pixels."
+                    },
+                    "bottomRight": {
+                      "type": "number",
+                      "description": "Bottom-right corner radius in pixels."
+                    },
+                    "topLeft": {
+                      "type": "number",
+                      "description": "Top-left corner radius in pixels."
+                    },
+                    "topRight": {
+                      "type": "number",
+                      "description": "Top-right corner radius in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottomLeft",
+                    "bottomRight",
+                    "topLeft",
+                    "topRight"
+                  ],
+                  "additionalProperties": false
+                },
+                "fill": {
+                  "description": "Fill color.",
+                  "type": "string"
+                },
+                "flipH": {
+                  "description": "Horizontal flip.",
+                  "type": "boolean"
+                },
+                "flipV": {
+                  "description": "Vertical flip.",
+                  "type": "boolean"
+                },
+                "padding": {
+                  "description": "Inner padding.",
+                  "type": "object",
+                  "properties": {
+                    "bottom": {
+                      "type": "number",
+                      "description": "Bottom padding in pixels."
+                    },
+                    "left": {
+                      "type": "number",
+                      "description": "Left padding in pixels."
+                    },
+                    "right": {
+                      "type": "number",
+                      "description": "Right padding in pixels."
+                    },
+                    "top": {
+                      "type": "number",
+                      "description": "Top padding in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottom",
+                    "left",
+                    "right",
+                    "top"
+                  ],
+                  "additionalProperties": false
+                },
+                "shadow": {
+                  "description": "Drop shadow.",
+                  "type": "object",
+                  "properties": {
+                    "blur": {
+                      "type": "number",
+                      "description": "Shadow blur radius in pixels."
+                    },
+                    "color": {
+                      "type": "string",
+                      "description": "Shadow color."
+                    },
+                    "offsetX": {
+                      "type": "number",
+                      "description": "Shadow horizontal offset in pixels."
+                    },
+                    "offsetY": {
+                      "type": "number",
+                      "description": "Shadow vertical offset in pixels."
+                    },
+                    "spread": {
+                      "type": "number",
+                      "description": "Shadow spread in pixels."
+                    }
+                  },
+                  "required": [
+                    "blur",
+                    "color",
+                    "offsetX",
+                    "offsetY",
+                    "spread"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "transform": {
+              "description": "Absolute transform box.",
+              "type": "object",
+              "properties": {
+                "height": {
+                  "default": 100,
+                  "description": "Height in pixels.",
+                  "type": "number"
+                },
+                "opacity": {
+                  "default": 1,
+                  "description": "Opacity (0-1).",
+                  "type": "number"
+                },
+                "rotation": {
+                  "default": 0,
+                  "description": "Rotation in degrees.",
+                  "type": "number"
+                },
+                "scaleX": {
+                  "default": 1,
+                  "description": "Horizontal scale.",
+                  "type": "number"
+                },
+                "scaleY": {
+                  "default": 1,
+                  "description": "Vertical scale.",
+                  "type": "number"
+                },
+                "width": {
+                  "default": 200,
+                  "description": "Width in pixels.",
+                  "type": "number"
+                },
+                "x": {
+                  "default": 0,
+                  "description": "X position in pixels.",
+                  "type": "number"
+                },
+                "y": {
+                  "default": 0,
+                  "description": "Y position in pixels.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "height",
+                "opacity",
+                "rotation",
+                "scaleX",
+                "scaleY",
+                "width",
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "writeMode": {
+              "default": "free",
+              "description": "Template write permission mode.",
+              "type": "string",
+              "enum": [
+                "locked",
+                "free",
+                "content",
+                "properties"
+              ]
+            },
+            "data": {
+              "default": {}
+            },
+            "type": {
+              "type": "string",
+              "description": "Plugin layer type identifier."
+            }
+          },
+          "required": [
+            "id",
+            "locked",
+            "writeMode",
+            "data",
+            "type"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

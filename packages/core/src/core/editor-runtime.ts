@@ -98,7 +98,7 @@ export class EditorRuntime {
         this.events.emit(WorkbenchEvents.DidChangeScene, snapshot);
         this.events.emit(
           WorkbenchEvents.DidChangeSelection,
-          snapshot.scene.selection
+          snapshot.editorState
         );
       })
     );

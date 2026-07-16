@@ -11,7 +11,6 @@ export function createMockWorkbenchApi(
   state: WorkbenchState;
 } {
   const scene = normalizeScene({
-    activePageId: 'p1',
     pages: [{ id: 'p1', name: 'Page', layout: 'flow', layers: [] }],
   });
   const state: WorkbenchState = {
@@ -35,7 +34,11 @@ export function createMockWorkbenchApi(
     properties: null,
     revision: 0,
     scene,
-    selection: scene.selection,
+    selection: {
+      activePageId: 'p1',
+      primaryLayerId: null,
+      selectedLayerIds: [],
+    },
     statusBar: [],
     statusBarItemRenderers: [],
     toolbarItems: [],

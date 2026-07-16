@@ -1,5 +1,4 @@
 import {
-  getActivePage,
   moveLayerRelativeToTarget,
 } from '@openenvx/core';
 import type { CommandContext, Layer } from '@openenvx/core';
@@ -17,7 +16,7 @@ import { describe, expect, it } from 'vitest';
 
 class LayersTreeProvider extends TreeDataProvider<Layer> {
   getRootChildren(ctx: CommandContext): Layer[] {
-    return getActivePage(ctx.scene.getScene()).layers;
+    return ctx.scene.getActivePage().layers;
   }
 
   getChildren(): Layer[] {
@@ -34,7 +33,7 @@ class LayersTreeProvider extends TreeDataProvider<Layer> {
     position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
-    const page = getActivePage(ctx.scene.getScene());
+    const page = ctx.scene.getActivePage();
     const effectivePosition = position === 'inside' ? 'after' : position;
     ctx.scene.apply({
       apply: (scene) => ({

@@ -23,6 +23,7 @@ export {
 } from './scene/scene-store';
 export { HistoryStack } from './scene/history-stack';
 export type {
+  EditorState,
   Layer,
   Page,
   PageLayout,
@@ -34,6 +35,7 @@ export type {
   EditorPaneKind,
 } from './scene/types';
 export {
+  cloneEditorState,
   cloneScene,
   getActivePage,
   getPrimaryLayer,

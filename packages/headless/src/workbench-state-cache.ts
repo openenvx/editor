@@ -104,6 +104,7 @@ export class WorkbenchStateCache {
 
   invalidateSelectionOnly(
     scene: Scene,
+    selection: Selection,
     contentRevision: number,
     rebuildSelectionDerived?: () => Pick<
       SceneSlice,
@@ -114,7 +115,7 @@ export class WorkbenchStateCache {
       const derived = rebuildSelectionDerived?.();
       const patch = {
         scene,
-        selection: scene.selection,
+        selection,
         ...derived,
       };
       this.sceneSlice = { ...this.sceneSlice, ...patch };

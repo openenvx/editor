@@ -1,7 +1,7 @@
 import { Emitter } from '../runtime/emitter';
 import type { Event } from '../runtime/emitter';
-import { cloneScene } from '../scene/types';
-import type { Scene } from '../scene/types';
+import { cloneEditorState, cloneScene } from '../scene/types';
+import type { EditorState, Scene } from '../scene/types';
 
 export interface EditorInput {
   uri: string;
@@ -13,6 +13,7 @@ export interface EditorInput {
 export class EditorService {
   private activeEditor: EditorInput | null = null;
   private savedScene: Scene | null = null;
+  private savedEditorState: EditorState | null = null;
   private savedContentRevision: number | null = null;
   private readonly onDidChangeDirtyEmitter = new Emitter<boolean>();
   private readonly onDidChangeActiveEditorEmitter =
@@ -27,9 +28,14 @@ export class EditorService {
     return this.activeEditor;
   }
 
-  open(input: EditorInput, contentRevision = 0): void {
+  open(
+    input: EditorInput,
+    contentRevision = 0,
+    editorState?: EditorState
+  ): void {
     this.activeEditor = input;
     this.savedScene = cloneScene(input.scene);
+    this.savedEditorState = editorState ? cloneEditorState(editorState) : null;
     this.savedContentRevision = contentRevision;
     this.onDidChangeActiveEditorEmitter.fire(this.activeEditor);
     this.emitDirty(false);
@@ -56,7 +62,8 @@ export class EditorService {
 
   async save(
     saveFn?: (input: EditorInput) => Promise<void>,
-    contentRevision?: number
+    contentRevision?: number,
+    editorState?: EditorState
   ): Promise<void> {
     if (!this.activeEditor) {
       return;
@@ -65,6 +72,9 @@ export class EditorService {
       await saveFn(this.activeEditor);
     }
     this.savedScene = cloneScene(this.activeEditor.scene);
+    if (editorState !== undefined) {
+      this.savedEditorState = cloneEditorState(editorState);
+    }
     if (contentRevision !== undefined) {
       this.savedContentRevision = contentRevision;
     }
@@ -72,14 +82,17 @@ export class EditorService {
     this.emitDirty(false);
   }
 
-  revert(): Scene | null {
+  revert(): { scene: Scene; editorState: EditorState | null } | null {
     if (!this.activeEditor || this.savedScene === null) {
       return null;
     }
     const scene = cloneScene(this.savedScene);
+    const editorState = this.savedEditorState
+      ? cloneEditorState(this.savedEditorState)
+      : null;
     this.activeEditor = { ...this.activeEditor, isDirty: false, scene };
     this.emitDirty(false);
-    return scene;
+    return { editorState, scene };
   }
 
   getSavedContentRevision(): number | null {

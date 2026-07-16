@@ -330,7 +330,7 @@ export const ViewPanelRenderer = memo(({ viewContainers }: Props) => {
     (state) => state.interaction.hoveredLayerId
   );
   const activePageId = useWorkbenchContextSelector(
-    (state) => state.scene.activePageId
+    (state) => state.selection.activePageId
   );
   const layerSelectedIds = useMemo(
     () => new Set(selection?.selectedLayerIds),

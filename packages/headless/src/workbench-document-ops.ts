@@ -1,4 +1,8 @@
-import { AssetServiceId, PersistenceServiceId } from '@openenvx/core';
+import {
+  AssetServiceId,
+  PersistenceServiceId,
+  SceneValidationError,
+} from '@openenvx/core';
 import type {
   AssetService,
   EditorInput,
@@ -7,8 +11,12 @@ import type {
   SceneStore,
   ServiceId,
 } from '@openenvx/core';
-import type { SceneAsset } from '@openenvx/schema';
-import { normalizeScene } from '@openenvx/schema';
+import type { SceneAsset, SceneSnapshot } from '@openenvx/schema';
+import {
+  normalizeScene,
+  normalizeSceneSnapshot,
+  validateScene,
+} from '@openenvx/schema';
 
 export interface DocumentOpsDeps {
   sceneStore: SceneStore;
@@ -38,6 +46,16 @@ function exportSceneAssets(scene: Scene, assets: AssetService | null): Scene {
   };
 }
 
+function toPersistedSnapshot(
+  deps: DocumentOpsDeps,
+  scene: Scene
+): SceneSnapshot {
+  return {
+    editorState: deps.sceneStore.getEditorState(),
+    scene: exportSceneAssets(scene, deps.getService(AssetServiceId) ?? null),
+  };
+}
+
 export async function saveDocument(
   deps: DocumentOpsDeps,
   saveFn?: (input: EditorInput) => Promise<void>
@@ -51,7 +69,8 @@ export async function saveDocument(
   const effectiveSaveFn: (input: EditorInput) => Promise<void> =
     saveFn ??
     (persistence
-      ? (input) => persistence.save(input.uri, input.scene)
+      ? (input) =>
+          persistence.save(input.uri, toPersistedSnapshot(deps, input.scene))
       : () => Promise.resolve());
   const wrappedSaveFn = (input: EditorInput): Promise<void> => {
     const scene = exportSceneAssets(input.scene, assets ?? null);
@@ -59,7 +78,8 @@ export async function saveDocument(
   };
   await deps.editorService.save(
     wrappedSaveFn,
-    deps.sceneStore.getContentRevision()
+    deps.sceneStore.getContentRevision(),
+    deps.sceneStore.getEditorState()
   );
 }
 
@@ -79,11 +99,14 @@ export async function saveDocumentAs(
       uri,
       title: uri,
     },
-    deps.sceneStore.getContentRevision()
+    deps.sceneStore.getContentRevision(),
+    deps.sceneStore.getEditorState()
   );
   await saveDocument(
     deps,
-    persistence ? (input) => persistence.save(uri, input.scene) : undefined
+    persistence
+      ? (input) => persistence.save(uri, toPersistedSnapshot(deps, input.scene))
+      : undefined
   );
 }
 
@@ -95,10 +118,14 @@ export async function openDocument(
   if (!persistence) {
     return;
   }
-  const scene = await persistence.load(uri);
-  const normalized = normalizeScene(scene);
-  hydrateAssets(deps, normalized.assets);
-  deps.sceneStore.setScene(normalized);
+  const loaded = await persistence.load(uri);
+  const snapshot = normalizeSceneSnapshot(loaded);
+  hydrateAssets(deps, snapshot.scene.assets);
+  deps.sceneStore.restoreSnapshot({
+    contentRevision: 0,
+    editorState: snapshot.editorState,
+    scene: snapshot.scene,
+  });
   deps.editorService.open(
     {
       isDirty: false,
@@ -106,22 +133,32 @@ export async function openDocument(
       title: uri,
       uri,
     },
-    deps.sceneStore.getContentRevision()
+    deps.sceneStore.getContentRevision(),
+    deps.sceneStore.getEditorState()
   );
 }
 
 export function revertDocument(deps: DocumentOpsDeps): void {
-  const scene = deps.editorService.revert();
-  if (scene) {
-    hydrateAssets(deps, scene.assets);
-    deps.sceneStore.restoreScene(
-      scene,
-      deps.editorService.getSavedContentRevision() ?? 0
-    );
+  const reverted = deps.editorService.revert();
+  if (reverted) {
+    hydrateAssets(deps, reverted.scene.assets);
+    deps.sceneStore.restoreSnapshot({
+      contentRevision: deps.editorService.getSavedContentRevision() ?? 0,
+      editorState: reverted.editorState ?? deps.sceneStore.getEditorState(),
+      scene: reverted.scene,
+    });
   }
 }
 
 export function loadScene(deps: DocumentOpsDeps, scene: Scene): void {
+  const validation = validateScene(scene);
+  if (!validation.valid) {
+    throw new SceneValidationError(
+      validation.errors.map((e) =>
+        e.path ? `${e.path}: ${e.message}` : e.message
+      )
+    );
+  }
   const normalized = normalizeScene(scene);
   hydrateAssets(deps, normalized.assets);
   deps.sceneStore.setScene(normalized);

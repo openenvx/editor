@@ -28,7 +28,6 @@ function createLayer(overrides: Partial<Layer> = {}): Layer {
 
 function createScene(overrides: Partial<Scene> = {}): Scene {
   return {
-    activePageId: 'page-1',
     pages: [
       {
         id: 'page-1',
@@ -40,11 +39,6 @@ function createScene(overrides: Partial<Scene> = {}): Scene {
       },
     ],
     schemaVersion: 1,
-    selection: {
-      activePageId: 'page-1',
-      primaryLayerId: null,
-      selectedLayerIds: [],
-    },
     ...overrides,
   };
 }

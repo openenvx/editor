@@ -13,7 +13,11 @@ export { DEFAULT_THREAD_TITLE, truncateThreadTitle };
 
 export interface SceneContextPayload {
   scene: ReturnType<WorkbenchApi['serializeScene']>;
-  selection: ReturnType<WorkbenchApi['serializeScene']>['selection'];
+  selection: {
+    activePageId: string;
+    selectedLayerIds: string[];
+    primaryLayerId: string | null;
+  };
   activePageId: string | null;
   sceneId: string;
 }
@@ -52,11 +56,12 @@ function readOrCreateSceneId(editorUri: string): string {
 
 export function buildSceneContext(api: WorkbenchApi): SceneContextPayload {
   const scene = api.serializeScene();
+  const selection = api.scene.getSelection();
   const editorUri = api.getSnapshot().editor?.uri ?? 'untitled://scene';
   return {
-    activePageId: scene.activePageId ?? null,
+    activePageId: selection.activePageId ?? null,
     scene,
-    selection: scene.selection,
+    selection,
     sceneId: readOrCreateSceneId(editorUri),
   };
 }

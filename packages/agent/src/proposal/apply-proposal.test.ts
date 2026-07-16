@@ -139,27 +139,22 @@ describe('applyProposedChanges', () => {
         apply: vi.fn(
           (transaction: {
             apply: (scene: {
-              activePageId: string;
               pages: { id: string; layers: unknown[] }[];
-              selection: {
-                activePageId: string;
-                selectedLayerIds: string[];
-                primaryLayerId: null;
-              };
             }) => unknown;
           }) => {
             order.push('scene.apply');
             transaction.apply({
-              activePageId: 'page-1',
               pages: [{ id: 'page-1', layers: [] }],
-              selection: {
-                activePageId: 'page-1',
-                selectedLayerIds: [],
-                primaryLayerId: null,
-              },
             });
           }
         ),
+        getActivePageId: () => 'page-1',
+        getSelection: () => ({
+          activePageId: 'page-1',
+          primaryLayerId: null,
+          selectedLayerIds: [],
+        }),
+        setSelection: vi.fn(),
       },
       runCommand: vi.fn(),
     } as unknown as WorkbenchApi;
@@ -191,15 +186,8 @@ describe('applyProposedChanges', () => {
         apply: vi.fn(
           (transaction: {
             apply: (scene: {
-              activePageId: string;
               pages: { id: string; layers: unknown[] }[];
-              selection: {
-                activePageId: string;
-                selectedLayerIds: string[];
-                primaryLayerId: null;
-              };
             }) => {
-              activePageId: string;
               pages: {
                 id: string;
                 layers: { type: string; data: Record<string, unknown> }[];
@@ -207,17 +195,18 @@ describe('applyProposedChanges', () => {
             };
           }) => {
             const next = transaction.apply({
-              activePageId: 'page-1',
               pages: [{ id: 'page-1', layers: [] }],
-              selection: {
-                activePageId: 'page-1',
-                selectedLayerIds: [],
-                primaryLayerId: null,
-              },
             });
             createdLayer = next.pages[0]!.layers.at(-1) ?? null;
           }
         ),
+        getActivePageId: () => 'page-1',
+        getSelection: () => ({
+          activePageId: 'page-1',
+          primaryLayerId: null,
+          selectedLayerIds: [],
+        }),
+        setSelection: vi.fn(),
       },
       runCommand: vi.fn(),
     } as unknown as WorkbenchApi;
@@ -257,26 +246,21 @@ describe('applyProposedChanges', () => {
         apply: vi.fn(
           (transaction: {
             apply: (scene: {
-              activePageId: string;
               pages: { id: string; layers: unknown[] }[];
-              selection: {
-                activePageId: string;
-                selectedLayerIds: string[];
-                primaryLayerId: null;
-              };
             }) => unknown;
           }) => {
             transaction.apply({
-              activePageId: 'page-1',
               pages: [{ id: 'page-1', layers: [] }],
-              selection: {
-                activePageId: 'page-1',
-                selectedLayerIds: [],
-                primaryLayerId: null,
-              },
             });
           }
         ),
+        getActivePageId: () => 'page-1',
+        getSelection: () => ({
+          activePageId: 'page-1',
+          primaryLayerId: null,
+          selectedLayerIds: [],
+        }),
+        setSelection: vi.fn(),
       },
       runCommand: vi.fn(),
     } as unknown as WorkbenchApi;

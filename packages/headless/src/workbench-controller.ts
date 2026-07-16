@@ -16,6 +16,10 @@ import type {
   Scene,
   ServiceId,
 } from '@openenvx/core';
+import {
+  createEmptySceneSnapshot,
+  normalizeSceneSnapshot,
+} from '@openenvx/schema';
 
 import { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
 import { ViewProviderRegistryImpl } from './registries/view-provider-registry';
@@ -77,8 +81,16 @@ export class WorkbenchController {
 
   constructor(private readonly options: WorkbenchControllerOptions) {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
+    const snapshot = options.initialScene
+      ? normalizeSceneSnapshot({
+          scene: options.initialScene,
+          ...(options.initialEditorState
+            ? { editorState: options.initialEditorState }
+            : {}),
+        })
+      : createEmptySceneSnapshot();
     this.runtime = new EditorRuntime(
-      new SceneStore(options.initialScene),
+      new SceneStore(snapshot.scene, snapshot.editorState),
       new EditorService()
     );
     this.manager = new PluginManager(this.runtime);
@@ -134,6 +146,7 @@ export class WorkbenchController {
         } else {
           this.stateCache.invalidateSelectionOnly(
             snapshot.scene,
+            snapshot.editorState,
             snapshot.contentRevision,
             () => {
               const { properties, inspectorPanes } = buildSceneSlice(
@@ -228,7 +241,8 @@ export class WorkbenchController {
         title: this.options.editorTitle ?? 'Untitled',
         uri: this.options.editorUri ?? 'untitled://scene',
       },
-      sceneStore.getContentRevision()
+      sceneStore.getContentRevision(),
+      sceneStore.getEditorState()
     );
     this.detachKeybindings = attachWorkbenchKeybindings(
       this.manager.getRegistries(),

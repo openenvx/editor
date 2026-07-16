@@ -17,14 +17,8 @@ import {
 
 function createScene(layers: Layer[]) {
   return {
-    activePageId: 'page-1',
     pages: [{ id: 'page-1', name: 'Page', layout: 'flow' as const, layers }],
     schemaVersion: 1,
-    selection: {
-      activePageId: 'page-1',
-      selectedLayerIds: [],
-      primaryLayerId: null,
-    },
   };
 }
 
@@ -49,7 +43,7 @@ function createContext(
   );
   const ctx: CommandContext = {
     scene: store,
-    selection: store.getScene().selection,
+    selection: store.getSelection(),
     services,
     events: new WorkbenchEventService(),
     editor,

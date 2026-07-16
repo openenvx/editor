@@ -1,14 +1,30 @@
+import { cloneDropNulls } from './clone-drop-nulls';
+import { pruneEditorState } from './editor-state';
 import { findPresetForPage, getDefaultPageDimensions } from './page-presets';
+import { sceneSchemaLenient } from './scene-schema';
 import { SCHEMA_VERSION } from './types';
 import type {
+  EditorState,
   Layer,
-  LayerWriteMode,
   Page,
   Scene,
-  SceneAsset,
-  Selection,
-  TemplatePolicy,
+  SceneSnapshot,
+  LengthUnit,
 } from './types';
+import { defaultDpiForUnit } from './units';
+import { parseValidEditorState } from './validate';
+
+function formatNormalizeError(
+  issues: { path: PropertyKey[]; message: string }[]
+): string {
+  return issues
+    .slice(0, 10)
+    .map((issue) => {
+      const path = issue.path.map(String).join('.');
+      return path ? `${path}: ${issue.message}` : issue.message;
+    })
+    .join('\n');
+}
 
 export function createDefaultTransform(): NonNullable<Layer['transform']> {
   return {
@@ -32,6 +48,8 @@ export function createDefaultPage(
     layers: [],
     layout,
     name: 'Page 1',
+    unit: 'px',
+    dpi: 96,
     ...(layout === 'absolute'
       ? (() => {
           const defaults = getDefaultPageDimensions();
@@ -41,7 +59,7 @@ export function createDefaultPage(
   };
 }
 
-export function createDefaultSelection(activePageId: string): Selection {
+export function createDefaultEditorState(activePageId: string): EditorState {
   return {
     activePageId,
     primaryLayerId: null,
@@ -52,180 +70,137 @@ export function createDefaultSelection(activePageId: string): Selection {
 export function createEmptyScene(): Scene {
   const page = createDefaultPage('page-1', 'flow');
   return {
-    activePageId: page.id,
     pages: [page],
     schemaVersion: SCHEMA_VERSION,
-    selection: createDefaultSelection(page.id),
   };
 }
 
-export function normalizeScene(input: Partial<Scene>): Scene {
-  const pages =
-    input.pages?.map((page) => normalizePage(page)) ?? createEmptyScene().pages;
-  const activePageId =
-    input.activePageId && pages.some((p) => p.id === input.activePageId)
-      ? input.activePageId
-      : pages[0]!.id;
-
-  const scene: Scene = {
-    activePageId,
-    assets: normalizeAssets(input.assets),
-    pages,
-    schemaVersion: input.schemaVersion ?? SCHEMA_VERSION,
-    selection: normalizeSelection(input.selection, activePageId, pages),
-  };
-
-  const templatePolicy = normalizeTemplatePolicy(input.templatePolicy);
-  if (templatePolicy) {
-    scene.templatePolicy = templatePolicy;
-  }
-
-  return scene;
-}
-
-function normalizeTemplatePolicy(
-  policy: Partial<TemplatePolicy> | undefined
-): TemplatePolicy | undefined {
-  if (!policy) {
-    return undefined;
-  }
-
+export function createEmptySceneSnapshot(): SceneSnapshot {
+  const scene = createEmptyScene();
   return {
-    allowDeleteLayers: policy.allowDeleteLayers ?? true,
-    allowDuplicateLayers: policy.allowDuplicateLayers ?? true,
-    allowInsertLayers: policy.allowInsertLayers ?? true,
-    allowPageResize: policy.allowPageResize ?? true,
-    version: 1,
-    ...(policy.frozenLayers
-      ? { frozenLayers: { ...policy.frozenLayers } }
-      : {}),
+    editorState: createDefaultEditorState(scene.pages[0]!.id),
+    scene,
   };
 }
 
-function resolveLayerWriteMode(layer: Partial<Layer>): LayerWriteMode {
-  return layer.writeMode ?? 'free';
+function ensurePages(scene: Scene): Scene {
+  if (scene.pages.length > 0) {
+    return scene;
+  }
+  return {
+    ...scene,
+    pages: [createDefaultPage('page-1', 'flow')],
+  };
 }
 
-function normalizeAssets(
-  assets: Record<string, SceneAsset> | undefined
-): Record<string, SceneAsset> | undefined {
-  if (typeof assets !== 'object' || assets === null) {
-    return undefined;
-  }
-
-  const result: Record<string, SceneAsset> = {};
-  for (const [id, entry] of Object.entries(assets)) {
-    if (
-      entry &&
-      entry.encoding === 'base64' &&
-      typeof entry.data === 'string'
-    ) {
-      result[id] = {
-        data: entry.data,
-        encoding: 'base64',
-        mimeType: entry.mimeType,
+function applyPagePresets(scene: Scene): Scene {
+  return {
+    ...scene,
+    pages: scene.pages.map((page) => {
+      const unit = (page.unit ?? 'px') as LengthUnit;
+      let next: Page = {
+        ...page,
+        dpi: page.dpi ?? defaultDpiForUnit(unit),
+        unit,
       };
-    }
-  }
-
-  return Object.keys(result).length > 0 ? result : undefined;
-}
-
-function normalizePage(page: Partial<Page>): Page {
-  const layout = page.layout === 'absolute' ? 'absolute' : 'flow';
-  const unit = page.unit ?? 'px';
-  const normalized: Page = {
-    dpi: page.dpi ?? (unit === 'pt' ? 72 : 96),
-    id: page.id ?? crypto.randomUUID(),
-    layers: (page.layers ?? []).map(normalizeLayer),
-    layout,
-    name: page.name ?? 'Untitled',
-    unit,
-    ...(page.presetId ? { presetId: page.presetId } : {}),
-    ...(page.backgroundColor ? { backgroundColor: page.backgroundColor } : {}),
-    ...(layout === 'absolute'
-      ? (() => {
-          const defaults = getDefaultPageDimensions();
-          return {
-            height: page.height ?? defaults.height,
-            width: page.width ?? defaults.width,
-          };
-        })()
-      : {}),
-  };
-
-  if (layout === 'absolute' && !normalized.presetId) {
-    const inferred = findPresetForPage(normalized);
-    if (inferred) {
-      normalized.presetId = inferred.id;
-    }
-  }
-
-  return normalized;
-}
-
-function normalizeLayer(layer: Partial<Layer>): Layer {
-  const data = normalizeLayerData(layer.type ?? 'unknown', layer.data ?? {});
-  const writeMode = resolveLayerWriteMode(layer);
-  return {
-    data,
-    id: layer.id ?? crypto.randomUUID(),
-    locked: layer.locked ?? false,
-    type: layer.type ?? 'unknown',
-    writeMode,
-    ...(layer.transform
-      ? { transform: { ...createDefaultTransform(), ...layer.transform } }
-      : {}),
-    ...(layer.style ? { style: { ...layer.style } } : {}),
+      if (next.layout !== 'absolute') {
+        return next;
+      }
+      next = {
+        ...next,
+        height: next.height ?? getDefaultPageDimensions().height,
+        width: next.width ?? getDefaultPageDimensions().width,
+      };
+      if (next.presetId) {
+        return next;
+      }
+      const inferred = findPresetForPage(next);
+      return inferred ? { ...next, presetId: inferred.id } : next;
+    }),
   };
 }
 
-function normalizeLayerData(type: string, data: unknown): unknown {
-  if (type !== 'container' || typeof data !== 'object' || data === null) {
-    return data;
+/**
+ * Validate and fill defaults via the lenient Zod schema.
+ * Idempotent for current-format input. Does not migrate old schemaVersion docs.
+ */
+export function normalizeScene(input: unknown = {}): Scene {
+  const parsed = sceneSchemaLenient.safeParse(cloneDropNulls(input ?? {}));
+  if (!parsed.success) {
+    throw new Error(
+      `Failed to normalize OpenEnvx scene:\n${formatNormalizeError(parsed.error.issues)}`
+    );
   }
-  const record = data as Record<string, unknown>;
-  const children = Array.isArray(record.children)
-    ? record.children.map((child) => normalizeLayer(child as Partial<Layer>))
-    : [];
-  return { ...record, children };
+  return applyPagePresets(ensurePages(parsed.data as unknown as Scene));
 }
 
-function collectLayerIds(layers: Layer[], ids: Set<string>): void {
-  for (const layer of layers) {
-    ids.add(layer.id);
-    if (
-      layer.type === 'container' &&
-      typeof layer.data === 'object' &&
-      layer.data !== null &&
-      Array.isArray((layer.data as { children?: Layer[] }).children)
-    ) {
-      collectLayerIds((layer.data as { children: Layer[] }).children, ids);
+export function normalizeEditorState(
+  input: unknown,
+  fallbackActivePageId: string,
+  scene?: Scene
+): EditorState {
+  if (input && typeof input === 'object') {
+    const record = input as Record<string, unknown>;
+    const activePageId =
+      typeof record.activePageId === 'string'
+        ? record.activePageId
+        : fallbackActivePageId;
+    try {
+      const state = parseValidEditorState({
+        ...record,
+        activePageId,
+      });
+      return scene ? pruneEditorState(scene, state) : state;
+    } catch {
+      const fallback = createDefaultEditorState(fallbackActivePageId);
+      return scene ? pruneEditorState(scene, fallback) : fallback;
     }
   }
+  const fallback = createDefaultEditorState(fallbackActivePageId);
+  return scene ? pruneEditorState(scene, fallback) : fallback;
 }
 
-function normalizeSelection(
-  selection: Partial<Selection> | undefined,
-  activePageId: string,
-  pages: Page[]
-): Selection {
-  const page =
-    pages.find((p) => p.id === (selection?.activePageId ?? activePageId)) ??
-    pages[0]!;
-  const validIds = new Set<string>();
-  collectLayerIds(page.layers, validIds);
-  const selectedLayerIds = (selection?.selectedLayerIds ?? []).filter((id) =>
-    validIds.has(id)
-  );
-  const primaryLayerId =
-    selection?.primaryLayerId && validIds.has(selection.primaryLayerId)
-      ? selection.primaryLayerId
-      : (selectedLayerIds[0] ?? null);
+export function normalizeSceneSnapshot(input: unknown = {}): SceneSnapshot {
+  if (input && typeof input === 'object') {
+    const record = input as Record<string, unknown>;
+    // Legacy: Scene used to embed activePageId + selection.
+    if ('pages' in record && !('scene' in record)) {
+      const legacy = record as Record<string, unknown> & {
+        activePageId?: string;
+        editorState?: unknown;
+        selection?: unknown;
+      };
+      const { activePageId, editorState, selection, ...sceneFields } = legacy;
+      const scene = normalizeScene(sceneFields);
+      const pageId =
+        (typeof activePageId === 'string' &&
+        scene.pages.some((p) => p.id === activePageId)
+          ? activePageId
+          : undefined) ?? scene.pages[0]!.id;
+      const editorInput =
+        editorState ??
+        (selection && typeof selection === 'object'
+          ? { ...(selection as object), activePageId: pageId }
+          : { activePageId: pageId });
+      const normalizedEditorState = normalizeEditorState(
+        editorInput,
+        pageId,
+        scene
+      );
+      return { editorState: normalizedEditorState, scene };
+    }
 
-  return {
-    activePageId: page.id,
-    primaryLayerId,
-    selectedLayerIds,
-  };
+    if ('scene' in record) {
+      const scene = normalizeScene(record.scene);
+      const fallbackId = scene.pages[0]!.id;
+      const editorState = normalizeEditorState(
+        record.editorState,
+        fallbackId,
+        scene
+      );
+      return { editorState, scene };
+    }
+  }
+
+  return createEmptySceneSnapshot();
 }

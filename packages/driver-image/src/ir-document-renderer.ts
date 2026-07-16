@@ -63,7 +63,6 @@ function createStubLayer(node: RenderIrNode): Layer {
 
 function createStubScene(document: RenderIrDocument): Scene {
   return {
-    activePageId: 'render-ir',
     pages: [
       {
         height: document.page.height,
@@ -75,11 +74,6 @@ function createStubScene(document: RenderIrDocument): Scene {
       },
     ],
     schemaVersion: 1,
-    selection: {
-      activePageId: 'render-ir',
-      primaryLayerId: null,
-      selectedLayerIds: [],
-    },
     ...(document.assets ? { assets: document.assets } : {}),
   };
 }

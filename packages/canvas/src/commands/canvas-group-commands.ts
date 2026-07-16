@@ -21,19 +21,19 @@ function applyPageLayers(
     primaryLayerId: string | null;
   }
 ): void {
-  const page = getActivePage(ctx.scene.getScene());
+  const page = ctx.scene.getActivePage();
   ctx.scene.apply({
     apply: (scene) => ({
       ...scene,
       pages: scene.pages.map((p) => (p.id === page.id ? { ...p, layers } : p)),
-      selection: {
-        activePageId: page.id,
-        ...selection,
-      },
     }),
     label: localize(ctx.services, 'canvas.history.groupLayers', {
       defaultValue: 'Group layers',
     }),
+  });
+  ctx.scene.setSelection({
+    activePageId: page.id,
+    ...selection,
   });
 }
 
@@ -41,12 +41,12 @@ export class InsertCanvasGroupCommand extends Command {
   readonly id = 'canvas.insertGroup';
 
   canExecute(ctx: CommandContext): boolean {
-    const page = getActivePage(ctx.scene.getScene());
+    const page = ctx.scene.getActivePage();
     return page.layout === 'absolute';
   }
 
   execute(ctx: CommandContext): void {
-    const page = getActivePage(ctx.scene.getScene());
+    const page = ctx.scene.getActivePage();
     const layer = new CanvasGroupLayer().createDefault(
       createLayerId('group'),
       page
@@ -62,8 +62,8 @@ export class GroupSelectionCommand extends Command {
   readonly id = 'canvas.groupSelection';
 
   canExecute(ctx: CommandContext): boolean {
-    const page = getActivePage(ctx.scene.getScene());
-    const { selectedLayerIds } = ctx.scene.getScene().selection;
+    const page = ctx.scene.getActivePage();
+    const { selectedLayerIds } = ctx.selection;
     return (
       page.layout === 'absolute' &&
       selectedLayerIds.length >= 2 &&
@@ -72,8 +72,8 @@ export class GroupSelectionCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = getActivePage(ctx.scene.getScene());
-    const { selectedLayerIds } = ctx.scene.getScene().selection;
+    const page = ctx.scene.getActivePage();
+    const { selectedLayerIds } = ctx.selection;
     const groupId = createLayerId('group');
     const nextLayers = groupRootLayers(
       page.layers,
@@ -92,14 +92,14 @@ export class UngroupSelectionCommand extends Command {
   readonly id = 'canvas.ungroup';
 
   canExecute(ctx: CommandContext): boolean {
-    const page = getActivePage(ctx.scene.getScene());
-    const { selectedLayerIds } = ctx.scene.getScene().selection;
+    const page = ctx.scene.getActivePage();
+    const { selectedLayerIds } = ctx.selection;
     return findSelectedRootGroup(page.layers, selectedLayerIds) !== null;
   }
 
   execute(ctx: CommandContext): void {
-    const page = getActivePage(ctx.scene.getScene());
-    const { selectedLayerIds } = ctx.scene.getScene().selection;
+    const page = ctx.scene.getActivePage();
+    const { selectedLayerIds } = ctx.selection;
     const group = findSelectedRootGroup(page.layers, selectedLayerIds);
     if (!group) {
       return;

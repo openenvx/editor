@@ -5,7 +5,8 @@
   "license": "MIT",
   "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "scene.schema.json"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -15,11 +16,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    }
+    },
+    "./scene.schema.json": "./scene.schema.json"
   },
   "scripts": {
-    "build": "tsup",
+    "generate:json-schema": "bun run src/generate-json-schema.ts",
+    "build": "bun run generate:json-schema && tsup",
     "test": "vitest"
+  },
+  "dependencies": {
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@openenvx/typescript-config": "workspace:*",

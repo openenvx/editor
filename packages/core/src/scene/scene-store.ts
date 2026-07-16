@@ -1,20 +1,34 @@
-import { normalizeScene, validateScene } from '@openenvx/schema';
+import {
+  createDefaultEditorState,
+  normalizeEditorState,
+  normalizeScene,
+  pruneEditorState,
+  validateScene,
+} from '@openenvx/schema';
+import type { EditorState, Scene, Selection } from '@openenvx/schema';
 
 import { Emitter } from '../runtime/emitter';
 import type { Event } from '../runtime/emitter';
 import { HistoryStack } from './history-stack';
 import { layerExistsOnPage } from './layer-tree';
 import { SceneValidationError } from './scene-validation-error';
-import { cloneScene, getActivePage } from './types';
-import type {
-  Scene,
-  SceneSnapshot,
-  SceneTransaction,
-  Selection,
+import {
+  cloneEditorState,
+  cloneScene,
+  getActivePage,
+  getPrimaryLayer as getPrimaryPageLayer,
 } from './types';
+import type { SceneSnapshot, SceneTransaction } from './types';
+
+function formatValidationErrors(
+  errors: { path: string; message: string }[]
+): string[] {
+  return errors.map((e) => (e.path ? `${e.path}: ${e.message}` : e.message));
+}
 
 export class SceneStore {
   private scene: Scene;
+  private editorState: EditorState;
   private readonly history = new HistoryStack();
   private readonly onDidChangeSceneEmitter = new Emitter<SceneSnapshot>();
   private revision = 0;
@@ -23,12 +37,21 @@ export class SceneStore {
   readonly onDidChangeScene: Event<SceneSnapshot> =
     this.onDidChangeSceneEmitter.event;
 
-  constructor(initial?: Scene) {
+  constructor(initial?: Scene, initialEditorState?: EditorState) {
     this.scene = normalizeScene(initial ?? {});
+    const fallbackPageId = this.scene.pages[0]!.id;
+    this.editorState = initialEditorState
+      ? normalizeEditorState(initialEditorState, fallbackPageId, this.scene)
+      : createDefaultEditorState(fallbackPageId);
+    this.syncEditorStateToScene();
   }
 
   getScene(): Readonly<Scene> {
     return this.scene;
+  }
+
+  getEditorState(): Readonly<EditorState> {
+    return this.editorState;
   }
 
   getRevision(): number {
@@ -42,48 +65,82 @@ export class SceneStore {
   getSnapshot(): SceneSnapshot {
     return {
       contentRevision: this.contentRevision,
+      editorState: cloneEditorState(this.editorState),
       scene: cloneScene(this.scene),
     };
   }
 
   getSelection(): Selection {
-    return { ...this.scene.selection };
+    return { ...this.editorState };
+  }
+
+  getActivePageId(): string {
+    return this.editorState.activePageId;
+  }
+
+  getActivePage() {
+    return getActivePage(this.scene, this.editorState.activePageId);
+  }
+
+  getPrimaryLayer() {
+    return getPrimaryPageLayer(this.scene, this.editorState);
   }
 
   setScene(scene: Scene): void {
-    const normalized = normalizeScene(scene);
-    const validation = validateScene(normalized);
+    const validation = validateScene(scene);
     if (!validation.valid) {
-      throw new SceneValidationError(validation.errors);
+      throw new SceneValidationError(formatValidationErrors(validation.errors));
     }
-    this.scene = normalized;
+    this.scene = normalizeScene(scene);
+    this.syncEditorStateToScene();
     this.bumpContentRevision();
     this.notify();
   }
 
   restoreScene(scene: Scene, contentRevision: number): void {
-    const normalized = normalizeScene(scene);
-    const validation = validateScene(normalized);
+    const validation = validateScene(scene);
     if (!validation.valid) {
-      throw new SceneValidationError(validation.errors);
+      throw new SceneValidationError(formatValidationErrors(validation.errors));
     }
-    this.scene = normalized;
+    this.scene = normalizeScene(scene);
+    this.syncEditorStateToScene();
     this.contentRevision = contentRevision;
     this.bumpRevision();
     this.notify();
   }
 
-  setSelection(selection: Selection): void {
-    this.scene = {
-      ...this.scene,
-      selection: { ...selection },
-    };
+  restoreSnapshot(snapshot: SceneSnapshot): void {
+    const validation = validateScene(snapshot.scene);
+    if (!validation.valid) {
+      throw new SceneValidationError(formatValidationErrors(validation.errors));
+    }
+    this.scene = normalizeScene(snapshot.scene);
+    this.editorState = normalizeEditorState(
+      snapshot.editorState,
+      this.scene.pages[0]!.id,
+      this.scene
+    );
+    this.contentRevision = snapshot.contentRevision;
     this.bumpRevision();
     this.notify();
   }
 
+  setEditorState(editorState: EditorState): void {
+    this.editorState = normalizeEditorState(
+      editorState,
+      this.scene.pages[0]!.id,
+      this.scene
+    );
+    this.bumpRevision();
+    this.notify();
+  }
+
+  setSelection(selection: Selection): void {
+    this.setEditorState(selection);
+  }
+
   selectLayers(layerIds: string[], primaryLayerId?: string | null): void {
-    const page = getActivePage(this.scene);
+    const page = getActivePage(this.scene, this.editorState.activePageId);
     const valid = layerIds.filter((id) => layerExistsOnPage(page, id));
     const primary =
       primaryLayerId === undefined
@@ -98,10 +155,22 @@ export class SceneStore {
     });
   }
 
+  setActivePage(pageId: string): void {
+    if (!this.scene.pages.some((p) => p.id === pageId)) {
+      return;
+    }
+    this.setEditorState({
+      activePageId: pageId,
+      primaryLayerId: null,
+      selectedLayerIds: [],
+    });
+  }
+
   apply(transaction: SceneTransaction): void {
     const snapshot = this.getSnapshot();
     this.history.push(snapshot);
     this.scene = normalizeScene(transaction.apply(cloneScene(this.scene)));
+    this.syncEditorStateToScene();
     this.bumpContentRevision();
     this.notify();
   }
@@ -113,6 +182,7 @@ export class SceneStore {
       return false;
     }
     this.scene = previous.scene;
+    this.editorState = previous.editorState;
     this.contentRevision = previous.contentRevision;
     this.bumpRevision();
     this.notify();
@@ -126,6 +196,7 @@ export class SceneStore {
       return false;
     }
     this.scene = next.scene;
+    this.editorState = next.editorState;
     this.contentRevision = next.contentRevision;
     this.bumpRevision();
     this.notify();
@@ -142,6 +213,10 @@ export class SceneStore {
 
   subscribe(listener: (snapshot: SceneSnapshot) => void): () => void {
     return this.onDidChangeScene(listener).dispose;
+  }
+
+  private syncEditorStateToScene(): void {
+    this.editorState = pruneEditorState(this.scene, this.editorState);
   }
 
   private bumpRevision(): void {

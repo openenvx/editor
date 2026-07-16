@@ -54,6 +54,42 @@ describe(SceneStore, () => {
     expect(store.getSelection().selectedLayerIds).toStrictEqual(["a", "b"]);
     expect(store.getSelection().primaryLayerId).toBe("a");
   });
+
+  it("prunes stale selection after apply removes layers", () => {
+    const store = new SceneStore();
+    const pageId = store.getScene().pages[0]!.id;
+    store.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: scene.pages.map((p) =>
+          p.id === pageId
+            ? {
+                ...p,
+                layers: [
+                  { id: "a", type: "plugin.text", data: {} },
+                  { id: "b", type: "plugin.text", data: {} },
+                ],
+              }
+            : p
+        ),
+      }),
+      label: "Add layers",
+    });
+    store.selectLayers(["a", "b"], "a");
+    store.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: scene.pages.map((p) =>
+          p.id === pageId
+            ? { ...p, layers: p.layers.filter((layer) => layer.id !== "a") }
+            : p
+        ),
+      }),
+      label: "Delete layer",
+    });
+    expect(store.getSelection().selectedLayerIds).toStrictEqual(["b"]);
+    expect(store.getSelection().primaryLayerId).toBe("b");
+  });
 });
 
 describe(moveLayerToIndex, () => {

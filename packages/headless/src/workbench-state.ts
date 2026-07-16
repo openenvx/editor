@@ -2,6 +2,7 @@ import type {
   CommandExecutionResult,
   CommandService,
   EditorInput,
+  EditorState,
   EventBus,
   ExternalStore,
   InteractionState,
@@ -132,6 +133,7 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
 export interface WorkbenchControllerOptions {
   plugins: Plugin[];
   initialScene?: Scene;
+  initialEditorState?: EditorState;
   editorUri?: string;
   editorTitle?: string;
   layout?: Partial<WorkbenchLayout>;

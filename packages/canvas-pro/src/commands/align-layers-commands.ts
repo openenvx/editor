@@ -38,7 +38,7 @@ function applyTransforms(
   labelKey: string,
   defaultLabel: string
 ): void {
-  const activePageId = ctx.scene.getScene().activePageId;
+  const activePageId = ctx.scene.getActivePageId();
   ctx.scene.apply({
     apply: (scene) => ({
       ...scene,

@@ -59,7 +59,6 @@ describe('resolve-scene-assets', () => {
   it('inlines asset refs from scene assets', async () => {
     const { createSceneAssetResolver } = await import('./resolve-scene-assets');
     const resolver = createSceneAssetResolver({
-      activePageId: 'p1',
       assets: {
         img1: {
           data: 'abc',
@@ -69,11 +68,6 @@ describe('resolve-scene-assets', () => {
       },
       pages: [],
       schemaVersion: 1,
-      selection: {
-        activePageId: 'p1',
-        primaryLayerId: null,
-        selectedLayerIds: [],
-      },
     });
 
     expect(resolver('asset://img1')).toBe('data:image/png;base64,abc');

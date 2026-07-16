@@ -15,7 +15,7 @@ function createContext(sceneStore: SceneStore): CommandContext {
     editor: new EditorService(),
     events: new WorkbenchEventService(),
     scene: sceneStore,
-    selection: sceneStore.getScene().selection,
+    selection: sceneStore.getSelection(),
     services: new InstantiationService(),
   };
 }
