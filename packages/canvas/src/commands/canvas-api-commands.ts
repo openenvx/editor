@@ -7,12 +7,17 @@ import {
   localize,
   updateLayerInTree,
 } from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
+import type {
+  CommandContext,
+  FontDescriptor,
+  FontService,
+} from '@openenvx/core';
 import { resolvePagePreset } from '@openenvx/schema';
 import type { Transform } from '@openenvx/schema';
 
 import {
   CanvasCommandRequestServiceId,
+  CanvasFontServiceId,
   CanvasPageResizeServiceId,
 } from '../canvas-service-tokens';
 import { bytesToDataUrl } from '../export/bytes-to-data-url';
@@ -273,6 +278,26 @@ export class UpdateRichTextTransformCommand extends Command {
         defaultValue: 'Update rich text transform',
       }),
     });
+  }
+}
+
+export class RegisterCanvasFontCommand extends Command {
+  readonly id = 'canvas.registerFont';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    if (!ctx.services.has(CanvasFontServiceId)) {
+      return false;
+    }
+    const font = args as FontDescriptor | undefined;
+    return Boolean(font?.id && font?.family);
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const font = args as FontDescriptor | undefined;
+    if (!font?.id || !font.family) {
+      return;
+    }
+    ctx.services.get<FontService>(CanvasFontServiceId).register(font);
   }
 }
 

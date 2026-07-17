@@ -1,4 +1,4 @@
-import { CANVAS_FONT_FAMILIES } from './fonts/canvas-font-catalog';
+import { canvasFontService } from './fonts/canvas-font-service';
 import type { CanvasLayerSurfaceItem } from './layer-surface-item';
 
 export function collectCanvasFontFamilies(
@@ -12,5 +12,7 @@ export function collectCanvasFontFamilies(
     })
     .filter((family): family is string => Boolean(family));
 
-  return [...new Set([...CANVAS_FONT_FAMILIES, ...fromLayers])];
+  const fromService = canvasFontService.list().map((font) => font.family);
+
+  return [...new Set([...fromService, ...fromLayers])];
 }

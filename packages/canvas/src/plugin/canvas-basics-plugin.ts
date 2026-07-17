@@ -33,6 +33,7 @@ import {
 import { CanvasClipboardService } from '../clipboard/canvas-clipboard-service';
 import {
   ExportImageCommand,
+  RegisterCanvasFontCommand,
   ResizePagePresetCommand,
   SetPagePresetCommand,
   SetPageSizeCommand,
@@ -260,6 +261,7 @@ export class CanvasBasicsPlugin extends Plugin {
       new RotateLayerLeftCommand(),
       new RotateLayerRightCommand(),
       new UpdateRichTextTransformCommand(),
+      new RegisterCanvasFontCommand(),
       new ExportImageCommand(),
       new UploadAssetCommand(),
       new CopyLayersCommand(),

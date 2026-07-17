@@ -111,6 +111,8 @@ export interface CanvasImageData {
 export interface CanvasTextData {
   html: string;
   align?: 'left' | 'center' | 'right';
+  /** Arc bend in degrees; 0 = straight, positive = smile, negative = frown. */
+  curve?: number;
   fill?: string;
   fontFamily?: string;
   fontSize?: number;

@@ -2,11 +2,6 @@
   width: 100%;
 }
 
-.triggerWrap {
-  display: block;
-  width: 100%;
-}
-
 .trigger {
   display: flex;
   align-items: center;
@@ -49,13 +44,14 @@
   color: var(--wb-muted-foreground);
 }
 
-.panel {
-  width: min(280px, var(--radix-popover-content-available-width, 280px));
-  padding: 0;
+.command {
+  background: transparent;
 }
 
-.panelBody {
-  padding: 0;
+.list {
+  max-height: min(360px, 50vh);
+  overflow: auto;
+  padding: var(--wb-space-1) 0 0;
 }
 
 .itemCheck {

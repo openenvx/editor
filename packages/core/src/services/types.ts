@@ -18,6 +18,7 @@ export interface FontDescriptor {
 export interface FontService {
   list(): FontDescriptor[];
   resolve(family: string): FontDescriptor | null;
+  register(font: FontDescriptor): void;
 }
 
 export interface PersistenceService {

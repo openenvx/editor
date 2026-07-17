@@ -102,8 +102,13 @@ export { useLoadedImage } from './renderers/image-canvas-renderer';
 export {
   CANVAS_FONT_CATALOG,
   CANVAS_FONT_FAMILIES,
+  SYSTEM_FONT_CATALOG,
+  createSeedFontCatalog,
 } from './fonts/canvas-font-catalog';
-export { canvasFontService } from './fonts/canvas-font-service';
+export {
+  canvasFontService,
+  resetCanvasFontServiceForTests,
+} from './fonts/canvas-font-service';
 export { loadCanvasFonts } from './fonts/load-canvas-fonts';
 export { collectCanvasFontFamilies } from './collect-canvas-font-families';
 export { useCanvasFontPreload } from './use-canvas-font-preload';
@@ -118,6 +123,7 @@ export {
 } from './plugin/canvas-basics-plugin';
 export {
   ExportImageCommand,
+  RegisterCanvasFontCommand,
   ResizePagePresetCommand,
   SetPagePresetCommand,
   SetPageSizeCommand,

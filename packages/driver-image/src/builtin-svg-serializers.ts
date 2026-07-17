@@ -91,10 +91,27 @@ const richTextSerializer: PreviewKindSvgSerializer = {
     const align = view.align ?? 'left';
     const lineHeight = view.lineHeight ?? 1.4;
     const letterSpacing = view.letterSpacing ?? 0;
+    const curve = view.curve ?? 0;
     const sanitized = sanitizeHtml(view.html);
+    const plain = stripHtmlToPlainText(sanitized);
+
+    if (Math.abs(curve) >= 0.5) {
+      const pathId = `text-curve-${Math.abs(Math.round(bounds.x * 100))}-${Math.abs(Math.round(bounds.y * 100))}-${Math.abs(Math.round(curve * 10))}`;
+      const pathData = buildSvgArcPath(
+        bounds.width,
+        fontSize,
+        curve,
+        bounds.x,
+        bounds.y
+      );
+      const anchor =
+        align === 'center' ? 'middle' : align === 'right' ? 'end' : 'start';
+      const startOffset =
+        align === 'center' ? '50%' : align === 'right' ? '100%' : '0%';
+      return `<defs><path id="${pathId}" d="${pathData}" fill="none"/></defs><text font-size="${fontSize}" font-family="${escapeAttr(fontFamily)}" fill="${escapeAttr(fill)}" letter-spacing="${letterSpacing}" text-anchor="${anchor}"><textPath href="#${pathId}" startOffset="${startOffset}">${escapeHtml(plain)}</textPath></text>`;
+    }
 
     if (!ctx.useRichText) {
-      const plain = stripHtmlToPlainText(sanitized);
       const anchor =
         align === 'center' ? 'middle' : align === 'right' ? 'end' : 'start';
       const x =
@@ -116,6 +133,30 @@ const richTextSerializer: PreviewKindSvgSerializer = {
     return `<foreignObject x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;font-size:${fontSize}px;font-family:${escapeAttr(fontFamily)};color:${escapeAttr(fill)};text-align:${textAlign};line-height:${lineHeight};letter-spacing:${letterSpacing}px;overflow:hidden;word-break:break-word;">${innerHtml}</div></foreignObject>`;
   },
 };
+
+function buildSvgArcPath(
+  width: number,
+  fontSize: number,
+  curveDeg: number,
+  offsetX: number,
+  offsetY: number
+): string {
+  const safeWidth = Math.max(width, 1);
+  const baselineY = offsetY + Math.max(fontSize, 1);
+  const absCurve = Math.min(180, Math.abs(curveDeg));
+  if (absCurve < 0.5) {
+    return `M ${offsetX},${baselineY} L ${offsetX + safeWidth},${baselineY}`;
+  }
+  const theta = (absCurve * Math.PI) / 180;
+  const halfWidth = safeWidth / 2;
+  const radius = halfWidth / Math.sin(theta / 2);
+  const sagitta = radius * (1 - Math.cos(theta / 2));
+  if (curveDeg > 0) {
+    return `M ${offsetX},${baselineY} A ${radius},${radius} 0 0 1 ${offsetX + safeWidth},${baselineY}`;
+  }
+  const yEnds = baselineY + sagitta;
+  return `M ${offsetX},${yEnds} A ${radius},${radius} 0 0 0 ${offsetX + safeWidth},${yEnds}`;
+}
 
 function stackChildBounds(
   direction: 'horizontal' | 'vertical',

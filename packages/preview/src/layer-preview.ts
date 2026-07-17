@@ -31,6 +31,7 @@ export type BuiltinLayerPreviewDescriptor =
       fontFamily?: string;
       fill?: string;
       align?: 'left' | 'center' | 'right';
+      curve?: number;
       lineHeight?: number;
       letterSpacing?: number;
     }
@@ -81,6 +82,7 @@ export class LayerPreviewBuilder {
       fontFamily?: string;
       fill?: string;
       align?: 'left' | 'center' | 'right';
+      curve?: number;
       lineHeight?: number;
       letterSpacing?: number;
     }

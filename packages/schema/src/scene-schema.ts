@@ -96,6 +96,10 @@ function build(o: typeof z.object) {
 
   const canvasTextData = o({
     align: z.enum(['left', 'center', 'right']).optional(),
+    curve: z
+      .number()
+      .optional()
+      .describe('Arc bend in degrees; 0 = straight, positive = smile.'),
     fill: z.string().optional(),
     fontFamily: z.string().optional(),
     fontSize: z.number().optional(),

@@ -17,7 +17,7 @@ import { createDefaultTransform } from '@openenvx/schema';
 import { z } from 'zod';
 
 import { CanvasFontServiceId } from '../canvas-service-tokens';
-import { CANVAS_FONT_CATALOG } from '../fonts/canvas-font-catalog';
+import { createSeedFontCatalog } from '../fonts/canvas-font-catalog';
 import {
   DEFAULT_RICH_TEXT_FILL,
   DEFAULT_RICH_TEXT_FONT_FAMILY,
@@ -28,6 +28,7 @@ import {
 
 export const canvasTextSchema = z.object({
   align: z.enum(['left', 'center', 'right']).optional(),
+  curve: z.number().optional(),
   fill: z.string().optional(),
   fontFamily: z.string().optional(),
   fontSize: z.number().optional(),
@@ -40,6 +41,7 @@ export type CanvasTextModel = z.infer<typeof canvasTextSchema>;
 
 const DEFAULT_MODEL: CanvasTextModel = {
   align: 'left',
+  curve: 0,
   fill: DEFAULT_RICH_TEXT_FILL,
   fontFamily: DEFAULT_RICH_TEXT_FONT_FAMILY,
   fontSize: DEFAULT_RICH_TEXT_FONT_SIZE,
@@ -73,7 +75,7 @@ function buildFontOptions(
       .map((font) => ({ label: font.id, value: font.family }));
   }
 
-  return CANVAS_FONT_CATALOG.map((font) => ({
+  return createSeedFontCatalog().map((font) => ({
     label: font.id,
     value: font.family,
   }));
@@ -116,6 +118,7 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
   properties(ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
     const scrubPx = { scrub: true, precision: 0 };
     const scrubLineHeight = { scrub: true, precision: 1 };
+    const scrubCurve = { scrub: true, precision: 0, unit: '°' };
     return (
       createPropertyBuilder()
         .section('text', 'Text')
@@ -126,6 +129,7 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
         .align('align', 'Align')
         .number('lineHeight', 'Line spacing', { numeric: scrubLineHeight })
         .number('letterSpacing', 'Letter spacing', { numeric: scrubPx })
+        .number('curve', 'Curve', { numeric: scrubCurve })
         .build()
     );
   }
@@ -133,6 +137,7 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
   renderPreview(ctx: LayerPreviewContext<CanvasTextModel>) {
     return createLayerPreviewBuilder().richText(sanitizeHtml(ctx.model.html), {
       align: ctx.model.align,
+      curve: ctx.model.curve,
       fill: ctx.model.fill,
       fontFamily: ctx.model.fontFamily,
       fontSize: ctx.model.fontSize,

@@ -35,6 +35,7 @@ export interface ComboboxProps {
   optionStyle?: (option: ComboboxOption) => CSSProperties | undefined;
 }
 
+/** Kept for reuse; font picker uses InspectorAnchoredPopover for now. */
 export function Combobox({
   id,
   value,
@@ -60,68 +61,69 @@ export function Combobox({
   );
 
   return (
-    <Popover onOpenChange={setOpen} open={open}>
-      <PopoverTrigger className={cn(styles.root, className)}>
-        <button
-          aria-controls={open ? listboxId : undefined}
-          aria-expanded={open}
-          aria-haspopup="listbox"
-          aria-label={ariaLabel}
-          className={styles.trigger}
-          id={id}
-          role="combobox"
-          type="button"
+    <div className={cn(styles.root, className)}>
+      <Popover onOpenChange={setOpen} open={open}>
+        <PopoverTrigger className={styles.triggerWrap}>
+          <button
+            aria-controls={open ? listboxId : undefined}
+            aria-expanded={open}
+            aria-haspopup="listbox"
+            aria-label={ariaLabel}
+            className={styles.trigger}
+            id={id}
+            role="combobox"
+            type="button"
+          >
+            <span className={styles.value}>
+              {renderValue
+                ? renderValue(selectedOption)
+                : (selectedOption?.label ?? t('combobox.select'))}
+            </span>
+            <ChevronDown aria-hidden className={styles.chevron} size={14} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          align="start"
+          bodyClassName={styles.panelBody}
+          className={styles.panel}
+          side="bottom"
         >
-          <span className={styles.value}>
-            {renderValue
-              ? renderValue(selectedOption)
-              : (selectedOption?.label ?? t('combobox.select'))}
-          </span>
-          <ChevronDown aria-hidden className={styles.chevron} size={14} />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent
-        align="start"
-        bodyClassName={styles.panelBody}
-        className={styles.panel}
-        onOpenAutoFocus={(event) => event.preventDefault()}
-        side="bottom"
-      >
-        <Command>
-          <CommandInput placeholder={resolvedSearchPlaceholder} />
-          <CommandList id={listboxId}>
-            <CommandEmpty>{resolvedEmptyMessage}</CommandEmpty>
-            <CommandGroup>
-              {options.map((option) => {
-                const selected = option.value === value;
-                return (
-                  <CommandItem
-                    key={option.value}
-                    onSelect={() => {
-                      onChange(option.value);
-                      setOpen(false);
-                    }}
-                    style={optionStyle?.(option)}
-                    value={option.label}
-                  >
-                    <Check
-                      aria-hidden
-                      className={cn(
-                        styles.itemCheck,
-                        selected ? styles.itemCheckVisible : undefined
-                      )}
-                      size={14}
-                    />
-                    <span className={styles.itemLabel}>
-                      {renderOption ? renderOption(option) : option.label}
-                    </span>
-                  </CommandItem>
-                );
-              })}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+          <Command>
+            <CommandInput placeholder={resolvedSearchPlaceholder} />
+            <CommandList id={listboxId}>
+              <CommandEmpty>{resolvedEmptyMessage}</CommandEmpty>
+              <CommandGroup>
+                {options.map((option) => {
+                  const selected = option.value === value;
+                  return (
+                    <CommandItem
+                      key={option.value}
+                      onSelect={() => {
+                        onChange(option.value);
+                        setOpen(false);
+                      }}
+                      style={optionStyle?.(option)}
+                      value={option.label}
+                    >
+                      <Check
+                        aria-hidden
+                        className={cn(
+                          styles.itemCheck,
+                          selected ? styles.itemCheckVisible : undefined
+                        )}
+                        size={14}
+                      />
+                      <span className={styles.itemLabel}>
+                        {renderOption ? renderOption(option) : option.label}
+                      </span>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

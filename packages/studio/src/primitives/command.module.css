@@ -37,7 +37,7 @@
 }
 
 .list {
-  max-height: min(220px, var(--radix-popover-content-available-height, 280px));
+  max-height: min(320px, var(--radix-popover-content-available-height, 360px));
   overflow: auto;
   padding: var(--wb-space-1);
 }
@@ -60,14 +60,14 @@
   align-items: center;
   gap: var(--wb-space-2);
   width: 100%;
-  min-height: var(--wb-control-height);
-  padding: 0 var(--wb-space-2);
+  min-height: 36px;
+  padding: var(--wb-space-1) var(--wb-space-2);
   border: none;
   border-radius: var(--wb-radius-sm);
   background: transparent;
   color: var(--wb-foreground);
   font-size: var(--wb-text-sm);
-  line-height: 1;
+  line-height: 1.2;
   cursor: default;
   text-align: left;
   outline: none;

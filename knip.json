@@ -55,7 +55,8 @@
         "!src/**/*.test.ts",
         "!src/**/*.test.tsx"
       ],
-      "ignoreDependencies": ["zod"]
+      "ignoreDependencies": ["zod"],
+      "ignore": ["src/primitives/combobox.tsx"]
     },
     "packages/canvas-pro": {
       "entry": ["src/index.ts!"],

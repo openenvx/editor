@@ -3,6 +3,11 @@ import Konva from 'konva';
 
 import { applyTransformToNode } from './geometry';
 import {
+  buildArcPath,
+  isCurvedText,
+  stripHtmlToPlainText,
+} from './rich-text-arc';
+import {
   layoutRichText,
   toKonvaFontStyle,
   toKonvaTextDecoration,
@@ -16,6 +21,7 @@ import {
 
 export interface RichTextLayerView {
   align?: 'left' | 'center' | 'right';
+  curve?: number;
   fill?: string;
   fontFamily?: string;
   html: string;
@@ -72,6 +78,7 @@ export function applyRichTextToGroup(
   const align = view.align ?? 'left';
   const lineHeight = view.lineHeight ?? RICH_TEXT_LINE_HEIGHT_MULTIPLIER;
   const letterSpacing = view.letterSpacing ?? DEFAULT_RICH_TEXT_LETTER_SPACING;
+  const curve = view.curve ?? 0;
 
   node.destroyChildren();
 
@@ -83,6 +90,22 @@ export function applyRichTextToGroup(
       width,
     })
   );
+
+  if (isCurvedText(curve)) {
+    node.add(
+      new Konva.TextPath({
+        align,
+        data: buildArcPath(width, fontSize, curve),
+        fill,
+        fontFamily,
+        fontSize,
+        letterSpacing,
+        text: stripHtmlToPlainText(view.html),
+      })
+    );
+    node.getLayer()?.batchDraw();
+    return;
+  }
 
   const spans = layoutRichTextSpans({
     align,
