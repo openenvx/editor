@@ -8,7 +8,8 @@ Package boundaries and contribution flow for the monorepo.
 | --- | --- | --- |
 | **Rendering-only** | `schema`, `canvas` | Embed `CanvasStage` in a custom React app with own state. No plugin host. |
 | **Editor backbone** | `core`, `headless`, optional `canvas`, `driver-*`, plugins | Full editor runtime (scene, commands, layers) with a **custom UI shell**. See `apps/demo-playground`. |
-| **Published product** | `studio` | Only published package; bundles needed `@openenvx/*` workspace libs into its `dist`. |
+| **Workbench UI** | `workbench` | React shell (`WorkbenchShell`); workspace-private. |
+| **Published product** | `studio` (+ `schema`) | Fat bundle of workbench + canvas + canvas-pro + agent + driver-image into `dist`. |
 
 **Hard rule:** All canvas code lives in `@openenvx/canvas`. Not in `core`.
 
@@ -28,9 +29,9 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 
 | Tier | Packages | License / publish (intent) | Responsibility |
 | --- | --- | --- | --- |
-| Foundation | `schema`, `preview`, `core` | Private (workspace) | Scene model (Zod + JSON Schema), plugin host primitives (commands, layers, services, property field data) |
-| Product libs | `headless`, `canvas`, `driver-*` | Private (workspace) | Workbench runtime, canvas engine, export drivers |
-| Published UI | `studio` (+ `canvas-pro` internal) | Proprietary; only `studio` published | React shell renderers; studio bundles inlined `@openenvx/*` deps |
+| Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives (commands, layers, services, property field data) |
+| Product libs | `headless`, `canvas`, `driver-*`, `workbench`, `canvas-pro`, `agent` | Private (workspace) | Workbench runtime, canvas engine, export drivers, React shell, pro chrome, agent |
+| Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + canvas-pro + agent + driver-image |
 
 ## What belongs in `@openenvx/canvas`
 
@@ -48,7 +49,7 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 - **`dataPatch` on `canvas.updateLayerTransform`** — optional enterprise data commits alongside transform updates (`dataPatch` merges into `layer.data`)
 - `CanvasStageInteractionService` — optional stage drag/resize adjustment + overlay primitives
 
-Workbench chrome for canvas (toolbar, palette, sidebars, editor pane registration) lives in enterprise `@openenvx/canvas-pro`.
+Workbench chrome for canvas (toolbar, palette, sidebars, editor pane registration) lives in enterprise `@xmazu/openenvxee-canvas-pro`.
 
 ## What belongs in `@openenvx/core`
 

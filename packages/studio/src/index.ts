@@ -1,93 +1,31 @@
-export { useWorkbench, type UseWorkbenchResult } from './hooks/use-workbench';
-export {
-  useWorkbenchSelector,
-  useWorkbenchContextSelector,
-} from './hooks/use-workbench-selector';
-export {
-  EditorViewportProvider,
-  useEditorViewport,
-  useEditorViewportBridge,
-} from './context/editor-viewport-context';
-export {
-  ThemeProvider,
-  useTheme,
-  useSetTheme,
-  useThemeScope,
-  DEFAULT_THEME,
-  BUILT_IN_THEMES,
-  THEME_LABELS,
-  type BuiltInTheme,
-  type ThemeProviderProps,
-  type ThemeContextValue,
-} from './context/theme-context';
-export {
-  LocaleProvider,
-  useLocale,
-  useSetLocale,
-  DEFAULT_LOCALE,
-  SUPPORTED_LOCALES,
-  type LocaleContextValue,
-  type SupportedLocale,
-  type LocaleProviderProps,
-} from './context/locale-context';
-export {
-  WorkbenchI18nProvider,
-  type WorkbenchI18nProviderProps,
-} from './i18n/workbench-i18n-provider';
-export { useWorkbenchTranslation } from './i18n/use-workbench-translation';
-export {
-  registerDefaultWorkbenchBundle,
-  WORKBENCH_I18N_NAMESPACE,
-} from './i18n/workbench-i18n';
-export { default as workbenchEnBundle } from './i18n/locales/en/workbench-en';
-export { default as workbenchPlBundle } from './i18n/locales/pl/workbench-pl';
-export {
-  WorkbenchShell,
-  type WorkbenchShellProps,
-} from './shell/workbench-shell';
-export {
-  ViewPanelRenderer,
-  TreePanelRenderer,
-} from './renderers/view-panel-renderer';
-export { PropertyPanelRenderer } from './renderers/property-panel-renderer';
-export { EditorPaneRenderer } from './renderers/editor-pane-renderer';
-export { ContextMenuRenderer } from './renderers/context-menu-renderer';
-export { CommandPaletteRenderer } from './renderers/command-palette-renderer';
-export { OverlayRenderer } from './renderers/overlay-renderer';
-export { StatusBarRenderer } from './renderers/status-bar-renderer';
-export { CanvasChrome } from './layout/canvas-chrome';
-export { EditorLayout } from './layout/editor-layout';
-export { editorLayoutStyles } from './layout/editor-layout-styles';
-export {
-  DefaultWorkbenchFieldsPlugin,
-  DEFAULT_FIELDS_PLUGIN_ID,
-} from './fields/default-fields-plugin';
-export { NumericControl } from './inputs/basic/numeric-control';
-export { TextInput } from './inputs/basic/text-input';
-export { WorkbenchIcon } from './icons/workbench-icon';
-export {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroups,
-  DropdownMenuTrigger,
-} from './primitives/dropdown-menu';
-export { InspectorPanel } from './layout/inspector-panel';
-export {
-  ActivitySidebar,
-  type ActivitySidebarProps,
-  type SidebarPanelComponent,
-} from './layout/activity-sidebar';
-export { ConfirmDialog } from './primitives/confirm-dialog';
-export { Select } from './primitives/select';
-export {
-  NumericInput,
-  type NumericInputProps,
-} from './primitives/numeric-input';
-export {
-  computeScrubValue,
-  type ScrubComputeOptions,
-} from './primitives/numeric-scrub';
-export {
-  ColorPickerPopover,
-  type ColorPickerPopoverProps,
-} from './primitives/color-picker';
+import { AgentChatPlugin } from '@openenvx/agent';
+import { CanvasBasicsPlugin } from '@openenvx/canvas';
+import { DriverImagePlugin } from '@openenvx/driver-image';
+import {
+  CanvasLayersPlugin,
+  CanvasPagesPlugin,
+  CanvasProPlugin,
+  CanvasSidebarPlugin,
+  CanvasTemplatePlugin,
+} from '@xmazu/openenvxee-canvas-pro';
+
+export * from '@xmazu/openenvxee-workbench';
+export * from '@openenvx/canvas';
+export * from '@xmazu/openenvxee-canvas-pro';
+export * from '@openenvx/agent';
+export * from '@openenvx/driver-image';
+
+/**
+ * Default plugin set for a full OpenEnvx Studio host app
+ * (canvas basics + image driver + canvas-pro chrome + agent).
+ */
+export const DEFAULT_STUDIO_PLUGINS = [
+  new CanvasBasicsPlugin(),
+  new DriverImagePlugin(),
+  new CanvasProPlugin(),
+  new CanvasSidebarPlugin(),
+  new CanvasPagesPlugin(),
+  new CanvasLayersPlugin(),
+  new CanvasTemplatePlugin(),
+  new AgentChatPlugin(),
+];

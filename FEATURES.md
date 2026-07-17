@@ -16,7 +16,7 @@ Agents: update this file when you add, remove, or materially change a user-facin
 | Tier | Meaning |
 | --- | --- |
 | **OSS** | Available in `@openenvx/core`, `@openenvx/schema`, `@openenvx/canvas`, `@openenvx/headless`, drivers |
-| **Pro** | Lives in `@openenvx/canvas-pro`, `@openenvx/studio`, or other closed packages |
+| **Pro** | Lives in `@xmazu/openenvxee-canvas-pro`, `@xmazu/openenvxee-studio`, or other closed packages |
 
 ## Polotno parity matrix
 

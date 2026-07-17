@@ -44,12 +44,12 @@ Read **Architecture.md** before placing new code. Update **FEATURES.md** when ad
 
 ## Licensing / publishing intent
 
-Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `driver-image`, …) are **private** and not published. Their `exports` point at **TypeScript `src/`** so Vite/Bun apps hot-reload and TypeScript resolves types from source without rebuilding.
+Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `driver-image`, `workbench`, `canvas-pro`, `agent`, …) are **private** and not published. Their `exports` point at **TypeScript `src/`** so Vite/Bun apps hot-reload and TypeScript resolves types from source without rebuilding.
 
 Published packages:
 
-- **`@openenvx/schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](../../PUBLISHING.md).
-- **`@xmazu/openenvxee-studio`** — React workbench UI. Build bundles `@openenvx/core`, `@openenvx/headless`, and `@openenvx/schema` into `dist/`. Locally, studio’s `development` export resolves to `src/` for HMR.
+- **`@openenvx/schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](PUBLISHING.md).
+- **`@xmazu/openenvxee-studio`** — product fat bundle. Build inlines `@xmazu/openenvxee-workbench`, `@openenvx/canvas`, `@xmazu/openenvxee-canvas-pro`, `@openenvx/agent`, `@openenvx/driver-image`, and their `@openenvx/*` deps into `dist/`. Locally, studio’s `development` export resolves to `src/` for HMR.
 
 ## Code conventions
 
@@ -124,7 +124,7 @@ bun run changeset     # create a release changeset
 
 ## Publishing
 
-Only `packages/studio` (`@xmazu/openenvxee-studio`) is published (private registry via `publishConfig`). See [README.md](README.md) and the `publish-packages` script in root `package.json`.
+Only `packages/studio` (`@xmazu/openenvxee-studio`) and `packages/schema` (`@openenvx/schema`) are published (private registry via `publishConfig`). See [README.md](README.md), [PUBLISHING.md](PUBLISHING.md), and the `publish-packages` script in root `package.json`.
 
 ## Before you finish
 

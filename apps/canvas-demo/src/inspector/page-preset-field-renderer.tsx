@@ -3,7 +3,7 @@ import { getActivePage } from '@openenvx/core';
 import type { PropertyFieldDescriptor } from '@openenvx/core';
 import { useWorkbenchContextSelector } from '@openenvx/headless/react';
 import { resolvePagePreset } from '@openenvx/schema';
-import { ConfirmDialog, Select } from '@openenvxee/studio';
+import { ConfirmDialog, Select } from '@xmazu/openenvxee-studio';
 import { memo, useState } from 'react';
 
 export interface PagePresetFieldRendererProps {

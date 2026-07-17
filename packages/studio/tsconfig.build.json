@@ -12,6 +12,20 @@
     "jsx": "react-jsx",
     "strictNullChecks": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "@openenvx/core": ["../core/src/index.ts"],
+      "@openenvx/headless": ["../headless/src/index.ts"],
+      "@openenvx/headless/react": ["../headless/src/react/workbench-context.tsx"],
+      "@openenvx/schema": ["../schema/src/index.ts"],
+      "@openenvx/preview": ["../preview/src/index.ts"],
+      "@openenvx/canvas": ["../canvas/src/index.ts"],
+      "@openenvx/agent": ["../agent/src/index.ts"],
+      "@openenvx/driver-image": ["../driver-image/src/index.ts"],
+      "@xmazu/openenvxee-workbench": ["../workbench/src/index.ts"],
+      "@xmazu/openenvxee-canvas-pro": ["../canvas-pro/src/index.ts"]
+    }
   }
 }

@@ -5,7 +5,7 @@ Two packages leave this monorepo:
 | Package | Registry | What ships |
 | --- | --- | --- |
 | `@openenvx/schema` | `registry.openenvx.com` (public) | Built `dist/` + `scene.schema.json` |
-| `@xmazu/openenvxee-studio` | `registry.openenvx.com` (restricted) | Single bundled `dist/` (inlines `@openenvx/core`, `@openenvx/headless`, `@openenvx/schema`) |
+| `@xmazu/openenvxee-studio` | `registry.openenvx.com` (restricted) | Single bundled `dist/` (inlines workbench, canvas, canvas-pro, agent, driver-image, and their `@openenvx/*` deps) |
 
 Everything else stays workspace-private and resolves from `src/` during local development.
 
@@ -49,7 +49,17 @@ bun add @openenvx/schema --registry https://registry.openenvx.com
 
 ## `@xmazu/openenvxee-studio`
 
-Studio is a **fat bundle**: `tsup` sets `noExternal: [/^@openenvx\//]`, so every `@openenvx/*` import used by studio is compiled into `dist/index.js`. Published `package.json` must not list any `@openenvx/*` runtime dependency.
+Studio is the **published product bundle**. Internally:
+
+| Workspace package | Role |
+| --- | --- |
+| `@xmazu/openenvxee-workbench` | React shell UI (`WorkbenchShell`, fields, theme) |
+| `@openenvx/canvas` | Konva canvas engine |
+| `@xmazu/openenvxee-canvas-pro` | Pro chrome (toolbars, sidebars, smart guides) |
+| `@openenvx/agent` | AI agent sidebar |
+| `@openenvx/driver-image` | Image/SVG export driver |
+
+`tsup` sets `noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/]`, so those packages are compiled into `dist/index.js`. Published `package.json` must not list any `@openenvx/*` or `@xmazu/openenvxee-*` runtime dependency.
 
 Workspace packages stay in `devDependencies` for types and local HMR via the `development` export condition.
 
@@ -59,7 +69,25 @@ Install:
 bun add @xmazu/openenvxee-studio --registry https://registry.openenvx.com
 ```
 
-Studio does **not** bundle `@openenvx/canvas`, `@openenvx/driver-image`, or other app-level packages — those stay separate and are composed by the host app (see `apps/demo-playground`).
+Host apps typically:
+
+```ts
+import {
+  WorkbenchShell,
+  DEFAULT_STUDIO_PLUGINS,
+  DEFAULT_CANVAS_LAYOUT,
+  createCanvasDemoScene,
+  createCanvasInspectorHostContextWithApi,
+  ChatPanel,
+  TemplateDataPanel,
+  AGENT_CHAT_CONTAINER_ID,
+  TEMPLATE_DATA_CONTAINER_ID,
+} from '@xmazu/openenvxee-studio';
+import '@xmazu/openenvxee-studio/theme.css';
+import '@xmazu/openenvxee-studio/fonts.css';
+```
+
+`@xmazu/openenvxee-workbench` is **not** published — compose from studio, or use workspace packages directly inside this monorepo (see `apps/demo-playground` for a minimal OSS shell without studio).
 
 ## Release workflow
 

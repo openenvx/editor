@@ -34,7 +34,7 @@ import {
   registerDefaultWorkbenchBundle,
   workbenchEnBundle,
   workbenchPlBundle,
-} from '@openenvxee/studio';
+} from '@xmazu/openenvxee-studio';
 
 import {
   CANVAS_DEMO_EXPORT_FORMATS,

@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@openenvx/agent": "workspace:*",
     "@openenvx/canvas": "workspace:*",
     "@openenvx/core": "workspace:*",
     "@openenvx/driver-image": "workspace:*",
@@ -18,7 +17,6 @@
     "@openenvx/preview": "workspace:*",
     "@openenvx/schema": "workspace:*",
     "@xmazu/openenvxee-studio": "workspace:*",
-    "@xmazu/openenvxee-canvas-pro": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },

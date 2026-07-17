@@ -46,17 +46,45 @@
       "entry": ["src/index.ts!", "src/schemas/index.ts!"],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
-    "packages/studio": {
-      "entry": ["src/index.ts!", "tsup.config.ts", "build-dts.ts"],
+    "packages/workbench": {
+      "entry": ["src/index.ts!"],
       "project": [
         "src/**/*.{ts,tsx}",
-        "tsup.config.ts",
-        "build-dts.ts",
         "!src/**/*.test.ts",
         "!src/**/*.test.tsx"
       ],
       "ignoreDependencies": ["zod"],
       "ignore": ["src/primitives/combobox.tsx"]
+    },
+    "packages/studio": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignoreDependencies": [
+        "@ai-sdk/react",
+        "@dnd-kit/core",
+        "@radix-ui/react-dropdown-menu",
+        "@radix-ui/react-popover",
+        "@radix-ui/react-select",
+        "@radix-ui/react-slot",
+        "@radix-ui/react-switch",
+        "@radix-ui/react-tooltip",
+        "@tiptap/pm",
+        "@tiptap/react",
+        "@tiptap/starter-kit",
+        "ai",
+        "clsx",
+        "cmdk",
+        "i18next",
+        "konva",
+        "lucide-react",
+        "react-colorful",
+        "react-i18next",
+        "react-konva",
+        "zod",
+        "@openenvx/core",
+        "@openenvx/preview",
+        "@openenvx/schema"
+      ]
     },
     "packages/canvas-pro": {
       "entry": ["src/index.ts!"],

@@ -15,11 +15,7 @@
     "experimentalDecorators": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@openenvxee/studio": ["../../packages/studio/src/index.ts"],
-      "@openenvxee/studio/theme.css": ["../../packages/studio/src/theme/tokens.css"]
-    }
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src", "../../packages/typescript-config/css-modules.d.ts"]
 }

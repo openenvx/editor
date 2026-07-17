@@ -1,9 +1,27 @@
 {
   "extends": "@openenvx/typescript-config/base.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "lib": ["ES2023"],
     "types": ["@cloudflare/workers-types"],
-    "noEmit": true
+    "customConditions": [],
+    "noEmit": true,
+    "paths": {
+      "@openenvx/core": ["../../packages/core/dist/index.d.ts"],
+      "@openenvx/core/*": ["../../packages/core/dist/*"],
+      "@openenvx/headless": ["../../packages/headless/dist/index.d.ts"],
+      "@openenvx/headless/*": ["../../packages/headless/dist/*"],
+      "@openenvx/canvas/document-export": [
+        "../../packages/canvas/dist/export/canvas-document-export-service.d.ts"
+      ],
+      "@openenvx/canvas/*": ["../../packages/canvas/dist/*"],
+      "@openenvx/driver-image": ["../../packages/driver-image/dist/index.d.ts"],
+      "@openenvx/driver-image/*": ["../../packages/driver-image/dist/*"],
+      "@openenvx/preview": ["../../packages/preview/dist/index.d.ts"],
+      "@openenvx/preview/*": ["../../packages/preview/dist/*"],
+      "@openenvx/schema": ["../../packages/schema/dist/index.d.ts"],
+      "@openenvx/schema/*": ["../../packages/schema/dist/*"]
+    }
   },
   "include": ["src/**/*.ts"]
 }

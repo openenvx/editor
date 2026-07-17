@@ -15,6 +15,7 @@
     "@openenvx/canvas",
     "@openenvx/driver-image",
     "@xmazu/openenvxee-canvas-pro",
+    "@xmazu/openenvxee-workbench",
     "@openenvx/agent",
     "@openenvxee/registry-contract"
   ]

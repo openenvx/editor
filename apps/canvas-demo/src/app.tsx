@@ -1,30 +1,23 @@
 import {
-  DEFAULT_AGENT_PLUGINS,
   AGENT_CHAT_CONTAINER_ID,
   ChatPanel,
-} from '@openenvx/agent';
-import { CanvasBasicsPlugin, createCanvasDemoScene } from '@openenvx/canvas';
-import { DriverImagePlugin } from '@openenvx/driver-image';
-import {
-  createCanvasInspectorHostContextWithApi,
-  DEFAULT_CANVAS_LAYOUT,
-  DEFAULT_CANVAS_PRO_PLUGINS,
+  DEFAULT_STUDIO_PLUGINS,
   TEMPLATE_DATA_CONTAINER_ID,
   TemplateDataPanel,
-} from '@xmazu/openenvxee-canvas-pro';
-import { WorkbenchShell } from '@xmazu/openenvxee-studio';
+  WorkbenchShell,
+  createCanvasDemoScene,
+  createCanvasInspectorHostContextWithApi,
+  DEFAULT_CANVAS_LAYOUT,
+} from '@xmazu/openenvxee-studio';
 
 import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
 import { CanvasDemoPlugin } from './plugins/canvas-demo-plugin';
 
-import '@openenvx/canvas/fonts.css';
-import '@openenvxee/studio/theme.css';
+import '@xmazu/openenvxee-studio/fonts.css';
+import '@xmazu/openenvxee-studio/theme.css';
 
 const plugins = [
-  new CanvasBasicsPlugin(),
-  new DriverImagePlugin(),
-  ...DEFAULT_CANVAS_PRO_PLUGINS,
-  ...DEFAULT_AGENT_PLUGINS,
+  ...DEFAULT_STUDIO_PLUGINS,
   new CanvasDemoPlugin(),
   new CanvasDemoChromePlugin(),
 ];

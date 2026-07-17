@@ -4,7 +4,15 @@ import type { Plugin } from 'esbuild';
 import { defineConfig } from 'tsup';
 
 const studioRoot = import.meta.dirname;
-const studioSrc = path.join(studioRoot, 'src');
+const packagesRoot = path.resolve(studioRoot, '..');
+
+const cssPackageRoots: { root: string; prefix: string }[] = [
+  { root: path.join(studioRoot, 'src'), prefix: '' },
+  { root: path.join(packagesRoot, 'workbench/src'), prefix: 'workbench/' },
+  { root: path.join(packagesRoot, 'canvas/src'), prefix: 'canvas/' },
+  { root: path.join(packagesRoot, 'agent/src'), prefix: 'agent/' },
+  { root: path.join(packagesRoot, 'canvas-pro/src'), prefix: 'canvas-pro/' },
+];
 
 /**
  * Keep CSS (and CSS module) imports external, rewriting paths so they resolve
@@ -17,15 +25,17 @@ function externalCssRelativeToDist(): Plugin {
       build.onResolve({ filter: /\.css$/ }, (args) => {
         const importerDir = args.importer
           ? path.dirname(args.importer)
-          : studioSrc;
+          : path.join(studioRoot, 'src');
         const absolute = path.resolve(importerDir, args.path);
-        const fromSrc = path
-          .relative(studioSrc, absolute)
-          .replaceAll('\\', '/');
-        if (fromSrc.startsWith('..')) {
-          return { path: args.path, external: true };
+
+        for (const { root, prefix } of cssPackageRoots) {
+          const fromRoot = path.relative(root, absolute).replaceAll('\\', '/');
+          if (!fromRoot.startsWith('..') && !path.isAbsolute(fromRoot)) {
+            return { path: `./${prefix}${fromRoot}`, external: true };
+          }
         }
-        return { path: `./${fromSrc}`, external: true };
+
+        return { path: args.path, external: true };
       });
     },
   };
@@ -41,7 +51,7 @@ export default defineConfig({
   clean: true,
   outDir: 'dist',
   tsconfig: 'tsconfig.build.json',
-  noExternal: [/^@openenvx\//],
+  noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/],
   external: [
     'react',
     'react-dom',
@@ -53,8 +63,14 @@ export default defineConfig({
     'react-i18next',
     'react-colorful',
     'lucide-react',
+    'konva',
+    'react-konva',
+    'ai',
+    '@ai-sdk/react',
     /^@radix-ui\//,
     /^@dnd-kit\//,
+    /^@tiptap\//,
+    /^@fontsource\//,
   ],
   esbuildPlugins: [externalCssRelativeToDist()],
 });
