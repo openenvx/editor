@@ -9,7 +9,6 @@
   "updateInternalDependencies": "patch",
   "ignore": [
     "@openenvx/typescript-config",
-    "@openenvx/schema",
     "@openenvx/preview",
     "@openenvx/core",
     "@openenvx/headless",

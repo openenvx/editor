@@ -4,21 +4,26 @@
   "description": "Canonical Scene JSON schema for OpenEnvx",
   "license": "MIT",
   "type": "module",
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
+  "files": [
+    "dist",
+    "scene.schema.json"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "development": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
+      "bun": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./scene.schema.json": "./scene.schema.json"
   },
   "scripts": {
     "generate:json-schema": "bun run src/generate-json-schema.ts",
     "build": "bun run generate:json-schema && tsup",
+    "prepack": "bun run build",
     "test": "vitest"
   },
   "dependencies": {
@@ -30,6 +35,10 @@
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.openenvx.com"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/openenvx/openenvx.git",
@@ -38,6 +47,5 @@
   "bugs": {
     "url": "https://github.com/openenvx/openenvx/issues"
   },
-  "homepage": "https://openenvx.dev",
-  "private": true
+  "homepage": "https://openenvx.dev"
 }

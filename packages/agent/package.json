@@ -6,20 +6,9 @@
   "type": "module",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "development": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
-    },
-    "./schemas": {
-      "development": "./src/schemas/index.ts",
-      "types": "./dist/schemas/index.d.ts",
-      "import": "./src/schemas/index.ts",
-      "default": "./src/schemas/index.ts"
-    }
+    ".": "./src/index.ts",
+    "./schemas": "./src/schemas/index.ts"
   },
   "scripts": {
     "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/ dist/",

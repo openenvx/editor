@@ -44,9 +44,12 @@ Read **Architecture.md** before placing new code. Update **FEATURES.md** when ad
 
 ## Licensing / publishing intent
 
-Internal workspace libraries (`core`, `headless`, `schema`, `preview`, `canvas`, `driver-image`, …) are **private** and not published. Their `exports` use **TypeScript `src/` for runtime** (`import` / `development`) so Vite/Bun apps hot-reload without rebuilding, and **`dist/*.d.ts` for `types`** so Node services (`tsc`) do not typecheck browser source.
+Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `driver-image`, …) are **private** and not published. Their `exports` point at **TypeScript `src/`** so Vite/Bun apps hot-reload and TypeScript resolves types from source without rebuilding.
 
-Only **`@xmazu/openenvxee-studio`** is published; its build bundles the `@openenvx/*` workspace packages it needs into `dist`. Locally, studio’s `exports` include a `development` condition that resolves to `src/` so the demo can HMR studio too.
+Published packages:
+
+- **`@openenvx/schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](../../PUBLISHING.md).
+- **`@xmazu/openenvxee-studio`** — React workbench UI. Build bundles `@openenvx/core`, `@openenvx/headless`, and `@openenvx/schema` into `dist/`. Locally, studio’s `development` export resolves to `src/` for HMR.
 
 ## Code conventions
 

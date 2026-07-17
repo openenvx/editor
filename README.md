@@ -14,17 +14,18 @@ OpenEnvx is a monorepo for building opinionated visual editors - canvas, command
 
 ### Packages
 
-Workspace libraries (private, not published — runtime `exports` → TypeScript `src/` for HMR; `types` → `dist/*.d.ts` for Node `tsc`):
+Workspace libraries (private, not published — `exports` point at TypeScript `src/` for HMR and type resolution without rebuilding):
 
-- **`@openenvx/schema`** - Scene document model and page presets
+- **`@openenvx/schema`** - Scene document model and page presets *(also published — see [PUBLISHING.md](PUBLISHING.md))*
 - **`@openenvx/preview`** - DOM preview rendering for layer types
 - **`@openenvx/core`** - Scene model, plugins, commands, and contribution registries
 - **`@openenvx/headless`** - `WorkbenchController` and headless editor runtime
 - **`@openenvx/canvas`** - Canvas engine, layers, Konva stage, TipTap rich text, `CanvasBasicsPlugin`
 - **`@openenvx/driver-image`** - PNG, SVG, and PDF export driver
 
-Published package:
+Published packages (see [PUBLISHING.md](PUBLISHING.md)):
 
+- **`@openenvx/schema`** - Scene document model, Zod schemas, and template helpers
 - **`@xmazu/openenvxee-studio`** - React workbench UI; bundles the `@openenvx/*` libraries it needs
 
 ---

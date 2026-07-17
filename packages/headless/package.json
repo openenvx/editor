@@ -6,20 +6,9 @@
   "type": "module",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "development": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
-    },
-    "./react": {
-      "development": "./src/react/workbench-context.tsx",
-      "types": "./dist/react/workbench-context.d.ts",
-      "import": "./src/react/workbench-context.tsx",
-      "default": "./src/react/workbench-context.tsx"
-    }
+    ".": "./src/index.ts",
+    "./react": "./src/react/workbench-context.tsx"
   },
   "scripts": {
     "build": "tsup",

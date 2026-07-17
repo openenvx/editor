@@ -25,6 +25,7 @@
   },
   "scripts": {
     "build": "tsup && bun run ./build-dts.ts && rsync -a --include='*/' --include='*.css' --exclude='*' src/ dist/",
+    "prepack": "bun run build",
     "test": "vitest",
     "publish:local": "bun run build && bun publish --registry http://localhost:8787"
   },
