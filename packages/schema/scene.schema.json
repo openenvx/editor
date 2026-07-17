@@ -77,9 +77,19 @@
             "description": "Display name.",
             "type": "string"
           },
+          "bleedMm": {
+            "description": "Bleed outside trim, in millimetres.",
+            "type": "number",
+            "minimum": 0
+          },
           "presetId": {
             "description": "ISO page size preset id.",
             "type": "string"
+          },
+          "safeMm": {
+            "description": "Safe/content inset inside trim, in millimetres.",
+            "type": "number",
+            "minimum": 0
           },
           "unit": {
             "default": "px",

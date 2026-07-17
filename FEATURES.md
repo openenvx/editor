@@ -30,7 +30,7 @@ Baseline competitor: [Polotno SDK](https://polotno.com/) drag-and-drop canvas (z
 | Snap to grid / guides / alignment | **Done** | Pro | `packages/canvas-pro/src/snap/smart-guides/`, `packages/canvas/src/snap/grid-snap.ts`, `packages/canvas/src/rulers/`, `packages/canvas-pro/src/stage/smart-guides-stage-interaction.ts`, `packages/canvas-pro/src/commands/align-layers-commands.ts` | Smart guides + align/distribute + snap-to-grid (8px) + user-placed guides (drag from rulers). Guides are session-only (not in schema / undo). |
 | Grid controls | **Partial** | OSS + Pro | `packages/canvas` (`CanvasGridSettings`, overlay), studio/canvas-pro toolbar | Overlay + snap toggle (`canvas.toggleGrid`); fixed 8px size. **No grid size picker.** |
 | Multi-page / artboards | **Done** | OSS model + Pro UI | `packages/schema` (`Scene.pages`), `packages/core` (`setActivePage`, `scene.addPage` / `removePage` / `duplicatePage` / `renamePage`), `packages/canvas-pro` Pages sidebar | Multi-page document, switch page, add / delete / duplicate / drag-reorder / inline rename. |
-| Bleed and trim | **Partial** | OSS overlay | `packages/canvas/src/page-margins.ts` (`PRINT_MARGIN_MM = 10`), canvas-pro page margin overlay | Fixed 10 mm safe/print margin. **No bleed, trim marks, or crop-mark export.** |
+| Bleed and trim | **Done** | OSS | `packages/schema` (`bleedMm` / `safeMm`, `page-print.ts`), `packages/canvas/src/page-margins.ts`, `packages/driver-image/src/crop-marks.ts`, `apps/export-service` | Page size = trim; defaults bleed 3 mm / safe 10 mm on print-eligible pages. Canvas print-guide overlay (safe + bleed edge). SVG/PDF crop marks when bleed > 0; PNG/JPG stay trim-only. |
 | Rulers and measurements | **Done** | OSS + Pro | `packages/canvas/src/rulers/`, canvas-pro toolbar (`canvas.toggleRulers`), selection size label + inspector | Top/left rulers with ticks + cursor markers; drag-out guides. |
 | Undo / redo history | **Done** | OSS | `packages/core/src/scene/history-stack.ts`, `packages/core/src/scene/scene-store.ts`, `packages/core/src/plugins/scene-plugin.ts` (`scene.undo` / `scene.redo`) | Snapshot history (depth 100). |
 | Automation and schema control | **Done** | OSS | `packages/schema`, `packages/agent`, `apps/agent-service` | Zod + published JSON Schema; agent proposals mutate scene. Stronger automation story than Polotno alone. |
@@ -38,7 +38,7 @@ Baseline competitor: [Polotno SDK](https://polotno.com/) drag-and-drop canvas (z
 | Grouping | **Done** | OSS | `packages/canvas/src/commands/canvas-group-commands.ts`, `packages/canvas/src/scene/group-layers.ts` | Nested groups; layers tree shows children. |
 | Rotation / transforms | **Done** | OSS | Schema `rotation` (+ optional `scaleX`/`scaleY`), Konva rotater, `canvas.rotateLeft` / `rotateRight` | Free rotation + box resize. Independent scale tool is not first-class. |
 | Lock layers | **Done** | OSS | Schema `locked` / `writeMode`, `scene.toggleLayerLock` | Runtime lock + template writeMode. |
-| Export | **Partial** | OSS + service | `packages/canvas/src/export/`, `packages/driver-image`, `apps/export-service` | Client SVG/PNG/JPG; PDF via export-service; page presets mm/dpi. Hidden layers skipped. **No bleed/trim marks, no CMYK/spot-color print pipeline.** |
+| Export | **Partial** | OSS + service | `packages/canvas/src/export/`, `packages/driver-image`, `apps/export-service` | Client SVG/PNG/JPG; PDF via export-service; page presets mm/dpi. Hidden layers skipped. SVG/PDF include bleed + crop marks when `bleedMm` > 0. **No CMYK/spot-color print pipeline.** |
 
 ## Better than Polotno — differentiators
 
@@ -62,7 +62,7 @@ OpenEnvx should not stop at parity. These are existing or planned edges.
 | Layer visibility | **Done** | `packages/schema`, `packages/core`, canvas-pro layers UI, canvas stage, driver-image export | Schema `visible` + `scene.toggleLayerVisibility` + layers panel eye toggle; hidden layers skipped in render/export. |
 | Grid overlay + snap-to-grid | **Done** | `packages/canvas` (+ pro chrome) | Fixed 8px grid; overlay + snap toggle (`canvas.toggleGrid`); smart guides win over grid when both hit. |
 | User guides + rulers | **Partial** | `packages/canvas`, `packages/canvas-pro` | Top/left rulers; drag-out guides; snap against guides; `canvas.toggleRulers` / `canvas.clearGuides`. **Session-only** (not schema/history; lost on reload). |
-| True bleed / trim / crop marks | **Planned** | `packages/schema`, `packages/canvas`, `apps/export-service` | Print-production boundaries in schema + export. |
+| True bleed / trim / crop marks | **Done** | `packages/schema`, `packages/canvas`, `packages/driver-image`, `apps/export-service` | Schema `bleedMm`/`safeMm`; canvas overlays; SVG/PDF crop marks. No inspector UI yet (defaults + schema). |
 | Video layer + timeline | **Planned** | `packages/schema`, `packages/canvas` | First-class `canvas.video` (and later animation timeline). |
 | Dedicated SVG layer | **Planned** | `packages/schema`, `packages/canvas` | Native SVG object, not only rasterized/image paste. |
 | Print pipeline (CMYK / spot) | **Planned** | drivers + export-service | Beyond RGB raster PDF for packaging/print SaaS. |
@@ -83,10 +83,10 @@ Gaps and differentiators grouped by priority. Implement in separate PRs; update 
 ### P1 — Production and media parity
 
 - ~~**User-placed guides**~~ **Partial** — session `CanvasRulerGuidesSettings` per page; drag from rulers; snap via smart guides; `canvas.clearGuides`. **Not persisted / not undoable.**
-- **Bleed / trim / crop marks** — schema fields on page layout; overlay in canvas; export marks via `apps/export-service` / drivers.
+- ~~**Bleed / trim / crop marks**~~ **Done** — schema `bleedMm` / `safeMm` (defaults 3 mm / 10 mm on print pages); canvas safe + bleed-edge overlays; SVG/PDF crop marks via `driver-image` + export-service (`x-export-bleed-mm`). PNG/JPG trim-only. No inspector UI yet.
 - **Video layer** — `canvas.video` in schema + Konva/HTML media renderer in `packages/canvas`.
 - **Dedicated SVG layer** — `canvas.svg` type with editable/preserve-vector path where practical.
-- **Hide remaining export gaps** — document DPI/bleed in exports; tighten print presets.
+- **Hide remaining export gaps** — document DPI in exports; tighten print presets; optional PNG-with-marks flag.
 
 ### P2 — Exceed Polotno
 

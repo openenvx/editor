@@ -53,6 +53,7 @@ export interface CanvasStageProps {
   hoveredLayerId?: string | null;
   editingLayerId?: string | null;
   pageMarginBounds?: CanvasRect | null;
+  pageBleedEdgeBounds?: CanvasRect | null;
   showMargins?: boolean;
   showGrid?: boolean;
   gridSize?: number;

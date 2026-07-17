@@ -13,6 +13,7 @@ import {
   resolvePageBackground,
 } from '@openenvx/schema';
 
+import { wrapPageExportSvgIfNeeded } from './crop-marks';
 import { defaultFileName, mimeTypeForFormat } from './export-mime';
 import type {
   PreviewKindSvgSerializerRegistry,
@@ -90,17 +91,26 @@ export class ImageDocumentExportService implements CanvasDocumentExportService {
       pageBackground,
       options.background
     );
-    const svg = renderSvgDocument(scene, this.layerRegistry, pageId, {
+    const trimSvg = renderSvgDocument(scene, this.layerRegistry, pageId, {
       background,
       dpi: options.dpi,
       scale: options.scale,
       serializers: this.serializers,
       useRichText: true,
     });
-    const dimensions = computePageExportDimensions(page, {
+    const wrapped = wrapPageExportSvgIfNeeded(trimSvg, page, options.format, {
       dpi: options.dpi,
       scale: options.scale,
     });
+    const svg = wrapped.svg;
+    const dimensions = {
+      ...computePageExportDimensions(page, {
+        dpi: options.dpi,
+        scale: options.scale,
+      }),
+      heightPx: wrapped.heightPx,
+      widthPx: wrapped.widthPx,
+    };
     const fileName = options.fileName ?? defaultFileName(options.format);
 
     if (options.format === 'svg') {

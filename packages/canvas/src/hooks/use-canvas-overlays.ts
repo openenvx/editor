@@ -20,6 +20,18 @@ function createMarginOverlay(marginInset: CanvasRect): CanvasOverlayPrimitive {
   };
 }
 
+function createBleedEdgeOverlay(bleedEdge: CanvasRect): CanvasOverlayPrimitive {
+  return {
+    dashed: true,
+    height: bleedEdge.height,
+    kind: 'rect',
+    strokeWidth: 1,
+    width: bleedEdge.width,
+    x: bleedEdge.x,
+    y: bleedEdge.y,
+  };
+}
+
 function createGridOverlay(input: {
   artboardHeight: number;
   artboardWidth: number;
@@ -36,6 +48,7 @@ function createGridOverlay(input: {
 export function composeCanvasOverlays(input: {
   artboardHeight: number;
   artboardWidth: number;
+  bleedEdge: CanvasRect | null;
   gridSize: number;
   interactionOverlays?: readonly CanvasOverlayPrimitive[];
   marginInset: CanvasRect | null;
@@ -56,6 +69,9 @@ export function composeCanvasOverlays(input: {
       })
     );
   }
+  if (input.showMargins && input.bleedEdge) {
+    primitives.push(createBleedEdgeOverlay(input.bleedEdge));
+  }
   if (input.showMargins && input.marginInset) {
     primitives.push(createMarginOverlay(input.marginInset));
   }
@@ -65,6 +81,7 @@ export function composeCanvasOverlays(input: {
 export function useCanvasOverlays({
   artboardHeight,
   artboardWidth,
+  getBleedEdge,
   getMarginInset,
   gridSize,
   showGrid,
@@ -74,6 +91,7 @@ export function useCanvasOverlays({
 }: {
   artboardHeight: number;
   artboardWidth: number;
+  getBleedEdge: () => CanvasRect | null;
   getMarginInset: () => CanvasRect | null;
   gridSize: number;
   showGrid: boolean;
@@ -102,6 +120,7 @@ export function useCanvasOverlays({
         composeCanvasOverlays({
           artboardHeight,
           artboardWidth,
+          bleedEdge: getBleedEdge(),
           gridSize,
           interactionOverlays,
           marginInset: getMarginInset(),
@@ -114,6 +133,7 @@ export function useCanvasOverlays({
     [
       artboardHeight,
       artboardWidth,
+      getBleedEdge,
       getMarginInset,
       getStaticOverlays,
       gridSize,

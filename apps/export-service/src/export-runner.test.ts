@@ -64,6 +64,22 @@ describe('runExport', () => {
     expect(result.diagnostics).toHaveLength(0);
   });
 
+  it('wraps svg with crop marks when bleedMm > 0', async () => {
+    const request = createRectDocument();
+    request.document.page.bleedMm = 3;
+    request.document.page.dpi = 96;
+    request.document.page.unit = 'mm';
+
+    const result = await runExport(request);
+    const svg = new TextDecoder().decode(result.body);
+
+    expect(result.bleedMm).toBe(3);
+    expect(result.widthPx).toBeGreaterThan(300);
+    expect(result.heightPx).toBeGreaterThan(200);
+    expect(svg).toContain('<line ');
+    expect(svg.match(/<line /g)?.length).toBe(8);
+  });
+
   it('fails in strict mode for unknown preview kinds', async () => {
     const request = createRectDocument();
     request.document.nodes.push({

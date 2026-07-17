@@ -178,7 +178,17 @@ function build(o: typeof z.object) {
       .default('flow')
       .describe('Page layout mode.'),
     name: z.string().default('Page 1').describe('Display name.'),
+    bleedMm: z
+      .number()
+      .min(0)
+      .optional()
+      .describe('Bleed outside trim, in millimetres.'),
     presetId: z.string().optional().describe('ISO page size preset id.'),
+    safeMm: z
+      .number()
+      .min(0)
+      .optional()
+      .describe('Safe/content inset inside trim, in millimetres.'),
     unit: z
       .enum(['px', 'mm', 'in', 'cm', 'pt'])
       .default('px')

@@ -52,6 +52,8 @@ export function createExportApp() {
             'cache-control': 'no-store',
             'content-disposition': `attachment; filename="${result.fileName}"`,
             'content-type': result.contentType,
+            'x-export-bleed-mm':
+              result.bleedMm !== undefined ? String(result.bleedMm) : '',
             'x-export-height': String(result.heightPx),
             'x-export-page-dpi': String(result.pageDpi),
             'x-export-page-preset': result.pagePresetId ?? '',

@@ -50,6 +50,8 @@ export interface RenderIrPage {
   dpi?: number;
   presetId?: string;
   background?: string;
+  /** Bleed outside trim in millimetres (0 = no crop marks on svg/pdf). */
+  bleedMm?: number;
 }
 
 export interface RenderIrDocument {

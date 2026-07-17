@@ -26,6 +26,7 @@ import {
 import { useCanvasClipboardService } from '../hooks/use-canvas-clipboard-service';
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
 import {
+  computePageBleedEdgeBounds,
   computePageSafeBounds,
   defaultShowMarginsForPage,
 } from '../page-margins';
@@ -162,6 +163,10 @@ export const CanvasEditor = memo(
     const [, setViewportTick] = useState(0);
 
     const pageMarginBounds = useMemo(() => computePageSafeBounds(page), [page]);
+    const pageBleedEdgeBounds = useMemo(
+      () => computePageBleedEdgeBounds(page),
+      [page]
+    );
     const gridService = host.getService(CanvasGridSettingsServiceId);
     const rulerGuidesService = host.getService(
       CanvasRulerGuidesSettingsServiceId
@@ -599,6 +604,7 @@ export const CanvasEditor = memo(
               onSelectLayer={handleSelectLayer}
               onTransformChange={onTransformChange}
               onViewportChange={handleViewportChange}
+              pageBleedEdgeBounds={pageBleedEdgeBounds}
               pageMarginBounds={pageMarginBounds}
               primaryLayerId={primaryLayerId}
               selectedLayerIds={selectedLayerIds}
@@ -620,7 +626,10 @@ export const CanvasEditor = memo(
             />
           </div>
         </CanvasRulers>
-        {gridService || pageMarginBounds || rulerGuidesService ? (
+        {gridService ||
+        pageMarginBounds ||
+        pageBleedEdgeBounds ||
+        rulerGuidesService ? (
           <div
             className={
               showRulers
@@ -660,7 +669,7 @@ export const CanvasEditor = memo(
                 Grid
               </button>
             ) : null}
-            {pageMarginBounds ? (
+            {pageMarginBounds || pageBleedEdgeBounds ? (
               <button
                 aria-pressed={showMargins}
                 className={

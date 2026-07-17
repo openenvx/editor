@@ -117,6 +117,7 @@ const renderIrAssetSchema = z.object({
 
 const renderIrPageSchema = z.object({
   background: z.string().optional(),
+  bleedMm: z.number().min(0).optional(),
   dpi: z.number().positive().optional(),
   height: z.number().positive(),
   presetId: z.string().optional(),

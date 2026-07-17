@@ -74,6 +74,17 @@ export {
 } from './page-export';
 
 export {
+  DEFAULT_BLEED_MM,
+  DEFAULT_SAFE_MM,
+  computePagePrintBoxes,
+  isPrintEligiblePage,
+  resolvePageBleedMm,
+  resolvePageSafeMm,
+  type PagePrintBoxes,
+  type PagePrintRect,
+} from './page-print';
+
+export {
   assertValidScene,
   parseValidEditorState,
   parseValidScene,

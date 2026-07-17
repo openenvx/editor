@@ -91,6 +91,7 @@ export function useCanvasStageRuntime(
     | 'hoveredLayerId'
     | 'editingLayerId'
     | 'pageMarginBounds'
+    | 'pageBleedEdgeBounds'
     | 'showMargins'
     | 'showGrid'
     | 'gridSize'
@@ -116,6 +117,7 @@ export function useCanvasStageRuntime(
     hoveredLayerId = null,
     editingLayerId = null,
     pageMarginBounds = null,
+    pageBleedEdgeBounds = null,
     showMargins = false,
     showGrid = false,
     gridSize = 8,
@@ -207,6 +209,11 @@ export function useCanvasStageRuntime(
     [pageMarginBounds, showMargins]
   );
 
+  const getBleedEdge = useCallback(
+    (): CanvasRect | null => (showMargins ? pageBleedEdgeBounds : null),
+    [pageBleedEdgeBounds, showMargins]
+  );
+
   const getGridConfig = useCallback(
     () => (showGrid ? { enabled: true as const, size: gridSize } : null),
     [gridSize, showGrid]
@@ -234,6 +241,7 @@ export function useCanvasStageRuntime(
     useCanvasOverlays({
       artboardHeight,
       artboardWidth,
+      getBleedEdge,
       getMarginInset,
       gridSize,
       showGrid,

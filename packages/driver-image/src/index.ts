@@ -1,4 +1,13 @@
 export {
+  CROP_MARK_GAP_MM,
+  CROP_MARK_GUTTER_MM,
+  shouldApplyCropMarks,
+  wrapPageExportSvgIfNeeded,
+  wrapTrimSvgWithCropMarks,
+  type CropMarkWrapOptions,
+  type CropMarkWrapResult,
+} from './crop-marks';
+export {
   DriverImagePlugin,
   registerPreviewKindSvgSerializer,
 } from './driver-image-plugin';

@@ -11,6 +11,7 @@ import type { Layer, Scene } from '@openenvx/schema';
 import {
   createDefaultTransform,
   resolvePageBackground,
+  resolvePageBleedMm,
   resolvePagePixelDimensions,
 } from '@openenvx/schema';
 
@@ -172,6 +173,7 @@ export function flattenSceneToIR(
     nodes,
     page: {
       background: resolvePageBackground(page),
+      bleedMm: resolvePageBleedMm(page),
       dpi: page.dpi,
       height,
       presetId: page.presetId,

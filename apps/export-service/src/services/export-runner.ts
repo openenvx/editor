@@ -1,5 +1,9 @@
-import { mimeTypeForFormat } from '@openenvx/driver-image';
+import {
+  mimeTypeForFormat,
+  wrapTrimSvgWithCropMarks,
+} from '@openenvx/driver-image';
 import type { RenderIrDocument } from '@openenvx/preview';
+import { toPx } from '@openenvx/schema';
 
 import type { ExportRequest } from '../schemas/export-request';
 import type { BrowserRenderBackend } from './browser-renderer';
@@ -22,6 +26,7 @@ export interface ExportRunnerResult {
   pagePresetId?: string;
   pageUnit: string;
   widthPx: number;
+  bleedMm?: number;
 }
 
 function resolveExportBackground(
@@ -39,6 +44,28 @@ function resolveExportBackground(
     return pageBackground === 'transparent' ? '#ffffff' : pageBackground;
   }
   return pageBackground;
+}
+
+function applyCropMarksIfNeeded(
+  format: ExportRequest['format'],
+  rendered: { svg: string; widthPx: number; heightPx: number },
+  page: ExportRequest['document']['page'],
+  scale: number
+): { svg: string; widthPx: number; heightPx: number; bleedMm: number } {
+  const bleedMm = page.bleedMm ?? 0;
+  if (bleedMm <= 0 || (format !== 'svg' && format !== 'pdf')) {
+    return { ...rendered, bleedMm };
+  }
+
+  const dpi = page.dpi ?? 96;
+  const bleedPx = Math.round(toPx(bleedMm, 'mm', dpi) * scale);
+  const wrapped = wrapTrimSvgWithCropMarks(rendered.svg, {
+    bleedPx,
+    dpi,
+    trimHeightPx: rendered.heightPx,
+    trimWidthPx: rendered.widthPx,
+  });
+  return { ...wrapped, bleedMm };
 }
 
 export async function runExport(
@@ -65,21 +92,29 @@ export async function runExport(
     }
   );
 
+  const withMarks = applyCropMarksIfNeeded(
+    request.format,
+    rendered,
+    page,
+    scale
+  );
+
   const fileName =
     request.fileName ??
     `artboard.${request.format === 'jpg' ? 'jpg' : request.format}`;
 
   if (request.format === 'svg') {
     return {
-      body: new TextEncoder().encode(rendered.svg),
+      bleedMm: withMarks.bleedMm > 0 ? withMarks.bleedMm : undefined,
+      body: new TextEncoder().encode(withMarks.svg),
       contentType: mimeTypeForFormat('svg'),
       diagnostics: rendered.diagnostics,
       fileName,
-      heightPx: rendered.heightPx,
+      heightPx: withMarks.heightPx,
       pageDpi: page.dpi ?? 96,
       pagePresetId: page.presetId,
       pageUnit: page.unit ?? 'px',
-      widthPx: rendered.widthPx,
+      widthPx: withMarks.widthPx,
     };
   }
 
@@ -93,20 +128,21 @@ export async function runExport(
     background,
     format: request.format,
     quality: request.quality,
-    svg: rendered.svg,
-    widthPx: rendered.widthPx,
-    heightPx: rendered.heightPx,
+    svg: withMarks.svg,
+    widthPx: withMarks.widthPx,
+    heightPx: withMarks.heightPx,
   });
 
   return {
+    bleedMm: withMarks.bleedMm > 0 ? withMarks.bleedMm : undefined,
     body,
     contentType: mimeTypeForFormat(request.format),
     diagnostics: rendered.diagnostics,
     fileName,
-    heightPx: rendered.heightPx,
+    heightPx: withMarks.heightPx,
     pageDpi: page.dpi ?? 96,
     pagePresetId: page.presetId,
     pageUnit: page.unit ?? 'px',
-    widthPx: rendered.widthPx,
+    widthPx: withMarks.widthPx,
   };
 }

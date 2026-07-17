@@ -189,6 +189,16 @@ export interface Page {
   dpi?: number;
   /** ISO page preset id when the page matches a known preset. */
   presetId?: string;
+  /**
+   * Bleed outside trim, in millimetres. When unset, print-eligible pages
+   * default to 3 mm and other pages to 0.
+   */
+  bleedMm?: number;
+  /**
+   * Safe/content inset inside trim, in millimetres. When unset, print-eligible
+   * pages default to 10 mm and other pages to 0.
+   */
+  safeMm?: number;
   /** Artboard background used for document export. */
   backgroundColor?: string;
   layers: Layer[];

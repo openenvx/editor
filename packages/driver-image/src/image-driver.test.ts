@@ -195,6 +195,48 @@ describe(ImageDocumentExportService, () => {
     expect(text).toContain('#00ff00');
   });
 
+  it('adds crop marks to svg export when page has bleed', async () => {
+    const scene = normalizeScene({
+      activePageId: 'p1',
+      pages: [
+        {
+          bleedMm: 3,
+          dpi: 96,
+          height: 200,
+          id: 'p1',
+          layout: 'absolute',
+          name: 'Artboard',
+          unit: 'mm',
+          width: 300,
+          layers: [
+            {
+              data: { fill: '#00ff00' },
+              id: 'r1',
+              type: 'test.rect',
+            },
+          ],
+        },
+      ],
+    });
+
+    const registry = new LayerRegistry();
+    registry.register(new StubRectLayer());
+    const { PreviewKindSvgSerializerRegistry } = await import(
+      './preview-kind-svg-serializer'
+    );
+    const { registerBuiltinSvgSerializers } = await import(
+      './builtin-svg-serializers'
+    );
+    const serializers = new PreviewKindSvgSerializerRegistry();
+    registerBuiltinSvgSerializers(serializers);
+    const exporter = new ImageDocumentExportService(registry, serializers);
+    const result = await exporter.exportDocument(scene, 'p1', { format: 'svg' });
+    const text = new TextDecoder().decode(result.data);
+
+    expect(result.dimensions.widthPx).toBeGreaterThan(300);
+    expect(text.match(/<line /g)?.length).toBe(8);
+  });
+
   it('reports unsupported pdf format locally', async () => {
     const registry = new LayerRegistry();
     registry.register(new StubRectLayer());
