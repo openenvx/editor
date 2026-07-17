@@ -4,7 +4,7 @@
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--wb-border, #d4d4d8);
-  border-radius: var(--wb-radius-md, 8px);
+  border-radius: var(--wb-radius-md, 4px);
   background: var(--wb-card, #fff);
 }
 
@@ -48,7 +48,7 @@
   gap: 4px;
   flex-shrink: 0;
   padding: 2px 6px;
-  border-radius: var(--wb-radius-sm, 4px);
+  border-radius: var(--wb-radius-sm, 2px);
   background: var(--wb-muted, #ececef);
   color: var(--wb-muted-foreground, #71717a);
   font-size: 11px;
@@ -119,7 +119,7 @@
   max-height: 160px;
   overflow: auto;
   padding: var(--wb-space-2, 8px);
-  border-radius: var(--wb-radius-sm, 4px);
+  border-radius: var(--wb-radius-sm, 2px);
   background: var(--wb-muted, #ececef);
   color: var(--wb-foreground, #18181b);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;

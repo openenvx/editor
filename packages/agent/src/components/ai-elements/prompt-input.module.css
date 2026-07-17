@@ -8,7 +8,7 @@
   position: relative;
   overflow: hidden;
   border: 1px solid var(--wb-border, #d4d4d8);
-  border-radius: var(--wb-radius-lg, 12px);
+  border-radius: var(--wb-radius-lg, 6px);
   background: var(--wb-card, #fff);
   box-shadow: var(--wb-shadow-xs, 0 0 0 1px rgb(0 0 0 / 6%));
 }
@@ -52,7 +52,7 @@
   width: var(--wb-icon-button-size, 28px);
   height: var(--wb-icon-button-size, 28px);
   border: none;
-  border-radius: var(--wb-radius-md, 8px);
+  border-radius: var(--wb-radius-md, 4px);
   background: var(--wb-primary, #18181b);
   color: var(--wb-primary-foreground, #fafafa);
   cursor: pointer;

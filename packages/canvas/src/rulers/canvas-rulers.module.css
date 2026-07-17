@@ -18,9 +18,9 @@
 
 .rulerCorner {
   grid-area: corner;
-  background: var(--wb-popover, #27272a);
-  border-right: 1px solid var(--wb-border, #3f3f46);
-  border-bottom: 1px solid var(--wb-border, #3f3f46);
+  background: var(--wb-popover, #1a1a1a);
+  border-right: 1px solid var(--wb-border, rgb(255 255 255 / 8%));
+  border-bottom: 1px solid var(--wb-border, rgb(255 255 255 / 8%));
   z-index: 4;
   overflow: hidden;
 }
@@ -29,8 +29,8 @@
   grid-area: top;
   position: relative;
   overflow: hidden;
-  background: var(--wb-popover, #27272a);
-  border-bottom: 1px solid var(--wb-border, #3f3f46);
+  background: var(--wb-popover, #1a1a1a);
+  border-bottom: 1px solid var(--wb-border, rgb(255 255 255 / 8%));
   cursor: ns-resize;
   z-index: 4;
   user-select: none;
@@ -40,8 +40,8 @@
   grid-area: left;
   position: relative;
   overflow: hidden;
-  background: var(--wb-popover, #27272a);
-  border-right: 1px solid var(--wb-border, #3f3f46);
+  background: var(--wb-popover, #1a1a1a);
+  border-right: 1px solid var(--wb-border, rgb(255 255 255 / 8%));
   cursor: ew-resize;
   z-index: 4;
   user-select: none;
@@ -70,7 +70,7 @@
   position: absolute;
   top: 0;
   width: 1px;
-  background: var(--wb-border, #3f3f46);
+  background: var(--wb-border, rgb(255 255 255 / 8%));
   pointer-events: none;
 }
 
@@ -100,7 +100,7 @@
   position: absolute;
   left: 0;
   height: 1px;
-  background: var(--wb-border, #3f3f46);
+  background: var(--wb-border, rgb(255 255 255 / 8%));
   pointer-events: none;
 }
 

@@ -82,7 +82,7 @@
   gap: 4px;
   padding: 4px;
   border-radius: 8px;
-  background: var(--wb-popover, #27272a);
+  background: var(--wb-popover, #1a1a1a);
   box-shadow: var(--wb-shadow-float, 0 4px 12px rgba(0, 0, 0, 0.35));
 }
 
@@ -100,7 +100,7 @@
 }
 
 .formatButton:hover {
-  background: var(--wb-hover-overlay, #3f3f46);
+  background: var(--wb-hover-overlay, #242424);
 }
 
 .chromeToggles {
@@ -121,10 +121,10 @@
 .chromeToggleActive,
 .marginToggle,
 .marginToggleActive {
-  border: 1px solid var(--wb-border, #3f3f46);
+  border: 1px solid var(--wb-border, rgb(255 255 255 / 8%));
   border-radius: 8px;
   padding: 6px 10px;
-  background: var(--wb-popover, #27272a);
+  background: var(--wb-popover, #1a1a1a);
   color: var(--wb-foreground, #fafafa);
   font-size: 12px;
   cursor: pointer;

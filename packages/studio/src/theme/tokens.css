@@ -17,11 +17,11 @@
   --wb-space-5: 20px;
   --wb-space-6: 24px;
 
-  /* Radius */
-  --wb-radius-sm: 6px;
-  --wb-radius-md: 8px;
-  --wb-radius-control: 8px;
-  --wb-radius-lg: 12px;
+  /* Radius — OpenEnvX Cloud: panel 4 / thumb 2 / modal 6 */
+  --wb-radius-sm: 2px;
+  --wb-radius-md: 4px;
+  --wb-radius-control: 4px;
+  --wb-radius-lg: 6px;
   --wb-radius-full: 9999px;
 
   /* Control sizes */
@@ -95,26 +95,26 @@
 }
 
 [data-owb-theme='dark'] {
-  /* Surfaces — unified black chrome per shadcn/designer editor */
-  --wb-background: #09090b;
-  --wb-canvas-field: #111113;
-  --wb-card: #18181b;
-  --wb-popover: #1c1c1f;
-  --wb-inspector-popover: #09090b;
-  --wb-muted: #27272a;
-  --wb-border: #3f3f46;
-  --wb-chrome-button: #27272a;
-  --wb-sidebar-segment-active: #18181b;
-  --wb-sidebar-row-selected: #3f3f46;
+  /* Surfaces — OpenEnvX Cloud: void canvas, graphite chrome, slate elevation */
+  --wb-background: #1a1a1a;
+  --wb-canvas-field: #0a0a0a;
+  --wb-card: #1a1a1a;
+  --wb-popover: #1a1a1a;
+  --wb-inspector-popover: #1a1a1a;
+  --wb-muted: #242424;
+  --wb-border: rgb(255 255 255 / 8%);
+  --wb-chrome-button: #242424;
+  --wb-sidebar-segment-active: #242424;
+  --wb-sidebar-row-selected: #242424;
   --wb-sidebar-row-hovered: rgb(59 130 246 / 22%);
 
   /* Text */
-  --wb-foreground: #fafafa;
-  --wb-muted-foreground: #a1a1aa;
+  --wb-foreground: rgb(255 255 255 / 92%);
+  --wb-muted-foreground: rgb(255 255 255 / 55%);
 
   /* Actions */
   --wb-primary: #fafafa;
-  --wb-primary-foreground: #09090b;
+  --wb-primary-foreground: #0a0a0a;
   --wb-selection: #3b82f6;
   --wb-selection-muted: rgb(59 130 246 / 50%);
   --wb-smart-guide: #ec4899;
@@ -128,18 +128,17 @@
   --wb-hover-overlay: rgb(255 255 255 / 4%);
   --wb-active-overlay: rgb(255 255 255 / 6%);
   --wb-divider-color: rgb(255 255 255 / 8%);
-  --wb-border-subtle: rgb(255 255 255 / 12%);
-  --wb-backdrop-overlay: rgb(0 0 0 / 60%);
+  --wb-border-subtle: rgb(255 255 255 / 8%);
+  --wb-backdrop-overlay: rgb(10 10 10 / 72%);
 
-  /* Elevation */
-  --wb-shadow-xs: 0 0 0 1px rgb(255 255 255 / 6%);
-  --wb-shadow-sm: 0 0 0 1px rgb(255 255 255 / 10%);
-  --wb-segment-active-ring: 0 0 0 1px rgb(255 255 255 / 14%);
-  --wb-shadow-md: 0 1px 2px rgb(0 0 0 / 40%), 0 0 0 1px rgb(255 255 255 / 6%);
-  --wb-shadow-float:
-    0 8px 24px rgb(0 0 0 / 55%), 0 0 0 1px rgb(255 255 255 / 10%);
-  --wb-shadow-control: 0 0 0 1px rgb(255 255 255 / 6%);
-  --wb-shadow-control-hover: 0 0 0 1px rgb(255 255 255 / 10%);
+  /* Elevation — hairline rings; depth from tonal steps, not drop shadows */
+  --wb-shadow-xs: 0 0 0 1px rgb(255 255 255 / 8%);
+  --wb-shadow-sm: 0 0 0 1px rgb(255 255 255 / 8%);
+  --wb-segment-active-ring: 0 0 0 1px rgb(255 255 255 / 8%);
+  --wb-shadow-md: 0 0 0 1px rgb(255 255 255 / 8%);
+  --wb-shadow-float: 0 0 0 1px rgb(255 255 255 / 8%);
+  --wb-shadow-control: 0 0 0 1px rgb(255 255 255 / 8%);
+  --wb-shadow-control-hover: 0 0 0 1px rgb(255 255 255 / 12%);
   --wb-shadow-control-focus:
     0 0 0 2px var(--wb-background), 0 0 0 4px rgb(255 255 255 / 28%);
   --wb-shadow-focus:
@@ -148,7 +147,7 @@
   --wb-artboard-shadow-color: rgba(0, 0, 0, 0.45);
 
   /* Hairline dividers */
-  --wb-hairline: 1px solid rgb(255 255 255 / 6%);
+  --wb-hairline: 1px solid rgb(255 255 255 / 8%);
   --wb-divider: 1px solid rgb(255 255 255 / 8%);
 }
 
