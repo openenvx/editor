@@ -34,6 +34,8 @@ export type BuiltinLayerPreviewDescriptor =
       curve?: number;
       lineHeight?: number;
       letterSpacing?: number;
+      autoFit?: 'none' | 'shrink';
+      minFontSize?: number;
     }
   | { kind: 'placeholder'; text: string };
 
@@ -85,6 +87,8 @@ export class LayerPreviewBuilder {
       curve?: number;
       lineHeight?: number;
       letterSpacing?: number;
+      autoFit?: 'none' | 'shrink';
+      minFontSize?: number;
     }
   ): LayerPreviewDescriptor {
     return { html, kind: 'richText', ...options };

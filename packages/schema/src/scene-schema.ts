@@ -89,13 +89,43 @@ function build(o: typeof z.object) {
     strokeWidth: z.number().optional().describe('Stroke width in pixels.'),
   });
 
+  const focalPoint = o({
+    x: z
+      .number()
+      .min(0)
+      .max(1)
+      .default(0.5)
+      .describe('Horizontal focus in the source image (0–1).'),
+    y: z
+      .number()
+      .min(0)
+      .max(1)
+      .default(0.5)
+      .describe('Vertical focus in the source image (0–1).'),
+  });
+
   const canvasImageData = o({
     alt: z.string().optional().describe('Alt text.'),
     assetRef: z.string().describe('Asset URL or scene asset id.'),
+    fit: z
+      .enum(['cover', 'contain', 'fill'])
+      .optional()
+      .describe(
+        'How the image fills its box. Absent = legacy stretch (fill). Prefer cover for templates.'
+      ),
+    focalPoint: focalPoint
+      .optional()
+      .describe('Focus used when fit is cover (defaults to center).'),
   }).passthrough();
 
   const canvasTextData = o({
     align: z.enum(['left', 'center', 'right']).optional(),
+    autoFit: z
+      .enum(['none', 'shrink'])
+      .optional()
+      .describe(
+        'When shrink, font size scales down so text stays inside the fixed box.'
+      ),
     curve: z
       .number()
       .optional()
@@ -106,6 +136,10 @@ function build(o: typeof z.object) {
     html: z.string().default('<p>Text</p>').describe('Rich text HTML.'),
     letterSpacing: z.number().optional(),
     lineHeight: z.number().optional(),
+    minFontSize: z
+      .number()
+      .optional()
+      .describe('Minimum font size for shrink-to-fit. Defaults to 8.'),
   });
 
   const canvasCircleData = o({

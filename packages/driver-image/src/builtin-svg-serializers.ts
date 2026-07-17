@@ -73,9 +73,33 @@ const imageSerializer: PreviewKindSvgSerializer = {
     >;
     const { bounds } = ctx;
     const href = ctx.resolveAsset(view.src);
-    return `<image href="${escapeAttr(href)}" x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" />`;
+    const preserve = resolveImagePreserveAspectRatio(view);
+    return `<image href="${escapeAttr(href)}" x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" preserveAspectRatio="${preserve}" />`;
   },
 };
+
+function resolveImagePreserveAspectRatio(
+  view: Extract<LayerPreviewDescriptor, { kind: 'image' }>
+): string {
+  const fit = view.fit;
+  if (fit !== 'cover' && fit !== 'contain' && fit !== 'fill') {
+    return 'none';
+  }
+  if (fit === 'fill') {
+    return 'none';
+  }
+  const focal =
+    view.focalPoint &&
+    typeof view.focalPoint === 'object' &&
+    typeof (view.focalPoint as { x?: unknown }).x === 'number' &&
+    typeof (view.focalPoint as { y?: unknown }).y === 'number'
+      ? (view.focalPoint as { x: number; y: number })
+      : { x: 0.5, y: 0.5 };
+  const xAlign = focal.x < 0.33 ? 'xMin' : focal.x > 0.66 ? 'xMax' : 'xMid';
+  const yAlign = focal.y < 0.33 ? 'YMin' : focal.y > 0.66 ? 'YMax' : 'YMid';
+  const meetOrSlice = fit === 'contain' ? 'meet' : 'slice';
+  return `${xAlign}${yAlign} ${meetOrSlice}`;
+}
 
 const richTextSerializer: PreviewKindSvgSerializer = {
   kind: 'richText',
@@ -86,7 +110,7 @@ const richTextSerializer: PreviewKindSvgSerializer = {
     >;
     const { bounds } = ctx;
     const fill = view.fill ?? '#111827';
-    const fontSize = view.fontSize ?? 24;
+    const maxFontSize = view.fontSize ?? 24;
     const fontFamily = view.fontFamily ?? 'sans-serif';
     const align = view.align ?? 'left';
     const lineHeight = view.lineHeight ?? 1.4;
@@ -94,6 +118,19 @@ const richTextSerializer: PreviewKindSvgSerializer = {
     const curve = view.curve ?? 0;
     const sanitized = sanitizeHtml(view.html);
     const plain = stripHtmlToPlainText(sanitized);
+    const minFontSize =
+      typeof view.minFontSize === 'number' ? view.minFontSize : 8;
+    const fontSize =
+      view.autoFit === 'shrink' && Math.abs(curve) < 0.5
+        ? fitFontSizeForExport(
+            plain,
+            bounds.width,
+            bounds.height,
+            minFontSize,
+            maxFontSize,
+            lineHeight
+          )
+        : maxFontSize;
 
     if (Math.abs(curve) >= 0.5) {
       const pathId = `text-curve-${Math.abs(Math.round(bounds.x * 100))}-${Math.abs(Math.round(bounds.y * 100))}-${Math.abs(Math.round(curve * 10))}`;
@@ -133,6 +170,47 @@ const richTextSerializer: PreviewKindSvgSerializer = {
     return `<foreignObject x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;font-size:${fontSize}px;font-family:${escapeAttr(fontFamily)};color:${escapeAttr(fill)};text-align:${textAlign};line-height:${lineHeight};letter-spacing:${letterSpacing}px;overflow:hidden;word-break:break-word;">${innerHtml}</div></foreignObject>`;
   },
 };
+
+/** Approximate shrink-to-fit for SVG export (no DOM). Matches fitFontSize contract. */
+function fitFontSizeForExport(
+  plain: string,
+  width: number,
+  height: number,
+  minFontSize: number,
+  maxFontSize: number,
+  lineHeight: number
+): number {
+  const min = Math.max(1, Math.min(minFontSize, maxFontSize));
+  const max = Math.max(min, maxFontSize);
+  const measure = (fontSize: number) => {
+    const avgCharWidth = Math.max(fontSize * 0.55, 1);
+    const charsPerLine = Math.max(1, Math.floor(width / avgCharWidth));
+    const lines = Math.max(
+      1,
+      Math.ceil(Math.max(plain.length, 1) / charsPerLine)
+    );
+    return lines * fontSize * lineHeight;
+  };
+  if (measure(max) <= height) {
+    return max;
+  }
+  if (measure(min) > height) {
+    return min;
+  }
+  let low = min;
+  let high = max;
+  let best = min;
+  for (let i = 0; i < 24; i += 1) {
+    const mid = (low + high) / 2;
+    if (measure(mid) <= height) {
+      best = mid;
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+  return Math.max(min, Math.min(max, best));
+}
 
 function buildSvgArcPath(
   width: number,

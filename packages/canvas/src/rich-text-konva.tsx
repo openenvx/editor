@@ -1,13 +1,18 @@
 import { memo, useMemo } from 'react';
 import { Rect, Text, TextPath } from 'react-konva';
 
+import { DEFAULT_MIN_FONT_SIZE, fitFontSize } from './fit-font-size';
 import {
   buildArcPath,
   isCurvedText,
   stripHtmlToPlainText,
 } from './rich-text-arc';
 import { layoutRichTextSpans } from './rich-text-konva-driver';
-import { toKonvaFontStyle, toKonvaTextDecoration } from './rich-text-layout';
+import {
+  measureRichTextHeight,
+  toKonvaFontStyle,
+  toKonvaTextDecoration,
+} from './rich-text-layout';
 import {
   DEFAULT_RICH_TEXT_FILL,
   DEFAULT_RICH_TEXT_FONT_FAMILY,
@@ -28,6 +33,8 @@ export interface RichTextKonvaProps {
   lineHeight?: number;
   letterSpacing?: number;
   fontLoadRevision?: number;
+  autoFit?: 'none' | 'shrink';
+  minFontSize?: number;
 }
 
 export const RichTextKonva = memo(
@@ -43,15 +50,51 @@ export const RichTextKonva = memo(
     lineHeight = RICH_TEXT_LINE_HEIGHT_MULTIPLIER,
     letterSpacing = DEFAULT_RICH_TEXT_LETTER_SPACING,
     fontLoadRevision = 0,
+    autoFit = 'none',
+    minFontSize = DEFAULT_MIN_FONT_SIZE,
   }: RichTextKonvaProps) => {
     const curved = isCurvedText(curve);
+    const resolvedFontSize = useMemo(() => {
+      void fontLoadRevision;
+      if (autoFit !== 'shrink' || curved) {
+        return fontSize;
+      }
+      return fitFontSize(
+        (size) =>
+          measureRichTextHeight({
+            align,
+            fontFamily,
+            fontSize: size,
+            html,
+            letterSpacing,
+            lineHeightMultiplier: lineHeight,
+            width,
+          }),
+        height,
+        minFontSize,
+        fontSize
+      );
+    }, [
+      align,
+      autoFit,
+      curved,
+      fontFamily,
+      fontLoadRevision,
+      fontSize,
+      height,
+      html,
+      letterSpacing,
+      lineHeight,
+      minFontSize,
+      width,
+    ]);
     const plainText = useMemo(
       () => (curved ? stripHtmlToPlainText(html) : ''),
       [curved, html]
     );
     const arcPath = useMemo(
-      () => (curved ? buildArcPath(width, fontSize, curve) : ''),
-      [curve, curved, fontSize, width]
+      () => (curved ? buildArcPath(width, resolvedFontSize, curve) : ''),
+      [curve, curved, resolvedFontSize, width]
     );
     const allSpans = useMemo(() => {
       void fontLoadRevision;
@@ -62,7 +105,7 @@ export const RichTextKonva = memo(
         align,
         fill,
         fontFamily,
-        fontSize,
+        fontSize: resolvedFontSize,
         height,
         html,
         letterSpacing,
@@ -75,11 +118,11 @@ export const RichTextKonva = memo(
       fill,
       fontFamily,
       fontLoadRevision,
-      fontSize,
       height,
       html,
       letterSpacing,
       lineHeight,
+      resolvedFontSize,
       width,
     ]);
 
@@ -97,7 +140,7 @@ export const RichTextKonva = memo(
             data={arcPath}
             fill={fill}
             fontFamily={fontFamily}
-            fontSize={fontSize}
+            fontSize={resolvedFontSize}
             letterSpacing={letterSpacing}
             text={plainText}
           />
@@ -106,7 +149,7 @@ export const RichTextKonva = memo(
             <Text
               fill={fill}
               fontFamily={fontFamily}
-              fontSize={fontSize}
+              fontSize={resolvedFontSize}
               fontStyle={toKonvaFontStyle(span.style)}
               key={`${index}-${span.x}-${span.y}-${span.text}`}
               letterSpacing={letterSpacing}
@@ -123,7 +166,7 @@ export const RichTextKonva = memo(
           <Text
             fill={fill}
             fontFamily={fontFamily}
-            fontSize={fontSize}
+            fontSize={resolvedFontSize}
             height={height}
             text=""
             width={width}

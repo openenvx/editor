@@ -28,6 +28,7 @@ import {
 
 export const canvasTextSchema = z.object({
   align: z.enum(['left', 'center', 'right']).optional(),
+  autoFit: z.enum(['none', 'shrink']).optional(),
   curve: z.number().optional(),
   fill: z.string().optional(),
   fontFamily: z.string().optional(),
@@ -35,12 +36,14 @@ export const canvasTextSchema = z.object({
   html: z.string(),
   letterSpacing: z.number().optional(),
   lineHeight: z.number().optional(),
+  minFontSize: z.number().optional(),
 });
 
 export type CanvasTextModel = z.infer<typeof canvasTextSchema>;
 
 const DEFAULT_MODEL: CanvasTextModel = {
   align: 'left',
+  autoFit: 'none',
   curve: 0,
   fill: DEFAULT_RICH_TEXT_FILL,
   fontFamily: DEFAULT_RICH_TEXT_FONT_FAMILY,
@@ -48,6 +51,7 @@ const DEFAULT_MODEL: CanvasTextModel = {
   html: '<p>Text</p>',
   letterSpacing: DEFAULT_RICH_TEXT_LETTER_SPACING,
   lineHeight: RICH_TEXT_LINE_HEIGHT_MULTIPLIER,
+  minFontSize: 8,
 };
 
 function migrateLegacyTextData(data: unknown): CanvasTextModel | null {
@@ -130,6 +134,15 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
         .number('lineHeight', 'Line spacing', { numeric: scrubLineHeight })
         .number('letterSpacing', 'Letter spacing', { numeric: scrubPx })
         .number('curve', 'Curve', { numeric: scrubCurve })
+        .select(
+          'autoFit',
+          [
+            { label: 'None', value: 'none' },
+            { label: 'Shrink to fit', value: 'shrink' },
+          ],
+          'Auto-fit'
+        )
+        .number('minFontSize', 'Min font size', { numeric: scrubPx })
         .build()
     );
   }
@@ -137,12 +150,14 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
   renderPreview(ctx: LayerPreviewContext<CanvasTextModel>) {
     return createLayerPreviewBuilder().richText(sanitizeHtml(ctx.model.html), {
       align: ctx.model.align,
+      autoFit: ctx.model.autoFit,
       curve: ctx.model.curve,
       fill: ctx.model.fill,
       fontFamily: ctx.model.fontFamily,
       fontSize: ctx.model.fontSize,
       letterSpacing: ctx.model.letterSpacing,
       lineHeight: ctx.model.lineHeight,
+      minFontSize: ctx.model.minFontSize,
     });
   }
 }

@@ -816,6 +816,40 @@
                 "assetRef": {
                   "type": "string",
                   "description": "Asset URL or scene asset id."
+                },
+                "fit": {
+                  "description": "How the image fills its box. Absent = legacy stretch (fill). Prefer cover for templates.",
+                  "type": "string",
+                  "enum": [
+                    "cover",
+                    "contain",
+                    "fill"
+                  ]
+                },
+                "focalPoint": {
+                  "description": "Focus used when fit is cover (defaults to center).",
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "default": 0.5,
+                      "description": "Horizontal focus in the source image (0–1).",
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "y": {
+                      "default": 0.5,
+                      "description": "Vertical focus in the source image (0–1).",
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y"
+                  ],
+                  "additionalProperties": false
                 }
               },
               "required": [
@@ -1068,6 +1102,14 @@
                     "right"
                   ]
                 },
+                "autoFit": {
+                  "description": "When shrink, font size scales down so text stays inside the fixed box.",
+                  "type": "string",
+                  "enum": [
+                    "none",
+                    "shrink"
+                  ]
+                },
                 "curve": {
                   "description": "Arc bend in degrees; 0 = straight, positive = smile.",
                   "type": "number"
@@ -1090,6 +1132,10 @@
                   "type": "number"
                 },
                 "lineHeight": {
+                  "type": "number"
+                },
+                "minFontSize": {
+                  "description": "Minimum font size for shrink-to-fit. Defaults to 8.",
                   "type": "number"
                 }
               },

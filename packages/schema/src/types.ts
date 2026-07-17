@@ -102,11 +102,29 @@ export interface CanvasRectData {
   flipV?: boolean;
 }
 
+export type ImageFit = 'cover' | 'contain' | 'fill';
+
+export interface FocalPoint {
+  /** Horizontal focus in the source image, 0 = left, 1 = right. */
+  x: number;
+  /** Vertical focus in the source image, 0 = top, 1 = bottom. */
+  y: number;
+}
+
 export interface CanvasImageData {
   assetRef: string;
   alt?: string;
+  /**
+   * How the image fills its transform box.
+   * Absent = legacy stretch (`fill`). Prefer `cover` for templates.
+   */
+  fit?: ImageFit;
+  /** Focus used when `fit` is `cover` (defaults to center). */
+  focalPoint?: FocalPoint;
   [key: string]: unknown;
 }
+
+export type TextAutoFit = 'none' | 'shrink';
 
 export interface CanvasTextData {
   html: string;
@@ -118,6 +136,13 @@ export interface CanvasTextData {
   fontSize?: number;
   letterSpacing?: number;
   lineHeight?: number;
+  /**
+   * When `shrink`, font size scales down (to `minFontSize`) so text stays
+   * inside the fixed transform box. `fontSize` is the maximum / starting size.
+   */
+  autoFit?: TextAutoFit;
+  /** Minimum font size used by shrink-to-fit. Defaults to 8. */
+  minFontSize?: number;
 }
 
 export interface CanvasCircleData {

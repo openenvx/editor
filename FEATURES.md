@@ -34,9 +34,9 @@ Baseline competitor: [Polotno SDK](https://polotno.com/) drag-and-drop canvas (z
 | Rulers and measurements | **Done** | OSS + Pro | `packages/canvas/src/rulers/`, canvas-pro toolbar (`canvas.toggleRulers`), selection size label + inspector | Top/left rulers with ticks + cursor markers; drag-out guides. |
 | Undo / redo history | **Done** | OSS | `packages/core/src/scene/history-stack.ts`, `packages/core/src/scene/scene-store.ts`, `packages/core/src/plugins/scene-plugin.ts` (`scene.undo` / `scene.redo`) | Snapshot history (depth 100). |
 | Automation and schema control | **Done** | OSS | `packages/schema`, `packages/agent`, `apps/agent-service` | Zod + published JSON Schema; agent proposals mutate scene. Stronger automation story than Polotno alone. |
-| Layer types: text / image / shape / video / SVG | **Partial** | OSS | `packages/schema/src/types.ts` (`canvas.rect\|image\|text\|circle\|group`), `packages/canvas/src/layers/` | Text (rich), image, rect, circle, group: yes. SVG as image paste/export, not `canvas.svg`. **Video: missing.** |
+| Layer types: text / image / shape / video / SVG | **Partial** | OSS | `packages/schema/src/types.ts` (`canvas.rect\|image\|text\|circle\|group`), `packages/canvas/src/layers/` | Text (rich), image, rect, circle, group: yes. SVG as image paste/export, not `canvas.svg`. **Video: missing.** Image fit `cover\|contain\|fill` + focal point; text shrink-to-fit via `autoFit`. |
 | Fonts and typography | **Done** | OSS | `packages/canvas/src/fonts/`, `FontService` + `canvas.registerFont`, text layer props | Built-in + system fonts; programmatic register (optional remote `src` via `FontFace`). Layer font family / size / fill / align / line height / letter spacing. |
-| Rich text editing | **Partial** | OSS | TipTap overlay (`canvas-rich-text-editor.tsx`), `data.html` | On-canvas bold / italic / underline / strike. **No inline color or per-span font family/size yet.** |
+| Rich text editing | **Partial** | OSS | TipTap overlay (`canvas-rich-text-editor.tsx`), `data.html` | On-canvas bold / italic / underline / strike. **No inline color or per-span font family/size yet.** Shrink-to-fit (`autoFit: 'shrink'`) for templated text. |
 | Curved text | **Done** | OSS | `data.curve`, `rich-text-arc.ts`, Konva `TextPath`, SVG `textPath` export | Arc-amount slider (degrees); whole-block curve (plain text along path). |
 | Grouping | **Done** | OSS | `packages/canvas/src/commands/canvas-group-commands.ts`, `packages/canvas/src/scene/group-layers.ts` | Nested groups; layers tree shows children. |
 | Rotation / transforms | **Done** | OSS | Schema `rotation` (+ optional `scaleX`/`scaleY`), Konva rotater, `canvas.rotateLeft` / `rotateRight` | Free rotation + box resize. Independent scale tool is not first-class. |
@@ -55,6 +55,7 @@ OpenEnvx should not stop at parity. These are existing or planned edges.
 | Plugin / contribution architecture | **Done** (expand) | `packages/core`, `packages/headless`, `packages/canvas` | Extensible layer types, commands, sidebars, inspectors — not a closed monolith. |
 | Headless controller + schema-first | **Done** (expand) | `packages/headless`, `packages/schema`, `packages/core` scene store | Server-safe scene mutation, reproducible JSON, automation without the React shell. |
 | Template policy / frozen layers | **Partial** | Schema `writeMode` / lock + template constraints | Constrained editing for marketing templates; deepen policy surface. |
+| Dynamic templates / data binding | **Done** | OSS + Pro UI | `packages/schema/src/template.ts` (`extractTemplateManifest`, `applyModifications`, `validateTemplateNames`); canvas-pro Template data panel; contract: [apps/docs/template-api-contract.md](apps/docs/template-api-contract.md) | Bannerbear-style modifications by unique layer `name` (`text`, `imageUrl`, `color`, `fontFamily`, `fontSize`, `hidden`). Shrink-to-fit text + image fit/focal point at render time. |
 | Composable apps (OSS canvas + custom shell) | **Done** | `apps/demo-playground`, Architecture.md | Hosts own UX; Polotno is more “embed our UI”. |
 
 ### Planned advantages (should still offer)
@@ -87,6 +88,9 @@ Gaps and differentiators grouped by priority. Implement in separate PRs; update 
 
 - ~~**User-placed guides**~~ **Partial** — session `CanvasRulerGuidesSettings` per page; drag from rulers; snap via smart guides; `canvas.clearGuides`. **Not persisted / not undoable.**
 - ~~**Bleed / trim / crop marks**~~ **Done** — schema `bleedMm` / `safeMm` (defaults 3 mm / 10 mm on print pages); canvas safe + bleed-edge overlays; SVG/PDF crop marks via `driver-image` + export-service (`x-export-bleed-mm`). PNG/JPG trim-only. No inspector UI yet.
+- ~~**Dynamic templates / modifications**~~ **Done** — named layers + `applyModifications` / `extractTemplateManifest`; Template data live preview; [template API contract](apps/docs/template-api-contract.md).
+- ~~**Text shrink-to-fit**~~ **Done** — `data.autoFit: 'shrink'` + `minFontSize`; `fitFontSize` in canvas + SVG export estimate.
+- ~~**Image fit + focal point**~~ **Done** — `data.fit` (`cover` / `contain` / `fill`) + `focalPoint`; canvas + SVG `preserveAspectRatio`.
 - **Video layer** — `canvas.video` in schema + Konva/HTML media renderer in `packages/canvas`.
 - **Dedicated SVG layer** — `canvas.svg` type with editable/preserve-vector path where practical.
 - **Hide remaining export gaps** — document DPI in exports; tighten print presets; optional PNG-with-marks flag.

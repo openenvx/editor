@@ -1,6 +1,6 @@
 {
   "extends": "@openenvx/typescript-config/base.json",
-  "include": ["src"],
+  "include": ["src", "../typescript-config/css-modules.d.ts"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
   "compilerOptions": {
     "jsx": "react-jsx",

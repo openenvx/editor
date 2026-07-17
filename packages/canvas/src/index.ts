@@ -97,6 +97,14 @@ export {
   type ImageCornerAnchor,
   type ImageEdgeAnchor,
 } from './image-resize';
+export { DEFAULT_MIN_FONT_SIZE, fitFontSize } from './fit-font-size';
+export {
+  computeImageFitLayout,
+  type ImageFitBox,
+  type ImageFitCrop,
+  type ImageFitLayout,
+  type ImageNaturalSize,
+} from './image-fit';
 export { ImageCanvasInteraction } from './interactions/image-canvas-interaction';
 export { useLoadedImage } from './renderers/image-canvas-renderer';
 export {

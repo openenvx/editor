@@ -9,6 +9,8 @@ import {
   createCanvasInspectorHostContextWithApi,
   DEFAULT_CANVAS_LAYOUT,
   DEFAULT_CANVAS_PRO_PLUGINS,
+  TEMPLATE_DATA_CONTAINER_ID,
+  TemplateDataPanel,
 } from '@xmazu/openenvxee-canvas-pro';
 import { WorkbenchShell } from '@xmazu/openenvxee-studio';
 
@@ -48,7 +50,10 @@ export function App() {
           promptUri('Save as URI', 'openworkbench://canvas-demo') ?? undefined
         }
         plugins={plugins}
-        sidebarPanels={{ [AGENT_CHAT_CONTAINER_ID]: ChatPanel }}
+        sidebarPanels={{
+          [AGENT_CHAT_CONTAINER_ID]: ChatPanel,
+          [TEMPLATE_DATA_CONTAINER_ID]: TemplateDataPanel,
+        }}
       />
       <style>{`
         html, body, #root { height: 100%; margin: 0; }

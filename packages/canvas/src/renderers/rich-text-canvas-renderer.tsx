@@ -24,6 +24,7 @@ export const RichTextCanvasRenderer = memo(
     return (
       <RichTextKonva
         align={descriptor.align}
+        autoFit={descriptor.autoFit}
         curve={descriptor.curve}
         fill={descriptor.fill}
         fontFamily={descriptor.fontFamily}
@@ -33,6 +34,7 @@ export const RichTextCanvasRenderer = memo(
         html={descriptor.html}
         letterSpacing={descriptor.letterSpacing}
         lineHeight={descriptor.lineHeight}
+        minFontSize={descriptor.minFontSize}
         width={width}
       />
     );

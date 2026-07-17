@@ -1,12 +1,15 @@
 import {
+  computeImageFitLayout,
   useLoadedImage,
   type CanvasLayerRendererHostProps,
 } from '@openenvx/canvas';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
+import type { FocalPoint, ImageFit } from '@openenvx/schema';
 import { memo } from 'react';
 import { Image as KonvaImage, Rect } from 'react-konva';
 
 import {
+  hasActiveCrop,
   readImageCrop,
   resolveNormalizedCrop,
   type NormalizedCrop,
@@ -25,6 +28,27 @@ function toKonvaCrop(
     x: crop.x * naturalWidth,
     y: crop.y * naturalHeight,
   };
+}
+
+function readFit(view: ImageView): ImageFit | undefined {
+  const fit = view.fit;
+  if (fit === 'cover' || fit === 'contain' || fit === 'fill') {
+    return fit;
+  }
+  return undefined;
+}
+
+function readFocalPoint(view: ImageView): FocalPoint | undefined {
+  const focal = view.focalPoint;
+  if (
+    focal &&
+    typeof focal === 'object' &&
+    typeof (focal as FocalPoint).x === 'number' &&
+    typeof (focal as FocalPoint).y === 'number'
+  ) {
+    return focal as FocalPoint;
+  }
+  return undefined;
 }
 
 export const ProImageCanvasRenderer = memo(
@@ -49,18 +73,38 @@ export const ProImageCanvasRenderer = memo(
       );
     }
 
-    const konvaCrop = toKonvaCrop(
-      crop,
-      image.naturalWidth,
-      image.naturalHeight
+    // Manual crop (pro) wins over fit mode when active.
+    if (hasActiveCrop(crop)) {
+      const konvaCrop = toKonvaCrop(
+        crop,
+        image.naturalWidth,
+        image.naturalHeight
+      );
+      return (
+        <KonvaImage
+          crop={konvaCrop}
+          height={height}
+          image={image}
+          width={width}
+        />
+      );
+    }
+
+    const layout = computeImageFitLayout(
+      { height: image.naturalHeight, width: image.naturalWidth },
+      { height, width },
+      readFit(descriptor),
+      readFocalPoint(descriptor)
     );
 
     return (
       <KonvaImage
-        crop={konvaCrop}
-        height={height}
+        crop={layout.crop}
+        height={layout.draw.height}
         image={image}
-        width={width}
+        width={layout.draw.width}
+        x={layout.draw.x}
+        y={layout.draw.y}
       />
     );
   }

@@ -16,7 +16,9 @@ export {
   type CornerRadius,
   type EditorPaneKind,
   type EditorState,
+  type FocalPoint,
   type FrozenLayerSnapshot,
+  type ImageFit,
   type Layer,
   type LayerBorder,
   type LayerShadow,
@@ -33,6 +35,7 @@ export {
   type SceneSnapshot,
   type Selection,
   type TemplatePolicy,
+  type TextAutoFit,
   type Transform,
 } from './types';
 
@@ -111,3 +114,16 @@ export {
 } from './scene-schema';
 
 export { cloneDropNulls } from './clone-drop-nulls';
+
+export {
+  applyModifications,
+  extractTemplateManifest,
+  findTemplateLayerByName,
+  plainTextToHtml,
+  validateTemplateNames,
+  type Modification,
+  type TemplateField,
+  type TemplateFieldKind,
+  type TemplateManifest,
+  type TemplateNameValidation,
+} from './template';

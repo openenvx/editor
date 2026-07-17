@@ -156,7 +156,21 @@ activateWorkbench(ctx) {
 
 Duplicate kinds overwrite earlier registrations so enterprise plugins activating later can replace OSS defaults.
 
-Enterprise `@openenvx/canvas-pro` ships composable sidebar plugins: `CanvasSidebarPlugin`, `CanvasPagesPlugin`, `CanvasLayersPlugin`. Use `DEFAULT_CANVAS_PRO_PLUGINS` for the full bundle, or compose your own list and omit `CanvasPagesPlugin` to hide Pages.
+Enterprise `@openenvx/canvas-pro` ships composable sidebar plugins: `CanvasSidebarPlugin`, `CanvasPagesPlugin`, `CanvasLayersPlugin`, `CanvasTemplatePlugin`. Use `DEFAULT_CANVAS_PRO_PLUGINS` for the full bundle, or compose your own list and omit `CanvasPagesPlugin` to hide Pages. Wire the Template data panel in the app shell:
+
+```ts
+import {
+  TEMPLATE_DATA_CONTAINER_ID,
+  TemplateDataPanel,
+} from '@xmazu/openenvxee-canvas-pro';
+
+<WorkbenchShell
+  sidebarPanels={{ [TEMPLATE_DATA_CONTAINER_ID]: TemplateDataPanel }}
+  // …
+/>
+```
+
+Cloud / render API contract for named-layer modifications: [template-api-contract.md](./template-api-contract.md).
 
 ## Contribution kinds
 

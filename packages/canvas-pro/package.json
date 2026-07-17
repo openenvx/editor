@@ -17,7 +17,7 @@
     }
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/ dist/",
     "test": "vitest run"
   },
   "dependencies": {

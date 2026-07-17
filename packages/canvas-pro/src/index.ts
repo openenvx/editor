@@ -4,6 +4,7 @@ import {
   CanvasPagesPlugin,
   CanvasSidebarPlugin,
 } from './plugin/canvas-sidebar-plugins';
+import { CanvasTemplatePlugin } from './plugin/canvas-template-plugin';
 
 export { alignTransforms, distributeHorizontally } from './align/align';
 export {
@@ -26,10 +27,16 @@ export {
   CanvasSidebarContainer,
 } from './contributions/canvas-sidebar-contributions';
 export {
+  CanvasTemplateContainer,
+  TEMPLATE_DATA_CONTAINER_ID,
+} from './contributions/canvas-template-contribution';
+export { TemplateDataPanel } from './components/template-data-panel';
+export {
   CanvasLayersPlugin,
   CanvasPagesPlugin,
   CanvasSidebarPlugin,
 } from './plugin/canvas-sidebar-plugins';
+export { CanvasTemplatePlugin } from './plugin/canvas-template-plugin';
 export { CanvasProPlugin } from './plugin/canvas-pro-plugin';
 export {
   CanvasStatusBarContribution,
@@ -60,4 +67,5 @@ export const DEFAULT_CANVAS_PRO_PLUGINS = [
   new CanvasSidebarPlugin(),
   new CanvasPagesPlugin(),
   new CanvasLayersPlugin(),
+  new CanvasTemplatePlugin(),
 ];

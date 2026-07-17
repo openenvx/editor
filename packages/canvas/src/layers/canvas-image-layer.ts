@@ -13,6 +13,13 @@ export const canvasImageSchema = z
   .object({
     alt: z.string().optional(),
     assetRef: z.string(),
+    fit: z.enum(['cover', 'contain', 'fill']).optional(),
+    focalPoint: z
+      .object({
+        x: z.number(),
+        y: z.number(),
+      })
+      .optional(),
   })
   .passthrough();
 
@@ -32,6 +39,8 @@ export class CanvasImageLayer extends LayerDefinition<CanvasImageModel> {
       data: {
         alt: 'Image',
         assetRef: 'https://placehold.co/400x300',
+        fit: 'cover',
+        focalPoint: { x: 0.5, y: 0.5 },
       },
       id,
       transform: { ...createDefaultTransform(), height: 240, width: 320 },
@@ -51,10 +60,33 @@ export class CanvasImageLayer extends LayerDefinition<CanvasImageModel> {
   }
 
   properties(_ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
+    const scrub = { scrub: true, precision: 2 };
     return createPropertyBuilder()
       .section('image')
       .text('assetRef', 'Asset URL or ref')
       .text('alt', 'Alt text')
+      .select(
+        'fit',
+        [
+          { label: 'Cover', value: 'cover' },
+          { label: 'Contain', value: 'contain' },
+          { label: 'Fill', value: 'fill' },
+        ],
+        'Fit'
+      )
+      .field({
+        key: 'focalPoint',
+        kind: 'text',
+        label: 'Focal point',
+      })
+      .withPopup(
+        'circle',
+        (popup) =>
+          popup
+            .number('x', 'X', { numeric: scrub })
+            .number('y', 'Y', { numeric: scrub }),
+        'Focal point'
+      )
       .build();
   }
 
