@@ -62,4 +62,12 @@ export default {
   'theme.dark': 'Ciemny',
   'locale.en': 'Angielski',
   'locale.pl': 'Polski',
+  'versionHistory.title': 'Historia wersji',
+  'versionHistory.current': 'Bieżąca wersja',
+  'versionHistory.autosaveGroup': '{{count}} wersji automatycznych',
+  'versionHistory.loading': 'Ładowanie wersji…',
+  'versionHistory.empty': 'Brak wersji.',
+  'versionHistory.loadFailed': 'Nie udało się wczytać historii wersji.',
+  'versionHistory.missingProvider': 'Historia wersji nie jest skonfigurowana.',
+  'versionHistory.noDocument': 'Otwórz dokument, aby zobaczyć historię wersji.',
 } as const satisfies Record<string, string>;

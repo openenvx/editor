@@ -1,10 +1,10 @@
+import type { ServicesAccessor } from './services-accessor';
+
 const SERVICE_DEBUG_NAME = Symbol('serviceDebugName');
 
-const ctorParamMap = new WeakMap<object, Map<number, ServiceId<unknown>>>();
-
-export type ServiceId<T> = ParameterDecorator & {
+export interface ServiceId<T> {
   readonly __serviceBrand?: T;
-};
+}
 
 export function getServiceDebugName(id: ServiceId<unknown>): string {
   return (
@@ -13,28 +13,38 @@ export function getServiceDebugName(id: ServiceId<unknown>): string {
 }
 
 export function createServiceId<T>(debugName: string): ServiceId<T> {
-  const decorator = ((
-    target: object,
-    _propertyKey: string | symbol | undefined,
-    parameterIndex: number
-  ): void => {
-    let params = ctorParamMap.get(target);
-    if (!params) {
-      params = new Map();
-      ctorParamMap.set(target, params);
-    }
-    params.set(parameterIndex, decorator as ServiceId<unknown>);
-  }) as ServiceId<T>;
-
-  Object.defineProperty(decorator, SERVICE_DEBUG_NAME, {
+  const id = {} as ServiceId<T>;
+  Object.defineProperty(id, SERVICE_DEBUG_NAME, {
     value: debugName,
   });
-
-  return decorator;
+  return id;
 }
 
-export function getConstructorServiceParameters(
-  ctor: abstract new (...args: never[]) => unknown
-): Map<number, ServiceId<unknown>> {
-  return ctorParamMap.get(ctor) ?? new Map();
+let currentAccessor: ServicesAccessor | undefined;
+
+/**
+ * Resolve a service from the active InstantiationService.createInstance context.
+ * Use as a field initializer:
+ *   private readonly assets = inject(AssetServiceId);
+ */
+export function inject<T>(id: ServiceId<T>): T {
+  if (!currentAccessor) {
+    throw new Error(
+      `inject(${getServiceDebugName(id)}) called outside InstantiationService.createInstance`
+    );
+  }
+  return currentAccessor.get(id);
+}
+
+export function runWithInjectionContext<T>(
+  accessor: ServicesAccessor,
+  fn: () => T
+): T {
+  const previous = currentAccessor;
+  currentAccessor = accessor;
+  try {
+    return fn();
+  } finally {
+    currentAccessor = previous;
+  }
 }

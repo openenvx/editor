@@ -62,4 +62,12 @@ export default {
   'theme.dark': 'Dark',
   'locale.en': 'English',
   'locale.pl': 'Polish',
+  'versionHistory.title': 'Version history',
+  'versionHistory.current': 'Current version',
+  'versionHistory.autosaveGroup': '{{count}} autosave versions',
+  'versionHistory.loading': 'Loading versions…',
+  'versionHistory.empty': 'No versions yet.',
+  'versionHistory.loadFailed': 'Failed to load version history.',
+  'versionHistory.missingProvider': 'Version history is not configured.',
+  'versionHistory.noDocument': 'Open a document to see version history.',
 } as const satisfies Record<string, string>;

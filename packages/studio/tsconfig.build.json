@@ -13,7 +13,6 @@
     "strictNullChecks": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
       "@openenvx/core": ["../core/src/index.ts"],

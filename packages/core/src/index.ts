@@ -113,6 +113,7 @@ export type { ExternalStore } from './runtime/external-store';
 export {
   createServiceId,
   getServiceDebugName,
+  inject,
   type ServiceId,
 } from './runtime/create-service-id';
 export {

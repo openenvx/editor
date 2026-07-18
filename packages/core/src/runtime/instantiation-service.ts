@@ -1,7 +1,7 @@
 import {
   createServiceId,
-  getConstructorServiceParameters,
   getServiceDebugName,
+  runWithInjectionContext,
 } from './create-service-id';
 import type { ServiceId } from './create-service-id';
 import { createServicesAccessor } from './services-accessor';
@@ -41,11 +41,7 @@ export class InstantiationService implements ServiceContainer {
     if (!factory) {
       throw new Error(`Service not found: ${getServiceDebugName(id)}`);
     }
-    const accessor = createServicesAccessor(
-      this.get.bind(this),
-      this.has.bind(this),
-      this.createInstance.bind(this)
-    );
+    const accessor = this.createAccessor();
     const instance = factory(accessor);
     this.instances.set(id, instance);
     return instance as T;
@@ -62,28 +58,24 @@ export class InstantiationService implements ServiceContainer {
     ctor: abstract new (...args: never[]) => T,
     ...staticArgs: unknown[]
   ): T {
-    const paramMap = getConstructorServiceParameters(ctor);
-    const maxIndex = Math.max(
-      staticArgs.length - 1,
-      paramMap.size > 0 ? Math.max(...paramMap.keys()) : -1
+    const accessor = this.createAccessor();
+    return runWithInjectionContext(
+      accessor,
+      () => new (ctor as new (...args: unknown[]) => T)(...staticArgs)
     );
-    const args: unknown[] = [];
-    for (let index = 0; index <= maxIndex; index += 1) {
-      const serviceId = paramMap.get(index);
-      if (serviceId) {
-        args[index] = this.get(serviceId);
-        continue;
-      }
-      if (index < staticArgs.length) {
-        args[index] = staticArgs[index];
-      }
-    }
-    return new (ctor as new (...args: unknown[]) => T)(...args);
   }
 
   clear(): void {
     this.factories.clear();
     this.instances.clear();
+  }
+
+  private createAccessor(): ServicesAccessor {
+    return createServicesAccessor(
+      this.get.bind(this),
+      this.has.bind(this),
+      this.createInstance.bind(this)
+    );
   }
 }
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { inject } from './create-service-id';
 import {
   TestConsumer,
   TestConsumerServiceId,
@@ -9,7 +10,7 @@ import {
 import { InstantiationService } from './instantiation-service';
 
 describe('InstantiationService', () => {
-  it('resolves constructor dependencies via parameter decorators', () => {
+  it('resolves field dependencies via inject()', () => {
     const services = new InstantiationService();
     services.registerFactory(TestServiceId, () => new TestService());
 
@@ -18,7 +19,11 @@ describe('InstantiationService', () => {
     expect(consumer.dep.value).toBe(42);
   });
 
-  it('registerSingleton resolves constructor dependencies', () => {
+  it('inject() throws outside createInstance', () => {
+    expect(() => inject(TestServiceId)).toThrow(/outside InstantiationService/);
+  });
+
+  it('registerSingleton resolves inject() dependencies', () => {
     const services = new InstantiationService();
     services.registerSingleton(TestServiceId, TestService);
     services.registerSingleton(TestConsumerServiceId, TestConsumer);

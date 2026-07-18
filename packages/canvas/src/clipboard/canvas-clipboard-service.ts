@@ -1,5 +1,4 @@
-import { AssetServiceId } from '@openenvx/core';
-import type { AssetService } from '@openenvx/core';
+import { AssetServiceId, inject } from '@openenvx/core';
 import type { Layer, Page } from '@openenvx/schema';
 import { createDefaultTransform } from '@openenvx/schema';
 
@@ -31,7 +30,7 @@ export interface ArtboardPointerContext {
 }
 
 export class CanvasClipboardService {
-  constructor(@AssetServiceId private readonly assets: AssetService) {}
+  private readonly assets = inject(AssetServiceId);
 
   private internal: InternalClipboardPayload | null = null;
   private lastPointer: ScreenPointer | null = null;

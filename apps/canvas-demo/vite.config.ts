@@ -27,13 +27,6 @@ export default defineConfig(() => ({
   optimizeDeps: {
     exclude: workspacePackages,
   },
-  esbuild: {
-    tsconfigRaw: {
-      compilerOptions: {
-        experimentalDecorators: true,
-      },
-    },
-  },
   server: {
     fs: {
       allow: [monorepoRoot],

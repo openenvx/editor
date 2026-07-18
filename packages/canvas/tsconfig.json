@@ -2,8 +2,7 @@
   "extends": "@openenvx/typescript-config/base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "strictNullChecks": true,
-    "experimentalDecorators": true
+    "strictNullChecks": true
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]

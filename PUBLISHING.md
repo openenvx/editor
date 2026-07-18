@@ -61,7 +61,7 @@ Studio is the **published product bundle**. Internally:
 
 `tsup` sets `noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/]`, so those packages are compiled into `dist/index.js`. Published `package.json` must not list any `@openenvx/*` or `@xmazu/openenvxee-*` runtime dependency.
 
-Workspace packages stay in `devDependencies` for types and local HMR via the `development` export condition.
+Workspace packages stay in `devDependencies` for types while building the bundle. Published `exports` point at `dist/` only — host apps always resolve the built package.
 
 Install:
 

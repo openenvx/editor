@@ -4,6 +4,7 @@ import {
   DEFAULT_STUDIO_PLUGINS,
   TEMPLATE_DATA_CONTAINER_ID,
   TemplateDataPanel,
+  VersionHistoryPlugin,
   WorkbenchShell,
   createCanvasDemoScene,
   createCanvasInspectorHostContextWithApi,
@@ -12,7 +13,7 @@ import {
 
 import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
 import { CanvasDemoPlugin } from './plugins/canvas-demo-plugin';
-import { CanvasDemoVersionPlugin } from './plugins/canvas-demo-version-plugin';
+import { createDemoVersionHistoryProvider } from './providers/demo-version-history-provider';
 
 import '@xmazu/openenvxee-studio/fonts.css';
 import '@xmazu/openenvxee-studio/theme.css';
@@ -21,7 +22,9 @@ const plugins = [
   ...DEFAULT_STUDIO_PLUGINS,
   new CanvasDemoPlugin(),
   new CanvasDemoChromePlugin(),
-  new CanvasDemoVersionPlugin(),
+  new VersionHistoryPlugin({
+    provider: createDemoVersionHistoryProvider(),
+  }),
 ];
 
 function promptUri(message: string, defaultValue?: string): string | null {

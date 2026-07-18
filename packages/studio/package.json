@@ -1,6 +1,6 @@
 {
   "name": "@xmazu/openenvxee-studio",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "OpenEnvx Studio — workbench UI, canvas, canvas-pro, and agent bundled for host apps",
   "license": "UNLICENSED",
   "type": "module",
@@ -12,18 +12,15 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./theme.css": {
-      "development": "./src/theme.css",
       "import": "./dist/theme/tokens.css",
       "default": "./dist/theme/tokens.css"
     },
     "./fonts.css": {
-      "development": "./src/fonts.css",
       "import": "./dist/fonts/fonts.css",
       "default": "./dist/fonts/fonts.css"
     }

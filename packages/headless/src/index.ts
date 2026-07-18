@@ -150,3 +150,10 @@ export type {
   ViewPanelRegistration,
 } from './workbench/inspector-pane-registration';
 export type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
+
+export type {
+  DocumentVersion,
+  VersionAuthor,
+  VersionHistoryProvider,
+} from './version-history/version-history-types';
+export { VersionHistoryProviderId } from './version-history/version-history-service-id';
