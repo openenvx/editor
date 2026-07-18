@@ -53,15 +53,22 @@ Studio is the **published product bundle**. Internally:
 
 | Workspace package | Role |
 | --- | --- |
+| `@openenvx/core` | Plugin/command/service authoring API (re-exported) |
+| `@openenvx/headless` | Workbench controller + contribution types (re-exported) |
 | `@xmazu/openenvxee-workbench` | React shell UI (`WorkbenchShell`, fields, theme) |
 | `@openenvx/canvas` | Konva canvas engine |
 | `@xmazu/openenvxee-canvas-pro` | Pro chrome (toolbars, sidebars, smart guides) |
 | `@openenvx/agent` | AI agent sidebar |
 | `@openenvx/driver-image` | Image/SVG export driver |
 
-`tsup` sets `noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/]`, so those packages are compiled into `dist/index.js`. Published `package.json` must not list any `@openenvx/*` or `@xmazu/openenvxee-*` runtime dependency.
+`tsup` sets `noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/]`, so those packages are compiled into `dist/index.js`. Studio also re-exports `@openenvx/core` and `@openenvx/headless` so host apps can author plugins (`Plugin`, `Command`, `PersistenceService`, …) without installing private workspace packages. Published `package.json` must not list any `@openenvx/*` or `@xmazu/openenvxee-*` runtime dependency.
 
-Workspace packages stay in `devDependencies` for types while building the bundle. Published `exports` point at `dist/` only — host apps always resolve the built package.
+Workspace packages stay in `devDependencies` for types while building the bundle. Export conditions:
+
+| Condition | Resolves to | Who |
+| --- | --- | --- |
+| `development` / `bun` | `src/` | Monorepo apps (`customConditions: ["development"]`) — same type identity as workspace `@openenvx/*` |
+| `import` / `default` / `types` | `dist/` | Published consumers (openenvx-cloud, etc.) |
 
 Install:
 
@@ -82,6 +89,13 @@ import {
   TemplateDataPanel,
   AGENT_CHAT_CONTAINER_ID,
   TEMPLATE_DATA_CONTAINER_ID,
+  // plugin authoring (from core, bundled + re-exported)
+  Plugin,
+  Command,
+  PersistenceServiceId,
+  type PersistenceService,
+  type PluginContext,
+  type CommandContext,
 } from '@xmazu/openenvxee-studio';
 import '@xmazu/openenvxee-studio/theme.css';
 import '@xmazu/openenvxee-studio/fonts.css';

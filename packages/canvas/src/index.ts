@@ -15,8 +15,6 @@ export {
   hitTestRotatedLayer,
   resizeTransform,
   hitTestAxisAlignedLayer,
-  MIN_LAYER_SIZE,
-  clampTransformSize,
   constrainTransformerBox,
   enforceNodeTransformLimits,
   isValidNodeTransform,

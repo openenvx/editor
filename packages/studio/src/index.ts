@@ -9,6 +9,8 @@ import {
   CanvasTemplatePlugin,
 } from '@xmazu/openenvxee-canvas-pro';
 
+export * from '@openenvx/core';
+export * from '@openenvx/headless';
 export * from '@xmazu/openenvxee-workbench';
 export * from '@openenvx/canvas';
 export * from '@xmazu/openenvxee-canvas-pro';
