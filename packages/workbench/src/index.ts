@@ -49,7 +49,6 @@ export {
   ViewPanelRenderer,
   TreePanelRenderer,
 } from './renderers/view-panel-renderer';
-export { PropertyPanelRenderer } from './renderers/property-panel-renderer';
 export { EditorPaneRenderer } from './renderers/editor-pane-renderer';
 export { ContextMenuRenderer } from './renderers/context-menu-renderer';
 export { CommandPaletteRenderer } from './renderers/command-palette-renderer';
@@ -62,6 +61,12 @@ export {
   DefaultWorkbenchFieldsPlugin,
   DEFAULT_FIELDS_PLUGIN_ID,
 } from './fields/default-fields-plugin';
+export {
+  DefaultInspectorContainerPlugin,
+  DEFAULT_INSPECTOR_PLUGIN_ID,
+} from './views/default-inspector-plugin';
+export { SecondarySidebarRenderer } from './renderers/secondary-sidebar-renderer';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './primitives/tabs';
 export { NumericControl } from './inputs/basic/numeric-control';
 export { TextInput } from './inputs/basic/text-input';
 export { WorkbenchIcon } from './icons/workbench-icon';

@@ -1,11 +1,15 @@
 import type {
+  InspectorHostContext,
+  InspectorPathContextOptions,
   MenuItemDescriptor,
   ViewContainerDescriptor,
+  WorkbenchApi,
 } from '@openenvx/headless';
 import { Fragment, forwardRef, useCallback, useMemo, useState } from 'react';
 import type { ButtonHTMLAttributes, ComponentType, ReactNode } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
+import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { WorkbenchIcon } from '../icons/workbench-icon';
 import { cn } from '../lib/cn';
@@ -16,7 +20,7 @@ import {
 } from '../primitives/dropdown-menu';
 import { ContextMenuRenderer } from '../renderers/context-menu-renderer';
 import { DropdownMenuRenderer } from '../renderers/dropdown-menu-renderer';
-import { ViewPanelRenderer } from '../renderers/view-panel-renderer';
+import { ViewContainerViews } from '../renderers/view-container-views';
 
 import styles from './activity-sidebar.module.css';
 
@@ -26,6 +30,14 @@ export interface ActivitySidebarProps {
   viewContainers: ViewContainerDescriptor[];
   contextMenuItems?: MenuItemDescriptor[];
   customPanels?: Record<string, SidebarPanelComponent>;
+  createInspectorHostContext?: (
+    options: InspectorPathContextOptions,
+    helpers: {
+      api: WorkbenchApi;
+      executeCommand: (commandId: string) => Promise<boolean>;
+    }
+  ) => InspectorHostContext;
+  viewPanels?: Record<string, ComponentType>;
 }
 
 type ActivityItemButtonProps = {
@@ -63,21 +75,40 @@ export function ActivitySidebar({
   viewContainers,
   contextMenuItems,
   customPanels,
+  createInspectorHostContext,
+  viewPanels,
 }: ActivitySidebarProps) {
-  const { executeCommand } = useWorkbenchContext();
+  const { api } = useWorkbenchContext();
   const { t } = useWorkbenchTranslation();
-  const panelContainers = useMemo(
-    () => viewContainers.filter((c) => c.sidebarBehavior === 'panel'),
+  const activeContainerByLocation = useWorkbenchContextSelector(
+    (state) => state.activeContainerByLocation
+  );
+  const primaryContainers = useMemo(
+    () => viewContainers.filter((c) => (c.location ?? 'primary') === 'primary'),
     [viewContainers]
   );
-  const [activeContainerId, setActiveContainerId] = useState(
-    () => panelContainers[0]?.id ?? ''
+  const panelContainers = useMemo(
+    () => primaryContainers.filter((c) => c.sidebarBehavior === 'panel'),
+    [primaryContainers]
   );
+  const activeFromService = activeContainerByLocation?.primary;
+  const activeContainerId =
+    activeFromService &&
+    panelContainers.some((container) => container.id === activeFromService)
+      ? activeFromService
+      : (panelContainers[0]?.id ?? '');
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   const closeDropdown = useCallback(() => {
     setOpenDropdownId(null);
   }, []);
+
+  const setActivePrimary = useCallback(
+    (containerId: string) => {
+      api.setActiveContainer('primary', containerId);
+    },
+    [api]
+  );
 
   const activePanel = panelContainers.find((c) => c.id === activeContainerId);
   const ActiveCustomPanel = activePanel
@@ -89,7 +120,7 @@ export function ActivitySidebar({
   return (
     <div className={styles.root}>
       <nav aria-label={t('activityBar')} className={styles.activityBar}>
-        {viewContainers.map((container) => {
+        {primaryContainers.map((container) => {
           const showSeparator =
             previousGroup !== undefined &&
             container.sidebarGroup !== previousGroup;
@@ -129,7 +160,7 @@ export function ActivitySidebar({
                 onClick={() => {
                   closeDropdown();
                   if (container.commandId) {
-                    void executeCommand(container.commandId);
+                    void api.executeCommand(container.commandId);
                   }
                 }}
               />
@@ -141,7 +172,7 @@ export function ActivitySidebar({
                 isActive={isPanelActive}
                 onClick={() => {
                   closeDropdown();
-                  setActiveContainerId(container.id);
+                  setActivePrimary(container.id);
                 }}
               />
             );
@@ -164,7 +195,11 @@ export function ActivitySidebar({
               <ActiveCustomPanel />
             ) : (
               <ContextMenuRenderer items={contextMenuItems ?? []}>
-                <ViewPanelRenderer viewContainers={[activePanel]} />
+                <ViewContainerViews
+                  container={activePanel}
+                  createHostContext={createInspectorHostContext}
+                  viewPanels={viewPanels}
+                />
               </ContextMenuRenderer>
             )}
           </div>

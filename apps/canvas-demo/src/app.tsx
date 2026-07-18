@@ -12,6 +12,7 @@ import {
 
 import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
 import { CanvasDemoPlugin } from './plugins/canvas-demo-plugin';
+import { CanvasDemoVersionPlugin } from './plugins/canvas-demo-version-plugin';
 
 import '@xmazu/openenvxee-studio/fonts.css';
 import '@xmazu/openenvxee-studio/theme.css';
@@ -20,6 +21,7 @@ const plugins = [
   ...DEFAULT_STUDIO_PLUGINS,
   new CanvasDemoPlugin(),
   new CanvasDemoChromePlugin(),
+  new CanvasDemoVersionPlugin(),
 ];
 
 function promptUri(message: string, defaultValue?: string): string | null {

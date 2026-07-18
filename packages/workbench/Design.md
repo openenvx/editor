@@ -385,11 +385,15 @@ Horizontal compound control for paired values:
 
 ### Tabs (sidebar)
 
-Same as SegmentedControl but full-width in sidebar header:
+Radix Tabs primitive (`primitives/tabs.tsx`) — full-width pill segments in the secondary sidebar header:
 
-- Padding: 8px 12px container
-- 3 equal segments: Layers | Library | Generate
-- No bottom border on tab row (current has heavy divider — remove)
+- Track: `--wb-muted` bg, 3px padding, `--wb-radius-md`
+- Trigger height: 24px; active: `--wb-card` + `--wb-shadow-xs`
+- Equal-width triggers; inactive content kept mounted (`forceMount` + CSS hide)
+- Used for secondary view containers (e.g. Inspector \| Version)
+- No bottom border on the tab row
+
+`SegmentedControl` remains for inspector field toggles (Auto/Flex, etc.) — not for sidebar tabs.
 
 ### PanelSection (inspector)
 
@@ -529,7 +533,7 @@ Bind to `layer.transform` when canvas layer selected.
 
 ### Phase 3 — Inspector panes (1 PR)
 
-- [ ] Split `PropertyPanelRenderer` into pane components
+- [x] Secondary sidebar uses shared `ViewContainerViews` for tree / properties / component content (replaces standalone `PropertyPanelRenderer`)
 - [ ] Wire Layer pane to transform (X/Y/W/H)
 - [ ] Add Styles pane color swatch row
 - [ ] Phase 2 layout fields behind `PropertyBuilder` extensions in canvas layers

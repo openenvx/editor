@@ -11,6 +11,7 @@ import type {
   ViewContainerContribution,
   ViewContribution,
   TreeDataProvider,
+  ViewContainerLocation,
 } from '../contributions/view-contribution';
 import type { ViewProviderRegistry } from '../registries/view-provider-registry';
 import type {
@@ -18,6 +19,7 @@ import type {
   ViewDescriptor,
   ViewTreeItem,
 } from '../workbench-state';
+import type { ViewLocationService } from '../workbench/view-location-service';
 
 export function buildViewContainer(
   container: ViewContainerContribution,
@@ -25,18 +27,26 @@ export function buildViewContainer(
   viewProviderRegistry: ViewProviderRegistry,
   ctx: CommandContext,
   evaluateWhen: (when?: string) => boolean,
-  buildCtx: ReturnType<typeof createContributionBuildContext>
+  buildCtx: ReturnType<typeof createContributionBuildContext>,
+  locationService: ViewLocationService
 ): ViewContainerDescriptor {
+  const defaultLocation: ViewContainerLocation =
+    container.defaultLocation ?? 'primary';
+  locationService.ensureRegistered(container.id, defaultLocation);
+
   const containerViews = views
     .filter((v) => v.containerId === container.id)
     .filter((v) => evaluateWhen(v.when))
     .toSorted((a, b) => (a.viewOrder ?? 0) - (b.viewOrder ?? 0))
     .map((view) => {
+      if (view.componentId) {
+        return buildComponentView(view, buildCtx);
+      }
       const provider = viewProviderRegistry.get(view.id);
       if (!provider) {
         return buildEmptyView(view, buildCtx);
       }
-      return buildView(view, provider, ctx, buildCtx);
+      return buildTreeView(view, provider, ctx, buildCtx);
     });
 
   const sidebarBehavior = container.sidebarBehavior ?? 'panel';
@@ -54,12 +64,34 @@ export function buildViewContainer(
     commandId: container.commandId,
     icon: container.icon,
     id: container.id,
+    location: locationService.getLocation(container.id),
     menuItems,
     sidebarBehavior,
     sidebarGroup: container.sidebarGroup ?? 0,
     sidebarOrder: container.sidebarOrder ?? 0,
     title: buildCtx.t(`viewContainer.${container.id}.title`, container.title),
     views: containerViews,
+  };
+}
+
+function buildComponentView(
+  view: ViewContribution,
+  buildCtx: ReturnType<typeof createContributionBuildContext>
+): ViewDescriptor {
+  return {
+    collapsible: view.collapsible ?? false,
+    containerId: view.containerId,
+    content: {
+      componentId: view.componentId ?? view.id,
+      kind: 'component',
+    },
+    id: view.id,
+    initialCollapsed: view.initialCollapsed ?? false,
+    name: buildCtx.t(`view.${view.id}.name`, view.name),
+    supportsReorder: false,
+    viewOrder: view.viewOrder ?? 0,
+    viewSelection: view.viewSelection ?? 'layer',
+    viewHover: view.viewHover ?? 'none',
   };
 }
 
@@ -70,9 +102,9 @@ function buildEmptyView(
   return {
     collapsible: view.collapsible ?? true,
     containerId: view.containerId,
+    content: { items: [], kind: 'tree' },
     id: view.id,
     initialCollapsed: view.initialCollapsed ?? false,
-    items: [],
     name: buildCtx.t(`view.${view.id}.name`, view.name),
     supportsReorder: false,
     viewOrder: view.viewOrder ?? 0,
@@ -81,7 +113,7 @@ function buildEmptyView(
   };
 }
 
-function buildView(
+function buildTreeView(
   view: ViewContribution,
   provider: TreeDataProvider<unknown>,
   ctx: CommandContext,
@@ -134,9 +166,9 @@ function buildView(
   return {
     collapsible: view.collapsible ?? true,
     containerId: view.containerId,
+    content: { items, kind: 'tree' },
     id: view.id,
     initialCollapsed: view.initialCollapsed ?? false,
-    items,
     name: buildCtx.t(`view.${view.id}.name`, view.name),
     supportsReorder: typeof provider.handleMove === 'function',
     viewOrder: view.viewOrder ?? 0,

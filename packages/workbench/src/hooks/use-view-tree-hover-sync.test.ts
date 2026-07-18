@@ -58,9 +58,9 @@ function createView(
   return {
     collapsible: true,
     containerId: 'layers',
+    content: { items: [], kind: 'tree' },
     id: 'canvas.layers',
     initialCollapsed: false,
-    items: [],
     name: 'Layers',
     supportsReorder: true,
     viewOrder: 0,

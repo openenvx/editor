@@ -18,7 +18,7 @@ import type {
 import type { EditorPaneRegistration } from './workbench/editor-pane-host-props';
 import type {
   FieldRendererRegistration,
-  InspectorPaneRegistration,
+  ViewPanelRegistration,
 } from './workbench/inspector-pane-registration';
 import type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
 import type { WorkbenchLayout } from './workbench/workbench-layout';
@@ -35,8 +35,8 @@ export interface SceneSlice {
   selection: Selection;
   properties: PropertySectionDescriptor[] | null;
   viewContainers: ViewContainerDescriptor[];
-  inspectorPanes: InspectorPaneRegistration[];
   fieldRenderers: FieldRendererRegistration[];
+  viewPanels: ViewPanelRegistration[];
 }
 
 export interface EditorSlice {
@@ -106,13 +106,12 @@ export class WorkbenchStateCache {
     scene: Scene,
     selection: Selection,
     contentRevision: number,
-    rebuildSelectionDerived?: () => Pick<
-      SceneSlice,
-      'properties' | 'inspectorPanes'
-    >
+    rebuildSelectionDerived?: (
+      current: SceneSlice
+    ) => Pick<SceneSlice, 'properties' | 'viewContainers'>
   ): void {
     if (this.sceneSlice && contentRevision === this.lastContentRevision) {
-      const derived = rebuildSelectionDerived?.();
+      const derived = rebuildSelectionDerived?.(this.sceneSlice);
       const patch = {
         scene,
         selection,

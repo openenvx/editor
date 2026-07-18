@@ -23,6 +23,7 @@ function createFileMenuContainers(): ViewContainerDescriptor[] {
     {
       icon: 'file',
       id: 'workbench.file',
+      location: 'primary',
       menuItems: [
         {
           id: 'theme',
@@ -46,6 +47,7 @@ function createFileMenuContainers(): ViewContainerDescriptor[] {
     {
       icon: 'layers',
       id: 'workbench.layers',
+      location: 'primary',
       sidebarBehavior: 'panel',
       sidebarGroup: 0,
       sidebarOrder: 1,

@@ -1,6 +1,5 @@
 import {
   DocumentHostServiceId,
-  findLayerById,
   LocalizationServiceId,
   MutableDocumentHostService,
   ThemeServiceId,
@@ -15,7 +14,7 @@ import type {
   WorkbenchControllerOptions,
 } from '@openenvx/headless';
 import type { Scene } from '@openenvx/schema';
-import type { MutableRefObject, ReactNode } from 'react';
+import type { ComponentType, MutableRefObject, ReactNode } from 'react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import { EditorViewportProvider } from '../context/editor-viewport-context';
@@ -45,8 +44,12 @@ import { ContextMenuRenderer } from '../renderers/context-menu-renderer';
 import { EditorPaneRenderer } from '../renderers/editor-pane-renderer';
 import { FloatingToolbarRenderer } from '../renderers/floating-toolbar-renderer';
 import { OverlayRenderer } from '../renderers/overlay-renderer';
-import { PropertyPanelRenderer } from '../renderers/property-panel-renderer';
+import { SecondarySidebarRenderer } from '../renderers/secondary-sidebar-renderer';
 import { StatusBarRenderer } from '../renderers/status-bar-renderer';
+import {
+  DEFAULT_INSPECTOR_PLUGIN_ID,
+  DefaultInspectorContainerPlugin,
+} from '../views/default-inspector-plugin';
 
 export interface WorkbenchShellProps {
   plugins: Plugin[];
@@ -75,6 +78,8 @@ export interface WorkbenchShellProps {
     editorPaneKind: string;
   }) => ReactNode;
   sidebarPanels?: Record<string, SidebarPanelComponent>;
+  /** Extra React panels keyed by view `componentId`. */
+  viewPanels?: Record<string, ComponentType>;
 }
 
 const ChromeRegion = memo(
@@ -180,9 +185,13 @@ const EditorRegion = memo(
 
 const SidebarRegion = memo(
   ({
+    createInspectorHostContext,
     sidebarPanels,
+    viewPanels,
   }: {
+    createInspectorHostContext?: WorkbenchShellProps['createInspectorHostContext'];
     sidebarPanels?: Record<string, SidebarPanelComponent>;
+    viewPanels?: WorkbenchShellProps['viewPanels'];
   }) => {
     const viewContainers = useWorkbenchContextSelector(
       (state) => state.viewContainers
@@ -199,57 +208,10 @@ const SidebarRegion = memo(
     return (
       <ActivitySidebar
         contextMenuItems={contextMenu}
+        createInspectorHostContext={createInspectorHostContext}
         customPanels={sidebarPanels}
         viewContainers={viewContainers}
-      />
-    );
-  }
-);
-
-const InspectorRegion = memo(
-  ({
-    createInspectorHostContext,
-  }: {
-    createInspectorHostContext?: WorkbenchShellProps['createInspectorHostContext'];
-  }) => {
-    const primaryLayerId = useWorkbenchContextSelector(
-      (state) => state.selection.primaryLayerId
-    );
-    const scene = useWorkbenchContextSelector((state) => state.scene);
-    const inspectorPanes = useWorkbenchContextSelector(
-      (state) => state.inspectorPanes
-    );
-    const fieldRenderers = useWorkbenchContextSelector(
-      (state) => state.fieldRenderers
-    );
-    const layout = useWorkbenchContextSelector((state) => state.layout);
-
-    const layerData = useMemo(() => {
-      if (!scene || !primaryLayerId) {
-        return null;
-      }
-      const primaryLayer = findLayerById(scene, primaryLayerId);
-      if (
-        !primaryLayer ||
-        typeof primaryLayer.data !== 'object' ||
-        primaryLayer.data === null
-      ) {
-        return null;
-      }
-      return primaryLayer.data as Record<string, unknown>;
-    }, [primaryLayerId, scene]);
-
-    if (!layout?.secondarySidebar || !inspectorPanes || !fieldRenderers) {
-      return null;
-    }
-
-    return (
-      <PropertyPanelRenderer
-        createInspectorHostContext={createInspectorHostContext}
-        fieldRenderers={fieldRenderers}
-        inspectorPanes={inspectorPanes}
-        layerData={layerData}
-        selectedLayerId={primaryLayerId ?? null}
+        viewPanels={viewPanels}
       />
     );
   }
@@ -280,12 +242,14 @@ const LayoutRegion = memo(
     renderEditorPane,
     createInspectorHostContext,
     sidebarPanels,
+    viewPanels,
   }: Pick<
     WorkbenchShellProps,
     | 'showEditorArea'
     | 'renderEditorPane'
     | 'createInspectorHostContext'
     | 'sidebarPanels'
+    | 'viewPanels'
   >) => {
     const layout = useWorkbenchContextSelector((state) => state.layout);
     if (!layout) {
@@ -301,11 +265,18 @@ const LayoutRegion = memo(
           />
         }
         inspector={
-          <InspectorRegion
+          <SecondarySidebarRenderer
             createInspectorHostContext={createInspectorHostContext}
+            viewPanels={viewPanels}
           />
         }
-        primarySidebar={<SidebarRegion sidebarPanels={sidebarPanels} />}
+        primarySidebar={
+          <SidebarRegion
+            createInspectorHostContext={createInspectorHostContext}
+            sidebarPanels={sidebarPanels}
+            viewPanels={viewPanels}
+          />
+        }
         statusBar={<StatusBarRegion />}
       />
     );
@@ -446,6 +417,7 @@ export function WorkbenchShell({
   createInspectorHostContext,
   renderEditorPane,
   sidebarPanels,
+  viewPanels,
 }: WorkbenchShellProps) {
   const [activeTheme, setActiveTheme] = useState(theme);
   const [prevThemeProp, setPrevThemeProp] = useState(theme);
@@ -472,9 +444,17 @@ export function WorkbenchShell({
     const hasFieldsPlugin = plugins.some(
       (plugin) => plugin.id === DEFAULT_FIELDS_PLUGIN_ID
     );
-    return hasFieldsPlugin
-      ? plugins
-      : [new DefaultWorkbenchFieldsPlugin(), ...plugins];
+    const hasInspectorPlugin = plugins.some(
+      (plugin) => plugin.id === DEFAULT_INSPECTOR_PLUGIN_ID
+    );
+    const next = [...plugins];
+    if (!hasInspectorPlugin) {
+      next.unshift(new DefaultInspectorContainerPlugin());
+    }
+    if (!hasFieldsPlugin) {
+      next.unshift(new DefaultWorkbenchFieldsPlugin());
+    }
+    return next;
   }, [plugins]);
 
   const workbenchOptions = useMemo(
@@ -570,6 +550,7 @@ export function WorkbenchShell({
                   renderEditorPane={renderEditorPane}
                   showEditorArea={showEditorArea}
                   sidebarPanels={sidebarPanels}
+                  viewPanels={viewPanels}
                 />
               </div>
             </EditorViewportProvider>

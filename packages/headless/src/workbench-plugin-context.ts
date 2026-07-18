@@ -19,6 +19,7 @@ export interface WorkbenchPluginContext extends PluginContext {
   registerFieldRenderer(kind: string, component: unknown): void;
   registerStatusBarItemRenderer(kind: string, component: unknown): void;
   registerEditorPane(editorPaneKind: string, component: unknown): void;
+  registerViewPanel(componentId: string, component: unknown): void;
 }
 
 export function createWorkbenchPluginContext(
@@ -55,6 +56,9 @@ export function createWorkbenchPluginContext(
     },
     registerEditorPane(editorPaneKind, component) {
       providerRegistries.editorPaneRegistry.register(editorPaneKind, component);
+    },
+    registerViewPanel(componentId, component) {
+      providerRegistries.viewPanelRegistry.register(componentId, component);
     },
     scene: base.scene,
     services: base.services,

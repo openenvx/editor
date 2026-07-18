@@ -22,6 +22,7 @@ import {
 } from '@openenvx/schema';
 
 import { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
+import type { ViewContainerLocation } from './contributions/view-contribution';
 import { ViewProviderRegistryImpl } from './registries/view-provider-registry';
 import type { WorkbenchProviderRegistries } from './registries/workbench-provider-registries';
 import { WorkbenchRegistries } from './registries/workbench-registries';
@@ -29,7 +30,10 @@ import { buildChromeSlice } from './state/chrome-slice-builder';
 import { buildCommandsSlice } from './state/commands-slice-builder';
 import { EditorSliceBuilder } from './state/editor-slice-builder';
 import { InteractionStateStore } from './state/interaction-state-store';
-import { buildSceneSlice } from './state/scene-slice-builder';
+import {
+  buildSceneSlice,
+  buildSelectionDerivedPatch,
+} from './state/scene-slice-builder';
 import type { WorkbenchSliceContext } from './state/workbench-slice-context';
 import { setNestedValue } from './utils/nested-value';
 import {
@@ -54,6 +58,7 @@ import type {
   InteractionSlice,
   SceneSlice,
 } from './workbench-state-cache';
+import { ViewLocationService } from './workbench/view-location-service';
 import { DEFAULT_WORKBENCH_LAYOUT } from './workbench/workbench-layout';
 
 type Listener = (state: WorkbenchState) => void;
@@ -67,15 +72,18 @@ export class WorkbenchController {
   private readonly stateCache = new WorkbenchStateCache();
   private readonly editorSliceBuilder = new EditorSliceBuilder();
   private readonly interactionState = new InteractionStateStore();
+  private readonly locationService = new ViewLocationService();
   private revision = 0;
   private disposed = false;
   private detachKeybindings: (() => void) | null = null;
   private lastSeenContentRevision = -1;
+  private cachedState: WorkbenchState | null = null;
   private readonly workbenchRegistries = new WorkbenchRegistries();
   private readonly providerRegistries: WorkbenchProviderRegistries = {
     editorPaneRegistry: new Registry<string, unknown>('overwrite'),
     fieldRendererRegistry: new Registry<string, unknown>('overwrite'),
     statusBarItemRendererRegistry: new Registry<string, unknown>('overwrite'),
+    viewPanelRegistry: new Registry<string, unknown>('overwrite'),
     viewProviderRegistry: new ViewProviderRegistryImpl(),
   };
 
@@ -103,6 +111,7 @@ export class WorkbenchController {
     return {
       coreRegistries: this.manager.getRegistries(),
       layout: this.layout,
+      locationService: this.locationService,
       providerRegistries: this.providerRegistries,
       runtime: this.runtime,
       workbenchRegistries: this.workbenchRegistries,
@@ -148,12 +157,11 @@ export class WorkbenchController {
             snapshot.scene,
             snapshot.editorState,
             snapshot.contentRevision,
-            () => {
-              const { properties, inspectorPanes } = buildSceneSlice(
-                this.sliceContext
-              );
-              return { properties, inspectorPanes };
-            }
+            (current) =>
+              buildSelectionDerivedPatch(
+                this.sliceContext,
+                current.viewContainers
+              )
           );
         }
         this.notify();
@@ -212,6 +220,10 @@ export class WorkbenchController {
       selectLayers: (layerIds, primaryLayerId) =>
         this.selectLayers(layerIds, primaryLayerId),
       setHoveredLayer: (layerId) => this.setHoveredLayer(layerId),
+      setActiveContainer: (location, containerId) =>
+        this.setActiveContainer(location, containerId),
+      moveContainer: (containerId, location) =>
+        this.moveContainer(containerId, location),
       selectViewItem: (viewId, item) => this.selectViewItem(viewId, item),
       serializeScene: () => this.serializeScene(),
       undo: () => this.undo(),
@@ -272,12 +284,13 @@ export class WorkbenchController {
   }
 
   getState(): WorkbenchState {
-    return this.buildState();
+    this.cachedState ??= this.buildState();
+    return this.cachedState;
   }
 
   subscribe(listener: Listener): () => void {
     this.listeners.add(listener);
-    listener(this.buildState());
+    listener(this.getState());
     return () => {
       this.listeners.delete(listener);
     };
@@ -317,6 +330,20 @@ export class WorkbenchController {
 
   setHoveredLayer(layerId: string | null): void {
     this.interactionState.setHoveredLayer(layerId);
+  }
+
+  setActiveContainer(
+    location: ViewContainerLocation,
+    containerId: string
+  ): void {
+    this.locationService.setActiveContainer(location, containerId);
+    this.notify();
+  }
+
+  moveContainer(containerId: string, location: ViewContainerLocation): void {
+    this.locationService.moveContainer(containerId, location);
+    this.stateCache.invalidateSceneContent();
+    this.notify();
   }
 
   updateProperty(layerId: string, key: string, value: unknown): void {
@@ -430,7 +457,8 @@ export class WorkbenchController {
 
   private notify(): void {
     this.revision += 1;
-    const state = this.buildState();
+    this.cachedState = this.buildState();
+    const state = this.cachedState;
     for (const listener of this.listeners) {
       listener(state);
     }
@@ -458,6 +486,8 @@ export class WorkbenchController {
   }): WorkbenchState {
     const { scene, editor, chrome, commands, interaction } = slices;
     return {
+      activeContainerByLocation:
+        this.locationService.getActiveContainerByLocation(),
       commandPalette: chrome.commandPalette,
       commandStates: commands.commandStates,
       contextKeys: chrome.contextKeys,
@@ -467,7 +497,6 @@ export class WorkbenchController {
       editorPanes: editor.editorPanes,
       fieldRenderers: scene.fieldRenderers,
       interaction,
-      inspectorPanes: scene.inspectorPanes,
       layerSurface: editor.layerSurface,
       layout: this.layout,
       overlays: chrome.overlays,
@@ -479,6 +508,8 @@ export class WorkbenchController {
       statusBarItemRenderers: chrome.statusBarItemRenderers,
       toolbarItems: chrome.toolbarItems,
       viewContainers: scene.viewContainers,
+      viewLocations: this.locationService.getViewLocations(),
+      viewPanels: scene.viewPanels,
     };
   }
 }

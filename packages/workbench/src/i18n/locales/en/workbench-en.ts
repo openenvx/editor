@@ -30,6 +30,7 @@ export default {
   'commandPalette.noResults': 'No results.',
   'commandPalette.other': 'Other',
   'inspector.empty': 'Select a layer to edit properties',
+  'viewContainer.workbench.inspector.title': 'Inspector',
   'confirm.confirm': 'Confirm',
   'confirm.cancel': 'Cancel',
   'combobox.search': 'Search…',

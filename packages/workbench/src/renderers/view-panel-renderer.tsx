@@ -329,6 +329,7 @@ function ViewPanelBody({
 }) {
   const { api } = useWorkbenchContext();
   const [renamingId, setRenamingId] = useState<string | null>(null);
+  const items = view.content.kind === 'tree' ? view.content.items : [];
 
   useViewTreeHoverSync(view, hoveredLayerId, scene, setCollapsed);
 
@@ -453,7 +454,7 @@ function ViewPanelBody({
       <TreeDndList
         collapsed={collapsed}
         hoveredIds={hoveredIds}
-        items={view.items}
+        items={items}
         onHoverItem={handleHoverItem}
         onMove={(source, target, position) => {
           api.moveViewItem(view.id, source, target, position);
@@ -469,8 +470,8 @@ function ViewPanelBody({
 
   return (
     <div>
-      {view.items.map((item, index) => {
-        if (!isItemVisible(view.items, index, collapsed)) {
+      {items.map((item, index) => {
+        if (!isItemVisible(items, index, collapsed)) {
           return null;
         }
 
@@ -553,24 +554,26 @@ export const ViewPanelRenderer = memo(({ viewContainers }: Props) => {
     <div className={styles.viewPanel} onMouseLeave={handlePanelMouseLeave}>
       {viewContainers.map((container) => (
         <div key={container.id}>
-          {container.views.map((view) => (
-            <PanelSection
-              collapsible={view.collapsible}
-              defaultOpen={!view.initialCollapsed}
-              key={view.id}
-              title={view.name}
-            >
-              <ViewPanelBody
-                activePageId={resolvedActivePageId}
-                collapsed={collapsed}
-                hoveredLayerId={hoveredLayerId}
-                layerSelectedIds={layerSelectedIds}
-                scene={scene}
-                setCollapsed={setCollapsed}
-                view={view}
-              />
-            </PanelSection>
-          ))}
+          {container.views
+            .filter((view) => view.content.kind === 'tree')
+            .map((view) => (
+              <PanelSection
+                collapsible={view.collapsible}
+                defaultOpen={!view.initialCollapsed}
+                key={view.id}
+                title={view.name}
+              >
+                <ViewPanelBody
+                  activePageId={resolvedActivePageId}
+                  collapsed={collapsed}
+                  hoveredLayerId={hoveredLayerId}
+                  layerSelectedIds={layerSelectedIds}
+                  scene={scene}
+                  setCollapsed={setCollapsed}
+                  view={view}
+                />
+              </PanelSection>
+            ))}
         </div>
       ))}
     </div>

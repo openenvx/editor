@@ -14,6 +14,7 @@ export function createMockWorkbenchApi(
     pages: [{ id: 'p1', name: 'Page', layout: 'flow', layers: [] }],
   });
   const state: WorkbenchState = {
+    activeContainerByLocation: { primary: null, secondary: null },
     commandPalette: {
       categories: [],
       items: [],
@@ -26,7 +27,6 @@ export function createMockWorkbenchApi(
     editorPaneKind: 'flow',
     editorPanes: [],
     fieldRenderers: [],
-    inspectorPanes: [],
     interaction: { hoveredLayerId: null },
     layerSurface: [],
     layout: DEFAULT_WORKBENCH_LAYOUT,
@@ -43,6 +43,8 @@ export function createMockWorkbenchApi(
     statusBarItemRenderers: [],
     toolbarItems: [],
     viewContainers: [],
+    viewLocations: {},
+    viewPanels: [],
     ...overrides,
   };
   const executeCommand = vi.fn(async () => true);
@@ -56,6 +58,17 @@ export function createMockWorkbenchApi(
     executeCommand,
     getService: () => {},
     getSnapshot: () => state,
+    setActiveContainer: (
+      location: 'primary' | 'secondary',
+      containerId: string
+    ) => {
+      state.activeContainerByLocation = {
+        ...state.activeContainerByLocation,
+        [location]: containerId,
+      };
+      state.revision += 1;
+      notify();
+    },
     setHoveredLayer: (layerId: string | null) => {
       if (state.interaction.hoveredLayerId === layerId) {
         return;

@@ -6,6 +6,7 @@ export {
   type WorkbenchControllerOptions,
   type WorkbenchState,
   type ViewContainerDescriptor,
+  type ViewContent,
   type ViewDescriptor,
   type ViewTreeItem,
   type LayerSurfaceItem,
@@ -31,7 +32,10 @@ export {
   TreeDataProvider,
   type SidebarBehavior,
   type TreeItem,
+  type ViewContainerLocation,
 } from './contributions/view-contribution';
+export { WORKBENCH_INSPECTOR_CONTAINER_ID } from './workbench/inspector-container';
+export { ViewLocationService } from './workbench/view-location-service';
 export {
   createWorkbenchPluginContext,
   type WorkbenchPluginContext,
@@ -143,5 +147,6 @@ export type {
 export type {
   InspectorPaneRegistration,
   FieldRendererRegistration,
+  ViewPanelRegistration,
 } from './workbench/inspector-pane-registration';
 export type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';

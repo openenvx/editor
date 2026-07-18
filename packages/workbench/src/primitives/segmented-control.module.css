@@ -12,13 +12,6 @@
   padding: 2px;
 }
 
-.tabs {
-  width: 100%;
-  padding: 3px;
-  border-radius: var(--wb-radius-md);
-  background: var(--wb-muted);
-}
-
 .option {
   display: inline-flex;
   align-items: center;
@@ -45,12 +38,6 @@
   padding: 0;
 }
 
-.tabs .option {
-  flex: 1;
-  height: 26px;
-  padding: 0 var(--wb-space-2);
-}
-
 .option:hover {
   color: var(--wb-foreground);
 }
@@ -64,12 +51,6 @@
 .inspector .optionActive {
   background: var(--wb-background);
   box-shadow: var(--wb-shadow-xs);
-}
-
-.tabs .optionActive {
-  background: var(--wb-sidebar-segment-active);
-  border-color: var(--wb-border-subtle);
-  box-shadow: none;
 }
 
 .fullWidth {

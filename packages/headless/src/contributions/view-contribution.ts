@@ -6,6 +6,9 @@ import { WorkbenchContributionPoint } from '../workbench-contributions/workbench
 
 export type SidebarBehavior = 'panel' | 'dropdown' | 'command';
 
+/** Where a view container is shown in the workbench shell. */
+export type ViewContainerLocation = 'primary' | 'secondary';
+
 export interface TreeItem {
   id: string;
   label: string;
@@ -59,6 +62,8 @@ export abstract class ViewContainerContribution extends WorkbenchContribution {
   sidebarOrder?: number;
   sidebarGroup?: number;
   commandId?: string;
+  /** Default workbench location. Defaults to `'primary'`. */
+  defaultLocation?: ViewContainerLocation;
 
   contributeMenu?(builder: MenuBuilder, ctx: ContributionBuildContext): void;
 }
@@ -77,4 +82,10 @@ export abstract class ViewContribution extends WorkbenchContribution {
   collapsible?: boolean;
   initialCollapsed?: boolean;
   when?: string;
+  /**
+   * When set, the view renders a registered React panel instead of a tree.
+   * Resolve via `registerViewPanel(componentId, Component)`.
+   * Works in both primary and secondary view containers.
+   */
+  componentId?: string;
 }

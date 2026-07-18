@@ -17,7 +17,9 @@ import { normalizeScene } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import { InspectorPaneContribution } from './contributions/inspector-pane-contribution';
+import { ViewContainerContribution } from './contributions/view-contribution';
 import { createInspectorPane } from './inspector/inspector-pane-builder';
+import { WORKBENCH_INSPECTOR_CONTAINER_ID } from './workbench/inspector-container';
 import { WorkbenchController } from './workbench-controller';
 import { WorkbenchPlugin } from './workbench-plugin';
 import type { WorkbenchPluginContext } from './workbench-plugin-context';
@@ -103,12 +105,29 @@ class LayerSelectedInspectorPane extends InspectorPaneContribution {
   }
 }
 
+class InspectorContainer extends ViewContainerContribution {
+  readonly id = WORKBENCH_INSPECTOR_CONTAINER_ID;
+  readonly title = 'Inspector';
+  readonly defaultLocation = 'secondary' as const;
+}
+
+class LayersContainer extends ViewContainerContribution {
+  readonly id = 'test.layers';
+  readonly title = 'Layers';
+  readonly defaultLocation = 'primary' as const;
+  readonly sidebarBehavior = 'panel' as const;
+}
+
 class InspectorWorkbenchPlugin extends WorkbenchPlugin {
   readonly id = 'inspector';
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
     ctx.register(new TestLayer());
-    ctx.registerWorkbench(new LayerSelectedInspectorPane());
+    ctx.registerWorkbench(
+      new LayersContainer(),
+      new InspectorContainer(),
+      new LayerSelectedInspectorPane()
+    );
   }
 }
 
@@ -142,13 +161,11 @@ describe('WorkbenchStateCache', () => {
     });
     await controller.start();
     const cache = controller.getStateCacheForTest();
-    const initialViewContainers = controller.getState().viewContainers;
     const sceneRebuildsBefore = cache.rebuildCounts.scene;
 
     controller.selectLayers(['b'], 'b');
 
     expect(cache.rebuildCounts.scene).toBe(sceneRebuildsBefore);
-    expect(controller.getState().viewContainers).toBe(initialViewContainers);
     expect(controller.getState().selection.primaryLayerId).toBe('b');
   });
 
@@ -196,7 +213,7 @@ describe('WorkbenchStateCache', () => {
     expect(cache.rebuildCounts.scene).toBe(sceneRebuildsBefore + 1);
   });
 
-  it('updates inspectorPanes on selection-only changes without full scene rebuild', async () => {
+  it('updates inspector views on selection-only changes without full scene rebuild', async () => {
     const controller = new WorkbenchController({
       initialScene: createAbsoluteSceneWithoutSelection(),
       plugins: [new InspectorWorkbenchPlugin()],
@@ -205,17 +222,32 @@ describe('WorkbenchStateCache', () => {
     const cache = controller.getStateCacheForTest();
     const sceneRebuildsBefore = cache.rebuildCounts.scene;
 
-    const paneIds = () =>
-      controller
+    const nonInspectorBefore = controller
+      .getState()
+      .viewContainers.filter((c) => c.id !== 'workbench.inspector');
+
+    const paneIds = () => {
+      const inspector = controller
         .getState()
-        .inspectorPanes.map((pane) => pane.id)
+        .viewContainers.find((c) => c.id === 'workbench.inspector');
+      return (inspector?.views ?? [])
+        .map((view) => view.id)
         .filter((id) => id === 'test.layer-selected');
+    };
 
     expect(paneIds()).toEqual([]);
 
     controller.selectLayers(['a'], 'a');
     expect(cache.rebuildCounts.scene).toBe(sceneRebuildsBefore);
     expect(paneIds()).toEqual(['test.layer-selected']);
+
+    const nonInspectorAfterSelect = controller
+      .getState()
+      .viewContainers.filter((c) => c.id !== 'workbench.inspector');
+    expect(nonInspectorAfterSelect).toHaveLength(nonInspectorBefore.length);
+    for (let i = 0; i < nonInspectorBefore.length; i += 1) {
+      expect(nonInspectorAfterSelect[i]).toBe(nonInspectorBefore[i]);
+    }
 
     controller.selectLayers([], null);
     expect(cache.rebuildCounts.scene).toBe(sceneRebuildsBefore);

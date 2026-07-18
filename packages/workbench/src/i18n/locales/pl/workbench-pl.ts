@@ -30,6 +30,7 @@ export default {
   'commandPalette.noResults': 'Brak wyników.',
   'commandPalette.other': 'Inne',
   'inspector.empty': 'Wybierz warstwę, aby edytować właściwości',
+  'viewContainer.workbench.inspector.title': 'Inspektor',
   'confirm.confirm': 'Potwierdź',
   'confirm.cancel': 'Anuluj',
   'combobox.search': 'Szukaj…',

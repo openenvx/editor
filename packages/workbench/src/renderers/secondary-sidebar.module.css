@@ -1,0 +1,18 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.tabs {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tabsHeader {
+  flex-shrink: 0;
+  padding: var(--wb-space-2) var(--wb-space-3);
+}

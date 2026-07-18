@@ -52,7 +52,8 @@ OpenEnvx should not stop at parity. These are existing or planned edges.
 | Differentiator | Status | Where | Notes |
 | --- | --- | --- | --- |
 | AI agent automation / scene proposals | **Done** (expand) | `packages/agent`, `apps/agent-service` | Programmatic layout generation and proposal apply — core product wedge. |
-| Plugin / contribution architecture | **Done** (expand) | `packages/core`, `packages/headless`, `packages/canvas` | Extensible layer types, commands, sidebars, inspectors — not a closed monolith. |
+| Plugin / contribution architecture | **Done** (expand) | `packages/core`, `packages/headless`, `packages/canvas` | Extensible layer types, commands, sidebars, inspectors — not a closed monolith. Primary/secondary view-container locations + content kinds (`tree` / `properties` / `component`) for relocation-ready panes. |
+| Secondary sidebar tabs | **Done** | Pro UI (`packages/workbench`, `ViewLocationService`) | Right sidebar Radix tabs; Inspector + Version (demo stub) as secondary view containers. |
 | Headless controller + schema-first | **Done** (expand) | `packages/headless`, `packages/schema`, `packages/core` scene store | Server-safe scene mutation, reproducible JSON, automation without the React shell. |
 | Template policy / frozen layers | **Partial** | Schema `writeMode` / lock + template constraints | Constrained editing for marketing templates; deepen policy surface. |
 | Dynamic templates / data binding | **Done** | OSS + Pro UI | `packages/schema/src/template.ts` (`extractTemplateManifest`, `applyModifications`, `validateTemplateNames`); canvas-pro Template data panel; contract: [apps/docs/template-api-contract.md](apps/docs/template-api-contract.md) | Bannerbear-style modifications by unique layer `name` (`text`, `imageUrl`, `color`, `fontFamily`, `fontSize`, `hidden`). Shrink-to-fit text + image fit/focal point at render time. |

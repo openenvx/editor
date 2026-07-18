@@ -22,11 +22,15 @@ import type { MenuItemDescriptor } from './builders/menu-builder';
 import type { StatusBarItemDescriptor } from './builders/status-bar-builder';
 import type { ToolbarItemDescriptor } from './builders/toolbar-builder';
 import type { OverlayDescriptor } from './contributions/overlay-contribution';
-import type { SidebarBehavior } from './contributions/view-contribution';
+import type {
+  SidebarBehavior,
+  ViewContainerLocation,
+} from './contributions/view-contribution';
+import type { InspectorLayoutNode } from './inspector/inspector-layout-node';
 import type { EditorPaneRegistration } from './workbench/editor-pane-host-props';
 import type {
   FieldRendererRegistration,
-  InspectorPaneRegistration,
+  ViewPanelRegistration,
 } from './workbench/inspector-pane-registration';
 import type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
 import type { WorkbenchLayout } from './workbench/workbench-layout';
@@ -47,6 +51,11 @@ export interface ViewTreeItem {
   editLabel?: string;
 }
 
+export type ViewContent =
+  | { kind: 'tree'; items: ViewTreeItem[] }
+  | { kind: 'properties'; nodes: InspectorLayoutNode[] }
+  | { kind: 'component'; componentId: string };
+
 export interface ViewDescriptor {
   id: string;
   containerId: string;
@@ -56,8 +65,8 @@ export interface ViewDescriptor {
   viewHover: 'layer' | 'page' | 'none';
   collapsible: boolean;
   initialCollapsed: boolean;
-  items: ViewTreeItem[];
   supportsReorder: boolean;
+  content: ViewContent;
 }
 
 export interface ViewContainerDescriptor {
@@ -69,6 +78,7 @@ export interface ViewContainerDescriptor {
   sidebarGroup: number;
   commandId?: string;
   menuItems?: MenuItemDescriptor[];
+  location: ViewContainerLocation;
   views: ViewDescriptor[];
 }
 
@@ -83,6 +93,8 @@ export interface WorkbenchState {
   selection: Selection;
   interaction: InteractionState;
   viewContainers: ViewContainerDescriptor[];
+  viewLocations: Record<string, ViewContainerLocation>;
+  activeContainerByLocation: Record<ViewContainerLocation, string | null>;
   properties: PropertySectionDescriptor[] | null;
   contextMenu: MenuItemDescriptor[];
   commandPalette: CommandPaletteDescriptor;
@@ -95,8 +107,8 @@ export interface WorkbenchState {
   contextKeys: Record<string, boolean | string | number>;
   editorPaneKind: string;
   editorPanes: EditorPaneRegistration[];
-  inspectorPanes: InspectorPaneRegistration[];
   fieldRenderers: FieldRendererRegistration[];
+  viewPanels: ViewPanelRegistration[];
   editor: EditorInput | null;
   layout: WorkbenchLayout;
 }
@@ -123,6 +135,11 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   ) => void;
   selectLayers: (layerIds: string[], primaryLayerId?: string | null) => void;
   setHoveredLayer: (layerId: string | null) => void;
+  setActiveContainer: (
+    location: ViewContainerLocation,
+    containerId: string
+  ) => void;
+  moveContainer: (containerId: string, location: ViewContainerLocation) => void;
   getService: <T>(token: ServiceId<T>) => T | undefined;
   undo: () => boolean;
   redo: () => boolean;
