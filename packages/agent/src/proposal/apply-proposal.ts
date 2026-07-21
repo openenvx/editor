@@ -6,13 +6,23 @@ import {
   walkLayers,
 } from '@openenvx/core';
 import type { WorkbenchApi } from '@openenvx/headless';
-import type { Scene } from '@openenvx/schema';
+import { normalizeScene, type Scene } from '@openenvx/schema';
 
 import type {
   CreateLayerChange,
   ProposedChange,
 } from '../schemas/proposed-changes';
 import { buildLayerFromChange } from './normalize-create-layer';
+
+/** Agent payloads are often slightly off-schema; skip rather than abort the batch. */
+function isNormalizable(scene: Scene): boolean {
+  try {
+    normalizeScene(scene);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function setNestedValue(
   target: Record<string, unknown>,
@@ -166,12 +176,12 @@ export async function applyProposedChanges(
         let next = scene;
         for (const change of createChanges) {
           const result = applyCreateLayerToScene(next, change, activePageId);
-          next = result.scene;
-          if (result.applied) {
-            createApplied += 1;
-          } else {
+          if (!result.applied || !isNormalizable(result.scene)) {
             createSkipped += 1;
+            continue;
           }
+          next = result.scene;
+          createApplied += 1;
         }
         return next;
       },
@@ -187,15 +197,26 @@ export async function applyProposedChanges(
   }
 
   if (propertyChanges.length > 0) {
+    let propertyApplied = 0;
+    let propertySkipped = 0;
     api.scene.apply({
-      apply: (scene) =>
-        propertyChanges.reduce(
-          (next, change) => applyPropertyChangeToScene(next, change),
-          scene
-        ),
+      apply: (scene) => {
+        let next = scene;
+        for (const change of propertyChanges) {
+          const candidate = applyPropertyChangeToScene(next, change);
+          if (candidate === next || !isNormalizable(candidate)) {
+            propertySkipped += 1;
+            continue;
+          }
+          next = candidate;
+          propertyApplied += 1;
+        }
+        return next;
+      },
       label: summary ?? 'Agent changes',
     });
-    applied += propertyChanges.length;
+    applied += propertyApplied;
+    skipped += propertySkipped;
   }
 
   for (const change of commandChanges) {

@@ -30,6 +30,7 @@ vi.mock('@openenvx/schema', () => ({
     scaleX: 1,
     scaleY: 1,
   }),
+  normalizeScene: (scene: unknown) => scene,
 }));
 
 describe('proposedChangeSchema', () => {
@@ -102,10 +103,38 @@ describe('applyProposedChanges', () => {
   });
 
   it('batches updateProperty changes in a single scene.apply transaction', async () => {
+    const { findLayerById, updateLayerInTree } = await import('@openenvx/core');
+    vi.mocked(findLayerById).mockReturnValue({
+      id: 'layer-a',
+      type: 'canvas.rect',
+      data: {},
+    } as never);
+    vi.mocked(updateLayerInTree).mockImplementation(
+      (layers, _id, update) => layers.map((layer) => update(layer as never))
+    );
+
     const api = {
       selectLayers: vi.fn(),
       scene: {
-        apply: vi.fn(),
+        apply: vi.fn(
+          (transaction: {
+            apply: (scene: {
+              pages: { id: string; layers: { id: string; data: object }[] }[];
+            }) => unknown;
+          }) => {
+            transaction.apply({
+              pages: [
+                {
+                  id: 'page-1',
+                  layers: [
+                    { id: 'layer-a', data: {} },
+                    { id: 'layer-b', data: {} },
+                  ],
+                },
+              ],
+            });
+          }
+        ),
       },
       runCommand: vi.fn(),
     } as unknown as WorkbenchApi;

@@ -168,8 +168,10 @@ export class SceneStore {
 
   apply(transaction: SceneTransaction): void {
     const snapshot = this.getSnapshot();
+    // Normalize before history push so invalid transactions leave no side effects.
+    const nextScene = normalizeScene(transaction.apply(cloneScene(this.scene)));
     this.history.push(snapshot);
-    this.scene = normalizeScene(transaction.apply(cloneScene(this.scene)));
+    this.scene = nextScene;
     if (transaction.activePageId) {
       this.editorState = normalizeEditorState(
         {

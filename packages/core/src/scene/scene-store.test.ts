@@ -3,6 +3,66 @@ import { describe, expect, it } from "vitest";
 import { moveLayerToIndex, reorderLayers, SceneStore } from "./scene-store";
 
 describe(SceneStore, () => {
+  it("does not push history when normalize rejects the transaction", () => {
+    const store = new SceneStore(
+      {
+        schemaVersion: 2,
+        pages: [
+          {
+            id: "p1",
+            name: "Page",
+            layout: "absolute",
+            width: 100,
+            height: 100,
+            layers: [
+              {
+                id: "t1",
+                type: "canvas.text",
+                data: { html: "<p>Hi</p>", align: "left" },
+                transform: {
+                  x: 0,
+                  y: 0,
+                  width: 100,
+                  height: 40,
+                  rotation: 0,
+                  scaleX: 1,
+                  scaleY: 1,
+                  opacity: 1,
+                },
+              },
+            ],
+          },
+        ],
+      },
+      { activePageId: "p1", primaryLayerId: null, selectedLayerIds: [] }
+    );
+
+    expect(() =>
+      store.apply({
+        apply: (scene) => ({
+          ...scene,
+          pages: scene.pages.map((page) => ({
+            ...page,
+            layers: page.layers.map((layer) =>
+              layer.id === "t1"
+                ? {
+                    ...layer,
+                    data: { ...(layer.data as object), align: "justify" },
+                  }
+                : layer
+            ),
+          })),
+        }),
+        label: "Bad align",
+      })
+    ).toThrow(/normalize/i);
+
+    expect(store.canUndo()).toBe(false);
+    expect(
+      (store.getScene().pages[0]!.layers[0]!.data as { align?: string }).align
+    ).toBe("left");
+  });
+
   it("applies transactions with undo", () => {
     const store = new SceneStore();
     const pageId = store.getScene().pages[0]!.id;

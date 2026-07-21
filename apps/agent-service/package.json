@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250710.0",
+    "@openenvx/core": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
     "typescript": "6.0.3",
     "vitest": "4.1.10",

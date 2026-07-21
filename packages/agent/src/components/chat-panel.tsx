@@ -91,6 +91,7 @@ export const ChatPanel = memo(() => {
     useState<ProposedChangesPayload | null>(null);
   const [autoApply, setAutoApply] = useState(readAutoApplyPreference);
   const [applying, setApplying] = useState(false);
+  const [applyError, setApplyError] = useState<string | null>(null);
   const [hasInput, setHasInput] = useState(false);
   const [activeTasks, setActiveTasks] = useState<AgentTaskEvent[]>([]);
   const autoAppliedRef = useRef<string | null>(null);
@@ -103,6 +104,7 @@ export const ChatPanel = memo(() => {
   const resetEphemeralState = useCallback(() => {
     setPendingProposal(null);
     setActiveTasks([]);
+    setApplyError(null);
     autoAppliedRef.current = null;
   }, []);
 
@@ -154,7 +156,14 @@ export const ChatPanel = memo(() => {
     onResetEphemeral: resetEphemeralState,
   });
 
-  const { messages, sendMessage, setMessages, status, error, stop } = useChat({
+  const {
+    messages,
+    sendMessage,
+    setMessages,
+    status,
+    error: chatError,
+    stop,
+  } = useChat({
     id: activeThreadId ?? 'pending-thread',
     transport,
   });
@@ -174,11 +183,18 @@ export const ChatPanel = memo(() => {
   }, [activeThreadId, hydrateMessagesRef, setMessages]);
 
   const handleApplyProposal = useCallback(
-    async (proposal: ProposedChangesPayload) => {
+    async (proposal: ProposedChangesPayload): Promise<boolean> => {
       setApplying(true);
       try {
         await applyProposedChanges(api, proposal.changes, proposal.summary);
         setPendingProposal(null);
+        setApplyError(null);
+        return true;
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Failed to apply changes';
+        setApplyError(message);
+        return false;
       } finally {
         setApplying(false);
       }
@@ -208,9 +224,16 @@ export const ChatPanel = memo(() => {
         if (autoAppliedRef.current === proposalKey) {
           continue;
         }
+        // Mark in-flight so streaming updates don't double-apply; clear on
+        // auto-apply failure so the user can retry via the proposal card.
         autoAppliedRef.current = proposalKey;
         if (autoApply) {
-          void handleApplyProposal(proposal);
+          void handleApplyProposal(proposal).then((ok) => {
+            if (!ok) {
+              autoAppliedRef.current = null;
+              setPendingProposal(proposal);
+            }
+          });
         } else {
           setPendingProposal(proposal);
         }
@@ -339,13 +362,16 @@ export const ChatPanel = memo(() => {
                 setAutoApply(enabled);
                 writeAutoApplyPreference(enabled);
               }}
-              onReject={() => setPendingProposal(null)}
+              onReject={() => {
+                setPendingProposal(null);
+                setApplyError(null);
+              }}
               proposal={pendingProposal}
             />
           ) : null}
         </ConversationContent>
       </Conversation>
-      <PromptInputError>{error?.message}</PromptInputError>
+      <PromptInputError>{applyError ?? chatError?.message}</PromptInputError>
       <PromptInput onSubmit={handleSubmit}>
         <PromptInputTextarea
           disabled={isBusy || historyBusy}
