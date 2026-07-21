@@ -10,8 +10,10 @@ import { PlaceholderPreviewRenderer } from './preview/placeholder-preview-render
 import { RectPreviewRenderer } from './preview/rect-preview-renderer';
 import { RichTextPreviewRenderer } from './preview/rich-text-preview-renderer';
 import { StackPreviewRenderer } from './preview/stack-preview-renderer';
+import { SvgPreviewRenderer } from './preview/svg-preview-renderer';
 import { RectCanvasRenderer } from './rect-canvas-renderer';
 import { RichTextCanvasRenderer } from './rich-text-canvas-renderer';
+import { SvgCanvasRenderer } from './svg-canvas-renderer';
 
 class RectCanvasRendererContribution extends CanvasLayerRendererContribution {
   readonly kind = 'rect';
@@ -28,6 +30,11 @@ class ImageCanvasRendererContribution extends CanvasLayerRendererContribution {
   readonly Component = ImageCanvasRenderer;
 }
 
+class SvgCanvasRendererContribution extends CanvasLayerRendererContribution {
+  readonly kind = 'svg';
+  readonly Component = SvgCanvasRenderer;
+}
+
 class RichTextCanvasRendererContribution extends CanvasLayerRendererContribution {
   readonly kind = 'richText';
   readonly Component = RichTextCanvasRenderer;
@@ -41,6 +48,11 @@ class PlaceholderCanvasRendererContribution extends CanvasLayerRendererContribut
 class ImagePreviewRendererContribution extends LayerPreviewRendererContribution {
   readonly kind = 'image';
   readonly Component = ImagePreviewRenderer;
+}
+
+class SvgPreviewRendererContribution extends LayerPreviewRendererContribution {
+  readonly kind = 'svg';
+  readonly Component = SvgPreviewRenderer;
 }
 
 class StackPreviewRendererContribution extends LayerPreviewRendererContribution {
@@ -67,12 +79,14 @@ export const builtinCanvasRendererContributions = [
   new RectCanvasRendererContribution(),
   new EllipseCanvasRendererContribution(),
   new ImageCanvasRendererContribution(),
+  new SvgCanvasRendererContribution(),
   new RichTextCanvasRendererContribution(),
   new PlaceholderCanvasRendererContribution(),
 ];
 
 export const builtinLayerPreviewRendererContributions = [
   new ImagePreviewRendererContribution(),
+  new SvgPreviewRendererContribution(),
   new StackPreviewRendererContribution(),
   new RichTextPreviewRendererContribution(),
   new PlaceholderPreviewRendererContribution(),

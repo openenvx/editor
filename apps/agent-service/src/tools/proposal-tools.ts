@@ -104,12 +104,12 @@ export function createProposalTools(requestToken: object) {
   const createLayer = createTool({
     id: 'propose-create-layer',
     description:
-      'Propose creating a new layer on the active page. Use exact types: canvas.text, canvas.rect, canvas.image, canvas.group, canvas.circle. For canvas.text, data.html is required (wrap copy in <p>…</p>); use align not textAlign.',
+      'Propose creating a new layer on the active page. Use exact types: canvas.text, canvas.rect, canvas.image, canvas.svg, canvas.group, canvas.circle. For canvas.text, data.html is required (wrap copy in <p>…</p>); use align not textAlign. For canvas.svg, data.svg is required. For canvas.image, data.assetRef must be a durable URL.',
     inputSchema: z.object({
       type: z
         .string()
         .describe(
-          'Exact layer type: canvas.text | canvas.rect | canvas.image | canvas.group | canvas.circle'
+          'Exact layer type: canvas.text | canvas.rect | canvas.image | canvas.svg | canvas.group | canvas.circle'
         ),
       id: z.string().optional(),
       parentId: z

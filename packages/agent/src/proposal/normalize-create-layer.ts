@@ -7,6 +7,7 @@ const LAYER_TYPE_ALIASES: Record<string, string> = {
   rect: 'canvas.rect',
   rectangle: 'canvas.rect',
   image: 'canvas.image',
+  svg: 'canvas.svg',
   group: 'canvas.group',
   circle: 'canvas.circle',
 };
@@ -57,6 +58,12 @@ export function normalizeLayerData(
   }
   if (type === 'canvas.rect' && typeof record.fill !== 'string') {
     return { fill: '#cccccc', ...record };
+  }
+  if (type === 'canvas.svg' && typeof record.svg !== 'string') {
+    return {
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"></svg>',
+      ...record,
+    };
   }
   return record;
 }

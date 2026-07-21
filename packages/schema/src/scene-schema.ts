@@ -118,6 +118,18 @@ function build(o: typeof z.object) {
       .describe('Focus used when fit is cover (defaults to center).'),
   }).passthrough();
 
+  const canvasSvgData = o({
+    fill: z.string().optional().describe('Optional tint for monochrome icons.'),
+    stroke: z.string().optional().describe('Optional stroke tint.'),
+    svg: z
+      .string()
+      .describe('SVG markup (full <svg> document or inner markup).'),
+    viewBox: z
+      .string()
+      .optional()
+      .describe('Optional viewBox; parsed from svg root when absent.'),
+  });
+
   const canvasTextData = o({
     align: z.enum(['left', 'center', 'right']).optional(),
     autoFit: z
@@ -159,6 +171,11 @@ function build(o: typeof z.object) {
         ...layerBase,
         data: canvasImageData,
         type: z.literal('canvas.image'),
+      }),
+      o({
+        ...layerBase,
+        data: canvasSvgData,
+        type: z.literal('canvas.svg'),
       }),
       o({
         ...layerBase,
@@ -298,6 +315,7 @@ function build(o: typeof z.object) {
     canvasCircleData,
     canvasImageData,
     canvasRectData,
+    canvasSvgData,
     canvasTextData,
     editorState,
     layerShadow,
@@ -336,6 +354,7 @@ export const leafSchemas = {
   canvasCircleData: lenient.leafShapes.canvasCircleData,
   canvasImageData: lenient.leafShapes.canvasImageData,
   canvasRectData: lenient.leafShapes.canvasRectData,
+  canvasSvgData: lenient.leafShapes.canvasSvgData,
   canvasTextData: lenient.leafShapes.canvasTextData,
   editorState: lenient.leafShapes.editorState,
   layerShadow: lenient.leafShapes.layerShadow,

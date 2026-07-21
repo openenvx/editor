@@ -67,6 +67,7 @@ import { CanvasCircleLayer } from '../layers/canvas-circle-layer';
 import { CanvasGroupLayer } from '../layers/canvas-group-layer';
 import { CanvasImageLayer } from '../layers/canvas-image-layer';
 import { CanvasRectLayer } from '../layers/canvas-rect-layer';
+import { CanvasSvgLayer } from '../layers/canvas-svg-layer';
 import { CanvasTextLayer } from '../layers/canvas-text-layer';
 import { resizeSceneToPagePreset } from '../page-resize/apply-page-preset-resize';
 import {
@@ -139,6 +140,23 @@ export class InsertCanvasImageCommand extends Command {
     const page = ctx.scene.getActivePage();
     const layer = new CanvasImageLayer().createDefault(
       createLayerId('image'),
+      page
+    );
+    insertCanvasLayer(ctx, layer);
+  }
+}
+
+export class InsertCanvasSvgCommand extends Command {
+  readonly id = 'canvas.insertSvg';
+
+  canExecute(ctx: CommandContext): boolean {
+    return canInsertOnActivePage(ctx);
+  }
+
+  execute(ctx: CommandContext): void {
+    const page = ctx.scene.getActivePage();
+    const layer = new CanvasSvgLayer().createDefault(
+      createLayerId('svg'),
       page
     );
     insertCanvasLayer(ctx, layer);
@@ -244,11 +262,13 @@ export class CanvasBasicsPlugin extends Plugin {
       new CanvasI18nBundle(),
       new CanvasTextLayer(),
       new CanvasImageLayer(),
+      new CanvasSvgLayer(),
       new CanvasRectLayer(),
       new CanvasCircleLayer(),
       new CanvasGroupLayer(),
       new InsertCanvasTextCommand(),
       new InsertCanvasImageCommand(),
+      new InsertCanvasSvgCommand(),
       new InsertCanvasRectCommand(),
       new InsertCanvasCircleCommand(),
       new InsertCanvasGroupCommand(),

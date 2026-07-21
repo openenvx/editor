@@ -78,6 +78,32 @@ const imageSerializer: PreviewKindSvgSerializer = {
   },
 };
 
+const svgSerializer: PreviewKindSvgSerializer = {
+  kind: 'svg',
+  toSvgFragment(descriptor, ctx) {
+    const view = descriptor as Extract<LayerPreviewDescriptor, { kind: 'svg' }>;
+    const { bounds } = ctx;
+    let markup = view.svg.trim();
+    markup = markup
+      .replaceAll(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+      .replaceAll(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, '');
+    if (view.fill) {
+      markup = markup.replaceAll('currentColor', view.fill);
+    }
+    if (/^<svg[\s>]/i.test(markup)) {
+      return markup.replace(/^<svg\b([^>]*)>/i, (_match, attrs: string) => {
+        const cleaned = attrs.replaceAll(
+          /\s(x|y|width|height)\s*=\s*(['"]).*?\2/gi,
+          ''
+        );
+        return `<svg x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}"${cleaned}>`;
+      });
+    }
+    const vb = view.viewBox ?? '0 0 24 24';
+    return `<svg xmlns="http://www.w3.org/2000/svg" x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" viewBox="${escapeAttr(vb)}">${markup}</svg>`;
+  },
+};
+
 function resolveImagePreserveAspectRatio(
   view: Extract<LayerPreviewDescriptor, { kind: 'image' }>
 ): string {
@@ -308,6 +334,7 @@ const builtinSerializers: PreviewKindSvgSerializer[] = [
   rectSerializer,
   ellipseSerializer,
   imageSerializer,
+  svgSerializer,
   richTextSerializer,
   stackSerializer,
   placeholderSerializer,

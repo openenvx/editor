@@ -143,6 +143,43 @@ describe('schema', () => {
     expect(result.valid).toBe(false);
   });
 
+  it('accepts canvas.svg with svg markup', () => {
+    const result = validateScene({
+      pages: [
+        {
+          id: 'p1',
+          layout: 'flow',
+          name: 'Page',
+          layers: [
+            {
+              id: 'svg-1',
+              type: 'canvas.svg',
+              data: {
+                svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4"/></svg>',
+                fill: '#111',
+              },
+            },
+          ],
+        },
+      ],
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('rejects canvas.svg without svg', () => {
+    const result = validateScene({
+      pages: [
+        {
+          id: 'p1',
+          layout: 'flow',
+          name: 'Page',
+          layers: [{ id: 'svg-1', type: 'canvas.svg', data: {} }],
+        },
+      ],
+    });
+    expect(result.valid).toBe(false);
+  });
+
   it('throws when normalizeScene cannot parse input', () => {
     expect(() =>
       normalizeScene({

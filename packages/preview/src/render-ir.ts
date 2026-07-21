@@ -8,6 +8,7 @@ export const SERVER_KNOWN_PREVIEW_KINDS = [
   'rect',
   'ellipse',
   'image',
+  'svg',
   'richText',
   'stack',
   'placeholder',

@@ -1,7 +1,16 @@
 OPENROUTER_API_KEY=
+# Supervisor + design/layout/style (e.g. x-ai/grok-4.5)
 OPENROUTER_MODEL=anthropic/claude-sonnet-4
+# Media / ImageGen tool-routing text model
+OPENROUTER_MEDIA_MODEL=openai/gpt-4.1-mini
+# OpenRouter Images API model
+OPENROUTER_IMAGE_MODEL=openai/gpt-image-2
 # Cap extended thinking (default in code is "low" if unset).
 # none | minimal | low | medium | high | xhigh | max
 OPENROUTER_REASONING_EFFORT=low
 # Optional hard token budget (takes precedence over effort when set).
 # OPENROUTER_REASONING_MAX_TOKENS=1024
+# Unsplash Access Key (stock photo search)
+UNSPLASH_ACCESS_KEY=
+# Optional absolute origin for /assets/:key (defaults to request origin)
+# ASSET_PUBLIC_BASE_URL=http://localhost:8789

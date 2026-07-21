@@ -11,6 +11,8 @@ export {
   type CanvasImageLayer,
   type CanvasRectData,
   type CanvasRectLayer,
+  type CanvasSvgData,
+  type CanvasSvgLayer,
   type CanvasTextData,
   type CanvasTextLayer,
   type CornerRadius,

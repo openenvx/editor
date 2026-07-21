@@ -3,6 +3,13 @@ import type { CornerRadius, LayerShadow, Padding } from '@openenvx/schema';
 export type BuiltinLayerPreviewDescriptor =
   | { kind: 'image'; src: string; alt?: string; [key: string]: unknown }
   | {
+      kind: 'svg';
+      svg: string;
+      viewBox?: string;
+      fill?: string;
+      stroke?: string;
+    }
+  | {
       kind: 'rect';
       fill: string;
       stroke?: string;
@@ -46,6 +53,13 @@ export type LayerPreviewDescriptor =
 export class LayerPreviewBuilder {
   image(src: string, alt?: string): LayerPreviewDescriptor {
     return { alt, kind: 'image', src };
+  }
+
+  svg(
+    svg: string,
+    options?: { viewBox?: string; fill?: string; stroke?: string }
+  ): LayerPreviewDescriptor {
+    return { kind: 'svg', svg, ...options };
   }
 
   rect(

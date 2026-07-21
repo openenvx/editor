@@ -123,6 +123,7 @@ export {
   createCanvasDemoScene,
   InsertCanvasTextCommand,
   InsertCanvasImageCommand,
+  InsertCanvasSvgCommand,
   InsertCanvasRectCommand,
   InsertCanvasCircleCommand,
   UploadAssetCommand,
@@ -153,6 +154,11 @@ export {
   canvasImageSchema,
   type CanvasImageModel,
 } from './layers/canvas-image-layer';
+export {
+  CanvasSvgLayer,
+  canvasSvgSchema,
+  type CanvasSvgModel,
+} from './layers/canvas-svg-layer';
 export {
   CanvasRectLayer,
   canvasRectSchema,

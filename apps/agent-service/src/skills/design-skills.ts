@@ -18,7 +18,7 @@ Structure the invitation with clear hierarchy:
 - Generous margins; center or elegant asymmetric column.
 - Vertical rhythm: largest gap between hero and body, tighter within body.
 - Keep decorative flourishes secondary to readable type.
-- When creating layers, use OpenEnvx types \`canvas.text\` and \`canvas.rect\` (never bare "text"/"rect").
+- When creating layers, use OpenEnvx types \`canvas.text\`, \`canvas.rect\`, \`canvas.image\`, and \`canvas.svg\` (never bare "text"/"rect").
 - Text content goes in data.html as HTML, e.g. \`<p>June 14, 2025</p>\`, with align: "center".
 
 ### Content checklist

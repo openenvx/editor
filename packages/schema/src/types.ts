@@ -70,6 +70,7 @@ export type LayerWriteMode = (typeof LAYER_WRITE_MODES)[number];
 export const BUILTIN_LAYER_TYPES = [
   'canvas.rect',
   'canvas.image',
+  'canvas.svg',
   'canvas.text',
   'canvas.circle',
   'canvas.group',
@@ -122,6 +123,16 @@ export interface CanvasImageData {
   /** Focus used when `fit` is `cover` (defaults to center). */
   focalPoint?: FocalPoint;
   [key: string]: unknown;
+}
+
+export interface CanvasSvgData {
+  /** Full SVG markup (`<svg>…</svg>`) or inner vector markup. */
+  svg: string;
+  /** Optional viewBox; when absent, parsed from the svg root if present. */
+  viewBox?: string;
+  /** Optional tint for monochrome icons (e.g. currentColor icons). */
+  fill?: string;
+  stroke?: string;
 }
 
 export type TextAutoFit = 'none' | 'shrink';
@@ -177,6 +188,11 @@ export interface CanvasImageLayer extends LayerBase {
   data: CanvasImageData;
 }
 
+export interface CanvasSvgLayer extends LayerBase {
+  type: 'canvas.svg';
+  data: CanvasSvgData;
+}
+
 export interface CanvasTextLayer extends LayerBase {
   type: 'canvas.text';
   data: CanvasTextData;
@@ -201,6 +217,7 @@ export interface PluginLayer extends LayerBase {
 export type Layer =
   | CanvasRectLayer
   | CanvasImageLayer
+  | CanvasSvgLayer
   | CanvasTextLayer
   | CanvasCircleLayer
   | CanvasGroupLayer

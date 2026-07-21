@@ -4,7 +4,13 @@ import { z } from 'zod';
 
 import { emitAgentTask } from '../request-context';
 
-const specialistIdSchema = z.enum(['design', 'layout', 'style']);
+const specialistIdSchema = z.enum([
+  'design',
+  'layout',
+  'style',
+  'media',
+  'imageGen',
+]);
 
 const specialistAdviceSchema = z.object({
   agentId: z.string(),
@@ -98,14 +104,23 @@ export function createParallelSpecialistsTool(options: {
   designAgent: Agent;
   layoutAgent: Agent;
   styleAgent: Agent;
+  mediaAgent: Agent;
+  imageGenAgent: Agent;
   requestToken: object;
 }) {
-  const { designAgent, layoutAgent, styleAgent, requestToken } = options;
+  const {
+    designAgent,
+    layoutAgent,
+    styleAgent,
+    mediaAgent,
+    imageGenAgent,
+    requestToken,
+  } = options;
 
   return createTool({
     id: 'run-parallel-specialists',
     description:
-      'Run selected design, layout, and/or style specialists in parallel when their tasks are independent. Pass `agents` to choose which specialists run; omit to run all three. Returns merged advice for you to synthesize into proposals.',
+      'Run selected specialists in parallel when their tasks are independent. Pass `agents` to choose which run (design, layout, style, media, imageGen); omit to run design+layout+style. Returns merged advice for you to synthesize into proposals.',
     inputSchema: z.object({
       brief: z.string().describe('Overall task brief for all specialists'),
       sceneSummary: z.string().describe('Compact scene summary text'),
@@ -128,13 +143,21 @@ export function createParallelSpecialistsTool(options: {
         .string()
         .optional()
         .describe('Optional override prompt for the style specialist'),
+      mediaPrompt: z
+        .string()
+        .optional()
+        .describe('Optional override prompt for the media specialist'),
+      imageGenPrompt: z
+        .string()
+        .optional()
+        .describe('Optional override prompt for the imageGen specialist'),
     }),
     execute: async (inputData) => {
       const selected = new Set(
         inputData.agents ?? (['design', 'layout', 'style'] as const)
       );
 
-      const [design, layout, style] = await Promise.all([
+      const [design, layout, style, media, imageGen] = await Promise.all([
         selected.has('design')
           ? runSpecialist({
               agent: designAgent,
@@ -177,6 +200,34 @@ export function createParallelSpecialistsTool(options: {
               requestToken,
             })
           : emptyAdvice('style', 'Skipped'),
+        selected.has('media')
+          ? runSpecialist({
+              agent: mediaAgent,
+              agentId: 'media',
+              label: 'Media',
+              prompt: buildPrompt(
+                'media',
+                inputData.brief,
+                inputData.sceneSummary,
+                inputData.mediaPrompt
+              ),
+              requestToken,
+            })
+          : emptyAdvice('media', 'Skipped'),
+        selected.has('imageGen')
+          ? runSpecialist({
+              agent: imageGenAgent,
+              agentId: 'imageGen',
+              label: 'ImageGen',
+              prompt: buildPrompt(
+                'imageGen',
+                inputData.brief,
+                inputData.sceneSummary,
+                inputData.imageGenPrompt
+              ),
+              requestToken,
+            })
+          : emptyAdvice('imageGen', 'Skipped'),
       ]);
 
       const sections: string[] = [];
@@ -189,11 +240,19 @@ export function createParallelSpecialistsTool(options: {
       if (selected.has('style')) {
         sections.push('## Style', style.advice || style.summary, '');
       }
+      if (selected.has('media')) {
+        sections.push('## Media', media.advice || media.summary, '');
+      }
+      if (selected.has('imageGen')) {
+        sections.push('## ImageGen', imageGen.advice || imageGen.summary, '');
+      }
 
       return {
         design,
         layout,
         style,
+        media,
+        imageGen,
         combined: sections.join('\n').trim(),
       };
     },
@@ -205,5 +264,7 @@ export const parallelSpecialistsOutputSchema = z.object({
   design: specialistAdviceSchema,
   layout: specialistAdviceSchema,
   style: specialistAdviceSchema,
+  media: specialistAdviceSchema,
+  imageGen: specialistAdviceSchema,
   combined: z.string(),
 });

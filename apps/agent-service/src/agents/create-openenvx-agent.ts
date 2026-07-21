@@ -4,16 +4,22 @@ import type { Memory } from '@mastra/memory';
 import { AGENT_COMMAND_CATALOG } from '@openenvx/agent/schemas';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 
+import type { MediaToolDeps } from '../tools/media-tools';
+import { createMediaTools } from '../tools/media-tools';
 import { createProposalTools } from '../tools/proposal-tools';
 import { createSceneTools } from '../tools/scene-tools';
 import { createParallelSpecialistsTool } from '../workflows/parallel-specialists';
 import { createDesignSubagent } from './subagents/design-agent';
+import { createImageGenSubagent } from './subagents/image-gen-agent';
 import { createLayoutSubagent } from './subagents/layout-agent';
+import { createMediaSubagent } from './subagents/media-agent';
 import { createStyleSubagent } from './subagents/style-agent';
 
 export { formatSceneContext } from '../scene/scene-summary';
 
-const DEFAULT_MODEL = 'anthropic/claude-sonnet-4';
+const DEFAULT_MODEL = 'x-ai/grok-4.5';
+const DEFAULT_MEDIA_MODEL = 'openai/gpt-4.1-mini';
+const DEFAULT_IMAGE_MODEL = 'openai/gpt-image-2';
 
 /** Caps extended thinking for interactive editor latency. Override via env. */
 const DEFAULT_REASONING_EFFORT = 'low' as const;
@@ -21,7 +27,8 @@ const DEFAULT_REASONING_EFFORT = 'low' as const;
 const LAYER_TYPE_CATALOG = [
   'canvas.text — rich text; data: { html (required, e.g. "<p>Hello</p>"), fontSize?, fontFamily?, fill?, align?: "left"|"center"|"right", letterSpacing?, lineHeight? }',
   'canvas.rect — rectangle; data: { fill (required), stroke?, strokeWidth?, cornerRadius? }',
-  'canvas.image — image; data: { assetRef, … }',
+  'canvas.image — photo/raster; data: { assetRef (HTTPS URL from Unsplash ingest or generate-image), fit?, alt? }',
+  'canvas.svg — vector icon/graphic; data: { svg (required markup), viewBox?, fill?, stroke? }',
   'canvas.group — container; data: { children: Layer[] }',
   'canvas.circle — circle; data: { fill, … }',
 ].join('\n  - ');
@@ -38,8 +45,13 @@ export type ReasoningEffort =
 export interface CreateAgentOptions {
   apiKey: string;
   modelId?: string;
+  /** Text model for Media specialist (default openai/gpt-4.1-mini). */
+  mediaModelId?: string;
+  /** OpenRouter Images API model (default openai/gpt-image-2). */
+  imageModelId?: string;
   requestToken: object;
   memory?: Memory;
+  media?: Omit<MediaToolDeps, 'openRouterApiKey' | 'imageModelId'>;
   /** OpenRouter reasoning effort. Prefer over maxTokens when the model supports effort. */
   reasoningEffort?: ReasoningEffort;
   /** Hard token budget for reasoning (Anthropic-style). Takes precedence over effort. */
@@ -81,6 +93,12 @@ function buildSystemInstructions(): string {
     'ALWAYS use these exact type strings when creating layers (never bare "text" or "rect"):',
     `  - ${LAYER_TYPE_CATALOG}`,
     '',
+    '## Media',
+    'For stock photos: ask Media (search-unsplash + ingest) or use search-unsplash yourself, then propose canvas.image with the durable assetUrl as assetRef.',
+    'For icons / simple vectors: Media search-icons or draft-svg → propose canvas.svg with data.svg.',
+    'For custom illustrations: ImageGen generate-image → propose canvas.image with assetUrl.',
+    'Prefer Unsplash for real photos; ImageGen when the user needs something unique.',
+    '',
     '## Available commands',
     commandList,
     '',
@@ -94,9 +112,10 @@ function buildSystemInstructions(): string {
     'Use list-layers, get-layer, and get-page when you need details beyond the compact summary.',
     '',
     '## Delegation',
-    'For independent multi-area work (e.g. design direction + layout + style at once), call run-parallel-specialists.',
-    'For a single specialist task, or when one step depends on another, delegate sequentially to design, layout, or style agents.',
+    'For independent multi-area work, call run-parallel-specialists (design, layout, style, media, imageGen).',
+    'For a single specialist task, or when one step depends on another, delegate sequentially.',
     'The design agent owns domain skills (wedding invitations, typography, color harmony).',
+    'Media finds stock/icons/SVG; ImageGen generates custom rasters.',
     '',
     'Be concise and practical. Reference layers and pages by name when possible.',
   ].join('\n');
@@ -110,17 +129,36 @@ export function createOpenEnvxSupervisorAgent(
     extraBody: buildReasoningExtraBody(options),
   });
   const modelId = options.modelId ?? DEFAULT_MODEL;
+  const mediaModelId = options.mediaModelId ?? DEFAULT_MEDIA_MODEL;
+  const imageModelId = options.imageModelId ?? DEFAULT_IMAGE_MODEL;
   const proposalTools = createProposalTools(options.requestToken);
   const sceneTools = createSceneTools(options.requestToken);
+
+  const mediaTools = createMediaTools({
+    openRouterApiKey: options.apiKey,
+    imageModelId,
+    publicBaseUrl: options.media?.publicBaseUrl ?? 'http://localhost:8789',
+    assets: options.media?.assets,
+    unsplashAccessKey: options.media?.unsplashAccessKey,
+    fetchImpl: options.media?.fetchImpl,
+  });
 
   const designAgent = createDesignSubagent(openrouter, modelId);
   const layoutAgent = createLayoutSubagent(openrouter, modelId);
   const styleAgent = createStyleSubagent(openrouter, modelId);
+  const mediaAgent = createMediaSubagent(openrouter, mediaModelId, mediaTools);
+  const imageGenAgent = createImageGenSubagent(
+    openrouter,
+    mediaModelId,
+    mediaTools
+  );
 
   const runParallelSpecialists = createParallelSpecialistsTool({
     designAgent,
     layoutAgent,
     styleAgent,
+    mediaAgent,
+    imageGenAgent,
     requestToken: options.requestToken,
   });
 
@@ -132,13 +170,18 @@ export function createOpenEnvxSupervisorAgent(
     tools: {
       ...proposalTools,
       ...sceneTools,
+      ...mediaTools,
       runParallelSpecialists,
     },
     agents: {
       design: designAgent,
       layout: layoutAgent,
       style: styleAgent,
+      media: mediaAgent,
+      imageGen: imageGenAgent,
     },
     ...(options.memory ? { memory: options.memory } : {}),
   });
 }
+
+export { DEFAULT_IMAGE_MODEL, DEFAULT_MEDIA_MODEL, DEFAULT_MODEL };

@@ -106,4 +106,40 @@ describe('applyProposedChanges against SceneStore', () => {
     expect(store.getScene().pages[0]!.layers).toHaveLength(2);
     expect(store.getScene().pages[0]!.layers[1]!.type).toBe('canvas.text');
   });
+
+  it('applies canvas.svg and canvas.image with HTTPS assetRef', async () => {
+    const store = createStore();
+
+    const result = await applyProposedChanges(apiFor(store), [
+      {
+        kind: 'createLayer',
+        type: 'canvas.svg',
+        id: 'svg-1',
+        data: {
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
+          fill: '#111',
+        },
+      },
+      {
+        kind: 'createLayer',
+        type: 'canvas.image',
+        id: 'img-1',
+        data: {
+          assetRef: 'http://localhost:8789/assets/gen/abc.png',
+          alt: 'generated',
+        },
+      },
+    ]);
+
+    expect(result).toEqual({ applied: 2, skipped: 0 });
+    const layers = store.getScene().pages[0]!.layers;
+    expect(layers).toHaveLength(3);
+    expect(layers.find((layer) => layer.id === 'svg-1')).toMatchObject({
+      type: 'canvas.svg',
+    });
+    expect(layers.find((layer) => layer.id === 'img-1')).toMatchObject({
+      type: 'canvas.image',
+      data: { assetRef: 'http://localhost:8789/assets/gen/abc.png' },
+    });
+  });
 });

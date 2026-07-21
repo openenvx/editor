@@ -20,9 +20,20 @@ describe('parallel-specialists output schema', () => {
         summary: 'Soft palette',
         advice: 'Use ivory background and navy accents',
       },
+      media: {
+        agentId: 'media',
+        summary: 'Stock photo',
+        advice: 'Use Unsplash floral backdrop',
+      },
+      imageGen: {
+        agentId: 'imageGen',
+        summary: 'Skipped',
+        advice: '',
+      },
       combined: '## Design\n...',
     });
     expect(parsed.design.agentId).toBe('design');
     expect(parsed.layout.advice).toContain('Align');
+    expect(parsed.media.agentId).toBe('media');
   });
 });

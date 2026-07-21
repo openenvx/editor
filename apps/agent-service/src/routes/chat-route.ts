@@ -88,8 +88,17 @@ export function registerChatRoute(
       const agent = createOpenEnvxSupervisorAgent({
         apiKey,
         modelId: context.env.OPENROUTER_MODEL,
+        mediaModelId: context.env.OPENROUTER_MEDIA_MODEL,
+        imageModelId: context.env.OPENROUTER_IMAGE_MODEL,
         requestToken,
         memory,
+        media: {
+          assets: context.env.ASSETS,
+          publicBaseUrl:
+            context.env.ASSET_PUBLIC_BASE_URL ??
+            new URL(context.req.url).origin,
+          unsplashAccessKey: context.env.UNSPLASH_ACCESS_KEY,
+        },
         reasoningEffort: parseReasoningEffort(
           context.env.OPENROUTER_REASONING_EFFORT
         ),
