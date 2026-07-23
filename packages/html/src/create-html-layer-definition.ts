@@ -101,12 +101,13 @@ export function createHtmlLayerDefinition(
     }
 
     renderPreview(ctx: LayerPreviewContext<Record<string, unknown>>) {
+      const htmlLabel =
+        typeof ctx.model.html === 'string'
+          ? ctx.model.html.replaceAll(/<[^>]+>/g, '').trim()
+          : '';
       const label =
-        typeof ctx.model.text === 'string'
-          ? ctx.model.text
-          : typeof ctx.model.alt === 'string'
-            ? ctx.model.alt
-            : config.label;
+        htmlLabel ||
+        (typeof ctx.model.alt === 'string' ? ctx.model.alt : config.label);
       return createLayerPreviewBuilder().placeholder(String(label));
     }
   })();

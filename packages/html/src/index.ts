@@ -4,15 +4,19 @@ export {
   BlockRegistryServiceId,
   defaultBlockRegistry,
 } from './block-registry';
-export { builtinBlocks } from './blocks/builtin-blocks';
+export { builtinBlocks, isHtmlTextBlockType } from './blocks/builtin-blocks';
 export {
+  DuplicateHtmlBlockCommand,
   InsertHtmlBlockCommand,
   MoveHtmlBlockCommand,
+  MoveHtmlBlockDownCommand,
+  MoveHtmlBlockUpCommand,
   RemoveHtmlBlockCommand,
   UpdateHtmlBlockDataCommand,
 } from './commands/html-block-commands';
 export { createHtmlDemoScene } from './create-html-demo-scene';
 export { createHtmlLayerDefinition } from './create-html-layer-definition';
+export { HtmlContextMenu } from './contributions/html-context-menu';
 export {
   HTML_BLOCKS_CONTAINER_ID,
   HTML_BLOCKS_PANEL_COMPONENT_ID,
@@ -24,6 +28,7 @@ export { BlockPalettePanel } from './editor/block-palette-panel';
 export { HtmlEditorPane } from './editor/html-editor-pane';
 export { HtmlBlocksPlugin } from './plugin/html-blocks-plugin';
 export {
+  cloneBlockWithNewIds,
   createBlock,
   findBlock,
   getPageRootId,

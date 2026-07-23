@@ -13,13 +13,16 @@ import {
   BlockRegistryServiceId,
 } from '../block-registry';
 import {
+  DuplicateHtmlBlockCommand,
   InsertHtmlBlockCommand,
   MoveHtmlBlockCommand,
+  MoveHtmlBlockDownCommand,
+  MoveHtmlBlockUpCommand,
   RemoveHtmlBlockCommand,
   UpdateHtmlBlockDataCommand,
 } from '../commands/html-block-commands';
 import { createHtmlDemoScene } from '../create-html-demo-scene';
-import { findBlock } from '../tree/block-tree';
+import { findBlock, getBlockChildren } from '../tree/block-tree';
 
 function createHarness() {
   const registry = new BlockRegistry();
@@ -34,6 +37,9 @@ function createHarness() {
     new SimpleServiceContribution(BlockRegistryServiceId, () => registry),
     new InsertHtmlBlockCommand(),
     new MoveHtmlBlockCommand(),
+    new MoveHtmlBlockUpCommand(),
+    new MoveHtmlBlockDownCommand(),
+    new DuplicateHtmlBlockCommand(),
     new UpdateHtmlBlockDataCommand(),
     new RemoveHtmlBlockCommand()
   );
@@ -75,12 +81,12 @@ describe('html block commands', () => {
       .getRegistries()
       .commands.execute('html.updateBlockData', ctx, runtime.getEvents(), {
         id: newId,
-        patch: { text: 'Updated' },
+        patch: { html: 'Updated' },
       });
     expect(
       (findBlock(store.getScene().pages[0]!.layers, newId)!.block.data as {
-        text: string;
-      }).text
+        html: string;
+      }).html
     ).toBe('Updated');
 
     expect(store.undo()).toBe(true);
@@ -103,6 +109,70 @@ describe('html block commands', () => {
       });
 
     expect(store.getScene()).toEqual(before);
+    runtime.dispose();
+  });
+
+  it('removes selected block when args.id is omitted', async () => {
+    const { manager, runtime, store } = createHarness();
+    store.setSelection({
+      activePageId: 'html-page',
+      primaryLayerId: 'text-1',
+      selectedLayerIds: ['text-1'],
+    });
+    const ctx = runtime.createCommandContext();
+
+    await manager
+      .getRegistries()
+      .commands.execute('html.removeBlock', ctx, runtime.getEvents());
+
+    expect(findBlock(store.getScene().pages[0]!.layers, 'text-1')).toBeNull();
+    runtime.dispose();
+  });
+
+  it('duplicates selected block under the same parent', async () => {
+    const { manager, runtime, store } = createHarness();
+    store.setSelection({
+      activePageId: 'html-page',
+      primaryLayerId: 'heading-1',
+      selectedLayerIds: ['heading-1'],
+    });
+    const ctx = runtime.createCommandContext();
+
+    await manager
+      .getRegistries()
+      .commands.execute('html.duplicateBlock', ctx, runtime.getEvents());
+
+    const root = store.getScene().pages[0]!.layers[0]!;
+    const children = getBlockChildren(root);
+    expect(children.length).toBe(4);
+    expect(children[1]!.type).toBe('html.heading');
+    expect(children[1]!.id).not.toBe('heading-1');
+    expect(store.getSelection().selectedLayerIds).toEqual([children[1]!.id]);
+    runtime.dispose();
+  });
+
+  it('moves block siblings up and down', async () => {
+    const { manager, runtime, store } = createHarness();
+    store.setSelection({
+      activePageId: 'html-page',
+      primaryLayerId: 'text-1',
+      selectedLayerIds: ['text-1'],
+    });
+    const ctx = runtime.createCommandContext();
+
+    await manager
+      .getRegistries()
+      .commands.execute('html.moveBlockUp', ctx, runtime.getEvents());
+
+    let children = getBlockChildren(store.getScene().pages[0]!.layers[0]!);
+    expect(children[0]!.id).toBe('text-1');
+
+    await manager
+      .getRegistries()
+      .commands.execute('html.moveBlockDown', ctx, runtime.getEvents());
+
+    children = getBlockChildren(store.getScene().pages[0]!.layers[0]!);
+    expect(children[1]!.id).toBe('text-1');
     runtime.dispose();
   });
 

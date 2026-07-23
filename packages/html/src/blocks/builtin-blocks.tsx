@@ -4,7 +4,7 @@ export const headingBlock: BlockConfig = {
   type: 'html.heading',
   label: 'Heading',
   fields: {
-    text: { kind: 'text', label: 'Text' },
+    html: { kind: 'text', label: 'Text' },
     level: {
       kind: 'select',
       label: 'Level',
@@ -16,22 +16,23 @@ export const headingBlock: BlockConfig = {
       ],
     },
   },
-  defaultData: { text: 'Heading', level: '2' },
+  defaultData: { html: 'Heading', level: '2' },
   render: ({ data }) => {
-    const text = String(data.text ?? '');
+    const html = String(data.html ?? '');
     const level = String(data.level ?? '2');
+    const style = { margin: '0 0 0.5rem' } as const;
     switch (level) {
       case '1': {
-        return <h1 style={{ margin: '0 0 0.5rem' }}>{text}</h1>;
+        return <h1 dangerouslySetInnerHTML={{ __html: html }} style={style} />;
       }
       case '3': {
-        return <h3 style={{ margin: '0 0 0.5rem' }}>{text}</h3>;
+        return <h3 dangerouslySetInnerHTML={{ __html: html }} style={style} />;
       }
       case '4': {
-        return <h4 style={{ margin: '0 0 0.5rem' }}>{text}</h4>;
+        return <h4 dangerouslySetInnerHTML={{ __html: html }} style={style} />;
       }
       default: {
-        return <h2 style={{ margin: '0 0 0.5rem' }}>{text}</h2>;
+        return <h2 dangerouslySetInnerHTML={{ __html: html }} style={style} />;
       }
     }
   },
@@ -41,13 +42,14 @@ export const textBlock: BlockConfig = {
   type: 'html.text',
   label: 'Text',
   fields: {
-    text: { kind: 'textarea', label: 'Text' },
+    html: { kind: 'textarea', label: 'Text' },
   },
-  defaultData: { text: 'Paragraph text' },
+  defaultData: { html: 'Paragraph text' },
   render: ({ data }) => (
-    <p style={{ margin: '0 0 0.75rem', lineHeight: 1.5 }}>
-      {String(data.text ?? '')}
-    </p>
+    <div
+      dangerouslySetInnerHTML={{ __html: String(data.html ?? '') }}
+      style={{ margin: '0 0 0.75rem', lineHeight: 1.5 }}
+    />
   ),
 };
 
@@ -132,3 +134,7 @@ export const builtinBlocks: BlockConfig[] = [
   textBlock,
   imageBlock,
 ];
+
+export function isHtmlTextBlockType(type: string): boolean {
+  return type === 'html.heading' || type === 'html.text';
+}

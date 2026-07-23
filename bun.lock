@@ -278,6 +278,10 @@
         "@openenvx/headless": "workspace:*",
         "@openenvx/preview": "workspace:*",
         "@openenvx/schema": "workspace:*",
+        "@tiptap/pm": "^3.27.3",
+        "@tiptap/react": "^3.27.3",
+        "@tiptap/starter-kit": "^3.27.3",
+        "lucide-react": "1.24.0",
       },
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
@@ -301,7 +305,6 @@
         "@openenvx/core": "workspace:*",
         "@openenvx/headless": "workspace:*",
         "@openenvx/html": "workspace:*",
-        "@openenvx/schema": "workspace:*",
         "@xmazu/openenvxee-workbench": "workspace:*",
       },
       "devDependencies": {
@@ -2896,6 +2899,8 @@
     "@openenvx/export-service/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
     "@openenvx/headless/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
+
+    "@openenvx/html/lucide-react": ["lucide-react@1.24.0", "", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-YT6mBD8lGKkg4nM39enlm94/sfJIiW0YKUT60fBy4YK8tai31ylg1VhGNWxkpSKHo9UagfnZqwIff3HTDQwXeA=="],
 
     "@openenvx/html/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 

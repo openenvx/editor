@@ -18,7 +18,11 @@
     "@openenvx/core": "workspace:*",
     "@openenvx/headless": "workspace:*",
     "@openenvx/preview": "workspace:*",
-    "@openenvx/schema": "workspace:*"
+    "@openenvx/schema": "workspace:*",
+    "@tiptap/pm": "^3.27.3",
+    "@tiptap/react": "^3.27.3",
+    "@tiptap/starter-kit": "^3.27.3",
+    "lucide-react": "1.24.0"
   },
   "peerDependencies": {
     "react": ">=18",

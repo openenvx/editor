@@ -101,9 +101,41 @@ export function createBlock(
   };
 }
 
+/** Deep-clone a block subtree with fresh ids (and nested `data.children`). */
+export function cloneBlockWithNewIds(
+  block: Layer,
+  createId: (type: string) => string
+): Layer {
+  const data =
+    typeof block.data === 'object' && block.data !== null
+      ? structuredClone(block.data as Record<string, unknown>)
+      : {};
+  if (Array.isArray(data.children)) {
+    data.children = (data.children as Layer[]).map((child) =>
+      cloneBlockWithNewIds(child, createId)
+    );
+  }
+  return {
+    ...block,
+    id: createId(block.type),
+    data,
+  };
+}
+
 export function getPageRootId(page: Page): string | null {
   const root = page.layers.find((layer) => layer.type === 'html.root');
   return root?.id ?? null;
+}
+
+export function siblingCount(layers: Layer[], parentId: string | null): number {
+  if (parentId === null) {
+    return layers.length;
+  }
+  const parent = findBlock(layers, parentId);
+  if (!parent) {
+    return 0;
+  }
+  return getLayerChildren(parent.block).length;
 }
 
 export { getLayerChildren as getBlockChildren };

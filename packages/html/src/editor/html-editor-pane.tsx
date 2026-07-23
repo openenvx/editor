@@ -11,7 +11,13 @@ import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
-import { memo, useCallback, type KeyboardEvent, type MouseEvent } from 'react';
+import {
+  memo,
+  useCallback,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+} from 'react';
 
 import { defaultBlockRegistry } from '../block-registry';
 import { getPageRootId } from '../tree/block-tree';
@@ -24,6 +30,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   const scene = useWorkbenchContextSelector((state) => state.scene);
   const selection = useWorkbenchContextSelector((state) => state.selection);
   const registry = defaultBlockRegistry;
+  const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } })
@@ -37,8 +44,26 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   );
 
   const clearSelection = useCallback(() => {
+    if (editingBlockId) {
+      return;
+    }
     api.selectLayers([]);
-  }, [api]);
+  }, [api, editingBlockId]);
+
+  const handleStartEdit = useCallback((id: string) => {
+    setEditingBlockId(id);
+  }, []);
+
+  const handleCommitEdit = useCallback(
+    (id: string, html: string) => {
+      void executeCommand('html.updateBlockData', {
+        id,
+        patch: { html },
+      });
+      setEditingBlockId(null);
+    },
+    [executeCommand]
+  );
 
   const handleCanvasClick = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
@@ -55,10 +80,13 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
       if (event.key !== 'Escape') {
         return;
       }
+      if (editingBlockId) {
+        return;
+      }
       event.preventDefault();
       clearSelection();
     },
-    [clearSelection]
+    [clearSelection, editingBlockId]
   );
 
   const handleDragEnd = useCallback(
@@ -104,8 +132,11 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
       >
         {rootId ? (
           <BlockTreeRenderer
+            editingBlockId={editingBlockId}
             layers={page.layers}
+            onCommitEdit={handleCommitEdit}
             onSelect={handleSelect}
+            onStartEdit={handleStartEdit}
             registry={registry}
             selectedId={selectedId}
           />

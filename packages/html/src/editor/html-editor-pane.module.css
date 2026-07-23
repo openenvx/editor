@@ -70,3 +70,49 @@
   border: 1px dashed #cbd5e1;
   padding: 12px;
 }
+
+.editorHost {
+  width: 100%;
+  outline: none;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.editorHost :global(.ProseMirror) {
+  width: 100%;
+  outline: none;
+  margin: 0;
+  min-height: 1.2em;
+}
+
+.editorHost :global(.ProseMirror p) {
+  margin: 0;
+}
+
+.bubbleMenu {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--wb-popover, #1a1a1a);
+  box-shadow: var(--wb-shadow-float, 0 4px 12px rgba(0, 0, 0, 0.35));
+}
+
+.formatButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--wb-foreground, #fafafa);
+  cursor: pointer;
+}
+
+.formatButton:hover,
+.formatButtonActive {
+  background: var(--wb-hover-overlay, #242424);
+}

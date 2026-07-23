@@ -8,8 +8,11 @@ import {
 } from '../block-registry';
 import { builtinBlocks } from '../blocks/builtin-blocks';
 import {
+  DuplicateHtmlBlockCommand,
   InsertHtmlBlockCommand,
   MoveHtmlBlockCommand,
+  MoveHtmlBlockDownCommand,
+  MoveHtmlBlockUpCommand,
   RemoveHtmlBlockCommand,
   UpdateHtmlBlockDataCommand,
 } from '../commands/html-block-commands';
@@ -18,6 +21,7 @@ import {
   HtmlBlocksView,
   HTML_BLOCKS_PANEL_COMPONENT_ID,
 } from '../contributions/html-blocks-sidebar';
+import { HtmlContextMenu } from '../contributions/html-context-menu';
 import { createHtmlLayerDefinition } from '../create-html-layer-definition';
 import { BlockPalettePanel } from '../editor/block-palette-panel';
 import { HtmlEditorPane } from '../editor/html-editor-pane';
@@ -38,11 +42,18 @@ export class HtmlBlocksPlugin extends WorkbenchPlugin {
       ...builtinBlocks.map((block) => createHtmlLayerDefinition(block)),
       new InsertHtmlBlockCommand(),
       new MoveHtmlBlockCommand(),
+      new MoveHtmlBlockUpCommand(),
+      new MoveHtmlBlockDownCommand(),
+      new DuplicateHtmlBlockCommand(),
       new UpdateHtmlBlockDataCommand(),
       new RemoveHtmlBlockCommand()
     );
 
-    ctx.registerWorkbench(new HtmlBlocksContainer(), new HtmlBlocksView());
+    ctx.registerWorkbench(
+      new HtmlContextMenu(),
+      new HtmlBlocksContainer(),
+      new HtmlBlocksView()
+    );
     ctx.registerViewPanel(HTML_BLOCKS_PANEL_COMPONENT_ID, BlockPalettePanel);
     ctx.registerEditorPane('html', HtmlEditorPane);
   }

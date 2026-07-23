@@ -18,13 +18,13 @@ export function createHtmlDemoScene(): Scene {
                 {
                   id: 'heading-1',
                   type: 'html.heading',
-                  data: { text: 'Welcome', level: '1' },
+                  data: { html: 'Welcome', level: '1' },
                 },
                 {
                   id: 'text-1',
                   type: 'html.text',
                   data: {
-                    text: 'Drag blocks from the left palette into containers. Select a block to edit its properties.',
+                    html: 'Drag blocks from the left palette into containers. Double-click text to edit. Right-click for the context menu.',
                   },
                 },
                 {
@@ -37,7 +37,7 @@ export function createHtmlDemoScene(): Scene {
                       {
                         id: 'heading-2',
                         type: 'html.heading',
-                        data: { text: 'Nested section', level: '3' },
+                        data: { html: 'Nested section', level: '3' },
                       },
                     ],
                   },

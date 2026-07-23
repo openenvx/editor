@@ -40,7 +40,7 @@ describe('block-tree', () => {
 
   it('inserts, moves, updates, and removes', () => {
     let layers = [block('root', 'html.root', [])];
-    const heading = createBlock('html.heading', 'h1', { text: 'Hi' });
+    const heading = createBlock('html.heading', 'h1', { html: 'Hi' });
     layers = insertAt(layers, 'root', heading, 0);
     expect(findBlock(layers, 'h1')?.parentId).toBe('root');
 
@@ -49,8 +49,8 @@ describe('block-tree', () => {
     layers = moveTo(layers, 'h1', 'box', 0);
     expect(findBlock(layers, 'h1')?.parentId).toBe('box');
 
-    layers = updateBlockData(layers, 'h1', { text: 'Hello' });
-    expect((findBlock(layers, 'h1')!.block.data as { text: string }).text).toBe(
+    layers = updateBlockData(layers, 'h1', { html: 'Hello' });
+    expect((findBlock(layers, 'h1')!.block.data as { html: string }).html).toBe(
       'Hello'
     );
 
