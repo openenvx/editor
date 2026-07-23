@@ -134,7 +134,7 @@ class MyViewPlugin extends WorkbenchPlugin {
 ```ts
 activateWorkbench(ctx) {
   ctx.registerWorkbench(new MyViewContainer(), new MyView());
-  ctx.registerTreeDataProvider('canvas.pages', new MyPagesTreeProvider(), {
+  ctx.registerTreeDataProvider('workbench.pages', new MyPagesTreeProvider(), {
     primary: true,
   });
 }
@@ -156,7 +156,7 @@ activateWorkbench(ctx) {
 
 Duplicate kinds overwrite earlier registrations so enterprise plugins activating later can replace OSS defaults.
 
-Enterprise `@openenvx/canvas-pro` ships composable sidebar plugins: `CanvasSidebarPlugin`, `CanvasPagesPlugin`, `CanvasLayersPlugin`, `CanvasTemplatePlugin`. Use `DEFAULT_CANVAS_PRO_PLUGINS` for the full bundle, or compose your own list and omit `CanvasPagesPlugin` to hide Pages. Wire the Template data panel in the app shell:
+`WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). Enterprise `@xmazu/openenvxee-canvas-pro` adds canvas-only chrome (`CanvasProPlugin`, `CanvasTemplatePlugin`). Wire the Template data panel in the app shell:
 
 ```ts
 import {

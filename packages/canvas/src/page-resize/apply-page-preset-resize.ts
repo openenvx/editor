@@ -1,7 +1,7 @@
 import { getActivePage, localize } from '@openenvx/core';
 import type { CommandContext, Scene } from '@openenvx/core';
-import { resolvePagePreset } from '@openenvx/schema';
 
+import { resolvePagePreset } from '../page-presets';
 import { resizeAbsolutePage } from './scale-page-content';
 
 export function resizeSceneToPagePreset(

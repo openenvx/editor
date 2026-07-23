@@ -5,8 +5,15 @@ import {
   pruneEditorState,
   validateScene,
 } from '@openenvx/schema';
-import type { EditorState, Scene, Selection } from '@openenvx/schema';
+import type {
+  EditorState,
+  Page,
+  Scene,
+  Selection,
+  ValidationError,
+} from '@openenvx/schema';
 
+import type { PageRulesContribution } from '../contributions/page-rules-contribution';
 import { Emitter } from '../runtime/emitter';
 import type { Event } from '../runtime/emitter';
 import { HistoryStack } from './history-stack';
@@ -26,6 +33,10 @@ function formatValidationErrors(
   return errors.map((e) => (e.path ? `${e.path}: ${e.message}` : e.message));
 }
 
+export type PageRulesLookup = (
+  layout: string
+) => PageRulesContribution | undefined;
+
 export class SceneStore {
   private scene: Scene;
   private editorState: EditorState;
@@ -33,6 +44,7 @@ export class SceneStore {
   private readonly onDidChangeSceneEmitter = new Emitter<SceneSnapshot>();
   private revision = 0;
   private contentRevision = 0;
+  private pageRulesLookup: PageRulesLookup | null = null;
 
   readonly onDidChangeScene: Event<SceneSnapshot> =
     this.onDidChangeSceneEmitter.event;
@@ -44,6 +56,22 @@ export class SceneStore {
       ? normalizeEditorState(initialEditorState, fallbackPageId, this.scene)
       : createDefaultEditorState(fallbackPageId);
     this.syncEditorStateToScene();
+  }
+
+  /** Wire provider page-rules lookup (call after plugins activate). */
+  setPageRulesLookup(lookup: PageRulesLookup | null): void {
+    this.pageRulesLookup = lookup;
+  }
+
+  /**
+   * Re-apply structural + provider page rules to the current scene.
+   * Call once after plugins register PageRules contributions.
+   */
+  renormalize(): void {
+    this.scene = this.finalizeScene(this.scene);
+    this.syncEditorStateToScene();
+    this.bumpRevision();
+    this.notify();
   }
 
   getScene(): Readonly<Scene> {
@@ -87,22 +115,14 @@ export class SceneStore {
   }
 
   setScene(scene: Scene): void {
-    const validation = validateScene(scene);
-    if (!validation.valid) {
-      throw new SceneValidationError(formatValidationErrors(validation.errors));
-    }
-    this.scene = normalizeScene(scene);
+    this.scene = this.finalizeScene(scene);
     this.syncEditorStateToScene();
     this.bumpContentRevision();
     this.notify();
   }
 
   restoreScene(scene: Scene, contentRevision: number): void {
-    const validation = validateScene(scene);
-    if (!validation.valid) {
-      throw new SceneValidationError(formatValidationErrors(validation.errors));
-    }
-    this.scene = normalizeScene(scene);
+    this.scene = this.finalizeScene(scene);
     this.syncEditorStateToScene();
     this.contentRevision = contentRevision;
     this.bumpRevision();
@@ -110,11 +130,7 @@ export class SceneStore {
   }
 
   restoreSnapshot(snapshot: SceneSnapshot): void {
-    const validation = validateScene(snapshot.scene);
-    if (!validation.valid) {
-      throw new SceneValidationError(formatValidationErrors(validation.errors));
-    }
-    this.scene = normalizeScene(snapshot.scene);
+    this.scene = this.finalizeScene(snapshot.scene);
     this.editorState = normalizeEditorState(
       snapshot.editorState,
       this.scene.pages[0]!.id,
@@ -168,8 +184,10 @@ export class SceneStore {
 
   apply(transaction: SceneTransaction): void {
     const snapshot = this.getSnapshot();
-    // Normalize before history push so invalid transactions leave no side effects.
-    const nextScene = normalizeScene(transaction.apply(cloneScene(this.scene)));
+    // Finalize before history push so invalid transactions leave no side effects.
+    const nextScene = this.finalizeScene(
+      transaction.apply(cloneScene(this.scene))
+    );
     this.history.push(snapshot);
     this.scene = nextScene;
     if (transaction.activePageId) {
@@ -227,6 +245,62 @@ export class SceneStore {
 
   subscribe(listener: (snapshot: SceneSnapshot) => void): () => void {
     return this.onDidChangeScene(listener).dispose;
+  }
+
+  private finalizeScene(input: Scene): Scene {
+    const structural = normalizeScene(input);
+    const withRules = this.applyPageRules(structural);
+    const structuralValidation = validateScene(withRules);
+    if (!structuralValidation.valid) {
+      throw new SceneValidationError(
+        formatValidationErrors(structuralValidation.errors)
+      );
+    }
+    const ruleErrors = this.collectPageRulesErrors(withRules);
+    if (ruleErrors.length > 0) {
+      throw new SceneValidationError(formatValidationErrors(ruleErrors));
+    }
+    return withRules;
+  }
+
+  private applyPageRules(scene: Scene): Scene {
+    if (!this.pageRulesLookup) {
+      return scene;
+    }
+    return {
+      ...scene,
+      pages: scene.pages.map((page) => this.normalizeOnePage(page)),
+    };
+  }
+
+  private normalizeOnePage(page: Page): Page {
+    const rules = this.pageRulesLookup?.(page.layout);
+    return rules ? rules.normalizePage(page) : page;
+  }
+
+  private collectPageRulesErrors(scene: Scene): ValidationError[] {
+    if (!this.pageRulesLookup) {
+      return [];
+    }
+    const errors: ValidationError[] = [];
+    for (const page of scene.pages) {
+      const rules = this.pageRulesLookup(page.layout);
+      if (rules) {
+        errors.push(...rules.validatePage(page));
+        continue;
+      }
+      // Fail closed: absolute pages need either registered rules or explicit dims.
+      if (
+        page.layout === 'absolute' &&
+        (typeof page.width !== 'number' || typeof page.height !== 'number')
+      ) {
+        errors.push({
+          message: 'absolute layout requires width and height',
+          path: `pages.${page.id}.layout`,
+        });
+      }
+    }
+    return errors;
   }
 
   private syncEditorStateToScene(): void {

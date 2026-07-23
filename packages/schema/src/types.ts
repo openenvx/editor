@@ -6,7 +6,8 @@
 
 export const SCHEMA_VERSION = 2;
 
-export type PageLayout = 'flow' | 'absolute';
+/** Provider-defined page layout / editor-pane kind (e.g. `'absolute'`, `'html'`). */
+export type PageLayout = string;
 
 export type LengthUnit = 'px' | 'mm' | 'in' | 'cm' | 'pt';
 
@@ -283,4 +284,4 @@ export interface SceneSnapshot {
   editorState: EditorState;
 }
 
-export type EditorPaneKind = PageLayout | string;
+export type EditorPaneKind = string;

@@ -368,6 +368,8 @@ describe(WorkbenchController, () => {
           id: "p1",
           name: "Page",
           layout: "absolute",
+          width: 800,
+          height: 600,
           layers: [
             { id: "1", type: "asset-image", data: { assetRef: "asset://x" } },
           ],
@@ -445,6 +447,8 @@ describe(WorkbenchController, () => {
           id: "p1",
           name: "Page",
           layout: "absolute",
+          width: 800,
+          height: 600,
           layers: [
             { id: "1", type: "asset-image", data: { assetRef: "asset://x" } },
           ],

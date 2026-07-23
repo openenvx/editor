@@ -52,7 +52,12 @@ export class PluginManager {
   private readonly registries = new Registries();
   private readonly lifecycle = new Lifecycle();
 
-  constructor(private readonly runtime: EditorRuntime) {}
+  constructor(private readonly runtime: EditorRuntime) {
+    // Live lookup — contributions registered later are visible immediately.
+    this.runtime
+      .getScene()
+      .setPageRulesLookup((layout) => this.registries.pageRules.get(layout));
+  }
 
   getRegistries(): Registries {
     return this.registries;
@@ -105,5 +110,6 @@ export class PluginManager {
     for (const plugin of plugins) {
       await this.activate(plugin);
     }
+    this.runtime.getScene().renormalize();
   }
 }

@@ -1,5 +1,5 @@
 import {
-  getContainerChildren,
+  getLayerChildren,
   isLayerEditable,
   isLayerLocked,
   isLayerVisible,
@@ -11,14 +11,20 @@ import {
 } from '@openenvx/core';
 import type { CommandContext, Layer } from '@openenvx/core';
 import {
+  StatusBarContribution,
   TreeDataProvider,
   ViewContainerContribution,
   ViewContribution,
+  type StatusBarBuilder,
   type TreeItem,
 } from '@openenvx/headless';
 import type { Page } from '@openenvx/schema';
 
-export class CanvasPagesTreeProvider extends TreeDataProvider<Page> {
+export const WORKBENCH_SIDEBAR_CONTAINER_ID = 'workbench.sidebar';
+export const WORKBENCH_PAGES_VIEW_ID = 'workbench.pages';
+export const WORKBENCH_LAYERS_VIEW_ID = 'workbench.layers';
+
+export class PagesTreeProvider extends TreeDataProvider<Page> {
   getRootChildren(ctx: CommandContext): Page[] {
     return ctx.scene.getScene().pages;
   }
@@ -66,20 +72,20 @@ export class CanvasPagesTreeProvider extends TreeDataProvider<Page> {
           effectivePosition
         ),
       }),
-      label: localize(ctx.services, 'canvas.history.reorderPage', {
+      label: localize(ctx.services, 'workbench.history.reorderPage', {
         defaultValue: 'Reorder page',
       }),
     });
   }
 }
 
-export class CanvasLayersTreeProvider extends TreeDataProvider<Layer> {
+export class LayersTreeProvider extends TreeDataProvider<Layer> {
   getRootChildren(ctx: CommandContext): Layer[] {
     return ctx.scene.getActivePage().layers;
   }
 
   getChildren(node: Layer): Layer[] {
-    return getContainerChildren(node);
+    return getLayerChildren(node);
   }
 
   getTreeItem(node: Layer, ctx: CommandContext): TreeItem {
@@ -95,11 +101,14 @@ export class CanvasLayersTreeProvider extends TreeDataProvider<Layer> {
       : runtimeLocked
         ? 'Unlock layer (Mod+L)'
         : 'Lock layer (Mod+L)';
+    const fallbackLabel = node.type.includes('.')
+      ? node.type.slice(node.type.indexOf('.') + 1)
+      : node.type;
     return {
       editLabel: node.name ?? '',
       icon: definition?.treeIcon,
       id: node.id,
-      label: definition?.treeLabel(node) ?? node.type.replace('canvas.', ''),
+      label: definition?.treeLabel(node) ?? fallbackLabel,
       locked: configLocked || runtimeLocked,
       lockedCommandId: configLocked ? undefined : 'scene.toggleLayerLock',
       renameCommandId: 'scene.renameLayer',
@@ -155,35 +164,45 @@ export class CanvasLayersTreeProvider extends TreeDataProvider<Layer> {
             : p
         ),
       }),
-      label: localize(ctx.services, 'canvas.history.reorderLayer', {
+      label: localize(ctx.services, 'workbench.history.reorderLayer', {
         defaultValue: 'Reorder layer',
       }),
     });
   }
 }
 
-export class CanvasPagesView extends ViewContribution {
-  readonly id = 'canvas.pages';
-  readonly containerId = 'canvas.sidebar';
+export class WorkbenchPagesView extends ViewContribution {
+  readonly id = WORKBENCH_PAGES_VIEW_ID;
+  readonly containerId = WORKBENCH_SIDEBAR_CONTAINER_ID;
   readonly name = 'Pages';
   readonly viewOrder = 0;
   readonly viewSelection = 'page' as const;
   readonly viewHover = 'none' as const;
 }
 
-export class CanvasLayersView extends ViewContribution {
-  readonly id = 'canvas.layers';
-  readonly containerId = 'canvas.sidebar';
+export class WorkbenchLayersView extends ViewContribution {
+  readonly id = WORKBENCH_LAYERS_VIEW_ID;
+  readonly containerId = WORKBENCH_SIDEBAR_CONTAINER_ID;
   readonly name = 'Layers';
   readonly viewOrder = 10;
   readonly viewHover = 'layer' as const;
 }
 
-export class CanvasSidebarContainer extends ViewContainerContribution {
-  readonly id = 'canvas.sidebar';
+export class WorkbenchSidebarContainer extends ViewContainerContribution {
+  readonly id = WORKBENCH_SIDEBAR_CONTAINER_ID;
   readonly title = 'Layers';
   readonly icon = 'layers';
   readonly sidebarBehavior = 'panel' as const;
   readonly sidebarGroup = 1;
   readonly sidebarOrder = 10;
+}
+
+/** Generic dirty indicators — canvas zoom/selection stay in canvas-pro. */
+export class WorkbenchStatusBarContribution extends StatusBarContribution {
+  contribute(builder: StatusBarBuilder, _ctx: CommandContext): void {
+    builder
+      .right()
+      .text('Saved', { id: 'workbench-saved', when: '!editor.dirty' })
+      .text('Unsaved', { id: 'workbench-unsaved', when: 'editor.dirty' });
+  }
 }

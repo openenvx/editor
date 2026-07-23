@@ -1,6 +1,5 @@
 import { cloneDropNulls } from './clone-drop-nulls';
 import { pruneEditorState } from './editor-state';
-import { findPresetForPage, getDefaultPageDimensions } from './page-presets';
 import { sceneSchemaLenient } from './scene-schema';
 import { SCHEMA_VERSION } from './types';
 import type {
@@ -50,12 +49,6 @@ export function createDefaultPage(
     name: 'Page 1',
     unit: 'px',
     dpi: 96,
-    ...(layout === 'absolute'
-      ? (() => {
-          const defaults = getDefaultPageDimensions();
-          return { height: defaults.height, width: defaults.width };
-        })()
-      : {}),
   };
 }
 
@@ -93,35 +86,24 @@ function ensurePages(scene: Scene): Scene {
   };
 }
 
-function applyPagePresets(scene: Scene): Scene {
+/** Structural page defaults only — no layout-specific rules. */
+function applyStructuralPageDefaults(scene: Scene): Scene {
   return {
     ...scene,
     pages: scene.pages.map((page) => {
       const unit = (page.unit ?? 'px') as LengthUnit;
-      let next: Page = {
+      return {
         ...page,
         dpi: page.dpi ?? defaultDpiForUnit(unit),
         unit,
       };
-      if (next.layout !== 'absolute') {
-        return next;
-      }
-      next = {
-        ...next,
-        height: next.height ?? getDefaultPageDimensions().height,
-        width: next.width ?? getDefaultPageDimensions().width,
-      };
-      if (next.presetId) {
-        return next;
-      }
-      const inferred = findPresetForPage(next);
-      return inferred ? { ...next, presetId: inferred.id } : next;
     }),
   };
 }
 
 /**
- * Validate and fill defaults via the lenient Zod schema.
+ * Validate and fill structural defaults via the lenient Zod schema.
+ * Layout-specific rules (e.g. absolute dims/presets) live on providers.
  * Idempotent for current-format input. Does not migrate old schemaVersion docs.
  */
 export function normalizeScene(input: unknown = {}): Scene {
@@ -131,7 +113,9 @@ export function normalizeScene(input: unknown = {}): Scene {
       `Failed to normalize OpenEnvx scene:\n${formatNormalizeError(parsed.error.issues)}`
     );
   }
-  return applyPagePresets(ensurePages(parsed.data as unknown as Scene));
+  return applyStructuralPageDefaults(
+    ensurePages(parsed.data as unknown as Scene)
+  );
 }
 
 export function normalizeEditorState(

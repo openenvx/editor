@@ -114,6 +114,24 @@
         "wrangler": "^4.24.0",
       },
     },
+    "apps/html-demo": {
+      "name": "@openenvxee/html-demo",
+      "version": "0.0.0",
+      "dependencies": {
+        "@openenvx/html": "workspace:*",
+        "@xmazu/openenvxee-html-studio": "workspace:*",
+        "react": "19.2.7",
+        "react-dom": "19.2.7",
+      },
+      "devDependencies": {
+        "@types/react": "^19.2.3",
+        "@types/react-dom": "^19.2.3",
+        "@vitejs/plugin-react": "6.0.3",
+        "typescript": "6.0.3",
+        "vite": "8.1.3",
+        "vitest": "4.1.10",
+      },
+    },
     "packages/agent": {
       "name": "@openenvx/agent",
       "version": "0.1.0",
@@ -249,6 +267,53 @@
       },
       "peerDependencies": {
         "react": ">=18",
+      },
+    },
+    "packages/html": {
+      "name": "@openenvx/html",
+      "version": "0.1.0",
+      "dependencies": {
+        "@dnd-kit/core": "6.3.1",
+        "@openenvx/core": "workspace:*",
+        "@openenvx/headless": "workspace:*",
+        "@openenvx/preview": "workspace:*",
+        "@openenvx/schema": "workspace:*",
+      },
+      "devDependencies": {
+        "@openenvx/typescript-config": "workspace:*",
+        "@types/react": "^19.2.3",
+        "@types/react-dom": "^19.2.3",
+        "react": "19.2.7",
+        "react-dom": "19.2.7",
+        "tsup": "catalog:dev",
+        "typescript": "catalog:dev",
+        "vitest": "catalog:testing",
+      },
+      "peerDependencies": {
+        "react": ">=18",
+        "react-dom": ">=18",
+      },
+    },
+    "packages/html-studio": {
+      "name": "@xmazu/openenvxee-html-studio",
+      "version": "0.1.0",
+      "dependencies": {
+        "@openenvx/core": "workspace:*",
+        "@openenvx/headless": "workspace:*",
+        "@openenvx/html": "workspace:*",
+        "@openenvx/schema": "workspace:*",
+        "@xmazu/openenvxee-workbench": "workspace:*",
+      },
+      "devDependencies": {
+        "@openenvx/typescript-config": "workspace:*",
+        "@types/react": "^19.2.3",
+        "react": "19.2.7",
+        "typescript": "catalog:dev",
+        "vitest": "catalog:testing",
+      },
+      "peerDependencies": {
+        "react": ">=18",
+        "react-dom": ">=18",
       },
     },
     "packages/preview": {
@@ -768,6 +833,8 @@
 
     "@openenvx/headless": ["@openenvx/headless@workspace:packages/headless"],
 
+    "@openenvx/html": ["@openenvx/html@workspace:packages/html"],
+
     "@openenvx/preview": ["@openenvx/preview@workspace:packages/preview"],
 
     "@openenvx/schema": ["@openenvx/schema@workspace:packages/schema"],
@@ -775,6 +842,8 @@
     "@openenvx/typescript-config": ["@openenvx/typescript-config@workspace:packages/typescript-config"],
 
     "@openenvxee/canvas-demo": ["@openenvxee/canvas-demo@workspace:apps/canvas-demo"],
+
+    "@openenvxee/html-demo": ["@openenvxee/html-demo@workspace:apps/html-demo"],
 
     "@openenvxee/registry-contract": ["@openenvxee/registry-contract@workspace:packages/registry-contract"],
 
@@ -1409,6 +1478,8 @@
     "@workflow/serde": ["@workflow/serde@4.1.0", "", {}, "sha512-pav4F2BoirECWR7Nf1TKt+2eETcBj7jj4cBefQ8VXQCA6NPkaKeLfj/zMgi+3zYV5ZIBT4GuUiphsj0/b9hPQQ=="],
 
     "@xmazu/openenvxee-canvas-pro": ["@xmazu/openenvxee-canvas-pro@workspace:packages/canvas-pro"],
+
+    "@xmazu/openenvxee-html-studio": ["@xmazu/openenvxee-html-studio@workspace:packages/html-studio"],
 
     "@xmazu/openenvxee-studio": ["@xmazu/openenvxee-studio@workspace:packages/studio"],
 
@@ -2826,11 +2897,15 @@
 
     "@openenvx/headless/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
+    "@openenvx/html/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
+
     "@openenvx/preview/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
     "@openenvx/schema/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
     "@openenvxee/canvas-demo/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
+
+    "@openenvxee/html-demo/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
     "@openenvxee/registry-contract/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
@@ -2865,6 +2940,8 @@
     "@testing-library/dom/aria-query": ["aria-query@5.3.0", "", { "dependencies": { "dequal": "^2.0.3" } }, "sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A=="],
 
     "@xmazu/openenvxee-canvas-pro/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
+
+    "@xmazu/openenvxee-html-studio/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
     "@xmazu/openenvxee-studio/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 

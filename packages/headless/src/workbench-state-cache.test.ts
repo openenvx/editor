@@ -139,6 +139,8 @@ function createAbsoluteSceneWithoutSelection() {
         id: 'p1',
         name: 'Page',
         layout: 'absolute',
+        width: 800,
+        height: 600,
         layers: [
           { id: 'a', type: 'test', data: { text: 'A' } },
           { id: 'b', type: 'test', data: { text: 'B' } },

@@ -1,8 +1,7 @@
-import { usePagePresetResize } from '@openenvx/canvas';
+import { resolvePagePreset, usePagePresetResize } from '@openenvx/canvas';
 import { getActivePage } from '@openenvx/core';
 import type { PropertyFieldDescriptor } from '@openenvx/core';
 import { useWorkbenchContextSelector } from '@openenvx/headless/react';
-import { resolvePagePreset } from '@openenvx/schema';
 import { ConfirmDialog, Select } from '@xmazu/openenvxee-studio';
 import { memo, useState } from 'react';
 

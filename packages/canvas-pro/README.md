@@ -18,9 +18,9 @@ import { DEFAULT_CANVAS_PRO_PLUGINS } from '@openenvx/canvas-pro';
 plugins: [new CanvasBasicsPlugin(), ...DEFAULT_CANVAS_PRO_PLUGINS],
 ```
 
-Omit `CanvasPagesPlugin` from the list to hide the Pages sidebar section.
+Omit the default chrome plugin or replace tree providers to customize Pages/Layers. Pages/Layers live in `@xmazu/openenvxee-workbench` (`DefaultWorkbenchChromePlugin`, auto-injected by `WorkbenchShell`).
 
-**Replace the Pages tree** — register your own `ViewTreeProviderContribution` with `readonly primary = true` after `CanvasPagesPlugin` activates. See [extension guide](../../apps/docs/extension-guide.md).
+**Replace the Pages tree** — register your own provider with `readonly primary = true` for `workbench.pages`. See [extension guide](../../apps/docs/extension-guide.md).
 
 ## Extension model
 

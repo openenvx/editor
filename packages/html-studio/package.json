@@ -1,0 +1,34 @@
+{
+  "name": "@xmazu/openenvxee-html-studio",
+  "version": "0.1.0",
+  "description": "OpenEnvx HTML Studio — workbench UI + HTML block editor",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./theme.css": "./src/theme.css"
+  },
+  "scripts": {
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@openenvx/core": "workspace:*",
+    "@openenvx/headless": "workspace:*",
+    "@openenvx/html": "workspace:*",
+    "@xmazu/openenvxee-workbench": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@openenvx/typescript-config": "workspace:*",
+    "@types/react": "^19.2.3",
+    "react": "19.2.7",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:testing"
+  }
+}

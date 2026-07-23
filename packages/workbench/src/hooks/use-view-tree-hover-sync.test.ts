@@ -24,6 +24,8 @@ const scene: Scene = {
     {
       id: 'p1',
       layout: 'absolute',
+      width: 800,
+      height: 600,
       layers: [
         {
           data: {
@@ -59,7 +61,7 @@ function createView(
     collapsible: true,
     containerId: 'layers',
     content: { items: [], kind: 'tree' },
-    id: 'canvas.layers',
+    id: 'workbench.layers',
     initialCollapsed: false,
     name: 'Layers',
     supportsReorder: true,

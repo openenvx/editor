@@ -1,8 +1,3 @@
-import {
-  findPresetForPage,
-  getDefaultPageDimensions,
-  resolvePagePreset,
-} from './page-presets';
 import type { LengthUnit, Page } from './types';
 import { defaultDpiForUnit, fromPx, toPx } from './units';
 
@@ -20,10 +15,7 @@ export interface PageExportOptions {
 }
 
 export function resolvePagePresetId(page: Page): string | undefined {
-  if (page.presetId) {
-    return page.presetId;
-  }
-  return findPresetForPage(page)?.id;
+  return page.presetId;
 }
 
 export function resolvePageBackground(page: Page): string {
@@ -35,27 +27,21 @@ export function resolvePageDpi(page: Page, exportDpi?: number): number {
 }
 
 export function resolvePageUnit(page: Page): LengthUnit {
-  if (page.unit) {
-    return page.unit;
-  }
-  const presetId = resolvePagePresetId(page);
-  if (presetId) {
-    const preset = resolvePagePreset(presetId);
-    if (preset?.unit) {
-      return preset.unit;
-    }
-  }
-  return 'px';
+  return page.unit ?? 'px';
 }
 
 export function resolvePagePixelDimensions(page: Page): {
   width: number;
   height: number;
 } {
-  const defaults = getDefaultPageDimensions();
+  if (typeof page.width !== 'number' || typeof page.height !== 'number') {
+    throw new TypeError(
+      `Page "${page.id}" is missing width/height (required for export)`
+    );
+  }
   return {
-    width: page.width ?? defaults.width,
-    height: page.height ?? defaults.height,
+    width: page.width,
+    height: page.height,
   };
 }
 

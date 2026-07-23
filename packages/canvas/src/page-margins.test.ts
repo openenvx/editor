@@ -1,12 +1,12 @@
+import { toPx } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
-
-import { resolvePagePreset, toPx } from '@openenvx/schema';
 
 import {
   computePageBleedEdgeBounds,
   computePageSafeBounds,
   defaultShowMarginsForPage,
 } from './page-margins';
+import { resolvePagePreset } from './page-presets';
 
 describe('page-margins', () => {
   it('returns safe bounds inset for A4 at 96 dpi', () => {
@@ -86,6 +86,8 @@ describe('page-margins', () => {
         layers: [],
         layout: 'absolute',
         name: 'Page',
+        presetId: 'a4-portrait',
+        unit: 'mm',
         width: preset.width,
       })
     ).toBe(true);

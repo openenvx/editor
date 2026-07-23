@@ -18,18 +18,12 @@ export const CANVAS_ZOOM_DROPDOWN_ITEMS: ShellDropdownMenuItemDescriptor[] = [
 
 export class CanvasStatusBarContribution extends StatusBarContribution {
   contribute(builder: StatusBarBuilder, ctx: CommandContext): void {
-    builder
-      .left()
-      .dropdown('canvas-zoom', {
-        items: CANVAS_ZOOM_DROPDOWN_ITEMS,
-        labelBinding: 'editorZoomPercent',
-        labelSuffix: '%',
-        priority: -10,
-      })
-      .end()
-      .right()
-      .text('Saved', { id: 'canvas-saved', when: '!editor.dirty' })
-      .text('Unsaved', { id: 'canvas-unsaved', when: 'editor.dirty' });
+    builder.left().dropdown('canvas-zoom', {
+      items: CANVAS_ZOOM_DROPDOWN_ITEMS,
+      labelBinding: 'editorZoomPercent',
+      labelSuffix: '%',
+      priority: -10,
+    });
 
     const scene = ctx.scene.getScene();
     const { selectedLayerIds, primaryLayerId } = ctx.selection;

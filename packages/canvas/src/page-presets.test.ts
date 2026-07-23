@@ -1,3 +1,4 @@
+import { toPx } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -6,7 +7,6 @@ import {
   PAGE_SIZE_PRESETS,
   resolvePagePreset,
 } from './page-presets';
-import { toPx } from './units';
 
 describe('page-presets', () => {
   it('defines all six ISO presets at 96 DPI', () => {

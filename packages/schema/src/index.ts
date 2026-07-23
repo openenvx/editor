@@ -44,15 +44,6 @@ export {
 export { LENGTH_UNITS, defaultDpiForUnit, fromPx, toPx } from './units';
 
 export {
-  DEFAULT_PAGE_SIZE_PRESET,
-  PAGE_SIZE_PRESETS,
-  findPresetForPage,
-  getDefaultPageDimensions,
-  resolvePagePreset,
-  type PageSizePreset,
-} from './page-presets';
-
-export {
   createDefaultEditorState,
   createDefaultPage,
   createDefaultTransform,

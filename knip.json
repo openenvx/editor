@@ -91,6 +91,18 @@
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
+    "packages/html": {
+      "entry": ["src/index.ts!", "src/plugin/html-blocks-plugin.ts!"],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "!src/**/*.test.ts",
+        "!src/**/*.test.tsx"
+      ]
+    },
+    "packages/html-studio": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
     "packages/registry-contract": {
       "project": ["src/**/*.{ts,tsx}"]
     },
@@ -113,6 +125,10 @@
     },
     "apps/canvas-demo": {
       "entry": ["src/**/*.test.ts"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "apps/html-demo": {
+      "entry": ["src/main.tsx", "src/app.tsx", "index.html"],
       "project": ["src/**/*.{ts,tsx}"]
     }
   }

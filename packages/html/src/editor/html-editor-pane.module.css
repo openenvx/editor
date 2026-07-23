@@ -1,0 +1,72 @@
+.pane {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  padding: 24px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.palettePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--wb-space-3, 12px);
+}
+
+.paletteItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: 1px solid var(--wb-border, #e2e8f0);
+  border-radius: var(--wb-radius-md, 6px);
+  background: var(--wb-bg-elevated, #f8fafc);
+  color: inherit;
+  cursor: pointer;
+  font-size: var(--wb-text-base, 13px);
+}
+
+.paletteItem:hover {
+  background: var(--wb-bg-hover, #f1f5f9);
+}
+
+.empty {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.blockWrap {
+  position: relative;
+  outline: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.blockWrapSelected {
+  outline: 2px solid #3b82f6;
+}
+
+.dropZone {
+  min-height: 28px;
+  border-radius: 4px;
+}
+
+.dropZoneActive {
+  background: rgba(59, 130, 246, 0.08);
+  outline: 1px dashed #3b82f6;
+}
+
+.dropZoneEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 12px;
+  border: 1px dashed #cbd5e1;
+  padding: 12px;
+}

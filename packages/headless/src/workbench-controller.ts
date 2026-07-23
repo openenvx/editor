@@ -242,8 +242,10 @@ export class WorkbenchController {
       );
       await this.manager.activateWithContext(plugin, ctx);
     }
-    this.stateCache.reset();
     const sceneStore = this.runtime.getScene();
+    // Lookup is already live via PluginManager; re-apply after plugins register rules.
+    sceneStore.renormalize();
+    this.stateCache.reset();
     this.lastSeenContentRevision = sceneStore.getContentRevision();
     this.stateCache.onSceneContentRevision(this.lastSeenContentRevision);
     this.runtime.getEditor().open(

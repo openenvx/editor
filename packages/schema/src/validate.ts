@@ -56,17 +56,6 @@ function validateSceneShape(scene: Scene): ValidationError[] {
     });
   }
 
-  for (const page of scene.pages ?? []) {
-    if (page.layout === 'absolute') {
-      if (typeof page.width !== 'number' || typeof page.height !== 'number') {
-        errors.push({
-          message: 'absolute layout requires width and height',
-          path: `pages.${page.id}.layout`,
-        });
-      }
-    }
-  }
-
   return errors;
 }
 

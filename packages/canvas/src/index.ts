@@ -1,3 +1,4 @@
+export { AbsolutePageRules } from './absolute-page-rules';
 export {
   ViewportController,
   DEFAULT_VIEWPORT,
@@ -280,6 +281,14 @@ export {
 } from './export/canvas-document-export-service';
 export { bytesToDataUrl, downloadBytes } from './export/bytes-to-data-url';
 export type { PageResizeService } from './page-resize/page-resize-types';
+export {
+  DEFAULT_PAGE_SIZE_PRESET,
+  PAGE_SIZE_PRESETS,
+  findPresetForPage,
+  getDefaultPageDimensions,
+  resolvePagePreset,
+  type PageSizePreset,
+} from './page-presets';
 export type {
   CanvasRegistriesReader,
   CanvasRegistriesSnapshot,

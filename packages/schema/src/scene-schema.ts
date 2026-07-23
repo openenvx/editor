@@ -229,9 +229,9 @@ function build(o: typeof z.object) {
       .default([])
       .describe('Top-level layers on the page.'),
     layout: z
-      .enum(['flow', 'absolute'])
+      .string()
       .default('flow')
-      .describe('Page layout mode.'),
+      .describe('Provider-defined page layout / editor-pane kind.'),
     name: z.string().default('Page 1').describe('Display name.'),
     bleedMm: z
       .number()

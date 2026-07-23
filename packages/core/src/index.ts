@@ -8,6 +8,7 @@ export { EditorRuntime } from './core/editor-runtime';
 
 export { Command } from './contributions/command';
 export { LayerDefinition } from './contributions/layer-definition';
+export { PageRulesContribution } from './contributions/page-rules-contribution';
 export { ShortcutContribution } from './contributions/shortcut-contribution';
 export { ContextKeyContribution } from './contributions/context-key-contribution';
 export {
@@ -20,6 +21,7 @@ export {
   SceneStore,
   moveLayerToIndex,
   reorderLayers,
+  type PageRulesLookup,
 } from './scene/scene-store';
 export { HistoryStack } from './scene/history-stack';
 export type {

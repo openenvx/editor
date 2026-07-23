@@ -11,8 +11,8 @@ import type {
   Transform,
 } from '@openenvx/core';
 import type { LayerStyle } from '@openenvx/schema';
-import { getDefaultPageDimensions } from '@openenvx/schema';
 
+import { getDefaultPageDimensions } from '../page-presets';
 import { measureRichTextHeight } from '../rich-text-layout';
 import { MIN_RICH_TEXT_FONT_SIZE } from '../rich-text-resize';
 import {

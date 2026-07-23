@@ -9,7 +9,6 @@ import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
-import { getDefaultPageDimensions } from '@openenvx/schema';
 import { memo, useCallback, useMemo } from 'react';
 
 import { CanvasHostProvider } from '../canvas-host-context';
@@ -19,6 +18,7 @@ import { useCanvasApi } from '../hooks/use-canvas-api';
 import { useCanvasRegistries } from '../hooks/use-canvas-registries';
 import { useCanvasStageInteraction } from '../hooks/use-canvas-stage-interaction';
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
+import { getDefaultPageDimensions } from '../page-presets';
 import { CanvasEditor, type CanvasEditorProps } from './canvas-editor';
 
 export const AbsoluteEditorPane = memo(

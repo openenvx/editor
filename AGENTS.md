@@ -2,6 +2,11 @@
 
 Instructions for coding agents working in the OpenEnvx monorepo.
 
+## Git / agent workflow (hard rules)
+
+- **Never create or use git worktrees** (`git worktree`, isolated worktree agents, etc.). Work only in this checkout.
+- **Never commit** (and never push). Leave staging and commits to the human; do not run `git commit` unless they explicitly ask in that message.
+
 ## What this repo is
 
 OpenEnvx is a composable visual editor framework: plugins register layers, commands, and UI contributions; a headless controller owns scene state; apps compose their own React shell. The monorepo uses **Bun** workspaces:
@@ -118,7 +123,9 @@ bun install
 bun run test          # all packages
 bun run build
 bun run dev:playground
-bun run check         # lint (ultracite)
+bun run fix           # auto-fix lint/format (ultracite)
+bun run check         # lint (ultracite) + knip
+bun run precommit     # check + build + test (run before finishing)
 bun run changeset     # create a release changeset
 ```
 
@@ -128,7 +135,15 @@ Only `packages/studio` (`@xmazu/openenvxee-studio`) and `packages/schema` (`@ope
 
 ## Before you finish
 
-- [ ] `bun run test` passes for affected packages
+After all code changes for the task are done, **always** run these from the repo root and fix every failure before stopping:
+
+1. `bun run fix` — apply Ultracite auto-fixes
+2. `bun run precommit` — `check` + `build` + `test`
+
+If either command fails, fix the reported errors, then re-run both until they pass. Do not leave lint, format, knip, build, or test failures unresolved.
+
+Also verify:
+
 - [ ] No new canvas code under `packages/core`
 - [ ] New files use kebab-case
 - [ ] No `I`-prefixed interface or type alias names

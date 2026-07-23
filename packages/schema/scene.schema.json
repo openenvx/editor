@@ -65,12 +65,8 @@
           },
           "layout": {
             "default": "flow",
-            "description": "Page layout mode.",
-            "type": "string",
-            "enum": [
-              "flow",
-              "absolute"
-            ]
+            "description": "Provider-defined page layout / editor-pane kind.",
+            "type": "string"
           },
           "name": {
             "default": "Page 1",

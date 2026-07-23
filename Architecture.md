@@ -7,15 +7,18 @@ Package boundaries and contribution flow for the monorepo.
 | Tier | Packages | Who |
 | --- | --- | --- |
 | **Rendering-only** | `schema`, `canvas` | Embed `CanvasStage` in a custom React app with own state. No plugin host. |
-| **Editor backbone** | `core`, `headless`, optional `canvas`, `driver-*`, plugins | Full editor runtime (scene, commands, layers) with a **custom UI shell**. See `apps/demo-playground`. |
+| **Editor backbone** | `core`, `headless`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
 | **Workbench UI** | `workbench` | React shell (`WorkbenchShell`); workspace-private. |
 | **Published product** | `studio` (+ `schema`) | Fat bundle of workbench + canvas + canvas-pro + agent + driver-image into `dist`. |
+| **HTML studio** | `html`, `html-studio` | Puck-style block editor + thin studio re-exports (workspace-private). |
 
-**Hard rule:** All canvas code lives in `@openenvx/canvas`. Not in `core`.
+**Hard rule:** All canvas code lives in `@openenvx/canvas`. Not in `core`. HTML block editing lives in `@openenvx/html`.
 
 ## `@openenvx/schema` (Scene document)
 
 Canonical **content** Scene JSON is authored once in Zod v4 (`sceneSchemaLenient` / `sceneSchemaCanonical`). Defaults, `validateScene` / `normalizeScene`, and the published `scene.schema.json` (for LLMs and other SDKs) all come from that schema.
+
+`Page.layout` is a **provider-defined string** (e.g. `'absolute'`, `'html'`). Schema normalization is structural only; layout-specific rules (dims, presets, validation) are registered by providers via `PageRulesContribution` in `@openenvx/core`.
 
 | Concept | Role |
 | --- | --- |
@@ -29,8 +32,8 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 
 | Tier | Packages | License / publish (intent) | Responsibility |
 | --- | --- | --- | --- |
-| Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives (commands, layers, services, property field data) |
-| Product libs | `headless`, `canvas`, `driver-*`, `workbench`, `canvas-pro`, `agent` | Private (workspace) | Workbench runtime, canvas engine, export drivers, React shell, pro chrome, agent |
+| Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives (commands, layers, page rules, services, property field data) |
+| Product libs | `headless`, `canvas`, `html`, `driver-*`, `workbench`, `canvas-pro`, `agent`, `html-studio` | Private (workspace) | Workbench runtime, canvas engine, HTML block editor, export drivers, React shell, pro chrome, agent |
 | Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + canvas-pro + agent + driver-image |
 
 ## What belongs in `@openenvx/canvas`
@@ -48,15 +51,25 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 - **Generic layer handles** — `CanvasLayerInteractionContribution` can provide custom handles (`providesHandles`, `layoutHandles`, `onHandleDrag*`) painted by OSS `CanvasStage`
 - **`dataPatch` on `canvas.updateLayerTransform`** — optional enterprise data commits alongside transform updates (`dataPatch` merges into `layer.data`)
 - `CanvasStageInteractionService` — optional stage drag/resize adjustment + overlay primitives
+- Page size presets (`page-presets.ts`) and `AbsolutePageRules` (`layout: 'absolute'`) — dims defaults, preset inference, width/height validation
 
-Workbench chrome for canvas (toolbar, palette, sidebars, editor pane registration) lives in enterprise `@xmazu/openenvxee-canvas-pro`.
+**Canvas-only** workbench chrome (zoom/selection status, transform inspector panes, insert-tool toolbar, grid/rulers) lives in enterprise `@xmazu/openenvxee-canvas-pro`. Scene-generic chrome (Pages/Layers sidebar, dirty status) lives in `@xmazu/openenvxee-workbench` — see below.
+
+## What belongs in `@openenvx/html`
+
+- Puck-style block config registry, block renderers, nested drop zones (dnd-kit)
+- `HtmlEditorPane` registered for `page.layout === 'html'` (preview only; props via shared inspector)
+- HTML block commands (`html.insertBlock`, `html.moveBlock`, `html.updateBlockData`, `html.removeBlock`)
+- `HtmlBlocksPlugin` — registers `LayerDefinition`s, commands, editor pane, and a primary activity-sidebar **Blocks** panel (`html.blocks`); owns nesting via `data.children`
+- No canvas / canvas-pro dependency
 
 ## What belongs in `@openenvx/core`
 
-- Plugin host primitives: `Command`, `LayerDefinition`, `Shortcut`, `ContextKey`, `Service`, `I18n`
+- Plugin host primitives: `Command`, `LayerDefinition`, `Shortcut`, `ContextKey`, `Service`, `I18n`, `PageRulesContribution`
 - `Plugin`, `PluginManager`, `EditorRuntime`, `registerContribution()`
 - `EditorRuntime` — owns the DI container (`InstantiationService`), core service bootstrap, event bus, context-key contributions, sync, and `createCommandContext()`
 - `PluginManager` — plugin lifecycle and contribution routing only; receives `EditorRuntime` via injection
+- **Page rules** — providers register `PageRulesContribution` keyed by `page.layout`; `SceneStore` applies them after structural `normalizeScene`
 - **Layer property data** — `PropertyBuilder`, `PropertyFieldDescriptor`, `PropertySectionDescriptor` (returned by `LayerDefinition.properties()`)
 - Generic service ids (`AssetServiceId`, `PersistenceServiceId`, `LocalizationServiceId`) and editor services (`EditorService`, `DocumentHostService`, `ThemeService`, …)
 - `LocalizationService`, `I18nContribution`, `localize()`
@@ -78,13 +91,22 @@ Workbench chrome for canvas (toolbar, palette, sidebars, editor pane registratio
 - `WorkbenchProvider`, `useWorkbenchContext` (React bridge)
 - `createInspectorHostContext`, `InspectorPathResolver`, `LayerPropertiesPaneFactory`, `InspectorPath`
 
+## What belongs in `@xmazu/openenvxee-workbench`
+
+- `WorkbenchShell` — React chrome host; auto-injects default plugins
+- `DefaultWorkbenchChromePlugin` — scene-generic `workbench.sidebar` (Pages + Layers), dirty Saved/Unsaved status (`workbench-saved` / `workbench-unsaved`)
+- Default inspector container + field renderer plugins
+- Shared by canvas studio and HTML studio (no canvas branding on generic chrome)
+
 ## Contribution flow
 
 ```mermaid
 flowchart TB
   subgraph plugins [Plugins]
+    Chrome[DefaultWorkbenchChromePlugin]
     CanvasBasics[CanvasBasicsPlugin]
     CanvasPro[CanvasProPlugin]
+    HtmlBlocks[HtmlBlocksPlugin]
     Custom[CustomPlugin]
   end
   subgraph canvasPkg [canvas]
@@ -100,21 +122,24 @@ flowchart TB
     Controller[WorkbenchController]
     State[WorkbenchState]
   end
-  subgraph app [demo-playground]
-    PaneHost[EditorPaneHost]
+  subgraph app [demo / html-demo]
+    Shell[WorkbenchShell]
   end
+  Chrome -->|workbench.pages layers status| WbRegs
   CanvasBasics -->|ctx.register commands layers| PluginHost
   CanvasBasics -->|registerCanvasContribution| Registries
-  CanvasPro -->|registerWorkbench chrome editorPane| WbRegs
+  CanvasPro -->|canvas-only chrome| WbRegs
+  HtmlBlocks -->|LayerDefinitions editorPane| PluginHost
+  HtmlBlocks -->|registerEditorPane html| WbRegs
   Controller --> State
-  PaneHost -->|CanvasHostProvider| CanvasEditor
-  PaneHost --> State
+  Shell --> Controller
 ```
 
-1. `CanvasBasicsPlugin` registers canvas engine contributions via core `ctx.register()` and canvas registries.
-2. Enterprise `CanvasProPlugin` registers workbench chrome via `ctx.registerWorkbench()` on a `WorkbenchPlugin`.
-3. `WorkbenchController` assembles core + workbench registries into `WorkbenchState`.
-4. App shell (`demo-playground`) wires `CanvasHostProvider` + `CanvasEditor`; studio/canvas-pro provide full chrome renderers.
+1. `WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages/Layers + dirty status) plus default inspector/fields plugins.
+2. `CanvasBasicsPlugin` registers canvas engine contributions via core `ctx.register()` and canvas registries.
+3. Enterprise `CanvasProPlugin` registers **canvas-only** workbench chrome (zoom status, transform inspectors, …).
+4. `HtmlBlocksPlugin` registers HTML `LayerDefinition`s (inspector props) + `HtmlEditorPane`.
+5. `WorkbenchController` assembles core + workbench registries into `WorkbenchState`.
 
 ## Workbench layout defaults
 

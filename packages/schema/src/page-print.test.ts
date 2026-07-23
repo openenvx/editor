@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolvePagePreset } from './page-presets';
 import {
   computePagePrintBoxes,
   DEFAULT_BLEED_MM,
@@ -12,17 +11,19 @@ import {
 import type { Page } from './types';
 import { toPx } from './units';
 
+/** A4 portrait at 96 DPI (210×297 mm). */
+const A4 = { width: 794, height: 1123 };
+
 function a4Page(overrides: Partial<Page> = {}): Page {
-  const preset = resolvePagePreset('a4-portrait')!;
   return {
-    height: preset.height,
+    height: A4.height,
     id: 'p1',
     layers: [],
     layout: 'absolute',
     name: 'Page',
     presetId: 'a4-portrait',
     unit: 'mm',
-    width: preset.width,
+    width: A4.width,
     ...overrides,
   };
 }

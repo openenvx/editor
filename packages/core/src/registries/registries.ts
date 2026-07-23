@@ -1,6 +1,7 @@
 import type { Command } from '../contributions/command';
 import type { ContextKeyContribution } from '../contributions/context-key-contribution';
 import type { LayerDefinition } from '../contributions/layer-definition';
+import type { PageRulesContribution } from '../contributions/page-rules-contribution';
 import type { ServiceContribution } from '../contributions/service-contribution';
 import type { ShortcutContribution } from '../contributions/shortcut-contribution';
 import type { Contribution } from '../core/contribution';
@@ -10,11 +11,13 @@ import type { I18nContribution } from '../i18n/i18n-contribution';
 import { LocalizationServiceId } from '../i18n/localization-service-id';
 import { CommandService } from '../runtime/command-service';
 import { KeybindingService } from '../runtime/keybinding-service';
+import { Registry } from './registry';
 
 export class Registries {
   readonly commands = new CommandService();
   readonly keybindings = new KeybindingService();
   readonly layers = new LayerRegistry();
+  readonly pageRules = new Registry<string, PageRulesContribution>('overwrite');
   readonly i18nContributions: I18nContribution[] = [];
 }
 
@@ -75,6 +78,11 @@ export function registerContribution(
         const registry = new I18nBundleRegistry(i18n.sourceId, localization);
         i18n.contribute(registry);
       }
+      break;
+    }
+    case 'pageRules': {
+      const rules = contribution as PageRulesContribution;
+      registries.pageRules.register(rules.layout, rules);
       break;
     }
     default: {

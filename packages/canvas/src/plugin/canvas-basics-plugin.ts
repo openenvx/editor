@@ -9,8 +9,9 @@ import {
   SingletonServiceContribution,
 } from '@openenvx/core';
 import type { CommandContext, Layer, PluginContext } from '@openenvx/core';
-import { getDefaultPageDimensions, normalizeScene } from '@openenvx/schema';
+import { normalizeScene } from '@openenvx/schema';
 
+import { AbsolutePageRules } from '../absolute-page-rules';
 import {
   CanvasClipboardServiceId,
   CanvasCommandRequestServiceId,
@@ -69,6 +70,7 @@ import { CanvasImageLayer } from '../layers/canvas-image-layer';
 import { CanvasRectLayer } from '../layers/canvas-rect-layer';
 import { CanvasSvgLayer } from '../layers/canvas-svg-layer';
 import { CanvasTextLayer } from '../layers/canvas-text-layer';
+import { getDefaultPageDimensions } from '../page-presets';
 import { resizeSceneToPagePreset } from '../page-resize/apply-page-preset-resize';
 import {
   builtinCanvasInteractionContributions,
@@ -259,6 +261,7 @@ export class CanvasBasicsPlugin extends Plugin {
     ]);
 
     ctx.register(
+      new AbsolutePageRules(),
       new CanvasI18nBundle(),
       new CanvasTextLayer(),
       new CanvasImageLayer(),

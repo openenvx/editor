@@ -65,6 +65,21 @@ export {
   DefaultInspectorContainerPlugin,
   DEFAULT_INSPECTOR_PLUGIN_ID,
 } from './views/default-inspector-plugin';
+export {
+  DefaultWorkbenchChromePlugin,
+  DEFAULT_WORKBENCH_CHROME_PLUGIN_ID,
+} from './views/default-workbench-chrome-plugin';
+export {
+  LayersTreeProvider,
+  PagesTreeProvider,
+  WORKBENCH_LAYERS_VIEW_ID,
+  WORKBENCH_PAGES_VIEW_ID,
+  WORKBENCH_SIDEBAR_CONTAINER_ID,
+  WorkbenchLayersView,
+  WorkbenchPagesView,
+  WorkbenchSidebarContainer,
+  WorkbenchStatusBarContribution,
+} from './views/workbench-chrome-contributions';
 export { SecondarySidebarRenderer } from './renderers/secondary-sidebar-renderer';
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './primitives/tabs';
 export { NumericControl } from './inputs/basic/numeric-control';

@@ -12,7 +12,6 @@ import type {
   FontDescriptor,
   FontService,
 } from '@openenvx/core';
-import { resolvePagePreset } from '@openenvx/schema';
 import type { Transform } from '@openenvx/schema';
 
 import {
@@ -23,6 +22,7 @@ import {
 import { bytesToDataUrl } from '../export/bytes-to-data-url';
 import { CanvasDocumentExportServiceId } from '../export/canvas-document-export-service';
 import type { CanvasDocumentExportService } from '../export/canvas-document-export-service';
+import { resolvePagePreset } from '../page-presets';
 import { applyPagePresetResize } from '../page-resize/apply-page-preset-resize';
 import type { PageResizeService } from '../page-resize/page-resize-types';
 import type { CanvasCommandRequestService } from './canvas-command-request-service';

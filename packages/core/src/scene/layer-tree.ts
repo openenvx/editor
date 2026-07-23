@@ -167,6 +167,7 @@ export function removeLayerFromTree(layers: Layer[], layerId: string): Layer[] {
     );
 }
 
+/** Insert into any parent that already has a `data.children` array (container, group, html.root, …). */
 export function insertLayerIntoContainer(
   layers: Layer[],
   containerId: string,
@@ -174,7 +175,7 @@ export function insertLayerIntoContainer(
   index?: number
 ): Layer[] {
   return layers.map((layer) => {
-    if (layer.id === containerId && isContainerLayer(layer)) {
+    if (layer.id === containerId && hasChildLayers(layer)) {
       const data = layer.data as { children: Layer[] };
       const children = [...(data.children ?? [])];
       const at = index ?? children.length;

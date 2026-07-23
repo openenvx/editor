@@ -217,3 +217,39 @@ describe(moveLayerToIndex, () => {
     ]);
   });
 });
+
+describe("SceneStore page rules", () => {
+  it("rejects undimensioned absolute pages once page-rules lookup is wired", () => {
+    const store = new SceneStore();
+    store.setPageRulesLookup(() => {});
+    expect(() =>
+      store.setScene({
+        schemaVersion: 2,
+        pages: [
+          {
+            id: "p1",
+            name: "Page",
+            layout: "absolute",
+            layers: [],
+          },
+        ],
+      })
+    ).toThrow(/width and height/);
+  });
+
+  it("accepts undimensioned absolute pages when lookup is unset", () => {
+    const store = new SceneStore();
+    store.setScene({
+      schemaVersion: 2,
+      pages: [
+        {
+          id: "p1",
+          name: "Page",
+          layout: "absolute",
+          layers: [],
+        },
+      ],
+    });
+    expect(store.getScene().pages[0]!.width).toBeUndefined();
+  });
+});

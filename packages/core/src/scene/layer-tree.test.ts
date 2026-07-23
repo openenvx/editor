@@ -5,6 +5,8 @@ import type { Page } from "./types";
 import {
   cloneLayerTree,
   getLayerAncestorIds,
+  getLayerChildren,
+  insertLayerIntoContainer,
   isLayerDescendant,
   moveLayerRelativeToTarget,
   updateLayerInTree,
@@ -100,6 +102,23 @@ describe("layer-tree", () => {
     const child = (groupLayer?.data as { children: Layer[] } | undefined)
       ?.children[0];
     expect(child?.data).toStrictEqual({ fill: "#fff" });
+  });
+
+  it("insertLayerIntoContainer works for non-container parents with children", () => {
+    const groupLayers: Layer[] = [
+      {
+        data: { children: [] },
+        id: "root",
+        type: "html.root",
+      },
+    ];
+    const result = insertLayerIntoContainer(
+      groupLayers,
+      "root",
+      { id: "t1", type: "html.text", data: { text: "Hi" } },
+      0
+    );
+    expect(getLayerChildren(result[0]!).map((l) => l.id)).toStrictEqual(["t1"]);
   });
 
   it("cloneLayerTree remaps ids including nested children", () => {

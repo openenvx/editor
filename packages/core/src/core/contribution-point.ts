@@ -6,4 +6,5 @@ export enum ContributionPoint {
   Service = 'service',
   ContextKey = 'contextKey',
   I18n = 'i18n',
+  PageRules = 'pageRules',
 }

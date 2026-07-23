@@ -1,12 +1,11 @@
+import { createDefaultTransform } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
-  createDefaultTransform,
   findPresetForPage,
   getDefaultPageDimensions,
   resolvePagePreset,
-} from '@openenvx/schema';
-
+} from '../page-presets';
 import { resizeAbsolutePage } from './scale-page-content';
 
 describe('resizeAbsolutePage', () => {

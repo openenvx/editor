@@ -3,22 +3,24 @@ import { describe, expect, it } from 'vitest';
 import {
   computePageExportDimensions,
   pagePhysicalSize,
+  resolvePagePixelDimensions,
   resolvePagePresetId,
 } from './page-export';
-import { resolvePagePreset } from './page-presets';
 import type { Page } from './types';
 
+/** A4 portrait at 96 DPI (210×297 mm). */
+const A4 = { width: 794, height: 1123 };
+
 function absolutePage(overrides: Partial<Page> = {}): Page {
-  const a4 = resolvePagePreset('a4-portrait')!;
   return {
-    height: a4.height,
+    height: A4.height,
     id: 'page-1',
     layers: [],
     layout: 'absolute',
     name: 'Artboard',
     presetId: 'a4-portrait',
     unit: 'mm',
-    width: a4.width,
+    width: A4.width,
     ...overrides,
   };
 }
@@ -27,6 +29,17 @@ describe('page-export', () => {
   it('preserves explicit preset id on the page model', () => {
     const page = absolutePage({ presetId: 'a4-portrait' });
     expect(resolvePagePresetId(page)).toBe('a4-portrait');
+  });
+
+  it('throws when page is missing width/height', () => {
+    expect(() =>
+      resolvePagePixelDimensions({
+        id: 'page-1',
+        layers: [],
+        layout: 'absolute',
+        name: 'Broken',
+      })
+    ).toThrow(/missing width\/height/);
   });
 
   it('computes scaled export dimensions from page pixels', () => {

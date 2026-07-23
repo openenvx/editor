@@ -15,9 +15,13 @@ import { createDefaultTransform, normalizeScene } from '@openenvx/schema';
 import type { Page } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
-import { CanvasPagesTreeProvider } from './canvas-sidebar-contributions';
+import {
+  LayersTreeProvider,
+  PagesTreeProvider,
+  WORKBENCH_PAGES_VIEW_ID,
+} from './workbench-chrome-contributions';
 
-class LayersTreeProvider extends TreeDataProvider<Layer> {
+class TestLayersTreeProvider extends TreeDataProvider<Layer> {
   getRootChildren(ctx: CommandContext): Layer[] {
     return ctx.scene.getActivePage().layers;
   }
@@ -76,12 +80,12 @@ class LayersPlugin extends WorkbenchPlugin {
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
     ctx.registerWorkbench(new LayersViewContainer(), new LayersView());
-    ctx.registerTreeDataProvider('layers.tree', new LayersTreeProvider());
+    ctx.registerTreeDataProvider('layers.tree', new TestLayersTreeProvider());
   }
 }
 
 class PagesView extends ViewContribution {
-  readonly id = 'canvas.pages';
+  readonly id = WORKBENCH_PAGES_VIEW_ID;
   readonly containerId = 'pages';
   readonly name = 'Pages';
 }
@@ -96,7 +100,10 @@ class PagesPlugin extends WorkbenchPlugin {
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
     ctx.registerWorkbench(new PagesViewContainer(), new PagesView());
-    ctx.registerTreeDataProvider('canvas.pages', new CanvasPagesTreeProvider());
+    ctx.registerTreeDataProvider(
+      WORKBENCH_PAGES_VIEW_ID,
+      new PagesTreeProvider()
+    );
   }
 }
 
@@ -109,6 +116,8 @@ describe('moveViewItem', () => {
             id: 'p1',
             name: 'Page',
             layout: 'absolute',
+            width: 800,
+            height: 600,
             layers: [
               {
                 id: 'x',
@@ -152,7 +161,7 @@ describe('moveViewItem', () => {
   });
 });
 
-describe('CanvasPagesTreeProvider', () => {
+describe('PagesTreeProvider', () => {
   it('selects a page via setActivePage', async () => {
     const controller = new WorkbenchController({
       initialScene: normalizeScene({
@@ -165,7 +174,7 @@ describe('CanvasPagesTreeProvider', () => {
       plugins: [new PagesPlugin()],
     });
     await controller.start();
-    controller.selectViewItem('canvas.pages', {
+    controller.selectViewItem(WORKBENCH_PAGES_VIEW_ID, {
       id: 'b',
       name: 'B',
       layout: 'flow',
@@ -189,7 +198,7 @@ describe('CanvasPagesTreeProvider', () => {
     });
     await controller.start();
     controller.moveViewItem(
-      'canvas.pages',
+      WORKBENCH_PAGES_VIEW_ID,
       { id: 'c', name: 'C', layout: 'flow', layers: [] } satisfies Page,
       { id: 'a', name: 'A', layout: 'flow', layers: [] } satisfies Page,
       'before'
@@ -203,7 +212,7 @@ describe('CanvasPagesTreeProvider', () => {
   });
 
   it('canMove rejects inside drops', () => {
-    const provider = new CanvasPagesTreeProvider();
+    const provider = new PagesTreeProvider();
     const a = { id: 'a', name: 'A', layout: 'flow' as const, layers: [] };
     const b = { id: 'b', name: 'B', layout: 'flow' as const, layers: [] };
     expect(provider.canMove?.(a, b, 'before')).toBe(true);
@@ -211,7 +220,7 @@ describe('CanvasPagesTreeProvider', () => {
   });
 
   it('exposes rename command and edit label', () => {
-    const provider = new CanvasPagesTreeProvider();
+    const provider = new PagesTreeProvider();
     const item = provider.getTreeItem(
       { id: 'a', name: 'Cover', layout: 'flow', layers: [] },
       {} as CommandContext
@@ -221,5 +230,23 @@ describe('CanvasPagesTreeProvider', () => {
       label: 'Cover',
       renameCommandId: 'scene.renamePage',
     });
+  });
+});
+
+describe('LayersTreeProvider', () => {
+  it('walks data.children for nested layers', () => {
+    const provider = new LayersTreeProvider();
+    const child: Layer = {
+      id: 'child',
+      type: 'html.text',
+      data: { text: 'Hi' },
+    };
+    const parent: Layer = {
+      id: 'parent',
+      type: 'html.container',
+      data: { children: [child] },
+    };
+    expect(provider.getChildren(parent)).toEqual([child]);
+    expect(provider.getChildren(child)).toEqual([]);
   });
 });

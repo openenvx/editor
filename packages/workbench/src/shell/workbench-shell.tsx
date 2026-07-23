@@ -50,6 +50,10 @@ import {
   DEFAULT_INSPECTOR_PLUGIN_ID,
   DefaultInspectorContainerPlugin,
 } from '../views/default-inspector-plugin';
+import {
+  DEFAULT_WORKBENCH_CHROME_PLUGIN_ID,
+  DefaultWorkbenchChromePlugin,
+} from '../views/default-workbench-chrome-plugin';
 
 export interface WorkbenchShellProps {
   plugins: Plugin[];
@@ -447,7 +451,13 @@ export function WorkbenchShell({
     const hasInspectorPlugin = plugins.some(
       (plugin) => plugin.id === DEFAULT_INSPECTOR_PLUGIN_ID
     );
+    const hasChromePlugin = plugins.some(
+      (plugin) => plugin.id === DEFAULT_WORKBENCH_CHROME_PLUGIN_ID
+    );
     const next = [...plugins];
+    if (!hasChromePlugin) {
+      next.unshift(new DefaultWorkbenchChromePlugin());
+    }
     if (!hasInspectorPlugin) {
       next.unshift(new DefaultInspectorContainerPlugin());
     }
