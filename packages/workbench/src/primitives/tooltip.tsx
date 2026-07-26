@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useThemeScope } from '../context/theme-context';
 import { cn } from '../lib/cn';
 
+import overlaySurface from './overlay-surface.module.css';
 import styles from './tooltip.module.css';
 
 export interface TooltipProps {
@@ -30,7 +31,7 @@ export function Tooltip({
           <TooltipPrimitive.Content
             {...themeScope}
             align={align}
-            className={cn(styles.content, className)}
+            className={cn(styles.content, overlaySurface.surface, className)}
             side={side}
             sideOffset={4}
           >

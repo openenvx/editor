@@ -11,6 +11,7 @@ import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useThemeScope } from '../context/theme-context';
 import { cn } from '../lib/cn';
 
+import overlaySurface from './overlay-surface.module.css';
 import styles from './popover.module.css';
 
 const SIDE_OFFSET = 8;
@@ -162,6 +163,7 @@ export function PopoverContent({
         avoidCollisions={resolvedAvoidCollisions}
         className={cn(
           styles.panel,
+          overlaySurface.surface,
           isInspector && styles.inspectorPanel,
           className
         )}

@@ -7,6 +7,7 @@ import { useThemeScope } from '../context/theme-context';
 import { cn } from '../lib/cn';
 
 import styles from './dropdown-menu.module.css';
+import overlaySurface from './overlay-surface.module.css';
 
 const SIDE_OFFSET = 4;
 /** Negative offset overlaps the submenu onto the parent panel. */
@@ -94,7 +95,7 @@ export function DropdownMenuContent({
       <DropdownMenuPrimitive.Content
         {...themeScope}
         align={align}
-        className={cn(styles.content, className)}
+        className={cn(styles.content, overlaySurface.surface, className)}
         onCloseAutoFocus={(event) => event.preventDefault()}
         side={side}
         sideOffset={SIDE_OFFSET}
@@ -177,7 +178,7 @@ export function DropdownMenuSubContent({
   return (
     <DropdownMenuPrimitive.SubContent
       {...themeScope}
-      className={cn(styles.subContent, className)}
+      className={cn(styles.subContent, overlaySurface.surface, className)}
       sideOffset={SUB_OFFSET}
     >
       {children}

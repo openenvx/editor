@@ -1,9 +1,12 @@
 import { memo } from 'react';
 
+import { usePresence } from '../hooks/use-presence';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
+import { cn } from '../lib/cn';
 import { Button } from './button';
 
 import styles from './confirm-dialog.module.css';
+import overlaySurface from './overlay-surface.module.css';
 
 export interface ConfirmDialogProps {
   open: boolean;
@@ -26,13 +29,16 @@ export const ConfirmDialog = memo(
     onCancel,
   }: ConfirmDialogProps) => {
     const { t } = useWorkbenchTranslation();
-    if (!open) {
+    const { present, state } = usePresence(open);
+
+    if (!present) {
       return null;
     }
 
     return (
       <div
-        className={styles.backdrop}
+        className={cn(styles.backdrop, overlaySurface.backdrop)}
+        data-state={state}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
             onCancel();
@@ -45,7 +51,12 @@ export const ConfirmDialog = memo(
         }}
         role="presentation"
       >
-        <div aria-modal="true" className={styles.dialog} role="dialog">
+        <div
+          aria-modal="true"
+          className={cn(styles.dialog, overlaySurface.surface)}
+          data-state={state}
+          role="dialog"
+        >
           <h3 className={styles.title}>{title}</h3>
           <p className={styles.description}>{description}</p>
           <div className={styles.actions}>

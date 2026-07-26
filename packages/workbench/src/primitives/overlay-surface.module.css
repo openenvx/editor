@@ -1,51 +1,127 @@
+/*
+ * shadcn overlay motion (tailwindcss-animate enter/exit), as CSS modules.
+ * Registry classes mirrored:
+ *   data-[state=open]:animate-in fade-in-0 zoom-in-95
+ *   data-[state=closed]:animate-out fade-out-0 zoom-out-95
+ *   data-[side=bottom]:slide-in-from-top-2 (etc.)
+ *
+ * Keyframes live in this module so Vite scopes animation-name + @keyframes
+ * together — global token keyframes left Presence waiting on animationend forever.
+ */
+
+@keyframes enter {
+  from {
+    opacity: var(--wb-enter-opacity, 1);
+    transform: translate3d(
+        var(--wb-enter-translate-x, 0),
+        var(--wb-enter-translate-y, 0),
+        0
+      )
+      scale3d(
+        var(--wb-enter-scale, 1),
+        var(--wb-enter-scale, 1),
+        var(--wb-enter-scale, 1)
+      );
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--wb-exit-opacity, 1);
+    transform: translate3d(
+        var(--wb-exit-translate-x, 0),
+        var(--wb-exit-translate-y, 0),
+        0
+      )
+      scale3d(
+        var(--wb-exit-scale, 1),
+        var(--wb-exit-scale, 1),
+        var(--wb-exit-scale, 1)
+      );
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
 .surface {
   transform-origin: var(
     --radix-popover-content-transform-origin,
-    var(--radix-dropdown-menu-content-transform-origin, center)
+    var(
+      --radix-dropdown-menu-content-transform-origin,
+      var(
+        --radix-select-content-transform-origin,
+        var(--radix-tooltip-content-transform-origin, center)
+      )
+    )
   );
 }
 
+/* animate-in + fade-in-0 + zoom-in-95 */
 .surface[data-state='open'] {
-  animation: wb-overlay-in 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --wb-enter-opacity: 0;
+  --wb-enter-scale: 0.95;
+  animation-name: enter;
+  animation-duration: 150ms;
+  animation-timing-function: ease;
 }
 
+/* animate-out + fade-out-0 + zoom-out-95 */
 .surface[data-state='closed'] {
-  animation: wb-overlay-out 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  --wb-exit-opacity: 0;
+  --wb-exit-scale: 0.95;
+  animation-name: exit;
+  animation-duration: 150ms;
+  animation-timing-function: ease;
   pointer-events: none;
+}
+
+/* data-[side=*]:slide-in-from-*-2 — enter only, like shadcn */
+.surface[data-side='bottom'][data-state='open'] {
+  --wb-enter-translate-y: -0.5rem;
 }
 
 .surface[data-side='top'][data-state='open'] {
-  animation-name: wb-overlay-in-from-bottom;
-}
-
-.surface[data-side='top'][data-state='closed'] {
-  animation: wb-overlay-out-to-bottom 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
-  pointer-events: none;
-}
-
-.surface[data-side='bottom'][data-state='open'] {
-  animation-name: wb-overlay-in-from-top;
-}
-
-.surface[data-side='bottom'][data-state='closed'] {
-  animation: wb-overlay-out-to-top 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
-  pointer-events: none;
+  --wb-enter-translate-y: 0.5rem;
 }
 
 .surface[data-side='left'][data-state='open'] {
-  animation-name: wb-overlay-in-from-right;
-}
-
-.surface[data-side='left'][data-state='closed'] {
-  animation: wb-overlay-out-to-left 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
-  pointer-events: none;
+  --wb-enter-translate-x: 0.5rem;
 }
 
 .surface[data-side='right'][data-state='open'] {
-  animation-name: wb-overlay-in-from-left;
+  --wb-enter-translate-x: -0.5rem;
 }
 
-.surface[data-side='right'][data-state='closed'] {
-  animation: wb-overlay-out-to-right 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
+/* Dialog overlay: fade-in-0 / fade-out-0 only */
+.backdrop[data-state='open'] {
+  animation-name: fade-in;
+  animation-duration: 150ms;
+  animation-timing-function: ease;
+}
+
+.backdrop[data-state='closed'] {
+  animation-name: fade-out;
+  animation-duration: 150ms;
+  animation-timing-function: ease;
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface[data-state='open'],
+  .surface[data-state='closed'],
+  .backdrop[data-state='open'],
+  .backdrop[data-state='closed'] {
+    /* Keep a real animation-name so Radix Presence still gets animationend. */
+    animation-duration: 0.01ms !important;
+  }
 }

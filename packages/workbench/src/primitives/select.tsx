@@ -6,6 +6,7 @@ import { useThemeScope } from '../context/theme-context';
 import { cn } from '../lib/cn';
 
 import menuStyles from './dropdown-menu.module.css';
+import overlaySurface from './overlay-surface.module.css';
 import styles from './select.module.css';
 
 const SIDE_OFFSET = 4;
@@ -55,7 +56,11 @@ export function Select({
             {...themeScope}
             align="start"
             avoidCollisions
-            className={cn(menuStyles.content, styles.panel)}
+            className={cn(
+              menuStyles.content,
+              styles.panel,
+              overlaySurface.surface
+            )}
             collisionPadding={COLLISION_PADDING}
             onCloseAutoFocus={(event) => event.preventDefault()}
             onPointerDownOutside={() => setOpen(false)}

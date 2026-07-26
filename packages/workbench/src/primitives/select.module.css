@@ -43,8 +43,3 @@
   flex-direction: column;
   gap: var(--wb-space-1);
 }
-
-.panel[data-state='closed'] {
-  display: none;
-  pointer-events: none;
-}

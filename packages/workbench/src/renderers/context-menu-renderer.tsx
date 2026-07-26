@@ -4,8 +4,11 @@ import { useCallback, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useMountEffect } from '../hooks/use-mount-effect';
+import { usePresence } from '../hooks/use-presence';
+import { cn } from '../lib/cn';
 
 import dropdownStyles from '../primitives/dropdown-menu.module.css';
+import overlaySurface from '../primitives/overlay-surface.module.css';
 import styles from './context-menu.module.css';
 
 interface Props {
@@ -17,12 +20,14 @@ function ContextMenuOverlay({
   menuItems,
   commandStates,
   position,
+  state,
   onClose,
   onExecute,
 }: {
   menuItems: MenuItemDescriptor[];
   commandStates: Record<string, { canExecute: boolean }>;
   position: { x: number; y: number };
+  state: 'open' | 'closed';
   onClose: () => void;
   onExecute: (commandId: string) => void;
 }) {
@@ -38,7 +43,12 @@ function ContextMenuOverlay({
 
   return (
     <div
-      className={`${dropdownStyles.content} ${styles.menu}`}
+      className={cn(
+        dropdownStyles.content,
+        styles.menu,
+        overlaySurface.surface
+      )}
+      data-state={state}
       role="menu"
       style={{ left: position.x, top: position.y }}
     >
@@ -72,6 +82,7 @@ function ContextMenuOverlay({
 export function ContextMenuRenderer({ items, children }: Props) {
   const { api, executeCommand } = useWorkbenchContext();
   const [open, setOpen] = useState(false);
+  const { present, state } = usePresence(open);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [menuItems, setMenuItems] = useState<MenuItemDescriptor[]>([]);
   const [commandStates, setCommandStates] = useState<
@@ -105,7 +116,7 @@ export function ContextMenuRenderer({ items, children }: Props) {
       <div className={styles.target} onContextMenu={handleContextMenu}>
         {children}
       </div>
-      {open ? (
+      {present ? (
         <ContextMenuOverlay
           commandStates={commandStates}
           menuItems={menuItems}
@@ -114,6 +125,7 @@ export function ContextMenuRenderer({ items, children }: Props) {
             void executeCommand(commandId);
           }}
           position={position}
+          state={state}
         />
       ) : null}
     </>

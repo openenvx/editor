@@ -2,7 +2,9 @@ import type { CommandPaletteDescriptor } from '@openenvx/headless';
 import { COMMAND_PALETTE_ALL_TAB_ID } from '@openenvx/headless';
 import { useCallback, useMemo, useState } from 'react';
 
+import { usePresence } from '../hooks/use-presence';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
+import { cn } from '../lib/cn';
 import {
   Command,
   CommandEmpty,
@@ -12,6 +14,7 @@ import {
   CommandList,
 } from '../primitives/command';
 
+import overlaySurface from '../primitives/overlay-surface.module.css';
 import styles from './command-palette.module.css';
 
 const UNCATEGORIZED_GROUP_ID = '__other__';
@@ -41,6 +44,7 @@ export function CommandPaletteRenderer({
   executeCommand,
 }: Props) {
   const { t } = useWorkbenchTranslation();
+  const { present, state } = usePresence(open);
   const [activeTabId, setActiveTabId] = useState(COMMAND_PALETTE_ALL_TAB_ID);
 
   const closePalette = useCallback(() => {
@@ -96,13 +100,14 @@ export function CommandPaletteRenderer({
       .filter((group) => group.items.length > 0);
   }, [categoryLabels, commandPalette.categories, t, tabFilteredItems]);
 
-  if (!open) {
+  if (!present) {
     return null;
   }
 
   return (
     <div
-      className={styles.backdrop}
+      className={cn(styles.backdrop, overlaySurface.backdrop)}
+      data-state={state}
       onClick={(event) => {
         if (event.target === event.currentTarget) {
           closePalette();
@@ -118,7 +123,8 @@ export function CommandPaletteRenderer({
       <div
         aria-label={t('commandPalette.title')}
         aria-modal="true"
-        className={styles.panel}
+        className={cn(styles.panel, overlaySurface.surface)}
+        data-state={state}
         role="dialog"
       >
         <Command className={styles.command}>

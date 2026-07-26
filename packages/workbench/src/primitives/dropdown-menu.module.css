@@ -93,16 +93,6 @@
   font-family: var(--wb-font);
 }
 
-.subContent[data-state='closed'] {
-  display: none;
-  pointer-events: none;
-}
-
-.content[data-state='closed'] {
-  display: none;
-  pointer-events: none;
-}
-
 .itemSelected {
   color: var(--wb-foreground);
 }

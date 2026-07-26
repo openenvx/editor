@@ -36,6 +36,12 @@ export function InspectorAnchoredPopover({
     inspectorPanel?.panelRef,
     triggerRef
   );
+  const lastAnchorRef = useRef(anchorRect);
+  if (anchorRect) {
+    lastAnchorRef.current = anchorRect;
+  }
+  // Keep last rect so Radix Presence can play exit while Root.open is false.
+  const displayAnchor = anchorRect ?? lastAnchorRef.current;
 
   return (
     <Popover
@@ -46,16 +52,16 @@ export function InspectorAnchoredPopover({
       <PopoverTrigger>
         <Slot ref={triggerRef}>{trigger}</Slot>
       </PopoverTrigger>
-      {open && anchorRect ? (
+      {displayAnchor ? (
         <PopoverAnchor
           style={{
-            height: anchorRect.height,
-            left: anchorRect.left,
-            top: anchorRect.top,
+            height: displayAnchor.height,
+            left: displayAnchor.left,
+            top: displayAnchor.top,
           }}
         />
       ) : null}
-      {open && anchorRect ? (
+      {displayAnchor ? (
         <PopoverContent placement={placement} title={title} variant="inspector">
           {children}
         </PopoverContent>

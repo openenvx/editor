@@ -24,11 +24,6 @@
   overflow: visible;
 }
 
-.panel[data-state='closed'] {
-  display: none;
-  pointer-events: none;
-}
-
 .header {
   padding: var(--wb-space-4) var(--wb-space-5);
   border-bottom: var(--wb-hairline);
