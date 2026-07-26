@@ -1,4 +1,5 @@
 import type { ShellDropdownMenuItemDescriptor } from '@openenvx/headless';
+import { ChevronUp } from 'lucide-react';
 import { memo, useMemo } from 'react';
 
 import { useEditorViewport } from '../context/editor-viewport-context';
@@ -80,9 +81,7 @@ export const ShellDropdownControl = memo(
         <DropdownMenuTrigger>
           <button className={triggerClass} type="button">
             <span>{displayLabel}</span>
-            <span aria-hidden className={styles.chevron}>
-              ▴
-            </span>
+            <ChevronUp aria-hidden className={styles.chevron} size={14} />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side="top">
