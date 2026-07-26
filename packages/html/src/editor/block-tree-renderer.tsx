@@ -1,8 +1,10 @@
 import { useDroppable } from '@dnd-kit/core';
 import {
+  rectSortingStrategy,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
+  type SortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
@@ -73,6 +75,17 @@ function DropZone({
   );
 }
 
+function DropPlaceholder() {
+  return <div aria-hidden className={styles.dropPlaceholder} />;
+}
+
+function sortStrategyForParentType(parentType: string): SortingStrategy {
+  if (parentType === 'html.flex' || parentType === 'html.grid') {
+    return rectSortingStrategy;
+  }
+  return verticalListSortingStrategy;
+}
+
 function orderVisibleEntries(
   layers: readonly Layer[],
   sortDraft: BlockSortDraft | null,
@@ -87,7 +100,14 @@ function orderVisibleEntries(
     isLayerVisible(child) ? [{ child, childIndex }] : []
   );
 
-  if (!(sortDraft && sortDraft.parentId === parentId)) {
+  // Same-parent reorder only — cross-parent uses placeholderIndex instead.
+  if (
+    !(
+      sortDraft &&
+      sortDraft.parentId === parentId &&
+      sortDraft.placeholderIndex === undefined
+    )
+  ) {
     return visible;
   }
 
@@ -201,28 +221,53 @@ function BlockChrome({
 
 function SortableChildren({
   parentId,
+  parentType,
   layers,
   registry,
 }: {
   parentId: string;
+  parentType: string;
   layers: readonly Layer[];
   registry: BlockRegistry;
 }) {
   const { sortDraft } = useBlockEditor();
   const visibleEntries = orderVisibleEntries(layers, sortDraft, parentId);
   const itemIds = visibleEntries.map(({ child }) => child.id);
+  const placeholderIndex =
+    sortDraft &&
+    sortDraft.parentId === parentId &&
+    typeof sortDraft.placeholderIndex === 'number'
+      ? sortDraft.placeholderIndex
+      : null;
+
+  const nodes: ReactNode[] = [];
+  for (const [
+    visibleIndex,
+    { child, childIndex },
+  ] of visibleEntries.entries()) {
+    if (placeholderIndex === visibleIndex) {
+      nodes.push(<DropPlaceholder key={`drop-ph-${visibleIndex}`} />);
+    }
+    nodes.push(
+      <SortableBlockNode
+        key={child.id}
+        index={childIndex}
+        layer={child}
+        parentId={parentId}
+        registry={registry}
+      />
+    );
+  }
+  if (placeholderIndex === visibleEntries.length) {
+    nodes.push(<DropPlaceholder key="drop-ph-end" />);
+  }
 
   return (
-    <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-      {visibleEntries.map(({ child, childIndex }) => (
-        <SortableBlockNode
-          key={child.id}
-          index={childIndex}
-          layer={child}
-          parentId={parentId}
-          registry={registry}
-        />
-      ))}
+    <SortableContext
+      items={itemIds}
+      strategy={sortStrategyForParentType(parentType)}
+    >
+      {nodes}
     </SortableContext>
   );
 }
@@ -234,20 +279,25 @@ function ContainerChildren({
   layer: Layer;
   registry: BlockRegistry;
 }) {
+  const { sortDraft } = useBlockEditor();
   const children = getBlockChildren(layer);
   const visibleCount = children.filter(isLayerVisible).length;
+  const showCrossPlaceholder =
+    sortDraft?.parentId === layer.id &&
+    typeof sortDraft.placeholderIndex === 'number';
+  const empty = visibleCount === 0 && !showCrossPlaceholder;
+
   return (
-    <DropZone
-      disabled={isLayerLocked(layer)}
-      empty={visibleCount === 0}
-      parentId={layer.id}
-    >
+    <DropZone disabled={isLayerLocked(layer)} empty={empty} parentId={layer.id}>
       {visibleCount > 0 ? (
         <SortableChildren
           layers={children}
           parentId={layer.id}
+          parentType={layer.type}
           registry={registry}
         />
+      ) : showCrossPlaceholder ? (
+        <DropPlaceholder />
       ) : null}
     </DropZone>
   );
@@ -367,6 +417,7 @@ function SortableBlockNode({
     blockId: layer.id,
     parentId,
     index,
+    acceptsChildren: config?.acceptsChildren === true,
   };
 
   const {

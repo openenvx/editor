@@ -24,20 +24,49 @@ export function createHtmlDemoScene(): Scene {
                   id: 'text-1',
                   type: 'html.text',
                   data: {
-                    html: 'Drag blocks from the left palette into containers. Double-click text to edit. Right-click for the context menu.',
+                    html: 'Drag blocks from the left palette into Flex or Grid. Double-click text to edit. Right-click for the context menu.',
                   },
                 },
                 {
-                  id: 'container-1',
-                  type: 'html.container',
+                  id: 'flex-1',
+                  type: 'html.flex',
                   data: {
-                    padding: 16,
-                    background: '#f8fafc',
+                    direction: 'row',
+                    justify: 'flex-start',
+                    gap: 24,
+                    wrap: 'true',
+                    paddingY: 0,
                     children: [
                       {
                         id: 'heading-2',
                         type: 'html.heading',
-                        data: { html: 'Nested section', level: '3' },
+                        data: { html: 'Flex item', level: '3' },
+                      },
+                      {
+                        id: 'text-2',
+                        type: 'html.text',
+                        data: { html: 'Another flex child' },
+                      },
+                    ],
+                  },
+                },
+                {
+                  id: 'grid-1',
+                  type: 'html.grid',
+                  data: {
+                    columns: 2,
+                    gap: 24,
+                    paddingY: 0,
+                    children: [
+                      {
+                        id: 'heading-3',
+                        type: 'html.heading',
+                        data: { html: 'Column A', level: '3' },
+                      },
+                      {
+                        id: 'text-3',
+                        type: 'html.text',
+                        data: { html: 'Column B' },
                       },
                     ],
                   },

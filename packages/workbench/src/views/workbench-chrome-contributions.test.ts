@@ -243,7 +243,7 @@ describe('LayersTreeProvider', () => {
     };
     const parent: Layer = {
       id: 'parent',
-      type: 'html.container',
+      type: 'html.flex',
       data: { children: [child] },
     };
     expect(provider.getChildren(parent)).toEqual([child]);

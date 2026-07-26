@@ -11,11 +11,7 @@ import {
   updateBlockData,
 } from './block-tree';
 
-function block(
-  id: string,
-  type: string,
-  children: Layer[] = []
-): Layer {
+function block(id: string, type: string, children: Layer[] = []): Layer {
   return {
     id,
     type,
@@ -28,7 +24,7 @@ describe('block-tree', () => {
     const layers = [
       block('root', 'html.root', [
         block('a', 'html.heading'),
-        block('c', 'html.container', [block('b', 'html.text')]),
+        block('c', 'html.flex', [block('b', 'html.text')]),
       ]),
     ];
     expect(findBlock(layers, 'b')).toEqual({
@@ -44,8 +40,8 @@ describe('block-tree', () => {
     layers = insertAt(layers, 'root', heading, 0);
     expect(findBlock(layers, 'h1')?.parentId).toBe('root');
 
-    const container = createBlock('html.container', 'box', { children: [] });
-    layers = insertAt(layers, 'root', container, 1);
+    const flex = createBlock('html.flex', 'box', { children: [] });
+    layers = insertAt(layers, 'root', flex, 1);
     layers = moveTo(layers, 'h1', 'box', 0);
     expect(findBlock(layers, 'h1')?.parentId).toBe('box');
 
@@ -60,7 +56,7 @@ describe('block-tree', () => {
 
   it('refuses to move a block into itself', () => {
     const layers = [
-      block('root', 'html.root', [block('box', 'html.container', [])]),
+      block('root', 'html.root', [block('box', 'html.flex', [])]),
     ];
     expect(moveTo(layers, 'box', 'box', 0)).toBe(layers);
   });

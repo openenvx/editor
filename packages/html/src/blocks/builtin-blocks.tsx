@@ -78,7 +78,104 @@ export const imageBlock: BlockConfig = {
   ),
 };
 
-export const containerBlock: BlockConfig = {
+export const flexBlock: BlockConfig = {
+  type: 'html.flex',
+  label: 'Flex',
+  fields: {
+    direction: {
+      kind: 'select',
+      label: 'Direction',
+      options: [
+        { label: 'Row', value: 'row' },
+        { label: 'Column', value: 'column' },
+      ],
+    },
+    justify: {
+      kind: 'select',
+      label: 'Justify Content',
+      options: [
+        { label: 'Start', value: 'flex-start' },
+        { label: 'Center', value: 'center' },
+        { label: 'End', value: 'flex-end' },
+      ],
+    },
+    gap: { kind: 'number', label: 'Gap' },
+    wrap: {
+      kind: 'select',
+      label: 'Wrap',
+      options: [
+        { label: 'true', value: 'true' },
+        { label: 'false', value: 'false' },
+      ],
+    },
+    paddingY: { kind: 'number', label: 'Vertical Padding' },
+  },
+  defaultData: {
+    direction: 'row',
+    justify: 'flex-start',
+    gap: 24,
+    wrap: 'true',
+    paddingY: 0,
+    children: [],
+  },
+  acceptsChildren: true,
+  render: ({ data, children }) => (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: data.direction === 'column' ? 'column' : 'row',
+        justifyContent: String(data.justify ?? 'flex-start'),
+        flexWrap: data.wrap === 'false' ? 'nowrap' : 'wrap',
+        gap: Number(data.gap ?? 24),
+        paddingBlock: Number(data.paddingY ?? 0),
+        minHeight: 40,
+        width: '100%',
+      }}
+    >
+      {children}
+    </div>
+  ),
+};
+
+export const gridBlock: BlockConfig = {
+  type: 'html.grid',
+  label: 'Grid',
+  fields: {
+    columns: { kind: 'number', label: 'Number of columns' },
+    gap: { kind: 'number', label: 'Gap' },
+    paddingY: { kind: 'number', label: 'Vertical Padding' },
+  },
+  defaultData: {
+    columns: 2,
+    gap: 24,
+    paddingY: 0,
+    children: [],
+  },
+  acceptsChildren: true,
+  render: ({ data, children }) => {
+    const columns = Math.min(
+      12,
+      Math.max(1, Math.floor(Number(data.columns ?? 2)) || 2)
+    );
+    return (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+          gap: Number(data.gap ?? 24),
+          paddingBlock: Number(data.paddingY ?? 0),
+          minHeight: 40,
+          width: '100%',
+        }}
+      >
+        {children}
+      </div>
+    );
+  },
+};
+
+/** Loaded for persisted scenes; palette uses flex/grid instead. */
+export const legacyContainerBlock: BlockConfig = {
   type: 'html.container',
   label: 'Container',
   fields: {
@@ -93,9 +190,7 @@ export const containerBlock: BlockConfig = {
         padding: Number(data.padding ?? 16),
         background: String(data.background ?? 'transparent'),
         minHeight: 40,
-        border: '1px dashed #cbd5e1',
-        borderRadius: 6,
-        marginBottom: '0.75rem',
+        width: '100%',
       }}
     >
       {children}
@@ -129,7 +224,9 @@ export const rootBlock: BlockConfig = {
 
 export const builtinBlocks: BlockConfig[] = [
   rootBlock,
-  containerBlock,
+  flexBlock,
+  gridBlock,
+  legacyContainerBlock,
   headingBlock,
   textBlock,
   imageBlock,

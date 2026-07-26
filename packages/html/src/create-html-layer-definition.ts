@@ -22,6 +22,11 @@ function treeIconFor(type: string): string {
     case 'html.root': {
       return 'file';
     }
+    case 'html.flex':
+    case 'html.grid':
+    case 'html.container': {
+      return 'box';
+    }
     default: {
       return 'box';
     }

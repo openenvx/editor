@@ -36,7 +36,7 @@ describe('resolveSameParentSortFromDraft', () => {
       'a',
       ['h0', 'a', 'b'],
       children,
-      { parentId: 'root', orderedIds: ['b', 'a'] }
+      { parentId: 'root', sourceParentId: 'root', activeId: 'a', orderedIds: ['b', 'a'] }
     );
     expect(result).toEqual({ parentId: 'root', index: 2 });
   });
@@ -46,6 +46,8 @@ describe('resolveSameParentSortFromDraft', () => {
     expect(
       resolveSameParentSortFromDraft('a', ['a', 'b'], children, {
         parentId: 'root',
+        sourceParentId: 'root',
+        activeId: 'a',
         orderedIds: ['a', 'b'],
       })
     ).toBeNull();
@@ -53,7 +55,7 @@ describe('resolveSameParentSortFromDraft', () => {
 });
 
 describe('resolveBlockDrop', () => {
-  it('places over a block as a sibling at that index', () => {
+  it('places over a leaf block as a sibling at that index', () => {
     expect(
       resolveBlockDrop({
         activeId: 'a',
@@ -64,12 +66,33 @@ describe('resolveBlockDrop', () => {
           blockId: 'b',
           parentId: 'root',
           index: 2,
+          acceptsChildren: false,
         },
         wouldCreateCycle: false,
         targetParentAcceptsChildren: true,
         targetParentLocked: false,
       })
     ).toEqual({ parentId: 'root', index: 2 });
+  });
+
+  it('nests into a flex/grid block instead of sibling-inserting', () => {
+    expect(
+      resolveBlockDrop({
+        activeId: 'a',
+        activeParentId: 'root',
+        activeIndex: 0,
+        over: {
+          type: 'block',
+          blockId: 'flex',
+          parentId: 'root',
+          index: 1,
+          acceptsChildren: true,
+        },
+        wouldCreateCycle: false,
+        targetParentAcceptsChildren: true,
+        targetParentLocked: false,
+      })
+    ).toEqual({ parentId: 'flex', index: Number.POSITIVE_INFINITY });
   });
 
   it('does not nest into a leaf when dropping on that leaf', () => {
@@ -82,6 +105,7 @@ describe('resolveBlockDrop', () => {
         blockId: 'heading',
         parentId: 'root',
         index: 1,
+        acceptsChildren: false,
       },
       wouldCreateCycle: false,
       targetParentAcceptsChildren: true,
@@ -144,6 +168,7 @@ describe('resolveBlockDrop', () => {
           blockId: 'b',
           parentId: 'leaf',
           index: 0,
+          acceptsChildren: false,
         },
         wouldCreateCycle: false,
         targetParentAcceptsChildren: false,
@@ -163,6 +188,7 @@ describe('resolveBlockDrop', () => {
           blockId: 'a',
           parentId: 'root',
           index: 1,
+          acceptsChildren: false,
         },
         wouldCreateCycle: false,
         targetParentAcceptsChildren: true,
@@ -178,6 +204,7 @@ describe('resolveBlockDragEnd', () => {
     blockId: 'a',
     parentId: 'root',
     index: 1,
+    acceptsChildren: false,
   };
 
   it('commits same-parent reorder via draft using full child indexes', () => {
@@ -189,8 +216,14 @@ describe('resolveBlockDragEnd', () => {
         blockId: 'b',
         parentId: 'root',
         index: 2,
+        acceptsChildren: false,
       },
-      draft: { parentId: 'root', orderedIds: ['b', 'a'] },
+      draft: {
+        parentId: 'root',
+        sourceParentId: 'root',
+        activeId: 'a',
+        orderedIds: ['b', 'a'],
+      },
       activeParentFullChildIds: ['h0', 'a', 'b'],
       activeParentChildren: children,
       wouldCreateCycle: false,
@@ -200,17 +233,69 @@ describe('resolveBlockDragEnd', () => {
     expect(resolved).toEqual({ parentId: 'root', index: 2 });
   });
 
-  it('does not fall through to visible index when same-parent draft is unchanged', () => {
-    const children = [layer('h0', false), layer('a'), layer('b')];
+  it('commits cross-parent placeholder draft into a nestable parent', () => {
     const resolved = resolveBlockDragEnd({
-      active,
-      over: {
+      active: {
         type: 'block',
         blockId: 'a',
         parentId: 'root',
-        index: 1,
+        index: 0,
+        acceptsChildren: false,
       },
-      draft: { parentId: 'root', orderedIds: ['a', 'b'] },
+      over: {
+        type: 'block',
+        blockId: 'flex',
+        parentId: 'root',
+        index: 1,
+        acceptsChildren: true,
+      },
+      draft: {
+        activeId: 'a',
+        sourceParentId: 'root',
+        parentId: 'flex',
+        orderedIds: ['x'],
+        placeholderIndex: 1,
+      },
+      activeParentFullChildIds: ['a', 'flex'],
+      activeParentChildren: [layer('a'), layer('flex')],
+      wouldCreateCycle: false,
+      targetParentAcceptsChildren: true,
+      targetParentLocked: false,
+    });
+    expect(resolved).toEqual({ parentId: 'flex', index: 1 });
+  });
+
+  it('commits same-parent reorder when release target is the parent zone', () => {
+    const children = [layer('h0', false), layer('a'), layer('b')];
+    const resolved = resolveBlockDragEnd({
+      active,
+      over: { type: 'zone', parentId: 'root' },
+      draft: {
+        parentId: 'root',
+        sourceParentId: 'root',
+        activeId: 'a',
+        orderedIds: ['b', 'a'],
+      },
+      activeParentFullChildIds: ['h0', 'a', 'b'],
+      activeParentChildren: children,
+      wouldCreateCycle: false,
+      targetParentAcceptsChildren: true,
+      targetParentLocked: false,
+    });
+    expect(resolved).toEqual({ parentId: 'root', index: 2 });
+  });
+
+  it('does not append when same-parent draft is unchanged', () => {
+    const children = [layer('h0', false), layer('a'), layer('b')];
+    const resolved = resolveBlockDragEnd({
+      active,
+      over: { type: 'zone', parentId: 'root' },
+      draft: {
+        parentId: 'root',
+        sourceParentId: 'root',
+        activeId: 'a',
+        orderedIds: ['a', 'b'],
+      },
       activeParentFullChildIds: ['h0', 'a', 'b'],
       activeParentChildren: children,
       wouldCreateCycle: false,

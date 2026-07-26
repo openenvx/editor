@@ -1,12 +1,9 @@
 import {
-  closestCenter,
   DndContext,
   DragOverlay,
   PointerSensor,
-  pointerWithin,
   useSensor,
   useSensors,
-  type CollisionDetection,
   type DragEndEvent,
   type DragOverEvent,
   type DragStartEvent,
@@ -36,6 +33,7 @@ import {
 import { defaultBlockRegistry } from '../block-registry';
 import { findBlock, getBlockChildren, getPageRootId } from '../tree/block-tree';
 import {
+  blockCollisionDetection,
   dropTargetParentId,
   isBlockDndData,
   resolveBlockDragEnd,
@@ -47,18 +45,6 @@ import {
 } from './block-tree-renderer';
 
 import styles from './html-editor-pane.module.css';
-
-const blockCollisionDetection: CollisionDetection = (args) => {
-  const pointerCollisions = pointerWithin(args);
-  if (pointerCollisions.length > 0) {
-    const blocks = pointerCollisions.filter(
-      (collision) =>
-        typeof collision.id === 'string' && !collision.id.startsWith('zone:')
-    );
-    return blocks.length > 0 ? blocks : pointerCollisions;
-  }
-  return closestCenter(args);
-};
 
 function visibleSiblingIds(layers: Layer[], parentId: string): string[] {
   const parent = findBlock(layers, parentId);
@@ -171,7 +157,9 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
       }
       const page = getActivePage(scene, selection.activePageId);
       setActiveLayer(findBlock(page.layers, data.blockId)?.block ?? null);
-      const draft = {
+      const draft: BlockSortDraft = {
+        activeId: data.blockId,
+        sourceParentId: data.parentId,
         parentId: data.parentId,
         orderedIds: visibleSiblingIds(page.layers, data.parentId),
       };
@@ -181,44 +169,131 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     [scene, selection]
   );
 
-  const handleDragOver = useCallback((event: DragOverEvent) => {
-    const { active, over } = event;
-    if (!over) {
-      return;
-    }
-    const activeData = active.data.current;
-    const overData = over.data.current;
-    if (!(isBlockDndData(activeData) && activeData.type === 'block')) {
-      return;
-    }
-    if (!(isBlockDndData(overData) && overData.type === 'block')) {
-      return;
-    }
-    if (
-      activeData.parentId === null ||
-      overData.parentId === null ||
-      activeData.parentId !== overData.parentId
-    ) {
-      return;
-    }
+  const handleDragOver = useCallback(
+    (event: DragOverEvent) => {
+      const { active, over } = event;
+      if (!(over && scene && selection)) {
+        return;
+      }
+      const activeData = active.data.current;
+      const overData = over.data.current;
+      if (!(isBlockDndData(activeData) && activeData.type === 'block')) {
+        return;
+      }
+      if (!isBlockDndData(overData)) {
+        return;
+      }
+      const sourceParentId = activeData.parentId;
+      if (sourceParentId === null) {
+        return;
+      }
 
-    setSortDraft((current) => {
-      if (!current || current.parentId !== activeData.parentId) {
-        return current;
-      }
-      const oldIndex = current.orderedIds.indexOf(activeData.blockId);
-      const newIndex = current.orderedIds.indexOf(overData.blockId);
-      if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
-        return current;
-      }
-      const next = {
-        parentId: current.parentId,
-        orderedIds: arrayMove(current.orderedIds, oldIndex, newIndex),
+      const page = getActivePage(scene, selection.activePageId);
+
+      const setCrossParentDraft = (
+        parentId: string,
+        placeholderIndex: number
+      ) => {
+        if (
+          parentId === activeData.blockId ||
+          isLayerDescendant(page.layers, activeData.blockId, parentId)
+        ) {
+          return;
+        }
+        const targetIds = visibleSiblingIds(page.layers, parentId).filter(
+          (id) => id !== activeData.blockId
+        );
+        const next: BlockSortDraft = {
+          activeId: activeData.blockId,
+          sourceParentId,
+          parentId,
+          orderedIds: targetIds,
+          placeholderIndex: Math.min(placeholderIndex, targetIds.length),
+        };
+        sortDraftRef.current = next;
+        setSortDraft(next);
       };
-      sortDraftRef.current = next;
-      return next;
-    });
-  }, []);
+
+      if (overData.type === 'zone') {
+        if (overData.parentId === activeData.blockId) {
+          return;
+        }
+        if (overData.parentId === sourceParentId) {
+          return;
+        }
+        const targetIds = visibleSiblingIds(
+          page.layers,
+          overData.parentId
+        ).filter((id) => id !== activeData.blockId);
+        setCrossParentDraft(overData.parentId, targetIds.length);
+        return;
+      }
+
+      // Hovering a nestable block (Flex/Grid/…) → show placeholder inside it.
+      if (overData.acceptsChildren && overData.blockId !== activeData.blockId) {
+        const targetIds = visibleSiblingIds(
+          page.layers,
+          overData.blockId
+        ).filter((id) => id !== activeData.blockId);
+        setCrossParentDraft(overData.blockId, targetIds.length);
+        return;
+      }
+
+      if (overData.parentId === sourceParentId) {
+        setSortDraft((current) => {
+          if (
+            !current ||
+            current.sourceParentId !== sourceParentId ||
+            current.placeholderIndex !== undefined
+          ) {
+            const orderedIds = visibleSiblingIds(page.layers, sourceParentId);
+            const oldIndex = orderedIds.indexOf(activeData.blockId);
+            const newIndex = orderedIds.indexOf(overData.blockId);
+            if (oldIndex === -1 || newIndex === -1) {
+              return current;
+            }
+            const next: BlockSortDraft = {
+              activeId: activeData.blockId,
+              sourceParentId,
+              parentId: sourceParentId,
+              orderedIds: arrayMove(orderedIds, oldIndex, newIndex),
+            };
+            sortDraftRef.current = next;
+            return next;
+          }
+          const oldIndex = current.orderedIds.indexOf(activeData.blockId);
+          const newIndex = current.orderedIds.indexOf(overData.blockId);
+          if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
+            return current;
+          }
+          const next: BlockSortDraft = {
+            activeId: activeData.blockId,
+            sourceParentId,
+            parentId: sourceParentId,
+            orderedIds: arrayMove(current.orderedIds, oldIndex, newIndex),
+          };
+          sortDraftRef.current = next;
+          return next;
+        });
+        return;
+      }
+
+      if (overData.parentId === null) {
+        return;
+      }
+
+      const targetIds = visibleSiblingIds(
+        page.layers,
+        overData.parentId
+      ).filter((id) => id !== activeData.blockId);
+      const overVisibleIndex = targetIds.indexOf(overData.blockId);
+      setCrossParentDraft(
+        overData.parentId,
+        overVisibleIndex === -1 ? targetIds.length : overVisibleIndex
+      );
+    },
+    [scene, selection]
+  );
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -240,7 +315,10 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
       }
 
       const page = getActivePage(scene, selection.activePageId);
-      const targetParentId = dropTargetParentId(overData);
+      const targetParentId =
+        draft && typeof draft.placeholderIndex === 'number'
+          ? draft.parentId
+          : dropTargetParentId(overData);
       if (!targetParentId) {
         return;
       }

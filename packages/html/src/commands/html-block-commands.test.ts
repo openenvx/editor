@@ -70,11 +70,11 @@ describe('html block commands', () => {
       .getRegistries()
       .commands.execute('html.moveBlock', ctx, runtime.getEvents(), {
         id: newId,
-        newParentId: 'container-1',
+        newParentId: 'flex-1',
         index: 0,
       });
     expect(findBlock(store.getScene().pages[0]!.layers, newId)?.parentId).toBe(
-      'container-1'
+      'flex-1'
     );
 
     await manager
@@ -144,7 +144,7 @@ describe('html block commands', () => {
 
     const root = store.getScene().pages[0]!.layers[0]!;
     const children = getBlockChildren(root);
-    expect(children.length).toBe(4);
+    expect(children.length).toBe(5);
     expect(children[1]!.type).toBe('html.heading');
     expect(children[1]!.id).not.toBe('heading-1');
     expect(store.getSelection().selectedLayerIds).toEqual([children[1]!.id]);
@@ -190,6 +190,45 @@ describe('html block commands', () => {
       });
 
     expect(store.getScene()).toEqual(before);
+    runtime.dispose();
+  });
+
+  it('inserts and reorders pure children inside flex and grid', async () => {
+    const { manager, runtime, store } = createHarness();
+    const ctx = runtime.createCommandContext();
+
+    await manager
+      .getRegistries()
+      .commands.execute('html.insertBlock', ctx, runtime.getEvents(), {
+        type: 'html.text',
+        parentId: 'grid-1',
+        index: Number.POSITIVE_INFINITY,
+      });
+
+    let grid = findBlock(store.getScene().pages[0]!.layers, 'grid-1')!.block;
+    let children = getBlockChildren(grid);
+    expect(children).toHaveLength(3);
+    expect(children.every((child) => child.type !== 'html.slot')).toBe(true);
+    const insertedId = children.at(-1)!.id;
+
+    await manager
+      .getRegistries()
+      .commands.execute('html.moveBlock', ctx, runtime.getEvents(), {
+        id: insertedId,
+        newParentId: 'flex-1',
+        index: 0,
+      });
+
+    expect(findBlock(store.getScene().pages[0]!.layers, insertedId)?.parentId).toBe(
+      'flex-1'
+    );
+    grid = findBlock(store.getScene().pages[0]!.layers, 'grid-1')!.block;
+    expect(getBlockChildren(grid)).toHaveLength(2);
+
+    children = getBlockChildren(
+      findBlock(store.getScene().pages[0]!.layers, 'flex-1')!.block
+    );
+    expect(children[0]!.id).toBe(insertedId);
     runtime.dispose();
   });
 });

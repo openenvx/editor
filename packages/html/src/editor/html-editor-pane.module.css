@@ -60,6 +60,14 @@
   border-radius: 6px;
 }
 
+.dropPlaceholder {
+  min-width: 40px;
+  min-height: 40px;
+  background: rgba(59, 130, 246, 0.16);
+  outline: 1px dashed #60a5fa;
+  border-radius: 6px;
+}
+
 .blockPlaceholderContent {
   visibility: hidden;
 }
@@ -80,7 +88,8 @@
   min-height: 24px;
 }
 
-/* Deepest hovered block only — nested parents stay clean. */
+/* Deepest hovered block only — nested parents stay clean.
+   Hovering layout padding/gaps (no child under cursor) still outlines Flex/Grid. */
 .blockWrap:not(:has(.blockWrap:hover)):hover {
   outline: 1px solid #3b82f6;
 }
@@ -141,6 +150,10 @@
   transition:
     background 120ms ease,
     outline-color 120ms ease;
+}
+
+.dropZone:not(.dropZoneEmpty) {
+  display: contents;
 }
 
 .dropZoneActive {

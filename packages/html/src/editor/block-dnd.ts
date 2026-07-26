@@ -1,9 +1,24 @@
+import {
+  closestCenter,
+  pointerWithin,
+  type CollisionDetection,
+} from '@dnd-kit/core';
 import { isLayerVisible } from '@openenvx/core';
 import type { Layer } from '@openenvx/schema';
 
 export interface BlockSortDraft {
+  activeId: string;
+  /** Original parent when the drag started. */
+  sourceParentId: string;
+  /** Parent currently used for sort/placeholder preview. */
   parentId: string;
   orderedIds: string[];
+  /**
+   * When set, show a blue insertion placeholder at this index under `parentId`
+   * (cross-parent preview). Same-parent reorder leaves this unset and uses the
+   * dragging item's own placeholder.
+   */
+  placeholderIndex?: number;
 }
 
 export interface BlockDragData {
@@ -11,6 +26,7 @@ export interface BlockDragData {
   blockId: string;
   parentId: string | null;
   index: number;
+  acceptsChildren: boolean;
 }
 
 export interface ZoneDragData {
@@ -59,7 +75,8 @@ export function resolveSameParentSortFromDraft(
 
 /**
  * Drop rules for HTML content DnD:
- * - Over a block → place as a sibling at that block's index (never nest into leaves).
+ * - Over a nestable block (flex/grid/root) → append inside that block.
+ * - Over a leaf block → place as a sibling at that block's index.
  * - Over a container zone → append inside that container.
  * - Reject cycles, root siblings, locked targets, and parents that do not accept children.
  */
@@ -79,6 +96,9 @@ export function resolveBlockDrop(args: {
     return null;
   }
 
+  const overBlockAcceptsChildren =
+    args.over.type === 'block' && args.over.acceptsChildren;
+
   if (args.over.type === 'zone') {
     if (args.over.parentId === args.activeId) {
       return null;
@@ -92,6 +112,14 @@ export function resolveBlockDrop(args: {
   if (args.over.blockId === args.activeId) {
     return null;
   }
+
+  if (overBlockAcceptsChildren) {
+    return {
+      parentId: args.over.blockId,
+      index: Number.POSITIVE_INFINITY,
+    };
+  }
+
   if (args.over.parentId === null) {
     return null;
   }
@@ -113,11 +141,14 @@ export function dropTargetParentId(over: BlockDndData): string | null {
   if (over.type === 'zone') {
     return over.parentId;
   }
+  if (over.acceptsChildren) {
+    return over.blockId;
+  }
   return over.parentId;
 }
 
 /**
- * Single commit path for drag-end: same-parent draft reorder or cross-parent/zone drop.
+ * Single commit path for drag-end: draft placeholder, same-parent reorder, or drop rules.
  */
 export function resolveBlockDragEnd(args: {
   active: BlockDragData;
@@ -135,12 +166,23 @@ export function resolveBlockDragEnd(args: {
 
   const { active, over, draft } = args;
 
+  if (draft && typeof draft.placeholderIndex === 'number') {
+    if (
+      args.wouldCreateCycle ||
+      draft.parentId === active.blockId ||
+      !args.targetParentAcceptsChildren
+    ) {
+      return null;
+    }
+    return { parentId: draft.parentId, index: draft.placeholderIndex };
+  }
+
   if (
     draft &&
-    over.type === 'block' &&
+    draft.placeholderIndex === undefined &&
     active.parentId !== null &&
-    active.parentId === draft.parentId &&
-    over.parentId === draft.parentId
+    draft.parentId === draft.sourceParentId &&
+    active.parentId === draft.sourceParentId
   ) {
     const fromDraft = resolveSameParentSortFromDraft(
       active.blockId,
@@ -165,6 +207,38 @@ export function resolveBlockDragEnd(args: {
   });
 }
 
+/** Prefer leaf blocks over nestable containers when both are under the pointer. */
+export const blockCollisionDetection: CollisionDetection = (args) => {
+  const pointerCollisions = pointerWithin(args);
+  if (pointerCollisions.length > 0) {
+    const blocks = pointerCollisions.filter(
+      (collision) =>
+        typeof collision.id === 'string' && !collision.id.startsWith('zone:')
+    );
+    if (blocks.length > 0) {
+      return [...blocks].toSorted((a, b) => {
+        const aData = a.data?.current;
+        const bData = b.data?.current;
+        const aNest =
+          isBlockDndData(aData) &&
+          aData.type === 'block' &&
+          aData.acceptsChildren
+            ? 1
+            : 0;
+        const bNest =
+          isBlockDndData(bData) &&
+          bData.type === 'block' &&
+          bData.acceptsChildren
+            ? 1
+            : 0;
+        return aNest - bNest;
+      });
+    }
+    return pointerCollisions;
+  }
+  return closestCenter(args);
+};
+
 function isBlockDragData(value: unknown): value is BlockDragData {
   if (typeof value !== 'object' || value === null) {
     return false;
@@ -174,7 +248,8 @@ function isBlockDragData(value: unknown): value is BlockDragData {
     record.type === 'block' &&
     typeof record.blockId === 'string' &&
     (typeof record.parentId === 'string' || record.parentId === null) &&
-    typeof record.index === 'number'
+    typeof record.index === 'number' &&
+    typeof record.acceptsChildren === 'boolean'
   );
 }
 

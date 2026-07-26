@@ -19,7 +19,9 @@ export class BlockRegistry {
 
   /** Palette entries — skip synthetic root. */
   getPaletteBlocks(): BlockConfig[] {
-    return this.getAll().filter((c) => c.type !== 'html.root');
+    return this.getAll().filter(
+      (c) => c.type !== 'html.root' && c.type !== 'html.container'
+    );
   }
 }
 
