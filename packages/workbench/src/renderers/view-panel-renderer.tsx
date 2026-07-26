@@ -4,7 +4,14 @@ import type {
   ViewDescriptor,
   ViewTreeItem,
 } from '@openenvx/headless';
-import { Eye, EyeOff, Lock, LockOpen } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Lock,
+  LockOpen,
+} from 'lucide-react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
@@ -411,7 +418,11 @@ function ViewPanelBody({
             }}
             type="button"
           >
-            {isCollapsed ? '▸' : '▾'}
+            {isCollapsed ? (
+              <ChevronRight aria-hidden size={14} />
+            ) : (
+              <ChevronDown aria-hidden size={14} />
+            )}
           </button>
         ) : (
           <span className={styles.treeToggleSpacer} />

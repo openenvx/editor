@@ -45,15 +45,102 @@
   position: relative;
   outline: 1px solid transparent;
   border-radius: 4px;
+  padding: 6px;
+  will-change: transform;
 }
 
-.blockWrapSelected {
+.blockWrapDraggable {
+  cursor: grab;
+  touch-action: none;
+}
+
+.blockWrapPlaceholder {
+  background: rgba(59, 130, 246, 0.16);
+  outline: 1px dashed #60a5fa;
+  border-radius: 6px;
+}
+
+.blockPlaceholderContent {
+  visibility: hidden;
+}
+
+.dragOverlay {
+  max-width: min(720px, 90vw);
+  padding: 6px;
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+  cursor: grabbing;
+  pointer-events: none;
+  opacity: 0.96;
+}
+
+.dragOverlayNested {
+  min-height: 24px;
+}
+
+/* Deepest hovered block only — nested parents stay clean. */
+.blockWrap:not(:has(.blockWrap:hover)):hover {
+  outline: 1px solid #3b82f6;
+}
+
+.blockWrapSelected,
+.blockWrapSelected:not(:has(.blockWrap:hover)):hover {
   outline: 2px solid #3b82f6;
+}
+
+.blockEditableHit {
+  cursor: text;
+}
+
+.selectionMenu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  transform: translateY(-100%);
+  padding: 4px 6px;
+  border-radius: 8px 8px 0 0;
+  background: #1a1a1a;
+  color: #fafafa;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  cursor: default;
+}
+
+.selectionMenuLabel {
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.selectionMenuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.selectionMenuButton:hover {
+  background: #242424;
 }
 
 .dropZone {
   min-height: 28px;
   border-radius: 4px;
+  transition:
+    background 120ms ease,
+    outline-color 120ms ease;
 }
 
 .dropZoneActive {
