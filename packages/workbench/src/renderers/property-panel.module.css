@@ -59,6 +59,39 @@
   box-shadow: var(--wb-shadow-control);
 }
 
+.slotList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-space-2);
+}
+
+.slotListRow {
+  padding: var(--wb-space-2);
+  border-radius: var(--wb-radius-md);
+  background: var(--wb-muted);
+  box-shadow: var(--wb-shadow-control);
+}
+
+.slotListRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wb-space-2);
+  margin-bottom: var(--wb-space-1);
+}
+
+.slotListRowLabel {
+  font-size: var(--wb-text-xs);
+  font-weight: 500;
+  color: var(--wb-muted-foreground);
+}
+
+.slotListAdd {
+  align-self: flex-start;
+  gap: var(--wb-space-1);
+  color: var(--wb-muted-foreground);
+}
+
 .cornerRow {
   display: flex;
   align-items: center;

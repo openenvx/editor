@@ -157,3 +157,5 @@ export type {
   VersionHistoryProvider,
 } from './version-history/version-history-types';
 export { VersionHistoryProviderId } from './version-history/version-history-service-id';
+
+export { getNestedValue, setNestedValue } from './utils/nested-value';

@@ -1,10 +1,12 @@
 import type { BlockConfig } from '../block-config';
+import { buttonBlock } from './button-block';
+import { heroBlock } from './hero-block';
 
 export const headingBlock: BlockConfig = {
   type: 'html.heading',
   label: 'Heading',
   fields: {
-    html: { kind: 'text', label: 'Text' },
+    html: { kind: 'richText', label: 'Text' },
     level: {
       kind: 'select',
       label: 'Level',
@@ -15,12 +17,14 @@ export const headingBlock: BlockConfig = {
         { label: 'H4', value: '4' },
       ],
     },
+    color: { kind: 'color', label: 'Color' },
   },
-  defaultData: { html: 'Heading', level: '2' },
+  defaultData: { html: 'Heading', level: '2', color: '#111827' },
   render: ({ data }) => {
     const html = String(data.html ?? '');
     const level = String(data.level ?? '2');
-    const style = { margin: '0 0 0.5rem' } as const;
+    const color = String(data.color ?? '#111827');
+    const style = { margin: '0 0 0.5rem', color } as const;
     switch (level) {
       case '1': {
         return <h1 dangerouslySetInnerHTML={{ __html: html }} style={style} />;
@@ -42,13 +46,18 @@ export const textBlock: BlockConfig = {
   type: 'html.text',
   label: 'Text',
   fields: {
-    html: { kind: 'textarea', label: 'Text' },
+    html: { kind: 'richText', label: 'Text' },
+    color: { kind: 'color', label: 'Color' },
   },
-  defaultData: { html: 'Paragraph text' },
+  defaultData: { html: 'Paragraph text', color: '#374151' },
   render: ({ data }) => (
     <div
       dangerouslySetInnerHTML={{ __html: String(data.html ?? '') }}
-      style={{ margin: '0 0 0.75rem', lineHeight: 1.5 }}
+      style={{
+        margin: '0 0 0.75rem',
+        lineHeight: 1.5,
+        color: String(data.color ?? '#374151'),
+      }}
     />
   ),
 };
@@ -57,7 +66,7 @@ export const imageBlock: BlockConfig = {
   type: 'html.image',
   label: 'Image',
   fields: {
-    src: { kind: 'text', label: 'URL' },
+    src: { kind: 'image', label: 'Image' },
     alt: { kind: 'text', label: 'Alt' },
   },
   defaultData: {
@@ -227,9 +236,11 @@ export const builtinBlocks: BlockConfig[] = [
   flexBlock,
   gridBlock,
   legacyContainerBlock,
+  heroBlock,
   headingBlock,
   textBlock,
   imageBlock,
+  buttonBlock,
 ];
 
 export function isHtmlTextBlockType(type: string): boolean {

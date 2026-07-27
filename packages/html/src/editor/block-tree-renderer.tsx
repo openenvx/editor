@@ -14,6 +14,7 @@ import {
 } from '@openenvx/core';
 import type { Layer, Scene } from '@openenvx/schema';
 import {
+  Fragment,
   memo,
   useCallback,
   type KeyboardEvent,
@@ -31,7 +32,11 @@ import {
   type BlockDragData,
   type BlockSortDraft,
 } from './block-dnd';
-import { BlockEditorProvider, useBlockEditor } from './block-editor-context';
+import {
+  BlockEditorProvider,
+  useBlockEditor,
+  type BlockEditTarget,
+} from './block-editor-context';
 import { BlockSelectionMenu } from './block-selection-menu';
 import { HtmlRichTextEditor } from './html-rich-text-editor';
 
@@ -296,6 +301,134 @@ function ContainerChildren({
   );
 }
 
+function SlotPartContent({
+  hostId,
+  dataPath,
+  part,
+  registry,
+}: {
+  hostId: string;
+  dataPath: string;
+  part: Layer;
+  registry: BlockRegistry;
+}) {
+  const { selectedId, editingTarget, onSelect, onStartEdit, onCommitEdit } =
+    useBlockEditor();
+  const config = registry.get(part.type);
+  const textBlock = isHtmlTextBlockType(part.type);
+  const editable = canEditLayerData(part);
+  const data = layerDataRecord(part);
+  const editing =
+    editingTarget?.hostId === hostId && editingTarget.dataPath === dataPath;
+
+  const handleClick = useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      onSelect(hostId);
+    },
+    [hostId, onSelect]
+  );
+
+  const handleDoubleClick = useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      onSelect(hostId);
+      if (textBlock && editable) {
+        onStartEdit(hostId, dataPath);
+      }
+    },
+    [dataPath, editable, hostId, onSelect, onStartEdit, textBlock]
+  );
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      onSelect(hostId);
+      if (textBlock && editable) {
+        onStartEdit(hostId, dataPath);
+      }
+    },
+    [dataPath, editable, hostId, onSelect, onStartEdit, textBlock]
+  );
+
+  const handleCommit = useCallback(
+    (html: string) => {
+      onCommitEdit(hostId, dataPath, html);
+    },
+    [dataPath, hostId, onCommitEdit]
+  );
+
+  if (!(config && isLayerVisible(part))) {
+    return null;
+  }
+
+  if (editing && textBlock && editable) {
+    return (
+      <HtmlRichTextEditor
+        html={String(data.html ?? '')}
+        onCommit={handleCommit}
+      />
+    );
+  }
+
+  if (textBlock && editable) {
+    return (
+      <div
+        className={styles.blockEditableHit}
+        role="button"
+        tabIndex={selectedId === hostId ? 0 : -1}
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
+        onKeyDown={handleKeyDown}
+      >
+        {config.render({ data })}
+      </div>
+    );
+  }
+
+  return (
+    <div role="presentation" onClick={handleClick} onKeyDown={handleKeyDown}>
+      {config.render({ data })}
+    </div>
+  );
+}
+
+function buildSlotNodes(
+  host: Layer,
+  registry: BlockRegistry
+): Record<string, ReactNode> | undefined {
+  const config = registry.get(host.type);
+  if (!config?.slots) {
+    return undefined;
+  }
+  const data = layerDataRecord(host);
+  const slotsRaw =
+    data.slots && typeof data.slots === 'object' && data.slots !== null
+      ? (data.slots as Record<string, unknown>)
+      : {};
+  const result: Record<string, ReactNode> = {};
+  for (const slotKey of Object.keys(config.slots)) {
+    const parts = Array.isArray(slotsRaw[slotKey])
+      ? (slotsRaw[slotKey] as Layer[])
+      : [];
+    result[slotKey] = parts.map((part, index) => (
+      <Fragment key={part.id}>
+        <SlotPartContent
+          dataPath={`slots.${slotKey}.${index}.data.html`}
+          hostId={host.id}
+          part={part}
+          registry={registry}
+        />
+      </Fragment>
+    ));
+  }
+  return result;
+}
+
 function BlockContent({
   layer,
   registry,
@@ -311,6 +444,7 @@ function BlockContent({
   const editable = canEditLayerData(layer);
   const acceptsChildren = config?.acceptsChildren === true;
   const data = layerDataRecord(layer);
+  const slotNodes = buildSlotNodes(layer, registry);
 
   const handleEditableClick = useCallback(
     (event: MouseEvent) => {
@@ -324,7 +458,7 @@ function BlockContent({
     (event: MouseEvent) => {
       event.stopPropagation();
       onSelect(layer.id);
-      onStartEdit(layer.id);
+      onStartEdit(layer.id, 'html');
     },
     [layer.id, onSelect, onStartEdit]
   );
@@ -337,14 +471,14 @@ function BlockContent({
       event.preventDefault();
       event.stopPropagation();
       onSelect(layer.id);
-      onStartEdit(layer.id);
+      onStartEdit(layer.id, 'html');
     },
     [layer.id, onSelect, onStartEdit]
   );
 
   const handleCommit = useCallback(
     (html: string) => {
-      onCommitEdit(layer.id, html);
+      onCommitEdit(layer.id, 'html', html);
     },
     [layer.id, onCommitEdit]
   );
@@ -382,7 +516,15 @@ function BlockContent({
     children: acceptsChildren ? (
       <ContainerChildren layer={layer} registry={registry} />
     ) : undefined,
+    slots: slotNodes,
   });
+}
+
+function isEditingLayer(
+  editingTarget: BlockEditTarget | null,
+  layerId: string
+): boolean {
+  return editingTarget?.hostId === layerId && editingTarget.dataPath === 'html';
 }
 
 function SortableBlockNode({
@@ -402,10 +544,10 @@ function SortableBlockNode({
   insertLineAfter?: boolean;
   insertLineVertical?: boolean;
 }) {
-  const { scene, selectedId, editingBlockId, sortDraft } = useBlockEditor();
+  const { scene, selectedId, editingTarget, sortDraft } = useBlockEditor();
   const config = registry.get(layer.type);
   const selected = selectedId === layer.id;
-  const editing = editingBlockId === layer.id;
+  const editing = isEditingLayer(editingTarget, layer.id);
   const reorderable = canReorderLayer(layer);
   const dragDisabled = editing || !reorderable;
   const canDuplicate = canDuplicateLayer(layer, scene);
@@ -458,6 +600,7 @@ function SortableBlockNode({
   );
 }
 
+/** The page frame is not a selectable block — page props live in Layers + inspector. */
 function RootBlockNode({
   layer,
   registry,
@@ -465,32 +608,11 @@ function RootBlockNode({
   layer: Layer;
   registry: BlockRegistry;
 }) {
-  const { scene, selectedId, editingBlockId } = useBlockEditor();
-  const config = registry.get(layer.type);
-  const selected = selectedId === layer.id;
-  const canDuplicate = canDuplicateLayer(layer, scene);
-  const canRemove = canDeleteLayer(layer, scene);
-
-  if (!(config && isLayerVisible(layer))) {
+  if (!(registry.get(layer.type) && isLayerVisible(layer))) {
     return null;
   }
 
-  return (
-    <BlockChrome
-      canDuplicate={canDuplicate}
-      canRemove={canRemove}
-      dragDisabled
-      label={config.label}
-      layer={layer}
-      selected={selected}
-    >
-      <BlockContent
-        editing={editingBlockId === layer.id}
-        layer={layer}
-        registry={registry}
-      />
-    </BlockChrome>
-  );
+  return <BlockContent editing={false} layer={layer} registry={registry} />;
 }
 
 export const BlockTreeRenderer = memo(
@@ -499,7 +621,7 @@ export const BlockTreeRenderer = memo(
     registry,
     scene,
     selectedId,
-    editingBlockId,
+    editingTarget,
     sortDraft,
     onSelect,
     onStartEdit,
@@ -511,11 +633,11 @@ export const BlockTreeRenderer = memo(
     registry: BlockRegistry;
     scene: Scene;
     selectedId: string | null;
-    editingBlockId: string | null;
+    editingTarget: BlockEditTarget | null;
     sortDraft: BlockSortDraft | null;
     onSelect: (id: string) => void;
-    onStartEdit: (id: string) => void;
-    onCommitEdit: (id: string, html: string) => void;
+    onStartEdit: (hostId: string, dataPath: string) => void;
+    onCommitEdit: (hostId: string, dataPath: string, html: string) => void;
     onDuplicate: (id: string) => void;
     onRemove: (id: string) => void;
   }) => (
@@ -523,7 +645,7 @@ export const BlockTreeRenderer = memo(
       value={{
         scene,
         selectedId,
-        editingBlockId,
+        editingTarget,
         sortDraft,
         onSelect,
         onStartEdit,

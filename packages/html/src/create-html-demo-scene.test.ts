@@ -21,11 +21,13 @@ describe('createHtmlDemoScene', () => {
     const children = (root.data as { children: { id: string; type: string }[] })
       .children;
     expect(children.map((c) => c.id)).toEqual([
+      'hero-1',
       'heading-1',
       'text-1',
       'flex-1',
       'grid-1',
     ]);
+    expect(children[0]!.type).toBe('html.hero');
 
     const flex = children.find((c) => c.id === 'flex-1')!;
     expect(flex.type).toBe('html.flex');

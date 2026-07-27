@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
+import { getNestedValue } from '@openenvx/headless';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
@@ -18,6 +19,12 @@ describe('HtmlEditorPane', () => {
       expect(screen.getByText('Welcome')).toBeTruthy();
       fireEvent.click(screen.getByText('Welcome'));
 
+      await waitFor(() => {
+        expect(api.getSnapshot().selection.selectedLayerIds).toContain(
+          'hero-1'
+        );
+      });
+      fireEvent.click(screen.getByText('Below the hero'));
       await waitFor(() => {
         expect(api.getSnapshot().selection.selectedLayerIds).toContain(
           'heading-1'
@@ -90,7 +97,7 @@ describe('HtmlEditorPane', () => {
 
       const canvas = container.querySelector('[role="tree"]') as HTMLElement;
       fireEvent.keyDown(canvas, { key: 'Escape' });
-      expect(api.getSnapshot().selection.selectedLayerIds).toContain('heading-1');
+      expect(api.getSnapshot().selection.selectedLayerIds).toContain('hero-1');
 
       const editable = document.querySelector(
         '[contenteditable="true"]'
@@ -99,6 +106,20 @@ describe('HtmlEditorPane', () => {
 
       await waitFor(() => {
         expect(document.querySelector('[contenteditable="true"]')).toBeNull();
+      });
+
+      await waitFor(() => {
+        const root = api.getSnapshot().scene.pages[0]!.layers[0]!;
+        const hero = (
+          root.data as { children: { id: string; data?: unknown }[] }
+        ).children.find((layer) => layer.id === 'hero-1');
+        expect(hero).toBeTruthy();
+        const headlineHtml = getNestedValue(
+          hero!.data as Record<string, unknown>,
+          'slots.headline.0.data.html'
+        );
+        expect(String(headlineHtml)).toContain('Welcome');
+        expect(String(headlineHtml)).not.toBe('Welcome');
       });
     } finally {
       dispose();
@@ -112,6 +133,21 @@ describe('HtmlEditorPane', () => {
       const { container } = renderWithWorkbench(api, <HtmlEditorPane />);
       const canvas = container.querySelector('[role="tree"]') as HTMLElement;
       fireEvent.click(canvas);
+      await waitFor(() => {
+        expect(api.getSnapshot().selection.selectedLayerIds).toEqual([]);
+      });
+    } finally {
+      dispose();
+    }
+  });
+
+  it('clears selection instead of selecting the page frame', async () => {
+    const { api, dispose } = await createHtmlWorkbench();
+    try {
+      api.selectLayers(['heading-1'], 'heading-1');
+      const { container } = renderWithWorkbench(api, <HtmlEditorPane />);
+      const canvas = container.querySelector('[role="tree"]') as HTMLElement;
+      fireEvent.click(canvas.firstElementChild as HTMLElement);
       await waitFor(() => {
         expect(api.getSnapshot().selection.selectedLayerIds).toEqual([]);
       });

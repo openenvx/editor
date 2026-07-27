@@ -3,14 +3,20 @@ import { createContext, useContext, type ReactNode } from 'react';
 
 import type { BlockSortDraft } from './block-dnd';
 
+/** Inline edit target — `dataPath` is `html` for plain blocks or a dotted slot path. */
+export interface BlockEditTarget {
+  hostId: string;
+  dataPath: string;
+}
+
 export interface BlockEditorContextValue {
   scene: Scene;
   selectedId: string | null;
-  editingBlockId: string | null;
+  editingTarget: BlockEditTarget | null;
   sortDraft: BlockSortDraft | null;
   onSelect: (id: string) => void;
-  onStartEdit: (id: string) => void;
-  onCommitEdit: (id: string, html: string) => void;
+  onStartEdit: (hostId: string, dataPath: string) => void;
+  onCommitEdit: (hostId: string, dataPath: string, html: string) => void;
   onDuplicate: (id: string) => void;
   onRemove: (id: string) => void;
 }

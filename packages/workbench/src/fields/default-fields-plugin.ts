@@ -10,6 +10,7 @@ import { FontFieldRenderer } from './advanced/font-field';
 import { ImageFieldRenderer } from './advanced/image-field';
 import { RepeaterFieldRenderer } from './advanced/repeater-field';
 import { RichTextFieldRenderer } from './advanced/rich-text-field';
+import { SlotListFieldRenderer } from './advanced/slot-list-field';
 import {
   CornerRadiusFieldRenderer,
   PaddingFieldRenderer,
@@ -33,6 +34,7 @@ const DEFAULT_FIELD_RENDERERS: { kind: string; Component: unknown }[] = [
   { kind: 'richText', Component: RichTextFieldRenderer },
   { kind: 'select', Component: SelectFieldRenderer },
   { kind: 'shadow', Component: ShadowFieldRenderer },
+  { kind: 'slotList', Component: SlotListFieldRenderer },
   { kind: 'text', Component: TextFieldRenderer },
   { kind: 'toggle', Component: ToggleFieldRenderer },
 ];

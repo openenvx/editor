@@ -147,6 +147,7 @@ export {
   type PropertyFieldKind,
   type PropertySectionDescriptor,
   type RepeaterFieldConfig,
+  type SlotListFieldConfig,
   type FieldAction,
   type FieldActionClick,
   type FieldConfigOptions,

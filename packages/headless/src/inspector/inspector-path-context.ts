@@ -1,5 +1,6 @@
 import type { Scene } from '@openenvx/core';
 
+import { getNestedValue } from '../utils/nested-value';
 import type { InspectorHostContext } from './inspector-path-resolver';
 import type { InspectorValuePath } from './inspector-value-path';
 
@@ -44,7 +45,13 @@ function readInspectorPath(
 ): unknown {
   if (path.startsWith('selection.layer.data.')) {
     const key = path.slice('selection.layer.data.'.length);
-    return ctx.layerData?.[key];
+    if (!ctx.layerData) {
+      return undefined;
+    }
+    if (key.includes('.')) {
+      return getNestedValue(ctx.layerData, key);
+    }
+    return ctx.layerData[key];
   }
 
   if (path.startsWith('command.')) {

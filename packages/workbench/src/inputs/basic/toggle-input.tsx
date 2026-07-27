@@ -1,4 +1,4 @@
-import { Switch } from '../../primitives/switch';
+import { Checkbox } from '../../primitives/checkbox';
 
 export interface ToggleInputProps {
   id: string;
@@ -14,7 +14,7 @@ export function ToggleInput({
   onChange,
 }: ToggleInputProps) {
   return (
-    <Switch
+    <Checkbox
       aria-label={ariaLabel}
       checked={checked}
       id={id}

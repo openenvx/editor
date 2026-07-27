@@ -457,6 +457,32 @@ Popup shell for per-side/per-corner/per-shadow controls:
 
 Map to shadcn/designer `DesignerPane` + `Action*` pattern conceptually. Each pane renders when layer type matches.
 
+### Field kinds (author once, reuse everywhere)
+
+Inspector controls are **descriptor → registered renderer**, not ad-hoc JSX in plugins. Author properties with `PropertyBuilder` (canvas) or HTML `FieldDef` → `createHtmlLayerDefinition` (maps onto the same builders). Prefer these kinds over inventing new inputs:
+
+| Kind | Control | Use for |
+| --- | --- | --- |
+| `text` | Compact text input | Short strings, URLs without media chrome |
+| `number` | Scrub / NumberInput | Dimensions, gaps, sizes |
+| `select` | Select | Discrete enums (H1–H4, fit mode) |
+| `toggle` | Checkbox (shadcn-style) | Optional visibility, flags |
+| `color` | Color swatch + popover | Fill, overlay, text color |
+| `image` | Image input (+ optional upload) | Backgrounds, media refs — **not** a plain text URL field |
+| `richText` | TipTap-backed rich text | Body / heading content |
+| `align` | Icon segmented control | left / center / right |
+| `font` | Font combobox | Canvas typography |
+| `repeater` | Full-width list of plain object rows | Simple multi-value data |
+| `slotList` | Full-width list of **part layers** | Composite HTML slots (CTAs); sub-fields are the part type’s own kinds |
+| `border` / `cornerRadius` / `padding` / `shadow` | Scrub + popup | Canvas style chrome |
+
+Rules:
+
+- **Do not** hand-roll inspector rows with outline “Add/Remove” buttons and stacked labels — use `InspectorFieldRow` / `InspectorFieldBlock` + registered kinds.
+- Fields with `chrome: false` (`repeater`, `slotList`) render as a **block** (label above, full width), not a cramped 56px label row.
+- Slot list rows: muted surface + inset ring (`--wb-muted` / `--wb-shadow-control`), header + ghost `IconButton` (trash / plus) — same grammar as layer-tree trailing actions.
+- HTML `BlockConfig.fields` should pick the kind from this table; composites generate slot inspector sections from each part type’s fields (re-keyed under `slots.<name>…`).
+
 ### Layout pane
 
 | Field | Control | Notes |

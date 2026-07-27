@@ -14,7 +14,7 @@ describe('BlockEditorProvider', () => {
     const value = {
       scene: { pages: [], schemaVersion: 1 },
       selectedId: 'a',
-      editingBlockId: null,
+      editingTarget: null,
       sortDraft: null,
       onSelect: () => {},
       onStartEdit: () => {},

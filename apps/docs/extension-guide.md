@@ -301,3 +301,46 @@ ctx.register(
 ```
 
 The stage controller resolves the service via `useCanvasStageInteraction()` inside a `CanvasHostProvider`, or an optional `stageInteraction` prop on `CanvasStage` (standalone embed). `adjustDrag` and `adjustResize` return adjusted coordinates plus transient `overlays` primitives; `buildOverlays` is for static overlays only. Overlays are **primitive arrays** (`line`, `rect`, `label`) painted imperatively with Konva inside canvas.
+
+## HTML composite blocks (named slots)
+
+`@openenvx/html` blocks can declare named **slots** — real nested part layers that stay invisible to the Layers tree.
+
+Parts live under `data.slots`, not `data.children`. Core's tree walk only descends `data.children`, so a slotted block appears as one atomic row, cannot be dropped into, and cannot expose parts for independent delete/drag.
+
+```ts
+import type { BlockConfig } from '@openenvx/html';
+
+export const featureBlock: BlockConfig = {
+  type: 'html.feature',
+  label: 'Feature',
+  fields: {
+    background: { kind: 'color', label: 'Background' },
+  },
+  defaultData: {
+    background: '#ffffff',
+    slots: {
+      title: [{ id: '…', type: 'html.heading', data: { html: 'Title', level: '2' } }],
+      actions: [{ id: '…', type: 'html.button', data: { label: 'Learn more', href: '#' } }],
+    },
+  },
+  slots: {
+    title: { label: 'Title', partType: 'html.heading' },
+    actions: { label: 'Actions', partType: 'html.button', repeatable: true },
+  },
+  render: ({ data, slots }) => (
+    <section style={{ background: String(data.background) }}>
+      {slots?.title}
+      <div>{slots?.actions}</div>
+    </section>
+  ),
+};
+```
+
+- Register the config on `BlockRegistry` and via `createHtmlLayerDefinition(config)` like any other block.
+- Inspector fields for slot parts are **generated** from each part type's `BlockConfig.fields` (keyed `slots.<name>.0.data.<field>`).
+- Repeatable slots use the workbench `slotList` field (add/remove part layers).
+- Optional single slots get a `visible` toggle (`slots.<name>.0.visible`).
+- Clicking a part selects the **host** block; double-click text parts edits inline via dotted-path `updateProperty`.
+
+See `html.hero` / `html.button` in `packages/html/src/blocks/` for the shipping reference.

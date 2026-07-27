@@ -96,35 +96,48 @@ function createInspectorLayoutVisitor(
       const handle = context.resolver.resolve(path);
       const value = handle.read();
 
+      const control = (
+        <PropertyFieldControl
+          customRenderers={customRenderers}
+          field={node.field}
+          layerData={context.layerData}
+          layerId={context.layerId}
+          onCommand={(command) => context.onCommand(command)}
+          onUpdate={(_key, nextValue) => {
+            handle.write(nextValue);
+          }}
+          renderField={(nested) => (
+            <PropertyFieldControl
+              {...nested}
+              customRenderers={customRenderers}
+              renderField={(deep) => (
+                <PropertyFieldControl
+                  {...deep}
+                  customRenderers={customRenderers}
+                  renderField={() => null}
+                />
+              )}
+            />
+          )}
+          value={value}
+        />
+      );
+
+      // Full-width chrome (repeater / slotList): block label above, not 56px row.
+      if (node.field.chrome === false) {
+        return (
+          <InspectorFieldBlock label={node.label}>
+            {control}
+          </InspectorFieldBlock>
+        );
+      }
+
       return (
         <InspectorFieldRow
           htmlFor={getFieldId(context.layerId, node.field.key)}
           label={node.label}
         >
-          <PropertyFieldControl
-            customRenderers={customRenderers}
-            field={node.field}
-            layerData={context.layerData}
-            layerId={context.layerId}
-            onCommand={(command) => context.onCommand(command)}
-            onUpdate={(_key, nextValue) => {
-              handle.write(nextValue);
-            }}
-            renderField={(nested) => (
-              <PropertyFieldControl
-                {...nested}
-                customRenderers={customRenderers}
-                renderField={(deep) => (
-                  <PropertyFieldControl
-                    {...deep}
-                    customRenderers={customRenderers}
-                    renderField={() => null}
-                  />
-                )}
-              />
-            )}
-            value={value}
-          />
+          {control}
         </InspectorFieldRow>
       );
     },

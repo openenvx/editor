@@ -1,14 +1,18 @@
-import { createPropertyBuilder, LayerDefinition } from '@openenvx/core';
-import type {
-  CommandContext,
-  Layer,
-  LayerPreviewContext,
-  Page,
-  PropertySectionDescriptor,
+import {
+  createPropertyBuilder,
+  LayerDefinition,
+  type RepeaterFieldConfig,
+  type CommandContext,
+  type Layer,
+  type LayerPreviewContext,
+  type Page,
+  type PropertySectionDescriptor,
 } from '@openenvx/core';
 import { createLayerPreviewBuilder } from '@openenvx/preview';
 
-import type { BlockConfig, FieldDef } from './block-config';
+import type { BlockConfig, FieldDef, SlotDef } from './block-config';
+import { BlockRegistryServiceId, type BlockRegistry } from './block-registry';
+import { createBlock } from './tree/block-tree';
 
 function treeIconFor(type: string): string {
   switch (type) {
@@ -17,6 +21,12 @@ function treeIconFor(type: string): string {
       return 'text';
     }
     case 'html.image': {
+      return 'image';
+    }
+    case 'html.button': {
+      return 'box';
+    }
+    case 'html.hero': {
       return 'image';
     }
     case 'html.root': {
@@ -51,6 +61,26 @@ function appendField(
       section.select(key, field.options, field.label);
       break;
     }
+    case 'color': {
+      section.color(key, field.label);
+      break;
+    }
+    case 'image': {
+      section.image(key, field.label);
+      break;
+    }
+    case 'richText': {
+      section.richText(key, field.label);
+      break;
+    }
+    case 'align': {
+      section.align(key, field.label);
+      break;
+    }
+    case 'toggle': {
+      section.toggle(key, field.label);
+      break;
+    }
     case 'textarea':
     case 'text': {
       section.text(key, field.label);
@@ -59,6 +89,99 @@ function appendField(
     default: {
       section.text(key, (field as FieldDef).label);
     }
+  }
+}
+
+function fieldDefToRepeaterField(
+  key: string,
+  field: FieldDef
+): RepeaterFieldConfig {
+  if (field.kind === 'select') {
+    return {
+      key,
+      kind: 'select',
+      label: field.label,
+      options: field.options,
+    };
+  }
+  if (field.kind === 'number') {
+    return { key, kind: 'number', label: field.label };
+  }
+  if (field.kind === 'color') {
+    return { key, kind: 'color', label: field.label };
+  }
+  if (field.kind === 'image') {
+    return { key, kind: 'image', label: field.label };
+  }
+  if (field.kind === 'richText') {
+    return { key, kind: 'richText', label: field.label };
+  }
+  if (field.kind === 'align') {
+    return { key, kind: 'align', label: field.label };
+  }
+  if (field.kind === 'toggle') {
+    return { key, kind: 'toggle', label: field.label };
+  }
+  if (field.kind === 'textarea') {
+    return { key, kind: 'text', label: field.label };
+  }
+  return { key, kind: 'text', label: field.label };
+}
+
+function getRegistry(ctx: CommandContext): BlockRegistry | null {
+  if (!ctx.services?.has(BlockRegistryServiceId)) {
+    return null;
+  }
+  return ctx.services.get(BlockRegistryServiceId);
+}
+
+function appendSlotSections(
+  builder: ReturnType<typeof createPropertyBuilder>,
+  config: BlockConfig,
+  registry: BlockRegistry
+): void {
+  if (!config.slots) {
+    return;
+  }
+  for (const [slotKey, slotDef] of Object.entries(config.slots)) {
+    appendSlotSection(builder, slotKey, slotDef, registry);
+  }
+}
+
+function appendSlotSection(
+  builder: ReturnType<typeof createPropertyBuilder>,
+  slotKey: string,
+  slotDef: SlotDef,
+  registry: BlockRegistry
+): void {
+  const partConfig = registry.get(slotDef.partType);
+  // ponytail: unregistered part types omit slot UI — register all slot partType values on BlockRegistry.
+  if (!partConfig) {
+    return;
+  }
+  if (slotDef.repeatable) {
+    const newPart: Layer = {
+      id: 'slot-part-template',
+      type: slotDef.partType,
+      data: structuredClone(partConfig.defaultData),
+    };
+    builder
+      .section(`slot.${slotKey}`, slotDef.label)
+      .slotList(`slots.${slotKey}`, {
+        label: slotDef.label,
+        newPart,
+        fields: Object.entries(partConfig.fields).map(([key, field]) =>
+          fieldDefToRepeaterField(key, field)
+        ),
+      });
+    return;
+  }
+  const section = builder.section(`slot.${slotKey}`, slotDef.label);
+  if (slotDef.optional) {
+    section.toggle(`slots.${slotKey}.0.visible`, 'Show');
+  }
+  for (const [key, field] of Object.entries(partConfig.fields)) {
+    appendField(section, `slots.${slotKey}.0.data.${key}`, field);
   }
 }
 
@@ -72,11 +195,7 @@ export function createHtmlLayerDefinition(
     readonly treeDisplayName = config.label;
 
     createDefault(id: string, _page: Page): Layer {
-      return {
-        data: structuredClone(config.defaultData),
-        id,
-        type: config.type,
-      };
+      return createBlock(config.type, id, config.defaultData);
     }
 
     serialize(layer: Layer): Record<string, unknown> {
@@ -91,18 +210,23 @@ export function createHtmlLayerDefinition(
     }
 
     properties(
-      _ctx: CommandContext,
+      ctx: CommandContext,
       _layer: Layer
     ): PropertySectionDescriptor[] {
+      const builder = createPropertyBuilder();
       const fieldEntries = Object.entries(config.fields);
-      if (fieldEntries.length === 0) {
-        return [];
+      if (fieldEntries.length > 0) {
+        const section = builder.section('props', config.label);
+        for (const [key, field] of fieldEntries) {
+          appendField(section, key, field);
+        }
       }
-      const section = createPropertyBuilder().section('props', config.label);
-      for (const [key, field] of fieldEntries) {
-        appendField(section, key, field);
+      // Slot sections need BlockRegistryServiceId (HtmlBlocksPlugin registers it).
+      const registry = getRegistry(ctx);
+      if (registry && config.slots) {
+        appendSlotSections(builder, config, registry);
       }
-      return section.build();
+      return builder.build();
     }
 
     renderPreview(ctx: LayerPreviewContext<Record<string, unknown>>) {

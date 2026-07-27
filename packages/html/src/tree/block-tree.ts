@@ -97,11 +97,42 @@ export function createBlock(
   return {
     id,
     type,
-    data: structuredClone(defaultData),
+    data: mintSlotPartIds(structuredClone(defaultData)),
   };
 }
 
-/** Deep-clone a block subtree with fresh ids (and nested `data.children`). */
+function mintSlotPartIds(
+  data: Record<string, unknown>
+): Record<string, unknown> {
+  const slots = data.slots;
+  if (!slots || typeof slots !== 'object' || slots === null) {
+    return data;
+  }
+  const nextSlots: Record<string, unknown> = {};
+  for (const [key, parts] of Object.entries(slots)) {
+    if (!Array.isArray(parts)) {
+      nextSlots[key] = parts;
+      continue;
+    }
+    nextSlots[key] = parts.map((part) => {
+      if (!part || typeof part !== 'object') {
+        return part;
+      }
+      const layer = part as Layer;
+      return {
+        ...structuredClone(layer),
+        id: createPartId(layer.type),
+      };
+    });
+  }
+  return { ...data, slots: nextSlots };
+}
+
+function createPartId(type: string): string {
+  return `${type.replaceAll('.', '-')}-${crypto.randomUUID()}`;
+}
+
+/** Deep-clone a block subtree with fresh ids (nested `data.children` and `data.slots`). */
 export function cloneBlockWithNewIds(
   block: Layer,
   createId: (type: string) => string
@@ -114,6 +145,23 @@ export function cloneBlockWithNewIds(
     data.children = (data.children as Layer[]).map((child) =>
       cloneBlockWithNewIds(child, createId)
     );
+  }
+  if (data.slots && typeof data.slots === 'object' && data.slots !== null) {
+    const nextSlots: Record<string, Layer[]> = {};
+    for (const [key, parts] of Object.entries(
+      data.slots as Record<string, unknown>
+    )) {
+      if (!Array.isArray(parts)) {
+        continue;
+      }
+      nextSlots[key] = parts.map((part) => {
+        if (!part || typeof part !== 'object') {
+          return part as Layer;
+        }
+        return cloneBlockWithNewIds(part as Layer, createId);
+      });
+    }
+    data.slots = nextSlots;
   }
   return {
     ...block,

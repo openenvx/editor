@@ -103,10 +103,10 @@ describe('html block commands', () => {
 
     const root = store.getScene().pages[0]!.layers[0]!;
     const children = getBlockChildren(root);
-    expect(children.length).toBe(5);
-    expect(children[1]!.type).toBe('html.heading');
-    expect(children[1]!.id).not.toBe('heading-1');
-    expect(store.getSelection().selectedLayerIds).toEqual([children[1]!.id]);
+    expect(children.length).toBe(6);
+    expect(children[2]!.type).toBe('html.heading');
+    expect(children[2]!.id).not.toBe('heading-1');
+    expect(store.getSelection().selectedLayerIds).toEqual([children[2]!.id]);
     runtime.dispose();
   });
 
@@ -124,14 +124,14 @@ describe('html block commands', () => {
       .commands.execute('html.moveBlockUp', ctx, runtime.getEvents());
 
     let children = getBlockChildren(store.getScene().pages[0]!.layers[0]!);
-    expect(children[0]!.id).toBe('text-1');
+    expect(children[1]!.id).toBe('text-1');
 
     await manager
       .getRegistries()
       .commands.execute('html.moveBlockDown', ctx, runtime.getEvents());
 
     children = getBlockChildren(store.getScene().pages[0]!.layers[0]!);
-    expect(children[1]!.id).toBe('text-1');
+    expect(children[2]!.id).toBe('text-1');
     runtime.dispose();
   });
 
@@ -196,7 +196,22 @@ describe('html block commands', () => {
       commands
         .get('html.moveBlockUp')!
         .canExecute(runtime.createCommandContext())
+    ).toBe(true);
+    store.setSelection({
+      ...htmlDemoSelection,
+      primaryLayerId: 'hero-1',
+      selectedLayerIds: ['hero-1'],
+    });
+    expect(
+      commands
+        .get('html.moveBlockUp')!
+        .canExecute(runtime.createCommandContext())
     ).toBe(false);
+    store.setSelection({
+      ...htmlDemoSelection,
+      primaryLayerId: 'heading-1',
+      selectedLayerIds: ['heading-1'],
+    });
     expect(
       commands
         .get('html.moveBlockDown')!

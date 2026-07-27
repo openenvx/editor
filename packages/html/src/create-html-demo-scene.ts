@@ -16,15 +16,67 @@ export function createHtmlDemoScene(): Scene {
               background: '#ffffff',
               children: [
                 {
+                  id: 'hero-1',
+                  type: 'html.hero',
+                  data: {
+                    variant: 'centered',
+                    backgroundImage: 'https://placehold.co/1200x600',
+                    overlay: '#00000066',
+                    minHeight: 360,
+                    paddingY: 48,
+                    align: 'center',
+                    slots: {
+                      headline: [
+                        {
+                          id: 'hero-1-headline',
+                          type: 'html.heading',
+                          data: {
+                            html: 'Welcome',
+                            level: '1',
+                            color: '#ffffff',
+                          },
+                        },
+                      ],
+                      body: [
+                        {
+                          id: 'hero-1-body',
+                          type: 'html.text',
+                          visible: true,
+                          data: {
+                            html: 'Composite blocks keep one row in Layers while slot parts stay editable here and in the inspector.',
+                            color: '#f3f4f6',
+                          },
+                        },
+                      ],
+                      actions: [
+                        {
+                          id: 'hero-1-cta',
+                          type: 'html.button',
+                          data: {
+                            label: 'Get started',
+                            href: '#',
+                            color: '#ffffff',
+                          },
+                        },
+                      ],
+                    },
+                  },
+                },
+                {
                   id: 'heading-1',
                   type: 'html.heading',
-                  data: { html: 'Welcome', level: '1' },
+                  data: {
+                    html: 'Below the hero',
+                    level: '2',
+                    color: '#111827',
+                  },
                 },
                 {
                   id: 'text-1',
                   type: 'html.text',
                   data: {
                     html: 'Drag blocks from the left palette into Flex or Grid. Double-click text to edit. Right-click for the context menu.',
+                    color: '#374151',
                   },
                 },
                 {
@@ -40,12 +92,16 @@ export function createHtmlDemoScene(): Scene {
                       {
                         id: 'heading-2',
                         type: 'html.heading',
-                        data: { html: 'Flex item', level: '3' },
+                        data: {
+                          html: 'Flex item',
+                          level: '3',
+                          color: '#111827',
+                        },
                       },
                       {
                         id: 'text-2',
                         type: 'html.text',
-                        data: { html: 'Another flex child' },
+                        data: { html: 'Another flex child', color: '#374151' },
                       },
                     ],
                   },
@@ -61,12 +117,16 @@ export function createHtmlDemoScene(): Scene {
                       {
                         id: 'heading-3',
                         type: 'html.heading',
-                        data: { html: 'Column A', level: '3' },
+                        data: {
+                          html: 'Column A',
+                          level: '3',
+                          color: '#111827',
+                        },
                       },
                       {
                         id: 'text-3',
                         type: 'html.text',
-                        data: { html: 'Column B' },
+                        data: { html: 'Column B', color: '#374151' },
                       },
                     ],
                   },

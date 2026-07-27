@@ -1,10 +1,17 @@
-export type { BlockConfig, BlockRenderProps, FieldDef } from './block-config';
+export type {
+  BlockConfig,
+  BlockRenderProps,
+  FieldDef,
+  SlotDef,
+} from './block-config';
 export {
   BlockRegistry,
   BlockRegistryServiceId,
   defaultBlockRegistry,
 } from './block-registry';
 export { builtinBlocks, isHtmlTextBlockType } from './blocks/builtin-blocks';
+export { buttonBlock } from './blocks/button-block';
+export { heroBlock } from './blocks/hero-block';
 export {
   DuplicateHtmlBlockCommand,
   InsertHtmlBlockCommand,

@@ -3,9 +3,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createHtmlDemoScene } from '../create-html-demo-scene';
-import {
-  createBlockRegistry,
-} from '../test/html-editor-harness';
+import { createBlockRegistry } from '../test/html-editor-harness';
 import { BlockTreeRenderer } from './block-tree-renderer';
 
 afterEach(cleanup);
@@ -13,10 +11,10 @@ afterEach(cleanup);
 function renderTree(
   overrides: Partial<{
     selectedId: string | null;
-    editingBlockId: string | null;
+    editingTarget: { hostId: string; dataPath: string } | null;
     onSelect: (id: string) => void;
-    onStartEdit: (id: string) => void;
-    onCommitEdit: (id: string, html: string) => void;
+    onStartEdit: (hostId: string, dataPath: string) => void;
+    onCommitEdit: (hostId: string, dataPath: string, html: string) => void;
     onDuplicate: (id: string) => void;
     onRemove: (id: string) => void;
   }> = {}
@@ -32,7 +30,7 @@ function renderTree(
   const result = render(
     <DndContext>
       <BlockTreeRenderer
-        editingBlockId={overrides.editingBlockId ?? null}
+        editingTarget={overrides.editingTarget ?? null}
         layers={scene.pages[0]!.layers}
         registry={registry}
         scene={scene}
@@ -59,13 +57,13 @@ function renderTree(
 }
 
 describe('BlockTreeRenderer', () => {
-  it('renders demo content and selects on click', () => {
+  it('renders demo content and selects host on hero slot click', () => {
     const { onSelect } = renderTree();
     expect(screen.getByText('Welcome')).toBeTruthy();
     expect(screen.getByText('Flex item')).toBeTruthy();
 
     fireEvent.click(screen.getByText('Welcome'));
-    expect(onSelect).toHaveBeenCalledWith('heading-1');
+    expect(onSelect).toHaveBeenCalledWith('hero-1');
   });
 
   it('shows selection menu and wires duplicate/remove', () => {
@@ -86,20 +84,33 @@ describe('BlockTreeRenderer', () => {
     expect(onRemove).toHaveBeenCalledWith('heading-1');
   });
 
-  it('starts edit on double-click of a text block', () => {
+  it('starts slot edit on double-click of hero headline', () => {
     const onStartEdit = vi.fn();
     const onSelect = vi.fn();
     renderTree({ onSelect, onStartEdit });
 
     fireEvent.doubleClick(screen.getByText('Welcome'));
+    expect(onSelect).toHaveBeenCalledWith('hero-1');
+    expect(onStartEdit).toHaveBeenCalledWith(
+      'hero-1',
+      'slots.headline.0.data.html'
+    );
+  });
+
+  it('starts edit on double-click of a plain text block', () => {
+    const onStartEdit = vi.fn();
+    const onSelect = vi.fn();
+    renderTree({ onSelect, onStartEdit });
+
+    fireEvent.doubleClick(screen.getByText('Below the hero'));
     expect(onSelect).toHaveBeenCalledWith('heading-1');
-    expect(onStartEdit).toHaveBeenCalledWith('heading-1');
+    expect(onStartEdit).toHaveBeenCalledWith('heading-1', 'html');
   });
 
   it('selects via Enter on a block wrap', () => {
     const onSelect = vi.fn();
     renderTree({ onSelect, selectedId: 'heading-1' });
-    const heading = screen.getByText('Welcome');
+    const heading = screen.getByText('Below the hero');
     const wrap = heading.closest('[tabindex]') as HTMLElement;
     expect(wrap).toBeTruthy();
     fireEvent.keyDown(wrap, { key: 'Enter' });
@@ -140,7 +151,7 @@ describe('BlockTreeRenderer', () => {
     render(
       <DndContext>
         <BlockTreeRenderer
-          editingBlockId={null}
+          editingTarget={null}
           layers={emptyFlex.pages[0]!.layers}
           registry={registry}
           scene={emptyFlex}
@@ -163,9 +174,9 @@ describe('BlockTreeRenderer', () => {
     const onStartEdit = vi.fn();
     const onSelect = vi.fn();
     renderTree({ onSelect, onStartEdit });
-    const hit = screen.getByText('Welcome').closest('[role="button"]')!;
+    const hit = screen.getByText('Below the hero').closest('[role="button"]')!;
     fireEvent.keyDown(hit, { key: ' ' });
-    expect(onStartEdit).toHaveBeenCalledWith('heading-1');
+    expect(onStartEdit).toHaveBeenCalledWith('heading-1', 'html');
   });
 
   it('renders insert-line preview from sortDraft', () => {
@@ -174,7 +185,7 @@ describe('BlockTreeRenderer', () => {
     render(
       <DndContext>
         <BlockTreeRenderer
-          editingBlockId={null}
+          editingTarget={null}
           layers={scene.pages[0]!.layers}
           registry={registry}
           scene={scene}
@@ -183,7 +194,7 @@ describe('BlockTreeRenderer', () => {
             activeId: 'heading-1',
             sourceParentId: 'root',
             parentId: 'root',
-            orderedIds: ['heading-1', 'text-1', 'flex-1', 'grid-1'],
+            orderedIds: ['hero-1', 'heading-1', 'text-1', 'flex-1', 'grid-1'],
             placeholderIndex: 1,
           }}
           onCommitEdit={vi.fn()}
@@ -203,7 +214,7 @@ describe('BlockTreeRenderer', () => {
     render(
       <DndContext>
         <BlockTreeRenderer
-          editingBlockId={null}
+          editingTarget={null}
           layers={scene.pages[0]!.layers}
           registry={registry}
           scene={scene}

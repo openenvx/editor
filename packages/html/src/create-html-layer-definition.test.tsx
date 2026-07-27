@@ -53,8 +53,12 @@ describe('createHtmlLayerDefinition', () => {
           label: 'Direction',
           options: [{ label: 'Row', value: 'row' }],
         },
-        html: { kind: 'textarea', label: 'HTML' },
+        html: { kind: 'richText', label: 'HTML' },
         name: { kind: 'text', label: 'Name' },
+        tint: { kind: 'color', label: 'Tint' },
+        photo: { kind: 'image', label: 'Photo' },
+        align: { kind: 'align', label: 'Align' },
+        show: { kind: 'toggle', label: 'Show' },
       })
     );
     const sections = withFields.properties(
@@ -67,6 +71,20 @@ describe('createHtmlLayerDefinition', () => {
       'direction',
       'html',
       'name',
+      'tint',
+      'photo',
+      'align',
+      'show',
+    ]);
+    expect(sections[0]!.fields.map((f) => f.kind)).toEqual([
+      'number',
+      'select',
+      'richText',
+      'text',
+      'color',
+      'image',
+      'align',
+      'toggle',
     ]);
 
     const empty = createHtmlLayerDefinition(
@@ -82,6 +100,8 @@ describe('createHtmlLayerDefinition', () => {
       ['html.heading', 'text'],
       ['html.text', 'text'],
       ['html.image', 'image'],
+      ['html.hero', 'image'],
+      ['html.button', 'box'],
       ['html.root', 'file'],
       ['html.flex', 'box'],
       ['html.grid', 'box'],

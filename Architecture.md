@@ -58,9 +58,11 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 ## What belongs in `@openenvx/html`
 
 - Puck-style block config registry, block renderers, nested drop zones (dnd-kit)
-- `HtmlEditorPane` registered for `page.layout === 'html'` (preview only; props via shared inspector)
+- Composite blocks via named **`slots`** on `BlockConfig` — real part layers under `data.slots` (not `data.children`), so they stay invisible to the Layers tree and `walkLayers`
+- `HtmlEditorPane` registered for `page.layout === 'html'` (preview only; props via shared inspector; slot parts editable inline + via generated inspector fields)
 - HTML block commands (`html.insertBlock`, `html.moveBlock`, `html.updateBlockData`, `html.removeBlock`)
-- `HtmlBlocksPlugin` — registers `LayerDefinition`s, commands, editor pane, and a primary activity-sidebar **Blocks** panel (`html.blocks`); owns nesting via `data.children`
+- `HtmlBlocksPlugin` — registers `LayerDefinition`s, commands, editor pane, and a primary activity-sidebar **Blocks** panel (`html.blocks`); owns nesting via `data.children` and composites via `data.slots`
+- Built-in composites: `html.hero` (slots: headline / body / actions), `html.button`
 - No canvas / canvas-pro dependency
 
 ## What belongs in `@openenvx/core`

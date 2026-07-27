@@ -21,12 +21,12 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
-  type MouseEvent,
 } from 'react';
 
 import { defaultBlockRegistry } from '../block-registry';
 import { getPageRootId } from '../tree/block-tree';
 import { blockCollisionDetection, type BlockSortDraft } from './block-dnd';
+import type { BlockEditTarget } from './block-editor-context';
 import { BlockTreeRenderer } from './block-tree-renderer';
 import {
   applyHtmlDragEnd,
@@ -41,7 +41,9 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   const scene = useWorkbenchContextSelector((state) => state.scene);
   const selection = useWorkbenchContextSelector((state) => state.selection);
   const registry = defaultBlockRegistry;
-  const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
+  const [editingTarget, setEditingTarget] = useState<BlockEditTarget | null>(
+    null
+  );
   const [sortDraft, setSortDraft] = useState<BlockSortDraft | null>(null);
   const sortDraftRef = useRef<BlockSortDraft | null>(null);
 
@@ -66,25 +68,29 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   );
 
   const clearSelection = useCallback(() => {
-    if (editingBlockId) {
+    if (editingTarget) {
       return;
     }
     api.selectLayers([]);
-  }, [api, editingBlockId]);
+  }, [api, editingTarget]);
 
-  const handleStartEdit = useCallback((id: string) => {
-    setEditingBlockId(id);
+  const handleStartEdit = useCallback((hostId: string, dataPath: string) => {
+    setEditingTarget({ hostId, dataPath });
   }, []);
 
   const handleCommitEdit = useCallback(
-    (id: string, html: string) => {
-      void executeCommand('html.updateBlockData', {
-        id,
-        patch: { html },
-      });
-      setEditingBlockId(null);
+    (hostId: string, dataPath: string, html: string) => {
+      if (dataPath.includes('.')) {
+        api.updateProperty(hostId, dataPath, html);
+      } else {
+        void executeCommand('html.updateBlockData', {
+          id: hostId,
+          patch: { [dataPath]: html },
+        });
+      }
+      setEditingTarget(null);
     },
-    [executeCommand]
+    [api, executeCommand]
   );
 
   const handleDuplicate = useCallback(
@@ -101,28 +107,18 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     [executeCommand]
   );
 
-  const handleCanvasClick = useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
-      if (event.target !== event.currentTarget) {
-        return;
-      }
-      clearSelection();
-    },
-    [clearSelection]
-  );
-
   const handleCanvasKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key !== 'Escape') {
         return;
       }
-      if (editingBlockId) {
+      if (editingTarget) {
         return;
       }
       event.preventDefault();
       clearSelection();
     },
-    [clearSelection, editingBlockId]
+    [clearSelection, editingTarget]
   );
 
   const clearDrag = useCallback(() => {
@@ -205,12 +201,12 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
           .join(' ')}
         role="tree"
         tabIndex={0}
-        onClick={handleCanvasClick}
+        onClick={clearSelection}
         onKeyDown={handleCanvasKeyDown}
       >
         {rootId ? (
           <BlockTreeRenderer
-            editingBlockId={editingBlockId}
+            editingTarget={editingTarget}
             layers={page.layers}
             onCommitEdit={handleCommitEdit}
             onDuplicate={handleDuplicate}

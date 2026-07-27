@@ -18,6 +18,7 @@ export type PropertyFieldKind =
   | 'color'
   | 'richText'
   | 'repeater'
+  | 'slotList'
   | 'image'
   | 'border'
   | 'cornerRadius'
@@ -28,9 +29,16 @@ export type PropertyFieldKind =
 
 export interface RepeaterFieldConfig {
   key: string;
-  kind: Exclude<PropertyFieldKind, 'repeater'>;
+  kind: Exclude<PropertyFieldKind, 'repeater' | 'slotList'>;
   label: string;
   options?: { value: string; label: string }[];
+}
+
+/** Config for a `slotList` field — rows are part layers under `data.slots`. */
+export interface SlotListFieldConfig {
+  /** Template part cloned (with a fresh id) when the user clicks Add. */
+  newPart: unknown;
+  fields: RepeaterFieldConfig[];
 }
 
 export type { PropertyFieldOption } from './field-config';
@@ -43,6 +51,7 @@ export interface PropertyFieldDescriptor {
   chrome?: boolean;
   options?: PropertyFieldOption[];
   repeaterFields?: RepeaterFieldConfig[];
+  slotList?: SlotListFieldConfig;
   uploadCommandId?: string;
   numeric?: NumericFieldConfig;
   popup?: PopupFieldConfig;
@@ -143,6 +152,25 @@ export class PropertyBuilder implements FieldHost {
       kind: 'repeater',
       label: repeaterConfig.label ?? key,
       repeaterFields: repeaterConfig.fields,
+    });
+    this.applyConfigToLast(config);
+    return this;
+  }
+
+  slotList(
+    key: string,
+    slotListConfig: SlotListFieldConfig & { label?: string },
+    config?: FieldConfigOptions
+  ): this {
+    this.pushField({
+      chrome: false,
+      key,
+      kind: 'slotList',
+      label: slotListConfig.label ?? key,
+      slotList: {
+        fields: slotListConfig.fields,
+        newPart: slotListConfig.newPart,
+      },
     });
     this.applyConfigToLast(config);
     return this;
@@ -347,6 +375,25 @@ class PropertySectionBuilder {
       kind: 'repeater',
       label: repeaterConfig.label ?? key,
       repeaterFields: repeaterConfig.fields,
+    });
+    this.applyConfigToLast(config);
+    return this;
+  }
+
+  slotList(
+    key: string,
+    slotListConfig: SlotListFieldConfig & { label?: string },
+    config?: FieldConfigOptions
+  ): this {
+    this.pushField({
+      chrome: false,
+      key,
+      kind: 'slotList',
+      label: slotListConfig.label ?? key,
+      slotList: {
+        fields: slotListConfig.fields,
+        newPart: slotListConfig.newPart,
+      },
     });
     this.applyConfigToLast(config);
     return this;

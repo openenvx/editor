@@ -24,6 +24,7 @@ describe('visibleSiblingIds', () => {
   it('returns visible children or empty when parent missing', () => {
     const scene = createHtmlDemoScene();
     expect(visibleSiblingIds(scene.pages[0]!.layers, 'root')).toEqual([
+      'hero-1',
       'heading-1',
       'text-1',
       'flex-1',
@@ -107,7 +108,7 @@ describe('applyHtmlDragOver', () => {
       type: 'block' as const,
       blockId: 'heading-1',
       parentId: 'root',
-      index: 0,
+      index: 1,
       acceptsChildren: false,
     };
 
@@ -146,13 +147,14 @@ describe('applyHtmlDragOver', () => {
         type: 'block',
         blockId: 'text-1',
         parentId: 'root',
-        index: 1,
+        index: 2,
         acceptsChildren: false,
       },
       sortDraftRef,
       setSortDraft,
     });
-    expect(sortDraftRef.current?.orderedIds[0]).toBe('text-1');
+    const ordered = sortDraftRef.current?.orderedIds ?? [];
+    expect(ordered.indexOf('text-1')).toBeLessThan(ordered.indexOf('heading-1'));
   });
 
   it('nests when hovering a nestable block', () => {
@@ -569,7 +571,7 @@ describe('applyHtmlDragEnd guards', () => {
         activeId: 'heading-1',
         sourceParentId: 'root',
         parentId: 'root',
-        orderedIds: ['text-1', 'heading-1', 'flex-1', 'grid-1'],
+        orderedIds: ['hero-1', 'text-1', 'heading-1', 'flex-1', 'grid-1'],
       },
       registry,
       clearDrag: vi.fn(),
