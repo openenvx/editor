@@ -6,6 +6,7 @@ import {
   cancelCrossParentDraftOnSourceParent,
   insertLineIsVertical,
   insertLineTargetIds,
+  isBlockDndData,
   mergeVisibleDraftIntoFullOrder,
   resolveBlockDragEnd,
   resolveBlockDrop,
@@ -650,5 +651,35 @@ describe('resolveBlockDragEnd', () => {
       targetParentLocked: false,
     });
     expect(resolved).toBeNull();
+  });
+});
+
+describe('isBlockDndData', () => {
+  it('accepts block and zone payloads and rejects junk', () => {
+    expect(
+      isBlockDndData({
+        type: 'block',
+        blockId: 'a',
+        parentId: 'root',
+        index: 0,
+        acceptsChildren: false,
+      })
+    ).toBe(true);
+    expect(
+      isBlockDndData({
+        type: 'block',
+        blockId: 'a',
+        parentId: null,
+        index: 0,
+        acceptsChildren: true,
+      })
+    ).toBe(true);
+    expect(isBlockDndData({ type: 'zone', parentId: 'root' })).toBe(true);
+    expect(isBlockDndData(null)).toBe(false);
+    expect(isBlockDndData({ type: 'block' })).toBe(false);
+    expect(isBlockDndData({ type: 'zone' })).toBe(false);
+    expect(isBlockDndData({ type: 'block', blockId: 'a', parentId: 1 })).toBe(
+      false
+    );
   });
 });

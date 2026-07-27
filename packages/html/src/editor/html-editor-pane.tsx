@@ -8,19 +8,12 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { arrayMove } from '@dnd-kit/sortable';
-import {
-  getActivePage,
-  isLayerDescendant,
-  isLayerLocked,
-  isLayerVisible,
-} from '@openenvx/core';
+import { getActivePage } from '@openenvx/core';
 import type { EditorPaneHostProps } from '@openenvx/headless';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
-import type { Layer } from '@openenvx/schema';
 import {
   memo,
   useCallback,
@@ -32,34 +25,16 @@ import {
 } from 'react';
 
 import { defaultBlockRegistry } from '../block-registry';
-import { findBlock, getBlockChildren, getPageRootId } from '../tree/block-tree';
-import {
-  blockCollisionDetection,
-  buildCrossParentDraft,
-  dropTargetParentId,
-  isBlockDndData,
-  cancelCrossParentDraftOnSourceParent,
-  usesContainerNestPreview,
-  resolveBlockDragEnd,
-  sameCrossParentDraft,
-  sameOrderedIds,
-  shouldIgnoreOverWhileCrossParent,
-  shouldKeepCrossParentDraft,
-  type BlockSortDraft,
-} from './block-dnd';
+import { getPageRootId } from '../tree/block-tree';
+import { blockCollisionDetection, type BlockSortDraft } from './block-dnd';
 import { BlockTreeRenderer } from './block-tree-renderer';
+import {
+  applyHtmlDragEnd,
+  applyHtmlDragOver,
+  applyHtmlDragStart,
+} from './html-editor-drag';
 
 import styles from './html-editor-pane.module.css';
-
-function visibleSiblingIds(layers: Layer[], parentId: string): string[] {
-  const parent = findBlock(layers, parentId);
-  if (!parent) {
-    return [];
-  }
-  return getBlockChildren(parent.block)
-    .filter(isLayerVisible)
-    .map((child) => child.id);
-}
 
 export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   const { api, executeCommand } = useWorkbenchContext();
@@ -157,231 +132,30 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
 
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
-      if (!(scene && selection)) {
-        return;
-      }
-      const data = event.active.data.current;
-      if (!(isBlockDndData(data) && data.type === 'block')) {
-        return;
-      }
-      if (data.parentId === null) {
-        return;
-      }
-      const page = getActivePage(scene, selection.activePageId);
-      const draft: BlockSortDraft = {
-        activeId: data.blockId,
-        sourceParentId: data.parentId,
-        parentId: data.parentId,
-        orderedIds: visibleSiblingIds(page.layers, data.parentId),
-      };
-      sortDraftRef.current = draft;
-      setSortDraft(draft);
+      applyHtmlDragStart({
+        scene,
+        selection,
+        activeData: event.active.data.current,
+        sortDraftRef,
+        setSortDraft,
+      });
     },
     [scene, selection]
   );
 
   const handleDragOver = useCallback(
     (event: DragOverEvent) => {
-      const { active, over } = event;
-      if (!(over && scene && selection)) {
+      if (!event.over) {
         return;
       }
-      const activeData = active.data.current;
-      const overData = over.data.current;
-      if (!(isBlockDndData(activeData) && activeData.type === 'block')) {
-        return;
-      }
-      if (!isBlockDndData(overData)) {
-        return;
-      }
-      const sourceParentId = activeData.parentId;
-      if (sourceParentId === null) {
-        return;
-      }
-
-      const page = getActivePage(scene, selection.activePageId);
-      const isAncestorOfLocked = (ancestorId: string, lockedParentId: string) =>
-        isLayerDescendant(page.layers, ancestorId, lockedParentId);
-
-      const overSourceParentZone =
-        overData.type === 'zone' && overData.parentId === sourceParentId;
-      const overSourceParentNestable =
-        overData.type === 'block' &&
-        overData.acceptsChildren &&
-        overData.blockId === sourceParentId;
-      if (overSourceParentZone || overSourceParentNestable) {
-        const next = cancelCrossParentDraftOnSourceParent({
-          current: sortDraftRef.current,
-          activeId: activeData.blockId,
-          sourceParentId,
-          sourceVisibleIds: visibleSiblingIds(page.layers, sourceParentId),
-        });
-        if (next) {
-          sortDraftRef.current = next;
-          setSortDraft(next);
-        }
-        return;
-      }
-
-      if (
-        shouldIgnoreOverWhileCrossParent({
-          current: sortDraftRef.current,
-          over: overData,
-          isAncestorOfLockedParent: isAncestorOfLocked,
-        })
-      ) {
-        return;
-      }
-
-      const setCrossParentDraft = (
-        parentId: string,
-        placeholderIndex: number,
-        containerPreview = false
-      ) => {
-        if (
-          parentId === activeData.blockId ||
-          isLayerDescendant(page.layers, activeData.blockId, parentId)
-        ) {
-          return;
-        }
-        const next = buildCrossParentDraft({
-          activeId: activeData.blockId,
-          sourceParentId,
-          parentId,
-          targetVisibleIds: visibleSiblingIds(page.layers, parentId),
-          placeholderIndex,
-          containerPreview,
-        });
-        if (sameCrossParentDraft(sortDraftRef.current, next)) {
-          return;
-        }
-        sortDraftRef.current = next;
-        setSortDraft(next);
-      };
-
-      const nestIntoParent = (parentId: string) => {
-        const parent = findBlock(page.layers, parentId)?.block;
-        const parentType = parent?.type ?? '';
-        const parentData =
-          parent && typeof parent.data === 'object' && parent.data !== null
-            ? (parent.data as Record<string, unknown>)
-            : {};
-        const targetIds = visibleSiblingIds(page.layers, parentId).filter(
-          (id) => id !== activeData.blockId
-        );
-        setCrossParentDraft(
-          parentId,
-          targetIds.length,
-          usesContainerNestPreview(parentType, parentData)
-        );
-      };
-
-      if (overData.type === 'zone') {
-        if (overData.parentId === activeData.blockId) {
-          return;
-        }
-        if (
-          shouldKeepCrossParentDraft(
-            sortDraftRef.current,
-            overData.parentId,
-            isAncestorOfLocked
-          )
-        ) {
-          return;
-        }
-        nestIntoParent(overData.parentId);
-        return;
-      }
-
-      // Hovering a nestable block (Flex/Grid/…) → nest preview inside it.
-      if (overData.acceptsChildren && overData.blockId !== activeData.blockId) {
-        if (
-          shouldKeepCrossParentDraft(
-            sortDraftRef.current,
-            overData.blockId,
-            isAncestorOfLocked
-          )
-        ) {
-          return;
-        }
-        nestIntoParent(overData.blockId);
-        return;
-      }
-
-      if (overData.parentId === sourceParentId) {
-        setSortDraft((current) => {
-          if (
-            !current ||
-            current.sourceParentId !== sourceParentId ||
-            current.placeholderIndex !== undefined
-          ) {
-            const orderedIds = visibleSiblingIds(page.layers, sourceParentId);
-            const oldIndex = orderedIds.indexOf(activeData.blockId);
-            const newIndex = orderedIds.indexOf(overData.blockId);
-            if (oldIndex === -1 || newIndex === -1) {
-              return current;
-            }
-            const nextIds = arrayMove(orderedIds, oldIndex, newIndex);
-            if (
-              current &&
-              current.placeholderIndex === undefined &&
-              current.parentId === sourceParentId &&
-              sameOrderedIds(current.orderedIds, nextIds)
-            ) {
-              return current;
-            }
-            const next: BlockSortDraft = {
-              activeId: activeData.blockId,
-              sourceParentId,
-              parentId: sourceParentId,
-              orderedIds: nextIds,
-            };
-            sortDraftRef.current = next;
-            return next;
-          }
-          const oldIndex = current.orderedIds.indexOf(activeData.blockId);
-          const newIndex = current.orderedIds.indexOf(overData.blockId);
-          if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
-            return current;
-          }
-          const next: BlockSortDraft = {
-            activeId: activeData.blockId,
-            sourceParentId,
-            parentId: sourceParentId,
-            orderedIds: arrayMove(current.orderedIds, oldIndex, newIndex),
-          };
-          sortDraftRef.current = next;
-          return next;
-        });
-        return;
-      }
-
-      if (overData.parentId === null) {
-        return;
-      }
-
-      const parent = findBlock(page.layers, overData.parentId)?.block;
-      const parentType = parent?.type ?? '';
-      const parentData =
-        parent && typeof parent.data === 'object' && parent.data !== null
-          ? (parent.data as Record<string, unknown>)
-          : {};
-      // Wrapping flex: whole-container nest preview (append). Nowrap flex/grid:
-      // insert line at the hovered child's index.
-      if (usesContainerNestPreview(parentType, parentData)) {
-        nestIntoParent(overData.parentId);
-        return;
-      }
-
-      const targetIds = visibleSiblingIds(
-        page.layers,
-        overData.parentId
-      ).filter((id) => id !== activeData.blockId);
-      const overVisibleIndex = targetIds.indexOf(overData.blockId);
-      setCrossParentDraft(
-        overData.parentId,
-        overVisibleIndex === -1 ? targetIds.length : overVisibleIndex
-      );
+      applyHtmlDragOver({
+        scene,
+        selection,
+        activeData: event.active.data.current,
+        overData: event.over.data.current,
+        sortDraftRef,
+        setSortDraft,
+      });
     },
     [scene, selection]
   );
@@ -389,72 +163,17 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const draft = sortDraftRef.current;
-      const { active, over } = event;
-      clearDrag();
-
-      if (!over || !scene || !selection) {
-        return;
-      }
-
-      const activeData = active.data.current;
-      const overData = over.data.current;
-      if (!(isBlockDndData(activeData) && activeData.type === 'block')) {
-        return;
-      }
-      if (!isBlockDndData(overData)) {
-        return;
-      }
-
-      const page = getActivePage(scene, selection.activePageId);
-      const targetParentId =
-        draft && typeof draft.placeholderIndex === 'number'
-          ? draft.parentId
-          : dropTargetParentId(overData);
-      if (!targetParentId) {
-        return;
-      }
-
-      const targetParentBlock = findBlock(page.layers, targetParentId)?.block;
-      const targetParentLocked = targetParentBlock
-        ? isLayerLocked(targetParentBlock)
-        : false;
-      const targetParentAcceptsChildren =
-        registry.get(targetParentBlock?.type ?? '')?.acceptsChildren === true;
-
-      const wouldCreateCycle =
-        targetParentId === activeData.blockId ||
-        isLayerDescendant(page.layers, activeData.blockId, targetParentId);
-
-      let activeParentFullChildIds: string[] = [];
-      let activeParentChildren: Layer[] = [];
-      if (activeData.parentId) {
-        const activeParent = findBlock(page.layers, activeData.parentId);
-        if (activeParent) {
-          activeParentChildren = getBlockChildren(activeParent.block);
-          activeParentFullChildIds = activeParentChildren.map(
-            (child) => child.id
-          );
-        }
-      }
-
-      const resolved = resolveBlockDragEnd({
-        active: activeData,
-        over: overData,
+      applyHtmlDragEnd({
+        scene,
+        selection,
+        activeData: event.active.data.current,
+        overData: event.over?.data.current,
         draft,
-        activeParentFullChildIds,
-        activeParentChildren,
-        wouldCreateCycle,
-        targetParentAcceptsChildren,
-        targetParentLocked,
-      });
-      if (!resolved) {
-        return;
-      }
-
-      void executeCommand('html.moveBlock', {
-        id: activeData.blockId,
-        newParentId: resolved.parentId,
-        index: resolved.index,
+        registry,
+        clearDrag,
+        executeCommand: (commandId, commandArgs) => {
+          void executeCommand(commandId, commandArgs);
+        },
       });
     },
     [clearDrag, executeCommand, registry, scene, selection]

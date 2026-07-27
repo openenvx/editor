@@ -8,7 +8,8 @@ import { HtmlRichTextBubbleMenuToolbar } from './html-rich-text-bubble-menu';
 
 import styles from './html-editor-pane.module.css';
 
-function shouldShowRichTextBubbleMenu({
+/** Exported for unit tests — bubble menu hides on caret/full-select. */
+export function shouldShowRichTextBubbleMenu({
   state,
 }: {
   editor: Editor;

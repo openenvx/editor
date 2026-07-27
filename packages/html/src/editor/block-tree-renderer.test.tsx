@@ -1,0 +1,229 @@
+import { DndContext } from '@dnd-kit/core';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { createHtmlDemoScene } from '../create-html-demo-scene';
+import {
+  createBlockRegistry,
+} from '../test/html-editor-harness';
+import { BlockTreeRenderer } from './block-tree-renderer';
+
+afterEach(cleanup);
+
+function renderTree(
+  overrides: Partial<{
+    selectedId: string | null;
+    editingBlockId: string | null;
+    onSelect: (id: string) => void;
+    onStartEdit: (id: string) => void;
+    onCommitEdit: (id: string, html: string) => void;
+    onDuplicate: (id: string) => void;
+    onRemove: (id: string) => void;
+  }> = {}
+) {
+  const scene = createHtmlDemoScene();
+  const registry = createBlockRegistry();
+  const onSelect = overrides.onSelect ?? vi.fn();
+  const onStartEdit = overrides.onStartEdit ?? vi.fn();
+  const onCommitEdit = overrides.onCommitEdit ?? vi.fn();
+  const onDuplicate = overrides.onDuplicate ?? vi.fn();
+  const onRemove = overrides.onRemove ?? vi.fn();
+
+  const result = render(
+    <DndContext>
+      <BlockTreeRenderer
+        editingBlockId={overrides.editingBlockId ?? null}
+        layers={scene.pages[0]!.layers}
+        registry={registry}
+        scene={scene}
+        selectedId={overrides.selectedId ?? null}
+        sortDraft={null}
+        onCommitEdit={onCommitEdit}
+        onDuplicate={onDuplicate}
+        onRemove={onRemove}
+        onSelect={onSelect}
+        onStartEdit={onStartEdit}
+      />
+    </DndContext>
+  );
+
+  return {
+    ...result,
+    onCommitEdit,
+    onDuplicate,
+    onRemove,
+    onSelect,
+    onStartEdit,
+    scene,
+  };
+}
+
+describe('BlockTreeRenderer', () => {
+  it('renders demo content and selects on click', () => {
+    const { onSelect } = renderTree();
+    expect(screen.getByText('Welcome')).toBeTruthy();
+    expect(screen.getByText('Flex item')).toBeTruthy();
+
+    fireEvent.click(screen.getByText('Welcome'));
+    expect(onSelect).toHaveBeenCalledWith('heading-1');
+  });
+
+  it('shows selection menu and wires duplicate/remove', () => {
+    const onDuplicate = vi.fn();
+    const onRemove = vi.fn();
+    renderTree({
+      selectedId: 'heading-1',
+      onDuplicate,
+      onRemove,
+    });
+
+    expect(
+      screen.getByRole('toolbar', { name: 'Heading actions' })
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    expect(onDuplicate).toHaveBeenCalledWith('heading-1');
+    expect(onRemove).toHaveBeenCalledWith('heading-1');
+  });
+
+  it('starts edit on double-click of a text block', () => {
+    const onStartEdit = vi.fn();
+    const onSelect = vi.fn();
+    renderTree({ onSelect, onStartEdit });
+
+    fireEvent.doubleClick(screen.getByText('Welcome'));
+    expect(onSelect).toHaveBeenCalledWith('heading-1');
+    expect(onStartEdit).toHaveBeenCalledWith('heading-1');
+  });
+
+  it('selects via Enter on a block wrap', () => {
+    const onSelect = vi.fn();
+    renderTree({ onSelect, selectedId: 'heading-1' });
+    const heading = screen.getByText('Welcome');
+    const wrap = heading.closest('[tabindex]') as HTMLElement;
+    expect(wrap).toBeTruthy();
+    fireEvent.keyDown(wrap, { key: 'Enter' });
+    expect(onSelect).toHaveBeenCalledWith('heading-1');
+  });
+
+  it('shows empty drop zone copy for empty containers', () => {
+    const scene = createHtmlDemoScene();
+    const emptyFlex = {
+      ...scene,
+      pages: [
+        {
+          ...scene.pages[0]!,
+          layers: [
+            {
+              id: 'root',
+              type: 'html.root',
+              data: {
+                background: '#fff',
+                children: [
+                  {
+                    id: 'flex-empty',
+                    type: 'html.flex',
+                    data: {
+                      direction: 'row',
+                      wrap: 'true',
+                      children: [],
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    };
+    const registry = createBlockRegistry();
+    render(
+      <DndContext>
+        <BlockTreeRenderer
+          editingBlockId={null}
+          layers={emptyFlex.pages[0]!.layers}
+          registry={registry}
+          scene={emptyFlex}
+          selectedId={null}
+          sortDraft={null}
+          onCommitEdit={vi.fn()}
+          onDuplicate={vi.fn()}
+          onRemove={vi.fn()}
+          onSelect={vi.fn()}
+          onStartEdit={vi.fn()}
+        />
+      </DndContext>
+    );
+    expect(
+      screen.getByText('Select Blocks in the sidebar to add content')
+    ).toBeTruthy();
+  });
+
+  it('starts edit via keyboard on editable text', () => {
+    const onStartEdit = vi.fn();
+    const onSelect = vi.fn();
+    renderTree({ onSelect, onStartEdit });
+    const hit = screen.getByText('Welcome').closest('[role="button"]')!;
+    fireEvent.keyDown(hit, { key: ' ' });
+    expect(onStartEdit).toHaveBeenCalledWith('heading-1');
+  });
+
+  it('renders insert-line preview from sortDraft', () => {
+    const scene = createHtmlDemoScene();
+    const registry = createBlockRegistry();
+    render(
+      <DndContext>
+        <BlockTreeRenderer
+          editingBlockId={null}
+          layers={scene.pages[0]!.layers}
+          registry={registry}
+          scene={scene}
+          selectedId={null}
+          sortDraft={{
+            activeId: 'heading-1',
+            sourceParentId: 'root',
+            parentId: 'root',
+            orderedIds: ['heading-1', 'text-1', 'flex-1', 'grid-1'],
+            placeholderIndex: 1,
+          }}
+          onCommitEdit={vi.fn()}
+          onDuplicate={vi.fn()}
+          onRemove={vi.fn()}
+          onSelect={vi.fn()}
+          onStartEdit={vi.fn()}
+        />
+      </DndContext>
+    );
+    expect(screen.getByText('Welcome')).toBeTruthy();
+  });
+
+  it('renders container nest preview highlight', () => {
+    const scene = createHtmlDemoScene();
+    const registry = createBlockRegistry();
+    render(
+      <DndContext>
+        <BlockTreeRenderer
+          editingBlockId={null}
+          layers={scene.pages[0]!.layers}
+          registry={registry}
+          scene={scene}
+          selectedId={null}
+          sortDraft={{
+            activeId: 'heading-1',
+            sourceParentId: 'root',
+            parentId: 'flex-1',
+            orderedIds: [],
+            placeholderIndex: 0,
+            containerPreview: true,
+          }}
+          onCommitEdit={vi.fn()}
+          onDuplicate={vi.fn()}
+          onRemove={vi.fn()}
+          onSelect={vi.fn()}
+          onStartEdit={vi.fn()}
+        />
+      </DndContext>
+    );
+    expect(screen.getByText('Flex item')).toBeTruthy();
+  });
+});

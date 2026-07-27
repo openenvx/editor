@@ -1,54 +1,11 @@
-import {
-  EditorRuntime,
-  EditorService,
-  PluginManager,
-  SceneStore,
-  SimpleServiceContribution,
-} from '@openenvx/core';
 import { describe, expect, it } from 'vitest';
 
-import { builtinBlocks } from '../blocks/builtin-blocks';
-import {
-  BlockRegistry,
-  BlockRegistryServiceId,
-} from '../block-registry';
-import {
-  DuplicateHtmlBlockCommand,
-  InsertHtmlBlockCommand,
-  MoveHtmlBlockCommand,
-  MoveHtmlBlockDownCommand,
-  MoveHtmlBlockUpCommand,
-  RemoveHtmlBlockCommand,
-  UpdateHtmlBlockDataCommand,
-} from '../commands/html-block-commands';
-import { createHtmlDemoScene } from '../create-html-demo-scene';
+import { createHtmlCommandHarness, htmlDemoSelection } from '../test/html-editor-harness';
 import { findBlock, getBlockChildren } from '../tree/block-tree';
-
-function createHarness() {
-  const registry = new BlockRegistry();
-  for (const block of builtinBlocks) {
-    registry.register(block);
-  }
-
-  const store = new SceneStore(createHtmlDemoScene());
-  const runtime = new EditorRuntime(store, new EditorService());
-  const manager = new PluginManager(runtime);
-  manager.createPluginContext().register(
-    new SimpleServiceContribution(BlockRegistryServiceId, () => registry),
-    new InsertHtmlBlockCommand(),
-    new MoveHtmlBlockCommand(),
-    new MoveHtmlBlockUpCommand(),
-    new MoveHtmlBlockDownCommand(),
-    new DuplicateHtmlBlockCommand(),
-    new UpdateHtmlBlockDataCommand(),
-    new RemoveHtmlBlockCommand()
-  );
-  return { manager, registry, runtime, store };
-}
 
 describe('html block commands', () => {
   it('insert → move → update → undo restores prior scene', async () => {
-    const { manager, runtime, store } = createHarness();
+    const { manager, runtime, store } = createHtmlCommandHarness();
     const before = structuredClone(store.getScene());
     const ctx = runtime.createCommandContext();
 
@@ -84,9 +41,11 @@ describe('html block commands', () => {
         patch: { html: 'Updated' },
       });
     expect(
-      (findBlock(store.getScene().pages[0]!.layers, newId)!.block.data as {
-        html: string;
-      }).html
+      (
+        findBlock(store.getScene().pages[0]!.layers, newId)!.block.data as {
+          html: string;
+        }
+      ).html
     ).toBe('Updated');
 
     expect(store.undo()).toBe(true);
@@ -98,7 +57,7 @@ describe('html block commands', () => {
   });
 
   it('refuses to remove html.root', async () => {
-    const { manager, runtime, store } = createHarness();
+    const { manager, runtime, store } = createHtmlCommandHarness();
     const ctx = runtime.createCommandContext();
     const before = structuredClone(store.getScene());
 
@@ -113,9 +72,9 @@ describe('html block commands', () => {
   });
 
   it('removes selected block when args.id is omitted', async () => {
-    const { manager, runtime, store } = createHarness();
+    const { manager, runtime, store } = createHtmlCommandHarness();
     store.setSelection({
-      activePageId: 'html-page',
+      ...htmlDemoSelection,
       primaryLayerId: 'text-1',
       selectedLayerIds: ['text-1'],
     });
@@ -130,9 +89,9 @@ describe('html block commands', () => {
   });
 
   it('duplicates selected block under the same parent', async () => {
-    const { manager, runtime, store } = createHarness();
+    const { manager, runtime, store } = createHtmlCommandHarness();
     store.setSelection({
-      activePageId: 'html-page',
+      ...htmlDemoSelection,
       primaryLayerId: 'heading-1',
       selectedLayerIds: ['heading-1'],
     });
@@ -152,9 +111,9 @@ describe('html block commands', () => {
   });
 
   it('moves block siblings up and down', async () => {
-    const { manager, runtime, store } = createHarness();
+    const { manager, runtime, store } = createHtmlCommandHarness();
     store.setSelection({
-      activePageId: 'html-page',
+      ...htmlDemoSelection,
       primaryLayerId: 'text-1',
       selectedLayerIds: ['text-1'],
     });
@@ -177,7 +136,7 @@ describe('html block commands', () => {
   });
 
   it('refuses to nest under a non-accepting parent', async () => {
-    const { manager, runtime, store } = createHarness();
+    const { manager, runtime, store } = createHtmlCommandHarness();
     const ctx = runtime.createCommandContext();
     const before = structuredClone(store.getScene());
 
@@ -193,8 +152,105 @@ describe('html block commands', () => {
     runtime.dispose();
   });
 
+  it('guards insert/move/update when args or registry are invalid', async () => {
+    const { manager, runtime, store } = createHtmlCommandHarness();
+    const ctx = runtime.createCommandContext();
+    const before = structuredClone(store.getScene());
+    const commands = manager.getRegistries().commands;
+
+    await commands.execute('html.insertBlock', ctx, runtime.getEvents(), {});
+    await commands.execute('html.insertBlock', ctx, runtime.getEvents(), {
+      type: 'html.root',
+      parentId: 'root',
+    });
+    await commands.execute('html.insertBlock', ctx, runtime.getEvents(), {
+      type: 'html.missing',
+      parentId: 'root',
+    });
+    await commands.execute('html.moveBlock', ctx, runtime.getEvents(), {});
+    await commands.execute('html.moveBlock', ctx, runtime.getEvents(), {
+      id: 'root',
+      newParentId: null,
+    });
+    await commands.execute('html.moveBlock', ctx, runtime.getEvents(), {
+      id: 'missing',
+      newParentId: 'root',
+    });
+    await commands.execute('html.updateBlockData', ctx, runtime.getEvents(), {
+      id: 'text-1',
+    });
+    await commands.execute('html.duplicateBlock', ctx, runtime.getEvents(), {});
+    await commands.execute('html.moveBlockUp', ctx, runtime.getEvents(), {});
+    await commands.execute('html.moveBlockDown', ctx, runtime.getEvents(), {
+      id: 'root',
+    });
+    expect(store.getScene()).toEqual(before);
+
+    expect(commands.get('html.moveBlockUp')!.canExecute(ctx)).toBe(false);
+    store.setSelection({
+      ...htmlDemoSelection,
+      primaryLayerId: 'heading-1',
+      selectedLayerIds: ['heading-1'],
+    });
+    expect(
+      commands
+        .get('html.moveBlockUp')!
+        .canExecute(runtime.createCommandContext())
+    ).toBe(false);
+    expect(
+      commands
+        .get('html.moveBlockDown')!
+        .canExecute(runtime.createCommandContext())
+    ).toBe(true);
+    expect(
+      commands
+        .get('html.duplicateBlock')!
+        .canExecute(runtime.createCommandContext())
+    ).toBe(true);
+    expect(
+      commands
+        .get('html.removeBlock')!
+        .canExecute(runtime.createCommandContext(), { id: 'root' })
+    ).toBe(false);
+    expect(
+      commands.get('html.removeBlock')!.canExecute(runtime.createCommandContext())
+    ).toBe(true);
+
+    await commands.execute(
+      'html.removeBlock',
+      runtime.createCommandContext(),
+      runtime.getEvents(),
+      { id: 'missing-block' }
+    );
+    store.setSelection(htmlDemoSelection);
+    await commands.execute(
+      'html.removeBlock',
+      runtime.createCommandContext(),
+      runtime.getEvents()
+    );
+    await commands.execute(
+      'html.duplicateBlock',
+      runtime.createCommandContext(),
+      runtime.getEvents(),
+      { id: 'root' }
+    );
+
+    store.setSelection({
+      ...htmlDemoSelection,
+      primaryLayerId: 'grid-1',
+      selectedLayerIds: ['grid-1'],
+    });
+    expect(
+      commands
+        .get('html.moveBlockDown')!
+        .canExecute(runtime.createCommandContext())
+    ).toBe(false);
+
+    runtime.dispose();
+  });
+
   it('inserts and reorders pure children inside flex and grid', async () => {
-    const { manager, runtime, store } = createHarness();
+    const { manager, runtime, store } = createHtmlCommandHarness();
     const ctx = runtime.createCommandContext();
 
     await manager
@@ -219,9 +275,9 @@ describe('html block commands', () => {
         index: 0,
       });
 
-    expect(findBlock(store.getScene().pages[0]!.layers, insertedId)?.parentId).toBe(
-      'flex-1'
-    );
+    expect(
+      findBlock(store.getScene().pages[0]!.layers, insertedId)?.parentId
+    ).toBe('flex-1');
     grid = findBlock(store.getScene().pages[0]!.layers, 'grid-1')!.block;
     expect(getBlockChildren(grid)).toHaveLength(2);
 
