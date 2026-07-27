@@ -2,10 +2,18 @@ import type { Layer } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildCrossParentDraft,
+  cancelCrossParentDraftOnSourceParent,
+  insertLineIsVertical,
+  insertLineTargetIds,
   mergeVisibleDraftIntoFullOrder,
   resolveBlockDragEnd,
   resolveBlockDrop,
   resolveSameParentSortFromDraft,
+  sameCrossParentDraft,
+  shouldIgnoreOverWhileCrossParent,
+  shouldKeepCrossParentDraft,
+  sortInsertLineIndex,
 } from './block-dnd';
 
 function layer(id: string, visible = true): Layer {
@@ -198,6 +206,290 @@ describe('resolveBlockDrop', () => {
   });
 });
 
+describe('shouldKeepCrossParentDraft', () => {
+  it('keeps a leaf-hit draft when the nestable parent is hit after reflow', () => {
+    // 2-col grid full → placeholder before B wraps B → pointer lands on grid.
+    const afterLeafHit = buildCrossParentDraft({
+      activeId: 'drag',
+      sourceParentId: 'root',
+      parentId: 'grid-1',
+      targetVisibleIds: ['heading-3', 'text-3'],
+      placeholderIndex: 1,
+    });
+    expect(shouldKeepCrossParentDraft(afterLeafHit, 'grid-1')).toBe(true);
+    expect(shouldKeepCrossParentDraft(afterLeafHit, 'other')).toBe(false);
+    expect(shouldKeepCrossParentDraft(null, 'grid-1')).toBe(false);
+  });
+
+  it('keeps a grid draft when collision lands on an ancestor nestable', () => {
+    const gridDraft = buildCrossParentDraft({
+      activeId: 'drag',
+      sourceParentId: 'root',
+      parentId: 'grid-1',
+      targetVisibleIds: ['heading-3', 'text-3'],
+      placeholderIndex: 2,
+    });
+    expect(
+      shouldKeepCrossParentDraft(
+        gridDraft,
+        'root',
+        (ancestorId, lockedParentId) =>
+          ancestorId === 'root' && lockedParentId === 'grid-1'
+      )
+    ).toBe(true);
+  });
+
+  it('does not keep a same-parent reorder draft (no placeholderIndex)', () => {
+    expect(
+      shouldKeepCrossParentDraft(
+        {
+          activeId: 'a',
+          sourceParentId: 'grid-1',
+          parentId: 'grid-1',
+          orderedIds: ['a', 'b'],
+        },
+        'grid-1'
+      )
+    ).toBe(false);
+  });
+});
+
+describe('shouldIgnoreOverWhileCrossParent', () => {
+  const gridDraft = buildCrossParentDraft({
+    activeId: 'drag',
+    sourceParentId: 'root',
+    parentId: 'grid-1',
+    targetVisibleIds: ['heading-3', 'text-3'],
+    placeholderIndex: 2,
+  });
+  const isAncestor = (ancestorId: string, lockedParentId: string) =>
+    ancestorId === 'root' && lockedParentId === 'grid-1';
+
+  it('ignores ancestor nestable hits that oscillate with grid', () => {
+    expect(
+      shouldIgnoreOverWhileCrossParent({
+        current: gridDraft,
+        over: {
+          type: 'block',
+          blockId: 'root',
+          parentId: null,
+          index: 0,
+          acceptsChildren: true,
+        },
+        isAncestorOfLockedParent: isAncestor,
+      })
+    ).toBe(true);
+  });
+
+  it('allows source-parent leaf hits so the preview can leave the grid', () => {
+    expect(
+      shouldIgnoreOverWhileCrossParent({
+        current: gridDraft,
+        over: {
+          type: 'block',
+          blockId: 'heading-1',
+          parentId: 'root',
+          index: 0,
+          acceptsChildren: false,
+        },
+        isAncestorOfLockedParent: isAncestor,
+      })
+    ).toBe(false);
+  });
+
+  it('does not ignore leaf hits inside locked parent (pane may still force flex/grid append)', () => {
+    expect(
+      shouldIgnoreOverWhileCrossParent({
+        current: gridDraft,
+        over: {
+          type: 'block',
+          blockId: 'text-3',
+          parentId: 'grid-1',
+          index: 1,
+          acceptsChildren: false,
+        },
+        isAncestorOfLockedParent: isAncestor,
+      })
+    ).toBe(false);
+  });
+});
+
+describe('cancelCrossParentDraftOnSourceParent', () => {
+  it('returns same-parent draft when cross-parent preview is active', () => {
+    expect(
+      cancelCrossParentDraftOnSourceParent({
+        current: buildCrossParentDraft({
+          activeId: 'drag',
+          sourceParentId: 'root',
+          parentId: 'grid-1',
+          targetVisibleIds: ['a', 'b'],
+          placeholderIndex: 2,
+          containerPreview: true,
+        }),
+        activeId: 'drag',
+        sourceParentId: 'root',
+        sourceVisibleIds: ['drag', 'sib'],
+      })
+    ).toEqual({
+      activeId: 'drag',
+      sourceParentId: 'root',
+      parentId: 'root',
+      orderedIds: ['drag', 'sib'],
+    });
+  });
+
+  it('returns null when already same-parent reorder', () => {
+    expect(
+      cancelCrossParentDraftOnSourceParent({
+        current: {
+          activeId: 'a',
+          sourceParentId: 'root',
+          parentId: 'root',
+          orderedIds: ['b', 'a'],
+        },
+        activeId: 'a',
+        sourceParentId: 'root',
+        sourceVisibleIds: ['a', 'b'],
+      })
+    ).toBeNull();
+  });
+});
+
+describe('insertLineIsVertical', () => {
+  it('uses horizontal lines for column flex and vertical for row flex', () => {
+    expect(insertLineIsVertical('html.flex', { direction: 'column' })).toBe(
+      false
+    );
+    expect(insertLineIsVertical('html.flex', { direction: 'row' })).toBe(true);
+    expect(insertLineIsVertical('html.flex', {})).toBe(true);
+  });
+
+  it('uses vertical lines for grid', () => {
+    expect(insertLineIsVertical('html.grid', {})).toBe(true);
+  });
+});
+
+describe('buildCrossParentDraft', () => {
+  it('excludes the active id and clamps placeholder to the end', () => {
+    expect(
+      buildCrossParentDraft({
+        activeId: 'drag',
+        sourceParentId: 'root',
+        parentId: 'grid-1',
+        targetVisibleIds: ['a', 'drag', 'b'],
+        placeholderIndex: 99,
+      })
+    ).toEqual({
+      activeId: 'drag',
+      sourceParentId: 'root',
+      parentId: 'grid-1',
+      orderedIds: ['a', 'b'],
+      placeholderIndex: 2,
+    });
+  });
+
+  it('sameCrossParentDraft ignores identical previews', () => {
+    const draft = buildCrossParentDraft({
+      activeId: 'drag',
+      sourceParentId: 'root',
+      parentId: 'grid-1',
+      targetVisibleIds: ['a', 'b'],
+      placeholderIndex: 2,
+      containerPreview: true,
+    });
+    expect(sameCrossParentDraft(draft, draft)).toBe(true);
+    expect(
+      sameCrossParentDraft(draft, {
+        ...draft,
+        placeholderIndex: 1,
+      })
+    ).toBe(false);
+    expect(
+      sameCrossParentDraft(draft, {
+        ...draft,
+        containerPreview: undefined,
+      })
+    ).toBe(false);
+  });
+
+  it('marks flex/grid nest drafts as container previews', () => {
+    expect(
+      buildCrossParentDraft({
+        activeId: 'drag',
+        sourceParentId: 'root',
+        parentId: 'grid-1',
+        targetVisibleIds: ['a', 'b'],
+        placeholderIndex: 2,
+        containerPreview: true,
+      }).containerPreview
+    ).toBe(true);
+  });
+});
+
+describe('sortInsertLineIndex', () => {
+  it('uses orderedIds position for same-parent sort', () => {
+    expect(
+      sortInsertLineIndex(
+        {
+          activeId: 'a',
+          sourceParentId: 'root',
+          parentId: 'root',
+          orderedIds: ['b', 'a', 'c'],
+        },
+        'root'
+      )
+    ).toBe(1);
+  });
+
+  it('uses placeholderIndex for cross-parent insert', () => {
+    expect(
+      sortInsertLineIndex(
+        buildCrossParentDraft({
+          activeId: 'drag',
+          sourceParentId: 'root',
+          parentId: 'box',
+          targetVisibleIds: ['a', 'b'],
+          placeholderIndex: 2,
+        }),
+        'box'
+      )
+    ).toBe(2);
+  });
+
+  it('hides the line for flex/grid container preview', () => {
+    expect(
+      sortInsertLineIndex(
+        buildCrossParentDraft({
+          activeId: 'drag',
+          sourceParentId: 'root',
+          parentId: 'grid-1',
+          targetVisibleIds: ['a', 'b'],
+          placeholderIndex: 2,
+          containerPreview: true,
+        }),
+        'grid-1'
+      )
+    ).toBeNull();
+  });
+});
+
+describe('insertLineTargetIds', () => {
+  it('never attaches the line to the active source sibling', () => {
+    // Live order stays [a, b, c]; draft wants a between b and c.
+    expect(insertLineTargetIds(['a', 'b', 'c'], 'a', 1)).toEqual({
+      beforeId: 'c',
+      afterId: null,
+    });
+  });
+
+  it('places the line after the last sibling when inserting at the end', () => {
+    expect(insertLineTargetIds(['a', 'b', 'c'], 'a', 2)).toEqual({
+      beforeId: null,
+      afterId: 'c',
+    });
+  });
+});
+
 describe('resolveBlockDragEnd', () => {
   const active = {
     type: 'block' as const,
@@ -263,6 +555,39 @@ describe('resolveBlockDragEnd', () => {
       targetParentLocked: false,
     });
     expect(resolved).toEqual({ parentId: 'flex', index: 1 });
+  });
+
+  it('commits containerPreview flex/grid draft at placeholderIndex (append)', () => {
+    const resolved = resolveBlockDragEnd({
+      active: {
+        type: 'block',
+        blockId: 'a',
+        parentId: 'root',
+        index: 0,
+        acceptsChildren: false,
+      },
+      over: {
+        type: 'block',
+        blockId: 'cell',
+        parentId: 'grid',
+        index: 0,
+        acceptsChildren: false,
+      },
+      draft: buildCrossParentDraft({
+        activeId: 'a',
+        sourceParentId: 'root',
+        parentId: 'grid',
+        targetVisibleIds: ['c1', 'c2'],
+        placeholderIndex: 2,
+        containerPreview: true,
+      }),
+      activeParentFullChildIds: ['a', 'grid'],
+      activeParentChildren: [layer('a'), layer('grid')],
+      wouldCreateCycle: false,
+      targetParentAcceptsChildren: true,
+      targetParentLocked: false,
+    });
+    expect(resolved).toEqual({ parentId: 'grid', index: 2 });
   });
 
   it('commits same-parent reorder when release target is the parent zone', () => {

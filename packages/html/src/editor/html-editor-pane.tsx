@@ -1,6 +1,6 @@
 import {
   DndContext,
-  DragOverlay,
+  MeasuringStrategy,
   PointerSensor,
   useSensor,
   useSensors,
@@ -24,6 +24,7 @@ import type { Layer } from '@openenvx/schema';
 import {
   memo,
   useCallback,
+  useMemo,
   useRef,
   useState,
   type KeyboardEvent,
@@ -34,15 +35,19 @@ import { defaultBlockRegistry } from '../block-registry';
 import { findBlock, getBlockChildren, getPageRootId } from '../tree/block-tree';
 import {
   blockCollisionDetection,
+  buildCrossParentDraft,
   dropTargetParentId,
   isBlockDndData,
+  cancelCrossParentDraftOnSourceParent,
+  usesContainerNestPreview,
   resolveBlockDragEnd,
+  sameCrossParentDraft,
+  sameOrderedIds,
+  shouldIgnoreOverWhileCrossParent,
+  shouldKeepCrossParentDraft,
   type BlockSortDraft,
 } from './block-dnd';
-import {
-  BlockDragOverlayPreview,
-  BlockTreeRenderer,
-} from './block-tree-renderer';
+import { BlockTreeRenderer } from './block-tree-renderer';
 
 import styles from './html-editor-pane.module.css';
 
@@ -62,12 +67,20 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   const selection = useWorkbenchContextSelector((state) => state.selection);
   const registry = defaultBlockRegistry;
   const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
-  const [activeLayer, setActiveLayer] = useState<Layer | null>(null);
   const [sortDraft, setSortDraft] = useState<BlockSortDraft | null>(null);
   const sortDraftRef = useRef<BlockSortDraft | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+  // Preview indicators don't reflow layout; remeasuring during drag re-fires
+  // onDragOver → setState loops (max update depth).
+  // ponytail: BeforeDragging freezes droppable rects — scroll mid-drag can mis-hit.
+  const measuring = useMemo(
+    () => ({
+      droppable: { strategy: MeasuringStrategy.BeforeDragging },
+    }),
+    []
   );
 
   const handleSelect = useCallback(
@@ -138,7 +151,6 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   );
 
   const clearDrag = useCallback(() => {
-    setActiveLayer(null);
     setSortDraft(null);
     sortDraftRef.current = null;
   }, []);
@@ -156,7 +168,6 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
         return;
       }
       const page = getActivePage(scene, selection.activePageId);
-      setActiveLayer(findBlock(page.layers, data.blockId)?.block ?? null);
       const draft: BlockSortDraft = {
         activeId: data.blockId,
         sourceParentId: data.parentId,
@@ -189,10 +200,43 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
       }
 
       const page = getActivePage(scene, selection.activePageId);
+      const isAncestorOfLocked = (ancestorId: string, lockedParentId: string) =>
+        isLayerDescendant(page.layers, ancestorId, lockedParentId);
+
+      const overSourceParentZone =
+        overData.type === 'zone' && overData.parentId === sourceParentId;
+      const overSourceParentNestable =
+        overData.type === 'block' &&
+        overData.acceptsChildren &&
+        overData.blockId === sourceParentId;
+      if (overSourceParentZone || overSourceParentNestable) {
+        const next = cancelCrossParentDraftOnSourceParent({
+          current: sortDraftRef.current,
+          activeId: activeData.blockId,
+          sourceParentId,
+          sourceVisibleIds: visibleSiblingIds(page.layers, sourceParentId),
+        });
+        if (next) {
+          sortDraftRef.current = next;
+          setSortDraft(next);
+        }
+        return;
+      }
+
+      if (
+        shouldIgnoreOverWhileCrossParent({
+          current: sortDraftRef.current,
+          over: overData,
+          isAncestorOfLockedParent: isAncestorOfLocked,
+        })
+      ) {
+        return;
+      }
 
       const setCrossParentDraft = (
         parentId: string,
-        placeholderIndex: number
+        placeholderIndex: number,
+        containerPreview = false
       ) => {
         if (
           parentId === activeData.blockId ||
@@ -200,42 +244,62 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
         ) {
           return;
         }
-        const targetIds = visibleSiblingIds(page.layers, parentId).filter(
-          (id) => id !== activeData.blockId
-        );
-        const next: BlockSortDraft = {
+        const next = buildCrossParentDraft({
           activeId: activeData.blockId,
           sourceParentId,
           parentId,
-          orderedIds: targetIds,
-          placeholderIndex: Math.min(placeholderIndex, targetIds.length),
-        };
+          targetVisibleIds: visibleSiblingIds(page.layers, parentId),
+          placeholderIndex,
+          containerPreview,
+        });
+        if (sameCrossParentDraft(sortDraftRef.current, next)) {
+          return;
+        }
         sortDraftRef.current = next;
         setSortDraft(next);
+      };
+
+      const nestIntoParent = (parentId: string) => {
+        const parentType = findBlock(page.layers, parentId)?.block.type ?? '';
+        const targetIds = visibleSiblingIds(page.layers, parentId).filter(
+          (id) => id !== activeData.blockId
+        );
+        setCrossParentDraft(
+          parentId,
+          targetIds.length,
+          usesContainerNestPreview(parentType)
+        );
       };
 
       if (overData.type === 'zone') {
         if (overData.parentId === activeData.blockId) {
           return;
         }
-        if (overData.parentId === sourceParentId) {
+        if (
+          shouldKeepCrossParentDraft(
+            sortDraftRef.current,
+            overData.parentId,
+            isAncestorOfLocked
+          )
+        ) {
           return;
         }
-        const targetIds = visibleSiblingIds(
-          page.layers,
-          overData.parentId
-        ).filter((id) => id !== activeData.blockId);
-        setCrossParentDraft(overData.parentId, targetIds.length);
+        nestIntoParent(overData.parentId);
         return;
       }
 
-      // Hovering a nestable block (Flex/Grid/…) → show placeholder inside it.
+      // Hovering a nestable block (Flex/Grid/…) → nest preview inside it.
       if (overData.acceptsChildren && overData.blockId !== activeData.blockId) {
-        const targetIds = visibleSiblingIds(
-          page.layers,
-          overData.blockId
-        ).filter((id) => id !== activeData.blockId);
-        setCrossParentDraft(overData.blockId, targetIds.length);
+        if (
+          shouldKeepCrossParentDraft(
+            sortDraftRef.current,
+            overData.blockId,
+            isAncestorOfLocked
+          )
+        ) {
+          return;
+        }
+        nestIntoParent(overData.blockId);
         return;
       }
 
@@ -252,11 +316,20 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
             if (oldIndex === -1 || newIndex === -1) {
               return current;
             }
+            const nextIds = arrayMove(orderedIds, oldIndex, newIndex);
+            if (
+              current &&
+              current.placeholderIndex === undefined &&
+              current.parentId === sourceParentId &&
+              sameOrderedIds(current.orderedIds, nextIds)
+            ) {
+              return current;
+            }
             const next: BlockSortDraft = {
               activeId: activeData.blockId,
               sourceParentId,
               parentId: sourceParentId,
-              orderedIds: arrayMove(orderedIds, oldIndex, newIndex),
+              orderedIds: nextIds,
             };
             sortDraftRef.current = next;
             return next;
@@ -279,6 +352,15 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
       }
 
       if (overData.parentId === null) {
+        return;
+      }
+
+      const parentType =
+        findBlock(page.layers, overData.parentId)?.block.type ?? '';
+      // Flex/grid children: whole-container nest preview (not a sibling slot under
+      // the container in the parent list, and not a per-cell marker).
+      if (usesContainerNestPreview(parentType)) {
+        nestIntoParent(overData.parentId);
         return;
       }
 
@@ -381,6 +463,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   return (
     <DndContext
       collisionDetection={blockCollisionDetection}
+      measuring={measuring}
       sensors={sensors}
       onDragCancel={clearDrag}
       onDragEnd={handleDragEnd}
@@ -413,11 +496,6 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
           <p className={styles.empty}>No html.root block on this page.</p>
         )}
       </div>
-      <DragOverlay dropAnimation={{ duration: 180, easing: 'ease' }}>
-        {activeLayer ? (
-          <BlockDragOverlayPreview layer={activeLayer} registry={registry} />
-        ) : null}
-      </DragOverlay>
     </DndContext>
   );
 });

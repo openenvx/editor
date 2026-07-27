@@ -19,6 +19,48 @@ export interface BlockSortDraft {
    * dragging item's own placeholder.
    */
   placeholderIndex?: number;
+  /**
+   * Flex/grid nest preview: highlight the whole container instead of a cell
+   * index marker (avoids “below the container” vs “lands inside” mismatch).
+   */
+  containerPreview?: boolean;
+}
+
+/** Flex/grid nest preview highlights the whole container (not per-cell lines). */
+export function usesContainerNestPreview(type: string): boolean {
+  return type === 'html.flex' || type === 'html.grid';
+}
+
+/** Insert marker axis for flex/grid children (column flex → horizontal line). */
+export function insertLineIsVertical(
+  parentType: string,
+  parentData: Record<string, unknown>
+): boolean {
+  if (parentType === 'html.flex') {
+    return parentData.direction !== 'column';
+  }
+  return parentType === 'html.grid';
+}
+
+/** Clear cross-parent nest preview when pointer returns to the source container. */
+export function cancelCrossParentDraftOnSourceParent(args: {
+  current: BlockSortDraft | null;
+  activeId: string;
+  sourceParentId: string;
+  sourceVisibleIds: readonly string[];
+}): BlockSortDraft | null {
+  if (
+    args.current === null ||
+    typeof args.current.placeholderIndex !== 'number'
+  ) {
+    return null;
+  }
+  return {
+    activeId: args.activeId,
+    sourceParentId: args.sourceParentId,
+    parentId: args.sourceParentId,
+    orderedIds: [...args.sourceVisibleIds],
+  };
 }
 
 export interface BlockDragData {
@@ -145,6 +187,148 @@ export function dropTargetParentId(over: BlockDndData): string | null {
     return over.blockId;
   }
   return over.parentId;
+}
+
+/**
+ * Grid/flex drop previews must stay put when collision re-targets to the
+ * nestable itself or an ancestor after layout/measure. Otherwise draft flips
+ * (grid ↔ root) every measure pass and React hits max update depth.
+ */
+export function shouldKeepCrossParentDraft(
+  current: BlockSortDraft | null,
+  nestableParentId: string,
+  isAncestorOfLockedParent?: (
+    ancestorId: string,
+    lockedParentId: string
+  ) => boolean
+): boolean {
+  if (current === null || typeof current.placeholderIndex !== 'number') {
+    return false;
+  }
+  if (current.parentId === nestableParentId) {
+    return true;
+  }
+  return (
+    isAncestorOfLockedParent?.(nestableParentId, current.parentId) === true
+  );
+}
+
+/**
+ * While a cross-parent placeholder is active, ignore nestable/zone hits on the
+ * locked parent or its ancestors (common after measure / chrome hover). Leaf
+ * hits inside the locked parent still update index; other parents can switch.
+ */
+export function shouldIgnoreOverWhileCrossParent(args: {
+  current: BlockSortDraft | null;
+  over: BlockDndData;
+  isAncestorOfLockedParent: (
+    ancestorId: string,
+    lockedParentId: string
+  ) => boolean;
+}): boolean {
+  const { current, over, isAncestorOfLockedParent } = args;
+  if (current === null || typeof current.placeholderIndex !== 'number') {
+    return false;
+  }
+  const locked = current.parentId;
+  if (over.type === 'zone') {
+    return (
+      over.parentId === locked ||
+      isAncestorOfLockedParent(over.parentId, locked)
+    );
+  }
+  if (over.acceptsChildren) {
+    return (
+      over.blockId === locked || isAncestorOfLockedParent(over.blockId, locked)
+    );
+  }
+  return false;
+}
+
+export function buildCrossParentDraft(args: {
+  activeId: string;
+  sourceParentId: string;
+  parentId: string;
+  targetVisibleIds: readonly string[];
+  placeholderIndex: number;
+  containerPreview?: boolean;
+}): BlockSortDraft {
+  const orderedIds = args.targetVisibleIds.filter((id) => id !== args.activeId);
+  return {
+    activeId: args.activeId,
+    sourceParentId: args.sourceParentId,
+    parentId: args.parentId,
+    orderedIds,
+    placeholderIndex: Math.min(args.placeholderIndex, orderedIds.length),
+    ...(args.containerPreview ? { containerPreview: true } : {}),
+  };
+}
+
+export function sameCrossParentDraft(
+  a: BlockSortDraft | null,
+  b: BlockSortDraft
+): boolean {
+  return (
+    a !== null &&
+    a.activeId === b.activeId &&
+    a.sourceParentId === b.sourceParentId &&
+    a.parentId === b.parentId &&
+    a.placeholderIndex === b.placeholderIndex &&
+    a.containerPreview === b.containerPreview &&
+    a.orderedIds.length === b.orderedIds.length &&
+    a.orderedIds.every((id, i) => id === b.orderedIds[i])
+  );
+}
+
+export function sameOrderedIds(
+  a: readonly string[],
+  b: readonly string[]
+): boolean {
+  return a.length === b.length && a.every((id, i) => id === b[i]);
+}
+
+/**
+ * Insert-line index for sort/nest preview (GrapesJS-style).
+ * Same-parent: index of the active id in orderedIds.
+ * Cross-parent: placeholderIndex among the target's visible children.
+ *
+ * Does not reorder the live tree — the source stays put; callers only move
+ * an absolute insert marker among the unchanged siblings.
+ */
+export function sortInsertLineIndex(
+  draft: BlockSortDraft | null,
+  parentId: string
+): number | null {
+  if (!draft || draft.parentId !== parentId || draft.containerPreview) {
+    return null;
+  }
+  if (typeof draft.placeholderIndex === 'number') {
+    return draft.placeholderIndex;
+  }
+  const at = draft.orderedIds.indexOf(draft.activeId);
+  return at === -1 ? null : at;
+}
+
+/**
+ * Map an insert-line index onto a sibling that keeps its live layout slot.
+ * Active id is excluded so the marker never attaches to the grayed source.
+ */
+export function insertLineTargetIds(
+  siblingIds: readonly string[],
+  activeId: string | null,
+  lineIndex: number | null
+): { beforeId: string | null; afterId: string | null } {
+  if (lineIndex === null) {
+    return { beforeId: null, afterId: null };
+  }
+  const others = siblingIds.filter((id) => id !== activeId);
+  if (lineIndex < others.length) {
+    return { beforeId: others[lineIndex] ?? null, afterId: null };
+  }
+  if (others.length > 0) {
+    return { beforeId: null, afterId: others.at(-1) ?? null };
+  }
+  return { beforeId: null, afterId: null };
 }
 
 /**

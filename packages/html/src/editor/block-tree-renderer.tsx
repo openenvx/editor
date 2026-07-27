@@ -1,12 +1,9 @@
 import { useDroppable } from '@dnd-kit/core';
 import {
-  rectSortingStrategy,
   SortableContext,
   useSortable,
-  verticalListSortingStrategy,
   type SortingStrategy,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import {
   canDeleteLayer,
   canDuplicateLayer,
@@ -19,7 +16,6 @@ import type { Layer, Scene } from '@openenvx/schema';
 import {
   memo,
   useCallback,
-  type CSSProperties,
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
@@ -28,7 +24,13 @@ import {
 import type { BlockRegistry } from '../block-registry';
 import { isHtmlTextBlockType } from '../blocks/builtin-blocks';
 import { getBlockChildren } from '../tree/block-tree';
-import type { BlockDragData, BlockSortDraft } from './block-dnd';
+import {
+  insertLineIsVertical,
+  insertLineTargetIds,
+  sortInsertLineIndex,
+  type BlockDragData,
+  type BlockSortDraft,
+} from './block-dnd';
 import { BlockEditorProvider, useBlockEditor } from './block-editor-context';
 import { BlockSelectionMenu } from './block-selection-menu';
 import { HtmlRichTextEditor } from './html-rich-text-editor';
@@ -75,50 +77,30 @@ function DropZone({
   );
 }
 
-function DropPlaceholder() {
-  return <div aria-hidden className={styles.dropPlaceholder} />;
-}
-
-function sortStrategyForParentType(parentType: string): SortingStrategy {
-  if (parentType === 'html.flex' || parentType === 'html.grid') {
-    return rectSortingStrategy;
-  }
-  return verticalListSortingStrategy;
-}
-
-function orderVisibleEntries(
-  layers: readonly Layer[],
-  sortDraft: BlockSortDraft | null,
-  parentId: string
-): { child: Layer; childIndex: number }[] {
-  const byId = new Map(
-    layers.map(
-      (child, childIndex) => [child.id, { child, childIndex }] as const
-    )
+/** GrapesJS-style insert marker for empty containers only. */
+function DropInsertLine({ vertical = false }: { vertical?: boolean }) {
+  return (
+    <div
+      aria-hidden
+      className={[
+        styles.dropInsertLine,
+        vertical ? styles.dropInsertLineVertical : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    />
   );
-  const visible = layers.flatMap((child, childIndex) =>
+}
+
+/** Keep items put during drag — preview uses an insert line, not live swaps. */
+const staticSortingStrategy: SortingStrategy = () => null;
+
+function visibleEntriesForParent(
+  layers: readonly Layer[]
+): { child: Layer; childIndex: number }[] {
+  return layers.flatMap((child, childIndex) =>
     isLayerVisible(child) ? [{ child, childIndex }] : []
   );
-
-  // Same-parent reorder only — cross-parent uses placeholderIndex instead.
-  if (
-    !(
-      sortDraft &&
-      sortDraft.parentId === parentId &&
-      sortDraft.placeholderIndex === undefined
-    )
-  ) {
-    return visible;
-  }
-
-  const ordered: { child: Layer; childIndex: number }[] = [];
-  for (const id of sortDraft.orderedIds) {
-    const entry = byId.get(id);
-    if (entry && isLayerVisible(entry.child)) {
-      ordered.push(entry);
-    }
-  }
-  return ordered.length > 0 ? ordered : visible;
 }
 
 function BlockChrome({
@@ -126,11 +108,14 @@ function BlockChrome({
   label,
   selected,
   dragDisabled,
-  isDragging,
+  isDraggingGhost,
+  dropContainerPreview,
+  insertLineBefore,
+  insertLineAfter,
+  insertLineVertical,
   canDuplicate,
   canRemove,
   setNodeRef,
-  style,
   sortableProps,
   children,
 }: {
@@ -138,11 +123,15 @@ function BlockChrome({
   label: string;
   selected: boolean;
   dragDisabled: boolean;
-  isDragging: boolean;
+  /** Dragging source stays put, grayed; only the insert line moves. */
+  isDraggingGhost?: boolean;
+  dropContainerPreview?: boolean;
+  insertLineBefore?: boolean;
+  insertLineAfter?: boolean;
+  insertLineVertical?: boolean;
   canDuplicate: boolean;
   canRemove: boolean;
   setNodeRef?: (node: HTMLElement | null) => void;
-  style?: CSSProperties;
   sortableProps?: Record<string, unknown>;
   children: ReactNode;
 }) {
@@ -184,26 +173,38 @@ function BlockChrome({
     onRemove(layer.id);
   }, [layer.id, onRemove]);
 
+  const lineClass = insertLineVertical
+    ? {
+        before: styles.blockWrapInsertLineBeforeVertical,
+        after: styles.blockWrapInsertLineAfterVertical,
+      }
+    : {
+        before: styles.blockWrapInsertLineBefore,
+        after: styles.blockWrapInsertLineAfter,
+      };
+
   return (
     <div
       className={[
         styles.blockWrap,
         selected ? styles.blockWrapSelected : '',
         dragDisabled ? '' : styles.blockWrapDraggable,
-        isDragging ? styles.blockWrapPlaceholder : '',
+        isDraggingGhost ? styles.blockWrapDraggingGhost : '',
+        dropContainerPreview ? styles.blockWrapDropContainer : '',
+        insertLineBefore ? lineClass.before : '',
+        insertLineAfter ? lineClass.after : '',
       ]
         .filter(Boolean)
         .join(' ')}
       ref={setNodeRef}
       role="treeitem"
-      style={style}
       tabIndex={selected ? 0 : -1}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       onKeyDown={handleKeyDown}
       {...sortableProps}
     >
-      {selected && !isDragging ? (
+      {selected && !isDraggingGhost ? (
         <BlockSelectionMenu
           canDuplicate={canDuplicate}
           canRemove={canRemove}
@@ -212,9 +213,7 @@ function BlockChrome({
           onRemove={handleRemove}
         />
       ) : null}
-      <div className={isDragging ? styles.blockPlaceholderContent : undefined}>
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
@@ -222,52 +221,42 @@ function BlockChrome({
 function SortableChildren({
   parentId,
   parentType,
+  parentData,
   layers,
   registry,
 }: {
   parentId: string;
   parentType: string;
+  parentData: Record<string, unknown>;
   layers: readonly Layer[];
   registry: BlockRegistry;
 }) {
   const { sortDraft } = useBlockEditor();
-  const visibleEntries = orderVisibleEntries(layers, sortDraft, parentId);
+  const visibleEntries = visibleEntriesForParent(layers);
   const itemIds = visibleEntries.map(({ child }) => child.id);
-  const placeholderIndex =
-    sortDraft &&
-    sortDraft.parentId === parentId &&
-    typeof sortDraft.placeholderIndex === 'number'
-      ? sortDraft.placeholderIndex
-      : null;
-
-  const nodes: ReactNode[] = [];
-  for (const [
-    visibleIndex,
-    { child, childIndex },
-  ] of visibleEntries.entries()) {
-    if (placeholderIndex === visibleIndex) {
-      nodes.push(<DropPlaceholder key={`drop-ph-${visibleIndex}`} />);
-    }
-    nodes.push(
-      <SortableBlockNode
-        key={child.id}
-        index={childIndex}
-        layer={child}
-        parentId={parentId}
-        registry={registry}
-      />
-    );
-  }
-  if (placeholderIndex === visibleEntries.length) {
-    nodes.push(<DropPlaceholder key="drop-ph-end" />);
-  }
+  const lineIndex = sortInsertLineIndex(sortDraft, parentId);
+  const activeId = sortDraft?.parentId === parentId ? sortDraft.activeId : null;
+  const verticalLine = insertLineIsVertical(parentType, parentData);
+  const { beforeId, afterId } = insertLineTargetIds(
+    itemIds,
+    activeId,
+    lineIndex
+  );
 
   return (
-    <SortableContext
-      items={itemIds}
-      strategy={sortStrategyForParentType(parentType)}
-    >
-      {nodes}
+    <SortableContext items={itemIds} strategy={staticSortingStrategy}>
+      {visibleEntries.map(({ child, childIndex }) => (
+        <SortableBlockNode
+          key={child.id}
+          index={childIndex}
+          insertLineAfter={afterId === child.id}
+          insertLineBefore={beforeId === child.id}
+          insertLineVertical={verticalLine}
+          layer={child}
+          parentId={parentId}
+          registry={registry}
+        />
+      ))}
     </SortableContext>
   );
 }
@@ -282,22 +271,26 @@ function ContainerChildren({
   const { sortDraft } = useBlockEditor();
   const children = getBlockChildren(layer);
   const visibleCount = children.filter(isLayerVisible).length;
-  const showCrossPlaceholder =
+  const showInsertLine =
     sortDraft?.parentId === layer.id &&
-    typeof sortDraft.placeholderIndex === 'number';
-  const empty = visibleCount === 0 && !showCrossPlaceholder;
+    typeof sortDraft.placeholderIndex === 'number' &&
+    !sortDraft.containerPreview;
+  const empty = visibleCount === 0 && !showInsertLine;
+  const parentData = layerDataRecord(layer);
+  const verticalLine = insertLineIsVertical(layer.type, parentData);
 
   return (
     <DropZone disabled={isLayerLocked(layer)} empty={empty} parentId={layer.id}>
       {visibleCount > 0 ? (
         <SortableChildren
           layers={children}
+          parentData={parentData}
           parentId={layer.id}
           parentType={layer.type}
           registry={registry}
         />
-      ) : showCrossPlaceholder ? (
-        <DropPlaceholder />
+      ) : showInsertLine ? (
+        <DropInsertLine vertical={verticalLine} />
       ) : null}
     </DropZone>
   );
@@ -397,13 +390,19 @@ function SortableBlockNode({
   parentId,
   index,
   registry,
+  insertLineBefore = false,
+  insertLineAfter = false,
+  insertLineVertical = false,
 }: {
   layer: Layer;
   parentId: string;
   index: number;
   registry: BlockRegistry;
+  insertLineBefore?: boolean;
+  insertLineAfter?: boolean;
+  insertLineVertical?: boolean;
 }) {
-  const { scene, selectedId, editingBlockId } = useBlockEditor();
+  const { scene, selectedId, editingBlockId, sortDraft } = useBlockEditor();
   const config = registry.get(layer.type);
   const selected = selectedId === layer.id;
   const editing = editingBlockId === layer.id;
@@ -411,6 +410,10 @@ function SortableBlockNode({
   const dragDisabled = editing || !reorderable;
   const canDuplicate = canDuplicateLayer(layer, scene);
   const canRemove = canDeleteLayer(layer, scene);
+  const dropContainerPreview =
+    sortDraft?.containerPreview === true &&
+    sortDraft.parentId === layer.id &&
+    config?.acceptsChildren === true;
 
   const dragData: BlockDragData = {
     type: 'block',
@@ -420,23 +423,15 @@ function SortableBlockNode({
     acceptsChildren: config?.acceptsChildren === true,
   };
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef } = useSortable({
     id: layer.id,
     data: dragData,
     disabled: dragDisabled,
+    animateLayoutChanges: () => false,
   });
 
-  const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  // Source stays put and grayed; only the insert line / container highlight moves.
+  const isDraggingGhost = sortDraft?.activeId === layer.id;
 
   if (!(config && isLayerVisible(layer))) {
     return null;
@@ -447,13 +442,16 @@ function SortableBlockNode({
       canDuplicate={canDuplicate}
       canRemove={canRemove}
       dragDisabled={dragDisabled}
-      isDragging={isDragging}
+      dropContainerPreview={dropContainerPreview}
+      insertLineAfter={insertLineAfter}
+      insertLineBefore={insertLineBefore}
+      insertLineVertical={insertLineVertical}
+      isDraggingGhost={isDraggingGhost}
       label={config.label}
       layer={layer}
       selected={selected}
       setNodeRef={setNodeRef}
       sortableProps={dragDisabled ? undefined : { ...listeners, ...attributes }}
-      style={style}
     >
       <BlockContent editing={editing} layer={layer} registry={registry} />
     </BlockChrome>
@@ -482,7 +480,6 @@ function RootBlockNode({
       canDuplicate={canDuplicate}
       canRemove={canRemove}
       dragDisabled
-      isDragging={false}
       label={config.label}
       layer={layer}
       selected={selected}
@@ -541,27 +538,3 @@ export const BlockTreeRenderer = memo(
     </BlockEditorProvider>
   )
 );
-
-export function BlockDragOverlayPreview({
-  layer,
-  registry,
-}: {
-  layer: Layer;
-  registry: BlockRegistry;
-}) {
-  const config = registry.get(layer.type);
-  if (!config) {
-    return null;
-  }
-  const data = layerDataRecord(layer);
-  return (
-    <div className={styles.dragOverlay}>
-      {config.render({
-        data,
-        children: config.acceptsChildren ? (
-          <div className={styles.dragOverlayNested} />
-        ) : undefined,
-      })}
-    </div>
-  );
-}
