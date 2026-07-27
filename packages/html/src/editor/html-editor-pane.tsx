@@ -260,14 +260,19 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
       };
 
       const nestIntoParent = (parentId: string) => {
-        const parentType = findBlock(page.layers, parentId)?.block.type ?? '';
+        const parent = findBlock(page.layers, parentId)?.block;
+        const parentType = parent?.type ?? '';
+        const parentData =
+          parent && typeof parent.data === 'object' && parent.data !== null
+            ? (parent.data as Record<string, unknown>)
+            : {};
         const targetIds = visibleSiblingIds(page.layers, parentId).filter(
           (id) => id !== activeData.blockId
         );
         setCrossParentDraft(
           parentId,
           targetIds.length,
-          usesContainerNestPreview(parentType)
+          usesContainerNestPreview(parentType, parentData)
         );
       };
 
@@ -355,11 +360,15 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
         return;
       }
 
-      const parentType =
-        findBlock(page.layers, overData.parentId)?.block.type ?? '';
-      // Flex/grid children: whole-container nest preview (not a sibling slot under
-      // the container in the parent list, and not a per-cell marker).
-      if (usesContainerNestPreview(parentType)) {
+      const parent = findBlock(page.layers, overData.parentId)?.block;
+      const parentType = parent?.type ?? '';
+      const parentData =
+        parent && typeof parent.data === 'object' && parent.data !== null
+          ? (parent.data as Record<string, unknown>)
+          : {};
+      // Wrapping flex: whole-container nest preview (append). Nowrap flex/grid:
+      // insert line at the hovered child's index.
+      if (usesContainerNestPreview(parentType, parentData)) {
         nestIntoParent(overData.parentId);
         return;
       }
@@ -472,7 +481,9 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     >
       <div
         aria-label="HTML blocks"
-        className={styles.pane}
+        className={[styles.pane, sortDraft ? styles.paneDragging : '']
+          .filter(Boolean)
+          .join(' ')}
         role="tree"
         tabIndex={0}
         onClick={handleCanvasClick}

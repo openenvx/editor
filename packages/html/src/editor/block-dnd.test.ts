@@ -14,6 +14,7 @@ import {
   shouldIgnoreOverWhileCrossParent,
   shouldKeepCrossParentDraft,
   sortInsertLineIndex,
+  usesContainerNestPreview,
 } from './block-dnd';
 
 function layer(id: string, visible = true): Layer {
@@ -352,6 +353,27 @@ describe('cancelCrossParentDraftOnSourceParent', () => {
         sourceVisibleIds: ['a', 'b'],
       })
     ).toBeNull();
+  });
+});
+
+describe('usesContainerNestPreview', () => {
+  it('uses insert lines for flex when wrap is off', () => {
+    expect(usesContainerNestPreview('html.flex', { wrap: 'false' })).toBe(
+      false
+    );
+  });
+
+  it('uses container highlight for wrapping flex', () => {
+    expect(usesContainerNestPreview('html.flex', { wrap: 'true' })).toBe(true);
+    expect(usesContainerNestPreview('html.flex', {})).toBe(true);
+  });
+
+  it('uses insert lines for grid (no wrap — linear order marker)', () => {
+    expect(usesContainerNestPreview('html.grid', { columns: 2 })).toBe(false);
+  });
+
+  it('is false for non layout blocks', () => {
+    expect(usesContainerNestPreview('html.paragraph', {})).toBe(false);
   });
 });
 

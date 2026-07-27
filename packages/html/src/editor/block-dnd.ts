@@ -20,15 +20,26 @@ export interface BlockSortDraft {
    */
   placeholderIndex?: number;
   /**
-   * Flex/grid nest preview: highlight the whole container instead of a cell
+   * Wrapping-flex nest preview: highlight the whole container instead of a cell
    * index marker (avoids “below the container” vs “lands inside” mismatch).
+   * Nowrap flex and grid use insert lines via placeholderIndex instead.
    */
   containerPreview?: boolean;
 }
 
-/** Flex/grid nest preview highlights the whole container (not per-cell lines). */
-export function usesContainerNestPreview(type: string): boolean {
-  return type === 'html.flex' || type === 'html.grid';
+/**
+ * When true, nest preview highlights the whole container (append).
+ * When false, show an insert line at the sibling index (nowrap flex / grid).
+ */
+export function usesContainerNestPreview(
+  type: string,
+  data: Record<string, unknown> = {}
+): boolean {
+  if (type === 'html.flex') {
+    // Default wrap is on; only nowrap gets linear insert lines.
+    return data.wrap !== 'false';
+  }
+  return false;
 }
 
 /** Insert marker axis for flex/grid children (column flex → horizontal line). */
