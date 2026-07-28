@@ -2,6 +2,8 @@
 
 Package boundaries and contribution flow for the monorepo.
 
+**Also read:** [Plugin-boundaries.md](Plugin-boundaries.md) — internal vs external plugins, protocol trust boundary, and cloud/marketplace runners (iframe / Worker / isolate). Do not load untrusted plugin JS into the editor main world.
+
 ## Client tiers (monorepo)
 
 | Tier | Packages | Who |
@@ -96,12 +98,11 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 
 ## What belongs in `@xmazu/openenvxee-plugin-protocol`
 
-- Declarative panel vocabulary (`PLUGIN_ELEMENT_TYPES`, element tokens, `PluginNode` tree shape)
-- `h` / jsx runtimes for building serializable trees (handler props → ids via `beginRender` / `endRender`)
-- `HostToParentMessage` / `ParentToHostMessage` unions for embed transports
-- `validatePluginTree` — size and element-type caps before host render (no React)
+Declarative plugin UI vocabulary (inspector panes, chrome menus/toolbar/status/palette), `h`/jsx runtime, `postMessage` message unions (`panel:tree`, `panel:manifest`, `panel:event`, …), and `validatePluginTree` size/type caps. Element trees are plain JSON; they do **not** include React.
 
-Host rendering (`PluginPanel`, `PluginTreeRenderer`, `createPostMessagePluginPanelTransport`) lives in `@xmazu/openenvxee-workbench`.
+Headless mappers (`mapPluginTreeToInspectorPane`, `mapPluginTreeToMenu`, …) live in `@openenvx/headless` and drive the existing fluent builders. Host rendering (`PluginPanel`, `createPostMessagePluginPanelTransport`) lives in `@xmazu/openenvxee-workbench` and renders mapped inspector descriptors through `InspectorContentRenderer`.
+
+Trust model, message allowlists, and cloud/marketplace runners: [Plugin-boundaries.md](Plugin-boundaries.md).
 
 ## What belongs in `@xmazu/openenvxee-workbench`
 

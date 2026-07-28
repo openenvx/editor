@@ -256,6 +256,7 @@
         "@openenvx/core": "workspace:*",
         "@openenvx/preview": "workspace:*",
         "@openenvx/schema": "workspace:*",
+        "@xmazu/openenvxee-plugin-protocol": "workspace:*",
       },
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
@@ -327,7 +328,7 @@
     },
     "packages/plugin-protocol": {
       "name": "@xmazu/openenvxee-plugin-protocol",
-      "version": "0.1.6",
+      "version": "0.2.0",
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
         "tsup": "catalog:dev",

@@ -10,6 +10,10 @@ import type {
 } from '../contributions/view-contribution';
 import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
 
+export interface WorkbenchContributionDisposable {
+  dispose(): void;
+}
+
 export class WorkbenchRegistries {
   readonly viewContainers: ViewContainerContribution[] = [];
   readonly views: ViewContribution[] = [];
@@ -21,49 +25,62 @@ export class WorkbenchRegistries {
   readonly inspectorPanes: InspectorPaneContribution[] = [];
 }
 
+function contributionList(
+  registries: WorkbenchRegistries,
+  point: WorkbenchContribution['contributionPoint']
+): WorkbenchContribution[] {
+  switch (point) {
+    case 'viewContainer': {
+      return registries.viewContainers;
+    }
+    case 'view': {
+      return registries.views;
+    }
+    case 'contextMenu': {
+      return registries.contextMenus;
+    }
+    case 'commandPalette': {
+      return registries.commandPalette;
+    }
+    case 'overlay': {
+      return registries.overlays;
+    }
+    case 'statusBar': {
+      return registries.statusBars;
+    }
+    case 'toolbar': {
+      return registries.toolbars;
+    }
+    case 'inspectorPane': {
+      return registries.inspectorPanes;
+    }
+    default: {
+      const exhaustive: never = point;
+      throw new Error(`Unknown workbench contribution point: ${exhaustive}`);
+    }
+  }
+}
+
+function removeContribution(
+  list: WorkbenchContribution[],
+  contribution: WorkbenchContribution
+): void {
+  const index = list.indexOf(contribution);
+  if (index !== -1) {
+    list.splice(index, 1);
+  }
+}
+
 export function registerWorkbenchContribution(
   registries: WorkbenchRegistries,
   contribution: WorkbenchContribution
-): void {
-  switch (contribution.contributionPoint) {
-    case 'viewContainer': {
-      registries.viewContainers.push(contribution as ViewContainerContribution);
-      break;
-    }
-    case 'view': {
-      registries.views.push(contribution as ViewContribution);
-      break;
-    }
-    case 'contextMenu': {
-      registries.contextMenus.push(contribution as ContextMenuContribution);
-      break;
-    }
-    case 'commandPalette': {
-      registries.commandPalette.push(
-        contribution as CommandPaletteContribution
-      );
-      break;
-    }
-    case 'overlay': {
-      registries.overlays.push(contribution as OverlayContribution);
-      break;
-    }
-    case 'statusBar': {
-      registries.statusBars.push(contribution as StatusBarContribution);
-      break;
-    }
-    case 'toolbar': {
-      registries.toolbars.push(contribution as ToolbarContribution);
-      break;
-    }
-    case 'inspectorPane': {
-      registries.inspectorPanes.push(contribution as InspectorPaneContribution);
-      break;
-    }
-    default: {
-      throw new Error(
-        `Unknown workbench contribution point: ${(contribution as WorkbenchContribution).contributionPoint}`
-      );
-    }
-  }
+): WorkbenchContributionDisposable {
+  const list = contributionList(registries, contribution.contributionPoint);
+  list.push(contribution);
+
+  return {
+    dispose: () => {
+      removeContribution(list, contribution);
+    },
+  };
 }

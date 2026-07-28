@@ -21,6 +21,14 @@ export {
   createInspectorHostContext,
   type InspectorPathContextOptions,
 } from './inspector/inspector-path-context';
+export {
+  createPluginInspectorHostContext,
+  decodePluginHandlerCommand,
+  encodePluginHandlerCommand,
+  PLUGIN_HANDLER_COMMAND_PREFIX,
+  PLUGIN_PATH_PREFIX,
+  type PluginInspectorHostContextOptions,
+} from './inspector/plugin-inspector-host-context';
 export { LayerPropertiesPaneFactory } from './inspector/layer-properties-pane-factory';
 
 export { WorkbenchContributionPoint } from './workbench-contributions/workbench-contribution-point';
@@ -159,3 +167,27 @@ export type {
 export { VersionHistoryProviderId } from './version-history/version-history-service-id';
 
 export { getNestedValue, setNestedValue } from './utils/nested-value';
+
+export { mapPluginTreeToInspectorPane } from './plugin-protocol/map-plugin-tree-to-inspector-pane';
+export {
+  mapPluginTreeToMenu,
+  contributePluginTreeToMenu,
+} from './plugin-protocol/map-plugin-tree-to-menu';
+export {
+  mapPluginTreeToToolbar,
+  contributePluginTreeToToolbar,
+} from './plugin-protocol/map-plugin-tree-to-toolbar';
+export {
+  mapPluginTreeToStatusBar,
+  contributePluginTreeToStatusBar,
+} from './plugin-protocol/map-plugin-tree-to-status-bar';
+export {
+  mapPluginTreeToPalette,
+  contributePluginTreeToPalette,
+} from './plugin-protocol/map-plugin-tree-to-palette';
+export {
+  createManifestContributions,
+  type CreateManifestContributionsResult,
+  type CreateManifestContributionsOptions,
+} from './plugin-protocol/create-manifest-contributions';
+export type { WorkbenchContributionDisposable } from './registries/workbench-registries';

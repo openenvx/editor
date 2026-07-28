@@ -17,7 +17,8 @@
   "dependencies": {
     "@openenvx/core": "workspace:*",
     "@openenvx/preview": "workspace:*",
-    "@openenvx/schema": "workspace:*"
+    "@openenvx/schema": "workspace:*",
+    "@xmazu/openenvxee-plugin-protocol": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18"

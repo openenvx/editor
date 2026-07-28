@@ -22,11 +22,12 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | Document | Use when |
 | --- | --- |
 | [Architecture.md](Architecture.md) | Package boundaries, contribution flow, where code belongs |
+| [Plugin-boundaries.md](Plugin-boundaries.md) | Internal vs external plugins, protocol trust boundary, cloud/marketplace runners |
 | [FEATURES.md](FEATURES.md) | Product capability matrix, Polotno gap tracking, what we should still offer |
 | [apps/docs/extension-guide.md](apps/docs/extension-guide.md) | Plugin author API, contribution kinds |
 | [packages/canvas/README.md](packages/canvas/README.md) | Canvas install and `CanvasBasicsPlugin` |
 
-Read **Architecture.md** before placing new code. Update **FEATURES.md** when adding or removing a user-facing editor capability.
+Read **Architecture.md** (and **Plugin-boundaries.md** when touching embed/external plugins) before placing new code. Update **FEATURES.md** when adding or removing a user-facing editor capability.
 
 ## Package placement (hard rules)
 

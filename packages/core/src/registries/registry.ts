@@ -19,6 +19,10 @@ export class Registry<K extends string, V> {
     this.items.set(key, value);
   }
 
+  unregister(key: K): boolean {
+    return this.items.delete(key);
+  }
+
   get(key: K): V | undefined {
     return this.items.get(key);
   }

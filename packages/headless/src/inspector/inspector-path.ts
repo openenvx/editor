@@ -16,4 +16,9 @@ export const InspectorPath = {
   command(commandId: string): InspectorValuePath {
     return `command.${commandId}`;
   },
+
+  /** External plugin panel value path — read/write via plugin-backed host context. */
+  plugin(panelId: string, key: string): InspectorValuePath {
+    return `plugin.${panelId}.${key}`;
+  },
 };

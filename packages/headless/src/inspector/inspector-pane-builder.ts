@@ -26,7 +26,8 @@ function getLastRowField(
   return null;
 }
 
-class InspectorBlockBuilder {
+/** Shared layout surface for pane + nested block builders. */
+export class InspectorBlockBuilder {
   readonly nodes: InspectorLayoutNode[] = [];
 
   row(

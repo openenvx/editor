@@ -3,8 +3,12 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ESNext", "dom"],
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "paths": {
+      "@xmazu/openenvxee-plugin-protocol": ["../plugin-protocol/src/index.ts"]
+    }
   },
   "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
 }

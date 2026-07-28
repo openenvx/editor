@@ -9,12 +9,11 @@ import {
   SceneStore,
   updateLayerInTree,
   WorkbenchEvents,
-} from '@openenvx/core';
-import type {
-  CommandExecutionResult,
-  EditorInput,
-  Scene,
-  ServiceId,
+  type CommandExecutionResult,
+  type EditorInput,
+  type Plugin,
+  type Scene,
+  type ServiceId,
 } from '@openenvx/core';
 import {
   createEmptySceneSnapshot,
@@ -25,7 +24,11 @@ import { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
 import type { ViewContainerLocation } from './contributions/view-contribution';
 import { ViewProviderRegistryImpl } from './registries/view-provider-registry';
 import type { WorkbenchProviderRegistries } from './registries/workbench-provider-registries';
-import { WorkbenchRegistries } from './registries/workbench-registries';
+import {
+  registerWorkbenchContribution,
+  type WorkbenchContributionDisposable,
+  WorkbenchRegistries,
+} from './registries/workbench-registries';
 import { buildChromeSlice } from './state/chrome-slice-builder';
 import { buildCommandsSlice } from './state/commands-slice-builder';
 import { EditorSliceBuilder } from './state/editor-slice-builder';
@@ -36,6 +39,7 @@ import {
 } from './state/scene-slice-builder';
 import type { WorkbenchSliceContext } from './state/workbench-slice-context';
 import { setNestedValue } from './utils/nested-value';
+import type { WorkbenchContribution } from './workbench-contributions/workbench-contribution';
 import {
   loadScene as loadSceneDocument,
   openDocument,
@@ -86,6 +90,10 @@ export class WorkbenchController {
     viewPanelRegistry: new Registry<string, unknown>('overwrite'),
     viewProviderRegistry: new ViewProviderRegistryImpl(),
   };
+  private readonly pluginDisposables = new Map<
+    string,
+    WorkbenchContributionDisposable[]
+  >();
 
   constructor(private readonly options: WorkbenchControllerOptions) {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
@@ -207,6 +215,8 @@ export class WorkbenchController {
       registerServiceInstance: (id, instance) =>
         this.registerServiceInstance(id, instance),
       getService: (token) => this.getService(token),
+      registerWorkbenchContributions: (...contributions) =>
+        this.registerWorkbenchContributions(...contributions),
       getSnapshot: () => this.getState(),
       loadScene: (scene) => this.loadScene(scene),
       moveViewItem: (viewId, source, target, position) =>
@@ -235,12 +245,7 @@ export class WorkbenchController {
   async start(): Promise<void> {
     await this.manager.activateCorePlugins();
     for (const plugin of this.options.plugins) {
-      const ctx = createWorkbenchPluginContext(
-        this.manager.createPluginContext(),
-        this.workbenchRegistries,
-        this.providerRegistries
-      );
-      await this.manager.activateWithContext(plugin, ctx);
+      await this.activatePlugin(plugin);
     }
     const sceneStore = this.runtime.getScene();
     // Lookup is already live via PluginManager; re-apply after plugins register rules.
@@ -262,6 +267,49 @@ export class WorkbenchController {
       this.manager.getRegistries(),
       this.runtime
     );
+    this.notify();
+  }
+
+  /**
+   * Activate a workbench plugin after boot. Contributions are tracked and
+   * removed on {@link deactivatePlugin}.
+   */
+  async activatePlugin(plugin: Plugin): Promise<void> {
+    if (this.pluginDisposables.has(plugin.id)) {
+      await this.deactivatePlugin(plugin.id);
+    }
+    const disposables: WorkbenchContributionDisposable[] = [];
+    const ctx = createWorkbenchPluginContext(
+      this.manager.createPluginContext(),
+      this.workbenchRegistries,
+      this.providerRegistries,
+      {
+        onContributionsChanged: () => this.invalidateContributions(),
+        trackDisposable: (disposable) => {
+          disposables.push(disposable);
+        },
+      }
+    );
+    await this.manager.activateWithContext(plugin, ctx);
+    this.pluginDisposables.set(plugin.id, disposables);
+    this.invalidateContributions();
+  }
+
+  /** Deactivate a plugin and dispose its workbench + provider registrations. */
+  async deactivatePlugin(pluginId: string): Promise<void> {
+    await this.manager.deactivate(pluginId);
+    const disposables = this.pluginDisposables.get(pluginId) ?? [];
+    for (const disposable of disposables) {
+      disposable.dispose();
+    }
+    this.pluginDisposables.delete(pluginId);
+    this.invalidateContributions();
+  }
+
+  /** Rebuild chrome + scene slices after contributions change. */
+  invalidateContributions(): void {
+    this.stateCache.invalidateChrome();
+    this.stateCache.invalidateSceneContent();
     this.notify();
   }
 
@@ -310,6 +358,23 @@ export class WorkbenchController {
     this.runtime.services.registerInstance(id, instance);
     this.stateCache.invalidateChrome();
     this.notify();
+  }
+
+  registerWorkbenchContributions(
+    ...contributions: WorkbenchContribution[]
+  ): WorkbenchContributionDisposable {
+    const disposables = contributions.map((contribution) =>
+      registerWorkbenchContribution(this.workbenchRegistries, contribution)
+    );
+    this.invalidateContributions();
+    return {
+      dispose: () => {
+        for (const disposable of disposables) {
+          disposable.dispose();
+        }
+        this.invalidateContributions();
+      },
+    };
   }
 
   selectLayers(layerIds: string[], primaryLayerId?: string | null): void {

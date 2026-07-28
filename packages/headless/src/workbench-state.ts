@@ -27,6 +27,8 @@ import type {
   ViewContainerLocation,
 } from './contributions/view-contribution';
 import type { InspectorLayoutNode } from './inspector/inspector-layout-node';
+import type { WorkbenchContributionDisposable } from './registries/workbench-registries';
+import type { WorkbenchContribution } from './workbench-contributions/workbench-contribution';
 import type { EditorPaneRegistration } from './workbench/editor-pane-host-props';
 import type {
   FieldRendererRegistration,
@@ -141,6 +143,13 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   ) => void;
   moveContainer: (containerId: string, location: ViewContainerLocation) => void;
   getService: <T>(token: ServiceId<T>) => T | undefined;
+  /**
+   * Register workbench contributions at runtime (e.g. external panel:manifest).
+   * Dispose to remove them and refresh chrome/scene slices.
+   */
+  registerWorkbenchContributions: (
+    ...contributions: WorkbenchContribution[]
+  ) => WorkbenchContributionDisposable;
   undo: () => boolean;
   redo: () => boolean;
   save: (saveFn?: (input: EditorInput) => Promise<void>) => Promise<void>;

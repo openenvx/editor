@@ -14,6 +14,10 @@ export interface ViewProviderRegistry {
     provider: TreeDataProvider<unknown>,
     options?: ViewProviderRegisterOptions
   ): void;
+  unregisterTreeDataProvider(
+    viewId: string,
+    provider: TreeDataProvider<unknown>
+  ): boolean;
   get(viewId: string): TreeDataProvider<unknown> | undefined;
 }
 
@@ -42,6 +46,25 @@ export class ViewProviderRegistryImpl implements ViewProviderRegistry {
       return;
     }
     this.providers.set(viewId, [entry]);
+  }
+
+  unregisterTreeDataProvider(
+    viewId: string,
+    provider: TreeDataProvider<unknown>
+  ): boolean {
+    const existing = this.providers.get(viewId);
+    if (!existing) {
+      return false;
+    }
+    const index = existing.findIndex((entry) => entry.provider === provider);
+    if (index === -1) {
+      return false;
+    }
+    existing.splice(index, 1);
+    if (existing.length === 0) {
+      this.providers.delete(viewId);
+    }
+    return true;
   }
 
   get(viewId: string): TreeDataProvider<unknown> | undefined {
