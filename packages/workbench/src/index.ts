@@ -142,7 +142,7 @@ export {
   MAX_PLUGIN_TREE_NODES,
   MAX_PLUGIN_TREE_JSON_CHARS,
   type PluginTreeValidationResult,
-} from '@openenvx/plugin-protocol';
+} from '@xmazu/openenvxee-plugin-protocol';
 export {
   PluginTreeRenderer,
   type PluginTreeRendererProps,

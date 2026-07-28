@@ -39,7 +39,7 @@ function serializeProp(
   if (typeof value === 'function') {
     if (!registry) {
       throw new Error(
-        `@openenvx/plugin-protocol: handler prop "${key}" used outside beginRender/endRender`
+        `@xmazu/openenvxee-plugin-protocol: handler prop "${key}" used outside beginRender/endRender`
       );
     }
     handlerSeq += 1;

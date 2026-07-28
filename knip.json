@@ -12,7 +12,7 @@
   "workspaces": {
     ".": {
       "entry": ["package.json"],
-      "project": ["*.{js,ts}"]
+      "project": ["*.{js,ts,mts}"]
     },
     "packages/core": {
       "entry": ["src/index.ts!", "src/plugins/scene-plugin.ts!"],

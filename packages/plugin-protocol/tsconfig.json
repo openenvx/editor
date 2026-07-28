@@ -5,6 +5,6 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@openenvx/plugin-protocol"
+    "jsxImportSource": "@xmazu/openenvxee-plugin-protocol"
   }
 }

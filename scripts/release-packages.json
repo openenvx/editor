@@ -1,0 +1,18 @@
+{
+  "comment": "Packages published for openenvx-cloud. Schema is not a direct cloud dep yet.",
+  "publish": [
+    {
+      "name": "@xmazu/openenvxee-plugin-protocol",
+      "dir": "packages/plugin-protocol"
+    },
+    {
+      "name": "@xmazu/openenvxee-studio",
+      "dir": "packages/studio"
+    }
+  ],
+  "cloudRepo": "../openenvx-cloud",
+  "cloudDeps": [
+    "@xmazu/openenvxee-studio",
+    "@xmazu/openenvxee-plugin-protocol"
+  ]
+}

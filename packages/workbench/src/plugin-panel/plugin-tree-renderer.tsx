@@ -1,4 +1,7 @@
-import type { PluginChild, PluginNode } from '@openenvx/plugin-protocol';
+import type {
+  PluginChild,
+  PluginNode,
+} from '@xmazu/openenvxee-plugin-protocol';
 import type { ReactNode } from 'react';
 
 import { WorkbenchIcon } from '../icons/workbench-icon';

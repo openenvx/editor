@@ -1,6 +1,6 @@
 {
-  "name": "@openenvx/plugin-protocol",
-  "version": "0.1.0",
+  "name": "@xmazu/openenvxee-plugin-protocol",
+  "version": "0.1.3",
   "description": "Declarative plugin panel protocol — JSON tree, h/jsx runtime, message union",
   "license": "MIT",
   "type": "module",

@@ -6,7 +6,7 @@ import {
   type ViewContainerLocation,
   type WorkbenchPluginContext,
 } from '@openenvx/headless';
-import type { PluginPanelDeclaration } from '@openenvx/plugin-protocol';
+import type { PluginPanelDeclaration } from '@xmazu/openenvxee-plugin-protocol';
 import type { ComponentType, ReactNode } from 'react';
 
 import { PluginPanel } from './plugin-panel';

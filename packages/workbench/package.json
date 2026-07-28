@@ -33,7 +33,7 @@
     "react-colorful": "^5.7.0",
     "react-i18next": "^17.0.8",
     "zod": "4.4.3",
-    "@openenvx/plugin-protocol": "workspace:*"
+    "@xmazu/openenvxee-plugin-protocol": "workspace:*"
   },
   "devDependencies": {
     "@openenvx/typescript-config": "workspace:*",

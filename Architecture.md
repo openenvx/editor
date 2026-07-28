@@ -94,7 +94,7 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 - `WorkbenchProvider`, `useWorkbenchContext` (React bridge)
 - `createInspectorHostContext`, `InspectorPathResolver`, `LayerPropertiesPaneFactory`, `InspectorPath`
 
-## What belongs in `@openenvx/plugin-protocol`
+## What belongs in `@xmazu/openenvxee-plugin-protocol`
 
 - Declarative panel vocabulary (`PLUGIN_ELEMENT_TYPES`, element tokens, `PluginNode` tree shape)
 - `h` / jsx runtimes for building serializable trees (handler props → ids via `beginRender` / `endRender`)

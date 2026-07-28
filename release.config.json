@@ -1,0 +1,21 @@
+{
+  "publish": [
+    {
+      "name": "@xmazu/openenvxee-plugin-protocol",
+      "dir": "packages/plugin-protocol"
+    },
+    {
+      "name": "@xmazu/openenvxee-studio",
+      "dir": "packages/studio"
+    }
+  ],
+  "consumers": [
+    {
+      "repo": "../openenvx-cloud",
+      "deps": [
+        "@xmazu/openenvxee-studio",
+        "@xmazu/openenvxee-plugin-protocol"
+      ]
+    }
+  ]
+}

@@ -18,7 +18,7 @@
     "fix": "ultracite fix",
     "changeset": "changeset",
     "version-packages": "changeset version && bun update",
-    "release": "bun run build && bun run publish-packages && changeset tag",
+    "release:changeset": "bun run build && bun run publish-packages && changeset tag",
     "publish-packages": "bun run publish-package:schema && bun run publish-package:plugin-protocol && bun run publish-package:studio",
     "publish-package:schema": "cd packages/schema && bun pm pack && tgz=$(ls -t *.tgz | head -1) && npm publish \"$tgz\" && rm -f \"$tgz\"",
     "publish-package:plugin-protocol": "cd packages/plugin-protocol && bun pm pack && tgz=$(ls -t *.tgz | head -1) && npm publish \"$tgz\" && rm -f \"$tgz\"",

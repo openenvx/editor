@@ -35,7 +35,7 @@ Read **Architecture.md** before placing new code. Update **FEATURES.md** when ad
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
 | `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchPlugin`, workbench contributions (`ToolbarContribution`, `InspectorPaneContribution`, …), provider registries (`registerFieldRenderer`, …), `InspectorPaneBuilder`, `WorkbenchProvider`, `useWorkbenchContext` |
 | `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasBasicsPlugin`, `CanvasEditor`, `CanvasHostProvider` |
-| `@openenvx/plugin-protocol` | Declarative embed panel tree types, `h`/jsx runtime, message unions, `validatePluginTree` |
+| `@xmazu/openenvxee-plugin-protocol` | Declarative embed panel tree types, `h`/jsx runtime, message unions, `validatePluginTree` |
 
 ### Canvas rule (non-negotiable)
 
@@ -55,7 +55,7 @@ Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `driver-i
 Published packages:
 
 - **`@openenvx/schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/plugin-protocol`** — declarative embed panel protocol (`h`, jsx runtimes, `validatePluginTree`, message types). Ships `dist/`; same dev export pattern as schema.
+- **`@xmazu/openenvxee-plugin-protocol`** — declarative embed panel protocol (`h`, jsx runtimes, `validatePluginTree`, message types). Ships `dist/`; same dev export pattern as schema.
 - **`@xmazu/openenvxee-studio`** — product fat bundle. Build inlines `@xmazu/openenvxee-workbench`, `@openenvx/canvas`, `@xmazu/openenvxee-canvas-pro`, `@openenvx/agent`, `@openenvx/driver-image`, and their `@openenvx/*` deps into `dist/`. Re-exports `@openenvx/core` + `@openenvx/headless` so host apps can author plugins without private workspace packages. Published `exports` resolve to `dist/` only.
 
 ## Code conventions
@@ -133,7 +133,7 @@ bun run changeset     # create a release changeset
 
 ## Publishing
 
-Only `packages/studio` (`@xmazu/openenvxee-studio`), `packages/schema` (`@openenvx/schema`), and `packages/plugin-protocol` (`@openenvx/plugin-protocol`) are published (private registry via `publishConfig`). See [README.md](README.md), [PUBLISHING.md](PUBLISHING.md), and the `publish-packages` script in root `package.json`.
+Only `packages/studio` (`@xmazu/openenvxee-studio`), `packages/schema` (`@openenvx/schema`), and `packages/plugin-protocol` (`@xmazu/openenvxee-plugin-protocol`) are published (private registry via `publishConfig`). See [README.md](README.md), [PUBLISHING.md](PUBLISHING.md), and the `publish-packages` script in root `package.json`.
 
 ## Before you finish
 

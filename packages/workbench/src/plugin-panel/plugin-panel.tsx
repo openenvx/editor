@@ -6,7 +6,7 @@ import {
   type PluginPanelDeclaration,
   type PluginPanelSelection,
   validatePluginTree,
-} from '@openenvx/plugin-protocol';
+} from '@xmazu/openenvxee-plugin-protocol';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 

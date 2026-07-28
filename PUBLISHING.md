@@ -5,7 +5,7 @@ Three packages leave this monorepo:
 | Package | Registry | What ships |
 | --- | --- | --- |
 | `@openenvx/schema` | `registry.openenvx.com` (public) | Built `dist/` + `scene.schema.json` |
-| `@openenvx/plugin-protocol` | `registry.openenvx.com` (public) | Declarative panel tree + `h`/jsx runtime (no React) |
+| `@xmazu/openenvxee-plugin-protocol` | `registry.openenvx.com` (public) | Declarative panel tree + `h`/jsx runtime (no React) |
 | `@xmazu/openenvxee-studio` | `registry.openenvx.com` (restricted) | Single bundled `dist/` (inlines workbench, canvas, canvas-pro, agent, driver-image, and their `@openenvx/*` deps) |
 
 Everything else stays workspace-private and resolves from `src/` during local development.
@@ -48,20 +48,20 @@ bun unlink @openenvx/schema
 bun add @openenvx/schema --registry https://registry.openenvx.com
 ```
 
-## `@openenvx/plugin-protocol`
+## `@xmazu/openenvxee-plugin-protocol`
 
 Published shape matches schema: `dist/` only on the default `import` condition; monorepo resolves `src/` via `development` / `bun`.
 
 Subpath exports:
 
-- `@openenvx/plugin-protocol` — types, `h`, elements, message unions
-- `@openenvx/plugin-protocol/jsx-runtime` — TS/JSX automatic runtime
-- `@openenvx/plugin-protocol/jsx-dev-runtime` — dev runtime (same as production)
+- `@xmazu/openenvxee-plugin-protocol` — types, `h`, elements, message unions
+- `@xmazu/openenvxee-plugin-protocol/jsx-runtime` — TS/JSX automatic runtime
+- `@xmazu/openenvxee-plugin-protocol/jsx-dev-runtime` — dev runtime (same as production)
 
 Install:
 
 ```bash
-bun add @openenvx/plugin-protocol --registry https://registry.openenvx.com
+bun add @xmazu/openenvxee-plugin-protocol --registry https://registry.openenvx.com
 ```
 
 Local dev with `bun link`:
@@ -71,7 +71,7 @@ Local dev with `bun link`:
 bun run link:plugin-protocol
 
 # In the consuming project
-bun link @openenvx/plugin-protocol
+bun link @xmazu/openenvxee-plugin-protocol
 ```
 
 For iframe embeds, use `createPostMessagePluginPanelTransport` from `@xmazu/openenvxee-workbench` with an explicit `allowedOrigins` (and `targetOrigin` when more than one origin is listed). `PluginPanel` trusts whatever the transport delivers; it does not validate `postMessage` origins by itself.
@@ -134,6 +134,18 @@ import '@xmazu/openenvxee-studio/fonts.css';
 
 ## Release workflow
 
+**Cloud-facing release** (`@xmazu/platforms-cli` — same `platforms release publish` everywhere):
+
+```bash
+# From editor-core (release.config.json at repo root)
+platforms release publish patch
+platforms release sync-consumers
+```
+
+`release.config.json` at repo root limits publish to `@xmazu/openenvxee-plugin-protocol` and `@xmazu/openenvxee-studio`, then syncs semver deps in `../openenvx-cloud`. With no config, `platforms release publish` would ship every non-private workspace package instead.
+
+**Changeset-driven release** (all three published packages, changelog + git tag):
+
 ```bash
 # 1. Add a changeset for schema, plugin-protocol, and/or studio
 bun run changeset
@@ -142,7 +154,7 @@ bun run changeset
 bun run version-packages
 
 # 3. Build, publish all published packages, tag
-bun run release
+bun run release:changeset
 ```
 
 Dry-run pack checks:
