@@ -6,6 +6,7 @@ import type { InspectorValuePath } from './inspector-value-path';
 
 export interface InspectorPathContextOptions {
   scene: Scene;
+  activePageId?: string | null;
   selectedLayerId: string | null;
   layerData: Record<string, unknown> | null;
   updateProperty: (layerId: string, key: string, value: unknown) => void;

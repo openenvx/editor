@@ -21,7 +21,41 @@ describe("ContextKeyService", () => {
     expect(keys.evaluate("page.layoutFlow")).toBeTruthy();
     expect(keys.evaluate("scene.layerSelected")).toBeFalsy();
     expect(keys.evaluate("scene.multiPage")).toBeFalsy();
+    expect(keys.evaluate("scene.primaryLayerType == 'canvas.svg'")).toBeFalsy();
     expect(keys.evaluate("page.layoutFlow && editor.hasActiveEditor")).toBeTruthy();
+  });
+
+  it("sets scene.primaryLayerType from the primary selection", () => {
+    const scene = normalizeScene({
+      pages: [
+        {
+          id: "a",
+          layout: "absolute",
+          layers: [
+            {
+              id: "svg-1",
+              type: "canvas.svg",
+              data: {
+                svg: '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
+              },
+            },
+          ],
+          name: "A",
+        },
+      ],
+    });
+    const keys = createContextKeyService();
+    keys.syncSceneKeys({
+      hasActiveEditor: true,
+      isDirty: false,
+      scene,
+      selection: {
+        activePageId: "a",
+        primaryLayerId: "svg-1",
+        selectedLayerIds: ["svg-1"],
+      },
+    });
+    expect(keys.evaluate("scene.primaryLayerType == 'canvas.svg'")).toBeTruthy();
   });
 
   it("sets scene.multiPage when more than one page exists", () => {

@@ -1,0 +1,47 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  color: var(--wb-muted-foreground, #6b7280);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.control {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--wb-border, #e5e7eb);
+  border-radius: 6px;
+  background: var(--wb-background, #fff);
+  color: var(--wb-foreground, #111827);
+  font: inherit;
+  font-size: 12px;
+}
+
+.control:focus {
+  outline: 2px solid var(--wb-ring, #93c5fd);
+  outline-offset: 1px;
+}
+
+.empty {
+  margin: 0;
+  color: var(--wb-muted-foreground, #6b7280);
+  font-size: 12px;
+  line-height: 1.4;
+}

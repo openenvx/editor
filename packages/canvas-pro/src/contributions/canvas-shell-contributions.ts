@@ -1,3 +1,4 @@
+import { CANVAS_GRID_SIZE_PRESETS } from '@openenvx/canvas';
 import { findLayerById } from '@openenvx/core';
 import type { CommandContext } from '@openenvx/core';
 import {
@@ -15,6 +16,13 @@ export const CANVAS_ZOOM_DROPDOWN_ITEMS: ShellDropdownMenuItemDescriptor[] = [
   { commandId: 'canvas.zoomToFit', labelKey: 'zoom.toFit', shortcut: '⌘ 1' },
   { commandId: 'canvas.zoomReset', labelKey: 'zoom.reset', shortcut: '⌘ 0' },
 ];
+
+export const CANVAS_GRID_SIZE_DROPDOWN_ITEMS: ShellDropdownMenuItemDescriptor[] =
+  CANVAS_GRID_SIZE_PRESETS.map((size) => ({
+    args: { size },
+    commandId: 'canvas.setGridSize',
+    label: `${size}px`,
+  }));
 
 export class CanvasStatusBarContribution extends StatusBarContribution {
   contribute(builder: StatusBarBuilder, ctx: CommandContext): void {
@@ -85,6 +93,11 @@ export class CanvasToolbarContribution extends ToolbarContribution {
         icon: 'grid',
         labelKey: 'toolbar.grid',
         priority: 20,
+      })
+      .dropdown('canvas-toolbar-grid-size', {
+        items: CANVAS_GRID_SIZE_DROPDOWN_ITEMS,
+        labelKey: 'toolbar.gridSize',
+        priority: 20.5,
       })
       .command('canvas-toolbar-rulers', {
         commandId: 'canvas.toggleRulers',

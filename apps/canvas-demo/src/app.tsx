@@ -1,3 +1,4 @@
+import type { Plugin } from '@openenvx/core';
 import {
   AGENT_CHAT_CONTAINER_ID,
   ChatPanel,
@@ -8,7 +9,9 @@ import {
   WorkbenchShell,
   createCanvasDemoScene,
   createCanvasInspectorHostContextWithApi,
+  createPostMessagePluginPanelTransport,
   DEFAULT_CANVAS_LAYOUT,
+  PluginPanelPlugin,
 } from '@xmazu/openenvxee-studio';
 
 import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
@@ -18,14 +21,41 @@ import { createDemoVersionHistoryProvider } from './providers/demo-version-histo
 import '@xmazu/openenvxee-studio/fonts.css';
 import '@xmazu/openenvxee-studio/theme.css';
 
-const plugins = [
-  ...DEFAULT_STUDIO_PLUGINS,
-  new CanvasDemoPlugin(),
-  new CanvasDemoChromePlugin(),
-  new VersionHistoryPlugin({
-    provider: createDemoVersionHistoryProvider(),
-  }),
-];
+const EMBED_PANEL_ID = 'embed.demo';
+
+function isEmbedMode(): boolean {
+  return new URLSearchParams(window.location.search).get('embed') === '1';
+}
+
+function createPlugins(): Plugin[] {
+  const plugins: Plugin[] = [
+    ...DEFAULT_STUDIO_PLUGINS,
+    new CanvasDemoPlugin(),
+    new CanvasDemoChromePlugin(),
+    new VersionHistoryPlugin({
+      provider: createDemoVersionHistoryProvider(),
+    }),
+  ];
+
+  if (isEmbedMode()) {
+    plugins.push(
+      new PluginPanelPlugin({
+        declaration: {
+          id: EMBED_PANEL_ID,
+          title: 'Embed',
+          allowedCommands: [],
+          contextScope: 'selection',
+        },
+        permission: 'edit',
+        transport: createPostMessagePluginPanelTransport({
+          allowedOrigins: [window.location.origin],
+        }),
+      })
+    );
+  }
+
+  return plugins;
+}
 
 function promptUri(message: string, defaultValue?: string): string | null {
   // Demo-only input; production apps should replace with a proper dialog.
@@ -47,7 +77,7 @@ export function App() {
         onSaveAs={async () =>
           promptUri('Save as URI', 'openworkbench://canvas-demo') ?? undefined
         }
-        plugins={plugins}
+        plugins={createPlugins()}
         sidebarPanels={{
           [AGENT_CHAT_CONTAINER_ID]: ChatPanel,
           [TEMPLATE_DATA_CONTAINER_ID]: TemplateDataPanel,

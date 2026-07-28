@@ -44,6 +44,7 @@ export {
   resolveEditorPaneKind,
 } from './scene/types';
 export {
+  applyFrozenLayerPolicy,
   buildFrozenLayerSnapshot,
   canDeleteLayer,
   canDuplicateLayer,
@@ -58,8 +59,16 @@ export {
   isLayerLocked,
   isLayerVisible,
   isLayerWritable,
+  withFrozenLayerSnapshots,
 } from './scene/layer-editability';
 export { clampTransformSize, MIN_LAYER_SIZE } from './scene/transform-utils';
+export {
+  CANVAS_INSTANCE_LAYER_TYPE,
+  getInstanceComponentId,
+  getLayerChildrenForScene,
+  isCanvasInstanceLayer,
+  resolveInstanceDefinitionLayers,
+} from './scene/expand-instances';
 export {
   CONTAINER_LAYER_TYPE,
   type ContainerLayoutModel,

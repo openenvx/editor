@@ -38,20 +38,33 @@ import {
   ResizePagePresetCommand,
   SetPagePresetCommand,
   SetPageSizeCommand,
+  SetBleedMmCommand,
+  SetSafeMmCommand,
   UpdateLayerTransformCommand,
   UpdateRichTextTransformCommand,
   RotateLayerLeftCommand,
   RotateLayerRightCommand,
 } from '../commands/canvas-api-commands';
 import { CanvasCommandRequestService } from '../commands/canvas-command-request-service';
-import { ToggleCanvasGridCommand } from '../commands/canvas-grid-commands';
+import {
+  CreateComponentFromSelectionCommand,
+  InsertComponentInstanceCommand,
+  UpdateComponentDefinitionCommand,
+} from '../commands/canvas-component-commands';
+import {
+  SetCanvasGridSizeCommand,
+  ToggleCanvasGridCommand,
+} from '../commands/canvas-grid-commands';
 import {
   GroupSelectionCommand,
   InsertCanvasGroupCommand,
   UngroupSelectionCommand,
 } from '../commands/canvas-group-commands';
 import {
+  AddCanvasGuideCommand,
   ClearCanvasGuidesCommand,
+  MoveCanvasGuideCommand,
+  RemoveCanvasGuideCommand,
   ToggleCanvasRulersCommand,
 } from '../commands/canvas-ruler-commands';
 import {
@@ -67,6 +80,7 @@ import { CanvasI18nBundle } from '../i18n/canvas-i18n-bundle';
 import { CanvasCircleLayer } from '../layers/canvas-circle-layer';
 import { CanvasGroupLayer } from '../layers/canvas-group-layer';
 import { CanvasImageLayer } from '../layers/canvas-image-layer';
+import { CanvasInstanceLayer } from '../layers/canvas-instance-layer';
 import { CanvasRectLayer } from '../layers/canvas-rect-layer';
 import { CanvasSvgLayer } from '../layers/canvas-svg-layer';
 import { CanvasTextLayer } from '../layers/canvas-text-layer';
@@ -249,7 +263,6 @@ export class UploadAssetCommand extends Command {
 
 export class CanvasBasicsPlugin extends Plugin {
   readonly id = 'OpenEnvx.canvas-basics';
-  private unsubGuidePrune: (() => void) | null = null;
 
   activate(ctx: PluginContext): void {
     ensureCanvasRegistriesInstalled(ctx);
@@ -269,6 +282,7 @@ export class CanvasBasicsPlugin extends Plugin {
       new CanvasRectLayer(),
       new CanvasCircleLayer(),
       new CanvasGroupLayer(),
+      new CanvasInstanceLayer(),
       new InsertCanvasTextCommand(),
       new InsertCanvasImageCommand(),
       new InsertCanvasSvgCommand(),
@@ -277,9 +291,14 @@ export class CanvasBasicsPlugin extends Plugin {
       new InsertCanvasGroupCommand(),
       new GroupSelectionCommand(),
       new UngroupSelectionCommand(),
+      new CreateComponentFromSelectionCommand(),
+      new InsertComponentInstanceCommand(),
+      new UpdateComponentDefinitionCommand(),
       new ResizePagePresetCommand(),
       new SetPageSizeCommand(),
       new SetPagePresetCommand(),
+      new SetBleedMmCommand(),
+      new SetSafeMmCommand(),
       new UpdateLayerTransformCommand(),
       new RotateLayerLeftCommand(),
       new RotateLayerRightCommand(),
@@ -302,8 +321,12 @@ export class CanvasBasicsPlugin extends Plugin {
       new CanvasZoomToFitCommand(),
       new CanvasZoomResetCommand(),
       new ToggleCanvasGridCommand(),
+      new SetCanvasGridSizeCommand(),
       new ToggleCanvasRulersCommand(),
       new ClearCanvasGuidesCommand(),
+      new AddCanvasGuideCommand(),
+      new MoveCanvasGuideCommand(),
+      new RemoveCanvasGuideCommand(),
       new SingletonServiceContribution(AssetServiceId, InMemoryAssetService),
       new SingletonServiceContribution(
         CanvasCommandRequestServiceId,
@@ -329,19 +352,9 @@ export class CanvasBasicsPlugin extends Plugin {
         () => canvasFontService
       )
     );
-
-    this.unsubGuidePrune = ctx.scene.subscribe((snapshot) => {
-      const guides = ctx.services.get(CanvasRulerGuidesSettingsServiceId);
-      if (!guides) {
-        return;
-      }
-      guides.pruneToPageIds(snapshot.scene.pages.map((page) => page.id));
-    });
   }
 
   deactivate(ctx: PluginContext): void {
-    this.unsubGuidePrune?.();
-    this.unsubGuidePrune = null;
     const assets = ctx.services.get(AssetServiceId);
     if ('dispose' in assets && typeof assets.dispose === 'function') {
       assets.dispose();

@@ -110,7 +110,7 @@ export function renderSvgDocument(
   const serializers =
     options.serializers ?? getDefaultSerializerRegistryWithBuiltins();
 
-  const bodies = flattenLayersForExport(page.layers)
+  const bodies = flattenLayersForExport(page.layers, undefined, scene)
     .map(({ layer, transform }) =>
       renderLayerSvg(
         layer,

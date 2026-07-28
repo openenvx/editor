@@ -32,6 +32,39 @@
         "additionalProperties": false
       }
     },
+    "components": {
+      "description": "Reusable component definitions for canvas.instance layers.",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Component id."
+          },
+          "layers": {
+            "default": [],
+            "description": "Definition layers relative to instance transform.",
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema0"
+            }
+          },
+          "name": {
+            "description": "Display name.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "layers"
+        ],
+        "additionalProperties": false
+      }
+    },
     "pages": {
       "default": [],
       "description": "Pages in the scene (at least one after normalize).",
@@ -46,6 +79,37 @@
           "dpi": {
             "description": "Dots per inch for print.",
             "type": "number"
+          },
+          "guides": {
+            "description": "User-placed ruler guides in artboard pixels.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Unique guide identifier."
+                },
+                "orientation": {
+                  "type": "string",
+                  "enum": [
+                    "horizontal",
+                    "vertical"
+                  ],
+                  "description": "Guide axis orientation."
+                },
+                "position": {
+                  "type": "number",
+                  "description": "Position in artboard pixels (x vertical, y horizontal)."
+                }
+              },
+              "required": [
+                "id",
+                "orientation",
+                "position"
+              ],
+              "additionalProperties": false
+            }
           },
           "height": {
             "description": "Page height in page units.",
@@ -451,6 +515,13 @@
                 "properties"
               ]
             },
+            "allowedDataKeys": {
+              "description": "When writeMode is content, optional allowlist of editable data keys.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "data": {
               "type": "object",
               "properties": {
@@ -802,6 +873,13 @@
                 "properties"
               ]
             },
+            "allowedDataKeys": {
+              "description": "When writeMode is content, optional allowlist of editable data keys.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "data": {
               "type": "object",
               "properties": {
@@ -1087,6 +1165,13 @@
                 "properties"
               ]
             },
+            "allowedDataKeys": {
+              "description": "When writeMode is content, optional allowlist of editable data keys.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "data": {
               "type": "object",
               "properties": {
@@ -1345,6 +1430,13 @@
                 "content",
                 "properties"
               ]
+            },
+            "allowedDataKeys": {
+              "description": "When writeMode is content, optional allowlist of editable data keys.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "data": {
               "type": "object",
@@ -1633,6 +1725,13 @@
                 "properties"
               ]
             },
+            "allowedDataKeys": {
+              "description": "When writeMode is content, optional allowlist of editable data keys.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "data": {
               "type": "object",
               "properties": {
@@ -1887,6 +1986,13 @@
                 "properties"
               ]
             },
+            "allowedDataKeys": {
+              "description": "When writeMode is content, optional allowlist of editable data keys.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "data": {
               "type": "object",
               "properties": {
@@ -2137,6 +2243,281 @@
                 "content",
                 "properties"
               ]
+            },
+            "allowedDataKeys": {
+              "description": "When writeMode is content, optional allowlist of editable data keys.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "componentId": {
+                  "type": "string",
+                  "description": "Id of scene.components entry."
+                },
+                "overrides": {
+                  "description": "Optional data overrides keyed by definition layer id.",
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  }
+                }
+              },
+              "required": [
+                "componentId"
+              ],
+              "additionalProperties": false
+            },
+            "type": {
+              "type": "string",
+              "const": "canvas.instance"
+            }
+          },
+          "required": [
+            "id",
+            "locked",
+            "visible",
+            "writeMode",
+            "data",
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Unique layer identifier."
+            },
+            "locked": {
+              "default": false,
+              "description": "Whether the layer is locked.",
+              "type": "boolean"
+            },
+            "name": {
+              "description": "Optional display name; falls back to the layer type label.",
+              "type": "string"
+            },
+            "style": {
+              "description": "Visual style overrides.",
+              "type": "object",
+              "properties": {
+                "border": {
+                  "description": "Layer border.",
+                  "type": "object",
+                  "properties": {
+                    "color": {
+                      "type": "string",
+                      "description": "Border color."
+                    },
+                    "width": {
+                      "type": "number",
+                      "description": "Border width in pixels."
+                    }
+                  },
+                  "required": [
+                    "color",
+                    "width"
+                  ],
+                  "additionalProperties": false
+                },
+                "cornerRadius": {
+                  "description": "Per-corner radius.",
+                  "type": "object",
+                  "properties": {
+                    "bottomLeft": {
+                      "type": "number",
+                      "description": "Bottom-left corner radius in pixels."
+                    },
+                    "bottomRight": {
+                      "type": "number",
+                      "description": "Bottom-right corner radius in pixels."
+                    },
+                    "topLeft": {
+                      "type": "number",
+                      "description": "Top-left corner radius in pixels."
+                    },
+                    "topRight": {
+                      "type": "number",
+                      "description": "Top-right corner radius in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottomLeft",
+                    "bottomRight",
+                    "topLeft",
+                    "topRight"
+                  ],
+                  "additionalProperties": false
+                },
+                "fill": {
+                  "description": "Fill color.",
+                  "type": "string"
+                },
+                "flipH": {
+                  "description": "Horizontal flip.",
+                  "type": "boolean"
+                },
+                "flipV": {
+                  "description": "Vertical flip.",
+                  "type": "boolean"
+                },
+                "padding": {
+                  "description": "Inner padding.",
+                  "type": "object",
+                  "properties": {
+                    "bottom": {
+                      "type": "number",
+                      "description": "Bottom padding in pixels."
+                    },
+                    "left": {
+                      "type": "number",
+                      "description": "Left padding in pixels."
+                    },
+                    "right": {
+                      "type": "number",
+                      "description": "Right padding in pixels."
+                    },
+                    "top": {
+                      "type": "number",
+                      "description": "Top padding in pixels."
+                    }
+                  },
+                  "required": [
+                    "bottom",
+                    "left",
+                    "right",
+                    "top"
+                  ],
+                  "additionalProperties": false
+                },
+                "shadow": {
+                  "description": "Drop shadow.",
+                  "type": "object",
+                  "properties": {
+                    "blur": {
+                      "type": "number",
+                      "description": "Shadow blur radius in pixels."
+                    },
+                    "color": {
+                      "type": "string",
+                      "description": "Shadow color."
+                    },
+                    "offsetX": {
+                      "type": "number",
+                      "description": "Shadow horizontal offset in pixels."
+                    },
+                    "offsetY": {
+                      "type": "number",
+                      "description": "Shadow vertical offset in pixels."
+                    },
+                    "spread": {
+                      "type": "number",
+                      "description": "Shadow spread in pixels."
+                    }
+                  },
+                  "required": [
+                    "blur",
+                    "color",
+                    "offsetX",
+                    "offsetY",
+                    "spread"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "transform": {
+              "description": "Absolute transform box.",
+              "type": "object",
+              "properties": {
+                "height": {
+                  "default": 100,
+                  "description": "Height in pixels.",
+                  "type": "number"
+                },
+                "opacity": {
+                  "default": 1,
+                  "description": "Opacity (0-1).",
+                  "type": "number"
+                },
+                "rotation": {
+                  "default": 0,
+                  "description": "Rotation in degrees.",
+                  "type": "number"
+                },
+                "scaleX": {
+                  "default": 1,
+                  "description": "Horizontal scale.",
+                  "type": "number"
+                },
+                "scaleY": {
+                  "default": 1,
+                  "description": "Vertical scale.",
+                  "type": "number"
+                },
+                "width": {
+                  "default": 200,
+                  "description": "Width in pixels.",
+                  "type": "number"
+                },
+                "x": {
+                  "default": 0,
+                  "description": "X position in pixels.",
+                  "type": "number"
+                },
+                "y": {
+                  "default": 0,
+                  "description": "Y position in pixels.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "height",
+                "opacity",
+                "rotation",
+                "scaleX",
+                "scaleY",
+                "width",
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "visible": {
+              "default": true,
+              "description": "Whether the layer is visible on canvas and in export.",
+              "type": "boolean"
+            },
+            "writeMode": {
+              "default": "free",
+              "description": "Template write permission mode.",
+              "type": "string",
+              "enum": [
+                "locked",
+                "free",
+                "content",
+                "properties"
+              ]
+            },
+            "allowedDataKeys": {
+              "description": "When writeMode is content, optional allowlist of editable data keys.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "data": {
               "default": {}

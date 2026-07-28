@@ -129,43 +129,45 @@ export function flattenSceneToIR(
   const resolveAsset = createSceneAssetResolver(scene);
   const { width, height } = resolvePagePixelDimensions(page);
 
-  const nodes: RenderIrNode[] = flattenLayersForExport(page.layers).map(
-    ({ layer, transform }) => {
-      const def = layerRegistry.get(layer.type);
+  const nodes: RenderIrNode[] = flattenLayersForExport(
+    page.layers,
+    undefined,
+    scene
+  ).map(({ layer, transform }) => {
+    const def = layerRegistry.get(layer.type);
 
-      if (!def) {
-        return {
-          descriptor: {
-            kind: 'placeholder',
-            text: `Unknown layer: ${layer.type}`,
-          },
-          id: layer.id,
-          transform,
-        };
-      }
-
-      const previewCtx = {
-        isSelected: false,
-        layerId: layer.id,
-        model: def.getModel(layer),
-        registry: layerRegistry,
-      };
-
+    if (!def) {
       return {
-        descriptor: flattenDescriptor(
-          def.renderPreview(previewCtx),
-          layer,
-          scene,
-          pageId,
-          layerRegistry,
-          resolveAsset,
-          serializers
-        ),
+        descriptor: {
+          kind: 'placeholder',
+          text: `Unknown layer: ${layer.type}`,
+        },
         id: layer.id,
         transform,
       };
     }
-  );
+
+    const previewCtx = {
+      isSelected: false,
+      layerId: layer.id,
+      model: def.getModel(layer),
+      registry: layerRegistry,
+    };
+
+    return {
+      descriptor: flattenDescriptor(
+        def.renderPreview(previewCtx),
+        layer,
+        scene,
+        pageId,
+        layerRegistry,
+        resolveAsset,
+        serializers
+      ),
+      id: layer.id,
+      transform,
+    };
+  });
 
   return {
     assets: scene.assets as RenderIrDocument['assets'],

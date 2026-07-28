@@ -28,6 +28,7 @@ import {
 } from '../contributions/canvas-shell-contributions';
 import { proImageCanvasContributions } from '../contributions/pro-image-contributions';
 import { ProImageSvgSerializer } from '../export/pro-image-svg-serializer';
+import { SvgNodesFieldRenderer } from '../fields/svg-nodes-field';
 import { SmartGuidesStageInteraction } from '../stage/smart-guides-stage-interaction';
 
 export class CanvasProPlugin extends Plugin {
@@ -36,6 +37,7 @@ export class CanvasProPlugin extends Plugin {
   activate(ctx: PluginContext): void {
     const workbench = ctx as WorkbenchPluginContext;
     workbench.registerEditorPane('absolute', AbsoluteEditorPane);
+    workbench.registerFieldRenderer('svgNodes', SvgNodesFieldRenderer);
     workbench.registerWorkbench(
       new CanvasContextMenu(),
       new CanvasCommandPaletteItems(),

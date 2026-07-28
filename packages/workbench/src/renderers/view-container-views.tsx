@@ -44,6 +44,9 @@ function PropertiesViewBody({
   const primaryLayerId = useWorkbenchContextSelector(
     (state) => state.selection.primaryLayerId
   );
+  const selectionActivePageId = useWorkbenchContextSelector(
+    (state) => state.selection.activePageId
+  );
   const scene = useWorkbenchContextSelector((state) => state.scene);
   const fieldRenderers = useWorkbenchContextSelector(
     (state) => state.fieldRenderers
@@ -68,6 +71,7 @@ function PropertiesViewBody({
     const create = createHostContext ?? defaultInspectorHostContext;
     return create(
       {
+        activePageId: selectionActivePageId ?? null,
         executeCommand,
         layerData,
         scene: scene!,
@@ -83,6 +87,7 @@ function PropertiesViewBody({
     layerData,
     primaryLayerId,
     scene,
+    selectionActivePageId,
   ]);
 
   if (view.content.kind !== 'properties' || !scene || !fieldRenderers) {

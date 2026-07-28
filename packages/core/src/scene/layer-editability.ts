@@ -4,6 +4,7 @@ import type {
   Scene,
 } from '@openenvx/schema';
 
+import { getLayerChildren, hasChildLayers, walkLayers } from './layer-tree';
 import type { Layer } from './types';
 
 export function getLayerWriteMode(layer: Layer): LayerWriteMode {
@@ -35,16 +36,30 @@ export function canTransformLayer(layer: Layer): boolean {
     return false;
   }
 
-  return getLayerWriteMode(layer) === 'free';
+  const mode = getLayerWriteMode(layer);
+  return mode === 'free' || mode === 'properties';
 }
 
-export function canEditLayerData(layer: Layer): boolean {
+export function canEditLayerData(layer: Layer, key?: string): boolean {
   if (!isLayerWritable(layer)) {
     return false;
   }
 
   const mode = getLayerWriteMode(layer);
-  return mode === 'free' || mode === 'content' || mode === 'properties';
+  if (mode === 'free') {
+    return true;
+  }
+  if (mode !== 'content') {
+    return false;
+  }
+  const allowed = layer.allowedDataKeys;
+  if (!allowed || allowed.length === 0) {
+    return true;
+  }
+  if (key === undefined) {
+    return true;
+  }
+  return allowed.includes(key);
 }
 
 export function canDeleteLayer(layer: Layer, scene: Scene): boolean {
@@ -75,13 +90,19 @@ export function canResizePage(scene: Scene): boolean {
   return scene.templatePolicy?.allowPageResize !== false;
 }
 
+/**
+ * Capture immutable fields from writeMode constraints.
+ * - locked: data + transform
+ * - content (data-only): transform
+ * - properties (transform-only): data
+ */
 export function buildFrozenLayerSnapshot(
   scene: Scene
 ): Record<string, FrozenLayerSnapshot> {
   const frozen: Record<string, FrozenLayerSnapshot> = {};
 
   for (const page of scene.pages) {
-    for (const layer of page.layers) {
+    walkLayers(page.layers, (layer) => {
       const mode = getLayerWriteMode(layer);
 
       if (mode === 'locked') {
@@ -91,16 +112,82 @@ export function buildFrozenLayerSnapshot(
             ? { transform: structuredClone(layer.transform) }
             : {}),
         };
-        continue;
+        return;
       }
 
-      if (mode === 'properties' && layer.transform) {
+      if (mode === 'content' && layer.transform) {
         frozen[layer.id] = {
           transform: structuredClone(layer.transform),
         };
+        return;
       }
-    }
+
+      if (mode === 'properties') {
+        frozen[layer.id] = {
+          data: structuredClone(layer.data),
+        };
+      }
+    });
   }
 
   return frozen;
+}
+
+/** Persist freeze snapshots onto `templatePolicy.frozenLayers` for write enforcement. */
+export function withFrozenLayerSnapshots(scene: Scene): Scene {
+  const policy = scene.templatePolicy;
+  if (!policy) {
+    return scene;
+  }
+  return {
+    ...scene,
+    templatePolicy: {
+      ...policy,
+      frozenLayers: buildFrozenLayerSnapshot(scene),
+    },
+  };
+}
+
+function restoreFrozenLayer(
+  layer: Layer,
+  frozen: Record<string, FrozenLayerSnapshot>
+): Layer {
+  const snap = frozen[layer.id];
+  let next = layer;
+  if (snap) {
+    next = { ...next };
+    if ('data' in snap && snap.data !== undefined) {
+      next = { ...next, data: structuredClone(snap.data) as Layer['data'] };
+    }
+    if (snap.transform !== undefined) {
+      next = { ...next, transform: structuredClone(snap.transform) };
+    }
+  }
+  if (!hasChildLayers(next)) {
+    return next;
+  }
+  return {
+    ...next,
+    data: {
+      ...(next.data as object),
+      children: getLayerChildren(next).map((child) =>
+        restoreFrozenLayer(child, frozen)
+      ),
+    },
+  } as Layer;
+}
+
+/** Re-apply `templatePolicy.frozenLayers` snapshots onto matching layers. */
+export function applyFrozenLayerPolicy(scene: Scene): Scene {
+  const frozen = scene.templatePolicy?.frozenLayers;
+  if (!frozen || Object.keys(frozen).length === 0) {
+    return scene;
+  }
+  return {
+    ...scene,
+    pages: scene.pages.map((page) => ({
+      ...page,
+      layers: page.layers.map((layer) => restoreFrozenLayer(layer, frozen)),
+    })),
+  };
 }

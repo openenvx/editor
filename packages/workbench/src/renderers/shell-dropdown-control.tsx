@@ -17,6 +17,7 @@ import styles from './shell-dropdown.module.css';
 export interface ShellDropdownControlProps {
   id: string;
   label?: string;
+  labelKey?: string;
   labelBinding?: string;
   labelSuffix?: string;
   items: ShellDropdownMenuItemDescriptor[];
@@ -37,6 +38,7 @@ export const ShellDropdownControl = memo(
   ({
     id,
     label,
+    labelKey,
     labelBinding,
     labelSuffix = '',
     items,
@@ -53,8 +55,11 @@ export const ShellDropdownControl = memo(
           return `${bound}${labelSuffix}`;
         }
       }
+      if (labelKey) {
+        return t(labelKey);
+      }
       return label ?? '';
-    }, [label, labelBinding, labelSuffix, zoomPercent]);
+    }, [label, labelBinding, labelKey, labelSuffix, t, zoomPercent]);
 
     const groups = useMemo(
       () => [
@@ -65,7 +70,7 @@ export const ShellDropdownControl = memo(
             ? t(item.labelKey)
             : (item.label ?? item.commandId),
           onSelect: () => {
-            void executeCommand(item.commandId);
+            void executeCommand(item.commandId, item.args);
           },
           shortcut: item.shortcut,
         })),

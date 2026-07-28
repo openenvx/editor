@@ -121,8 +121,8 @@ export function applyRichTextToGroup(
   for (const span of spans) {
     node.add(
       new Konva.Text({
-        fill,
-        fontFamily,
+        fill: span.style.color ?? fill,
+        fontFamily: span.style.fontFamily ?? fontFamily,
         fontSize,
         fontStyle: toKonvaFontStyle(span.style),
         letterSpacing,

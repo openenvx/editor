@@ -108,6 +108,76 @@ export class SetPageSizeCommand extends Command {
   }
 }
 
+function parseNonNegativeMm(
+  args: unknown,
+  key: 'bleedMm' | 'safeMm'
+): number | null {
+  const raw =
+    typeof args === 'number'
+      ? args
+      : args && typeof args === 'object' && key in args
+        ? (args as Record<string, unknown>)[key]
+        : undefined;
+  if (typeof raw !== 'number' || !Number.isFinite(raw) || raw < 0) {
+    return null;
+  }
+  return raw;
+}
+
+export class SetBleedMmCommand extends Command {
+  readonly id = 'canvas.setBleedMm';
+
+  canExecute(ctx: CommandContext): boolean {
+    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const bleedMm = parseNonNegativeMm(args, 'bleedMm');
+    if (bleedMm === null) {
+      return;
+    }
+    const activePageId = ctx.scene.getActivePageId();
+    ctx.scene.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: scene.pages.map((page) =>
+          page.id === activePageId ? { ...page, bleedMm } : page
+        ),
+      }),
+      label: localize(ctx.services, 'canvas.history.setBleedMm', {
+        defaultValue: 'Set bleed',
+      }),
+    });
+  }
+}
+
+export class SetSafeMmCommand extends Command {
+  readonly id = 'canvas.setSafeMm';
+
+  canExecute(ctx: CommandContext): boolean {
+    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const safeMm = parseNonNegativeMm(args, 'safeMm');
+    if (safeMm === null) {
+      return;
+    }
+    const activePageId = ctx.scene.getActivePageId();
+    ctx.scene.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: scene.pages.map((page) =>
+          page.id === activePageId ? { ...page, safeMm } : page
+        ),
+      }),
+      label: localize(ctx.services, 'canvas.history.setSafeMm', {
+        defaultValue: 'Set safe margin',
+      }),
+    });
+  }
+}
+
 export class SetPagePresetCommand extends Command {
   readonly id = 'canvas.setPagePreset';
 

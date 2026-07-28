@@ -27,6 +27,7 @@ export {
 } from './contributions/canvas-shell-contributions';
 export {
   CanvasLayerTransformInspectorPane,
+  CanvasPagePrintGuidesInspectorPane,
   CanvasTransformsInspectorPane,
   canvasInspectorPaneContributions,
 } from './contributions/canvas-inspector-pane-contributions';

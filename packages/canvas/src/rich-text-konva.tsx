@@ -147,8 +147,8 @@ export const RichTextKonva = memo(
         ) : (
           allSpans.map((span, index) => (
             <Text
-              fill={fill}
-              fontFamily={fontFamily}
+              fill={span.style.color ?? fill}
+              fontFamily={span.style.fontFamily ?? fontFamily}
               fontSize={resolvedFontSize}
               fontStyle={toKonvaFontStyle(span.style)}
               key={`${index}-${span.x}-${span.y}-${span.text}`}

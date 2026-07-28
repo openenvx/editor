@@ -169,6 +169,12 @@ export {
   type CanvasSvgModel,
 } from './layers/canvas-svg-layer';
 export {
+  editableAttrsForTag,
+  parseSvgElements,
+  setSvgElementAttrs,
+  type SvgElementNode,
+} from './svg/svg-node-list';
+export {
   CanvasRectLayer,
   canvasRectSchema,
   type CanvasRectModel,
@@ -240,6 +246,11 @@ export {
   type CanvasGridSettingsListener,
   type CanvasGridSettingsSnapshot,
 } from './grid/canvas-grid-settings';
+export {
+  CANVAS_GRID_SIZE_PRESETS,
+  SetCanvasGridSizeCommand,
+  ToggleCanvasGridCommand,
+} from './commands/canvas-grid-commands';
 export {
   CanvasRulerGuidesSettings,
   type CanvasRulerGuidesSettingsListener,

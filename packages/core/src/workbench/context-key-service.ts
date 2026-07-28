@@ -1,5 +1,6 @@
 import { Emitter } from '../runtime/emitter';
 import type { Event } from '../runtime/emitter';
+import { findLayerById } from '../scene/layer-tree';
 import type { Scene, Selection } from '../scene/types';
 
 export class ContextKeyService {
@@ -57,9 +58,16 @@ export class ContextKeyService {
       }
     };
 
+    const primaryLayerId =
+      input.selection.primaryLayerId ?? selectedLayerIds[0] ?? null;
+    const primaryLayer = primaryLayerId
+      ? findLayerById(input.scene, primaryLayerId)
+      : null;
+
     set('scene.layerSelected', selectedLayerIds.length > 0);
     set('scene.multiSelect', selectedLayerIds.length > 1);
     set('scene.multiPage', input.scene.pages.length > 1);
+    set('scene.primaryLayerType', primaryLayer?.type ?? '');
     set('page.layout', page.layout);
     set('page.layoutAbsolute', page.layout === 'absolute');
     set('page.layoutFlow', page.layout === 'flow');

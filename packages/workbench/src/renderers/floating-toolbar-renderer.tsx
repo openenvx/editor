@@ -42,6 +42,7 @@ export const FloatingToolbarRenderer = memo(
                 key={item.id}
                 label={item.label}
                 labelBinding={item.labelBinding}
+                labelKey={item.labelKey}
                 labelSuffix={item.labelSuffix}
                 variant="toolbar"
               />

@@ -22,6 +22,25 @@ describe('rich-text-layout', () => {
     ]);
   });
 
+  it('parses inline color and font-family from span styles', () => {
+    const spans = parseRichTextHtml(
+      '<p><span style="color: rgb(255, 0, 0); font-family: Georgia">Hi</span></p>'
+    );
+    expect(spans).toEqual([
+      {
+        style: {
+          bold: false,
+          color: 'rgb(255, 0, 0)',
+          fontFamily: 'Georgia',
+          italic: false,
+          strike: false,
+          underline: false,
+        },
+        text: 'Hi',
+      },
+    ]);
+  });
+
   it('maps font styles for konva', () => {
     expect(
       toKonvaFontStyle({

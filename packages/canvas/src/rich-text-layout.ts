@@ -12,6 +12,8 @@ export interface RichTextStyle {
   italic: boolean;
   underline: boolean;
   strike: boolean;
+  color?: string;
+  fontFamily?: string;
 }
 
 export interface StyledSpan {
@@ -33,23 +35,54 @@ const DEFAULT_STYLE: RichTextStyle = {
   underline: false,
 };
 
+function stylesEqual(left: RichTextStyle, right: RichTextStyle): boolean {
+  return (
+    left.bold === right.bold &&
+    left.italic === right.italic &&
+    left.underline === right.underline &&
+    left.strike === right.strike &&
+    left.color === right.color &&
+    left.fontFamily === right.fontFamily
+  );
+}
+
 function mergeAdjacentSpans(spans: StyledSpan[]): StyledSpan[] {
   const merged: StyledSpan[] = [];
   for (const span of spans) {
     const previous = merged.at(-1);
-    if (
-      previous &&
-      previous.style.bold === span.style.bold &&
-      previous.style.italic === span.style.italic &&
-      previous.style.underline === span.style.underline &&
-      previous.style.strike === span.style.strike
-    ) {
+    if (previous && stylesEqual(previous.style, span.style)) {
       previous.text += span.text;
       continue;
     }
     merged.push({ ...span, style: { ...span.style } });
   }
   return merged;
+}
+
+function applyElementStyleMarks(element: Element, style: RichTextStyle): void {
+  const tag = element.tagName.toLowerCase();
+  if (tag === 'strong' || tag === 'b') {
+    style.bold = true;
+  }
+  if (tag === 'em' || tag === 'i') {
+    style.italic = true;
+  }
+  if (tag === 'u') {
+    style.underline = true;
+  }
+  if (tag === 's' || tag === 'strike' || tag === 'del') {
+    style.strike = true;
+  }
+  if (element instanceof HTMLElement) {
+    const color = element.style.color?.trim();
+    if (color) {
+      style.color = color;
+    }
+    const fontFamily = element.style.fontFamily?.trim();
+    if (fontFamily) {
+      style.fontFamily = fontFamily.replaceAll(/['"]/g, '');
+    }
+  }
 }
 
 function walkNodes(
@@ -73,19 +106,8 @@ function walkNodes(
   const element = node as Element;
   const tag = element.tagName.toLowerCase();
   const nextStyle: RichTextStyle = { ...style };
+  applyElementStyleMarks(element, nextStyle);
 
-  if (tag === 'strong' || tag === 'b') {
-    nextStyle.bold = true;
-  }
-  if (tag === 'em' || tag === 'i') {
-    nextStyle.italic = true;
-  }
-  if (tag === 'u') {
-    nextStyle.underline = true;
-  }
-  if (tag === 's' || tag === 'strike' || tag === 'del') {
-    nextStyle.strike = true;
-  }
   if (tag === 'br') {
     spans.push({ style: { ...DEFAULT_STYLE }, text: '\n' });
     return;
@@ -165,7 +187,8 @@ function buildRichTextFont(
 ): string {
   const weight = style.bold ? 'bold' : 'normal';
   const fontStyle = style.italic ? 'italic' : 'normal';
-  return `${fontStyle} ${weight} ${fontSize}px ${fontFamily}`;
+  const family = style.fontFamily ?? fontFamily;
+  return `${fontStyle} ${weight} ${fontSize}px ${family}`;
 }
 
 function measureRichTextWidth(
@@ -210,12 +233,7 @@ function measureRichTextWidth(
 }
 
 function areStylesEqual(left: RichTextStyle, right: RichTextStyle): boolean {
-  return (
-    left.bold === right.bold &&
-    left.italic === right.italic &&
-    left.underline === right.underline &&
-    left.strike === right.strike
-  );
+  return stylesEqual(left, right);
 }
 
 function createRichTextMeasurementRoot(options: {
@@ -262,19 +280,7 @@ function getRichTextStyleFromNode(
       : node.parentElement;
 
   while (current && current !== root) {
-    const tag = current.tagName.toLowerCase();
-    if (tag === 'strong' || tag === 'b') {
-      style.bold = true;
-    }
-    if (tag === 'em' || tag === 'i') {
-      style.italic = true;
-    }
-    if (tag === 'u') {
-      style.underline = true;
-    }
-    if (tag === 's' || tag === 'strike' || tag === 'del') {
-      style.strike = true;
-    }
+    applyElementStyleMarks(current, style);
     current = current.parentElement;
   }
 

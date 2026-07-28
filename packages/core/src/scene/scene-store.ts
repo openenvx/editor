@@ -17,6 +17,7 @@ import type { PageRulesContribution } from '../contributions/page-rules-contribu
 import { Emitter } from '../runtime/emitter';
 import type { Event } from '../runtime/emitter';
 import { HistoryStack } from './history-stack';
+import { applyFrozenLayerPolicy } from './layer-editability';
 import { layerExistsOnPage } from './layer-tree';
 import { SceneValidationError } from './scene-validation-error';
 import {
@@ -250,17 +251,18 @@ export class SceneStore {
   private finalizeScene(input: Scene): Scene {
     const structural = normalizeScene(input);
     const withRules = this.applyPageRules(structural);
-    const structuralValidation = validateScene(withRules);
+    const withFrozen = applyFrozenLayerPolicy(withRules);
+    const structuralValidation = validateScene(withFrozen);
     if (!structuralValidation.valid) {
       throw new SceneValidationError(
         formatValidationErrors(structuralValidation.errors)
       );
     }
-    const ruleErrors = this.collectPageRulesErrors(withRules);
+    const ruleErrors = this.collectPageRulesErrors(withFrozen);
     if (ruleErrors.length > 0) {
       throw new SceneValidationError(formatValidationErrors(ruleErrors));
     }
-    return withRules;
+    return withFrozen;
   }
 
   private applyPageRules(scene: Scene): Scene {

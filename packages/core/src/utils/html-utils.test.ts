@@ -27,4 +27,12 @@ describe('html-utils', () => {
     const input = '<p><s>Strike</s> and <u>underline</u></p>';
     expect(sanitizeHtml(input)).toBe(input);
   });
+
+  it('keeps allowlisted span color and font-family styles', () => {
+    const input =
+      '<p><span style="color: #f00; font-family: Georgia; background: red">Hi</span></p>';
+    expect(sanitizeHtml(input)).toBe(
+      '<p><span style="color: #f00; font-family: Georgia">Hi</span></p>'
+    );
+  });
 });

@@ -41,6 +41,7 @@ export interface ToolbarCommandOptions extends ShellItemOptions {
 
 export interface ToolbarDropdownOptions extends ShellItemOptions {
   label?: string;
+  labelKey?: string;
   labelBinding?: string;
   labelSuffix?: string;
   items: ShellDropdownMenuItemDescriptor[];
@@ -87,6 +88,7 @@ export class ToolbarBuilder extends DescriptorBuilder<ToolbarItemDescriptor> {
           kind: 'dropdown',
           label: options.label,
           labelBinding: options.labelBinding,
+          labelKey: options.labelKey,
           labelSuffix: options.labelSuffix,
           variant: 'toolbar',
         },

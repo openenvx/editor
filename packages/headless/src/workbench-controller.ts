@@ -417,7 +417,7 @@ export class WorkbenchController {
     const sceneStore = this.runtime.getScene();
     const currentScene = sceneStore.getScene();
     const targetLayer = findLayerById(currentScene, layerId);
-    if (!targetLayer || !canEditLayerData(targetLayer)) {
+    if (!targetLayer || !canEditLayerData(targetLayer, key)) {
       return;
     }
     sceneStore.apply({

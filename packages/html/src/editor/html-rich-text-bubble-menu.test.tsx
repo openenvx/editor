@@ -10,6 +10,8 @@ function mockEditor(active: Partial<Record<string, boolean>> = {}): Editor {
   const run = vi.fn();
   const chain = {
     focus: () => chain,
+    setColor: () => chain,
+    setFontFamily: () => chain,
     toggleBold: () => chain,
     toggleItalic: () => chain,
     toggleUnderline: () => chain,
@@ -17,6 +19,7 @@ function mockEditor(active: Partial<Record<string, boolean>> = {}): Editor {
     run,
   };
   return {
+    getAttributes: () => ({}),
     isActive: (name: string) => active[name] === true,
     chain: () => chain,
   } as unknown as Editor;

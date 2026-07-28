@@ -2,7 +2,6 @@ import type { EditorState } from '@tiptap/pm/state';
 import type { Editor } from '@tiptap/react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
-import { StarterKit } from '@tiptap/starter-kit';
 
 import {
   DEFAULT_RICH_TEXT_FILL,
@@ -12,6 +11,7 @@ import {
   RICH_TEXT_LINE_HEIGHT_MULTIPLIER,
 } from '../rich-text-typography';
 import { RichTextBubbleMenuToolbar } from './rich-text-bubble-menu';
+import { createRichTextEditorExtensions } from './rich-text-editor-extensions';
 
 import styles from './canvas-editor.module.css';
 
@@ -71,16 +71,7 @@ export function CanvasRichTextEditor({
         return true;
       },
     },
-    extensions: [
-      StarterKit.configure({
-        blockquote: false,
-        bulletList: false,
-        codeBlock: false,
-        heading: false,
-        horizontalRule: false,
-        orderedList: false,
-      }),
-    ],
+    extensions: createRichTextEditorExtensions(),
     onBlur: ({ editor: activeEditor }) => {
       onCommit(activeEditor.getHTML());
     },

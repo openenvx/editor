@@ -7,7 +7,8 @@ export function createBlankPageLike(
   id: string,
   name: string
 ): Page {
-  return { ...source, id, name, layers: [] };
+  const { guides: _guides, ...rest } = source;
+  return { ...rest, id, name, layers: [] };
 }
 
 /** Deep-clone a page including layers with remapped ids. */

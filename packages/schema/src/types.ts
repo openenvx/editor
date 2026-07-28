@@ -75,6 +75,7 @@ export const BUILTIN_LAYER_TYPES = [
   'canvas.text',
   'canvas.circle',
   'canvas.group',
+  'canvas.instance',
 ] as const;
 
 export type BuiltinLayerType = (typeof BUILTIN_LAYER_TYPES)[number];
@@ -174,6 +175,11 @@ export interface LayerBase {
   transform?: Transform;
   style?: LayerStyle;
   writeMode?: LayerWriteMode;
+  /**
+   * When `writeMode` is `content`, optional allowlist of `data` keys that may be
+   * edited. Absent/empty means all data keys are editable.
+   */
+  allowedDataKeys?: string[];
   locked?: boolean;
   /** When false, the layer is hidden on canvas and in export. Absent/true = visible. */
   visible?: boolean;
@@ -209,6 +215,24 @@ export interface CanvasGroupLayer extends LayerBase {
   data: CanvasGroupData;
 }
 
+/** One-way symbol definition: layers are relative to the instance transform. */
+export interface SceneComponent {
+  id: string;
+  name?: string;
+  layers: Layer[];
+}
+
+export interface CanvasInstanceData {
+  componentId: string;
+  /** Optional shallow data overrides keyed by definition layer id. */
+  overrides?: Record<string, Record<string, unknown>>;
+}
+
+export interface CanvasInstanceLayer extends LayerBase {
+  type: 'canvas.instance';
+  data: CanvasInstanceData;
+}
+
 /** Unknown plugin layer — structural fields validated; data opaque. */
 export interface PluginLayer extends LayerBase {
   type: string;
@@ -222,7 +246,18 @@ export type Layer =
   | CanvasTextLayer
   | CanvasCircleLayer
   | CanvasGroupLayer
+  | CanvasInstanceLayer
   | PluginLayer;
+
+export type PageGuideOrientation = 'horizontal' | 'vertical';
+
+/** User-placed ruler guide on a page (artboard pixels). */
+export interface PageGuide {
+  id: string;
+  orientation: PageGuideOrientation;
+  /** Position in artboard pixels (x for vertical, y for horizontal). */
+  position: number;
+}
 
 export interface Page {
   id: string;
@@ -246,6 +281,8 @@ export interface Page {
   safeMm?: number;
   /** Artboard background used for document export. */
   backgroundColor?: string;
+  /** User-placed ruler guides (persisted; undoable via scene history). */
+  guides?: PageGuide[];
   layers: Layer[];
 }
 
@@ -275,6 +312,8 @@ export interface Scene {
   schemaVersion: number;
   pages: Page[];
   assets?: Record<string, SceneAsset>;
+  /** Reusable layer trees referenced by `canvas.instance` layers. */
+  components?: Record<string, SceneComponent>;
   templatePolicy?: TemplatePolicy;
 }
 

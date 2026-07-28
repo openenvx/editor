@@ -40,9 +40,35 @@ const ALLOWED_TAGS = new Set([
   'ul',
 ]);
 
-const ALLOWED_ATTRS = new Set(['class', 'href', 'rel', 'target']);
+const ALLOWED_ATTRS = new Set(['class', 'href', 'rel', 'style', 'target']);
+
+const ALLOWED_STYLE_PROPS = new Set(['color', 'font-family']);
 
 const UNSAFE_HREF = /^\s*(javascript|data|vbscript):/i;
+
+function sanitizeInlineStyle(value: string): string | null {
+  const kept: string[] = [];
+  for (const declaration of value.split(';')) {
+    const colon = declaration.indexOf(':');
+    if (colon === -1) {
+      continue;
+    }
+    const prop = declaration.slice(0, colon).trim().toLowerCase();
+    const raw = declaration.slice(colon + 1).trim();
+    if (!(prop && raw) || !ALLOWED_STYLE_PROPS.has(prop)) {
+      continue;
+    }
+    if (
+      UNSAFE_HREF.test(raw) ||
+      /expression\s*\(/i.test(raw) ||
+      /url\s*\(/i.test(raw)
+    ) {
+      continue;
+    }
+    kept.push(`${prop}: ${raw}`);
+  }
+  return kept.length > 0 ? kept.join('; ') : null;
+}
 
 function sanitizeNode(root: ParentNode): void {
   const children: Element[] = [];
@@ -76,6 +102,14 @@ function sanitizeNode(root: ParentNode): void {
       }
       if (name === 'href' && UNSAFE_HREF.test(attr.value)) {
         child.removeAttribute(attr.name);
+        continue;
+      }
+      if (name === 'style') {
+        const cleaned = sanitizeInlineStyle(attr.value);
+        child.removeAttribute('style');
+        if (cleaned) {
+          child.setAttribute('style', cleaned);
+        }
       }
     }
 
@@ -106,5 +140,12 @@ function sanitizeHtmlFallback(html: string): string {
     .replaceAll(
       /\s(href|src)\s*=\s*(?:"|')\s*(javascript|data|vbscript):[^"']*(?:"|')/gi,
       ''
+    )
+    .replaceAll(
+      /\sstyle\s*=\s*(?:"([^"]*)"|'([^']*)')/gi,
+      (_match, doubleQuoted, singleQuoted) => {
+        const cleaned = sanitizeInlineStyle(doubleQuoted ?? singleQuoted ?? '');
+        return cleaned ? ` style="${cleaned}"` : '';
+      }
     );
 }

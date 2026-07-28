@@ -15,6 +15,7 @@ export default {
   'toolbar.undo': 'Undo',
   'toolbar.redo': 'Redo',
   'toolbar.grid': 'Grid',
+  'toolbar.gridSize': 'Grid size',
   'toolbar.rulers': 'Rulers',
   'toolbar.textTool': 'Text tool',
   'toolbar.imageTool': 'Image tool',

@@ -15,6 +15,7 @@ export default {
   'toolbar.undo': 'Cofnij',
   'toolbar.redo': 'Ponów',
   'toolbar.grid': 'Siatka',
+  'toolbar.gridSize': 'Rozmiar siatki',
   'toolbar.rulers': 'Linijki',
   'toolbar.textTool': 'Narzędzie tekstu',
   'toolbar.imageTool': 'Narzędzie obrazu',

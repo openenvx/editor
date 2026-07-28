@@ -74,10 +74,12 @@ Host pieces:
 The protocol shape is enough as the **interaction model**. Seal these before treating it as a product boundary:
 
 1. **`panel:manifest` is privileged** — requires `allowManifest: true` on the declaration, `permission === 'edit'`, validated trees, and command ids filtered through `allowedCommands`. Contribute failures are isolated from chrome rebuild.
-2. **Default `contextScope` to `selection`** — `scene` can exfiltrate the full document to the parent.
+2. **Default `contextScope` to `selection`** — product default for embeds; `scene` can exfiltrate the full document to the parent and needs explicit host opt-in.
 3. **Semantic allowlists** — command ids via `allowedCommands`; external `panel:tree` binds must be `plugin.<panelId>.*` (validated + mapped).
 4. **Mandatory origin checks** on the transport.
 5. **Capability negotiation** — grow beyond `v: 1` with an explicit capabilities list so the surface can evolve without silent breakage.
+
+Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/public/embed-parent.html) at `/embed-parent.html`; the iframe loads `/?embed=1` with `PluginPanelPlugin` (`contextScope: 'selection'`, empty `allowedCommands`, no manifest).
 
 ## Cloud-hosted / marketplace plugins
 

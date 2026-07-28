@@ -1,4 +1,7 @@
-import { getLayerChildren, resolveEditorPaneKind } from '@openenvx/core';
+import {
+  getLayerChildrenForScene,
+  resolveEditorPaneKind,
+} from '@openenvx/core';
 import type { Layer } from '@openenvx/core';
 import type { LayerPreviewDescriptor } from '@openenvx/preview';
 
@@ -40,7 +43,7 @@ export class EditorSliceBuilder {
             },
         commandCtx
       );
-      const childLayers = getLayerChildren(layer);
+      const childLayers = getLayerChildrenForScene(layer, scene);
       const children =
         childLayers.length > 0
           ? childLayers.map((child) => buildSurfaceItem(child))

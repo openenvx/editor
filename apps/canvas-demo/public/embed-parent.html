@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenEnvx embed parent</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      iframe {
+        border: 0;
+        display: block;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="studio" src="/?embed=1" title="OpenEnvx studio embed"></iframe>
+    <script>
+      const PANEL_ID = 'embed.demo';
+      const iframe = document.getElementById('studio');
+
+      function sendTree(targetOrigin) {
+        iframe.contentWindow.postMessage(
+          {
+            source: 'openenvx-embed-parent',
+            v: 1,
+            type: 'panel:tree',
+            payload: {
+              panelId: PANEL_ID,
+              root: {
+                type: 'Pane',
+                props: { id: PANEL_ID, title: 'Embed demo' },
+                children: [
+                  {
+                    type: 'Row',
+                    props: { label: 'Greeting' },
+                    children: [
+                      {
+                        type: 'Text',
+                        props: {
+                          key: 'note',
+                          label: 'Message',
+                          bind: `plugin.${PANEL_ID}.note`,
+                          value: 'Hello from parent',
+                        },
+                        children: [],
+                      },
+                      {
+                        type: 'Action',
+                        props: {
+                          label: 'Ping',
+                          onClick: { type: 'handler', handlerId: 'ping' },
+                        },
+                        children: [],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+          targetOrigin
+        );
+      }
+
+      window.addEventListener('message', (event) => {
+        if (event.source !== iframe.contentWindow) {
+          return;
+        }
+        if (event.data?.source !== 'openenvx-embed' || event.data?.v !== 1) {
+          return;
+        }
+        if (event.data.type === 'panel:context') {
+          sendTree(event.origin);
+          return;
+        }
+        if (event.data.type === 'panel:event') {
+          console.info('[embed-parent] panel:event', event.data.payload);
+        }
+      });
+    </script>
+  </body>
+</html>

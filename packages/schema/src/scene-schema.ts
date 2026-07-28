@@ -76,6 +76,12 @@ function build(o: typeof z.object) {
       .enum(['locked', 'free', 'content', 'properties'])
       .default('free')
       .describe('Template write permission mode.'),
+    allowedDataKeys: z
+      .array(z.string())
+      .optional()
+      .describe(
+        'When writeMode is content, optional allowlist of editable data keys.'
+      ),
   };
 
   const canvasRectData = o({
@@ -197,6 +203,17 @@ function build(o: typeof z.object) {
         }),
         type: z.literal('canvas.group'),
       }),
+      o({
+        ...layerBase,
+        data: o({
+          componentId: z.string().describe('Id of scene.components entry.'),
+          overrides: z
+            .record(z.string(), z.record(z.string(), z.unknown()))
+            .optional()
+            .describe('Optional data overrides keyed by definition layer id.'),
+        }),
+        type: z.literal('canvas.instance'),
+      }),
       // Plugin escape hatch — must be last; builtin type strings are excluded
       // so invalid builtin payloads cannot fall through to this branch.
       o({
@@ -216,12 +233,26 @@ function build(o: typeof z.object) {
     ])
   );
 
+  const pageGuide = o({
+    id: z.string().describe('Unique guide identifier.'),
+    orientation: z
+      .enum(['horizontal', 'vertical'])
+      .describe('Guide axis orientation.'),
+    position: z
+      .number()
+      .describe('Position in artboard pixels (x vertical, y horizontal).'),
+  });
+
   const page = o({
     backgroundColor: z
       .string()
       .optional()
       .describe('Artboard background for export.'),
     dpi: z.number().optional().describe('Dots per inch for print.'),
+    guides: z
+      .array(pageGuide)
+      .optional()
+      .describe('User-placed ruler guides in artboard pixels.'),
     height: z.number().optional().describe('Page height in page units.'),
     id: z.string().describe('Unique page identifier.'),
     layers: z
@@ -274,11 +305,24 @@ function build(o: typeof z.object) {
     version: z.literal(1).default(1),
   });
 
+  const sceneComponent = o({
+    id: z.string().describe('Component id.'),
+    layers: z
+      .array(layer)
+      .default([])
+      .describe('Definition layers relative to instance transform.'),
+    name: z.string().optional().describe('Display name.'),
+  });
+
   const scene = o({
     assets: z
       .record(z.string(), sceneAsset)
       .optional()
       .describe('Inline assets keyed by id.'),
+    components: z
+      .record(z.string(), sceneComponent)
+      .optional()
+      .describe('Reusable component definitions for canvas.instance layers.'),
     pages: z
       .array(page)
       .default([])

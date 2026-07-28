@@ -100,4 +100,31 @@ describe('createCanvasInspectorHostContext', () => {
 
     expect(executeCommand).toHaveBeenCalledWith('canvas.rotateLeft');
   });
+
+  it('reads and writes active page bleed/safe via commands', () => {
+    const scene = createSceneWithLayer();
+    const executeCommand = vi.fn();
+    const ctx = createCanvasInspectorHostContext({
+      scene,
+      activePageId: 'page-1',
+      selectedLayerId: null,
+      layerData: null,
+      updateProperty: vi.fn(),
+      executeCommand,
+      updateLayerTransform: vi.fn(),
+    });
+
+    expect(ctx.readPath('scene.activePage.bleedMm')).toBe(0);
+    expect(ctx.readPath('scene.activePage.safeMm')).toBe(0);
+
+    ctx.writePath('scene.activePage.bleedMm', 3);
+    ctx.writePath('scene.activePage.safeMm', 10);
+
+    expect(executeCommand).toHaveBeenCalledWith('canvas.setBleedMm', {
+      bleedMm: 3,
+    });
+    expect(executeCommand).toHaveBeenCalledWith('canvas.setSafeMm', {
+      safeMm: 10,
+    });
+  });
 });

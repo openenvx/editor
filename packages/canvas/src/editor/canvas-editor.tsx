@@ -157,7 +157,6 @@ export const CanvasEditor = memo(
       }));
     const [rulerSettings, setRulerSettings] =
       useState<CanvasRulerGuidesSettingsSnapshot>(() => ({
-        guidesByPageId: {},
         showRulers: true,
       }));
     const [, setViewportTick] = useState(0);
@@ -189,29 +188,29 @@ export const CanvasEditor = memo(
     }, [rulerGuidesService]);
 
     const pageGuides = useMemo(
-      (): readonly UserGuide[] => rulerSettings.guidesByPageId[page.id] ?? [],
-      [page.id, rulerSettings.guidesByPageId]
+      (): readonly UserGuide[] => page.guides ?? [],
+      [page.guides]
     );
 
     const handleAddGuide = useCallback(
       (guide: { orientation: UserGuideOrientation; position: number }) => {
-        rulerGuidesService?.addGuide(page.id, guide);
+        void host.executeCommand('canvas.addGuide', guide);
       },
-      [page.id, rulerGuidesService]
+      [host]
     );
 
     const handleMoveGuide = useCallback(
       (guideId: string, position: number) => {
-        rulerGuidesService?.moveGuide(page.id, guideId, position);
+        void host.executeCommand('canvas.moveGuide', { guideId, position });
       },
-      [page.id, rulerGuidesService]
+      [host]
     );
 
     const handleRemoveGuide = useCallback(
       (guideId: string) => {
-        rulerGuidesService?.removeGuide(page.id, guideId);
+        void host.executeCommand('canvas.removeGuide', { guideId });
       },
-      [page.id, rulerGuidesService]
+      [host]
     );
 
     containerSizeRef.current = containerSize;

@@ -2,10 +2,10 @@ import type { EditorState } from '@tiptap/pm/state';
 import type { Editor } from '@tiptap/react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
-import { StarterKit } from '@tiptap/starter-kit';
 
 import { HtmlRichTextBubbleMenuToolbar } from './html-rich-text-bubble-menu';
 import { normalizeCommittedRichTextHtml } from './normalize-committed-rich-text-html';
+import { createRichTextEditorExtensions } from './rich-text-editor-extensions';
 
 import styles from './html-editor-pane.module.css';
 
@@ -53,16 +53,7 @@ export function HtmlRichTextEditor({
         return true;
       },
     },
-    extensions: [
-      StarterKit.configure({
-        blockquote: false,
-        bulletList: false,
-        codeBlock: false,
-        heading: false,
-        horizontalRule: false,
-        orderedList: false,
-      }),
-    ],
+    extensions: createRichTextEditorExtensions(),
     onBlur: ({ editor: activeEditor }) => {
       onCommit(normalizeCommittedRichTextHtml(activeEditor.getHTML()));
     },
