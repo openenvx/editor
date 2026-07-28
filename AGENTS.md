@@ -55,8 +55,8 @@ Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `driver-i
 Published packages:
 
 - **`@openenvx/schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](PUBLISHING.md).
-- **`@xmazu/openenvxee-plugin-protocol`** — declarative embed panel protocol (`h`, jsx runtimes, `validatePluginTree`, message types). Ships `dist/`; same dev export pattern as schema.
-- **`@xmazu/openenvxee-studio`** — product fat bundle. Build inlines `@xmazu/openenvxee-workbench`, `@openenvx/canvas`, `@xmazu/openenvxee-canvas-pro`, `@openenvx/agent`, `@openenvx/driver-image`, and their `@openenvx/*` deps into `dist/`. Re-exports `@openenvx/core` + `@openenvx/headless` so host apps can author plugins without private workspace packages. Published `exports` resolve to `dist/` only.
+- **`@xmazu/openenvxee-plugin-protocol`** — declarative embed panel protocol (`h`, jsx runtimes, `validatePluginTree`, message types). Ships `dist/`; published `exports` are dist-only (see [PUBLISHING.md](PUBLISHING.md)).
+- **`@xmazu/openenvxee-studio`** — product fat bundle. Build inlines `@xmazu/openenvxee-workbench`, `@openenvx/canvas`, `@xmazu/openenvxee-canvas-pro`, `@openenvx/agent`, `@openenvx/driver-image`, and their `@openenvx/*` deps into `dist/`. Re-exports `@openenvx/core` + `@openenvx/headless` so host apps can author plugins without private workspace packages. Published `exports` resolve to `dist/` only. Monorepo apps that need `src/` HMR alias studio in Vite/tsconfig (see `apps/canvas-demo`).
 
 ## Code conventions
 

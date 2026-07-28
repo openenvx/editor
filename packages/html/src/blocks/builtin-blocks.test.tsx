@@ -151,6 +151,10 @@ describe('builtinBlocks', () => {
 
     rerender(legacyContainerBlock.render({ data: {} }));
     rerender(rootBlock.render({ data: {} }));
+    const root = document.querySelector(
+      '[style*="max-width"]'
+    ) as HTMLElement | null;
+    expect(root?.style.maxWidth).toBe('720px');
     unmount();
   });
 });

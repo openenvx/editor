@@ -22,6 +22,21 @@ const workspacePackages = [
 export default defineConfig(() => ({
   plugins: [react()],
   resolve: {
+    // Published exports are dist-only; alias to src in this monorepo for HMR.
+    alias: {
+      '@xmazu/openenvxee-studio/theme.css': path.resolve(
+        monorepoRoot,
+        'packages/studio/src/theme.css'
+      ),
+      '@xmazu/openenvxee-studio/fonts.css': path.resolve(
+        monorepoRoot,
+        'packages/studio/src/fonts.css'
+      ),
+      '@xmazu/openenvxee-studio': path.resolve(
+        monorepoRoot,
+        'packages/studio/src/index.ts'
+      ),
+    },
     dedupe: workspacePackages,
   },
   optimizeDeps: {

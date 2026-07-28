@@ -1,15 +1,46 @@
 .pane {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   min-height: 0;
+  overflow: hidden;
+  background: var(--wb-canvas-field, #e4e4e9);
+  color: var(--wb-foreground, #18181b);
+  font-family: var(--wb-font-sans, Inter, system-ui, -apple-system, sans-serif);
+}
+
+.toolbarHost {
+  position: absolute;
+  top: var(--wb-space-3, 12px);
+  left: 50%;
+  z-index: 10;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toolbarHost > * {
+  pointer-events: auto;
+}
+
+.stage {
+  flex: 1;
+  min-height: 0;
   overflow: auto;
-  padding: 24px;
-  background: #f1f5f9;
-  color: #0f172a;
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    sans-serif;
+  padding: 64px 48px 48px;
+}
+
+.artboardSlot {
+  margin: 0 auto;
+  overflow: hidden;
+  /* Width set inline to frameWidth * zoom so the scaled page stays proportional. */
+}
+
+.artboard {
+  transform-origin: top left;
+  min-height: 480px;
+  background: var(--wb-card, #ffffff);
+  box-shadow: var(--wb-shadow-sm, 0 1px 3px rgb(0 0 0 / 8%));
 }
 
 .palettePanel {

@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { getNestedValue } from '@openenvx/headless';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -184,6 +185,66 @@ describe('HtmlEditorPane', () => {
       });
       renderWithWorkbench(api, <HtmlEditorPane />);
       expect(screen.getByText('No html.root block on this page.')).toBeTruthy();
+    } finally {
+      dispose();
+    }
+  });
+
+  it('switches device frame width from the preview toolbar', async () => {
+    const user = userEvent.setup();
+    const { api, dispose } = await createHtmlWorkbench();
+    try {
+      renderWithWorkbench(api, <HtmlEditorPane />);
+
+      const zoomSelect = screen.getByRole('combobox', {
+        name: 'Zoom',
+      }) as HTMLSelectElement;
+      expect(zoomSelect.value).toBe('1');
+
+      expect(screen.getByRole('toolbar', { name: 'Device preview' })).toBeTruthy();
+
+      const artboard = screen.getByTestId('html-artboard');
+      expect(artboard.dataset.device).toBe('fluid');
+
+      await user.click(screen.getByRole('button', { name: 'Mobile' }));
+      expect(artboard.dataset.device).toBe('mobile');
+      expect(artboard.style.width).toBe('390px');
+
+      await user.click(screen.getByRole('button', { name: 'Desktop' }));
+      expect(artboard.dataset.device).toBe('desktop');
+      expect(artboard.style.width).toBe('1280px');
+
+      await user.click(screen.getByRole('button', { name: 'Fit width' }));
+      expect(artboard.dataset.device).toBe('fluid');
+
+      await user.click(screen.getByRole('button', { name: 'Desktop' }));
+      await user.click(screen.getByRole('button', { name: 'Zoom in' }));
+      expect(artboard.style.width).toBe(`${1280 * 1.1}px`);
+
+      await user.click(screen.getByRole('button', { name: 'Zoom out' }));
+      expect(
+        (screen.getByRole('combobox', { name: 'Zoom' }) as HTMLSelectElement)
+          .value
+      ).toBe('1');
+
+      await user.selectOptions(
+        screen.getByRole('combobox', { name: 'Zoom' }),
+        '0.25'
+      );
+      expect(
+        (screen.getByRole('combobox', { name: 'Zoom' }) as HTMLSelectElement)
+          .value
+      ).toBe('0.25');
+      expect(artboard.style.width).toBe('320px');
+
+      await user.selectOptions(
+        screen.getByRole('combobox', { name: 'Zoom' }),
+        'auto'
+      );
+      expect(
+        (screen.getByRole('combobox', { name: 'Zoom' }) as HTMLSelectElement)
+          .value
+      ).toBe('auto');
     } finally {
       dispose();
     }

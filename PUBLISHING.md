@@ -50,7 +50,7 @@ bun add @openenvx/schema --registry https://registry.openenvx.com
 
 ## `@xmazu/openenvxee-plugin-protocol`
 
-Published shape matches schema: `dist/` only on the default `import` condition; monorepo resolves `src/` via `development` / `bun`.
+Published shape is **dist-only** on every export condition (no `development` / `bun` → `src/` — those files are not in the tarball).
 
 Subpath exports:
 
@@ -92,12 +92,7 @@ Studio is the **published product bundle**. Internally:
 
 `tsup` sets `noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/]`, so those packages are compiled into `dist/index.js`. Studio also re-exports `@openenvx/core` and `@openenvx/headless` so host apps can author plugins (`Plugin`, `Command`, `PersistenceService`, …) without installing private workspace packages. Published `package.json` must not list any `@openenvx/*` or `@xmazu/openenvxee-*` runtime dependency.
 
-Workspace packages stay in `devDependencies` for types while building the bundle. Export conditions:
-
-| Condition | Resolves to | Who |
-| --- | --- | --- |
-| `development` / `bun` | `src/` | Monorepo apps (`customConditions: ["development"]`) — same type identity as workspace `@openenvx/*` |
-| `import` / `default` / `types` | `dist/` | Published consumers (openenvx-cloud, etc.) |
+Workspace packages stay in `devDependencies` for types while building the bundle. Published `exports` are **dist-only** (`types` / `import` / `default` → `dist/`). Do not add `development` / `bun` → `src/` — `src/` is not shipped in the npm tarball and breaks Vite consumers.
 
 Install:
 
