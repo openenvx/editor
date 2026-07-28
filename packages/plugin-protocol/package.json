@@ -1,0 +1,60 @@
+{
+  "name": "@openenvx/plugin-protocol",
+  "version": "0.1.0",
+  "description": "Declarative plugin panel protocol — JSON tree, h/jsx runtime, message union",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "bun": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./jsx-runtime": {
+      "development": "./src/jsx-runtime.ts",
+      "bun": "./src/jsx-runtime.ts",
+      "types": "./dist/jsx-runtime.d.ts",
+      "import": "./dist/jsx-runtime.js",
+      "default": "./dist/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "development": "./src/jsx-dev-runtime.ts",
+      "bun": "./src/jsx-dev-runtime.ts",
+      "types": "./dist/jsx-dev-runtime.d.ts",
+      "import": "./dist/jsx-dev-runtime.js",
+      "default": "./dist/jsx-dev-runtime.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "prepack": "bun run build",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@openenvx/typescript-config": "workspace:*",
+    "tsup": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:testing"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.openenvx.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openenvx/openenvx.git",
+    "directory": "packages/plugin-protocol"
+  },
+  "bugs": {
+    "url": "https://github.com/openenvx/openenvx/issues"
+  },
+  "homepage": "https://openenvx.dev"
+}

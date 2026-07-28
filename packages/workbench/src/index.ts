@@ -125,3 +125,25 @@ export {
   VERSION_HISTORY_RESTORE_COMMAND_ID,
   type RestoreVersionArgs,
 } from './version-history/restore-version-command';
+
+export {
+  PluginPanelPlugin,
+  type PluginPanelPluginOptions,
+} from './plugin-panel/plugin-panel-plugin';
+export {
+  PluginPanel,
+  type PluginPanelProps,
+} from './plugin-panel/plugin-panel';
+export type { PluginPanelTransport } from './plugin-panel/plugin-panel-transport';
+export { createPostMessagePluginPanelTransport } from './plugin-panel/create-post-message-plugin-panel-transport';
+export type { PostMessagePluginPanelTransportOptions } from './plugin-panel/create-post-message-plugin-panel-transport';
+export {
+  validatePluginTree,
+  MAX_PLUGIN_TREE_NODES,
+  MAX_PLUGIN_TREE_JSON_CHARS,
+  type PluginTreeValidationResult,
+} from '@openenvx/plugin-protocol';
+export {
+  PluginTreeRenderer,
+  type PluginTreeRendererProps,
+} from './plugin-panel/plugin-tree-renderer';

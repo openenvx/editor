@@ -10,7 +10,8 @@
       "@openenvx/headless": ["../headless/src/index.ts"],
       "@openenvx/headless/react": ["../headless/src/react/workbench-context.tsx"],
       "@openenvx/schema": ["../schema/src/index.ts"],
-      "@openenvx/preview": ["../preview/src/index.ts"]
+      "@openenvx/preview": ["../preview/src/index.ts"],
+      "@openenvx/plugin-protocol": ["../plugin-protocol/src/index.ts"]
     }
   }
 }

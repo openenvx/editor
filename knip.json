@@ -34,6 +34,10 @@
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
+    "packages/plugin-protocol": {
+      "entry": ["src/index.ts!", "src/jsx-runtime.ts!", "src/jsx-dev-runtime.ts!"],
+      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
+    },
     "packages/preview": {
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]

@@ -1,10 +1,11 @@
 # Publishing
 
-Two packages leave this monorepo:
+Three packages leave this monorepo:
 
 | Package | Registry | What ships |
 | --- | --- | --- |
 | `@openenvx/schema` | `registry.openenvx.com` (public) | Built `dist/` + `scene.schema.json` |
+| `@openenvx/plugin-protocol` | `registry.openenvx.com` (public) | Declarative panel tree + `h`/jsx runtime (no React) |
 | `@xmazu/openenvxee-studio` | `registry.openenvx.com` (restricted) | Single bundled `dist/` (inlines workbench, canvas, canvas-pro, agent, driver-image, and their `@openenvx/*` deps) |
 
 Everything else stays workspace-private and resolves from `src/` during local development.
@@ -46,6 +47,34 @@ To go back to the registry version:
 bun unlink @openenvx/schema
 bun add @openenvx/schema --registry https://registry.openenvx.com
 ```
+
+## `@openenvx/plugin-protocol`
+
+Published shape matches schema: `dist/` only on the default `import` condition; monorepo resolves `src/` via `development` / `bun`.
+
+Subpath exports:
+
+- `@openenvx/plugin-protocol` — types, `h`, elements, message unions
+- `@openenvx/plugin-protocol/jsx-runtime` — TS/JSX automatic runtime
+- `@openenvx/plugin-protocol/jsx-dev-runtime` — dev runtime (same as production)
+
+Install:
+
+```bash
+bun add @openenvx/plugin-protocol --registry https://registry.openenvx.com
+```
+
+Local dev with `bun link`:
+
+```bash
+# In editor-core
+bun run link:plugin-protocol
+
+# In the consuming project
+bun link @openenvx/plugin-protocol
+```
+
+For iframe embeds, use `createPostMessagePluginPanelTransport` from `@xmazu/openenvxee-workbench` with an explicit `allowedOrigins` (and `targetOrigin` when more than one origin is listed). `PluginPanel` trusts whatever the transport delivers; it does not validate `postMessage` origins by itself.
 
 ## `@xmazu/openenvxee-studio`
 
@@ -106,21 +135,22 @@ import '@xmazu/openenvxee-studio/fonts.css';
 ## Release workflow
 
 ```bash
-# 1. Add a changeset for schema and/or studio
+# 1. Add a changeset for schema, plugin-protocol, and/or studio
 bun run changeset
 
 # 2. Version + changelog
 bun run version-packages
 
-# 3. Build, publish both packages, tag
+# 3. Build, publish all published packages, tag
 bun run release
 ```
 
 Dry-run pack checks:
 
 ```bash
-bun run verify-pack          # schema + studio
+bun run verify-pack          # schema + plugin-protocol + studio
 bun run verify-pack:schema
+bun run verify-pack:plugin-protocol
 bun run verify-pack:studio
 ```
 
@@ -128,5 +158,6 @@ Publish individually:
 
 ```bash
 bun run publish-package:schema
+bun run publish-package:plugin-protocol
 bun run publish-package:studio
 ```

@@ -9,7 +9,7 @@ Package boundaries and contribution flow for the monorepo.
 | **Rendering-only** | `schema`, `canvas` | Embed `CanvasStage` in a custom React app with own state. No plugin host. |
 | **Editor backbone** | `core`, `headless`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
 | **Workbench UI** | `workbench` | React shell (`WorkbenchShell`); workspace-private. |
-| **Published product** | `studio` (+ `schema`) | Fat bundle of workbench + canvas + canvas-pro + agent + driver-image into `dist`. |
+| **Published product** | `studio` (+ `schema`, `plugin-protocol`) | Fat bundle of workbench + canvas + canvas-pro + agent + driver-image into `dist`; protocol also published standalone for embed panel authors. |
 | **HTML studio** | `html`, `html-studio` | Puck-style block editor + thin studio re-exports (workspace-private). |
 
 **Hard rule:** All canvas code lives in `@openenvx/canvas`. Not in `core`. HTML block editing lives in `@openenvx/html`.
@@ -33,6 +33,7 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 | Tier | Packages | License / publish (intent) | Responsibility |
 | --- | --- | --- | --- |
 | Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives (commands, layers, page rules, services, property field data) |
+| Embed protocol | `plugin-protocol` | Published (public) | Declarative plugin panel JSON tree, `h`/jsx runtime, `postMessage` message unions, `validatePluginTree` caps |
 | Product libs | `headless`, `canvas`, `html`, `driver-*`, `workbench`, `canvas-pro`, `agent`, `html-studio` | Private (workspace) | Workbench runtime, canvas engine, HTML block editor, export drivers, React shell, pro chrome, agent |
 | Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + canvas-pro + agent + driver-image |
 
@@ -92,6 +93,15 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 - `WorkbenchLayout`, `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
 - `WorkbenchProvider`, `useWorkbenchContext` (React bridge)
 - `createInspectorHostContext`, `InspectorPathResolver`, `LayerPropertiesPaneFactory`, `InspectorPath`
+
+## What belongs in `@openenvx/plugin-protocol`
+
+- Declarative panel vocabulary (`PLUGIN_ELEMENT_TYPES`, element tokens, `PluginNode` tree shape)
+- `h` / jsx runtimes for building serializable trees (handler props → ids via `beginRender` / `endRender`)
+- `HostToParentMessage` / `ParentToHostMessage` unions for embed transports
+- `validatePluginTree` — size and element-type caps before host render (no React)
+
+Host rendering (`PluginPanel`, `PluginTreeRenderer`, `createPostMessagePluginPanelTransport`) lives in `@xmazu/openenvxee-workbench`.
 
 ## What belongs in `@xmazu/openenvxee-workbench`
 
