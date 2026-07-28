@@ -20,25 +20,17 @@ export const headingBlock: BlockConfig = {
     color: { kind: 'color', label: 'Color' },
   },
   defaultData: { html: 'Heading', level: '2', color: '#111827' },
-  render: ({ data }) => {
+  render: ({ data, children }) => {
     const html = String(data.html ?? '');
     const level = String(data.level ?? '2');
     const color = String(data.color ?? '#111827');
     const style = { margin: '0 0 0.5rem', color } as const;
-    switch (level) {
-      case '1': {
-        return <h1 dangerouslySetInnerHTML={{ __html: html }} style={style} />;
-      }
-      case '3': {
-        return <h3 dangerouslySetInnerHTML={{ __html: html }} style={style} />;
-      }
-      case '4': {
-        return <h4 dangerouslySetInnerHTML={{ __html: html }} style={style} />;
-      }
-      default: {
-        return <h2 dangerouslySetInnerHTML={{ __html: html }} style={style} />;
-      }
+    const Tag =
+      level === '1' ? 'h1' : level === '3' ? 'h3' : level === '4' ? 'h4' : 'h2';
+    if (children) {
+      return <Tag style={style}>{children}</Tag>;
     }
+    return <Tag dangerouslySetInnerHTML={{ __html: html }} style={style} />;
   },
 };
 
@@ -50,16 +42,22 @@ export const textBlock: BlockConfig = {
     color: { kind: 'color', label: 'Color' },
   },
   defaultData: { html: 'Paragraph text', color: '#374151' },
-  render: ({ data }) => (
-    <div
-      dangerouslySetInnerHTML={{ __html: String(data.html ?? '') }}
-      style={{
-        margin: '0 0 0.75rem',
-        lineHeight: 1.5,
-        color: String(data.color ?? '#374151'),
-      }}
-    />
-  ),
+  render: ({ data, children }) => {
+    const style = {
+      margin: '0 0 0.75rem',
+      lineHeight: 1.5,
+      color: String(data.color ?? '#374151'),
+    };
+    if (children) {
+      return <div style={style}>{children}</div>;
+    }
+    return (
+      <div
+        dangerouslySetInnerHTML={{ __html: String(data.html ?? '') }}
+        style={style}
+      />
+    );
+  },
 };
 
 export const imageBlock: BlockConfig = {

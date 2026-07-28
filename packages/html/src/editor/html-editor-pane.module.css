@@ -138,6 +138,7 @@
 }
 
 .blockEditableHit {
+  display: contents;
   cursor: text;
 }
 
@@ -210,20 +211,34 @@
 }
 
 .editorHost {
-  width: 100%;
+  display: contents;
+}
+
+.editorHost :global(.ProseMirror) {
+  cursor: text;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
   outline: none;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  white-space: inherit;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-.editorHost :global(.ProseMirror) {
-  width: 100%;
-  outline: none;
+.editorHost :global(.ProseMirror p) {
   margin: 0;
-  min-height: 1.2em;
 }
 
-.editorHost :global(.ProseMirror p) {
+/* TipTap may have left a solitary <p> in heading HTML from older edits. */
+.pane :is(h1, h2, h3, h4) p {
   margin: 0;
 }
 

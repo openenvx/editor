@@ -75,7 +75,7 @@ export function createHtmlDemoScene(): Scene {
                   id: 'text-1',
                   type: 'html.text',
                   data: {
-                    html: 'Drag blocks from the left palette into Flex or Grid. Double-click text to edit. Right-click for the context menu.',
+                    html: 'Drag blocks from the left palette into Flex or Grid. Click text to edit. Right-click for the context menu.',
                     color: '#374151',
                   },
                 },

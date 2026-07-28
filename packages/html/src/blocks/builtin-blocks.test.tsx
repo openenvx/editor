@@ -34,6 +34,29 @@ describe('builtinBlocks', () => {
     expect(screen.getByRole('heading', { level: 2 })).toBeTruthy();
   });
 
+  it('wraps edit children in the same heading/text chrome', () => {
+    const { rerender, unmount } = render(
+      headingBlock.render({
+        data: { html: 'Title', level: '1', color: '#fff' },
+        children: <span data-testid="edit">edit</span>,
+      })
+    );
+    const h1 = screen.getByRole('heading', { level: 1 });
+    expect(h1.querySelector('[data-testid="edit"]')).toBeTruthy();
+    expect(h1.getAttribute('style')).toMatch(/color:/);
+
+    rerender(
+      textBlock.render({
+        data: { html: 'Body', color: '#aabbcc' },
+        children: <span data-testid="edit">edit</span>,
+      })
+    );
+    expect(screen.getByTestId('edit').parentElement?.getAttribute('style')).toContain(
+      'color'
+    );
+    unmount();
+  });
+
   it('renders text, image, and container blocks', () => {
     const { unmount } = render(
       textBlock.render({ data: { html: '<p>Paragraph</p>' } })

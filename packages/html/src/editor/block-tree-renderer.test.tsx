@@ -1,5 +1,5 @@
 import { DndContext } from '@dnd-kit/core';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createHtmlDemoScene } from '../create-html-demo-scene';
@@ -84,12 +84,12 @@ describe('BlockTreeRenderer', () => {
     expect(onRemove).toHaveBeenCalledWith('heading-1');
   });
 
-  it('starts slot edit on double-click of hero headline', () => {
+  it('starts slot edit on click of hero headline', () => {
     const onStartEdit = vi.fn();
     const onSelect = vi.fn();
     renderTree({ onSelect, onStartEdit });
 
-    fireEvent.doubleClick(screen.getByText('Welcome'));
+    fireEvent.click(screen.getByText('Welcome'));
     expect(onSelect).toHaveBeenCalledWith('hero-1');
     expect(onStartEdit).toHaveBeenCalledWith(
       'hero-1',
@@ -97,14 +97,47 @@ describe('BlockTreeRenderer', () => {
     );
   });
 
-  it('starts edit on double-click of a plain text block', () => {
+  it('starts edit on click of a plain text block', () => {
     const onStartEdit = vi.fn();
     const onSelect = vi.fn();
     renderTree({ onSelect, onStartEdit });
 
-    fireEvent.doubleClick(screen.getByText('Below the hero'));
+    fireEvent.click(screen.getByText('Below the hero'));
     expect(onSelect).toHaveBeenCalledWith('heading-1');
     expect(onStartEdit).toHaveBeenCalledWith('heading-1', 'html');
+  });
+
+  it('keeps heading level chrome while editing', async () => {
+    renderTree({
+      editingTarget: { hostId: 'heading-1', dataPath: 'html' },
+    });
+
+    await waitFor(() => {
+      expect(document.querySelector('[contenteditable="true"]')).toBeTruthy();
+    });
+
+    const editable = document.querySelector(
+      '[contenteditable="true"]'
+    ) as HTMLElement;
+    expect(editable.closest('h2')).toBeTruthy();
+  });
+
+  it('keeps slot heading chrome while editing', async () => {
+    renderTree({
+      editingTarget: {
+        hostId: 'hero-1',
+        dataPath: 'slots.headline.0.data.html',
+      },
+    });
+
+    await waitFor(() => {
+      expect(document.querySelector('[contenteditable="true"]')).toBeTruthy();
+    });
+
+    const editable = document.querySelector(
+      '[contenteditable="true"]'
+    ) as HTMLElement;
+    expect(editable.closest('h1')).toBeTruthy();
   });
 
   it('selects via Enter on a block wrap', () => {

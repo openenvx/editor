@@ -325,14 +325,6 @@ function SlotPartContent({
     (event: MouseEvent) => {
       event.stopPropagation();
       onSelect(hostId);
-    },
-    [hostId, onSelect]
-  );
-
-  const handleDoubleClick = useCallback(
-    (event: MouseEvent) => {
-      event.stopPropagation();
-      onSelect(hostId);
       if (textBlock && editable) {
         onStartEdit(hostId, dataPath);
       }
@@ -366,26 +358,26 @@ function SlotPartContent({
     return null;
   }
 
-  if (editing && textBlock && editable) {
-    return (
-      <HtmlRichTextEditor
-        html={String(data.html ?? '')}
-        onCommit={handleCommit}
-      />
-    );
-  }
-
   if (textBlock && editable) {
     return (
       <div
         className={styles.blockEditableHit}
         role="button"
         tabIndex={selectedId === hostId ? 0 : -1}
-        onClick={handleClick}
-        onDoubleClick={handleDoubleClick}
-        onKeyDown={handleKeyDown}
+        onClick={editing ? undefined : handleClick}
+        onKeyDown={editing ? undefined : handleKeyDown}
       >
-        {config.render({ data })}
+        {editing
+          ? config.render({
+              data,
+              children: (
+                <HtmlRichTextEditor
+                  html={String(data.html ?? '')}
+                  onCommit={handleCommit}
+                />
+              ),
+            })
+          : config.render({ data })}
       </div>
     );
   }
@@ -450,14 +442,6 @@ function BlockContent({
     (event: MouseEvent) => {
       event.stopPropagation();
       onSelect(layer.id);
-    },
-    [layer.id, onSelect]
-  );
-
-  const handleEditableDoubleClick = useCallback(
-    (event: MouseEvent) => {
-      event.stopPropagation();
-      onSelect(layer.id);
       onStartEdit(layer.id, 'html');
     },
     [layer.id, onSelect, onStartEdit]
@@ -489,10 +473,17 @@ function BlockContent({
 
   if (editing && textBlock && editable) {
     return (
-      <HtmlRichTextEditor
-        html={String(data.html ?? '')}
-        onCommit={handleCommit}
-      />
+      <div className={styles.blockEditableHit}>
+        {config.render({
+          data,
+          children: (
+            <HtmlRichTextEditor
+              html={String(data.html ?? '')}
+              onCommit={handleCommit}
+            />
+          ),
+        })}
+      </div>
     );
   }
 
@@ -503,7 +494,6 @@ function BlockContent({
         role="button"
         tabIndex={0}
         onClick={handleEditableClick}
-        onDoubleClick={handleEditableDoubleClick}
         onKeyDown={handleEditableKeyDown}
       >
         {config.render({ data })}
@@ -524,7 +514,8 @@ function isEditingLayer(
   editingTarget: BlockEditTarget | null,
   layerId: string
 ): boolean {
-  return editingTarget?.hostId === layerId && editingTarget.dataPath === 'html';
+  // Any in-place edit on this host (plain `html` or slot path) — disables grab cursor.
+  return editingTarget?.hostId === layerId;
 }
 
 function SortableBlockNode({

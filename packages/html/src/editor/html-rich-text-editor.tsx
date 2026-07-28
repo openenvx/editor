@@ -5,6 +5,7 @@ import { BubbleMenu } from '@tiptap/react/menus';
 import { StarterKit } from '@tiptap/starter-kit';
 
 import { HtmlRichTextBubbleMenuToolbar } from './html-rich-text-bubble-menu';
+import { normalizeCommittedRichTextHtml } from './normalize-committed-rich-text-html';
 
 import styles from './html-editor-pane.module.css';
 
@@ -48,7 +49,7 @@ export function HtmlRichTextEditor({
         }
         event.preventDefault();
         event.stopPropagation();
-        onCommit(view.dom.innerHTML || html);
+        onCommit(normalizeCommittedRichTextHtml(view.dom.innerHTML || html));
         return true;
       },
     },
@@ -63,7 +64,7 @@ export function HtmlRichTextEditor({
       }),
     ],
     onBlur: ({ editor: activeEditor }) => {
-      onCommit(activeEditor.getHTML());
+      onCommit(normalizeCommittedRichTextHtml(activeEditor.getHTML()));
     },
     onCreate: ({ editor: activeEditor }) => {
       activeEditor
