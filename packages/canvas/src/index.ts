@@ -51,6 +51,7 @@ export { computeArtboardOffset, type ArtboardOffset } from './artboard-offset';
 export { useContainerSize, type ContainerSize } from './use-container-size';
 export {
   layoutRichText,
+  measureRichTextContentSize,
   measureRichTextHeight,
   parseRichTextHtml,
   type PositionedSpan,
@@ -97,6 +98,13 @@ export {
   type ImageEdgeAnchor,
 } from './image-resize';
 export { DEFAULT_MIN_FONT_SIZE, fitFontSize } from './fit-font-size';
+export {
+  applyModificationsWithTextFit,
+  fitCanvasTextLayerToContent,
+  fitSceneCanvasTextToContent,
+  type FitTextLayerMode,
+  type FitTextLayerOptions,
+} from './fit-text-layer-to-content';
 export {
   computeImageFitLayout,
   type ImageFitBox,

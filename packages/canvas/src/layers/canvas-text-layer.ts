@@ -17,6 +17,7 @@ import { createDefaultTransform } from '@openenvx/schema';
 import { z } from 'zod';
 
 import { CanvasFontServiceId } from '../canvas-service-tokens';
+import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';
 import { createSeedFontCatalog } from '../fonts/canvas-font-catalog';
 import {
   DEFAULT_RICH_TEXT_FILL,
@@ -98,12 +99,15 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
   }
 
   createDefault(id: string, _page: Page): Layer {
-    return {
-      data: { ...DEFAULT_MODEL },
-      id,
-      transform: { ...createDefaultTransform(), height: 48, width: 240 },
-      type: this.type,
-    };
+    return fitCanvasTextLayerToContent(
+      {
+        data: { ...DEFAULT_MODEL },
+        id,
+        transform: { ...createDefaultTransform(), height: 48, width: 240 },
+        type: this.type,
+      },
+      { mode: 'box' }
+    );
   }
 
   serialize(layer: Layer): CanvasTextModel {

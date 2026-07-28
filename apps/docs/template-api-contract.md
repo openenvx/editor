@@ -74,9 +74,10 @@ Unknown `name` values are skipped (no error from `applyModifications`). Prefer v
 2. For each modification, find the first layer whose trimmed `name` matches.
 3. Apply field mutations as above.
 4. **Auto-fit and image-fit are layout/render-time**, not applied inside `applyModifications`:
-   - Text: when `data.autoFit === 'shrink'`, renderers call `fitFontSize(measureFn, boxHeight, minFontSize, fontSize)` so content stays inside the fixed transform box (`packages/canvas/src/fit-font-size.ts`).
+   - Text shrink: when `data.autoFit === 'shrink'`, renderers call `fitFontSize(measureFn, boxHeight, minFontSize, fontSize)` so content stays inside the fixed transform box (`packages/canvas/src/fit-font-size.ts`).
+   - Text box grow (editor / preview): after injecting copy, call `applyModificationsWithTextFit` from `@openenvx/canvas` (or `fitSceneCanvasTextToContent` on an already-resolved scene) so `transform.height` matches the wrapped content at the template width. Skips `autoFit: 'shrink'` and curved text. Pure `applyModifications` alone does not remasure.
    - Image: `data.fit` is `cover | contain | fill` with optional `data.focalPoint: { x, y }` in 0..1 (`packages/canvas/src/image-fit.ts`). Absent `fit` = legacy stretch (`fill`).
-5. Export/render the resolved scene with the same fit algorithms so canvas preview and server output match.
+5. Export/render the resolved scene with the same fit algorithms so canvas preview and server output match. For cloud render of non-shrink text, remasure with `applyModificationsWithTextFit` (or equivalent) before rasterizing if the box should hug injected copy.
 
 ## Cloud API sketch
 
@@ -102,7 +103,7 @@ Server steps:
 2. Optionally `GET` equivalent: return `extractTemplateManifest(scene)` for form builders.
 3. If `validateTemplateNames(scene).duplicates.length > 0` → `400` with duplicate names.
 4. Reject unknown modification names (recommended) or skip them.
-5. `const resolved = applyModifications(scene, modifications)`.
+5. `const resolved = applyModificationsWithTextFit(scene, modifications)` (or `applyModifications` then `fitSceneCanvasTextToContent` when you need the pure schema step separately).
 6. Render resolved scene (reuse export-service / driver-image). Honor shrink-to-fit and image fit during rasterization.
 
 ## End-to-end example

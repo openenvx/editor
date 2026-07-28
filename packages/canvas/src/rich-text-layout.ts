@@ -696,6 +696,74 @@ export function measureRichTextHeight(options: {
   return Math.ceil(Math.max(spanLineHeight, konvaBottom, domHeight ?? 0));
 }
 
+/** Probe width large enough that only explicit newlines wrap. */
+const INTRINSIC_WIDTH_PROBE = 100_000;
+
+/**
+ * Natural content size: width is the longest unwrapped line, height is the
+ * laid-out height at that width (or at `maxWidth` when the line is longer).
+ */
+export function measureRichTextContentSize(options: {
+  html: string;
+  fontSize: number;
+  fontFamily: string;
+  align?: 'left' | 'center' | 'right';
+  lineHeightMultiplier?: number;
+  letterSpacing?: number;
+  maxWidth?: number;
+}): { width: number; height: number } {
+  const lineHeightMultiplier =
+    options.lineHeightMultiplier ?? RICH_TEXT_LINE_HEIGHT_MULTIPLIER;
+  const letterSpacing =
+    options.letterSpacing ?? DEFAULT_RICH_TEXT_LETTER_SPACING;
+
+  const spans = layoutRichText({
+    align: 'left',
+    fontFamily: options.fontFamily,
+    fontSize: options.fontSize,
+    html: options.html,
+    letterSpacing,
+    lineHeightMultiplier,
+    width: INTRINSIC_WIDTH_PROBE,
+  });
+
+  let contentWidth = 0;
+  for (const span of spans) {
+    contentWidth = Math.max(
+      contentWidth,
+      span.x +
+        measureRichTextWidth(
+          span.text,
+          options.fontSize,
+          options.fontFamily,
+          span.style,
+          letterSpacing
+        )
+    );
+  }
+
+  if (contentWidth <= 0) {
+    contentWidth = options.fontSize;
+  }
+
+  let width = Math.ceil(contentWidth);
+  if (options.maxWidth !== undefined) {
+    width = Math.min(width, Math.max(1, options.maxWidth));
+  }
+
+  const height = measureRichTextHeight({
+    align: options.align,
+    fontFamily: options.fontFamily,
+    fontSize: options.fontSize,
+    html: options.html,
+    letterSpacing,
+    lineHeightMultiplier,
+    width,
+  });
+
+  return { height, width };
+}
+
 export function layoutRichText(options: {
   html: string;
   width: number;

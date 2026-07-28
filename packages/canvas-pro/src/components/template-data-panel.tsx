@@ -1,10 +1,10 @@
+import { applyModificationsWithTextFit } from '@openenvx/canvas';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
 import type { Modification, Scene, TemplateField } from '@openenvx/schema';
 import {
-  applyModifications,
   createEmptyScene,
   extractTemplateManifest,
   validateTemplateNames,
@@ -85,7 +85,10 @@ export const TemplateDataPanel = memo(() => {
           mod.fontSize !== undefined ||
           mod.hidden !== undefined
       );
-      const resolved = applyModifications(baseSceneRef.current, mods);
+      const resolved = applyModificationsWithTextFit(
+        baseSceneRef.current,
+        mods
+      );
       previewingRef.current = true;
       setPreviewing(true);
       if (!valuesEqualScene(api.scene.getScene(), resolved)) {

@@ -8,8 +8,8 @@ import type { CommandContext, Layer } from '@openenvx/core';
 import { createDefaultTransform } from '@openenvx/schema';
 
 import { CanvasClipboardServiceId } from '../canvas-service-tokens';
+import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';
 import { CanvasTextLayer } from '../layers/canvas-text-layer';
-import { measureRichTextHeight } from '../rich-text-layout';
 import type { CanvasClipboardService } from './canvas-clipboard-service';
 import {
   cloneLayers,
@@ -25,7 +25,7 @@ import {
 import type { ExternalClipboardPayload } from './read-external-clipboard';
 
 const DUPLICATE_OFFSET = { x: 10, y: 10 };
-const DEFAULT_TEXT_WIDTH = 320;
+const MAX_PASTED_TEXT_WIDTH = 320;
 
 function getClipboardService(
   ctx: CommandContext
@@ -102,23 +102,22 @@ async function layersFromExternalPayload(
       createLayerId('text'),
       page
     );
-    const width = DEFAULT_TEXT_WIDTH;
-    const height = measureRichTextHeight({
-      align: payload.model.align,
-      fontFamily: payload.model.fontFamily ?? 'Inter, sans-serif',
-      fontSize: payload.model.fontSize ?? 24,
-      html: payload.model.html,
-      width,
-    });
     layer.data = payload.model;
-    layer.transform = {
-      ...createDefaultTransform(),
-      x: anchor.x,
-      y: anchor.y,
-      width,
-      height,
-    };
-    return [layer];
+    const fitted = fitCanvasTextLayerToContent(
+      {
+        ...layer,
+        data: payload.model,
+        transform: {
+          ...createDefaultTransform(),
+          x: anchor.x,
+          y: anchor.y,
+          width: MAX_PASTED_TEXT_WIDTH,
+          height: 48,
+        },
+      },
+      { maxWidth: MAX_PASTED_TEXT_WIDTH, mode: 'box' }
+    );
+    return [fitted];
   }
 
   const layer = await service.createImageLayerFromExternalPaste(page, anchor, {
