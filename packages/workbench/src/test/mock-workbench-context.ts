@@ -69,6 +69,32 @@ export function createMockWorkbenchApi(
       state.revision += 1;
       notify();
     },
+    setPrimarySidebarVisible: (visible: boolean) => {
+      state.layout = { ...state.layout, primarySidebar: visible };
+      state.revision += 1;
+      notify();
+    },
+    setActivityBarVisible: (visible: boolean) => {
+      state.layout = { ...state.layout, activityBar: visible };
+      state.revision += 1;
+      notify();
+    },
+    setSecondarySidebarVisible: (visible: boolean) => {
+      state.layout = { ...state.layout, secondarySidebar: visible };
+      state.revision += 1;
+      notify();
+    },
+    togglePrimarySidebar: () => {
+      api.setPrimarySidebarVisible(!state.layout.primarySidebar);
+    },
+    toggleActivityBar: () => {
+      api.setActivityBarVisible(!state.layout.activityBar);
+    },
+    toggleSecondarySidebar: () => {
+      api.setSecondarySidebarVisible(!state.layout.secondarySidebar);
+    },
+    moveContainer: vi.fn(),
+    setContainerOrder: vi.fn(),
     setHoveredLayer: (layerId: string | null) => {
       if (state.interaction.hoveredLayerId === layerId) {
         return;

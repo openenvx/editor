@@ -1,7 +1,12 @@
 import { AgentChatPlugin } from './plugin/agent-plugin';
 
 export { AgentChatPlugin } from './plugin/agent-plugin';
-export { AgentChatContainer } from './contributions/agent-sidebar-contribution';
+export {
+  AgentChatContainer,
+  AgentChatView,
+  AGENT_CHAT_VIEW_ID,
+  AGENT_CHAT_PANEL_COMPONENT_ID,
+} from './contributions/agent-sidebar-contribution';
 export { ChatPanel } from './components/chat-panel';
 export { AgentTaskBoard } from './components/agent-task-board';
 export { ProposalCard } from './components/proposal-card';

@@ -123,11 +123,10 @@ function ComponentViewBody({
   return <Component />;
 }
 
-export function resolveViewPanels(
-  registered: ViewPanelRegistration[] | undefined,
-  extra: Record<string, ComponentType> | undefined
+function resolveViewPanels(
+  registered: ViewPanelRegistration[] | undefined
 ): Record<string, ComponentType> {
-  const map: Record<string, ComponentType> = { ...extra };
+  const map: Record<string, ComponentType> = {};
   for (const entry of registered ?? []) {
     map[entry.id] = entry.Component as ComponentType;
   }
@@ -137,18 +136,16 @@ export function resolveViewPanels(
 export function ViewContainerViews({
   container,
   createHostContext,
-  viewPanels: extraViewPanels,
 }: {
   container: ViewContainerDescriptor;
   createHostContext?: CreateInspectorHostContext;
-  viewPanels?: Record<string, ComponentType>;
 }) {
   const registeredViewPanels = useWorkbenchContextSelector(
     (state) => state.viewPanels
   );
   const viewPanels = useMemo(
-    () => resolveViewPanels(registeredViewPanels ?? undefined, extraViewPanels),
-    [extraViewPanels, registeredViewPanels]
+    () => resolveViewPanels(registeredViewPanels ?? undefined),
+    [registeredViewPanels]
   );
 
   const treeViews = container.views.filter((v) => v.content.kind === 'tree');

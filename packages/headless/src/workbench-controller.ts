@@ -62,8 +62,11 @@ import type {
   InteractionSlice,
   SceneSlice,
 } from './workbench-state-cache';
+import { ShellUiServiceId } from './workbench/shell-ui-service-id';
 import { ViewLocationService } from './workbench/view-location-service';
 import { DEFAULT_WORKBENCH_LAYOUT } from './workbench/workbench-layout';
+import type { WorkbenchLayoutSnapshot } from './workbench/workbench-layout-store';
+import { WorkbenchLayoutStoreId } from './workbench/workbench-layout-store-id';
 
 type Listener = (state: WorkbenchState) => void;
 
@@ -94,6 +97,7 @@ export class WorkbenchController {
     string,
     WorkbenchContributionDisposable[]
   >();
+  private applyingLayoutSnapshot = false;
 
   constructor(private readonly options: WorkbenchControllerOptions) {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
@@ -138,6 +142,7 @@ export class WorkbenchController {
     const keys = this.runtime.getContextKeys();
     keys.setContext('workbench.floatingToolbar', this.layout.floatingToolbar);
     keys.setContext('workbench.statusBar', this.layout.statusBar);
+    keys.setContext('workbench.activityBar', this.layout.activityBar);
     keys.setContext('workbench.primarySidebar', this.layout.primarySidebar);
     keys.setContext('workbench.secondarySidebar', this.layout.secondarySidebar);
     keys.setContext('workbench.editorArea', this.layout.editorArea);
@@ -148,6 +153,16 @@ export class WorkbenchController {
       openDocument: (uri) => this.openDocument(uri),
       save: () => this.save(),
       saveAs: (uri) => this.saveAs(uri),
+    });
+    this.getService(ShellUiServiceId)?.bindLayoutHost({
+      setActivityBarVisible: (visible) => this.setActivityBarVisible(visible),
+      toggleActivityBar: () => this.toggleActivityBar(),
+      setPrimarySidebarVisible: (visible) =>
+        this.setPrimarySidebarVisible(visible),
+      togglePrimarySidebar: () => this.togglePrimarySidebar(),
+      setSecondarySidebarVisible: (visible) =>
+        this.setSecondarySidebarVisible(visible),
+      toggleSecondarySidebar: () => this.toggleSecondarySidebar(),
     });
   }
 
@@ -234,6 +249,16 @@ export class WorkbenchController {
         this.setActiveContainer(location, containerId),
       moveContainer: (containerId, location) =>
         this.moveContainer(containerId, location),
+      setContainerOrder: (location, orderedIds) =>
+        this.setContainerOrder(location, orderedIds),
+      setActivityBarVisible: (visible) => this.setActivityBarVisible(visible),
+      toggleActivityBar: () => this.toggleActivityBar(),
+      setPrimarySidebarVisible: (visible) =>
+        this.setPrimarySidebarVisible(visible),
+      togglePrimarySidebar: () => this.togglePrimarySidebar(),
+      setSecondarySidebarVisible: (visible) =>
+        this.setSecondarySidebarVisible(visible),
+      toggleSecondarySidebar: () => this.toggleSecondarySidebar(),
       selectViewItem: (viewId, item) => this.selectViewItem(viewId, item),
       serializeScene: () => this.serializeScene(),
       undo: () => this.undo(),
@@ -267,6 +292,7 @@ export class WorkbenchController {
       this.manager.getRegistries(),
       this.runtime
     );
+    await this.restoreLayoutSnapshot();
     this.notify();
   }
 
@@ -409,8 +435,175 @@ export class WorkbenchController {
 
   moveContainer(containerId: string, location: ViewContainerLocation): void {
     this.locationService.moveContainer(containerId, location);
+    this.locationService.setActiveContainer(location, containerId);
+    if (location === 'primary' && !this.layout.primarySidebar) {
+      this.layout.primarySidebar = true;
+      this.syncLayoutContextKeys();
+      this.stateCache.invalidateChrome();
+    }
+    if (location === 'secondary' && !this.layout.secondarySidebar) {
+      this.layout.secondarySidebar = true;
+      this.syncLayoutContextKeys();
+      this.stateCache.invalidateChrome();
+    }
     this.stateCache.invalidateSceneContent();
     this.notify();
+    this.persistLayoutSnapshot();
+  }
+
+  setContainerOrder(
+    location: ViewContainerLocation,
+    orderedIds: string[]
+  ): void {
+    this.locationService.setContainerOrder(location, orderedIds);
+    this.stateCache.invalidateSceneContent();
+    this.notify();
+    this.persistLayoutSnapshot();
+  }
+
+  setActivityBarVisible(visible: boolean): void {
+    if (this.layout.activityBar === visible) {
+      return;
+    }
+    this.layout.activityBar = visible;
+    this.syncLayoutContextKeys();
+    this.stateCache.invalidateChrome();
+    this.notify();
+    this.persistLayoutSnapshot();
+  }
+
+  toggleActivityBar(): void {
+    this.setActivityBarVisible(!this.layout.activityBar);
+  }
+
+  setPrimarySidebarVisible(visible: boolean): void {
+    if (this.layout.primarySidebar === visible) {
+      return;
+    }
+    this.layout.primarySidebar = visible;
+    this.syncLayoutContextKeys();
+    this.stateCache.invalidateChrome();
+    this.notify();
+    this.persistLayoutSnapshot();
+  }
+
+  togglePrimarySidebar(): void {
+    this.setPrimarySidebarVisible(!this.layout.primarySidebar);
+  }
+
+  setSecondarySidebarVisible(visible: boolean): void {
+    if (this.layout.secondarySidebar === visible) {
+      return;
+    }
+    this.layout.secondarySidebar = visible;
+    this.syncLayoutContextKeys();
+    this.stateCache.invalidateChrome();
+    this.notify();
+    this.persistLayoutSnapshot();
+  }
+
+  toggleSecondarySidebar(): void {
+    this.setSecondarySidebarVisible(!this.layout.secondarySidebar);
+  }
+
+  private getLayoutStore() {
+    return (
+      this.options.layoutStore ??
+      this.getService(WorkbenchLayoutStoreId) ??
+      null
+    );
+  }
+
+  private buildLayoutSnapshot(): WorkbenchLayoutSnapshot {
+    const primary = this.locationService.getActiveContainer('primary');
+    const secondary = this.locationService.getActiveContainer('secondary');
+    return {
+      locations: { ...this.locationService.getViewLocations() },
+      orders: this.locationService.getOrders(),
+      visibility: {
+        activityBar: this.layout.activityBar,
+        primarySidebar: this.layout.primarySidebar,
+        secondarySidebar: this.layout.secondarySidebar,
+      },
+      activeByLocation: {
+        ...(primary ? { primary } : {}),
+        ...(secondary ? { secondary } : {}),
+      },
+    };
+  }
+
+  private applyLayoutSnapshot(snapshot: WorkbenchLayoutSnapshot): void {
+    this.applyingLayoutSnapshot = true;
+    try {
+      this.applyLayoutSnapshotInner(snapshot);
+    } finally {
+      this.applyingLayoutSnapshot = false;
+    }
+  }
+
+  private applyLayoutSnapshotInner(snapshot: WorkbenchLayoutSnapshot): void {
+    const { visibility, locations, orders } = snapshot;
+    if (visibility.activityBar !== undefined) {
+      this.layout.activityBar = visibility.activityBar;
+    }
+    if (visibility.primarySidebar !== undefined) {
+      this.layout.primarySidebar = visibility.primarySidebar;
+    }
+    if (visibility.secondarySidebar !== undefined) {
+      this.layout.secondarySidebar = visibility.secondarySidebar;
+    }
+    for (const [containerId, location] of Object.entries(locations)) {
+      if (location === 'primary' || location === 'secondary') {
+        this.moveContainer(containerId, location);
+      }
+    }
+    if (orders) {
+      for (const location of ['primary', 'secondary'] as const) {
+        const orderedIds = orders[location];
+        if (orderedIds) {
+          this.locationService.setContainerOrder(location, orderedIds);
+        }
+      }
+    }
+    const { activeByLocation } = snapshot;
+    if (activeByLocation) {
+      for (const location of ['primary', 'secondary'] as const) {
+        const containerId = activeByLocation[location];
+        if (
+          containerId &&
+          this.locationService.hasContainer(containerId) &&
+          this.locationService.getLocation(containerId) === location
+        ) {
+          this.locationService.setActiveContainer(location, containerId);
+        }
+      }
+    }
+    this.syncLayoutContextKeys();
+    this.stateCache.invalidateChrome();
+    this.stateCache.invalidateSceneContent();
+  }
+
+  private async restoreLayoutSnapshot(): Promise<void> {
+    const store = this.getLayoutStore();
+    if (!store) {
+      return;
+    }
+    const snapshot = await store.load();
+    if (!snapshot) {
+      return;
+    }
+    this.applyLayoutSnapshot(snapshot);
+  }
+
+  private persistLayoutSnapshot(): void {
+    if (this.applyingLayoutSnapshot) {
+      return;
+    }
+    const store = this.getLayoutStore();
+    if (!store) {
+      return;
+    }
+    void store.save(this.buildLayoutSnapshot());
   }
 
   updateProperty(layerId: string, key: string, value: unknown): void {

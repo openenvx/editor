@@ -68,6 +68,9 @@ export {
 export {
   DefaultWorkbenchChromePlugin,
   DEFAULT_WORKBENCH_CHROME_PLUGIN_ID,
+  WORKBENCH_TOGGLE_ACTIVITY_BAR_COMMAND_ID,
+  WORKBENCH_TOGGLE_PRIMARY_SIDEBAR_COMMAND_ID,
+  WORKBENCH_TOGGLE_SECONDARY_SIDEBAR_COMMAND_ID,
 } from './views/default-workbench-chrome-plugin';
 export {
   LayersTreeProvider,
@@ -92,10 +95,10 @@ export {
   DropdownMenuTrigger,
 } from './primitives/dropdown-menu';
 export { InspectorPanel } from './layout/inspector-panel';
+export { createLocalStorageWorkbenchLayoutStore } from './layout/local-storage-workbench-layout-store';
 export {
   ActivitySidebar,
   type ActivitySidebarProps,
-  type SidebarPanelComponent,
 } from './layout/activity-sidebar';
 export { ConfirmDialog } from './primitives/confirm-dialog';
 export { Select } from './primitives/select';

@@ -92,7 +92,9 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 - Workbench contribution points: `Toolbar`, `CommandPalette`, `ViewContainer`, `View`, `ContextMenu`, `StatusBar`, `Overlay`, `InspectorPane`
 - Provider registries: `ViewProviderRegistry`, `FieldRendererRegistry`, `StatusBarItemRendererRegistry`, `EditorPaneRegistry`
 - Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `InspectorPaneBuilder`
-- `WorkbenchLayout`, `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
+- `WorkbenchLayout` (includes independent `activityBar` / `primarySidebar` / `secondarySidebar`), mutable via `WorkbenchApi` / `ShellUiService`
+- `WorkbenchLayoutStore` (optional host persistence for visibility + view-container locations)
+- `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
 - `WorkbenchProvider`, `useWorkbenchContext` (React bridge)
 - `createInspectorHostContext`, `InspectorPathResolver`, `LayerPropertiesPaneFactory`, `InspectorPath`
 
@@ -158,10 +160,15 @@ flowchart TB
 
 `DEFAULT_WORKBENCH_LAYOUT` in `@openenvx/headless` replaces the removed `DEFAULT_CANVAS_LAYOUT` from `@openenvx/canvas`.
 
-| Field | `DEFAULT_WORKBENCH_LAYOUT` | Legacy `DEFAULT_CANVAS_LAYOUT` |
+| Field | `DEFAULT_WORKBENCH_LAYOUT` | Canvas Pro `DEFAULT_CANVAS_LAYOUT` |
 | --- | --- | --- |
+| `activityBar` | `true` | `true` |
+| `primarySidebar` | `true` | `true` |
+| `secondarySidebar` | `true` | `true` |
 | `floatingToolbar` | `false` | `true` |
 | Other parts | all enabled | all enabled |
+
+Layout visibility is mutable at runtime (`toggleActivityBar` / `togglePrimarySidebar` / `toggleSecondarySidebar`). View containers move between primary and secondary via `api.moveContainer` (panel header menu). Pass optional `layoutStore` (or register `WorkbenchLayoutStoreId`) to persist visibility + locations across reloads.
 
 Set `layout: { floatingToolbar: true }` on `WorkbenchController` when migrating toolbar items that use `when: 'workbench.floatingToolbar'`.
 

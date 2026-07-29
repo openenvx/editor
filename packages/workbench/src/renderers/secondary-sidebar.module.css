@@ -13,6 +13,16 @@
 }
 
 .tabsHeader {
+  display: flex;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wb-space-2);
   padding: var(--wb-space-2) var(--wb-space-3);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }

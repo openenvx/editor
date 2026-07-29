@@ -156,19 +156,16 @@ activateWorkbench(ctx) {
 
 Duplicate kinds overwrite earlier registrations so enterprise plugins activating later can replace OSS defaults.
 
-`WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). Enterprise `@xmazu/openenvxee-canvas-pro` adds canvas-only chrome (`CanvasProPlugin`, `CanvasTemplatePlugin`). Wire the Template data panel in the app shell:
+`WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). Enterprise `@xmazu/openenvxee-canvas-pro` adds canvas-only chrome (`CanvasProPlugin`, `CanvasTemplatePlugin`). Custom React panels register from a workbench plugin:
 
 ```ts
-import {
-  TEMPLATE_DATA_CONTAINER_ID,
-  TemplateDataPanel,
-} from '@xmazu/openenvxee-canvas-pro';
-
-<WorkbenchShell
-  sidebarPanels={{ [TEMPLATE_DATA_CONTAINER_ID]: TemplateDataPanel }}
-  // …
-/>
+activateWorkbench(ctx) {
+  ctx.registerWorkbench(new MyContainer(), new MyView()); // View.componentId set
+  ctx.registerViewPanel('my.panel', MyPanel);
+}
 ```
+
+Include `CanvasTemplatePlugin` / `AgentChatPlugin` (or `DEFAULT_STUDIO_PLUGINS`) and the panels appear automatically.
 
 Cloud / render API contract for named-layer modifications: [template-api-contract.md](./template-api-contract.md).
 

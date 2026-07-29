@@ -36,6 +36,7 @@ import type {
 } from './workbench/inspector-pane-registration';
 import type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
 import type { WorkbenchLayout } from './workbench/workbench-layout';
+import type { WorkbenchLayoutStore } from './workbench/workbench-layout-store';
 
 export interface ViewTreeItem {
   id: string;
@@ -142,6 +143,16 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
     containerId: string
   ) => void;
   moveContainer: (containerId: string, location: ViewContainerLocation) => void;
+  setContainerOrder: (
+    location: ViewContainerLocation,
+    orderedIds: string[]
+  ) => void;
+  setActivityBarVisible: (visible: boolean) => void;
+  toggleActivityBar: () => void;
+  setPrimarySidebarVisible: (visible: boolean) => void;
+  togglePrimarySidebar: () => void;
+  setSecondarySidebarVisible: (visible: boolean) => void;
+  toggleSecondarySidebar: () => void;
   getService: <T>(token: ServiceId<T>) => T | undefined;
   /**
    * Register workbench contributions at runtime (e.g. external panel:manifest).
@@ -167,4 +178,5 @@ export interface WorkbenchControllerOptions {
   editorUri?: string;
   editorTitle?: string;
   layout?: Partial<WorkbenchLayout>;
+  layoutStore?: WorkbenchLayoutStore;
 }

@@ -41,7 +41,20 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
         ctx.locationService
       )
     )
-    .toSorted((a, b) => a.sidebarOrder - b.sidebarOrder);
+    .toSorted((a, b) => {
+      if (a.location === b.location) {
+        const order = ctx.locationService.getOrder(a.location);
+        const indexA = order.indexOf(a.id);
+        const indexB = order.indexOf(b.id);
+        if (indexA !== -1 && indexB !== -1) {
+          return indexA - indexB;
+        }
+      }
+      if (a.sidebarGroup !== b.sidebarGroup) {
+        return a.sidebarGroup - b.sidebarGroup;
+      }
+      return a.sidebarOrder - b.sidebarOrder;
+    });
 
   const inspectorViews = buildInspectorViews(
     workbenchRegistries,

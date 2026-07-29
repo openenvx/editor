@@ -143,10 +143,17 @@ export {
   DEFAULT_WORKBENCH_LAYOUT,
   type WorkbenchLayout,
 } from './workbench/workbench-layout';
+export type {
+  WorkbenchLayoutSnapshot,
+  WorkbenchLayoutStore,
+} from './workbench/workbench-layout-store';
+export { WorkbenchLayoutStoreId } from './workbench/workbench-layout-store-id';
+export { mergePrimaryContainerOrder } from './workbench/merge-primary-container-order';
 export { ShellUiServiceId } from './workbench/shell-ui-service-id';
 export {
   ShellUiServiceImpl,
   type ShellUiService,
+  type WorkbenchLayoutHost,
 } from './workbench/shell-ui-service';
 export type {
   EditorPaneHostProps,

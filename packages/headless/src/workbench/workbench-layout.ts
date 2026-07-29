@@ -1,4 +1,5 @@
 export enum WorkbenchPart {
+  ActivityBar = 'activityBar',
   PrimarySidebar = 'primarySidebar',
   EditorArea = 'editorArea',
   SecondarySidebar = 'secondarySidebar',
@@ -6,6 +7,7 @@ export enum WorkbenchPart {
 }
 
 export interface WorkbenchLayout {
+  activityBar: boolean;
   primarySidebar: boolean;
   editorArea: boolean;
   secondarySidebar: boolean;
@@ -14,6 +16,7 @@ export interface WorkbenchLayout {
 }
 
 export const DEFAULT_WORKBENCH_LAYOUT: WorkbenchLayout = {
+  activityBar: true,
   editorArea: true,
   /** Defaults to false. Canvas Pro and legacy `DEFAULT_CANVAS_LAYOUT` used `true`. */
   floatingToolbar: false,

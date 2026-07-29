@@ -14,7 +14,7 @@ import type {
   WorkbenchControllerOptions,
 } from '@openenvx/headless';
 import type { Scene } from '@openenvx/schema';
-import type { ComponentType, MutableRefObject, ReactNode } from 'react';
+import type { MutableRefObject, ReactNode } from 'react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import { EditorViewportProvider } from '../context/editor-viewport-context';
@@ -33,10 +33,7 @@ import { useWorkbench } from '../hooks/use-workbench';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { workbenchI18n } from '../i18n/workbench-i18n';
 import { WorkbenchI18nProvider } from '../i18n/workbench-i18n-provider';
-import {
-  ActivitySidebar,
-  type SidebarPanelComponent,
-} from '../layout/activity-sidebar';
+import { ActivitySidebar } from '../layout/activity-sidebar';
 import { CanvasChrome } from '../layout/canvas-chrome';
 import { EditorLayout } from '../layout/editor-layout';
 import { CommandPaletteRenderer } from '../renderers/command-palette-renderer';
@@ -67,6 +64,7 @@ export interface WorkbenchShellProps {
   editorUri?: string;
   editorTitle?: string;
   layout?: WorkbenchControllerOptions['layout'];
+  layoutStore?: WorkbenchControllerOptions['layoutStore'];
   showEditorArea?: boolean;
   onOpenDocument?: () => Promise<string | undefined>;
   onSaveAs?: () => Promise<string | undefined>;
@@ -81,9 +79,6 @@ export interface WorkbenchShellProps {
     layerSurface: LayerSurfaceItem[];
     editorPaneKind: string;
   }) => ReactNode;
-  sidebarPanels?: Record<string, SidebarPanelComponent>;
-  /** Extra React panels keyed by view `componentId`. */
-  viewPanels?: Record<string, ComponentType>;
 }
 
 const ChromeRegion = memo(
@@ -190,12 +185,8 @@ const EditorRegion = memo(
 const SidebarRegion = memo(
   ({
     createInspectorHostContext,
-    sidebarPanels,
-    viewPanels,
   }: {
     createInspectorHostContext?: WorkbenchShellProps['createInspectorHostContext'];
-    sidebarPanels?: Record<string, SidebarPanelComponent>;
-    viewPanels?: WorkbenchShellProps['viewPanels'];
   }) => {
     const viewContainers = useWorkbenchContextSelector(
       (state) => state.viewContainers
@@ -205,7 +196,12 @@ const SidebarRegion = memo(
     );
     const layout = useWorkbenchContextSelector((state) => state.layout);
 
-    if (!layout?.primarySidebar || !contextMenu || !viewContainers) {
+    if (
+      !layout ||
+      !(layout.activityBar || layout.primarySidebar) ||
+      !contextMenu ||
+      !viewContainers
+    ) {
       return null;
     }
 
@@ -213,9 +209,7 @@ const SidebarRegion = memo(
       <ActivitySidebar
         contextMenuItems={contextMenu}
         createInspectorHostContext={createInspectorHostContext}
-        customPanels={sidebarPanels}
         viewContainers={viewContainers}
-        viewPanels={viewPanels}
       />
     );
   }
@@ -245,15 +239,9 @@ const LayoutRegion = memo(
     showEditorArea,
     renderEditorPane,
     createInspectorHostContext,
-    sidebarPanels,
-    viewPanels,
   }: Pick<
     WorkbenchShellProps,
-    | 'showEditorArea'
-    | 'renderEditorPane'
-    | 'createInspectorHostContext'
-    | 'sidebarPanels'
-    | 'viewPanels'
+    'showEditorArea' | 'renderEditorPane' | 'createInspectorHostContext'
   >) => {
     const layout = useWorkbenchContextSelector((state) => state.layout);
     if (!layout) {
@@ -271,14 +259,11 @@ const LayoutRegion = memo(
         inspector={
           <SecondarySidebarRenderer
             createInspectorHostContext={createInspectorHostContext}
-            viewPanels={viewPanels}
           />
         }
         primarySidebar={
           <SidebarRegion
             createInspectorHostContext={createInspectorHostContext}
-            sidebarPanels={sidebarPanels}
-            viewPanels={viewPanels}
           />
         }
         statusBar={<StatusBarRegion />}
@@ -415,13 +400,12 @@ export function WorkbenchShell({
   editorUri,
   editorTitle,
   layout,
+  layoutStore,
   showEditorArea = true,
   onOpenDocument,
   onSaveAs,
   createInspectorHostContext,
   renderEditorPane,
-  sidebarPanels,
-  viewPanels,
 }: WorkbenchShellProps) {
   const [activeTheme, setActiveTheme] = useState(theme);
   const [prevThemeProp, setPrevThemeProp] = useState(theme);
@@ -473,9 +457,10 @@ export function WorkbenchShell({
       editorUri,
       initialScene,
       layout,
+      layoutStore,
       plugins: resolvedPlugins,
     }),
-    [editorTitle, editorUri, initialScene, layout, resolvedPlugins]
+    [editorTitle, editorUri, initialScene, layout, layoutStore, resolvedPlugins]
   );
 
   const { api, ready } = useWorkbench(workbenchOptions);
@@ -559,8 +544,6 @@ export function WorkbenchShell({
                   createInspectorHostContext={createInspectorHostContext}
                   renderEditorPane={renderEditorPane}
                   showEditorArea={showEditorArea}
-                  sidebarPanels={sidebarPanels}
-                  viewPanels={viewPanels}
                 />
               </div>
             </EditorViewportProvider>

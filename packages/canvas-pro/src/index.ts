@@ -16,7 +16,10 @@ export { CanvasCommandPaletteItems } from './contributions/canvas-command-palett
 export { CanvasContextMenu } from './contributions/canvas-context-menu';
 export {
   CanvasTemplateContainer,
+  CanvasTemplateView,
   TEMPLATE_DATA_CONTAINER_ID,
+  TEMPLATE_DATA_VIEW_ID,
+  TEMPLATE_DATA_PANEL_COMPONENT_ID,
 } from './contributions/canvas-template-contribution';
 export { TemplateDataPanel } from './components/template-data-panel';
 export { CanvasTemplatePlugin } from './plugin/canvas-template-plugin';

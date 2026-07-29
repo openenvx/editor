@@ -1,14 +1,11 @@
 import type { Plugin } from '@openenvx/core';
 import {
-  AGENT_CHAT_CONTAINER_ID,
-  ChatPanel,
   DEFAULT_STUDIO_PLUGINS,
-  TEMPLATE_DATA_CONTAINER_ID,
-  TemplateDataPanel,
   VersionHistoryPlugin,
   WorkbenchShell,
   createCanvasDemoScene,
   createCanvasInspectorHostContextWithApi,
+  createLocalStorageWorkbenchLayoutStore,
   createPostMessagePluginPanelTransport,
   DEFAULT_CANVAS_LAYOUT,
   PluginPanelPlugin,
@@ -22,6 +19,7 @@ import '@xmazu/openenvxee-studio/fonts.css';
 import '@xmazu/openenvxee-studio/theme.css';
 
 const EMBED_PANEL_ID = 'embed.demo';
+const LAYOUT_STORE_KEY = 'openenvx.canvas-demo.workbench-layout';
 
 function isEmbedMode(): boolean {
   return new URLSearchParams(window.location.search).get('embed') === '1';
@@ -63,6 +61,8 @@ function promptUri(message: string, defaultValue?: string): string | null {
   return window.prompt(message, defaultValue);
 }
 
+const layoutStore = createLocalStorageWorkbenchLayoutStore(LAYOUT_STORE_KEY);
+
 export function App() {
   return (
     <div className="canvas-demo-app">
@@ -73,15 +73,12 @@ export function App() {
         editorUri="openworkbench://canvas-demo"
         initialScene={createCanvasDemoScene()}
         layout={DEFAULT_CANVAS_LAYOUT}
+        layoutStore={layoutStore}
         onOpenDocument={async () => promptUri('Open document URI') ?? undefined}
         onSaveAs={async () =>
           promptUri('Save as URI', 'openworkbench://canvas-demo') ?? undefined
         }
         plugins={createPlugins()}
-        sidebarPanels={{
-          [AGENT_CHAT_CONTAINER_ID]: ChatPanel,
-          [TEMPLATE_DATA_CONTAINER_ID]: TemplateDataPanel,
-        }}
       />
       <style>{`
         html, body, #root { height: 100%; margin: 0; }

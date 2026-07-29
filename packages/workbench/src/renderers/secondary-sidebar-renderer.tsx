@@ -1,8 +1,22 @@
-import type { ComponentType } from 'react';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import {
+  SortableContext,
+  horizontalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
 import { memo, useMemo } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
+import {
+  sortableDragStyle,
+  useSortableContainerSensors,
+  useSortableOrderDragEnd,
+} from '../hooks/use-sortable-container-order';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
+import {
+  ViewContainerHeader,
+  ViewContainerMoveMenu,
+} from '../layout/view-container-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../primitives/tabs';
 import {
   type CreateInspectorHostContext,
@@ -13,14 +27,34 @@ import styles from './secondary-sidebar.module.css';
 
 export interface SecondarySidebarRendererProps {
   createInspectorHostContext?: CreateInspectorHostContext;
-  /** Extra view panels from the shell (merged with registered panels). */
-  viewPanels?: Record<string, ComponentType>;
+}
+
+function SortableTabTrigger({ id, title }: { id: string; title: string }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+  const style = sortableDragStyle(transform, transition, isDragging);
+  return (
+    <TabsTrigger
+      ref={setNodeRef}
+      style={style}
+      value={id}
+      {...attributes}
+      {...listeners}
+    >
+      {title}
+    </TabsTrigger>
+  );
 }
 
 export const SecondarySidebarRenderer = memo(
   ({
     createInspectorHostContext: createHostContextProp,
-    viewPanels: extraViewPanels,
   }: SecondarySidebarRendererProps) => {
     const { api } = useWorkbenchContext();
     const viewContainers = useWorkbenchContextSelector(
@@ -40,6 +74,15 @@ export const SecondarySidebarRenderer = memo(
         ),
       [viewContainers]
     );
+    const sortableIds = useMemo(
+      () => secondaryContainers.map((container) => container.id),
+      [secondaryContainers]
+    );
+
+    const sensors = useSortableContainerSensors();
+    const handleDragEnd = useSortableOrderDragEnd(sortableIds, (orderedIds) => {
+      api.setContainerOrder('secondary', orderedIds);
+    });
 
     if (!layout?.secondarySidebar || secondaryContainers.length === 0) {
       return null;
@@ -54,13 +97,20 @@ export const SecondarySidebarRenderer = memo(
         : secondaryContainers[0]!.id;
 
     if (secondaryContainers.length === 1) {
+      const container = secondaryContainers[0]!;
       return (
         <div className={styles.root}>
-          <ViewContainerViews
-            container={secondaryContainers[0]!}
-            createHostContext={createHostContextProp}
-            viewPanels={extraViewPanels}
+          <ViewContainerHeader
+            containerId={container.id}
+            location="secondary"
+            title={container.title}
           />
+          <div className={styles.body}>
+            <ViewContainerViews
+              container={container}
+              createHostContext={createHostContextProp}
+            />
+          </div>
         </div>
       );
     }
@@ -75,20 +125,36 @@ export const SecondarySidebarRenderer = memo(
           value={activeId}
         >
           <div className={styles.tabsHeader}>
-            <TabsList>
-              {secondaryContainers.map((container) => (
-                <TabsTrigger key={container.id} value={container.id}>
-                  {container.title}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              sensors={sensors}
+            >
+              <SortableContext
+                items={sortableIds}
+                strategy={horizontalListSortingStrategy}
+              >
+                <TabsList>
+                  {secondaryContainers.map((container) => (
+                    <SortableTabTrigger
+                      id={container.id}
+                      key={container.id}
+                      title={container.title}
+                    />
+                  ))}
+                </TabsList>
+              </SortableContext>
+            </DndContext>
+            <ViewContainerMoveMenu
+              containerId={activeId}
+              location="secondary"
+            />
           </div>
           {secondaryContainers.map((container) => (
             <TabsContent forceMount key={container.id} value={container.id}>
               <ViewContainerViews
                 container={container}
                 createHostContext={createHostContextProp}
-                viewPanels={extraViewPanels}
               />
             </TabsContent>
           ))}

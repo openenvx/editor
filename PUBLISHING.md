@@ -109,10 +109,7 @@ import {
   DEFAULT_CANVAS_LAYOUT,
   createCanvasDemoScene,
   createCanvasInspectorHostContextWithApi,
-  ChatPanel,
-  TemplateDataPanel,
-  AGENT_CHAT_CONTAINER_ID,
-  TEMPLATE_DATA_CONTAINER_ID,
+  createLocalStorageWorkbenchLayoutStore,
   // plugin authoring (from core, bundled + re-exported)
   Plugin,
   Command,
@@ -124,6 +121,8 @@ import {
 import '@xmazu/openenvxee-studio/theme.css';
 import '@xmazu/openenvxee-studio/fonts.css';
 ```
+
+Agent chat and Template data panels register via their plugins (`registerViewPanel` + `ViewContribution`).
 
 `@xmazu/openenvxee-workbench` is **not** published — compose from studio, or use workspace packages directly inside this monorepo (see `apps/demo-playground` for a minimal OSS shell without studio).
 
