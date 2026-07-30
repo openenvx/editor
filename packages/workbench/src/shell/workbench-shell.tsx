@@ -65,6 +65,12 @@ export interface WorkbenchShellProps {
   editorTitle?: string;
   layout?: WorkbenchControllerOptions['layout'];
   layoutStore?: WorkbenchControllerOptions['layoutStore'];
+  /**
+   * When true (default), embed/template write policy is enforced.
+   * Dashboard authoring should pass false so the Embed inspector tab appears
+   * and authors can edit locked layers freely.
+   */
+  enforceTemplatePolicy?: boolean;
   showEditorArea?: boolean;
   onOpenDocument?: () => Promise<string | undefined>;
   onSaveAs?: () => Promise<string | undefined>;
@@ -256,7 +262,7 @@ const LayoutRegion = memo(
             showEditorArea={showEditorArea ?? true}
           />
         }
-        inspector={
+        secondarySidebar={
           <SecondarySidebarRenderer
             createInspectorHostContext={createInspectorHostContext}
           />
@@ -401,6 +407,7 @@ export function WorkbenchShell({
   editorTitle,
   layout,
   layoutStore,
+  enforceTemplatePolicy,
   showEditorArea = true,
   onOpenDocument,
   onSaveAs,
@@ -455,12 +462,21 @@ export function WorkbenchShell({
     (): WorkbenchControllerOptions => ({
       editorTitle,
       editorUri,
+      enforceTemplatePolicy,
       initialScene,
       layout,
       layoutStore,
       plugins: resolvedPlugins,
     }),
-    [editorTitle, editorUri, initialScene, layout, layoutStore, resolvedPlugins]
+    [
+      editorTitle,
+      editorUri,
+      enforceTemplatePolicy,
+      initialScene,
+      layout,
+      layoutStore,
+      resolvedPlugins,
+    ]
   );
 
   const { api, ready } = useWorkbench(workbenchOptions);

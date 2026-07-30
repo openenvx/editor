@@ -18,7 +18,7 @@ flowchart LR
   subgraph host [Studio editor - trusted]
     Validate["validatePluginTree"]
     Mapper["mappers → builders"]
-    Render["InspectorContentRenderer"]
+    Render["PropertyContentRenderer"]
     Gate["allowedCommands + permission"]
     Validate --> Mapper --> Render
     Gate --> Commands["executeCommand"]
@@ -35,7 +35,7 @@ This is the VS Code webview / Figma widget model: **UI description + message bus
 |  | Internal | External |
 | --- | --- | --- |
 | Runs where | Same JS bundle as the editor | Other document / origin / Worker |
-| Authors with | OOP `Plugin` + fluent builders (`createInspectorPane`, `MenuBuilder`, …) | `h` / JSX → JSON tree (`@xmazu/openenvxee-plugin-protocol`) |
+| Authors with | OOP `Plugin` + fluent builders (`createPropertyPane`, `MenuBuilder`, …) | `h` / JSX → JSON tree (`@xmazu/openenvxee-plugin-protocol`) |
 | Trust | First-party | Must not execute arbitrary code in-editor |
 | Mutation path | Direct `ctx.register` / workbench API | Only `panel:command` through allowlist |
 | UI path | Builders → descriptors → renderers | Tree → validate → **same** mappers/builders → renderers |
@@ -59,8 +59,8 @@ Host pieces:
 - Transport: `createPostMessagePluginPanelTransport` (origin allowlist required)
 - Gate: `canRunPluginPanelCommand` (`permission === 'edit'` ∧ `allowedCommands`)
 - Validate: `validatePluginTree` (element whitelist, node/byte caps)
-- Map: `mapPluginTreeToInspectorPane`, chrome mappers, `createManifestContributions`
-- Render: `PluginPanel` → `InspectorContentRenderer`
+- Map: `mapPluginTreeToPropertyPane`, chrome mappers, `createManifestContributions`
+- Render: `PluginPanel` → `PropertyContentRenderer`
 
 ### What not to expose to third parties
 

@@ -34,7 +34,7 @@ Read **Architecture.md** (and **Plugin-boundaries.md** when touching embed/exter
 | Put it here | Examples |
 | --- | --- |
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
-| `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchPlugin`, workbench contributions (`ToolbarContribution`, `InspectorPaneContribution`, …), provider registries (`registerFieldRenderer`, …), `InspectorPaneBuilder`, `WorkbenchProvider`, `useWorkbenchContext` |
+| `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchPlugin`, workbench contributions (`ToolbarContribution`, `PropertyPaneContribution`, …), provider registries (`registerFieldRenderer`, …), `PropertyPaneBuilder`, `WorkbenchProvider`, `useWorkbenchContext` |
 | `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasBasicsPlugin`, `CanvasEditor`, `CanvasHostProvider` |
 | `@xmazu/openenvxee-plugin-protocol` | Declarative embed panel tree types, `h`/jsx runtime, message unions, `validatePluginTree` |
 
@@ -58,6 +58,29 @@ Published packages:
 - **`@openenvx/schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](PUBLISHING.md).
 - **`@xmazu/openenvxee-plugin-protocol`** — declarative embed panel protocol (`h`, jsx runtimes, `validatePluginTree`, message types). Ships `dist/`; published `exports` are dist-only (see [PUBLISHING.md](PUBLISHING.md)).
 - **`@xmazu/openenvxee-studio`** — product fat bundle. Build inlines `@xmazu/openenvxee-workbench`, `@openenvx/canvas`, `@xmazu/openenvxee-canvas-pro`, `@openenvx/agent`, `@openenvx/driver-image`, and their `@openenvx/*` deps into `dist/`. Re-exports `@openenvx/core` + `@openenvx/headless` so host apps can author plugins without private workspace packages. Published `exports` resolve to `dist/` only. Monorepo apps that need `src/` HMR alias studio in Vite/tsconfig (see `apps/canvas-demo`).
+
+## Host sidebar panels (product hosts)
+
+Product apps (dashboard Studio, embed host) register host sidebars the **VS Code way**: declare contributions; the workbench shell renders. Do **not** mount React inspector views from the product host.
+
+| VS Code | OpenEnvx |
+| --- | --- |
+| `contributes.viewsContainers` | `ViewContainerContribution` |
+| `contributes.views` | `ViewContribution` (`when`, order, container) |
+| `when` / context keys | Existing `when` strings (`scene.layerSelected`, …) |
+| `registerTreeDataProvider` | `ctx.registerTreeDataProvider` (data only) |
+| Settings / properties form | `ViewContribution.buildProperties()` → `createPropertyPane` + field kinds + `InspectorPath` |
+| `viewsWelcome` | `emptyMessage` on a view (often with `when: '!scene.layerSelected'`) |
+| WebviewView | `registerViewPanel` — **only** non-form surfaces (chat, version history, template data) |
+
+**Hard rules:**
+
+- Form/settings panels: `WorkbenchPlugin` + `registerWorkbench(container, ...views)` with `buildProperties` / `emptyMessage` / `when`. Zero React panel components in the host.
+- Product hosts: use `ViewContribution.buildProperties()` only. `PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas-pro transform panes) merged into the default inspector container—not for embed/dashboard hosts.
+- **Naming:** “Property pane” is the sidebar UI label. `InspectorPath`, `InspectorHostContext`, and `InspectorLayoutNode` are the path/layout protocol (unchanged identifiers). Headless `createInspectorHostContext` resolves `layerProp` / `templatePolicy` paths; canvas hosts may still pass `createCanvasInspectorHostContext` for transform and page bleed/safe paths.
+- Do **not** import or compose `ViewPane` / `PropertyContentRenderer` from the host (they are shell-internal).
+- Before adding a new primitive: inventory published exports and call sites; prefer reuse; only then extend core.
+- Embed **policy/data API** (scene commands, schema fields, path context) stays in editor-core; embed **product panels** (e.g. Embed Options) live in the product host (`studio-host`), not in canvas-pro inspector contributions.
 
 ## Code conventions
 

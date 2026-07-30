@@ -1,6 +1,6 @@
 {
   "name": "@xmazu/openenvxee-plugin-protocol",
-  "version": "0.2.0",
+  "version": "0.2.3",
   "description": "Declarative plugin UI protocol — inspector/chrome trees, h/jsx runtime, message union",
   "license": "MIT",
   "type": "module",

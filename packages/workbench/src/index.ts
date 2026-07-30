@@ -3,6 +3,7 @@ export {
   useWorkbenchSelector,
   useWorkbenchContextSelector,
 } from './hooks/use-workbench-selector';
+export { useWorkbenchContext } from './context/workbench-context';
 export {
   EditorViewportProvider,
   useEditorViewport,
@@ -94,7 +95,6 @@ export {
   DropdownMenuGroups,
   DropdownMenuTrigger,
 } from './primitives/dropdown-menu';
-export { InspectorPanel } from './layout/inspector-panel';
 export { createLocalStorageWorkbenchLayoutStore } from './layout/local-storage-workbench-layout-store';
 export {
   ActivitySidebar,

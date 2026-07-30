@@ -39,8 +39,14 @@ export function buildViewContainer(
     .filter((v) => evaluateWhen(v.when))
     .toSorted((a, b) => (a.viewOrder ?? 0) - (b.viewOrder ?? 0))
     .map((view) => {
+      if (typeof view.buildProperties === 'function') {
+        return buildPropertiesView(view, buildCtx);
+      }
       if (view.componentId) {
         return buildComponentView(view, buildCtx);
+      }
+      if (view.emptyMessage) {
+        return buildWelcomeView(view, buildCtx);
       }
       const provider = viewProviderRegistry.get(view.id);
       if (!provider) {
@@ -74,6 +80,52 @@ export function buildViewContainer(
   };
 }
 
+function buildPropertiesView(
+  view: ViewContribution,
+  buildCtx: ReturnType<typeof createContributionBuildContext>
+): ViewDescriptor {
+  const pane = view.buildProperties?.(buildCtx);
+  return {
+    collapsible: view.collapsible ?? false,
+    containerId: view.containerId,
+    content: {
+      headerToggle: pane?.headerToggle,
+      kind: 'properties',
+      nodes: pane?.nodes ?? [],
+    },
+    emptyMessage: view.emptyMessage,
+    id: view.id,
+    initialCollapsed: view.initialCollapsed ?? false,
+    name: buildCtx.t(`view.${view.id}.name`, view.name),
+    supportsReorder: false,
+    viewOrder: view.viewOrder ?? 0,
+    viewSelection: view.viewSelection ?? 'layer',
+    viewHover: view.viewHover ?? 'none',
+  };
+}
+
+function buildWelcomeView(
+  view: ViewContribution,
+  buildCtx: ReturnType<typeof createContributionBuildContext>
+): ViewDescriptor {
+  return {
+    collapsible: view.collapsible ?? false,
+    containerId: view.containerId,
+    content: {
+      kind: 'welcome',
+      message: view.emptyMessage ?? '',
+    },
+    emptyMessage: view.emptyMessage,
+    id: view.id,
+    initialCollapsed: view.initialCollapsed ?? false,
+    name: buildCtx.t(`view.${view.id}.name`, view.name),
+    supportsReorder: false,
+    viewOrder: view.viewOrder ?? 0,
+    viewSelection: view.viewSelection ?? 'layer',
+    viewHover: view.viewHover ?? 'none',
+  };
+}
+
 function buildComponentView(
   view: ViewContribution,
   buildCtx: ReturnType<typeof createContributionBuildContext>
@@ -85,6 +137,7 @@ function buildComponentView(
       componentId: view.componentId ?? view.id,
       kind: 'component',
     },
+    emptyMessage: view.emptyMessage,
     id: view.id,
     initialCollapsed: view.initialCollapsed ?? false,
     name: buildCtx.t(`view.${view.id}.name`, view.name),

@@ -34,7 +34,7 @@ export default {
   'commandPalette.filters': 'Filtry palety poleceń',
   'commandPalette.noResults': 'Brak wyników.',
   'commandPalette.other': 'Inne',
-  'inspector.empty': 'Wybierz warstwę, aby edytować właściwości',
+  'view.empty': 'Wybierz warstwę, aby edytować właściwości',
   'viewContainer.workbench.inspector.title': 'Inspektor',
   'viewContainer.workbench.sidebar.title': 'Warstwy',
   'view.workbench.pages.name': 'Strony',

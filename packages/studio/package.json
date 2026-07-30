@@ -1,6 +1,6 @@
 {
   "name": "@xmazu/openenvxee-studio",
-  "version": "0.1.14",
+  "version": "0.1.19",
   "description": "OpenEnvx Studio — workbench UI, canvas, canvas-pro, and agent bundled for host apps",
   "license": "UNLICENSED",
   "type": "module",

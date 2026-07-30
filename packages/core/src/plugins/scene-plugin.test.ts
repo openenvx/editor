@@ -12,6 +12,9 @@ import {
   MoveDownCommand,
   MoveLayerCommand,
   MoveUpCommand,
+  SetLayerShowInLayersCommand,
+  SetLayerWriteModeCommand,
+  SetTemplatePolicyCommand,
   ToggleLayerLockCommand,
   ToggleLayerVisibilityCommand,
 } from './scene-plugin';
@@ -245,5 +248,42 @@ describe('ScenePlugin toggle layer visibility command', () => {
     toggleVisibility.execute(ctx);
     expect(ctx.scene.getScene().pages[0]!.layers[0]!.visible).toBe(true);
     expect(ctx.scene.getSelection().primaryLayerId).toBe('a');
+  });
+});
+
+describe('ScenePlugin embed template policy commands', () => {
+  it('sets writeMode on the selected layer', () => {
+    const cmd = new SetLayerWriteModeCommand();
+    const ctx = createContext([createLayer('a')], ['a'], 'a');
+    expect(cmd.canExecute(ctx, { writeMode: 'content' })).toBe(true);
+    cmd.execute(ctx, { writeMode: 'content' });
+    expect(ctx.scene.getScene().pages[0]!.layers[0]!.writeMode).toBe('content');
+  });
+
+  it('sets showInLayers on the selected layer', () => {
+    const cmd = new SetLayerShowInLayersCommand();
+    const ctx = createContext([createLayer('a')], ['a'], 'a');
+    cmd.execute(ctx, { showInLayers: false });
+    expect(ctx.scene.getScene().pages[0]!.layers[0]!.showInLayers).toBe(false);
+  });
+
+  it('clears selection when hiding layer from Layers under template policy', () => {
+    const cmd = new SetLayerShowInLayersCommand();
+    const ctx = createContext([createLayer('a')], ['a'], 'a');
+    cmd.execute(ctx, { showInLayers: false });
+    expect(ctx.scene.getSelection().primaryLayerId).toBeNull();
+    expect(ctx.scene.getSelection().selectedLayerIds).toEqual([]);
+  });
+
+  it('patches templatePolicy flags', () => {
+    const cmd = new SetTemplatePolicyCommand();
+    const ctx = createContext([createLayer('a')], []);
+    expect(cmd.canExecute(ctx, { allowInsertLayers: false })).toBe(true);
+    cmd.execute(ctx, { allowInsertLayers: false, allowDeleteLayers: false });
+    expect(ctx.scene.getScene().templatePolicy).toMatchObject({
+      allowDeleteLayers: false,
+      allowInsertLayers: false,
+      version: 1,
+    });
   });
 });

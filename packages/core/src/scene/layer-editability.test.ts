@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   applyFrozenLayerPolicy,
@@ -12,11 +12,18 @@ import {
   getLayerWriteMode,
   isLayerEditable,
   isLayerLocked,
+  isLayerShownInLayers,
   isLayerWritable,
+  isTemplatePolicyEnforced,
+  setTemplatePolicyEnforced,
   withFrozenLayerSnapshots,
 } from './layer-editability';
 import { SceneStore } from './scene-store';
 import type { Layer, Scene } from './types';
+
+afterEach(() => {
+  setTemplatePolicyEnforced(true);
+});
 
 function createLayer(overrides: Partial<Layer> = {}): Layer {
   return {
@@ -379,5 +386,69 @@ describe('isLayerLocked', () => {
 describe('isLayerWritable', () => {
   it('returns false when writeMode is locked', () => {
     expect(isLayerWritable(createLayer({ writeMode: 'locked' }))).toBe(false);
+  });
+});
+
+describe('isLayerShownInLayers', () => {
+  it('defaults to true when absent', () => {
+    expect(isLayerShownInLayers(createLayer())).toBe(true);
+  });
+
+  it('returns false when showInLayers is false', () => {
+    expect(isLayerShownInLayers(createLayer({ showInLayers: false }))).toBe(
+      false
+    );
+  });
+});
+
+describe('template policy enforcement', () => {
+  it('defaults to enforced', () => {
+    expect(isTemplatePolicyEnforced()).toBe(true);
+  });
+
+  it('ignores writeMode when not enforced (authoring)', () => {
+    setTemplatePolicyEnforced(false);
+    const locked = createLayer({ writeMode: 'locked' });
+    expect(isLayerEditable(locked)).toBe(true);
+    expect(canSelectLayer(locked)).toBe(true);
+    expect(canTransformLayer(locked)).toBe(true);
+    expect(canEditLayerData(locked)).toBe(true);
+  });
+
+  it('still respects runtime locked when not enforced', () => {
+    setTemplatePolicyEnforced(false);
+    expect(
+      canTransformLayer(createLayer({ writeMode: 'locked', locked: true }))
+    ).toBe(false);
+  });
+
+  it('blocks select when showInLayers is false and enforced', () => {
+    expect(
+      canSelectLayer(createLayer({ showInLayers: false, writeMode: 'free' }))
+    ).toBe(false);
+  });
+
+  it('allows select when showInLayers is false and not enforced', () => {
+    setTemplatePolicyEnforced(false);
+    expect(
+      canSelectLayer(createLayer({ showInLayers: false, writeMode: 'locked' }))
+    ).toBe(true);
+  });
+
+  it('ignores templatePolicy insert/delete when not enforced', () => {
+    setTemplatePolicyEnforced(false);
+    const scene = createScene({
+      templatePolicy: {
+        allowDeleteLayers: false,
+        allowDuplicateLayers: false,
+        allowInsertLayers: false,
+        allowPageResize: false,
+        version: 1,
+      },
+    });
+    expect(canInsertLayers(scene)).toBe(true);
+    expect(canDeleteLayer(createLayer({ writeMode: 'free' }), scene)).toBe(
+      true
+    );
   });
 });

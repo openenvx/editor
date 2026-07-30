@@ -1,3 +1,6 @@
+import type { LayerWriteMode, TemplatePolicy } from '@openenvx/schema';
+import { LAYER_WRITE_MODES } from '@openenvx/schema';
+
 import { Command } from '../contributions/command';
 import { ShortcutContribution } from '../contributions/shortcut-contribution';
 import { Plugin } from '../core/plugin';
@@ -10,6 +13,7 @@ import {
   isLayerEditable,
   isLayerLocked,
   isLayerVisible,
+  isTemplatePolicyEnforced,
 } from '../scene/layer-editability';
 import {
   findLayerById,
@@ -506,6 +510,161 @@ export class RenameLayerCommand extends Command {
   }
 }
 
+function isLayerWriteMode(value: unknown): value is LayerWriteMode {
+  return (
+    typeof value === 'string' &&
+    (LAYER_WRITE_MODES as readonly string[]).includes(value)
+  );
+}
+
+export class SetLayerWriteModeCommand extends Command {
+  readonly id = 'scene.setLayerWriteMode';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    const writeMode = (args as { writeMode?: unknown } | undefined)?.writeMode;
+    if (!isLayerWriteMode(writeMode)) {
+      return false;
+    }
+    return Boolean(ctx.selection.primaryLayerId);
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const writeMode = (args as { writeMode?: unknown } | undefined)?.writeMode;
+    const id = ctx.selection.primaryLayerId;
+    if (!id || !isLayerWriteMode(writeMode)) {
+      return;
+    }
+    ctx.scene.apply({
+      apply: (currentScene) => ({
+        ...currentScene,
+        pages: currentScene.pages.map((page) => ({
+          ...page,
+          layers: updateLayerInTree(page.layers, id, (l) => ({
+            ...l,
+            writeMode,
+          })),
+        })),
+      }),
+      label: 'Set layer write mode',
+    });
+  }
+}
+
+export class SetLayerShowInLayersCommand extends Command {
+  readonly id = 'scene.setLayerShowInLayers';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    const showInLayers = (args as { showInLayers?: unknown } | undefined)
+      ?.showInLayers;
+    if (typeof showInLayers !== 'boolean') {
+      return false;
+    }
+    return Boolean(ctx.selection.primaryLayerId);
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const showInLayers = (args as { showInLayers?: unknown } | undefined)
+      ?.showInLayers;
+    const id = ctx.selection.primaryLayerId;
+    if (!id || typeof showInLayers !== 'boolean') {
+      return;
+    }
+    ctx.scene.apply({
+      apply: (currentScene) => ({
+        ...currentScene,
+        pages: currentScene.pages.map((page) => ({
+          ...page,
+          layers: updateLayerInTree(page.layers, id, (l) => ({
+            ...l,
+            showInLayers,
+          })),
+        })),
+      }),
+      label: showInLayers ? 'Show layer in Layers' : 'Hide layer from Layers',
+    });
+    if (!showInLayers && isTemplatePolicyEnforced()) {
+      const selection = ctx.scene.getSelection();
+      const remaining = selection.selectedLayerIds.filter(
+        (selectedId) => selectedId !== id
+      );
+      ctx.scene.selectLayers(remaining, remaining[0] ?? null);
+    }
+  }
+}
+
+type TemplatePolicyFlag = keyof Pick<
+  TemplatePolicy,
+  | 'allowDeleteLayers'
+  | 'allowDuplicateLayers'
+  | 'allowInsertLayers'
+  | 'allowPageResize'
+>;
+
+const TEMPLATE_POLICY_FLAGS: TemplatePolicyFlag[] = [
+  'allowDeleteLayers',
+  'allowDuplicateLayers',
+  'allowInsertLayers',
+  'allowPageResize',
+];
+
+export class SetTemplatePolicyCommand extends Command {
+  readonly id = 'scene.setTemplatePolicy';
+
+  canExecute(_ctx: CommandContext, args?: unknown): boolean {
+    const patch = args as
+      | Partial<Record<TemplatePolicyFlag, unknown>>
+      | undefined;
+    if (!patch || typeof patch !== 'object') {
+      return false;
+    }
+    return TEMPLATE_POLICY_FLAGS.some((key) => typeof patch[key] === 'boolean');
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const patch = args as
+      | Partial<Record<TemplatePolicyFlag, unknown>>
+      | undefined;
+    if (!patch || typeof patch !== 'object') {
+      return;
+    }
+    const updates: Partial<
+      Pick<
+        TemplatePolicy,
+        | 'allowDeleteLayers'
+        | 'allowDuplicateLayers'
+        | 'allowInsertLayers'
+        | 'allowPageResize'
+      >
+    > = {};
+    for (const key of TEMPLATE_POLICY_FLAGS) {
+      if (typeof patch[key] === 'boolean') {
+        updates[key] = patch[key];
+      }
+    }
+    if (Object.keys(updates).length === 0) {
+      return;
+    }
+    ctx.scene.apply({
+      apply: (currentScene) => {
+        const prev = currentScene.templatePolicy;
+        return {
+          ...currentScene,
+          templatePolicy: {
+            version: 1,
+            allowDeleteLayers: prev?.allowDeleteLayers ?? true,
+            allowDuplicateLayers: prev?.allowDuplicateLayers ?? true,
+            allowInsertLayers: prev?.allowInsertLayers ?? true,
+            allowPageResize: prev?.allowPageResize ?? true,
+            ...prev,
+            ...updates,
+          },
+        };
+      },
+      label: 'Update embed template policy',
+    });
+  }
+}
+
 class UndoShortcut extends ShortcutContribution {
   readonly keybinding = 'Mod+Z';
   readonly commandId = 'scene.undo';
@@ -550,6 +709,9 @@ export class ScenePlugin extends Plugin {
       new DuplicatePageCommand(),
       new RenamePageCommand(),
       new RenameLayerCommand(),
+      new SetLayerWriteModeCommand(),
+      new SetLayerShowInLayersCommand(),
+      new SetTemplatePolicyCommand(),
       new UndoShortcut(),
       new RedoShortcut(),
       new MoveUpShortcut(),

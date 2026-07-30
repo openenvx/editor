@@ -11,12 +11,6 @@ import {
   type PluginPropValue,
 } from '@xmazu/openenvxee-plugin-protocol';
 
-import {
-  createInspectorPane,
-  InspectorBlockBuilder,
-  InspectorPaneBuilder,
-} from '../inspector/inspector-pane-builder';
-import type { InspectorPaneDescriptor } from '../inspector/inspector-pane-descriptor';
 import { InspectorPath } from '../inspector/inspector-path';
 import type {
   InspectorInputGroupCell,
@@ -24,13 +18,19 @@ import type {
 } from '../inspector/inspector-value-path';
 import { encodePluginHandlerCommand } from '../inspector/plugin-inspector-host-context';
 import {
+  createPropertyPane,
+  PropertyBlockBuilder,
+  PropertyPaneBuilder,
+} from '../inspector/property-pane-builder';
+import type { PropertyPaneDescriptor } from '../inspector/property-pane-descriptor';
+import {
   asBoolean,
   asNumber,
   asString,
   pluginNodes,
 } from './plugin-tree-helpers';
 
-export interface MapPluginTreeToInspectorPaneOptions {
+export interface MapPluginTreeToPropertyPaneOptions {
   /**
    * External panel id — only `plugin.${panelId}.*` binds are allowed;
    * missing binds default to that prefix + field key.
@@ -38,7 +38,7 @@ export interface MapPluginTreeToInspectorPaneOptions {
   panelId?: string;
 }
 
-type LayoutTarget = InspectorPaneBuilder | InspectorBlockBuilder;
+type LayoutTarget = PropertyPaneBuilder | PropertyBlockBuilder;
 
 function parseOptions(
   value: PluginPropValue | undefined
@@ -212,7 +212,7 @@ function resolveBindPath(
   if (typeof bind === 'string' && bind.length > 0) {
     if (panelId && !bind.startsWith(`plugin.${panelId}.`)) {
       throw new Error(
-        `mapPluginTreeToInspectorPane: bind must be under plugin.${panelId}.*, got ${bind}`
+        `mapPluginTreeToPropertyPane: bind must be under plugin.${panelId}.*, got ${bind}`
       );
     }
     return bind;
@@ -265,7 +265,7 @@ function mapLayoutChild(
     return;
   }
 
-  if (node.type === 'Block' && builder instanceof InspectorPaneBuilder) {
+  if (node.type === 'Block' && builder instanceof PropertyPaneBuilder) {
     builder.block(asString(node.props.label, 'Block'), (blockBuilder) => {
       for (const child of pluginNodes(node.children)) {
         mapLayoutChild(blockBuilder, child, panelId);
@@ -285,25 +285,25 @@ function mapLayoutChild(
 }
 
 /**
- * Walk a plugin-protocol inspector tree and drive {@link createInspectorPane}.
+ * Walk a plugin-protocol inspector tree and drive {@link createPropertyPane}.
  * Root must be a `Pane` node. Builders stay the source of truth for defaults.
  */
-export function mapPluginTreeToInspectorPane(
+export function mapPluginTreeToPropertyPane(
   root: PluginNode,
-  options?: MapPluginTreeToInspectorPaneOptions
-): InspectorPaneDescriptor {
+  options?: MapPluginTreeToPropertyPaneOptions
+): PropertyPaneDescriptor {
   if (root.type !== 'Pane') {
     throw new Error(
-      `mapPluginTreeToInspectorPane: expected Pane root, got ${root.type}`
+      `mapPluginTreeToPropertyPane: expected Pane root, got ${root.type}`
     );
   }
   const id = asString(root.props.id);
   const title = asString(root.props.title, id || 'Pane');
   if (!id) {
-    throw new Error('mapPluginTreeToInspectorPane: Pane requires id');
+    throw new Error('mapPluginTreeToPropertyPane: Pane requires id');
   }
 
-  const builder: InspectorPaneBuilder = createInspectorPane(id, title);
+  const builder: PropertyPaneBuilder = createPropertyPane(id, title);
   if (typeof root.props.when === 'string') {
     builder.when(root.props.when);
   }

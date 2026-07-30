@@ -57,8 +57,11 @@ export {
   getLayerWriteMode,
   isLayerEditable,
   isLayerLocked,
+  isLayerShownInLayers,
   isLayerVisible,
   isLayerWritable,
+  isTemplatePolicyEnforced,
+  setTemplatePolicyEnforced,
   withFrozenLayerSnapshots,
 } from './scene/layer-editability';
 export { clampTransformSize, MIN_LAYER_SIZE } from './scene/transform-utils';

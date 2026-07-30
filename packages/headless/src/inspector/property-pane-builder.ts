@@ -9,12 +9,12 @@ import {
 import { InspectorBlockNode } from './inspector-block-node';
 import { InspectorInputGroupNode } from './inspector-input-group-node';
 import type { InspectorLayoutNode } from './inspector-layout-node';
-import { InspectorPaneDescriptor } from './inspector-pane-descriptor';
 import { InspectorRowNode } from './inspector-row-node';
 import type {
   InspectorInputGroupCell,
   InspectorValuePath,
 } from './inspector-value-path';
+import { PropertyPaneDescriptor } from './property-pane-descriptor';
 
 function getLastRowField(
   nodes: InspectorLayoutNode[]
@@ -27,7 +27,7 @@ function getLastRowField(
 }
 
 /** Shared layout surface for pane + nested block builders. */
-export class InspectorBlockBuilder {
+export class PropertyBlockBuilder {
   readonly nodes: InspectorLayoutNode[] = [];
 
   row(
@@ -75,10 +75,11 @@ export class InspectorBlockBuilder {
   }
 }
 
-export class InspectorPaneBuilder {
+export class PropertyPaneBuilder {
   private readonly nodes: InspectorLayoutNode[] = [];
   private whenClause?: string;
   private panePriority?: number;
+  private headerTogglePath?: InspectorValuePath;
 
   constructor(
     private readonly id: string,
@@ -92,6 +93,12 @@ export class InspectorPaneBuilder {
 
   priority(value: number): this {
     this.panePriority = value;
+    return this;
+  }
+
+  /** Master enable switch in the section header (Smart Stacking–style). */
+  headerToggle(path: InspectorValuePath): this {
+    this.headerTogglePath = path;
     return this;
   }
 
@@ -109,8 +116,8 @@ export class InspectorPaneBuilder {
     return this;
   }
 
-  block(label: string, build: (builder: InspectorBlockBuilder) => void): this {
-    const blockBuilder = new InspectorBlockBuilder();
+  block(label: string, build: (builder: PropertyBlockBuilder) => void): this {
+    const blockBuilder = new PropertyBlockBuilder();
     build(blockBuilder);
     this.nodes.push(new InspectorBlockNode(label, blockBuilder.nodes));
     return this;
@@ -146,20 +153,21 @@ export class InspectorPaneBuilder {
     return this;
   }
 
-  build(): InspectorPaneDescriptor {
-    return new InspectorPaneDescriptor(
+  build(): PropertyPaneDescriptor {
+    return new PropertyPaneDescriptor(
       this.id,
       this.title,
       [...this.nodes],
       this.whenClause,
-      this.panePriority
+      this.panePriority,
+      this.headerTogglePath
     );
   }
 }
 
-export function createInspectorPane(
+export function createPropertyPane(
   id: string,
   title: string
-): InspectorPaneBuilder {
-  return new InspectorPaneBuilder(id, title);
+): PropertyPaneBuilder {
+  return new PropertyPaneBuilder(id, title);
 }

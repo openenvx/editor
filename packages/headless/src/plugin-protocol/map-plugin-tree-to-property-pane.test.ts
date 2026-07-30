@@ -10,11 +10,11 @@ import {
 import { describe, expect, it } from 'vitest';
 
 import { InspectorPath } from '../inspector/inspector-path';
-import type { InspectorPaneDescriptor } from '../inspector/inspector-pane-descriptor';
-import { createInspectorPane } from '../inspector/inspector-pane-builder';
-import { mapPluginTreeToInspectorPane } from './map-plugin-tree-to-inspector-pane';
+import type { PropertyPaneDescriptor } from '../inspector/property-pane-descriptor';
+import { createPropertyPane } from '../inspector/property-pane-builder';
+import { mapPluginTreeToPropertyPane } from './map-plugin-tree-to-property-pane';
 
-function serializePane(pane: InspectorPaneDescriptor): unknown {
+function serializePane(pane: PropertyPaneDescriptor): unknown {
   return {
     id: pane.id,
     title: pane.title,
@@ -59,9 +59,9 @@ const serializeVisitor = {
   },
 };
 
-describe('mapPluginTreeToInspectorPane', () => {
+describe('mapPluginTreeToPropertyPane', () => {
   it('matches handwritten builder for InputGroup layout', () => {
-    const viaBuilder = createInspectorPane('canvas.layer', 'Layer')
+    const viaBuilder = createPropertyPane('canvas.layer', 'Layer')
       .when('page.layoutAbsolute && scene.layerSelected')
       .priority(20)
       .inputGroup('Position', [
@@ -86,7 +86,7 @@ describe('mapPluginTreeToInspectorPane', () => {
       ])
       .build();
 
-    const viaTree = mapPluginTreeToInspectorPane(
+    const viaTree = mapPluginTreeToPropertyPane(
       h(
         Pane,
         {
@@ -120,7 +120,7 @@ describe('mapPluginTreeToInspectorPane', () => {
   });
 
   it('matches handwritten builder for row with popup and actions', () => {
-    const viaBuilder = createInspectorPane('canvas.transforms', 'Transforms')
+    const viaBuilder = createPropertyPane('canvas.transforms', 'Transforms')
       .when('page.layoutAbsolute && scene.layerSelected')
       .priority(40)
       .row(
@@ -152,7 +152,7 @@ describe('mapPluginTreeToInspectorPane', () => {
       }, 'Fine tune')
       .build();
 
-    const viaTree = mapPluginTreeToInspectorPane(
+    const viaTree = mapPluginTreeToPropertyPane(
       h(
         Pane,
         {
@@ -203,7 +203,7 @@ describe('mapPluginTreeToInspectorPane', () => {
   });
 
   it('encodes Action handler clicks as plugin.handler commands', () => {
-    const pane = mapPluginTreeToInspectorPane(
+    const pane = mapPluginTreeToPropertyPane(
       h(
         Pane,
         { id: 'ext.panel', title: 'Ext' },
@@ -240,7 +240,7 @@ describe('mapPluginTreeToInspectorPane', () => {
   });
 
   it('defaults missing binds to plugin.<panelId>.<key> when panelId is set', () => {
-    const pane = mapPluginTreeToInspectorPane(
+    const pane = mapPluginTreeToPropertyPane(
       h(
         Pane,
         { id: 'ext.panel', title: 'Ext' },

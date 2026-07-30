@@ -156,7 +156,31 @@ activateWorkbench(ctx) {
 
 Duplicate kinds overwrite earlier registrations so enterprise plugins activating later can replace OSS defaults.
 
-`WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). Enterprise `@xmazu/openenvxee-canvas-pro` adds canvas-only chrome (`CanvasProPlugin`, `CanvasTemplatePlugin`). Custom React panels register from a workbench plugin:
+`WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). Enterprise `@xmazu/openenvxee-canvas-pro` adds canvas-only chrome (`CanvasProPlugin`, `CanvasTemplatePlugin`).
+
+**Form / settings sidebars** (VS Code `views` + properties): declare only — no React panel:
+
+```ts
+class EmbedOptionsView extends ViewContribution {
+  readonly id = 'embed.options.layer';
+  readonly containerId = 'embed.options';
+  readonly name = 'Layer';
+  readonly collapsible = false;
+  readonly when = 'scene.layerSelected';
+
+  buildProperties(ctx: ContributionBuildContext) {
+    return createPropertyPane(this.id, this.name)
+      .row('Edit mode', { key: 'writeMode', kind: 'select', … }, InspectorPath.layerProp('writeMode'))
+      .build();
+  }
+}
+
+activateWorkbench(ctx) {
+  ctx.registerWorkbench(new EmbedContainer(), new EmbedOptionsView());
+}
+```
+
+**Custom React panels** (`registerViewPanel`) are only for non-form surfaces (chat, version history):
 
 ```ts
 activateWorkbench(ctx) {

@@ -27,13 +27,14 @@ import type {
   ViewContainerLocation,
 } from './contributions/view-contribution';
 import type { InspectorLayoutNode } from './inspector/inspector-layout-node';
+import type { InspectorValuePath } from './inspector/inspector-value-path';
 import type { WorkbenchContributionDisposable } from './registries/workbench-registries';
 import type { WorkbenchContribution } from './workbench-contributions/workbench-contribution';
 import type { EditorPaneRegistration } from './workbench/editor-pane-host-props';
 import type {
   FieldRendererRegistration,
   ViewPanelRegistration,
-} from './workbench/inspector-pane-registration';
+} from './workbench/panel-registrations';
 import type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
 import type { WorkbenchLayout } from './workbench/workbench-layout';
 import type { WorkbenchLayoutStore } from './workbench/workbench-layout-store';
@@ -56,8 +57,13 @@ export interface ViewTreeItem {
 
 export type ViewContent =
   | { kind: 'tree'; items: ViewTreeItem[] }
-  | { kind: 'properties'; nodes: InspectorLayoutNode[] }
-  | { kind: 'component'; componentId: string };
+  | {
+      kind: 'properties';
+      nodes: InspectorLayoutNode[];
+      headerToggle?: InspectorValuePath;
+    }
+  | { kind: 'component'; componentId: string }
+  | { kind: 'welcome'; message: string };
 
 export interface ViewDescriptor {
   id: string;
@@ -70,6 +76,8 @@ export interface ViewDescriptor {
   initialCollapsed: boolean;
   supportsReorder: boolean;
   content: ViewContent;
+  /** viewsWelcome analogue — used when content is welcome or for empty properties. */
+  emptyMessage?: string;
 }
 
 export interface ViewContainerDescriptor {
@@ -179,4 +187,9 @@ export interface WorkbenchControllerOptions {
   editorTitle?: string;
   layout?: Partial<WorkbenchLayout>;
   layoutStore?: WorkbenchLayoutStore;
+  /**
+   * When true (default), layer writeMode / showInLayers / templatePolicy are
+   * enforced (embed consumer). Dashboard authoring should pass false.
+   */
+  enforceTemplatePolicy?: boolean;
 }

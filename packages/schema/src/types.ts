@@ -183,6 +183,12 @@ export interface LayerBase {
   locked?: boolean;
   /** When false, the layer is hidden on canvas and in export. Absent/true = visible. */
   visible?: boolean;
+  /**
+   * When false, embed consumers omit the layer from the Layers tree and cannot
+   * select it on canvas. Still renders and exports. Absent/true = listed.
+   * Authors always see and select the layer (template policy not enforced).
+   */
+  showInLayers?: boolean;
 }
 
 export interface CanvasRectLayer extends LayerBase {

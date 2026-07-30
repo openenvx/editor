@@ -10,7 +10,7 @@ Designing the `@xmazu/openenvxee-workbench` React UI for canvas/flow editor auth
 **Grammar reference:** [shadcn/ui](https://ui.shadcn.com) zinc dark palette, inset rings — not component imports  
 **Secondary reference:** Framer / Artboard Studio editor screens (Refero) — three-column canvas layout patterns
 
-**Status (v3):** Tokens, layout chrome, inspector panes (Layout → Layer → Styles → Transforms), sidebar segments, layer tree, floating toolbar, and canvas-demo scene aligned to reference screenshot.
+**Status (v3):** Tokens, layout chrome, property panes (Layout → Layer → Styles → Transforms), sidebar segments, layer tree, floating toolbar, and canvas-demo scene aligned to reference screenshot. Primary and secondary side bars share `ViewPane` + `ViewContainerViews`; default secondary container title is "Inspector".
 
 ---
 
@@ -74,7 +74,7 @@ Reject:
 | **Accent** | Blue focus + blue selection + blue tab potential | Blue **canvas-only**; focus = white/neutral ring | Split `--wb-ring` from `--wb-selection` |
 | **Typography** | 11–12px, no scale | 12px body, 11px caption, mono for X/Y/W/H | Formal type scale tokens |
 | **File menu** | Activity bar dropdown | Theme, Save, Open, Export via descriptor menu | `ActivitySidebar` + `DropdownMenuRenderer` |
-| **Inspector** | Basic label + input rows | Layout / Layer / Styles / Transforms sections | `inspector-panes.tsx` + property renderer |
+| **Inspector** | Basic label + input rows | Layout / Layer / Styles / Transforms sections | `createPropertyPane` + property renderer |
 | **Canvas** | No dimension badge | Blue `W × H px` label on selection | `canvas-stage.tsx` Konva Label |
 | **Demo scene** | Generic shapes | 1080×1920 Yellowstone image + text + rotated group | `createCanvasDemoScene()` |
 
@@ -126,15 +126,15 @@ Light mode inverts the dark reference: **soft zinc chrome**, a **darker canvas f
 
 ### Control metrics
 
-| Token                      | Value   | Use                            |
-| -------------------------- | ------- | ------------------------------ |
-| `--wb-control-height`      | `28px`  | Inputs, buttons, selects       |
-| `--wb-radius-control`      | `8px`   | Inputs, buttons, segments      |
-| `--wb-topbar-height`       | `40px`  | Top chrome (legacy / optional) |
-| `--wb-activity-bar-width`  | `56px`  | Left icon rail with labels     |
-| `--wb-sidebar-width`       | `240px` | Side panel beside activity bar |
-| `--wb-inspector-width`     | `280px` | Right inspector                |
-| `--wb-icon-button-size-lg` | `32px`  | Floating toolbar icons         |
+| Token                          | Value   | Use                            |
+| ------------------------------ | ------- | ------------------------------ |
+| `--wb-control-height`          | `28px`  | Inputs, buttons, selects       |
+| `--wb-radius-control`          | `8px`   | Inputs, buttons, segments      |
+| `--wb-topbar-height`           | `40px`  | Top chrome (legacy / optional) |
+| `--wb-activity-bar-width`      | `56px`  | Left icon rail with labels     |
+| `--wb-sidebar-width`           | `240px` | Side panel beside activity bar |
+| `--wb-secondary-sidebar-width` | `280px` | Secondary side bar (right)     |
+| `--wb-icon-button-size-lg`     | `32px`  | Floating toolbar icons         |
 
 ### Theme-aware alpha tokens
 
@@ -285,13 +285,13 @@ Use `--wb-shadow-xs` on inputs at rest. Use `--wb-shadow-float` only on floating
 
 ### Layout constants
 
-| Token                   | Value |
-| ----------------------- | ----- |
-| `--wb-topbar-height`    | 36px  |
-| `--wb-sidebar-width`    | 240px |
-| `--wb-inspector-width`  | 280px |
-| `--wb-layer-row-height` | 28px  |
-| `--wb-icon-button-size` | 32px  |
+| Token                          | Value |
+| ------------------------------ | ----- |
+| `--wb-topbar-height`           | 36px  |
+| `--wb-sidebar-width`           | 240px |
+| `--wb-secondary-sidebar-width` | 280px |
+| `--wb-layer-row-height`        | 28px  |
+| `--wb-icon-button-size`        | 32px  |
 
 ---
 
@@ -318,10 +318,10 @@ Use `--wb-shadow-xs` on inputs at rest. Use `--wb-shadow-float` only on floating
 | Region | Component | Notes |
 | --- | --- | --- |
 | ActivityBar | `ActivitySidebar` (icon rail) | 56px; icon + label per item; active icon uses `--wb-muted` fill |
-| SidePanel | `ActivitySidebar` (panel body) | 240px; title header + scrollable view content |
+| Primary Side Bar | `ActivitySidebar` (panel body) | 240px; title header + scrollable `ViewPane` content |
 | CanvasField | `CanvasChrome` | `--wb-canvas-field` bg; artboard centered |
 | FloatingToolbar | `FloatingToolbarRenderer` | Bottom-center overlay; contribution-driven tools + widgets |
-| Inspector | `InspectorPanel` + panes | Scrollable; sections collapsible |
+| Secondary Side Bar | `ViewContainerViews` + `ViewPane` | 280px; default container title **"Inspector"**; same view chrome as primary |
 | StatusBar | `StatusBarRenderer` | 24px; zoom, dirty/saved, selection summary |
 
 ---
@@ -453,9 +453,9 @@ Popup shell for per-side/per-corner/per-shadow controls:
 
 ---
 
-## Inspector panes (property panel v2)
+## Property panes (form content inside a view)
 
-Map to shadcn/designer `DesignerPane` + `Action*` pattern conceptually. Each pane renders when layer type matches.
+Map to shadcn/designer `DesignerPane` + `Action*` pattern conceptually. Each pane is a `PropertyPaneDescriptor` rendered inside a `View` (primary or secondary).
 
 ### Field kinds (author once, reuse everywhere)
 
@@ -466,7 +466,7 @@ Inspector controls are **descriptor → registered renderer**, not ad-hoc JSX in
 | `text` | Compact text input | Short strings, URLs without media chrome |
 | `number` | Scrub / NumberInput | Dimensions, gaps, sizes |
 | `select` | Select | Discrete enums (H1–H4, fit mode) |
-| `toggle` | Checkbox (shadcn-style) | Optional visibility, flags |
+| `toggle` | Switch (pill) | Optional visibility, flags |
 | `color` | Color swatch + popover | Fill, overlay, text color |
 | `image` | Image input (+ optional upload) | Backgrounds, media refs — **not** a plain text URL field |
 | `richText` | TipTap-backed rich text | Body / heading content |
@@ -530,7 +530,7 @@ Bind to `layer.transform` when canvas layer selected.
 | Inset ring elevation | shadcn/ui card shadow | Inputs, cards, toolbar | Avoid heavy drop shadows on static UI |
 | Blue selection only | shadcn/designer editor | Canvas handles | Current blue focus rings feel Tailwind-generic |
 | 36px header slot | Framer / Artboard Studio screens | `EditorLayout` optional `topBar` slot | Custom apps only; not used by default shell |
-| 240/280px sidebars | shadcn/designer editor proportions | Sidebar/inspector width | Reference uses narrow chrome, wide canvas |
+| 240/280px sidebars | shadcn/designer editor proportions | Primary / secondary sidebar width | Reference uses narrow chrome, wide canvas |
 | Geist/Inter stack | shadcn/ui typography | All UI text | Precise, technical voice |
 | Mono for numbers | shadcn/designer inspector | X/Y/W/H, zoom | Aligns numeric columns |
 | CSS modules, no Tailwind | User constraint | All components | Zero runtime CSS-in-JS, no shadcn dep |
@@ -557,9 +557,10 @@ Bind to `layer.transform` when canvas layer selected.
 - [ ] Restyle sidebar `Tabs` as full-width segment control
 - [ ] `PanelSection` hairline separators
 
-### Phase 3 — Inspector panes (1 PR)
+### Phase 3 — Property panes (1 PR)
 
 - [x] Secondary sidebar uses shared `ViewContainerViews` for tree / properties / component content (replaces standalone `PropertyPanelRenderer`)
+- [x] Shared scroll chrome is `ViewPane` (not inspector-specific); default secondary container title remains "Inspector"
 - [ ] Wire Layer pane to transform (X/Y/W/H)
 - [ ] Add Styles pane color swatch row
 - [ ] Phase 2 layout fields behind `PropertyBuilder` extensions in canvas layers
@@ -595,7 +596,7 @@ Before merging visual changes, verify against [shadcn/designer editor](https://d
 | `src/theme/tokens.css` | Global CSS variables — **single source of truth** |
 | `src/context/theme-context.tsx` | `ThemeProvider`, `useTheme`, `useThemeScope` |
 | `src/primitives/` | `button`, `input`, `input-group`, `segmented-control`, `tabs`, `panel-section`, `icon-button` |
-| `src/layout/` | `editor-layout`, `activity-sidebar`, `canvas-chrome`, `floating-toolbar`, `zoom-controls`, `inspector-panel` |
+| `src/layout/` | `editor-layout`, `activity-sidebar`, `canvas-chrome`, `floating-toolbar`, `zoom-controls`, `view-pane` |
 | `src/renderers/` | Descriptor → UI (view tree, property panes, menus) |
 | `src/shell/shell.tsx` | Orchestrator |
 | `Design.md` | This document |

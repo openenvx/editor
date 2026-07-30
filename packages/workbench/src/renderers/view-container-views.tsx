@@ -8,15 +8,18 @@ import type {
   ViewPanelRegistration,
   WorkbenchApi,
 } from '@openenvx/headless';
-import { createInspectorHostContext } from '@openenvx/headless';
+import {
+  createInspectorHostContext,
+  InspectorPathResolver,
+} from '@openenvx/headless';
 import type { ComponentType } from 'react';
 import { useMemo } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
-import { InspectorPanel } from '../layout/inspector-panel';
+import { ViewPane } from '../layout/view-pane';
 import { PanelSection } from '../primitives/panel-section';
-import { InspectorContentRenderer } from './inspector-content-renderer';
+import { PropertyContentRenderer } from './property-content-renderer';
 import { ViewPanelRenderer } from './view-panel-renderer';
 
 function defaultInspectorHostContext(
@@ -33,13 +36,9 @@ export type CreateInspectorHostContext = (
   }
 ) => InspectorHostContext;
 
-function PropertiesViewBody({
-  view,
-  createHostContext,
-}: {
-  view: ViewDescriptor;
-  createHostContext?: CreateInspectorHostContext;
-}) {
+function usePropertiesHostContext(
+  createHostContext?: CreateInspectorHostContext
+) {
   const { api, executeCommand } = useWorkbenchContext();
   const primaryLayerId = useWorkbenchContextSelector(
     (state) => state.selection.primaryLayerId
@@ -68,13 +67,16 @@ function PropertiesViewBody({
   }, [primaryLayerId, scene]);
 
   const hostContext = useMemo(() => {
+    if (!scene) {
+      return null;
+    }
     const create = createHostContext ?? defaultInspectorHostContext;
     return create(
       {
         activePageId: selectionActivePageId ?? null,
         executeCommand,
         layerData,
-        scene: scene!,
+        scene,
         selectedLayerId: primaryLayerId ?? null,
         updateProperty: api.updateProperty,
       },
@@ -90,19 +92,130 @@ function PropertiesViewBody({
     selectionActivePageId,
   ]);
 
-  if (view.content.kind !== 'properties' || !scene || !fieldRenderers) {
+  return {
+    executeCommand,
+    fieldRenderers,
+    hostContext,
+    layerData,
+    primaryLayerId,
+    scene,
+  };
+}
+
+function PropertiesViewBody({
+  view,
+  executeCommand,
+  fieldRenderers,
+  hostContext,
+  layerData,
+  primaryLayerId,
+}: {
+  view: ViewDescriptor;
+  executeCommand: (commandId: string) => Promise<boolean>;
+  fieldRenderers: FieldRendererRegistration[];
+  hostContext: InspectorHostContext;
+  layerData: Record<string, unknown> | null;
+  primaryLayerId: string | null;
+}) {
+  if (view.content.kind !== 'properties') {
     return null;
   }
 
   return (
-    <InspectorContentRenderer
-      fieldRenderers={fieldRenderers as FieldRendererRegistration[]}
+    <PropertyContentRenderer
+      fieldRenderers={fieldRenderers}
       hostContext={hostContext}
       layerData={layerData ?? {}}
       layerId={primaryLayerId ?? 'inspector'}
       nodes={view.content.nodes}
       onCommand={executeCommand}
     />
+  );
+}
+
+function PropertiesViewSection({
+  view,
+  createHostContext,
+}: {
+  view: ViewDescriptor;
+  createHostContext?: CreateInspectorHostContext;
+}) {
+  const {
+    executeCommand,
+    fieldRenderers,
+    hostContext,
+    layerData,
+    primaryLayerId,
+    scene,
+  } = usePropertiesHostContext(createHostContext);
+
+  const headerTogglePath =
+    view.content.kind === 'properties' ? view.content.headerToggle : undefined;
+
+  const headerSwitch = useMemo(() => {
+    if (!(headerTogglePath && hostContext && scene)) {
+      return;
+    }
+    const resolver = new InspectorPathResolver(hostContext);
+    const handle = resolver.resolve(headerTogglePath);
+    return {
+      ariaLabel: `Toggle ${view.name}`,
+      checked: Boolean(handle.read()),
+      onChange: (checked: boolean) => {
+        handle.write(checked);
+      },
+    };
+  }, [headerTogglePath, hostContext, scene, view.name]);
+
+  if (view.content.kind !== 'properties') {
+    return null;
+  }
+
+  if (!(scene && fieldRenderers && hostContext)) {
+    return view.emptyMessage ? (
+      <ViewPane empty emptyMessage={view.emptyMessage} />
+    ) : null;
+  }
+
+  const body = (
+    <PropertiesViewBody
+      executeCommand={executeCommand}
+      fieldRenderers={fieldRenderers as FieldRendererRegistration[]}
+      hostContext={hostContext}
+      layerData={layerData}
+      primaryLayerId={primaryLayerId}
+      view={view}
+    />
+  );
+
+  if (view.collapsible === false) {
+    return (
+      <div key={view.id}>
+        {headerSwitch ? (
+          <PanelSection
+            collapsible={false}
+            headerSwitch={headerSwitch}
+            title={view.name}
+          >
+            {body}
+          </PanelSection>
+        ) : (
+          body
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <PanelSection
+      collapsible={view.collapsible}
+      defaultOpen={!view.initialCollapsed}
+      headerSwitch={headerSwitch}
+      key={view.id}
+      title={view.name}
+    >
+      {body}
+    </PanelSection>
   );
 }
 
@@ -152,7 +265,7 @@ export function ViewContainerViews({
   const otherViews = container.views.filter((v) => v.content.kind !== 'tree');
 
   if (container.views.length === 0) {
-    return <InspectorPanel empty />;
+    return <ViewPane empty />;
   }
 
   const treeSection =
@@ -163,19 +276,18 @@ export function ViewContainerViews({
     ) : null;
 
   const otherSections = otherViews.map((view) => {
+    if (view.content.kind === 'welcome') {
+      return (
+        <ViewPane empty emptyMessage={view.content.message} key={view.id} />
+      );
+    }
     if (view.content.kind === 'properties') {
       return (
-        <PanelSection
-          collapsible={view.collapsible}
-          defaultOpen={!view.initialCollapsed}
+        <PropertiesViewSection
+          createHostContext={createHostContext}
           key={view.id}
-          title={view.name}
-        >
-          <PropertiesViewBody
-            createHostContext={createHostContext}
-            view={view}
-          />
-        </PanelSection>
+          view={view}
+        />
       );
     }
     if (view.content.kind === 'component') {
@@ -203,9 +315,9 @@ export function ViewContainerViews({
   }
 
   return (
-    <InspectorPanel>
+    <ViewPane>
       {treeSection}
       {otherSections}
-    </InspectorPanel>
+    </ViewPane>
   );
 }

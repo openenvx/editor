@@ -1,7 +1,7 @@
 import type { CommandPaletteContribution } from '../contributions/command-palette-contribution';
 import type { ContextMenuContribution } from '../contributions/context-menu-contribution';
-import type { InspectorPaneContribution } from '../contributions/inspector-pane-contribution';
 import type { OverlayContribution } from '../contributions/overlay-contribution';
+import type { PropertyPaneContribution } from '../contributions/property-pane-contribution';
 import type { StatusBarContribution } from '../contributions/status-bar-contribution';
 import type { ToolbarContribution } from '../contributions/toolbar-contribution';
 import type {
@@ -22,7 +22,7 @@ export class WorkbenchRegistries {
   readonly overlays: OverlayContribution[] = [];
   readonly statusBars: StatusBarContribution[] = [];
   readonly toolbars: ToolbarContribution[] = [];
-  readonly inspectorPanes: InspectorPaneContribution[] = [];
+  readonly propertyPanes: PropertyPaneContribution[] = [];
 }
 
 function contributionList(
@@ -51,8 +51,8 @@ function contributionList(
     case 'toolbar': {
       return registries.toolbars;
     }
-    case 'inspectorPane': {
-      return registries.inspectorPanes;
+    case 'propertyPane': {
+      return registries.propertyPanes;
     }
     default: {
       const exhaustive: never = point;

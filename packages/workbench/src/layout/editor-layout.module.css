@@ -40,9 +40,9 @@
   background: var(--wb-canvas-field);
 }
 
-.inspector {
+.secondarySidebar {
   flex-shrink: 0;
-  width: var(--wb-inspector-width);
+  width: var(--wb-secondary-sidebar-width);
   border-left: var(--wb-hairline);
   background: var(--wb-background);
   min-height: 0;

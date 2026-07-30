@@ -21,7 +21,7 @@ import {
 import { ResetImageCropCommand } from '../commands/reset-image-crop-command';
 import { CanvasCommandPaletteItems } from '../contributions/canvas-command-palette';
 import { CanvasContextMenu } from '../contributions/canvas-context-menu';
-import { canvasInspectorPaneContributions } from '../contributions/canvas-inspector-pane-contributions';
+import { canvasPropertyPaneContributions } from '../contributions/canvas-property-pane-contributions';
 import {
   CanvasStatusBarContribution,
   CanvasToolbarContribution,
@@ -43,7 +43,7 @@ export class CanvasProPlugin extends Plugin {
       new CanvasCommandPaletteItems(),
       new CanvasStatusBarContribution(),
       new CanvasToolbarContribution(),
-      ...canvasInspectorPaneContributions
+      ...canvasPropertyPaneContributions
     );
     ctx.register(
       new SingletonServiceContribution(

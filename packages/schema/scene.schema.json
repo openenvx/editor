@@ -515,6 +515,11 @@
                 "properties"
               ]
             },
+            "showInLayers": {
+              "default": true,
+              "description": "When false, embed consumers hide the layer from the Layers tree and block canvas selection; still renders/exports.",
+              "type": "boolean"
+            },
             "allowedDataKeys": {
               "description": "When writeMode is content, optional allowlist of editable data keys.",
               "type": "array",
@@ -649,6 +654,7 @@
             "locked",
             "visible",
             "writeMode",
+            "showInLayers",
             "data",
             "type"
           ],
@@ -872,6 +878,11 @@
                 "content",
                 "properties"
               ]
+            },
+            "showInLayers": {
+              "default": true,
+              "description": "When false, embed consumers hide the layer from the Layers tree and block canvas selection; still renders/exports.",
+              "type": "boolean"
             },
             "allowedDataKeys": {
               "description": "When writeMode is content, optional allowlist of editable data keys.",
@@ -941,6 +952,7 @@
             "locked",
             "visible",
             "writeMode",
+            "showInLayers",
             "data",
             "type"
           ],
@@ -1164,6 +1176,11 @@
                 "content",
                 "properties"
               ]
+            },
+            "showInLayers": {
+              "default": true,
+              "description": "When false, embed consumers hide the layer from the Layers tree and block canvas selection; still renders/exports.",
+              "type": "boolean"
             },
             "allowedDataKeys": {
               "description": "When writeMode is content, optional allowlist of editable data keys.",
@@ -1207,6 +1224,7 @@
             "locked",
             "visible",
             "writeMode",
+            "showInLayers",
             "data",
             "type"
           ],
@@ -1430,6 +1448,11 @@
                 "content",
                 "properties"
               ]
+            },
+            "showInLayers": {
+              "default": true,
+              "description": "When false, embed consumers hide the layer from the Layers tree and block canvas selection; still renders/exports.",
+              "type": "boolean"
             },
             "allowedDataKeys": {
               "description": "When writeMode is content, optional allowlist of editable data keys.",
@@ -1501,6 +1524,7 @@
             "locked",
             "visible",
             "writeMode",
+            "showInLayers",
             "data",
             "type"
           ],
@@ -1724,6 +1748,11 @@
                 "content",
                 "properties"
               ]
+            },
+            "showInLayers": {
+              "default": true,
+              "description": "When false, embed consumers hide the layer from the Layers tree and block canvas selection; still renders/exports.",
+              "type": "boolean"
             },
             "allowedDataKeys": {
               "description": "When writeMode is content, optional allowlist of editable data keys.",
@@ -1762,6 +1791,7 @@
             "locked",
             "visible",
             "writeMode",
+            "showInLayers",
             "data",
             "type"
           ],
@@ -1985,6 +2015,11 @@
                 "content",
                 "properties"
               ]
+            },
+            "showInLayers": {
+              "default": true,
+              "description": "When false, embed consumers hide the layer from the Layers tree and block canvas selection; still renders/exports.",
+              "type": "boolean"
             },
             "allowedDataKeys": {
               "description": "When writeMode is content, optional allowlist of editable data keys.",
@@ -2020,6 +2055,7 @@
             "locked",
             "visible",
             "writeMode",
+            "showInLayers",
             "data",
             "type"
           ],
@@ -2243,6 +2279,11 @@
                 "content",
                 "properties"
               ]
+            },
+            "showInLayers": {
+              "default": true,
+              "description": "When false, embed consumers hide the layer from the Layers tree and block canvas selection; still renders/exports.",
+              "type": "boolean"
             },
             "allowedDataKeys": {
               "description": "When writeMode is content, optional allowlist of editable data keys.",
@@ -2288,6 +2329,7 @@
             "locked",
             "visible",
             "writeMode",
+            "showInLayers",
             "data",
             "type"
           ],
@@ -2512,6 +2554,11 @@
                 "properties"
               ]
             },
+            "showInLayers": {
+              "default": true,
+              "description": "When false, embed consumers hide the layer from the Layers tree and block canvas selection; still renders/exports.",
+              "type": "boolean"
+            },
             "allowedDataKeys": {
               "description": "When writeMode is content, optional allowlist of editable data keys.",
               "type": "array",
@@ -2532,6 +2579,7 @@
             "locked",
             "visible",
             "writeMode",
+            "showInLayers",
             "data",
             "type"
           ],

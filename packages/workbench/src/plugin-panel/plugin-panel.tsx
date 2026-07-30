@@ -1,9 +1,9 @@
 import {
-  mapPluginTreeToInspectorPane,
+  mapPluginTreeToPropertyPane,
   createPluginInspectorHostContext,
   createManifestContributions,
   decodePluginHandlerCommand,
-  type InspectorPaneDescriptor,
+  type PropertyPaneDescriptor,
   type WorkbenchContributionDisposable,
 } from '@openenvx/headless';
 import {
@@ -21,7 +21,7 @@ import type { ReactNode } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
-import { InspectorContentRenderer } from '../renderers/inspector-content-renderer';
+import { PropertyContentRenderer } from '../renderers/property-content-renderer';
 import { canRunPluginPanelCommand } from './plugin-panel-command-gate';
 import type { PluginPanelTransport } from './plugin-panel-transport';
 
@@ -244,7 +244,7 @@ export function PluginPanel({
   }, [buildContext, transport]);
 
   const mapped = useMemo((): {
-    pane: InspectorPaneDescriptor | null;
+    pane: PropertyPaneDescriptor | null;
     mapError: string | null;
   } => {
     if (!root) {
@@ -252,7 +252,7 @@ export function PluginPanel({
     }
     try {
       return {
-        pane: mapPluginTreeToInspectorPane(root, { panelId: declaration.id }),
+        pane: mapPluginTreeToPropertyPane(root, { panelId: declaration.id }),
         mapError: null,
       };
     } catch (error: unknown) {
@@ -363,7 +363,7 @@ export function PluginPanel({
 
   return (
     <div className={styles.root}>
-      <InspectorContentRenderer
+      <PropertyContentRenderer
         fieldRenderers={fieldRenderers ?? []}
         hostContext={hostContext}
         layerData={values}

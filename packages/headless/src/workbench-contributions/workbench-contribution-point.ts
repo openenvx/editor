@@ -5,7 +5,7 @@ export enum WorkbenchContributionPoint {
   ContextMenu = 'contextMenu',
   Overlay = 'overlay',
   StatusBar = 'statusBar',
-  InspectorPane = 'inspectorPane',
+  PropertyPane = 'propertyPane',
   CommandPalette = 'commandPalette',
   Toolbar = 'toolbar',
 }

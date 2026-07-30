@@ -1,6 +1,7 @@
 import type { CommandContext, ContributionBuildContext } from '@openenvx/core';
 
 import type { MenuBuilder } from '../builders/menu-builder';
+import type { PropertyPaneDescriptor } from '../inspector/property-pane-descriptor';
 import { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
 import { WorkbenchContributionPoint } from '../workbench-contributions/workbench-contribution-point';
 
@@ -85,7 +86,15 @@ export abstract class ViewContribution extends WorkbenchContribution {
   /**
    * When set, the view renders a registered React panel instead of a tree.
    * Resolve via `registerViewPanel(componentId, Component)`.
-   * Works in both primary and secondary view containers.
+   * Only for non-form surfaces (chat, version history). Prefer
+   * {@link buildProperties} for settings / property panes.
    */
   componentId?: string;
+  /**
+   * VS Code–style properties view: declare field rows; workbench renders.
+   * Takes precedence over tree providers when implemented.
+   */
+  buildProperties?(ctx: ContributionBuildContext): PropertyPaneDescriptor;
+  /** viewsWelcome analogue when this view has no properties body. */
+  emptyMessage?: string;
 }

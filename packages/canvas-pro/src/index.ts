@@ -29,11 +29,11 @@ export {
   CanvasToolbarContribution,
 } from './contributions/canvas-shell-contributions';
 export {
-  CanvasLayerTransformInspectorPane,
-  CanvasPagePrintGuidesInspectorPane,
-  CanvasTransformsInspectorPane,
-  canvasInspectorPaneContributions,
-} from './contributions/canvas-inspector-pane-contributions';
+  CanvasLayerTransformPropertyPane,
+  CanvasPagePrintGuidesPropertyPane,
+  CanvasTransformsPropertyPane,
+  canvasPropertyPaneContributions,
+} from './contributions/canvas-property-pane-contributions';
 export { DEFAULT_CANVAS_LAYOUT } from './default-canvas-layout';
 export { createCanvasInspectorHostContextWithApi } from './inspector/create-canvas-inspector-host-context';
 export { SmartGuidesStageInteraction } from './stage/smart-guides-stage-interaction';

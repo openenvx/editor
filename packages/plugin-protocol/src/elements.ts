@@ -4,7 +4,7 @@ function element(type: PluginElementType): PluginElement {
   return { __pluginElement: true, type };
 }
 
-/** Inspector port — maps onto createInspectorPane(). */
+/** Property pane port — maps onto createPropertyPane(). */
 export const Pane = element('Pane');
 export const Row = element('Row');
 export const Block = element('Block');

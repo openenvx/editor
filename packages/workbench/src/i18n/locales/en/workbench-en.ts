@@ -34,7 +34,7 @@ export default {
   'commandPalette.filters': 'Command palette filters',
   'commandPalette.noResults': 'No results.',
   'commandPalette.other': 'Other',
-  'inspector.empty': 'Select a layer to edit properties',
+  'view.empty': 'Select a layer to edit properties',
   'viewContainer.workbench.inspector.title': 'Inspector',
   'viewContainer.workbench.sidebar.title': 'Layers',
   'view.workbench.pages.name': 'Pages',

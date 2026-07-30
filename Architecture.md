@@ -56,7 +56,7 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 - `CanvasStageInteractionService` — optional stage drag/resize adjustment + overlay primitives
 - Page size presets (`page-presets.ts`) and `AbsolutePageRules` (`layout: 'absolute'`) — dims defaults, preset inference, width/height validation
 
-**Canvas-only** workbench chrome (zoom/selection status, transform inspector panes, insert-tool toolbar, grid/rulers) lives in enterprise `@xmazu/openenvxee-canvas-pro`. Scene-generic chrome (Pages/Layers sidebar, dirty status) lives in `@xmazu/openenvxee-workbench` — see below.
+**Canvas-only** workbench chrome (zoom/selection status, transform property panes, insert-tool toolbar, grid/rulers) lives in enterprise `@xmazu/openenvxee-canvas-pro`. Scene-generic chrome (Pages/Layers sidebar, dirty status) lives in `@xmazu/openenvxee-workbench` — see below.
 
 ## What belongs in `@openenvx/html`
 
@@ -81,7 +81,7 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 - `InstantiationService` - service registry with `createServiceId` tokens
 - **Provider/Registry tier** — `Registry<K, V>` keyed runtime registrations (distinct from static contributions and DI services)
 - **No** canvas types, tokens, or registry contracts
-- **No** workbench UI contribution points (toolbar, palette, views, editor panes, inspector panes, field renderers)
+- **No** workbench UI contribution points (toolbar, palette, views, editor panes, property panes, field renderers)
 
 ## What belongs in `@openenvx/headless`
 
@@ -89,9 +89,9 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 - `bootstrapWorkbenchServices()` - registers headless-specific DI services on an `EditorRuntime`
 - `WorkbenchPlugin`, `WorkbenchRegistries`, `WorkbenchPluginContext.registerWorkbench()` - workbench UI contribution registration
 - `WorkbenchPluginContext.registerTreeDataProvider()`, `registerFieldRenderer()`, `registerStatusBarItemRenderer()`, `registerEditorPane()` - runtime provider registries
-- Workbench contribution points: `Toolbar`, `CommandPalette`, `ViewContainer`, `View`, `ContextMenu`, `StatusBar`, `Overlay`, `InspectorPane`
+- Workbench contribution points: `Toolbar`, `CommandPalette`, `ViewContainer`, `View`, `ContextMenu`, `StatusBar`, `Overlay`, `PropertyPane`
 - Provider registries: `ViewProviderRegistry`, `FieldRendererRegistry`, `StatusBarItemRendererRegistry`, `EditorPaneRegistry`
-- Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `InspectorPaneBuilder`
+- Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `PropertyPaneBuilder`
 - `WorkbenchLayout` (includes independent `activityBar` / `primarySidebar` / `secondarySidebar`), mutable via `WorkbenchApi` / `ShellUiService`
 - `WorkbenchLayoutStore` (optional host persistence for visibility + view-container locations)
 - `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
@@ -100,9 +100,9 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 
 ## What belongs in `@xmazu/openenvxee-plugin-protocol`
 
-Declarative plugin UI vocabulary (inspector panes, chrome menus/toolbar/status/palette), `h`/jsx runtime, `postMessage` message unions (`panel:tree`, `panel:manifest`, `panel:event`, …), and `validatePluginTree` size/type caps. Element trees are plain JSON; they do **not** include React.
+Declarative plugin UI vocabulary (property panes, chrome menus/toolbar/status/palette), `h`/jsx runtime, `postMessage` message unions (`panel:tree`, `panel:manifest`, `panel:event`, …), and `validatePluginTree` size/type caps. Element trees are plain JSON; they do **not** include React.
 
-Headless mappers (`mapPluginTreeToInspectorPane`, `mapPluginTreeToMenu`, …) live in `@openenvx/headless` and drive the existing fluent builders. Host rendering (`PluginPanel`, `createPostMessagePluginPanelTransport`) lives in `@xmazu/openenvxee-workbench` and renders mapped inspector descriptors through `InspectorContentRenderer`.
+Headless mappers (`mapPluginTreeToPropertyPane`, `mapPluginTreeToMenu`, …) live in `@openenvx/headless` and drive the existing fluent builders. Host rendering (`PluginPanel`, `createPostMessagePluginPanelTransport`) lives in `@xmazu/openenvxee-workbench` and renders mapped inspector descriptors through `PropertyContentRenderer`.
 
 Trust model, message allowlists, and cloud/marketplace runners: [Plugin-boundaries.md](Plugin-boundaries.md).
 
@@ -188,41 +188,41 @@ Plugin author API: [apps/docs/extension-guide.md](apps/docs/extension-guide.md).
 
 | Layer | Style | Examples |
 | --- | --- | --- |
-| `core`, `headless`, `canvas`, plugins | **OOP** - abstract classes, builders, visitors, resolvers | `Plugin`, `Command`, `LayerDefinition`, `InspectorPaneContribution`, `InspectorPaneBuilder`, `InspectorPathResolver` |
+| `core`, `headless`, `canvas`, plugins | **OOP** - abstract classes, builders, visitors, resolvers | `Plugin`, `Command`, `LayerDefinition`, `PropertyPaneContribution`, `PropertyPaneBuilder`, `InspectorPathResolver` |
 | App React UI | **Functional only** - function components and hooks; no class components | `PlaygroundShell`, `EditorPaneHost`, inspector field renderers |
 
 Rules:
 
 - Plugin API surface = **classes extending contribution base classes**, not plain config objects.
 - Inspector layout = **class hierarchy + visitor** (`InspectorLayoutNode.accept(visitor)`).
-- Layer properties use `PropertyBuilder` in core; workbench pane layout uses `InspectorPaneBuilder` in headless.
+- Layer properties use `PropertyBuilder` in core; workbench pane layout uses `PropertyPaneBuilder` in headless.
 - React shell **consumes** OOP descriptors via visitors.
 
-## Inspector flow
+## Property pane flow
 
 ```mermaid
 flowchart LR
   subgraph plugins [Plugins]
-    InspectorPlugin[InspectorPaneContribution]
+    PropertyPlugin[PropertyPaneContribution]
   end
   subgraph corePkg [core]
     PropertyBuilder[PropertyBuilder]
   end
   subgraph headlessPkg [headless]
-    Builder[InspectorPaneBuilder]
+    Builder[PropertyPaneBuilder]
     GenericCtx[createInspectorHostContext]
     Factory[LayerPropertiesPaneFactory]
   end
   subgraph app [studio / playground]
-    Visitor[Inspector field renderers]
+    Visitor[Property field renderers]
   end
-  InspectorPlugin -->|buildDescriptor| Builder
+  PropertyPlugin -->|buildDescriptor| Builder
   PropertyBuilder -->|layer.properties| Factory
-  headlessPkg -->|inspectorPanes on state| app
+  headlessPkg -->|viewContainers views| app
   GenericCtx --> Visitor
 ```
 
-1. Plugins subclass `InspectorPaneContribution` (headless) and implement `buildDescriptor()` using `createInspectorPane()`.
+1. Plugins subclass `PropertyPaneContribution` (headless) and implement `buildDescriptor()` using `createPropertyPane()`.
 2. `LayerDefinition.properties()` returns `PropertySectionDescriptor[]` from core `PropertyBuilder`.
-3. `WorkbenchController` merges plugin panes + synthesized layer property panes into `state.inspectorPanes`.
-4. App inspector UI uses `createInspectorHostContext` from `@openenvx/headless`.
+3. `WorkbenchController` merges plugin panes + synthesized layer property panes into `viewContainers` (inspector sidebar) as `content.kind: 'properties'` views.
+4. Shell views render panes via `ViewPane` + `PropertyContentRenderer`, using `createInspectorHostContext` from `@openenvx/headless`.

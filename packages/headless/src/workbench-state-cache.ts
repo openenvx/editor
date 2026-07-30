@@ -19,7 +19,7 @@ import type { EditorPaneRegistration } from './workbench/editor-pane-host-props'
 import type {
   FieldRendererRegistration,
   ViewPanelRegistration,
-} from './workbench/inspector-pane-registration';
+} from './workbench/panel-registrations';
 import type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
 import type { WorkbenchLayout } from './workbench/workbench-layout';
 

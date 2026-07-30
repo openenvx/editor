@@ -52,7 +52,7 @@ export { WorkbenchPlugin } from './workbench-plugin';
 
 export { CommandPaletteContribution } from './contributions/command-palette-contribution';
 export { ContextMenuContribution } from './contributions/context-menu-contribution';
-export { InspectorPaneContribution } from './contributions/inspector-pane-contribution';
+export { PropertyPaneContribution } from './contributions/property-pane-contribution';
 export {
   OverlayContribution,
   type OverlayDescriptor,
@@ -127,10 +127,11 @@ export {
   InspectorBlockNode,
   InspectorInputGroupNode,
   InspectorLayoutNode,
-  InspectorPaneBuilder,
-  InspectorPaneDescriptor,
+  PropertyBlockBuilder,
+  PropertyPaneBuilder,
+  PropertyPaneDescriptor,
   InspectorRowNode,
-  createInspectorPane,
+  createPropertyPane,
 } from './inspector';
 export type {
   InspectorInputGroupCell,
@@ -160,10 +161,9 @@ export type {
   EditorPaneRegistration,
 } from './workbench/editor-pane-host-props';
 export type {
-  InspectorPaneRegistration,
   FieldRendererRegistration,
   ViewPanelRegistration,
-} from './workbench/inspector-pane-registration';
+} from './workbench/panel-registrations';
 export type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
 
 export type {
@@ -175,7 +175,7 @@ export { VersionHistoryProviderId } from './version-history/version-history-serv
 
 export { getNestedValue, setNestedValue } from './utils/nested-value';
 
-export { mapPluginTreeToInspectorPane } from './plugin-protocol/map-plugin-tree-to-inspector-pane';
+export { mapPluginTreeToPropertyPane } from './plugin-protocol/map-plugin-tree-to-property-pane';
 export {
   mapPluginTreeToMenu,
   contributePluginTreeToMenu,

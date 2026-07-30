@@ -76,6 +76,12 @@ function build(o: typeof z.object) {
       .enum(['locked', 'free', 'content', 'properties'])
       .default('free')
       .describe('Template write permission mode.'),
+    showInLayers: z
+      .boolean()
+      .default(true)
+      .describe(
+        'When false, embed consumers hide the layer from the Layers tree and block canvas selection; still renders/exports.'
+      ),
     allowedDataKeys: z
       .array(z.string())
       .optional()

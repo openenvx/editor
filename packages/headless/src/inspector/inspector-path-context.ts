@@ -1,8 +1,26 @@
-import type { Scene } from '@openenvx/core';
+import {
+  findLayerById,
+  getLayerWriteMode,
+  isLayerShownInLayers,
+  type Scene,
+} from '@openenvx/core';
 
 import { getNestedValue } from '../utils/nested-value';
 import type { InspectorHostContext } from './inspector-path-resolver';
 import type { InspectorValuePath } from './inspector-value-path';
+
+const TEMPLATE_POLICY_KEYS = [
+  'allowDeleteLayers',
+  'allowDuplicateLayers',
+  'allowInsertLayers',
+  'allowPageResize',
+] as const;
+
+type TemplatePolicyKey = (typeof TEMPLATE_POLICY_KEYS)[number];
+
+function isTemplatePolicyKey(key: string): key is TemplatePolicyKey {
+  return (TEMPLATE_POLICY_KEYS as readonly string[]).includes(key);
+}
 
 export interface InspectorPathContextOptions {
   scene: Scene;
@@ -19,16 +37,55 @@ export interface InspectorPathContextOptions {
 export function createInspectorHostContext(
   options: InspectorPathContextOptions
 ): InspectorHostContext {
-  const { selectedLayerId, layerData, updateProperty, executeCommand } =
+  const { scene, selectedLayerId, layerData, updateProperty, executeCommand } =
     options;
+  const primaryLayer = selectedLayerId
+    ? findLayerById(scene, selectedLayerId)
+    : null;
 
   return {
     layerData,
     readPath(path: InspectorValuePath): unknown {
+      if (path.startsWith('scene.templatePolicy.')) {
+        const key = path.slice('scene.templatePolicy.'.length);
+        if (!isTemplatePolicyKey(key)) {
+          return undefined;
+        }
+        return scene.templatePolicy?.[key] ?? true;
+      }
+
+      if (path === 'selection.layer.writeMode') {
+        return primaryLayer ? getLayerWriteMode(primaryLayer) : 'free';
+      }
+
+      if (path === 'selection.layer.showInLayers') {
+        return primaryLayer ? isLayerShownInLayers(primaryLayer) : true;
+      }
+
       return readInspectorPath(path, { layerData });
     },
     selectedLayerId,
     writePath(path: InspectorValuePath, value: unknown): void {
+      if (path.startsWith('scene.templatePolicy.')) {
+        const key = path.slice('scene.templatePolicy.'.length);
+        if (isTemplatePolicyKey(key) && typeof value === 'boolean') {
+          void executeCommand('scene.setTemplatePolicy', { [key]: value });
+        }
+        return;
+      }
+
+      if (path === 'selection.layer.writeMode') {
+        void executeCommand('scene.setLayerWriteMode', { writeMode: value });
+        return;
+      }
+
+      if (path === 'selection.layer.showInLayers') {
+        void executeCommand('scene.setLayerShowInLayers', {
+          showInLayers: value,
+        });
+        return;
+      }
+
       writeInspectorPath(path, value, {
         executeCommand,
         selectedLayerId,

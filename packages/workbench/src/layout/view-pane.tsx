@@ -4,23 +4,23 @@ import { InspectorPopoverProvider } from '../context/inspector-popover-context';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { cn } from '../lib/cn';
 
-import styles from './inspector-panel.module.css';
+import styles from './view-pane.module.css';
 
-export interface InspectorPanelProps {
+export interface ViewPaneProps {
   children?: ReactNode;
   empty?: boolean;
   emptyMessage?: string;
   className?: string;
 }
 
-export function InspectorPanel({
+export function ViewPane({
   children,
   empty,
   emptyMessage,
   className,
-}: InspectorPanelProps) {
+}: ViewPaneProps) {
   const { t } = useWorkbenchTranslation();
-  const resolvedEmptyMessage = emptyMessage ?? t('inspector.empty');
+  const resolvedEmptyMessage = emptyMessage ?? t('view.empty');
   if (empty) {
     return (
       <div className={cn(styles.empty, className)}>{resolvedEmptyMessage}</div>
@@ -28,7 +28,7 @@ export function InspectorPanel({
   }
 
   return (
-    <InspectorPopoverProvider className={cn(styles.inspector, className)}>
+    <InspectorPopoverProvider className={cn(styles.pane, className)}>
       {children}
     </InspectorPopoverProvider>
   );

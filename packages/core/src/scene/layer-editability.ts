@@ -7,11 +7,34 @@ import type {
 import { getLayerChildren, hasChildLayers, walkLayers } from './layer-tree';
 import type { Layer } from './types';
 
+/**
+ * Session flag: when false (dashboard authoring), writeMode / showInLayers /
+ * templatePolicy do not constrain editing. When true (embed consumer), they do.
+ * ponytail: process-wide for the active workbench; set once at shell start.
+ */
+let templatePolicyEnforced = true;
+
+export function setTemplatePolicyEnforced(enforced: boolean): void {
+  templatePolicyEnforced = enforced;
+}
+
+export function isTemplatePolicyEnforced(): boolean {
+  return templatePolicyEnforced;
+}
+
 export function getLayerWriteMode(layer: Layer): LayerWriteMode {
   return layer.writeMode ?? 'free';
 }
 
+/** Absent/true = listed in Layers tree for consumers. */
+export function isLayerShownInLayers(layer: Layer): boolean {
+  return layer.showInLayers !== false;
+}
+
 export function isLayerEditable(layer: Layer): boolean {
+  if (!isTemplatePolicyEnforced()) {
+    return true;
+  }
   return getLayerWriteMode(layer) !== 'locked';
 }
 
@@ -28,12 +51,21 @@ export function isLayerWritable(layer: Layer): boolean {
 }
 
 export function canSelectLayer(layer: Layer): boolean {
+  if (!isTemplatePolicyEnforced()) {
+    return true;
+  }
+  if (!isLayerShownInLayers(layer)) {
+    return false;
+  }
   return getLayerWriteMode(layer) !== 'locked';
 }
 
 export function canTransformLayer(layer: Layer): boolean {
   if (!isLayerWritable(layer)) {
     return false;
+  }
+  if (!isTemplatePolicyEnforced()) {
+    return true;
   }
 
   const mode = getLayerWriteMode(layer);
@@ -43,6 +75,9 @@ export function canTransformLayer(layer: Layer): boolean {
 export function canEditLayerData(layer: Layer, key?: string): boolean {
   if (!isLayerWritable(layer)) {
     return false;
+  }
+  if (!isTemplatePolicyEnforced()) {
+    return true;
   }
 
   const mode = getLayerWriteMode(layer);
@@ -66,6 +101,9 @@ export function canDeleteLayer(layer: Layer, scene: Scene): boolean {
   if (!canTransformLayer(layer)) {
     return false;
   }
+  if (!isTemplatePolicyEnforced()) {
+    return true;
+  }
 
   return scene.templatePolicy?.allowDeleteLayers !== false;
 }
@@ -73,6 +111,9 @@ export function canDeleteLayer(layer: Layer, scene: Scene): boolean {
 export function canDuplicateLayer(layer: Layer, scene: Scene): boolean {
   if (!canTransformLayer(layer)) {
     return false;
+  }
+  if (!isTemplatePolicyEnforced()) {
+    return true;
   }
 
   return scene.templatePolicy?.allowDuplicateLayers !== false;
@@ -83,10 +124,16 @@ export function canReorderLayer(layer: Layer): boolean {
 }
 
 export function canInsertLayers(scene: Scene): boolean {
+  if (!isTemplatePolicyEnforced()) {
+    return true;
+  }
   return scene.templatePolicy?.allowInsertLayers !== false;
 }
 
 export function canResizePage(scene: Scene): boolean {
+  if (!isTemplatePolicyEnforced()) {
+    return true;
+  }
   return scene.templatePolicy?.allowPageResize !== false;
 }
 
@@ -136,12 +183,14 @@ export function buildFrozenLayerSnapshot(
 /** Persist freeze snapshots onto `templatePolicy.frozenLayers` for write enforcement. */
 export function withFrozenLayerSnapshots(scene: Scene): Scene {
   const policy = scene.templatePolicy;
-  if (!policy) {
-    return scene;
-  }
   return {
     ...scene,
     templatePolicy: {
+      allowDeleteLayers: policy?.allowDeleteLayers ?? true,
+      allowDuplicateLayers: policy?.allowDuplicateLayers ?? true,
+      allowInsertLayers: policy?.allowInsertLayers ?? true,
+      allowPageResize: policy?.allowPageResize ?? true,
+      version: 1,
       ...policy,
       frozenLayers: buildFrozenLayerSnapshot(scene),
     },
@@ -179,6 +228,9 @@ function restoreFrozenLayer(
 
 /** Re-apply `templatePolicy.frozenLayers` snapshots onto matching layers. */
 export function applyFrozenLayerPolicy(scene: Scene): Scene {
+  if (!isTemplatePolicyEnforced()) {
+    return scene;
+  }
   const frozen = scene.templatePolicy?.frozenLayers;
   if (!frozen || Object.keys(frozen).length === 0) {
     return scene;

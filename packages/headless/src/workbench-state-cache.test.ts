@@ -16,9 +16,9 @@ import { createLayerPreviewBuilder } from '@openenvx/preview';
 import { normalizeScene } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
-import { InspectorPaneContribution } from './contributions/inspector-pane-contribution';
+import { PropertyPaneContribution } from './contributions/property-pane-contribution';
 import { ViewContainerContribution } from './contributions/view-contribution';
-import { createInspectorPane } from './inspector/inspector-pane-builder';
+import { createPropertyPane } from './inspector/property-pane-builder';
 import { WORKBENCH_INSPECTOR_CONTAINER_ID } from './workbench/inspector-container';
 import { WorkbenchController } from './workbench-controller';
 import { WorkbenchPlugin } from './workbench-plugin';
@@ -93,12 +93,12 @@ function createSceneWithLayers() {
   });
 }
 
-class LayerSelectedInspectorPane extends InspectorPaneContribution {
+class LayerSelectedPropertyPane extends PropertyPaneContribution {
   readonly id = 'test.layer-selected';
   readonly title = 'Layer Selected';
 
   buildDescriptor(_ctx: ContributionBuildContext) {
-    return createInspectorPane(this.id, this.title)
+    return createPropertyPane(this.id, this.title)
       .when('scene.layerSelected')
       .row('Label', { key: 'label', kind: 'text', label: 'Label' })
       .build();
@@ -126,7 +126,7 @@ class InspectorWorkbenchPlugin extends WorkbenchPlugin {
     ctx.registerWorkbench(
       new LayersContainer(),
       new InspectorContainer(),
-      new LayerSelectedInspectorPane()
+      new LayerSelectedPropertyPane()
     );
   }
 }

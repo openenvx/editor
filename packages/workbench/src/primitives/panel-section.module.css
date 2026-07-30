@@ -6,28 +6,55 @@
   border-bottom: none;
 }
 
+.headerBar {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-1);
+  min-height: 36px;
+  padding: 0 var(--wb-space-3);
+}
+
 .header,
 .headerStatic {
   display: flex;
+  min-width: 0;
+  flex: 1;
   align-items: center;
-  width: 100%;
-  padding: 10px var(--wb-space-3);
-  color: var(--wb-foreground);
+  gap: var(--wb-space-1);
+  padding: 0;
+  color: var(--wb-muted-foreground);
   font-size: var(--wb-text-sm);
   font-weight: 500;
+  line-height: 16px;
   letter-spacing: -0.01em;
   text-align: left;
 }
 
 .header {
   border: none;
+  border-radius: var(--wb-radius-md);
   background: transparent;
   cursor: pointer;
+  outline: none;
+}
+
+.header:hover {
+  color: var(--wb-foreground);
+}
+
+.header:focus-visible {
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+.title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chevron {
   flex-shrink: 0;
-  margin-right: var(--wb-space-2);
   color: var(--wb-muted-foreground);
 }
 

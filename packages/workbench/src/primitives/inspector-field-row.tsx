@@ -9,6 +9,8 @@ export interface InspectorFieldRowProps {
   htmlFor?: string;
   children: ReactNode;
   className?: string;
+  /** `switch`: flex h-9 truncate label + trailing control (toggles). Default: 56px grid. */
+  variant?: 'default' | 'switch';
 }
 
 export function InspectorFieldRow({
@@ -16,9 +18,16 @@ export function InspectorFieldRow({
   htmlFor,
   children,
   className,
+  variant = 'default',
 }: InspectorFieldRowProps) {
   return (
-    <div className={cn(styles.fieldRow, className)}>
+    <div
+      className={cn(
+        styles.fieldRow,
+        variant === 'switch' && styles.fieldRowSwitch,
+        className
+      )}
+    >
       {htmlFor ? (
         <label className={styles.label} htmlFor={htmlFor}>
           {label}

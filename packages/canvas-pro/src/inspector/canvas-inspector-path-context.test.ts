@@ -127,4 +127,37 @@ describe('createCanvasInspectorHostContext', () => {
       safeMm: 10,
     });
   });
+
+  it('reads and writes embed layer / templatePolicy paths', () => {
+    const scene = createSceneWithLayer();
+    scene.pages[0]!.layers[0]!.writeMode = 'content';
+    scene.pages[0]!.layers[0]!.showInLayers = false;
+    const executeCommand = vi.fn();
+    const ctx = createCanvasInspectorHostContext({
+      scene,
+      selectedLayerId: 'layer-1',
+      layerData: null,
+      updateProperty: vi.fn(),
+      executeCommand,
+      updateLayerTransform: vi.fn(),
+    });
+
+    expect(ctx.readPath('selection.layer.writeMode')).toBe('content');
+    expect(ctx.readPath('selection.layer.showInLayers')).toBe(false);
+    expect(ctx.readPath('scene.templatePolicy.allowInsertLayers')).toBe(true);
+
+    ctx.writePath('selection.layer.writeMode', 'locked');
+    ctx.writePath('selection.layer.showInLayers', true);
+    ctx.writePath('scene.templatePolicy.allowInsertLayers', false);
+
+    expect(executeCommand).toHaveBeenCalledWith('scene.setLayerWriteMode', {
+      writeMode: 'locked',
+    });
+    expect(executeCommand).toHaveBeenCalledWith('scene.setLayerShowInLayers', {
+      showInLayers: true,
+    });
+    expect(executeCommand).toHaveBeenCalledWith('scene.setTemplatePolicy', {
+      allowInsertLayers: false,
+    });
+  });
 });

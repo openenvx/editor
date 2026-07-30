@@ -1,0 +1,52 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 32px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--wb-border);
+  cursor: pointer;
+  outline: none;
+  transition: background 0.12s ease;
+}
+
+.root:hover:not(:disabled) {
+  background: var(--wb-muted-foreground);
+}
+
+.root:focus-visible {
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+.root:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checked {
+  background: var(--wb-selection);
+}
+
+.checked:hover:not(:disabled) {
+  background: var(--wb-selection);
+  opacity: 0.92;
+}
+
+.thumb {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--wb-card);
+  box-shadow: var(--wb-shadow-control);
+  transform: translateX(1px);
+  transition: transform 0.12s ease;
+  pointer-events: none;
+}
+
+.checked .thumb {
+  transform: translateX(15px);
+}

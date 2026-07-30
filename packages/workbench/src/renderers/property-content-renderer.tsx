@@ -23,7 +23,7 @@ import { buildCustomRendererMap } from './property-field-registry';
 import type { PropertyFieldComponent } from './property-field-types';
 import { getFieldId } from './property-field-types';
 
-export interface InspectorContentRendererProps {
+export interface PropertyContentRendererProps {
   nodes: InspectorLayoutNode[];
   layerId: string;
   layerData: Record<string, unknown>;
@@ -136,6 +136,7 @@ function createInspectorLayoutVisitor(
         <InspectorFieldRow
           htmlFor={getFieldId(context.layerId, node.field.key)}
           label={node.label}
+          variant={node.field.kind === 'toggle' ? 'switch' : 'default'}
         >
           {control}
         </InspectorFieldRow>
@@ -160,14 +161,14 @@ function toInputGroupField(
   };
 }
 
-export function InspectorContentRenderer({
+export function PropertyContentRenderer({
   nodes,
   layerId,
   layerData,
   fieldRenderers,
   hostContext,
   onCommand,
-}: InspectorContentRendererProps) {
+}: PropertyContentRendererProps) {
   const customRenderers = useMemo(
     () => buildCustomRendererMap(fieldRenderers),
     [fieldRenderers]

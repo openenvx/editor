@@ -2,8 +2,10 @@ import {
   getLayerChildren,
   isLayerEditable,
   isLayerLocked,
+  isLayerShownInLayers,
   isLayerVisible,
   isLayerWritable,
+  isTemplatePolicyEnforced,
   localize,
   moveLayerRelativeToTarget,
   movePageRelativeToTarget,
@@ -81,11 +83,19 @@ export class PagesTreeProvider extends TreeDataProvider<Page> {
 
 export class LayersTreeProvider extends TreeDataProvider<Layer> {
   getRootChildren(ctx: CommandContext): Layer[] {
-    return ctx.scene.getActivePage().layers;
+    const layers = ctx.scene.getActivePage().layers;
+    if (!isTemplatePolicyEnforced()) {
+      return layers;
+    }
+    return layers.filter((layer) => isLayerShownInLayers(layer));
   }
 
   getChildren(node: Layer): Layer[] {
-    return getLayerChildren(node);
+    const children = getLayerChildren(node);
+    if (!isTemplatePolicyEnforced()) {
+      return children;
+    }
+    return children.filter((layer) => isLayerShownInLayers(layer));
   }
 
   getTreeItem(node: Layer, ctx: CommandContext): TreeItem {

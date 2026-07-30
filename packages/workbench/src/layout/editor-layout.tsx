@@ -6,7 +6,7 @@ export interface EditorLayoutProps {
   topBar?: ReactNode;
   primarySidebar?: ReactNode;
   editor?: ReactNode;
-  inspector?: ReactNode;
+  secondarySidebar?: ReactNode;
   statusBar?: ReactNode;
 }
 
@@ -14,7 +14,7 @@ export function EditorLayout({
   topBar,
   primarySidebar,
   editor,
-  inspector,
+  secondarySidebar,
   statusBar,
 }: EditorLayoutProps) {
   return (
@@ -25,8 +25,8 @@ export function EditorLayout({
           <aside className={styles.primarySidebar}>{primarySidebar}</aside>
         ) : null}
         {editor ? <main className={styles.editor}>{editor}</main> : null}
-        {inspector ? (
-          <aside className={styles.inspector}>{inspector}</aside>
+        {secondarySidebar ? (
+          <aside className={styles.secondarySidebar}>{secondarySidebar}</aside>
         ) : null}
       </div>
       {statusBar ? (

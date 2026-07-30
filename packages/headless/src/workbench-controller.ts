@@ -7,6 +7,7 @@ import {
   PluginManager,
   Registry,
   SceneStore,
+  setTemplatePolicyEnforced,
   updateLayerInTree,
   WorkbenchEvents,
   type CommandExecutionResult,
@@ -101,6 +102,7 @@ export class WorkbenchController {
 
   constructor(private readonly options: WorkbenchControllerOptions) {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
+    setTemplatePolicyEnforced(options.enforceTemplatePolicy !== false);
     const snapshot = options.initialScene
       ? normalizeSceneSnapshot({
           scene: options.initialScene,
@@ -146,6 +148,10 @@ export class WorkbenchController {
     keys.setContext('workbench.primarySidebar', this.layout.primarySidebar);
     keys.setContext('workbench.secondarySidebar', this.layout.secondarySidebar);
     keys.setContext('workbench.editorArea', this.layout.editorArea);
+    keys.setContext(
+      'template.policyEnforced',
+      this.options.enforceTemplatePolicy !== false
+    );
   }
 
   private registerCoreServices(): void {
@@ -708,6 +714,7 @@ export class WorkbenchController {
     this.listeners.clear();
     this.interactionState.dispose();
     this.runtime.dispose();
+    setTemplatePolicyEnforced(true);
   }
 
   /** @internal */

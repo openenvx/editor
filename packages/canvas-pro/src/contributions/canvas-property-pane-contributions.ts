@@ -1,7 +1,7 @@
 import type { ContributionBuildContext } from '@openenvx/core';
 import {
-  createInspectorPane,
-  InspectorPaneContribution,
+  createPropertyPane,
+  PropertyPaneContribution,
   InspectorPath,
 } from '@openenvx/headless';
 
@@ -28,13 +28,13 @@ function scrubMmField(key: string, label: string) {
   };
 }
 
-export class CanvasPagePrintGuidesInspectorPane extends InspectorPaneContribution {
+export class CanvasPagePrintGuidesPropertyPane extends PropertyPaneContribution {
   readonly id = 'canvas.pagePrintGuides';
   readonly title = 'Print guides';
 
   buildDescriptor(ctx: ContributionBuildContext) {
     const t = ctx.t;
-    return createInspectorPane(
+    return createPropertyPane(
       this.id,
       t('canvas.inspector.pagePrintGuides.title', this.title)
     )
@@ -54,13 +54,13 @@ export class CanvasPagePrintGuidesInspectorPane extends InspectorPaneContributio
   }
 }
 
-export class CanvasLayerTransformInspectorPane extends InspectorPaneContribution {
+export class CanvasLayerTransformPropertyPane extends PropertyPaneContribution {
   readonly id = 'canvas.layer';
   readonly title = 'Layer';
 
   buildDescriptor(ctx: ContributionBuildContext) {
     const t = ctx.t;
-    return createInspectorPane(
+    return createPropertyPane(
       this.id,
       t('canvas.inspector.layer.title', this.title)
     )
@@ -90,13 +90,13 @@ export class CanvasLayerTransformInspectorPane extends InspectorPaneContribution
   }
 }
 
-export class CanvasSvgNodesInspectorPane extends InspectorPaneContribution {
+export class CanvasSvgNodesPropertyPane extends PropertyPaneContribution {
   readonly id = 'canvas.svgNodes';
   readonly title = 'SVG nodes';
 
   buildDescriptor(ctx: ContributionBuildContext) {
     const t = ctx.t;
-    return createInspectorPane(
+    return createPropertyPane(
       this.id,
       t('canvas.inspector.svgNodes.title', this.title)
     )
@@ -116,13 +116,13 @@ export class CanvasSvgNodesInspectorPane extends InspectorPaneContribution {
   }
 }
 
-export class CanvasTransformsInspectorPane extends InspectorPaneContribution {
+export class CanvasTransformsPropertyPane extends PropertyPaneContribution {
   readonly id = 'canvas.transforms';
   readonly title = 'Transforms';
 
   buildDescriptor(ctx: ContributionBuildContext) {
     const t = ctx.t;
-    return createInspectorPane(
+    return createPropertyPane(
       this.id,
       t('canvas.inspector.transforms.title', this.title)
     )
@@ -154,9 +154,9 @@ export class CanvasTransformsInspectorPane extends InspectorPaneContribution {
   }
 }
 
-export const canvasInspectorPaneContributions = [
-  new CanvasPagePrintGuidesInspectorPane(),
-  new CanvasLayerTransformInspectorPane(),
-  new CanvasSvgNodesInspectorPane(),
-  new CanvasTransformsInspectorPane(),
+export const canvasPropertyPaneContributions = [
+  new CanvasPagePrintGuidesPropertyPane(),
+  new CanvasLayerTransformPropertyPane(),
+  new CanvasSvgNodesPropertyPane(),
+  new CanvasTransformsPropertyPane(),
 ];

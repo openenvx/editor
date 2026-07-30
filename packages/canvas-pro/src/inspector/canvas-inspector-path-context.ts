@@ -2,6 +2,8 @@ import {
   clampTransformSize,
   findLayerById,
   getActivePage,
+  getLayerWriteMode,
+  isLayerShownInLayers,
 } from '@openenvx/core';
 import type {
   InspectorValuePath,
@@ -20,6 +22,19 @@ export interface CanvasInspectorPathContextOptions extends InspectorPathContextO
     layerId: string,
     transform: Transform
   ) => void | Promise<boolean>;
+}
+
+const TEMPLATE_POLICY_KEYS = [
+  'allowDeleteLayers',
+  'allowDuplicateLayers',
+  'allowInsertLayers',
+  'allowPageResize',
+] as const;
+
+type TemplatePolicyKey = (typeof TEMPLATE_POLICY_KEYS)[number];
+
+function isTemplatePolicyKey(key: string): key is TemplatePolicyKey {
+  return (TEMPLATE_POLICY_KEYS as readonly string[]).includes(key);
 }
 
 export function createCanvasInspectorHostContext(
@@ -53,6 +68,14 @@ export function createCanvasInspectorHostContext(
         return undefined;
       }
 
+      if (path.startsWith('scene.templatePolicy.')) {
+        const key = path.slice('scene.templatePolicy.'.length);
+        if (!isTemplatePolicyKey(key)) {
+          return undefined;
+        }
+        return scene.templatePolicy?.[key] ?? true;
+      }
+
       if (path.startsWith('selection.layer.transform.')) {
         const key = path.slice('selection.layer.transform.'.length);
         const transform = primaryLayer?.transform;
@@ -60,6 +83,14 @@ export function createCanvasInspectorHostContext(
           return 0;
         }
         return transform[key as keyof Transform];
+      }
+
+      if (path === 'selection.layer.writeMode') {
+        return primaryLayer ? getLayerWriteMode(primaryLayer) : 'free';
+      }
+
+      if (path === 'selection.layer.showInLayers') {
+        return primaryLayer ? isLayerShownInLayers(primaryLayer) : true;
       }
 
       return base.readPath(path);
@@ -84,6 +115,14 @@ export function createCanvasInspectorHostContext(
         return;
       }
 
+      if (path.startsWith('scene.templatePolicy.')) {
+        const key = path.slice('scene.templatePolicy.'.length);
+        if (isTemplatePolicyKey(key) && typeof value === 'boolean') {
+          void executeCommand('scene.setTemplatePolicy', { [key]: value });
+        }
+        return;
+      }
+
       if (selectedLayerId && path.startsWith('selection.layer.transform.')) {
         const key = path.slice('selection.layer.transform.'.length);
         const current = primaryLayer?.transform;
@@ -93,6 +132,18 @@ export function createCanvasInspectorHostContext(
         const patch = { [key]: value } as Partial<Transform>;
         const transform = clampTransformSize({ ...current, ...patch });
         void updateLayerTransform(selectedLayerId, transform);
+        return;
+      }
+
+      if (path === 'selection.layer.writeMode') {
+        void executeCommand('scene.setLayerWriteMode', { writeMode: value });
+        return;
+      }
+
+      if (path === 'selection.layer.showInLayers') {
+        void executeCommand('scene.setLayerShowInLayers', {
+          showInLayers: value,
+        });
         return;
       }
 

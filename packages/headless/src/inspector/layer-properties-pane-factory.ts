@@ -1,13 +1,13 @@
 import type { PropertySectionDescriptor } from '@openenvx/core';
 
-import { InspectorPaneDescriptor } from '../inspector/inspector-pane-descriptor';
 import { InspectorRowNode } from '../inspector/inspector-row-node';
+import { PropertyPaneDescriptor } from '../inspector/property-pane-descriptor';
 import { InspectorPath } from './inspector-path';
 
 const LAYER_PROPERTIES_PRIORITY = 30;
 
 export class LayerPropertiesPaneFactory {
-  build(sections: PropertySectionDescriptor[]): InspectorPaneDescriptor[] {
+  build(sections: PropertySectionDescriptor[]): PropertyPaneDescriptor[] {
     return sections.map((section, index) => {
       const nodes = section.fields.map(
         (field) =>
@@ -18,7 +18,7 @@ export class LayerPropertiesPaneFactory {
           )
       );
 
-      return new InspectorPaneDescriptor(
+      return new PropertyPaneDescriptor(
         `core.properties.${section.id}`,
         section.label ?? section.id,
         nodes,

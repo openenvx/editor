@@ -9,8 +9,16 @@ export const InspectorPath = {
     return `selection.layer.transform.${key}`;
   },
 
+  layerProp(key: string): InspectorValuePath {
+    return `selection.layer.${key}`;
+  },
+
   activePage(key: string): InspectorValuePath {
     return `scene.activePage.${key}`;
+  },
+
+  templatePolicy(key: string): InspectorValuePath {
+    return `scene.templatePolicy.${key}`;
   },
 
   command(commandId: string): InspectorValuePath {

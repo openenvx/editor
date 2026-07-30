@@ -170,10 +170,11 @@ function buildInspectorViews(
   evaluateWhen: (when: string | undefined) => boolean
 ): ViewDescriptor[] {
   const panes = [
-    ...workbenchRegistries.inspectorPanes
+    ...workbenchRegistries.propertyPanes
       .map((pane) => pane.buildDescriptor(buildCtx))
       .filter((descriptor) => evaluateWhen(descriptor.when))
       .map((descriptor) => ({
+        headerToggle: descriptor.headerToggle,
         id: descriptor.id,
         nodes: descriptor.nodes,
         priority: descriptor.priority,
@@ -183,6 +184,7 @@ function buildInspectorViews(
       ? new LayerPropertiesPaneFactory()
           .build(properties)
           .map((descriptor) => ({
+            headerToggle: descriptor.headerToggle,
             id: descriptor.id,
             nodes: descriptor.nodes,
             priority: descriptor.priority,
@@ -194,7 +196,11 @@ function buildInspectorViews(
   return panes.map((pane, index) => ({
     collapsible: true,
     containerId: WORKBENCH_INSPECTOR_CONTAINER_ID,
-    content: { kind: 'properties' as const, nodes: pane.nodes },
+    content: {
+      headerToggle: pane.headerToggle,
+      kind: 'properties' as const,
+      nodes: pane.nodes,
+    },
     id: pane.id,
     initialCollapsed: false,
     name: pane.title,
