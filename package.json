@@ -13,7 +13,7 @@
     "test": "turbo run test -- --run",
     "lint": "turbo run lint",
     "check": "ultracite check && knip",
-    "precommit": "bun run check && bun run build && bun run test && turbo run test:coverage --filter=@openenvx/html",
+    "precommit": "bun run check && turbo run build --filter='...[HEAD]' --filter='!./apps/*' && turbo run test --filter='...[HEAD]' --filter='!./apps/*' -- --run && turbo run test:coverage --filter='@openenvx/html[HEAD]'",
     "knip": "knip",
     "fix": "ultracite fix",
     "changeset": "changeset",

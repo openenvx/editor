@@ -1,8 +1,8 @@
 import { normalizeSceneSnapshot } from '@openenvx/schema';
 import { describe, expect, it, vi } from 'vitest';
 
-import { InspectorPath } from './inspector-path';
-import { createInspectorHostContext } from './inspector-path-context';
+import { PropertyPath } from './property-path';
+import { createPropertyHostContext } from './property-path-context';
 
 const scene = normalizeSceneSnapshot({
   pages: [
@@ -32,37 +32,37 @@ const scene = normalizeSceneSnapshot({
   },
 }).scene;
 
-describe('createInspectorHostContext', () => {
+describe('createPropertyHostContext', () => {
   it('reads and writes layer data paths', () => {
     const updateProperty = vi.fn();
-    const ctx = createInspectorHostContext({
+    const ctx = createPropertyHostContext({
       executeCommand: vi.fn(),
       layerData: { text: 'hi' },
       scene,
       selectedLayerId: 'a',
       updateProperty,
     });
-    expect(ctx.readPath(InspectorPath.layerData('text'))).toBe('hi');
-    ctx.writePath(InspectorPath.layerData('text'), 'bye');
+    expect(ctx.readPath(PropertyPath.layerData('text'))).toBe('hi');
+    ctx.writePath(PropertyPath.layerData('text'), 'bye');
     expect(updateProperty).toHaveBeenCalledWith('a', 'text', 'bye');
   });
 
   it('reads layer scalar props and routes writes to scene commands', () => {
     const executeCommand = vi.fn().mockResolvedValue(true);
-    const ctx = createInspectorHostContext({
+    const ctx = createPropertyHostContext({
       executeCommand,
       layerData: {},
       scene,
       selectedLayerId: 'a',
       updateProperty: vi.fn(),
     });
-    expect(ctx.readPath(InspectorPath.layerProp('writeMode'))).toBe('free');
-    expect(ctx.readPath(InspectorPath.layerProp('showInLayers'))).toBe(true);
-    ctx.writePath(InspectorPath.layerProp('writeMode'), 'content');
+    expect(ctx.readPath(PropertyPath.layerProp('writeMode'))).toBe('free');
+    expect(ctx.readPath(PropertyPath.layerProp('showInLayers'))).toBe(true);
+    ctx.writePath(PropertyPath.layerProp('writeMode'), 'content');
     expect(executeCommand).toHaveBeenCalledWith('scene.setLayerWriteMode', {
       writeMode: 'content',
     });
-    ctx.writePath(InspectorPath.layerProp('showInLayers'), false);
+    ctx.writePath(PropertyPath.layerProp('showInLayers'), false);
     expect(executeCommand).toHaveBeenCalledWith('scene.setLayerShowInLayers', {
       showInLayers: false,
     });
@@ -70,17 +70,17 @@ describe('createInspectorHostContext', () => {
 
   it('reads and writes templatePolicy flags', () => {
     const executeCommand = vi.fn().mockResolvedValue(true);
-    const ctx = createInspectorHostContext({
+    const ctx = createPropertyHostContext({
       executeCommand,
       layerData: null,
       scene,
       selectedLayerId: null,
       updateProperty: vi.fn(),
     });
-    expect(ctx.readPath(InspectorPath.templatePolicy('allowInsertLayers'))).toBe(
+    expect(ctx.readPath(PropertyPath.templatePolicy('allowInsertLayers'))).toBe(
       true
     );
-    ctx.writePath(InspectorPath.templatePolicy('allowInsertLayers'), false);
+    ctx.writePath(PropertyPath.templatePolicy('allowInsertLayers'), false);
     expect(executeCommand).toHaveBeenCalledWith('scene.setTemplatePolicy', {
       allowInsertLayers: false,
     });

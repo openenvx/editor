@@ -1,7 +1,7 @@
 import { createContributionBuildContext } from '@openenvx/core';
 import type { PropertySectionDescriptor } from '@openenvx/core';
 
-import { LayerPropertiesPaneFactory } from '../inspector/layer-properties-pane-factory';
+import { LayerPropertiesPaneFactory } from '../properties/layer-properties-pane-factory';
 import type {
   ViewContainerDescriptor,
   ViewDescriptor,

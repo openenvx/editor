@@ -6,18 +6,18 @@ import {
   isLayerShownInLayers,
 } from '@openenvx/core';
 import type {
-  InspectorValuePath,
-  InspectorHostContext,
-  InspectorPathContextOptions,
+  PropertyValuePath,
+  PropertyHostContext,
+  PropertyPathContextOptions,
 } from '@openenvx/headless';
-import { createInspectorHostContext } from '@openenvx/headless';
+import { createPropertyHostContext } from '@openenvx/headless';
 import {
   resolvePageBleedMm,
   resolvePageSafeMm,
   type Transform,
 } from '@openenvx/schema';
 
-export interface CanvasInspectorPathContextOptions extends InspectorPathContextOptions {
+export interface CanvasPropertyPathContextOptions extends PropertyPathContextOptions {
   updateLayerTransform: (
     layerId: string,
     transform: Transform
@@ -37,10 +37,10 @@ function isTemplatePolicyKey(key: string): key is TemplatePolicyKey {
   return (TEMPLATE_POLICY_KEYS as readonly string[]).includes(key);
 }
 
-export function createCanvasInspectorHostContext(
-  options: CanvasInspectorPathContextOptions
-): InspectorHostContext {
-  const base = createInspectorHostContext(options);
+export function createCanvasPropertyHostContext(
+  options: CanvasPropertyPathContextOptions
+): PropertyHostContext {
+  const base = createPropertyHostContext(options);
   const {
     scene,
     activePageId,
@@ -56,7 +56,7 @@ export function createCanvasInspectorHostContext(
   return {
     layerData: base.layerData,
     selectedLayerId: base.selectedLayerId,
-    readPath(path: InspectorValuePath): unknown {
+    readPath(path: PropertyValuePath): unknown {
       if (path.startsWith('scene.activePage.')) {
         const key = path.slice('scene.activePage.'.length);
         if (key === 'bleedMm') {
@@ -95,7 +95,7 @@ export function createCanvasInspectorHostContext(
 
       return base.readPath(path);
     },
-    writePath(path: InspectorValuePath, value: unknown): void {
+    writePath(path: PropertyValuePath, value: unknown): void {
       if (path.startsWith('command.')) {
         const commandId = path.slice('command.'.length);
         void executeCommand(commandId);

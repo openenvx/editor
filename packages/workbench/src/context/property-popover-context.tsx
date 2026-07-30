@@ -1,14 +1,14 @@
 import { createContext, useContext, useMemo, useRef } from 'react';
 import type { ReactNode, RefObject } from 'react';
 
-interface InspectorPopoverContextValue {
+interface PropertyPopoverContextValue {
   panelRef: RefObject<HTMLDivElement | null>;
 }
 
-const InspectorPopoverContext =
-  createContext<InspectorPopoverContextValue | null>(null);
+const PropertyPopoverContext =
+  createContext<PropertyPopoverContextValue | null>(null);
 
-export function InspectorPopoverProvider({
+export function PropertyPopoverProvider({
   children,
   className,
 }: {
@@ -18,14 +18,14 @@ export function InspectorPopoverProvider({
   const panelRef = useRef<HTMLDivElement | null>(null);
   const value = useMemo(() => ({ panelRef }), []);
   return (
-    <InspectorPopoverContext.Provider value={value}>
+    <PropertyPopoverContext.Provider value={value}>
       <div className={className} ref={panelRef}>
         {children}
       </div>
-    </InspectorPopoverContext.Provider>
+    </PropertyPopoverContext.Provider>
   );
 }
 
-export function useInspectorPopoverPanel() {
-  return useContext(InspectorPopoverContext);
+export function usePropertyPopoverPanel() {
+  return useContext(PropertyPopoverContext);
 }

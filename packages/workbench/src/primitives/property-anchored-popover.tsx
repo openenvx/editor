@@ -2,8 +2,8 @@ import { Slot } from '@radix-ui/react-slot';
 import { useRef } from 'react';
 import type { ReactNode } from 'react';
 
-import { useInspectorPopoverPanel } from '../context/inspector-popover-context';
-import { useInspectorPopoverAnchor } from '../hooks/use-inspector-popover-anchor';
+import { usePropertyPopoverPanel } from '../context/property-popover-context';
+import { usePropertyPopoverAnchor } from '../hooks/use-property-popover-anchor';
 import {
   Popover,
   PopoverAnchor,
@@ -12,7 +12,7 @@ import {
 } from './popover';
 import type { PopoverPlacement, PopoverTriggerProps } from './popover';
 
-export interface InspectorAnchoredPopoverProps {
+export interface PropertyAnchoredPopoverProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger: PopoverTriggerProps['children'];
@@ -21,19 +21,19 @@ export interface InspectorAnchoredPopoverProps {
   placement?: PopoverPlacement;
 }
 
-export function InspectorAnchoredPopover({
+export function PropertyAnchoredPopover({
   open,
   onOpenChange,
   trigger,
   title,
   children,
   placement,
-}: InspectorAnchoredPopoverProps) {
+}: PropertyAnchoredPopoverProps) {
   const triggerRef = useRef<HTMLElement>(null);
-  const inspectorPanel = useInspectorPopoverPanel();
-  const anchorRect = useInspectorPopoverAnchor(
+  const propertyPanel = usePropertyPopoverPanel();
+  const anchorRect = usePropertyPopoverAnchor(
     open,
-    inspectorPanel?.panelRef,
+    propertyPanel?.panelRef,
     triggerRef
   );
   const lastAnchorRef = useRef(anchorRect);
@@ -62,7 +62,7 @@ export function InspectorAnchoredPopover({
         />
       ) : null}
       {displayAnchor ? (
-        <PopoverContent placement={placement} title={title} variant="inspector">
+        <PopoverContent placement={placement} title={title} variant="property">
           {children}
         </PopoverContent>
       ) : null}

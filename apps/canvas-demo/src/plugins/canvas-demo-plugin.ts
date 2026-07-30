@@ -11,7 +11,7 @@ import {
   CanvasDemoExportStatusBar,
   createCanvasDemoExportCommands,
 } from '../contributions/canvas-demo-export';
-import { PagePresetFieldRenderer } from '../inspector/page-preset-field-renderer';
+import { PagePresetFieldRenderer } from '../properties/page-preset-field-renderer';
 import {
   CanvasDemoExportServiceId,
   CanvasDemoExportServiceImpl,

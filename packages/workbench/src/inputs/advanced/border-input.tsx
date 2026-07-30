@@ -7,7 +7,7 @@ import { NumericControl } from '../basic/numeric-control';
 import type { NumericFieldLike } from '../types';
 import { ColorInput } from './color-input';
 
-import inspectorStyles from '../../primitives/inspector-field.module.css';
+import propertyFieldStyles from '../../primitives/property-field.module.css';
 
 export interface BorderInputProps {
   field: NumericFieldLike;
@@ -35,8 +35,8 @@ export function BorderInput({
   onUpdate,
 }: BorderInputProps) {
   return (
-    <div className={inspectorStyles.controlRow}>
-      <div className={inspectorStyles.inputGrow}>
+    <div className={propertyFieldStyles.controlRow}>
+      <div className={propertyFieldStyles.inputGrow}>
         <NumericControl
           field={field}
           id={id}
@@ -55,7 +55,7 @@ export function BorderInput({
       ) : (
         <IconButton
           aria-label="Clear border"
-          className={inspectorStyles.iconAction}
+          className={propertyFieldStyles.iconAction}
           onClick={() => {
             onBorderChange(0);
             onStrokeChange('transparent');

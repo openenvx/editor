@@ -96,7 +96,7 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 - `WorkbenchLayoutStore` (optional host persistence for visibility + view-container locations)
 - `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
 - `WorkbenchProvider`, `useWorkbenchContext` (React bridge)
-- `createInspectorHostContext`, `InspectorPathResolver`, `LayerPropertiesPaneFactory`, `InspectorPath`
+- `createPropertyHostContext`, `PropertyPathResolver`, `LayerPropertiesPaneFactory`, `PropertyPath`
 
 ## What belongs in `@xmazu/openenvxee-plugin-protocol`
 
@@ -150,7 +150,7 @@ flowchart TB
   Shell --> Controller
 ```
 
-1. `WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages/Layers + dirty status) plus default inspector/fields plugins.
+1. `WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages/Layers + dirty status) plus default Inspector container / fields plugins.
 2. `CanvasBasicsPlugin` registers canvas engine contributions via core `ctx.register()` and canvas registries.
 3. Enterprise `CanvasProPlugin` registers **canvas-only** workbench chrome (zoom status, transform inspectors, …).
 4. `HtmlBlocksPlugin` registers HTML `LayerDefinition`s (inspector props) + `HtmlEditorPane`.
@@ -188,13 +188,13 @@ Plugin author API: [apps/docs/extension-guide.md](apps/docs/extension-guide.md).
 
 | Layer | Style | Examples |
 | --- | --- | --- |
-| `core`, `headless`, `canvas`, plugins | **OOP** - abstract classes, builders, visitors, resolvers | `Plugin`, `Command`, `LayerDefinition`, `PropertyPaneContribution`, `PropertyPaneBuilder`, `InspectorPathResolver` |
+| `core`, `headless`, `canvas`, plugins | **OOP** - abstract classes, builders, visitors, resolvers | `Plugin`, `Command`, `LayerDefinition`, `PropertyPaneContribution`, `PropertyPaneBuilder`, `PropertyPathResolver` |
 | App React UI | **Functional only** - function components and hooks; no class components | `PlaygroundShell`, `EditorPaneHost`, inspector field renderers |
 
 Rules:
 
 - Plugin API surface = **classes extending contribution base classes**, not plain config objects.
-- Inspector layout = **class hierarchy + visitor** (`InspectorLayoutNode.accept(visitor)`).
+- Property layout = **class hierarchy + visitor** (`PropertyLayoutNode.accept(visitor)`).
 - Layer properties use `PropertyBuilder` in core; workbench pane layout uses `PropertyPaneBuilder` in headless.
 - React shell **consumes** OOP descriptors via visitors.
 
@@ -210,7 +210,7 @@ flowchart LR
   end
   subgraph headlessPkg [headless]
     Builder[PropertyPaneBuilder]
-    GenericCtx[createInspectorHostContext]
+    GenericCtx[createPropertyHostContext]
     Factory[LayerPropertiesPaneFactory]
   end
   subgraph app [studio / playground]
@@ -225,4 +225,4 @@ flowchart LR
 1. Plugins subclass `PropertyPaneContribution` (headless) and implement `buildDescriptor()` using `createPropertyPane()`.
 2. `LayerDefinition.properties()` returns `PropertySectionDescriptor[]` from core `PropertyBuilder`.
 3. `WorkbenchController` merges plugin panes + synthesized layer property panes into `viewContainers` (inspector sidebar) as `content.kind: 'properties'` views.
-4. Shell views render panes via `ViewPane` + `PropertyContentRenderer`, using `createInspectorHostContext` from `@openenvx/headless`.
+4. Shell views render panes via `ViewPane` + `PropertyContentRenderer`, using `createPropertyHostContext` from `@openenvx/headless`.

@@ -12,7 +12,7 @@ export interface SwitchProps extends Omit<
   onChange: (checked: boolean) => void;
 }
 
-/** Compact pill switch — used for inspector toggles and section header enables. */
+/** Compact pill switch — used for property toggles and section header enables. */
 export function Switch({
   checked,
   onChange,

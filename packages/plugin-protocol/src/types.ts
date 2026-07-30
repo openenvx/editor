@@ -1,5 +1,5 @@
-/** Inspector port element kinds — compile to fluent builders via headless mapper. */
-export const PLUGIN_INSPECTOR_ELEMENT_TYPES = [
+/** Property pane element kinds — compile to fluent builders via headless mapper. */
+export const PLUGIN_PROPERTY_ELEMENT_TYPES = [
   'Pane',
   'Row',
   'Block',
@@ -46,12 +46,12 @@ export const PLUGIN_CHROME_ELEMENT_TYPES = [
 
 /** All element kinds in the declarative plugin vocabulary. */
 export const PLUGIN_ELEMENT_TYPES = [
-  ...PLUGIN_INSPECTOR_ELEMENT_TYPES,
+  ...PLUGIN_PROPERTY_ELEMENT_TYPES,
   ...PLUGIN_CHROME_ELEMENT_TYPES,
 ] as const;
 
 export type PluginInspectorElementType =
-  (typeof PLUGIN_INSPECTOR_ELEMENT_TYPES)[number];
+  (typeof PLUGIN_PROPERTY_ELEMENT_TYPES)[number];
 export type PluginChromeElementType =
   (typeof PLUGIN_CHROME_ELEMENT_TYPES)[number];
 export type PluginElementType = (typeof PLUGIN_ELEMENT_TYPES)[number];
@@ -84,7 +84,7 @@ export const PLUGIN_FIELD_KINDS = [
 export type PluginFieldKind = (typeof PLUGIN_FIELD_KINDS)[number];
 
 /**
- * Element type → PropertyFieldKind for inspector field elements.
+ * Element type → PropertyFieldKind for property field elements.
  */
 export const PLUGIN_FIELD_ELEMENT_TO_KIND: Readonly<
   Record<string, PluginFieldKind>

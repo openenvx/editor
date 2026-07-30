@@ -16,7 +16,7 @@ export interface SegmentedControlProps<T extends string> {
   onChange: (value: T) => void;
   className?: string;
   fullWidth?: boolean;
-  variant?: 'inspector';
+  variant?: 'property';
 }
 
 export function SegmentedControl<T extends string>({
@@ -30,7 +30,7 @@ export function SegmentedControl<T extends string>({
     <div
       className={cn(
         styles.root,
-        styles.inspector,
+        styles.compact,
         fullWidth && styles.fullWidth,
         className
       )}

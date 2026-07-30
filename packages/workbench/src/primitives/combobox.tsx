@@ -35,7 +35,7 @@ export interface ComboboxProps {
   optionStyle?: (option: ComboboxOption) => CSSProperties | undefined;
 }
 
-/** Kept for reuse; font picker uses InspectorAnchoredPopover for now. */
+/** Kept for reuse; font picker uses PropertyAnchoredPopover for now. */
 export function Combobox({
   id,
   value,

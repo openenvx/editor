@@ -26,8 +26,8 @@ import type {
   SidebarBehavior,
   ViewContainerLocation,
 } from './contributions/view-contribution';
-import type { InspectorLayoutNode } from './inspector/inspector-layout-node';
-import type { InspectorValuePath } from './inspector/inspector-value-path';
+import type { PropertyLayoutNode } from './properties/property-layout-node';
+import type { PropertyValuePath } from './properties/property-value-path';
 import type { WorkbenchContributionDisposable } from './registries/workbench-registries';
 import type { WorkbenchContribution } from './workbench-contributions/workbench-contribution';
 import type { EditorPaneRegistration } from './workbench/editor-pane-host-props';
@@ -59,8 +59,8 @@ export type ViewContent =
   | { kind: 'tree'; items: ViewTreeItem[] }
   | {
       kind: 'properties';
-      nodes: InspectorLayoutNode[];
-      headerToggle?: InspectorValuePath;
+      nodes: PropertyLayoutNode[];
+      headerToggle?: PropertyValuePath;
     }
   | { kind: 'component'; componentId: string }
   | { kind: 'welcome'; message: string };

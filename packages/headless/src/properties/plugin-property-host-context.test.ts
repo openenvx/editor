@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  createPluginInspectorHostContext,
+  createPluginPropertyHostContext,
   decodePluginHandlerCommand,
   encodePluginHandlerCommand,
-} from './plugin-inspector-host-context';
+} from './plugin-property-host-context';
 
-describe('createPluginInspectorHostContext', () => {
+describe('createPluginPropertyHostContext', () => {
   it('reads and writes plugin.<panelId>.<key> paths', () => {
     const writes: { path: string; value: unknown }[] = [];
     const values: Record<string, unknown> = { fill: '#f00' };
-    const host = createPluginInspectorHostContext({
+    const host = createPluginPropertyHostContext({
       panelId: 'assets',
       values,
       onWrite: (path, value) => {

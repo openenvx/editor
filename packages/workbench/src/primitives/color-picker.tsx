@@ -3,7 +3,7 @@ import { HexAlphaColorPicker } from 'react-colorful';
 
 import { cn } from '../lib/cn';
 import { Input } from './input';
-import { InspectorAnchoredPopover } from './inspector-anchored-popover';
+import { PropertyAnchoredPopover } from './property-anchored-popover';
 
 import styles from './color-picker.module.css';
 
@@ -294,7 +294,7 @@ export function ColorPickerPopover({
         placeholder={placeholder}
         value={inlineValue}
       />
-      <InspectorAnchoredPopover
+      <PropertyAnchoredPopover
         onOpenChange={setOpen}
         open={open}
         trigger={
@@ -314,7 +314,7 @@ export function ColorPickerPopover({
           placeholder={placeholder}
           value={value}
         />
-      </InspectorAnchoredPopover>
+      </PropertyAnchoredPopover>
     </div>
   );
 }

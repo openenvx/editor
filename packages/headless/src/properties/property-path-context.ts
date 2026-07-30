@@ -6,8 +6,8 @@ import {
 } from '@openenvx/core';
 
 import { getNestedValue } from '../utils/nested-value';
-import type { InspectorHostContext } from './inspector-path-resolver';
-import type { InspectorValuePath } from './inspector-value-path';
+import type { PropertyHostContext } from './property-path-resolver';
+import type { PropertyValuePath } from './property-value-path';
 
 const TEMPLATE_POLICY_KEYS = [
   'allowDeleteLayers',
@@ -22,7 +22,7 @@ function isTemplatePolicyKey(key: string): key is TemplatePolicyKey {
   return (TEMPLATE_POLICY_KEYS as readonly string[]).includes(key);
 }
 
-export interface InspectorPathContextOptions {
+export interface PropertyPathContextOptions {
   scene: Scene;
   activePageId?: string | null;
   selectedLayerId: string | null;
@@ -34,9 +34,9 @@ export interface InspectorPathContextOptions {
   ) => void | Promise<boolean>;
 }
 
-export function createInspectorHostContext(
-  options: InspectorPathContextOptions
-): InspectorHostContext {
+export function createPropertyHostContext(
+  options: PropertyPathContextOptions
+): PropertyHostContext {
   const { scene, selectedLayerId, layerData, updateProperty, executeCommand } =
     options;
   const primaryLayer = selectedLayerId
@@ -45,7 +45,7 @@ export function createInspectorHostContext(
 
   return {
     layerData,
-    readPath(path: InspectorValuePath): unknown {
+    readPath(path: PropertyValuePath): unknown {
       if (path.startsWith('scene.templatePolicy.')) {
         const key = path.slice('scene.templatePolicy.'.length);
         if (!isTemplatePolicyKey(key)) {
@@ -62,10 +62,10 @@ export function createInspectorHostContext(
         return primaryLayer ? isLayerShownInLayers(primaryLayer) : true;
       }
 
-      return readInspectorPath(path, { layerData });
+      return readPropertyPath(path, { layerData });
     },
     selectedLayerId,
-    writePath(path: InspectorValuePath, value: unknown): void {
+    writePath(path: PropertyValuePath, value: unknown): void {
       if (path.startsWith('scene.templatePolicy.')) {
         const key = path.slice('scene.templatePolicy.'.length);
         if (isTemplatePolicyKey(key) && typeof value === 'boolean') {
@@ -86,7 +86,7 @@ export function createInspectorHostContext(
         return;
       }
 
-      writeInspectorPath(path, value, {
+      writePropertyPath(path, value, {
         executeCommand,
         selectedLayerId,
         updateProperty,
@@ -95,8 +95,8 @@ export function createInspectorHostContext(
   };
 }
 
-function readInspectorPath(
-  path: InspectorValuePath,
+function readPropertyPath(
+  path: PropertyValuePath,
   ctx: {
     layerData: Record<string, unknown> | null;
   }
@@ -119,8 +119,8 @@ function readInspectorPath(
   return undefined;
 }
 
-function writeInspectorPath(
-  path: InspectorValuePath,
+function writePropertyPath(
+  path: PropertyValuePath,
   value: unknown,
   ctx: {
     selectedLayerId: string | null;

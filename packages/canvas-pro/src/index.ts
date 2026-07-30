@@ -35,7 +35,7 @@ export {
   canvasPropertyPaneContributions,
 } from './contributions/canvas-property-pane-contributions';
 export { DEFAULT_CANVAS_LAYOUT } from './default-canvas-layout';
-export { createCanvasInspectorHostContextWithApi } from './inspector/create-canvas-inspector-host-context';
+export { createCanvasPropertyHostContextWithApi } from './properties/create-canvas-property-host-context';
 export { SmartGuidesStageInteraction } from './stage/smart-guides-stage-interaction';
 export {
   ImageCropInteraction,

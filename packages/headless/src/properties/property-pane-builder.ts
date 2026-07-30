@@ -6,21 +6,21 @@ import {
   type PropertyFieldDescriptor,
 } from '@openenvx/core';
 
-import { InspectorBlockNode } from './inspector-block-node';
-import { InspectorInputGroupNode } from './inspector-input-group-node';
-import type { InspectorLayoutNode } from './inspector-layout-node';
-import { InspectorRowNode } from './inspector-row-node';
-import type {
-  InspectorInputGroupCell,
-  InspectorValuePath,
-} from './inspector-value-path';
+import { PropertyBlockNode } from './property-block-node';
+import { PropertyInputGroupNode } from './property-input-group-node';
+import type { PropertyLayoutNode } from './property-layout-node';
 import { PropertyPaneDescriptor } from './property-pane-descriptor';
+import { PropertyRowNode } from './property-row-node';
+import type {
+  PropertyInputGroupCell,
+  PropertyValuePath,
+} from './property-value-path';
 
 function getLastRowField(
-  nodes: InspectorLayoutNode[]
+  nodes: PropertyLayoutNode[]
 ): PropertyFieldDescriptor | null {
   const last = nodes.at(-1);
-  if (last instanceof InspectorRowNode) {
+  if (last instanceof PropertyRowNode) {
     return last.field;
   }
   return null;
@@ -28,19 +28,19 @@ function getLastRowField(
 
 /** Shared layout surface for pane + nested block builders. */
 export class PropertyBlockBuilder {
-  readonly nodes: InspectorLayoutNode[] = [];
+  readonly nodes: PropertyLayoutNode[] = [];
 
   row(
     label: string,
     field: PropertyFieldDescriptor,
-    path?: InspectorValuePath
+    path?: PropertyValuePath
   ): this {
-    this.nodes.push(new InspectorRowNode(label, field, path));
+    this.nodes.push(new PropertyRowNode(label, field, path));
     return this;
   }
 
-  inputGroup(blockLabel: string, cells: InspectorInputGroupCell[]): this {
-    this.nodes.push(new InspectorInputGroupNode(blockLabel, cells));
+  inputGroup(blockLabel: string, cells: PropertyInputGroupCell[]): this {
+    this.nodes.push(new PropertyInputGroupNode(blockLabel, cells));
     return this;
   }
 
@@ -76,10 +76,10 @@ export class PropertyBlockBuilder {
 }
 
 export class PropertyPaneBuilder {
-  private readonly nodes: InspectorLayoutNode[] = [];
+  private readonly nodes: PropertyLayoutNode[] = [];
   private whenClause?: string;
   private panePriority?: number;
-  private headerTogglePath?: InspectorValuePath;
+  private headerTogglePath?: PropertyValuePath;
 
   constructor(
     private readonly id: string,
@@ -97,7 +97,7 @@ export class PropertyPaneBuilder {
   }
 
   /** Master enable switch in the section header (Smart Stacking–style). */
-  headerToggle(path: InspectorValuePath): this {
+  headerToggle(path: PropertyValuePath): this {
     this.headerTogglePath = path;
     return this;
   }
@@ -105,21 +105,21 @@ export class PropertyPaneBuilder {
   row(
     label: string,
     field: PropertyFieldDescriptor,
-    path?: InspectorValuePath
+    path?: PropertyValuePath
   ): this {
-    this.nodes.push(new InspectorRowNode(label, field, path));
+    this.nodes.push(new PropertyRowNode(label, field, path));
     return this;
   }
 
-  inputGroup(blockLabel: string, cells: InspectorInputGroupCell[]): this {
-    this.nodes.push(new InspectorInputGroupNode(blockLabel, cells));
+  inputGroup(blockLabel: string, cells: PropertyInputGroupCell[]): this {
+    this.nodes.push(new PropertyInputGroupNode(blockLabel, cells));
     return this;
   }
 
   block(label: string, build: (builder: PropertyBlockBuilder) => void): this {
     const blockBuilder = new PropertyBlockBuilder();
     build(blockBuilder);
-    this.nodes.push(new InspectorBlockNode(label, blockBuilder.nodes));
+    this.nodes.push(new PropertyBlockNode(label, blockBuilder.nodes));
     return this;
   }
 

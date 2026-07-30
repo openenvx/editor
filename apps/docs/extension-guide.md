@@ -170,7 +170,7 @@ class EmbedOptionsView extends ViewContribution {
 
   buildProperties(ctx: ContributionBuildContext) {
     return createPropertyPane(this.id, this.name)
-      .row('Edit mode', { key: 'writeMode', kind: 'select', … }, InspectorPath.layerProp('writeMode'))
+      .row('Edit mode', { key: 'writeMode', kind: 'select', … }, PropertyPath.layerProp('writeMode'))
       .build();
   }
 }

@@ -12,24 +12,24 @@ export {
   type LayerSurfaceItem,
 } from './workbench-state';
 export {
-  InspectorPathResolver,
-  InspectorValueHandle,
-  type InspectorHostContext,
-} from './inspector/inspector-path-resolver';
-export { InspectorPath } from './inspector/inspector-path';
+  PropertyPathResolver,
+  PropertyValueHandle,
+  type PropertyHostContext,
+} from './properties/property-path-resolver';
+export { PropertyPath } from './properties/property-path';
 export {
-  createInspectorHostContext,
-  type InspectorPathContextOptions,
-} from './inspector/inspector-path-context';
+  createPropertyHostContext,
+  type PropertyPathContextOptions,
+} from './properties/property-path-context';
 export {
-  createPluginInspectorHostContext,
+  createPluginPropertyHostContext,
   decodePluginHandlerCommand,
   encodePluginHandlerCommand,
   PLUGIN_HANDLER_COMMAND_PREFIX,
   PLUGIN_PATH_PREFIX,
-  type PluginInspectorHostContextOptions,
-} from './inspector/plugin-inspector-host-context';
-export { LayerPropertiesPaneFactory } from './inspector/layer-properties-pane-factory';
+  type PluginPropertyHostContextOptions,
+} from './properties/plugin-property-host-context';
+export { LayerPropertiesPaneFactory } from './properties/layer-properties-pane-factory';
 
 export { WorkbenchContributionPoint } from './workbench-contributions/workbench-contribution-point';
 export { WorkbenchContribution } from './workbench-contributions/workbench-contribution';
@@ -124,20 +124,20 @@ export {
 } from './builders/shell-dropdown';
 
 export {
-  InspectorBlockNode,
-  InspectorInputGroupNode,
-  InspectorLayoutNode,
+  PropertyBlockNode,
+  PropertyInputGroupNode,
+  PropertyLayoutNode,
   PropertyBlockBuilder,
   PropertyPaneBuilder,
   PropertyPaneDescriptor,
-  InspectorRowNode,
+  PropertyRowNode,
   createPropertyPane,
-} from './inspector';
+} from './properties';
 export type {
-  InspectorInputGroupCell,
-  InspectorLayoutVisitor,
-  InspectorValuePath,
-} from './inspector';
+  PropertyInputGroupCell,
+  PropertyLayoutVisitor,
+  PropertyValuePath,
+} from './properties';
 
 export {
   WorkbenchPart,

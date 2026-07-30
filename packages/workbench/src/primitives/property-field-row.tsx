@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 
 import { cn } from '../lib/cn';
 
-import styles from './inspector-field-row.module.css';
+import styles from './property-field-row.module.css';
 
-export interface InspectorFieldRowProps {
+export interface PropertyFieldRowProps {
   label: string;
   htmlFor?: string;
   children: ReactNode;
@@ -13,13 +13,13 @@ export interface InspectorFieldRowProps {
   variant?: 'default' | 'switch';
 }
 
-export function InspectorFieldRow({
+export function PropertyFieldRow({
   label,
   htmlFor,
   children,
   className,
   variant = 'default',
-}: InspectorFieldRowProps) {
+}: PropertyFieldRowProps) {
   return (
     <div
       className={cn(
@@ -40,17 +40,17 @@ export function InspectorFieldRow({
   );
 }
 
-export interface InspectorFieldBlockProps {
+export interface PropertyFieldBlockProps {
   label: string;
   children: ReactNode;
   className?: string;
 }
 
-export function InspectorFieldBlock({
+export function PropertyFieldBlock({
   label,
   children,
   className,
-}: InspectorFieldBlockProps) {
+}: PropertyFieldBlockProps) {
   return (
     <div className={cn(styles.fieldBlock, className)}>
       <span className={styles.blockLabel}>{label}</span>

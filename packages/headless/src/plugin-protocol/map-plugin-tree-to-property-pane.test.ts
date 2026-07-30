@@ -9,9 +9,9 @@ import {
 } from '@xmazu/openenvxee-plugin-protocol';
 import { describe, expect, it } from 'vitest';
 
-import { InspectorPath } from '../inspector/inspector-path';
-import type { PropertyPaneDescriptor } from '../inspector/property-pane-descriptor';
-import { createPropertyPane } from '../inspector/property-pane-builder';
+import { PropertyPath } from '../properties/property-path';
+import type { PropertyPaneDescriptor } from '../properties/property-pane-descriptor';
+import { createPropertyPane } from '../properties/property-pane-builder';
 import { mapPluginTreeToPropertyPane } from './map-plugin-tree-to-property-pane';
 
 function serializePane(pane: PropertyPaneDescriptor): unknown {
@@ -72,7 +72,7 @@ describe('mapPluginTreeToPropertyPane', () => {
             label: 'X',
             numeric: { precision: 0, scrub: true },
           },
-          path: InspectorPath.layerTransform('x'),
+          path: PropertyPath.layerTransform('x'),
         },
         {
           field: {
@@ -81,7 +81,7 @@ describe('mapPluginTreeToPropertyPane', () => {
             label: 'Y',
             numeric: { precision: 0, scrub: true },
           },
-          path: InspectorPath.layerTransform('y'),
+          path: PropertyPath.layerTransform('y'),
         },
       ])
       .build();
@@ -101,14 +101,14 @@ describe('mapPluginTreeToPropertyPane', () => {
           h(Number, {
             key: 'x',
             label: 'X',
-            bind: InspectorPath.layerTransform('x'),
+            bind: PropertyPath.layerTransform('x'),
             scrub: true,
             precision: 0,
           }),
           h(Number, {
             key: 'y',
             label: 'Y',
-            bind: InspectorPath.layerTransform('y'),
+            bind: PropertyPath.layerTransform('y'),
             scrub: true,
             precision: 0,
           })
@@ -131,7 +131,7 @@ describe('mapPluginTreeToPropertyPane', () => {
           label: 'Rotate',
           numeric: { precision: 0, scrub: true, unit: '°' },
         },
-        InspectorPath.layerTransform('rotation')
+        PropertyPath.layerTransform('rotation')
       )
       .withActions([
         {
@@ -169,7 +169,7 @@ describe('mapPluginTreeToPropertyPane', () => {
             {
               key: 'rotation',
               label: 'Rotate',
-              bind: InspectorPath.layerTransform('rotation'),
+              bind: PropertyPath.layerTransform('rotation'),
               scrub: true,
               precision: 0,
               unit: '°',
@@ -215,7 +215,7 @@ describe('mapPluginTreeToPropertyPane', () => {
             {
               key: 'name',
               label: 'Name',
-              bind: InspectorPath.plugin('ext.panel', 'name'),
+              bind: PropertyPath.plugin('ext.panel', 'name'),
             },
             h(Action, {
               icon: 'sparkles',

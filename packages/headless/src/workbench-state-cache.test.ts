@@ -18,7 +18,7 @@ import { describe, expect, it } from 'vitest';
 
 import { PropertyPaneContribution } from './contributions/property-pane-contribution';
 import { ViewContainerContribution } from './contributions/view-contribution';
-import { createPropertyPane } from './inspector/property-pane-builder';
+import { createPropertyPane } from './properties/property-pane-builder';
 import { WORKBENCH_INSPECTOR_CONTAINER_ID } from './workbench/inspector-container';
 import { WorkbenchController } from './workbench-controller';
 import { WorkbenchPlugin } from './workbench-plugin';

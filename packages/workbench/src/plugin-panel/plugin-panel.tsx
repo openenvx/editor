@@ -1,6 +1,6 @@
 import {
   mapPluginTreeToPropertyPane,
-  createPluginInspectorHostContext,
+  createPluginPropertyHostContext,
   createManifestContributions,
   decodePluginHandlerCommand,
   type PropertyPaneDescriptor,
@@ -305,7 +305,7 @@ export function PluginPanel({
 
   const hostContext = useMemo(
     () =>
-      createPluginInspectorHostContext({
+      createPluginPropertyHostContext({
         panelId: declaration.id,
         values,
         onWrite: (path, value) => {

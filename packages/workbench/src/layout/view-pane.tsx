@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { InspectorPopoverProvider } from '../context/inspector-popover-context';
+import { PropertyPopoverProvider } from '../context/property-popover-context';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { cn } from '../lib/cn';
 
@@ -28,8 +28,8 @@ export function ViewPane({
   }
 
   return (
-    <InspectorPopoverProvider className={cn(styles.pane, className)}>
+    <PropertyPopoverProvider className={cn(styles.pane, className)}>
       {children}
-    </InspectorPopoverProvider>
+    </PropertyPopoverProvider>
   );
 }

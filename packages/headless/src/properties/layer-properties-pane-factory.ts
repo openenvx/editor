@@ -1,8 +1,8 @@
 import type { PropertySectionDescriptor } from '@openenvx/core';
 
-import { InspectorRowNode } from '../inspector/inspector-row-node';
-import { PropertyPaneDescriptor } from '../inspector/property-pane-descriptor';
-import { InspectorPath } from './inspector-path';
+import { PropertyPaneDescriptor } from '../properties/property-pane-descriptor';
+import { PropertyRowNode } from '../properties/property-row-node';
+import { PropertyPath } from './property-path';
 
 const LAYER_PROPERTIES_PRIORITY = 30;
 
@@ -11,10 +11,10 @@ export class LayerPropertiesPaneFactory {
     return sections.map((section, index) => {
       const nodes = section.fields.map(
         (field) =>
-          new InspectorRowNode(
+          new PropertyRowNode(
             field.label,
             field,
-            InspectorPath.layerData(field.key)
+            PropertyPath.layerData(field.key)
           )
       );
 

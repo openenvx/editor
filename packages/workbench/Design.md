@@ -10,7 +10,7 @@ Designing the `@xmazu/openenvxee-workbench` React UI for canvas/flow editor auth
 **Grammar reference:** [shadcn/ui](https://ui.shadcn.com) zinc dark palette, inset rings — not component imports  
 **Secondary reference:** Framer / Artboard Studio editor screens (Refero) — three-column canvas layout patterns
 
-**Status (v3):** Tokens, layout chrome, property panes (Layout → Layer → Styles → Transforms), sidebar segments, layer tree, floating toolbar, and canvas-demo scene aligned to reference screenshot. Primary and secondary side bars share `ViewPane` + `ViewContainerViews`; default secondary container title is "Inspector".
+**Status (v3):** Tokens, layout chrome, property panes (Layout → Layer → Styles → Transforms), sidebar segments, layer tree, floating toolbar, and canvas-demo scene aligned to reference screenshot. Primary and secondary side bars share `ViewPane` + `ViewContainerViews`. **Inspector** is only the default secondary container that hosts canvas layer/node property views.
 
 ---
 
@@ -321,7 +321,7 @@ Use `--wb-shadow-xs` on inputs at rest. Use `--wb-shadow-float` only on floating
 | Primary Side Bar | `ActivitySidebar` (panel body) | 240px; title header + scrollable `ViewPane` content |
 | CanvasField | `CanvasChrome` | `--wb-canvas-field` bg; artboard centered |
 | FloatingToolbar | `FloatingToolbarRenderer` | Bottom-center overlay; contribution-driven tools + widgets |
-| Secondary Side Bar | `ViewContainerViews` + `ViewPane` | 280px; default container title **"Inspector"**; same view chrome as primary |
+| Secondary Side Bar | `ViewContainerViews` + `ViewPane` | 280px; default **Inspector** container (`workbench.inspector`) hosts canvas layer/node property views; same view chrome as primary |
 | StatusBar | `StatusBarRenderer` | 24px; zoom, dirty/saved, selection summary |
 
 ---
@@ -351,7 +351,7 @@ Height: 32px default, 28px sm. No colored fills except `default` (Export CTA).
 
 ### StepperField
 
-Compound numeric control used inside inspector popovers:
+Compound numeric control used inside property popovers:
 
 ```
 Top     [↓ 0        ] [+] [-]
@@ -425,24 +425,24 @@ Radix Tabs primitive (`primitives/tabs.tsx`) — full-width pill segments in the
 - Dividers: 1px × 20px, `rgb(255 255 255 / 8%)`
 - Zoom chip: mono 11px, ghost, min-width 44px
 
-### InspectorPopover
+### PropertyPopover
 
 Popup shell for per-side/per-corner/per-shadow controls:
 
 - Width: ~508px max, clamped to viewport
 - Radius: 12px shell
 - Light surface: `#ffffff`
-- Dark surface: near-black (`--wb-inspector-popover`), darker than standard dropdown popovers
+- Dark surface: near-black (`--wb-property-popover`), darker than standard dropdown popovers
 - Header: 16px vertical / 20px horizontal padding, 13px semibold title, hairline divider
 - Body: 16px top / 20px sides / 20px bottom
 - Layout: vertical stack; color picker block renders first when present, then stepper rows
 
 ### ColorPickerPopover
 
-- Uses the same `InspectorPopover` shell
+- Uses the same `PropertyPopover` shell
 - Large inline square color well followed by a hue rail
 - Hex input sits directly below the picker inside the same panel
-- No nested micro-card styling when rendered inside an inspector popup
+- No nested micro-card styling when rendered inside an property popup
 
 ### Canvas / Artboard
 
@@ -459,7 +459,7 @@ Map to shadcn/designer `DesignerPane` + `Action*` pattern conceptually. Each pan
 
 ### Field kinds (author once, reuse everywhere)
 
-Inspector controls are **descriptor → registered renderer**, not ad-hoc JSX in plugins. Author properties with `PropertyBuilder` (canvas) or HTML `FieldDef` → `createHtmlLayerDefinition` (maps onto the same builders). Prefer these kinds over inventing new inputs:
+Property form controls are **descriptor → registered renderer**, not ad-hoc JSX in plugins. Author properties with `PropertyBuilder` (canvas) or HTML `FieldDef` → `createHtmlLayerDefinition` (maps onto the same builders). Prefer these kinds over inventing new inputs:
 
 | Kind | Control | Use for |
 | --- | --- | --- |
@@ -478,7 +478,7 @@ Inspector controls are **descriptor → registered renderer**, not ad-hoc JSX in
 
 Rules:
 
-- **Do not** hand-roll inspector rows with outline “Add/Remove” buttons and stacked labels — use `InspectorFieldRow` / `InspectorFieldBlock` + registered kinds.
+- **Do not** hand-roll property rows with outline “Add/Remove” buttons and stacked labels — use `PropertyFieldRow` / `PropertyFieldBlock` + registered kinds.
 - Fields with `chrome: false` (`repeater`, `slotList`) render as a **block** (label above, full width), not a cramped 56px label row.
 - Slot list rows: muted surface + inset ring (`--wb-muted` / `--wb-shadow-control`), header + ghost `IconButton` (trash / plus) — same grammar as layer-tree trailing actions.
 - HTML `BlockConfig.fields` should pick the kind from this table; composites generate slot inspector sections from each part type’s fields (re-keyed under `slots.<name>…`).
@@ -560,7 +560,7 @@ Bind to `layer.transform` when canvas layer selected.
 ### Phase 3 — Property panes (1 PR)
 
 - [x] Secondary sidebar uses shared `ViewContainerViews` for tree / properties / component content (replaces standalone `PropertyPanelRenderer`)
-- [x] Shared scroll chrome is `ViewPane` (not inspector-specific); default secondary container title remains "Inspector"
+- [x] Shared scroll chrome is `ViewPane`; **Inspector** remains only as the default secondary container for canvas layer/node property views
 - [ ] Wire Layer pane to transform (X/Y/W/H)
 - [ ] Add Styles pane color swatch row
 - [ ] Phase 2 layout fields behind `PropertyBuilder` extensions in canvas layers

@@ -1,6 +1,6 @@
 import type { ContributionBuildContext } from '@openenvx/core';
 
-import type { PropertyPaneDescriptor } from '../inspector/property-pane-descriptor';
+import type { PropertyPaneDescriptor } from '../properties/property-pane-descriptor';
 import { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
 import { WorkbenchContributionPoint } from '../workbench-contributions/workbench-contribution-point';
 

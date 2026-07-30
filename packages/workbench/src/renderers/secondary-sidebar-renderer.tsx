@@ -19,14 +19,14 @@ import {
 } from '../layout/view-container-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../primitives/tabs';
 import {
-  type CreateInspectorHostContext,
+  type CreatePropertyHostContext,
   ViewContainerViews,
 } from './view-container-views';
 
 import styles from './secondary-sidebar.module.css';
 
 export interface SecondarySidebarRendererProps {
-  createInspectorHostContext?: CreateInspectorHostContext;
+  createPropertyHostContext?: CreatePropertyHostContext;
 }
 
 function SortableTabTrigger({ id, title }: { id: string; title: string }) {
@@ -54,7 +54,7 @@ function SortableTabTrigger({ id, title }: { id: string; title: string }) {
 
 export const SecondarySidebarRenderer = memo(
   ({
-    createInspectorHostContext: createHostContextProp,
+    createPropertyHostContext: createHostContextProp,
   }: SecondarySidebarRendererProps) => {
     const { api } = useWorkbenchContext();
     const viewContainers = useWorkbenchContextSelector(

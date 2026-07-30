@@ -6,7 +6,7 @@
   background: var(--wb-muted);
 }
 
-.inspector {
+.compact {
   width: 100%;
   gap: 2px;
   padding: 2px;
@@ -32,7 +32,7 @@
     box-shadow 0.12s ease;
 }
 
-.inspector .option {
+.compact .option {
   flex: 1;
   height: 26px;
   padding: 0;
@@ -48,7 +48,7 @@
   box-shadow: var(--wb-segment-active-ring);
 }
 
-.inspector .optionActive {
+.compact .optionActive {
   background: var(--wb-background);
   box-shadow: var(--wb-shadow-xs);
 }

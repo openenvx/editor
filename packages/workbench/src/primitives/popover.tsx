@@ -106,8 +106,8 @@ export interface PopoverAnchorProps {
 export interface PopoverPlacement {
   side?: 'top' | 'right' | 'bottom' | 'left';
   align?: 'start' | 'center' | 'end';
-  /** Position against the inspector panel's left edge instead of the trigger. */
-  anchor?: 'trigger' | 'inspector-edge';
+  /** Position against the properties panel's left edge instead of the trigger. */
+  anchor?: 'trigger' | 'property-edge';
 }
 
 export interface PopoverContentProps {
@@ -117,7 +117,7 @@ export interface PopoverContentProps {
   className?: string;
   bodyClassName?: string;
   title?: string;
-  variant?: 'default' | 'inspector';
+  variant?: 'default' | 'property';
   placement?: PopoverPlacement;
   onOpenAutoFocus?: (event: Event) => void;
   avoidCollisions?: boolean;
@@ -125,10 +125,10 @@ export interface PopoverContentProps {
   sticky?: 'partial' | 'always';
 }
 
-const INSPECTOR_DEFAULT_PLACEMENT: PopoverPlacement = {
+const PROPERTY_DEFAULT_PLACEMENT: PopoverPlacement = {
   side: 'left',
   align: 'start',
-  anchor: 'inspector-edge',
+  anchor: 'property-edge',
 };
 
 export function PopoverContent({
@@ -147,13 +147,13 @@ export function PopoverContent({
 }: PopoverContentProps) {
   const themeScope = useThemeScope();
 
-  const isInspector = variant === 'inspector';
-  const resolvedPlacement = isInspector
-    ? { ...INSPECTOR_DEFAULT_PLACEMENT, ...placement }
+  const isPropertyPopover = variant === 'property';
+  const resolvedPlacement = isPropertyPopover
+    ? { ...PROPERTY_DEFAULT_PLACEMENT, ...placement }
     : placement;
   const resolvedSide = side ?? resolvedPlacement?.side ?? 'bottom';
   const resolvedAlign = align ?? resolvedPlacement?.align ?? 'end';
-  const resolvedAvoidCollisions = isInspector ? false : avoidCollisions;
+  const resolvedAvoidCollisions = isPropertyPopover ? false : avoidCollisions;
 
   return (
     <PopoverPrimitive.Portal>
@@ -164,13 +164,13 @@ export function PopoverContent({
         className={cn(
           styles.panel,
           overlaySurface.surface,
-          isInspector && styles.inspectorPanel,
+          isPropertyPopover && styles.propertyPanel,
           className
         )}
         collisionPadding={collisionPadding}
         onCloseAutoFocus={(event) => event.preventDefault()}
         onFocusOutside={
-          isInspector ? (event) => event.preventDefault() : undefined
+          isPropertyPopover ? (event) => event.preventDefault() : undefined
         }
         onOpenAutoFocus={onOpenAutoFocus}
         side={resolvedSide}
@@ -178,10 +178,10 @@ export function PopoverContent({
         sticky={sticky}
       >
         {title ? (
-          isInspector ? (
+          isPropertyPopover ? (
             <>
-              <div className={styles.inspectorTitle}>{title}</div>
-              <div className={styles.inspectorSeparator} />
+              <div className={styles.propertyTitle}>{title}</div>
+              <div className={styles.propertySeparator} />
             </>
           ) : (
             <div className={styles.header}>{title}</div>
@@ -190,7 +190,7 @@ export function PopoverContent({
         <div
           className={cn(
             styles.body,
-            isInspector && styles.inspectorBody,
+            isPropertyPopover && styles.propertyBody,
             bodyClassName
           )}
         >

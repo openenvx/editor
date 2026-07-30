@@ -11,18 +11,18 @@ import {
   type PluginPropValue,
 } from '@xmazu/openenvxee-plugin-protocol';
 
-import { InspectorPath } from '../inspector/inspector-path';
-import type {
-  InspectorInputGroupCell,
-  InspectorValuePath,
-} from '../inspector/inspector-value-path';
-import { encodePluginHandlerCommand } from '../inspector/plugin-inspector-host-context';
+import { encodePluginHandlerCommand } from '../properties/plugin-property-host-context';
 import {
   createPropertyPane,
   PropertyBlockBuilder,
   PropertyPaneBuilder,
-} from '../inspector/property-pane-builder';
-import type { PropertyPaneDescriptor } from '../inspector/property-pane-descriptor';
+} from '../properties/property-pane-builder';
+import type { PropertyPaneDescriptor } from '../properties/property-pane-descriptor';
+import { PropertyPath } from '../properties/property-path';
+import type {
+  PropertyInputGroupCell,
+  PropertyValuePath,
+} from '../properties/property-value-path';
 import {
   asBoolean,
   asNumber,
@@ -207,7 +207,7 @@ function buildFieldFromNode(node: PluginNode): PropertyFieldDescriptor | null {
 function resolveBindPath(
   node: PluginNode,
   panelId: string | undefined
-): InspectorValuePath | undefined {
+): PropertyValuePath | undefined {
   const bind = node.props.bind;
   if (typeof bind === 'string' && bind.length > 0) {
     if (panelId && !bind.startsWith(`plugin.${panelId}.`)) {
@@ -218,7 +218,7 @@ function resolveBindPath(
     return bind;
   }
   if (panelId) {
-    return InspectorPath.plugin(panelId, fieldKey(node));
+    return PropertyPath.plugin(panelId, fieldKey(node));
   }
   return undefined;
 }
@@ -249,7 +249,7 @@ function mapLayoutChild(
   }
 
   if (node.type === 'InputGroup') {
-    const cells: InspectorInputGroupCell[] = [];
+    const cells: PropertyInputGroupCell[] = [];
     for (const child of pluginNodes(node.children)) {
       const field = buildFieldFromNode(child);
       if (!field) {
@@ -285,7 +285,7 @@ function mapLayoutChild(
 }
 
 /**
- * Walk a plugin-protocol inspector tree and drive {@link createPropertyPane}.
+ * Walk a plugin-protocol property pane tree and drive {@link createPropertyPane}.
  * Root must be a `Pane` node. Builders stay the source of truth for defaults.
  */
 export function mapPluginTreeToPropertyPane(

@@ -6,15 +6,15 @@ import { WorkbenchIcon } from '../icons/workbench-icon';
 import { cn } from '../lib/cn';
 import { ColorPickerPanel } from '../primitives/color-picker';
 import { IconButton } from '../primitives/icon-button';
-import { InspectorAnchoredPopover } from '../primitives/inspector-anchored-popover';
-import { InspectorFieldRow } from '../primitives/inspector-field-row';
+import { PropertyAnchoredPopover } from '../primitives/property-anchored-popover';
+import { PropertyFieldRow } from '../primitives/property-field-row';
 import { StepperField } from '../primitives/stepper-field';
 import { FieldActionsRow } from './field-actions-row';
 import { readNestedValue, writeNestedValue } from './nested-field-value';
 import { getFieldId } from './property-field-types';
 import type { PropertyFieldRendererProps } from './property-field-types';
 
-import styles from '../primitives/inspector-field.module.css';
+import styles from '../primitives/property-field.module.css';
 
 export interface FieldChromeProps extends Pick<
   PropertyFieldRendererProps,
@@ -56,7 +56,7 @@ export function FieldChrome({
     : [];
 
   const inline = hasPopup ? (
-    <InspectorAnchoredPopover
+    <PropertyAnchoredPopover
       onOpenChange={setPopupOpen}
       open={popupOpen}
       title={popup.title ?? field.label}
@@ -113,7 +113,7 @@ export function FieldChrome({
         }
 
         return (
-          <InspectorFieldRow
+          <PropertyFieldRow
             className={cn(styles.popupField, styles.popupFieldFull)}
             htmlFor={popupFieldId}
             key={subField.key}
@@ -129,10 +129,10 @@ export function FieldChrome({
               },
               value: nestedValue,
             })}
-          </InspectorFieldRow>
+          </PropertyFieldRow>
         );
       })}
-    </InspectorAnchoredPopover>
+    </PropertyAnchoredPopover>
   ) : null;
 
   return (

@@ -45,7 +45,7 @@
   --wb-canvas-field: #e4e4e9;
   --wb-card: #ffffff;
   --wb-popover: #ffffff;
-  --wb-inspector-popover: #ffffff;
+  --wb-property-popover: #ffffff;
   --wb-muted: #ececef;
   --wb-border: #d4d4d8;
   --wb-chrome-button: #ffffff;
@@ -100,7 +100,7 @@
   --wb-canvas-field: #0a0a0a;
   --wb-card: #1a1a1a;
   --wb-popover: #1a1a1a;
-  --wb-inspector-popover: #1a1a1a;
+  --wb-property-popover: #1a1a1a;
   --wb-muted: #242424;
   --wb-border: rgb(255 255 255 / 8%);
   --wb-chrome-button: #242424;

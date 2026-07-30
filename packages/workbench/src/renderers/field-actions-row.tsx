@@ -3,7 +3,7 @@ import type { FieldAction } from '@openenvx/core';
 import { WorkbenchIcon } from '../icons/workbench-icon';
 import { IconButton } from '../primitives/icon-button';
 
-import styles from '../primitives/inspector-field.module.css';
+import styles from '../primitives/property-field.module.css';
 
 export interface FieldActionsRowProps {
   actions: FieldAction[];

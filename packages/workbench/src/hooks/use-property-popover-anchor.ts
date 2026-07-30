@@ -1,16 +1,16 @@
 import { useCallback, useLayoutEffect, useState } from 'react';
 import type { RefObject } from 'react';
 
-export interface InspectorPopoverAnchorRect {
+export interface PropertyPopoverAnchorRect {
   top: number;
   left: number;
   height: number;
 }
 
-export function measureInspectorPopoverAnchor(
+export function measurePropertyPopoverAnchor(
   panelRef: RefObject<HTMLElement | null> | undefined,
   triggerRef: RefObject<HTMLElement | null>
-): InspectorPopoverAnchorRect | null {
+): PropertyPopoverAnchorRect | null {
   const panel = panelRef?.current;
   const trigger = triggerRef.current;
   if (!panel || !trigger) {
@@ -25,16 +25,16 @@ export function measureInspectorPopoverAnchor(
   };
 }
 
-export function useInspectorPopoverAnchor(
+export function usePropertyPopoverAnchor(
   open: boolean,
   panelRef: RefObject<HTMLElement | null> | undefined,
   triggerRef: RefObject<HTMLElement | null>
 ) {
   const [anchorRect, setAnchorRect] =
-    useState<InspectorPopoverAnchorRect | null>(null);
+    useState<PropertyPopoverAnchorRect | null>(null);
 
   const updateAnchor = useCallback(() => {
-    const next = measureInspectorPopoverAnchor(panelRef, triggerRef);
+    const next = measurePropertyPopoverAnchor(panelRef, triggerRef);
     if (next) {
       setAnchorRect(next);
     }
@@ -58,5 +58,5 @@ export function useInspectorPopoverAnchor(
     return null;
   }
 
-  return measureInspectorPopoverAnchor(panelRef, triggerRef) ?? anchorRect;
+  return measurePropertyPopoverAnchor(panelRef, triggerRef) ?? anchorRect;
 }

@@ -1,16 +1,16 @@
 import { findLayerById } from '@openenvx/core';
 import type {
   FieldRendererRegistration,
-  InspectorHostContext,
-  InspectorPathContextOptions,
+  PropertyHostContext,
+  PropertyPathContextOptions,
   ViewContainerDescriptor,
   ViewDescriptor,
   ViewPanelRegistration,
   WorkbenchApi,
 } from '@openenvx/headless';
 import {
-  createInspectorHostContext,
-  InspectorPathResolver,
+  createPropertyHostContext,
+  PropertyPathResolver,
 } from '@openenvx/headless';
 import type { ComponentType } from 'react';
 import { useMemo } from 'react';
@@ -22,22 +22,22 @@ import { PanelSection } from '../primitives/panel-section';
 import { PropertyContentRenderer } from './property-content-renderer';
 import { ViewPanelRenderer } from './view-panel-renderer';
 
-function defaultInspectorHostContext(
-  options: InspectorPathContextOptions
-): InspectorHostContext {
-  return createInspectorHostContext(options);
+function defaultPropertyHostContext(
+  options: PropertyPathContextOptions
+): PropertyHostContext {
+  return createPropertyHostContext(options);
 }
 
-export type CreateInspectorHostContext = (
-  options: InspectorPathContextOptions,
+export type CreatePropertyHostContext = (
+  options: PropertyPathContextOptions,
   helpers: {
     api: WorkbenchApi;
     executeCommand: (commandId: string) => Promise<boolean>;
   }
-) => InspectorHostContext;
+) => PropertyHostContext;
 
 function usePropertiesHostContext(
-  createHostContext?: CreateInspectorHostContext
+  createHostContext?: CreatePropertyHostContext
 ) {
   const { api, executeCommand } = useWorkbenchContext();
   const primaryLayerId = useWorkbenchContextSelector(
@@ -70,7 +70,7 @@ function usePropertiesHostContext(
     if (!scene) {
       return null;
     }
-    const create = createHostContext ?? defaultInspectorHostContext;
+    const create = createHostContext ?? defaultPropertyHostContext;
     return create(
       {
         activePageId: selectionActivePageId ?? null,
@@ -113,7 +113,7 @@ function PropertiesViewBody({
   view: ViewDescriptor;
   executeCommand: (commandId: string) => Promise<boolean>;
   fieldRenderers: FieldRendererRegistration[];
-  hostContext: InspectorHostContext;
+  hostContext: PropertyHostContext;
   layerData: Record<string, unknown> | null;
   primaryLayerId: string | null;
 }) {
@@ -138,7 +138,7 @@ function PropertiesViewSection({
   createHostContext,
 }: {
   view: ViewDescriptor;
-  createHostContext?: CreateInspectorHostContext;
+  createHostContext?: CreatePropertyHostContext;
 }) {
   const {
     executeCommand,
@@ -156,7 +156,7 @@ function PropertiesViewSection({
     if (!(headerTogglePath && hostContext && scene)) {
       return;
     }
-    const resolver = new InspectorPathResolver(hostContext);
+    const resolver = new PropertyPathResolver(hostContext);
     const handle = resolver.resolve(headerTogglePath);
     return {
       ariaLabel: `Toggle ${view.name}`,
@@ -251,7 +251,7 @@ export function ViewContainerViews({
   createHostContext,
 }: {
   container: ViewContainerDescriptor;
-  createHostContext?: CreateInspectorHostContext;
+  createHostContext?: CreatePropertyHostContext;
 }) {
   const registeredViewPanels = useWorkbenchContextSelector(
     (state) => state.viewPanels

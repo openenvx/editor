@@ -4,7 +4,7 @@ import {
   VersionHistoryPlugin,
   WorkbenchShell,
   createCanvasDemoScene,
-  createCanvasInspectorHostContextWithApi,
+  createCanvasPropertyHostContextWithApi,
   createLocalStorageWorkbenchLayoutStore,
   createPostMessagePluginPanelTransport,
   DEFAULT_CANVAS_LAYOUT,
@@ -68,7 +68,7 @@ export function App() {
     <div className="canvas-demo-app">
       <WorkbenchShell
         className="canvas-workbench"
-        createInspectorHostContext={createCanvasInspectorHostContextWithApi}
+        createPropertyHostContext={createCanvasPropertyHostContextWithApi}
         editorTitle="Canvas"
         editorUri="openworkbench://canvas-demo"
         initialScene={createCanvasDemoScene()}

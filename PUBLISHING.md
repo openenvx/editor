@@ -108,7 +108,7 @@ import {
   DEFAULT_STUDIO_PLUGINS,
   DEFAULT_CANVAS_LAYOUT,
   createCanvasDemoScene,
-  createCanvasInspectorHostContextWithApi,
+  createCanvasPropertyHostContextWithApi,
   createLocalStorageWorkbenchLayoutStore,
   // plugin authoring (from core, bundled + re-exported)
   Plugin,

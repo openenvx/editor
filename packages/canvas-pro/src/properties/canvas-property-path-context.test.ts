@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createDefaultTransform, normalizeScene } from '@openenvx/schema';
 
-import { createCanvasInspectorHostContext } from './canvas-inspector-path-context';
+import { createCanvasPropertyHostContext } from './canvas-property-path-context';
 
 function createSceneWithLayer() {
   const transform = {
@@ -41,10 +41,10 @@ function createSceneWithLayer() {
   });
 }
 
-describe('createCanvasInspectorHostContext', () => {
+describe('createCanvasPropertyHostContext', () => {
   it('readPath returns transform values for the selected layer', () => {
     const scene = createSceneWithLayer();
-    const ctx = createCanvasInspectorHostContext({
+    const ctx = createCanvasPropertyHostContext({
       scene,
       selectedLayerId: 'layer-1',
       layerData: null,
@@ -63,7 +63,7 @@ describe('createCanvasInspectorHostContext', () => {
   it('writePath patches transform and calls updateLayerTransform', () => {
     const scene = createSceneWithLayer();
     const updateLayerTransform = vi.fn();
-    const ctx = createCanvasInspectorHostContext({
+    const ctx = createCanvasPropertyHostContext({
       scene,
       selectedLayerId: 'layer-1',
       layerData: null,
@@ -87,7 +87,7 @@ describe('createCanvasInspectorHostContext', () => {
   it('writePath delegates command paths to executeCommand', () => {
     const scene = createSceneWithLayer();
     const executeCommand = vi.fn();
-    const ctx = createCanvasInspectorHostContext({
+    const ctx = createCanvasPropertyHostContext({
       scene,
       selectedLayerId: 'layer-1',
       layerData: null,
@@ -104,7 +104,7 @@ describe('createCanvasInspectorHostContext', () => {
   it('reads and writes active page bleed/safe via commands', () => {
     const scene = createSceneWithLayer();
     const executeCommand = vi.fn();
-    const ctx = createCanvasInspectorHostContext({
+    const ctx = createCanvasPropertyHostContext({
       scene,
       activePageId: 'page-1',
       selectedLayerId: null,
@@ -133,7 +133,7 @@ describe('createCanvasInspectorHostContext', () => {
     scene.pages[0]!.layers[0]!.writeMode = 'content';
     scene.pages[0]!.layers[0]!.showInLayers = false;
     const executeCommand = vi.fn();
-    const ctx = createCanvasInspectorHostContext({
+    const ctx = createCanvasPropertyHostContext({
       scene,
       selectedLayerId: 'layer-1',
       layerData: null,

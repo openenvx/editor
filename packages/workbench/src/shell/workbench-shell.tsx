@@ -7,8 +7,8 @@ import {
 import type { Plugin } from '@openenvx/core';
 import { ShellUiServiceId } from '@openenvx/headless';
 import type {
-  InspectorHostContext,
-  InspectorPathContextOptions,
+  PropertyHostContext,
+  PropertyPathContextOptions,
   LayerSurfaceItem,
   WorkbenchApi,
   WorkbenchControllerOptions,
@@ -67,20 +67,20 @@ export interface WorkbenchShellProps {
   layoutStore?: WorkbenchControllerOptions['layoutStore'];
   /**
    * When true (default), embed/template write policy is enforced.
-   * Dashboard authoring should pass false so the Embed inspector tab appears
+   * Dashboard authoring should pass false so the Embed properties tab appears
    * and authors can edit locked layers freely.
    */
   enforceTemplatePolicy?: boolean;
   showEditorArea?: boolean;
   onOpenDocument?: () => Promise<string | undefined>;
   onSaveAs?: () => Promise<string | undefined>;
-  createInspectorHostContext?: (
-    options: InspectorPathContextOptions,
+  createPropertyHostContext?: (
+    options: PropertyPathContextOptions,
     helpers: {
       api: WorkbenchApi;
       executeCommand: (commandId: string) => Promise<boolean>;
     }
-  ) => InspectorHostContext;
+  ) => PropertyHostContext;
   renderEditorPane?: (ctx: {
     layerSurface: LayerSurfaceItem[];
     editorPaneKind: string;
@@ -190,9 +190,9 @@ const EditorRegion = memo(
 
 const SidebarRegion = memo(
   ({
-    createInspectorHostContext,
+    createPropertyHostContext,
   }: {
-    createInspectorHostContext?: WorkbenchShellProps['createInspectorHostContext'];
+    createPropertyHostContext?: WorkbenchShellProps['createPropertyHostContext'];
   }) => {
     const viewContainers = useWorkbenchContextSelector(
       (state) => state.viewContainers
@@ -214,7 +214,7 @@ const SidebarRegion = memo(
     return (
       <ActivitySidebar
         contextMenuItems={contextMenu}
-        createInspectorHostContext={createInspectorHostContext}
+        createPropertyHostContext={createPropertyHostContext}
         viewContainers={viewContainers}
       />
     );
@@ -244,10 +244,10 @@ const LayoutRegion = memo(
   ({
     showEditorArea,
     renderEditorPane,
-    createInspectorHostContext,
+    createPropertyHostContext,
   }: Pick<
     WorkbenchShellProps,
-    'showEditorArea' | 'renderEditorPane' | 'createInspectorHostContext'
+    'showEditorArea' | 'renderEditorPane' | 'createPropertyHostContext'
   >) => {
     const layout = useWorkbenchContextSelector((state) => state.layout);
     if (!layout) {
@@ -264,12 +264,12 @@ const LayoutRegion = memo(
         }
         secondarySidebar={
           <SecondarySidebarRenderer
-            createInspectorHostContext={createInspectorHostContext}
+            createPropertyHostContext={createPropertyHostContext}
           />
         }
         primarySidebar={
           <SidebarRegion
-            createInspectorHostContext={createInspectorHostContext}
+            createPropertyHostContext={createPropertyHostContext}
           />
         }
         statusBar={<StatusBarRegion />}
@@ -411,7 +411,7 @@ export function WorkbenchShell({
   showEditorArea = true,
   onOpenDocument,
   onSaveAs,
-  createInspectorHostContext,
+  createPropertyHostContext,
   renderEditorPane,
 }: WorkbenchShellProps) {
   const [activeTheme, setActiveTheme] = useState(theme);
@@ -557,7 +557,7 @@ export function WorkbenchShell({
                   paletteOpen={paletteOpen}
                 />
                 <LayoutRegion
-                  createInspectorHostContext={createInspectorHostContext}
+                  createPropertyHostContext={createPropertyHostContext}
                   renderEditorPane={renderEditorPane}
                   showEditorArea={showEditorArea}
                 />

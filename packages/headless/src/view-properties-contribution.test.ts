@@ -18,8 +18,8 @@ import {
   ViewContainerContribution,
   ViewContribution,
 } from './contributions/view-contribution';
-import { createPropertyPane } from './inspector/property-pane-builder';
-import { InspectorPath } from './inspector/inspector-path';
+import { createPropertyPane } from './properties/property-pane-builder';
+import { PropertyPath } from './properties/property-path';
 import { WorkbenchController } from './workbench-controller';
 import { WorkbenchPlugin } from './workbench-plugin';
 import type { WorkbenchPluginContext } from './workbench-plugin-context';
@@ -96,9 +96,9 @@ class EmbedLayerView extends ViewContribution {
           label: 'Edit mode',
           options: [{ label: 'Free', value: 'free' }],
         },
-        InspectorPath.layerProp('writeMode')
+        PropertyPath.layerProp('writeMode')
       )
-      .headerToggle(InspectorPath.layerProp('showInLayers'))
+      .headerToggle(PropertyPath.layerProp('showInLayers'))
       .build();
   }
 }
@@ -129,7 +129,7 @@ class EmbedPolicyView extends ViewContribution {
           kind: 'toggle',
           label: 'Allow insert',
         },
-        InspectorPath.templatePolicy('allowInsertLayers')
+        PropertyPath.templatePolicy('allowInsertLayers')
       )
       .build();
   }

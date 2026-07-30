@@ -61,7 +61,7 @@ Published packages:
 
 ## Host sidebar panels (product hosts)
 
-Product apps (dashboard Studio, embed host) register host sidebars the **VS Code way**: declare contributions; the workbench shell renders. Do **not** mount React inspector views from the product host.
+Product apps (dashboard Studio, embed host) register host sidebars the **VS Code way**: declare contributions; the workbench shell renders. Do **not** mount React panel views from the product host.
 
 | VS Code | OpenEnvx |
 | --- | --- |
@@ -69,18 +69,18 @@ Product apps (dashboard Studio, embed host) register host sidebars the **VS Code
 | `contributes.views` | `ViewContribution` (`when`, order, container) |
 | `when` / context keys | Existing `when` strings (`scene.layerSelected`, …) |
 | `registerTreeDataProvider` | `ctx.registerTreeDataProvider` (data only) |
-| Settings / properties form | `ViewContribution.buildProperties()` → `createPropertyPane` + field kinds + `InspectorPath` |
+| Settings / properties form | `ViewContribution.buildProperties()` → `createPropertyPane` + field kinds + `PropertyPath` |
 | `viewsWelcome` | `emptyMessage` on a view (often with `when: '!scene.layerSelected'`) |
 | WebviewView | `registerViewPanel` — **only** non-form surfaces (chat, version history, template data) |
 
 **Hard rules:**
 
 - Form/settings panels: `WorkbenchPlugin` + `registerWorkbench(container, ...views)` with `buildProperties` / `emptyMessage` / `when`. Zero React panel components in the host.
-- Product hosts: use `ViewContribution.buildProperties()` only. `PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas-pro transform panes) merged into the default inspector container—not for embed/dashboard hosts.
-- **Naming:** “Property pane” is the sidebar UI label. `InspectorPath`, `InspectorHostContext`, and `InspectorLayoutNode` are the path/layout protocol (unchanged identifiers). Headless `createInspectorHostContext` resolves `layerProp` / `templatePolicy` paths; canvas hosts may still pass `createCanvasInspectorHostContext` for transform and page bleed/safe paths.
+- Product hosts: use `ViewContribution.buildProperties()` only. `PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas-pro transform panes) merged into the default **Inspector** container — not for embed/dashboard hosts.
+- **Naming:** **Inspector** = the default secondary container (`workbench.inspector`) and the canvas layer/node property views it hosts. Generic form content is a `properties` view + `PropertyPane` / `PropertyPath` / `PropertyHostContext` (any container). Headless `createPropertyHostContext` resolves `layerProp` / `templatePolicy` paths; canvas hosts pass `createCanvasPropertyHostContext` for transform and page bleed/safe paths.
 - Do **not** import or compose `ViewPane` / `PropertyContentRenderer` from the host (they are shell-internal).
 - Before adding a new primitive: inventory published exports and call sites; prefer reuse; only then extend core.
-- Embed **policy/data API** (scene commands, schema fields, path context) stays in editor-core; embed **product panels** (e.g. Embed Options) live in the product host (`studio-host`), not in canvas-pro inspector contributions.
+- Embed **policy/data API** (scene commands, schema fields, path context) stays in editor-core; embed **product panels** (e.g. Embed Options) live in the product host (`studio-host`), not in canvas-pro Inspector contributions.
 
 ## Code conventions
 
@@ -147,11 +147,11 @@ All packages are pre-1.0.0. Breaking API changes are expected and preferred over
 ```bash
 bun install
 bun run test          # all packages
-bun run build
+bun run build         # all packages (CI gate)
 bun run dev:playground
 bun run fix           # auto-fix lint/format (ultracite)
 bun run check         # lint (ultracite) + knip
-bun run precommit     # check + build + test (run before finishing)
+bun run precommit     # check + build/test packages dirty vs HEAD (excl. apps)
 bun run changeset     # create a release changeset
 ```
 
@@ -164,7 +164,7 @@ Only `packages/studio` (`@xmazu/openenvxee-studio`), `packages/schema` (`@openen
 After all code changes for the task are done, **always** run these from the repo root and fix every failure before stopping:
 
 1. `bun run fix` — apply Ultracite auto-fixes
-2. `bun run precommit` — `check` + `build` + `test`
+2. `bun run precommit` — `check` + Turbo build/test for packages changed vs `HEAD` (and their dependents), excluding `apps/*`. Full-repo gate is `bun run build && bun run test` (what CI runs).
 
 If either command fails, fix the reported errors, then re-run both until they pass. Do not leave lint, format, knip, build, or test failures unresolved.
 

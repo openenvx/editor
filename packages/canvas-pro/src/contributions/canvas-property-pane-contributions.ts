@@ -2,7 +2,7 @@ import type { ContributionBuildContext } from '@openenvx/core';
 import {
   createPropertyPane,
   PropertyPaneContribution,
-  InspectorPath,
+  PropertyPath,
 } from '@openenvx/headless';
 
 const ABSOLUTE_LAYER_SELECTED = 'page.layoutAbsolute && scene.layerSelected';
@@ -43,12 +43,12 @@ export class CanvasPagePrintGuidesPropertyPane extends PropertyPaneContribution 
       .row(
         t('canvas.inspector.bleedMm', 'Bleed'),
         scrubMmField('bleedMm', t('canvas.inspector.bleedMm', 'Bleed')),
-        InspectorPath.activePage('bleedMm')
+        PropertyPath.activePage('bleedMm')
       )
       .row(
         t('canvas.inspector.safeMm', 'Safe'),
         scrubMmField('safeMm', t('canvas.inspector.safeMm', 'Safe')),
-        InspectorPath.activePage('safeMm')
+        PropertyPath.activePage('safeMm')
       )
       .build();
   }
@@ -69,21 +69,21 @@ export class CanvasLayerTransformPropertyPane extends PropertyPaneContribution {
       .inputGroup(t('canvas.inspector.position', 'Position'), [
         {
           field: scrubNumberField('x', 'X'),
-          path: InspectorPath.layerTransform('x'),
+          path: PropertyPath.layerTransform('x'),
         },
         {
           field: scrubNumberField('y', 'Y'),
-          path: InspectorPath.layerTransform('y'),
+          path: PropertyPath.layerTransform('y'),
         },
       ])
       .inputGroup(t('canvas.inspector.size', 'Size'), [
         {
           field: scrubNumberField('width', 'W'),
-          path: InspectorPath.layerTransform('width'),
+          path: PropertyPath.layerTransform('width'),
         },
         {
           field: scrubNumberField('height', 'H'),
-          path: InspectorPath.layerTransform('height'),
+          path: PropertyPath.layerTransform('height'),
         },
       ])
       .build();
@@ -110,7 +110,7 @@ export class CanvasSvgNodesPropertyPane extends PropertyPaneContribution {
           kind: 'svgNodes',
           label: t('canvas.inspector.svgNodes.nodes', 'Nodes'),
         },
-        InspectorPath.layerData('svg')
+        PropertyPath.layerData('svg')
       )
       .build();
   }
@@ -136,7 +136,7 @@ export class CanvasTransformsPropertyPane extends PropertyPaneContribution {
           label: t('canvas.inspector.rotate', 'Rotate'),
           numeric: { precision: 0, scrub: true, unit: '°' },
         },
-        InspectorPath.layerTransform('rotation')
+        PropertyPath.layerTransform('rotation')
       )
       .withActions([
         {

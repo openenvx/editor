@@ -12,7 +12,7 @@ import {
   CommandItem,
   CommandList,
 } from './command';
-import { InspectorAnchoredPopover } from './inspector-anchored-popover';
+import { PropertyAnchoredPopover } from './property-anchored-popover';
 
 import styles from './font-combobox.module.css';
 
@@ -53,7 +53,7 @@ export function FontCombobox({
 
   return (
     <div className={styles.root}>
-      <InspectorAnchoredPopover
+      <PropertyAnchoredPopover
         onOpenChange={setOpen}
         open={open}
         title={t('font.label')}
@@ -109,7 +109,7 @@ export function FontCombobox({
             </CommandGroup>
           </CommandList>
         </Command>
-      </InspectorAnchoredPopover>
+      </PropertyAnchoredPopover>
     </div>
   );
 }

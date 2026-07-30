@@ -1,5 +1,5 @@
-import type { InspectorHostContext } from './inspector-path-resolver';
-import type { InspectorValuePath } from './inspector-value-path';
+import type { PropertyHostContext } from './property-path-resolver';
+import type { PropertyValuePath } from './property-value-path';
 
 export const PLUGIN_PATH_PREFIX = 'plugin.';
 
@@ -17,35 +17,35 @@ export function decodePluginHandlerCommand(commandId: string): string | null {
   return commandId.slice(PLUGIN_HANDLER_COMMAND_PREFIX.length);
 }
 
-export interface PluginInspectorHostContextOptions {
+export interface PluginPropertyHostContextOptions {
   panelId: string;
   /** Mutable value bag keyed by full `plugin.<panelId>.<key>` path or bare key. */
   values: Record<string, unknown>;
-  onWrite: (path: InspectorValuePath, value: unknown) => void;
+  onWrite: (path: PropertyValuePath, value: unknown) => void;
 }
 
-function isPluginPath(path: InspectorValuePath, panelId: string): boolean {
+function isPluginPath(path: PropertyValuePath, panelId: string): boolean {
   return path.startsWith(`${PLUGIN_PATH_PREFIX}${panelId}.`);
 }
 
-function valueKey(path: InspectorValuePath, panelId: string): string {
+function valueKey(path: PropertyValuePath, panelId: string): string {
   return path.slice(`${PLUGIN_PATH_PREFIX}${panelId}.`.length);
 }
 
 /**
  * Host context for external plugin panes. Reads from a values bag; writes notify
- * the parent via {@link PluginInspectorHostContextOptions.onWrite} (typically a
+ * the parent via {@link PluginPropertyHostContextOptions.onWrite} (typically a
  * `panel:event` with the path as handler id).
  */
-export function createPluginInspectorHostContext(
-  options: PluginInspectorHostContextOptions
-): InspectorHostContext {
+export function createPluginPropertyHostContext(
+  options: PluginPropertyHostContextOptions
+): PropertyHostContext {
   const { panelId, values, onWrite } = options;
 
   return {
     selectedLayerId: panelId,
     layerData: values,
-    readPath(path: InspectorValuePath): unknown {
+    readPath(path: PropertyValuePath): unknown {
       if (!isPluginPath(path, panelId)) {
         return undefined;
       }
@@ -55,7 +55,7 @@ export function createPluginInspectorHostContext(
       }
       return values[path];
     },
-    writePath(path: InspectorValuePath, value: unknown): void {
+    writePath(path: PropertyValuePath, value: unknown): void {
       if (!isPluginPath(path, panelId)) {
         return;
       }

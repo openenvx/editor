@@ -1,43 +1,43 @@
 import type {
   FieldRendererRegistration,
-  InspectorBlockNode,
-  InspectorInputGroupCell,
-  InspectorInputGroupNode,
-  InspectorLayoutNode,
-  InspectorLayoutVisitor,
-  InspectorRowNode,
-  InspectorValuePath,
-  InspectorHostContext,
+  PropertyBlockNode,
+  PropertyInputGroupCell,
+  PropertyInputGroupNode,
+  PropertyLayoutNode,
+  PropertyLayoutVisitor,
+  PropertyRowNode,
+  PropertyValuePath,
+  PropertyHostContext,
 } from '@openenvx/headless';
-import { InspectorPath, InspectorPathResolver } from '@openenvx/headless';
+import { PropertyPath, PropertyPathResolver } from '@openenvx/headless';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 
 import { InputGroup } from '../primitives/input-group';
 import {
-  InspectorFieldBlock,
-  InspectorFieldRow,
-} from '../primitives/inspector-field-row';
+  PropertyFieldBlock,
+  PropertyFieldRow,
+} from '../primitives/property-field-row';
 import { PropertyFieldControl } from './property-field-control';
 import { buildCustomRendererMap } from './property-field-registry';
 import type { PropertyFieldComponent } from './property-field-types';
 import { getFieldId } from './property-field-types';
 
 export interface PropertyContentRendererProps {
-  nodes: InspectorLayoutNode[];
+  nodes: PropertyLayoutNode[];
   layerId: string;
   layerData: Record<string, unknown>;
   fieldRenderers: FieldRendererRegistration[];
-  hostContext: InspectorHostContext;
+  hostContext: PropertyHostContext;
   onCommand: (commandId: string) => void;
 }
 
-function defaultRowPath(fieldKey: string): InspectorValuePath {
-  return InspectorPath.layerData(fieldKey);
+function defaultRowPath(fieldKey: string): PropertyValuePath {
+  return PropertyPath.layerData(fieldKey);
 }
 
 function renderNodes(
-  nodes: InspectorLayoutNode[],
+  nodes: PropertyLayoutNode[],
   context: InspectorRenderContext
 ): ReactNode {
   return nodes.map((node, index) => (
@@ -53,7 +53,7 @@ interface InspectorRenderContext {
   layerId: string;
   layerData: Record<string, unknown>;
   customRenderers: Record<string, PropertyFieldComponent>;
-  resolver: InspectorPathResolver;
+  resolver: PropertyPathResolver;
   onCommand: (commandId: string) => void;
 }
 
@@ -61,37 +61,37 @@ function InspectorNodeRenderer({
   node,
   context,
 }: {
-  node: InspectorLayoutNode;
+  node: PropertyLayoutNode;
   context: InspectorRenderContext;
 }) {
-  return <>{node.accept(createInspectorLayoutVisitor(context))}</>;
+  return <>{node.accept(createPropertyLayoutVisitor(context))}</>;
 }
 
-function createInspectorLayoutVisitor(
+function createPropertyLayoutVisitor(
   context: InspectorRenderContext
-): InspectorLayoutVisitor<ReactNode> {
+): PropertyLayoutVisitor<ReactNode> {
   const { customRenderers } = context;
 
   return {
-    visitBlock(node: InspectorBlockNode): ReactNode {
+    visitBlock(node: PropertyBlockNode): ReactNode {
       return (
-        <InspectorFieldBlock label={node.label}>
+        <PropertyFieldBlock label={node.label}>
           {renderNodes(node.children, context)}
-        </InspectorFieldBlock>
+        </PropertyFieldBlock>
       );
     },
-    visitInputGroup(node: InspectorInputGroupNode): ReactNode {
+    visitInputGroup(node: PropertyInputGroupNode): ReactNode {
       return (
-        <InspectorFieldBlock label={node.blockLabel}>
+        <PropertyFieldBlock label={node.blockLabel}>
           <InputGroup
-            fields={node.cells.map((cell: InspectorInputGroupCell) =>
+            fields={node.cells.map((cell: PropertyInputGroupCell) =>
               toInputGroupField(cell, context)
             )}
           />
-        </InspectorFieldBlock>
+        </PropertyFieldBlock>
       );
     },
-    visitRow(node: InspectorRowNode): ReactNode {
+    visitRow(node: PropertyRowNode): ReactNode {
       const path = node.path ?? defaultRowPath(node.field.key);
       const handle = context.resolver.resolve(path);
       const value = handle.read();
@@ -126,27 +126,25 @@ function createInspectorLayoutVisitor(
       // Full-width chrome (repeater / slotList): block label above, not 56px row.
       if (node.field.chrome === false) {
         return (
-          <InspectorFieldBlock label={node.label}>
-            {control}
-          </InspectorFieldBlock>
+          <PropertyFieldBlock label={node.label}>{control}</PropertyFieldBlock>
         );
       }
 
       return (
-        <InspectorFieldRow
+        <PropertyFieldRow
           htmlFor={getFieldId(context.layerId, node.field.key)}
           label={node.label}
           variant={node.field.kind === 'toggle' ? 'switch' : 'default'}
         >
           {control}
-        </InspectorFieldRow>
+        </PropertyFieldRow>
       );
     },
   };
 }
 
 function toInputGroupField(
-  cell: InspectorInputGroupCell,
+  cell: PropertyInputGroupCell,
   context: InspectorRenderContext
 ) {
   const handle = context.resolver.resolve(cell.path);
@@ -180,7 +178,7 @@ export function PropertyContentRenderer({
       layerData,
       layerId,
       onCommand,
-      resolver: new InspectorPathResolver(hostContext),
+      resolver: new PropertyPathResolver(hostContext),
     }),
     [customRenderers, hostContext, layerData, layerId, onCommand]
   );

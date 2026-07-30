@@ -3,7 +3,7 @@ import { Plus, Trash2 } from 'lucide-react';
 
 import { Button } from '../../primitives/button';
 import { IconButton } from '../../primitives/icon-button';
-import { InspectorFieldRow } from '../../primitives/inspector-field-row';
+import { PropertyFieldRow } from '../../primitives/property-field-row';
 import type { PropertyFieldRendererProps } from '../../renderers/property-field-types';
 import { getFieldId } from '../../renderers/property-field-types';
 
@@ -71,7 +71,7 @@ export function SlotListInput({
             </IconButton>
           </div>
           {slotList.fields.map((sub) => (
-            <InspectorFieldRow
+            <PropertyFieldRow
               htmlFor={getFieldId(`${layerId}-${row.id}`, sub.key)}
               key={sub.key}
               label={sub.label}
@@ -95,7 +95,7 @@ export function SlotListInput({
                 },
                 value: partData(row)[sub.key],
               })}
-            </InspectorFieldRow>
+            </PropertyFieldRow>
           ))}
         </div>
       ))}

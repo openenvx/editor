@@ -5,8 +5,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import type {
-  InspectorHostContext,
-  InspectorPathContextOptions,
+  PropertyHostContext,
+  PropertyPathContextOptions,
   MenuItemDescriptor,
   ViewContainerDescriptor,
   WorkbenchApi,
@@ -40,13 +40,13 @@ import styles from './activity-sidebar.module.css';
 export interface ActivitySidebarProps {
   viewContainers: ViewContainerDescriptor[];
   contextMenuItems?: MenuItemDescriptor[];
-  createInspectorHostContext?: (
-    options: InspectorPathContextOptions,
+  createPropertyHostContext?: (
+    options: PropertyPathContextOptions,
     helpers: {
       api: WorkbenchApi;
       executeCommand: (commandId: string) => Promise<boolean>;
     }
-  ) => InspectorHostContext;
+  ) => PropertyHostContext;
 }
 
 type ActivityItemButtonProps = {
@@ -134,7 +134,7 @@ function SortablePanelItem({
 export function ActivitySidebar({
   viewContainers,
   contextMenuItems,
-  createInspectorHostContext,
+  createPropertyHostContext,
 }: ActivitySidebarProps) {
   const { api } = useWorkbenchContext();
   const { t } = useWorkbenchTranslation();
@@ -312,7 +312,7 @@ export function ActivitySidebar({
             <ContextMenuRenderer items={contextMenuItems ?? []}>
               <ViewContainerViews
                 container={activePanel}
-                createHostContext={createInspectorHostContext}
+                createHostContext={createPropertyHostContext}
               />
             </ContextMenuRenderer>
           </div>
