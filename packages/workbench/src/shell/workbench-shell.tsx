@@ -36,6 +36,10 @@ import { WorkbenchI18nProvider } from '../i18n/workbench-i18n-provider';
 import { ActivitySidebar } from '../layout/activity-sidebar';
 import { CanvasChrome } from '../layout/canvas-chrome';
 import { EditorLayout } from '../layout/editor-layout';
+import {
+  EmbedPanelHost,
+  mountEmbedPanel,
+} from '../plugin-panel/embed-panel-host';
 import { CommandPaletteRenderer } from '../renderers/command-palette-renderer';
 import { ContextMenuRenderer } from '../renderers/context-menu-renderer';
 import { EditorPaneRenderer } from '../renderers/editor-pane-renderer';
@@ -43,6 +47,10 @@ import { FloatingToolbarRenderer } from '../renderers/floating-toolbar-renderer'
 import { OverlayRenderer } from '../renderers/overlay-renderer';
 import { SecondarySidebarRenderer } from '../renderers/secondary-sidebar-renderer';
 import { StatusBarRenderer } from '../renderers/status-bar-renderer';
+import {
+  mountSandboxExtensions,
+  SandboxExtensionHost,
+} from '../sandbox/sandbox-extension-host';
 import {
   DEFAULT_INSPECTOR_PLUGIN_ID,
   DefaultInspectorContainerPlugin,
@@ -85,6 +93,10 @@ export interface WorkbenchShellProps {
     layerSurface: LayerSurfaceItem[];
     editorPaneKind: string;
   }) => ReactNode;
+  /** External sandbox host — mounted off PluginManager after start. */
+  sandboxHost?: SandboxExtensionHost | null;
+  /** External embed panels — mounted off PluginManager after start. */
+  embedPanels?: EmbedPanelHost[];
 }
 
 const ChromeRegion = memo(
@@ -278,6 +290,32 @@ const LayoutRegion = memo(
   }
 );
 
+function ExternalHostsBinding({
+  api,
+  sandboxHost,
+  embedPanels,
+}: {
+  api: WorkbenchApi;
+  sandboxHost?: SandboxExtensionHost | null;
+  embedPanels?: EmbedPanelHost[];
+}) {
+  useMountEffect(() => {
+    const disposers: (() => void)[] = [];
+    if (sandboxHost) {
+      disposers.push(mountSandboxExtensions(api, sandboxHost));
+    }
+    for (const panel of embedPanels ?? []) {
+      disposers.push(mountEmbedPanel(api, panel));
+    }
+    return () => {
+      for (const dispose of disposers) {
+        dispose();
+      }
+    };
+  });
+  return null;
+}
+
 function ThemeServiceBinding({
   api,
   theme,
@@ -413,6 +451,8 @@ export function WorkbenchShell({
   onSaveAs,
   createPropertyHostContext,
   renderEditorPane,
+  sandboxHost = null,
+  embedPanels,
 }: WorkbenchShellProps) {
   const [activeTheme, setActiveTheme] = useState(theme);
   const [prevThemeProp, setPrevThemeProp] = useState(theme);
@@ -538,6 +578,12 @@ export function WorkbenchShell({
                 key={`${Boolean(onOpenDocument)}:${Boolean(onSaveAs)}`}
                 onOpenDocument={onOpenDocument}
                 onSaveAs={onSaveAs}
+              />
+              <ExternalHostsBinding
+                api={api}
+                embedPanels={embedPanels}
+                key={`external:${sandboxHost?.id ?? ''}:${(embedPanels ?? []).map((p) => p.id).join(',')}`}
+                sandboxHost={sandboxHost}
               />
               <WorkbenchShellSubscriptions
                 api={api}

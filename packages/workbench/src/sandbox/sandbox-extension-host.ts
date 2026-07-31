@@ -4,10 +4,7 @@ import {
   updateLayerInTree,
   walkLayers,
 } from '@openenvx/core';
-import {
-  WorkbenchPlugin,
-  type WorkbenchPluginContext,
-} from '@openenvx/headless';
+import type { SandboxHostSurface, WorkbenchApi } from '@openenvx/headless';
 import type { SandboxExtensionGrant } from '@xmazu/openenvxee-plugin-protocol';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -17,11 +14,11 @@ import { SandboxUiModal } from './sandbox-ui-modal';
 
 const DEFAULT_WIDGET_LAYER_TYPE = 'openenvx.widget';
 
-export interface SandboxExtensionPluginOptions {
+export interface SandboxExtensionHostOptions {
   grants: SandboxExtensionGrant[];
   permission?: 'read' | 'edit';
   /**
-   * When true, start plugin-kind grants on activate.
+   * When true, start plugin-kind grants on mount.
    * Production default is false (Figma-shaped: user runs via command).
    * Widgets always start when matching layers appear.
    */
@@ -43,11 +40,10 @@ export interface SandboxExtensionPluginOptions {
 }
 
 /**
- * Host plugin: loads session-granted QuickJS bundles in a Worker, mounts plugin
- * showUI as a floating modal iframe (Figma-shaped), and binds widget isolates to
- * widget canvas layers (on-canvas object — no default iframe; one isolate per layer).
+ * External sandbox host — not a WorkbenchPlugin / PluginManager citizen.
+ * Mount via {@link mountSandboxExtensions} on a narrow {@link SandboxHostSurface}.
  */
-export class SandboxExtensionPlugin extends WorkbenchPlugin {
+export class SandboxExtensionHost {
   readonly id = 'openenvx.sandbox-extensions';
 
   private readonly grants: SandboxExtensionGrant[];
@@ -66,8 +62,7 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
   private modalHost: HTMLDivElement | null = null;
   private modalRoot: Root | null = null;
 
-  constructor(options: SandboxExtensionPluginOptions) {
-    super();
+  constructor(options: SandboxExtensionHostOptions) {
     this.grants = options.grants;
     this.permission = options.permission ?? 'read';
     this.autoStartPlugins = options.autoStartPlugins ?? false;
@@ -77,20 +72,24 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
     this.bindWidgetClick = options.bindWidgetClick;
   }
 
-  activateWorkbench(ctx: WorkbenchPluginContext): void {
+  /** Attach to a narrow host surface. Call once per mount. */
+  mount(host: SandboxHostSurface): void {
     if (this.grants.length === 0) {
       return;
+    }
+    if (this.controller) {
+      throw new Error('SandboxExtensionHost already mounted');
     }
 
     const widgetLayerType = this.widgetLayerType;
     const controller = new SandboxExtensionController({
       grants: this.grants,
       permission: this.permission,
-      ctx,
+      host,
       workerUrl: this.workerUrl,
       preferInProcess: this.preferInProcess,
       getWidgetSyncedState: (layerId) => {
-        const layer = findLayerById(ctx.scene.getScene(), layerId);
+        const layer = findLayerById(host.getScene(), layerId);
         if (!layer || layer.type !== widgetLayerType) {
           return null;
         }
@@ -98,11 +97,11 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
         return data.syncedState ?? null;
       },
       setWidgetSyncedState: (layerId, value) => {
-        const layer = findLayerById(ctx.scene.getScene(), layerId);
+        const layer = findLayerById(host.getScene(), layerId);
         if (!layer || layer.type !== widgetLayerType) {
           return;
         }
-        ctx.scene.apply({
+        host.apply({
           label: 'Update widget synced state',
           apply: (scene) => ({
             ...scene,
@@ -120,11 +119,11 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
         });
       },
       resizeWidgetLayer: (layerId, width, height) => {
-        const layer = findLayerById(ctx.scene.getScene(), layerId);
+        const layer = findLayerById(host.getScene(), layerId);
         if (!layer) {
           return;
         }
-        ctx.scene.apply({
+        host.apply({
           label: 'Resize widget',
           apply: (scene) => ({
             ...scene,
@@ -145,12 +144,11 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
     });
     this.controller = controller;
 
-    // Modal host (not a sidebar panel) — Figma plugin UI is a floating dialog.
-    const host = document.createElement('div');
-    host.dataset.openenvxSandboxUi = '1';
-    document.body.append(host);
-    this.modalHost = host;
-    this.modalRoot = createRoot(host);
+    const modalHost = document.createElement('div');
+    modalHost.dataset.openenvxSandboxUi = '1';
+    document.body.append(modalHost);
+    this.modalHost = modalHost;
+    this.modalRoot = createRoot(modalHost);
     this.modalRoot.render(createElement(SandboxUiModal, { controller }));
 
     for (const grant of this.grants) {
@@ -158,7 +156,7 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
         continue;
       }
       const extensionId = grant.id;
-      ctx.register(
+      host.registerCommand(
         new (class extends Command {
           readonly id = `openenvx.sandbox.run.${extensionId}`;
           readonly title = grant.title?.trim() || `Run ${extensionId}`;
@@ -189,7 +187,7 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
     }
 
     const syncWidgets = () => {
-      const scene = ctx.scene.getScene();
+      const scene = host.getScene();
       const widgetGrants = new Map(
         this.grants.filter((g) => g.kind === 'widget').map((g) => [g.id, g])
       );
@@ -216,12 +214,12 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
     };
 
     syncWidgets();
-    this.widgetWatchDispose = ctx.scene.onDidChangeScene(() => {
+    this.widgetWatchDispose = host.onDidChangeScene(() => {
       syncWidgets();
     });
-    this.selectionWatchDispose = ctx.events.onDidChangeSelection(() => {
+    this.selectionWatchDispose = host.onDidChangeSelection(() => {
       controller.notifyUiContextChanged();
-    }).dispose;
+    });
     if (this.bindWidgetClick) {
       this.widgetClickDispose = this.bindWidgetClick((layerId) => {
         controller.dispatchWidgetClick(layerId);
@@ -229,7 +227,7 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
     }
   }
 
-  override deactivate(): void {
+  dispose(): void {
     this.widgetWatchDispose?.();
     this.widgetWatchDispose = null;
     this.selectionWatchDispose?.();
@@ -243,4 +241,15 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
     this.modalHost?.remove();
     this.modalHost = null;
   }
+}
+
+/** Mount a sandbox host via WorkbenchApi (not PluginManager). */
+export function mountSandboxExtensions(
+  api: Pick<WorkbenchApi, 'mountSandboxHost'>,
+  host: SandboxExtensionHost
+): () => void {
+  return api.mountSandboxHost((surface) => {
+    host.mount(surface);
+    return () => host.dispose();
+  });
 }

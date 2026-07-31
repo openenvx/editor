@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { PluginContext } from '@openenvx/core';
+import type { SandboxHostSurface } from '@openenvx/headless';
 import type { SandboxExtensionGrant } from '@xmazu/openenvxee-plugin-protocol';
 
 import { sha256Hex } from './fetch-artifact';
@@ -13,22 +13,25 @@ import {
 import { assertUiMessagePolicy } from './capabilities';
 import { SandboxExtensionController } from './sandbox-extension-controller';
 
-function mockCtx(): PluginContext {
+function mockHost(): SandboxHostSurface {
   return {
-    scene: {
-      getSelection: () => ({
-        activePageId: 'page-1',
-        selectedLayerIds: [],
-        primaryLayerId: null,
-      }),
-    },
-    commands: {
-      execute: async () => ({ executed: true }),
-    },
-    services: {},
-    events: {},
-    editor: {},
-  } as unknown as PluginContext;
+    getSelection: () => ({
+      activePageId: 'page-1',
+      selectedLayerIds: [],
+      primaryLayerId: null,
+    }),
+    getScene: () =>
+      ({
+        version: 1,
+        pages: [],
+        assets: {},
+      }) as ReturnType<SandboxHostSurface['getScene']>,
+    apply: () => {},
+    onDidChangeScene: () => () => {},
+    onDidChangeSelection: () => () => {},
+    executeCommand: async () => ({ executed: true }),
+    registerCommand: () => ({ dispose: () => {} }),
+  };
 }
 
 async function grantForSource(
@@ -56,7 +59,7 @@ describe('SandboxExtensionController', () => {
     const controller = new SandboxExtensionController({
       grants,
       permission: 'edit',
-      ctx: mockCtx(),
+      host: mockHost(),
       preferInProcess: true,
       fetchImpl: async (url) => {
         const id = String(url).match(/ext-\d+/)?.[0] ?? 'ext-0';
@@ -89,7 +92,7 @@ describe('SandboxExtensionController', () => {
     const controller = new SandboxExtensionController({
       grants,
       permission: 'edit',
-      ctx: mockCtx(),
+      host: mockHost(),
       preferInProcess: true,
       fetchImpl: async (url) => {
         startedFetches += 1;
@@ -129,7 +132,7 @@ describe('SandboxExtensionController', () => {
     const controller = new SandboxExtensionController({
       grants: [grant],
       permission: 'edit',
-      ctx: mockCtx(),
+      host: mockHost(),
       preferInProcess: true,
       fetchImpl: async () => new Response('globalThis.ok = 1;', { status: 200 }),
     });
@@ -152,7 +155,7 @@ describe('SandboxExtensionController', () => {
     const controller = new SandboxExtensionController({
       grants: [grant],
       permission: 'edit',
-      ctx: mockCtx(),
+      host: mockHost(),
       preferInProcess: true,
       fetchImpl: async () =>
         new Response(
@@ -183,7 +186,7 @@ describe('SandboxExtensionController', () => {
     const controller = new SandboxExtensionController({
       grants: [grant],
       permission: 'edit',
-      ctx: mockCtx(),
+      host: mockHost(),
       preferInProcess: true,
       fetchImpl: async () => new Response(source, { status: 200 }),
     });
@@ -232,7 +235,7 @@ describe('SandboxExtensionController', () => {
     const controller = new SandboxExtensionController({
       grants: [grant],
       permission: 'edit',
-      ctx: mockCtx(),
+      host: mockHost(),
       preferInProcess: true,
       fetchImpl: async () =>
         new Response(`openenvx.notify('hello toast');`, { status: 200 }),
@@ -258,7 +261,7 @@ describe('SandboxExtensionController', () => {
     const controller = new SandboxExtensionController({
       grants: [grant],
       permission: 'edit',
-      ctx: mockCtx(),
+      host: mockHost(),
       preferInProcess: true,
       fetchImpl: async () => new Response(source, { status: 200 }),
     });
@@ -280,7 +283,7 @@ describe('SandboxExtensionController', () => {
     const controller = new SandboxExtensionController({
       grants: [grant],
       permission: 'edit',
-      ctx: mockCtx(),
+      host: mockHost(),
       preferInProcess: true,
       fetchImpl: async () => new Response(source, { status: 200 }),
     });
@@ -301,7 +304,7 @@ describe('SandboxExtensionController', () => {
     const controller = new SandboxExtensionController({
       grants: [{ ...grant, capabilities: ['ui:show'] }],
       permission: 'edit',
-      ctx: mockCtx(),
+      host: mockHost(),
       preferInProcess: true,
       fetchImpl: async () => new Response('globalThis.ok = 1;', { status: 200 }),
     });
@@ -314,7 +317,7 @@ describe('SandboxExtensionController', () => {
     const controller = new SandboxExtensionController({
       grants: [{ ...grant, capabilities: ['ui:show', 'document:read'] }],
       permission: 'edit',
-      ctx: mockCtx(),
+      host: mockHost(),
       preferInProcess: true,
       fetchImpl: async () => new Response('globalThis.ok = 1;', { status: 200 }),
     });

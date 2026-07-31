@@ -8,7 +8,7 @@ import {
   createLocalStorageWorkbenchLayoutStore,
   createPostMessagePluginPanelTransport,
   DEFAULT_CANVAS_LAYOUT,
-  PluginPanelPlugin,
+  EmbedPanelHost,
 } from '@xmazu/openenvxee-studio';
 
 import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
@@ -26,7 +26,7 @@ function isEmbedMode(): boolean {
 }
 
 function createPlugins(): Plugin[] {
-  const plugins: Plugin[] = [
+  return [
     ...DEFAULT_STUDIO_PLUGINS,
     new CanvasDemoPlugin(),
     new CanvasDemoChromePlugin(),
@@ -34,25 +34,26 @@ function createPlugins(): Plugin[] {
       provider: createDemoVersionHistoryProvider(),
     }),
   ];
+}
 
-  if (isEmbedMode()) {
-    plugins.push(
-      new PluginPanelPlugin({
-        declaration: {
-          id: EMBED_PANEL_ID,
-          title: 'Embed',
-          allowedCommands: [],
-          contextScope: 'selection',
-        },
-        permission: 'edit',
-        transport: createPostMessagePluginPanelTransport({
-          allowedOrigins: [window.location.origin],
-        }),
-      })
-    );
+function createEmbedPanels(): EmbedPanelHost[] | undefined {
+  if (!isEmbedMode()) {
+    return undefined;
   }
-
-  return plugins;
+  return [
+    new EmbedPanelHost({
+      declaration: {
+        id: EMBED_PANEL_ID,
+        title: 'Embed',
+        allowedCommands: [],
+        contextScope: 'selection',
+      },
+      permission: 'edit',
+      transport: createPostMessagePluginPanelTransport({
+        allowedOrigins: [window.location.origin],
+      }),
+    }),
+  ];
 }
 
 function promptUri(message: string, defaultValue?: string): string | null {
@@ -71,6 +72,7 @@ export function App() {
         createPropertyHostContext={createCanvasPropertyHostContextWithApi}
         editorTitle="Canvas"
         editorUri="openworkbench://canvas-demo"
+        embedPanels={createEmbedPanels()}
         initialScene={createCanvasDemoScene()}
         layout={DEFAULT_CANVAS_LAYOUT}
         layoutStore={layoutStore}

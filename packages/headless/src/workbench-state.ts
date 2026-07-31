@@ -26,6 +26,8 @@ import type {
   SidebarBehavior,
   ViewContainerLocation,
 } from './contributions/view-contribution';
+import type { EmbedPanelHostSurface } from './external-host/embed-panel-host-surface';
+import type { SandboxHostSurface } from './external-host/sandbox-host-surface';
 import type { PropertyLayoutNode } from './properties/property-layout-node';
 import type { PropertyValuePath } from './properties/property-value-path';
 import type { WorkbenchContributionDisposable } from './registries/workbench-registries';
@@ -169,6 +171,20 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   registerWorkbenchContributions: (
     ...contributions: WorkbenchContribution[]
   ) => WorkbenchContributionDisposable;
+  /**
+   * Mount a sandbox host on a narrow surface (not PluginManager).
+   * Returns dispose for the mount.
+   */
+  mountSandboxHost: (
+    activate: (surface: SandboxHostSurface) => void | (() => void)
+  ) => () => void;
+  /**
+   * Mount an embed panel host on a narrow surface (not PluginManager).
+   * Returns dispose for the mount.
+   */
+  mountEmbedPanelHost: (
+    activate: (surface: EmbedPanelHostSurface) => void | (() => void)
+  ) => () => void;
   undo: () => boolean;
   redo: () => boolean;
   save: (saveFn?: (input: EditorInput) => Promise<void>) => Promise<void>;

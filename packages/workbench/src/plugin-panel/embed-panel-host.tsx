@@ -1,10 +1,11 @@
-import { IconRegistryId } from '@openenvx/core';
+import type {
+  EmbedPanelHostSurface,
+  ViewContainerLocation,
+  WorkbenchApi,
+} from '@openenvx/headless';
 import {
   ViewContainerContribution,
   ViewContribution,
-  WorkbenchPlugin,
-  type ViewContainerLocation,
-  type WorkbenchPluginContext,
 } from '@openenvx/headless';
 import type { PluginPanelDeclaration } from '@xmazu/openenvxee-plugin-protocol';
 import type { ComponentType, ReactNode } from 'react';
@@ -12,7 +13,7 @@ import type { ComponentType, ReactNode } from 'react';
 import { PluginPanel } from './plugin-panel';
 import type { PluginPanelTransport } from './plugin-panel-transport';
 
-export interface PluginPanelPluginOptions {
+export interface EmbedPanelHostOptions {
   declaration: PluginPanelDeclaration;
   transport: PluginPanelTransport;
   templateId?: string | null;
@@ -46,10 +47,10 @@ function createIconGlyph(
 }
 
 /**
- * Registers one activity-bar panel that renders a declarative plugin tree
- * received over {@link PluginPanelTransport}.
+ * External embed panel host — not a WorkbenchPlugin / PluginManager citizen.
+ * Mount via {@link mountEmbedPanel} on a narrow {@link EmbedPanelHostSurface}.
  */
-export class PluginPanelPlugin extends WorkbenchPlugin {
+export class EmbedPanelHost {
   readonly id: string;
 
   private readonly declaration: PluginPanelDeclaration;
@@ -63,9 +64,9 @@ export class PluginPanelPlugin extends WorkbenchPlugin {
   private readonly viewId: string;
   private readonly componentId: string;
   private readonly iconId: string;
+  private mounted = false;
 
-  constructor(options: PluginPanelPluginOptions) {
-    super();
+  constructor(options: EmbedPanelHostOptions) {
     this.declaration = options.declaration;
     this.transport = options.transport;
     this.templateId = options.templateId ?? null;
@@ -73,17 +74,21 @@ export class PluginPanelPlugin extends WorkbenchPlugin {
     this.theme = options.theme ?? 'dark';
     this.location = options.location ?? 'secondary';
     this.sidebarOrder = options.sidebarOrder ?? 50;
-    this.id = `openenvx.plugin-panel.${options.declaration.id}`;
+    this.id = `openenvx.embed-panel.${options.declaration.id}`;
     this.containerId = `plugin.panel.${options.declaration.id}`;
     this.viewId = `${this.containerId}.view`;
     this.componentId = `${this.containerId}.component`;
     this.iconId = `plugin.panel.icon.${options.declaration.id}`;
   }
 
-  activateWorkbench(ctx: WorkbenchPluginContext): void {
+  mount(surface: EmbedPanelHostSurface): void {
+    if (this.mounted) {
+      throw new Error(`EmbedPanelHost already mounted: ${this.id}`);
+    }
+    this.mounted = true;
+
     if (this.declaration.icon) {
-      const registry = ctx.services.get(IconRegistryId);
-      registry.register(this.iconId, createIconGlyph(this.declaration.icon));
+      surface.registerIcon(this.iconId, createIconGlyph(this.declaration.icon));
     }
 
     const declaration = this.declaration;
@@ -129,7 +134,22 @@ export class PluginPanelPlugin extends WorkbenchPlugin {
       );
     };
 
-    ctx.registerWorkbench(new Container(), new View());
-    ctx.registerViewPanel(componentId, BoundPanel);
+    surface.registerWorkbench(new Container(), new View());
+    surface.registerViewPanel(componentId, BoundPanel);
   }
+
+  dispose(): void {
+    this.mounted = false;
+  }
+}
+
+/** Mount an embed panel host via WorkbenchApi (not PluginManager). */
+export function mountEmbedPanel(
+  api: Pick<WorkbenchApi, 'mountEmbedPanelHost'>,
+  host: EmbedPanelHost
+): () => void {
+  return api.mountEmbedPanelHost((surface) => {
+    host.mount(surface);
+    return () => host.dispose();
+  });
 }
