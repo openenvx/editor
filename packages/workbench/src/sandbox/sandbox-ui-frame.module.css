@@ -1,0 +1,7 @@
+.frame {
+  display: block;
+  border: none;
+  border-radius: var(--wb-radius-md);
+  background: var(--wb-muted);
+  box-shadow: var(--wb-shadow-xs);
+}

@@ -21,6 +21,7 @@ export interface SandboxHostHandlers {
   ) => Promise<void> | void;
   resizeUI: (width: number, height: number) => Promise<void> | void;
   closeUI: () => Promise<void> | void;
+  postToUI: (pluginMessage: unknown) => Promise<void> | void;
   notify: (message: string) => Promise<void> | void;
   closePlugin: () => Promise<void> | void;
   getClientStorage: (key: string) => Promise<unknown> | unknown;
@@ -126,6 +127,9 @@ async function dispatch(
     }
     case 'closeUI': {
       return handlers.closeUI();
+    }
+    case 'postToUI': {
+      return handlers.postToUI(params.pluginMessage);
     }
     case 'notify': {
       return handlers.notify(String(params.message ?? ''));

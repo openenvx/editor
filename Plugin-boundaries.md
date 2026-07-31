@@ -1,12 +1,26 @@
 # Plugin trust boundaries
 
-How **internal** (first-party) and **external** (embed / future marketplace) plugins relate to the editor. Companion to [Architecture.md](Architecture.md).
+How **internal** (first-party) and **external** (embed / sandbox) extensions relate to the editor. Companion to [Architecture.md](Architecture.md).
+
+## Vocabulary (three surfaces)
+
+| Term | Meaning | Not |
+| --- | --- | --- |
+| **Plugin** / **WorkbenchPlugin** | Trusted first-party in-process OOP module | Marketplace / untrusted |
+| **Embed panel** | Declarative `panel:*` trees from a parent page | QuickJS / widgets |
+| **Sandbox extension** | Untrusted QuickJS grant (Worker isolate) | Internal OOP |
+| **Sandbox plugin** (`kind: 'plugin'`) | Off-canvas tool extension | Widget; embed panel |
+| **Sandbox widget** (`kind: 'widget'`) | On-canvas `openenvx.widget` + isolate | Sandbox plugin |
+
+Figma parity (plugins vs widgets, isolate + `showUI` iframe) lives on the **sandbox** path only. Embed panels stay a separate, safer/weaker trust path — do not force them onto QuickJS.
 
 ## Hard rule
 
-**Untrusted plugin code must never execute inside the Studio / editor main world.**
+**Untrusted extension code must never execute inside the Studio / editor main world.**
 
-External plugins interact only through `@xmazu/openenvxee-plugin-protocol`: serializable UI trees + a small `postMessage` (or equivalent) bus. The host validates data, maps it through the same fluent builders internals use, and renders with Studio’s own React.
+External embed panels interact only through `@xmazu/openenvxee-plugin-protocol`: serializable UI trees + a small `postMessage` (or equivalent) bus. The host validates data, maps it through the same fluent builders internals use, and renders with Studio’s own React.
+
+Sandbox extensions run in a QuickJS Worker isolate and talk through a capability-gated host bridge; optional UI is a sandboxed iframe (`allow-scripts` only).
 
 ```mermaid
 flowchart LR
@@ -32,19 +46,60 @@ This is the VS Code webview / Figma widget model: **UI description + message bus
 
 ## Internal vs external
 
-|  | Internal | External |
+|  | Internal | External (embed panel) | External (sandbox) |
+| --- | --- | --- | --- |
+| Runs where | Same JS bundle as the editor | Other document / origin | QuickJS Worker isolate |
+| Authors with | OOP `Plugin` + fluent builders | `h` / JSX → JSON tree | JS/TS + `openenvx.*`; optional HTML/`showUI` |
+| Trust | First-party | Must not execute arbitrary code in-editor | Must not execute in editor main world |
+| Mutation path | Direct `ctx.register` / workbench API | Only `panel:command` through allowlist | Allowlisted `executeCommand` + widget syncedState |
+| UI path | Builders → descriptors → renderers | Tree → validate → **same** mappers/builders → renderers | Sandboxed iframe (`showUI`) or on-canvas widget face |
+
+Same renderers underneath for embed panels; different trust boundary. Internal plugins stay privileged in-process OOP. Do not force them onto the protocol vocabulary.
+
+## Plugins vs widgets (Figma-shaped)
+
+Sandbox grants use `kind: 'plugin' | 'widget'` with the same product contract as [Figma’s widgets vs plugins](https://developers.figma.com/docs/widgets/widgets-vs-plugins/):
+
+|  | **Sandbox plugin** | **Sandbox widget** |
 | --- | --- | --- |
-| Runs where | Same JS bundle as the editor | Other document / origin / Worker |
-| Authors with | OOP `Plugin` + fluent builders (`createPropertyPane`, `MenuBuilder`, …) | `h` / JSX → JSON tree (`@xmazu/openenvxee-plugin-protocol`) |
-| Trust | First-party | Must not execute arbitrary code in-editor |
-| Mutation path | Direct `ctx.register` / workbench API | Only `panel:command` through allowlist |
-| UI path | Builders → descriptors → renderers | Tree → validate → **same** mappers/builders → renderers |
+| Mental model | A **tool you run** | An **object on the canvas** |
+| Primary UI | Off-canvas iframe (`showUI`) | On-canvas `openenvx.widget` face; iframe optional |
+| Who sees it | Only the user who ran it | Everyone in the file (same layer instance) |
+| Lifetime | Starts on user action (`openenvx.sandbox.run.<id>`); one UI modal at a time | Lives while the layer is in the document; one isolate per `extensionId:layerId`; many at once |
+| State | `clientStorage` (per-user, session-local today) | `syncedState` on the node (**local until CRDT / multiplayer** — API shape is Figma-like; collaborative sync deferred) |
+| Best for | Automation, import/export, setup | Collaborative / on-canvas interaction |
 
-Same renderers underneath; different trust boundary. Internal plugins stay privileged in-process OOP. Do not force them onto the protocol vocabulary.
+```mermaid
+flowchart TB
+  subgraph pluginRun [Plugin - user runs tool]
+    PIsolate[QuickJS isolate]
+    PIframe[showUI iframe]
+    PIsolate <-->|"postMessage duplex"| PIframe
+    PIsolate -->|"document API"| Scene
+  end
+  subgraph widgetLive [Widget - node on canvas]
+    WNode[openenvx.widget layer]
+    WIsolate[QuickJS isolate per layer]
+    WIframe[optional showUI]
+    WNode -->|"click / syncedState"| WIsolate
+    WIsolate -.->|"optional"| WIframe
+  end
+```
 
-## Protocol surface (public for untrusted code)
+### Authoring / React
 
-Treat the protocol package as the **only** public extension surface for untrusted authors:
+| Surface | Supported? | Notes |
+| --- | --- | --- |
+| React (or any framework) in `showUI` iframe | **Yes** | Authors bundle UI into HTML; host never loads it into Studio’s main React tree. Duplex: `openenvx.ui.postMessage` ↔ iframe `postPluginMessage` / `onPluginMessage`. |
+| React in isolate main logic | **No** | QuickJS has no DOM (same as Figma). Plain JS/TS + `openenvx.*`. |
+| ReactDOM as widget canvas face | **No** | Would put untrusted UI on the editor render path. |
+| Figma-like Widget JSX face | **Deferred** | Isolate returns a declarative tree; host paints. Not a second React runtime. |
+
+**V.1 author promise:** write your panel in React inside `showUI`; talk to the sandbox over `postMessage`. Widget face is host preview + `syncedState` until Widget JSX ships.
+
+## Protocol surface (public for untrusted embed code)
+
+Treat the protocol package as the **only** public extension surface for untrusted **embed panel** authors:
 
 | Direction | Message | Role |
 | --- | --- | --- |
@@ -83,7 +138,9 @@ Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/p
 
 ## QuickJS sandbox (Phase V.1 / V.1.1)
 
-Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionPlugin` (workbench `SandboxExtensionPlugin` + canvas widget click bind): **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` canvas nodes carry local synced state. Bundles load from session-granted signed URLs + content hashes (minted by openenvx-cloud).
+Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionPlugin` (workbench `SandboxExtensionPlugin` + canvas widget click bind): **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` canvas nodes carry **local** synced state (collaborative CRDT deferred). Bundles load from session-granted signed URLs + content hashes (minted by openenvx-cloud).
+
+**Plugin lifecycle:** production hosts default `autoStartPlugins: false` — sandbox plugins start via `openenvx.sandbox.run.<id>` (user-run). Demos may opt into auto-start. Closing the UI modal does not stop the isolate; **Stop** / `closePlugin` does.
 
 **OK to run:** cloud-minted, hash-pinned, capability-scoped extensions that you (or a customer org admin) explicitly installed for a session.
 
@@ -99,8 +156,8 @@ Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionPlugin` (workb
 | Artifact size | 2 MiB; `https:` only (`http:` localhost/127.0.0.1 for tests) |
 | Concurrent isolates | 8 |
 | `showUI` HTML | 512 KiB |
-| UI→isolate message | JSON-serializable, 64 KiB; `openenvx.ui.onmessage` only (no host→UI / isolate→iframe duplex yet) |
-| `notify` | 500 chars, 10/s per extension (toast reserved; not capability-gated) |
+| UI↔isolate message | JSON-serializable, 64 KiB; duplex `openenvx.ui.postMessage` ↔ iframe `postPluginMessage` / `onPluginMessage`; host pushes `ui:context` (theme always; selection only if grant has `document:read`) |
+| `notify` | 500 chars, 10/s per extension → workbench toast overlay |
 | Grant ingest | Constructor-only: URL/hash/`uiHtml` size + `normalizeCapabilities` + frozen `allowedCommands` |
 
 UI iframe messages use `postMessage(..., '*')` because the sandboxed frame has an opaque null origin — the host still checks `event.source === iframe.contentWindow`.
@@ -109,7 +166,7 @@ See openenvx-cloud `docs/embed/plugin-api.md`.
 
 ## Cloud-hosted / marketplace plugins
 
-If OpenEnvx Cloud hosts plugins “added by people,” **only the other endpoint moves**. Studio’s job stays the same: speak the protocol.
+If OpenEnvx Cloud hosts plugins “added by people,” **only the other endpoint moves**. Studio’s job stays the same: speak the protocol (embed) or mint sandbox grants.
 
 ```mermaid
 flowchart TB
@@ -136,10 +193,10 @@ Use an isolate when you cannot trust a full browser iframe and people upload scr
 Rules if you sandbox JS:
 
 - No DOM, no `fetch` by default, no Studio imports
-- Only I/O is the protocol (context/event in → tree/command out)
+- Only I/O is the host bridge (and optional sandboxed `showUI` iframe)
 - Cap CPU (5s interrupt + 15s Worker eval timeout), memory (8 MiB), artifact size, and tree size (tree caps already exist)
 - Run in a **Worker** only in production hosts (never `eval` / dynamic `import()` / in-process QuickJS on the editor UI thread). Unit tests may set `preferInProcess: true`.
-- Capabilities stay host-side (`allowedCommands`, `contextScope`, privileged `panel:manifest`)
+- Capabilities stay host-side (`allowedCommands`, grant capabilities)
 
 Cloudflare Workers already provide V8 isolates — often enough without shipping QuickJS yourself. QuickJS-in-Wasm is useful when the same tiny sandbox must run in browser _and_ on the server.
 
@@ -153,13 +210,13 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 
 | Concern | Package |
 | --- | --- |
-| Element vocabulary, `h`/jsx, messages, `validatePluginTree` | `@xmazu/openenvxee-plugin-protocol` (published) |
+| Element vocabulary, `h`/jsx, messages, `validatePluginTree`, sandbox grant types | `@xmazu/openenvxee-plugin-protocol` (published) |
 | Tree → builder mappers, plugin host context, manifest → contributions | `@openenvx/headless` |
-| `PluginPanel`, postMessage transport, command gate | `@xmazu/openenvxee-workbench` |
+| `PluginPanel`, postMessage transport, command gate, sandbox runtime | `@xmazu/openenvxee-workbench` |
 | Internal OOP plugins + builders | `@openenvx/core`, `@openenvx/headless`, product plugins (`canvas-pro`, …) |
 
 ## Related
 
 - [Architecture.md](Architecture.md) — package boundaries and contribution flow
-- [FEATURES.md](FEATURES.md) — “Declarative embed plugin panels” capability row
+- [FEATURES.md](FEATURES.md) — embed panels + sandbox extensions rows
 - [PUBLISHING.md](PUBLISHING.md) — protocol publish / link notes

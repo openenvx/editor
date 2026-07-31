@@ -131,7 +131,12 @@ export async function createQuickJsEngine(input: {
 
   const bootstrap = `
     globalThis.openenvx = {
-      ui: { onmessage: null },
+      ui: {
+        onmessage: null,
+        postMessage(pluginMessage) {
+          return globalThis.openenvx.call('postToUI', { pluginMessage });
+        },
+      },
       async call(method, params) {
         const id = Math.random().toString(36).slice(2);
         const raw = await globalThis.__openenvxHostCall({

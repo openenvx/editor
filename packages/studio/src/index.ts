@@ -50,7 +50,7 @@ export {
   assertMethodAllowed,
   fetchAndVerifyArtifact,
   createSandboxHostBridge,
-  PluginUiFrame,
+  SandboxUiFrame,
   registerDefaultWorkbenchBundle,
   Select,
   SUPPORTED_LOCALES,

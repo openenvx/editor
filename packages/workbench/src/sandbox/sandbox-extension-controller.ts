@@ -2,9 +2,14 @@ import type { PluginContext } from '@openenvx/core';
 import type {
   SandboxExtensionGrant,
   SandboxBridgeRequest,
+  SandboxUiSelection,
 } from '@xmazu/openenvxee-plugin-protocol';
 
-import { freezeGrant, assertUiMessagePolicy } from './capabilities';
+import {
+  freezeGrant,
+  assertUiMessagePolicy,
+  hasCapability,
+} from './capabilities';
 import { fetchAndVerifyArtifact } from './fetch-artifact';
 import {
   createSandboxHostBridge,
@@ -37,6 +42,19 @@ export interface SandboxUiState {
 
 export type SandboxUiListener = (state: SandboxUiState | null) => void;
 
+export interface SandboxNotifyEvent {
+  id: string;
+  extensionId: string;
+  message: string;
+}
+
+export type SandboxNotifyListener = (event: SandboxNotifyEvent) => void;
+
+/** Isolate → showUI iframe (React owns the contentWindow). */
+export type SandboxUiOutboundListener = (pluginMessage: unknown) => void;
+
+export type SandboxUiContextListener = () => void;
+
 const MAX_CLIENT_STORAGE_KEYS = 64;
 const MAX_CLIENT_STORAGE_VALUE_CHARS = 32_768;
 
@@ -58,7 +76,11 @@ export class SandboxExtensionController {
   private readonly notifyTimestamps = new Map<string, number[]>();
   private uiState: SandboxUiState | null = null;
   private readonly uiListeners = new Set<SandboxUiListener>();
+  private readonly notifyListeners = new Set<SandboxNotifyListener>();
+  private readonly uiOutboundListeners = new Set<SandboxUiOutboundListener>();
+  private readonly uiContextListeners = new Set<SandboxUiContextListener>();
   private disposed = false;
+  private notifySeq = 0;
 
   constructor(
     private readonly options: {
@@ -91,23 +113,70 @@ export class SandboxExtensionController {
     return () => this.uiListeners.delete(listener);
   }
 
+  subscribeNotify(listener: SandboxNotifyListener): () => void {
+    this.notifyListeners.add(listener);
+    return () => this.notifyListeners.delete(listener);
+  }
+
+  /** Isolate `postToUI` → React posts into the iframe when ready. */
+  subscribeUiOutbound(listener: SandboxUiOutboundListener): () => void {
+    this.uiOutboundListeners.add(listener);
+    return () => this.uiOutboundListeners.delete(listener);
+  }
+
+  /** Fired when selection (or host) wants showUI context refreshed. */
+  subscribeUiContext(listener: SandboxUiContextListener): () => void {
+    this.uiContextListeners.add(listener);
+    return () => this.uiContextListeners.delete(listener);
+  }
+
+  /** Call when scene selection changes so open showUI gets a context push. */
+  notifyUiContextChanged(): void {
+    for (const listener of this.uiContextListeners) {
+      listener();
+    }
+  }
+
+  /**
+   * Selection for showUI context. Requires `document:read` on the grant
+   * (same gate as `getSelection`); otherwise `null` (omit from `ui:context`).
+   */
+  getUiContextSelection(extensionId?: string): SandboxUiSelection | null {
+    if (extensionId) {
+      const grant = this.grantById.get(extensionId);
+      if (!(grant && hasCapability(grant, 'document:read'))) {
+        return null;
+      }
+    }
+    const selection = this.options.ctx.scene.getSelection();
+    return {
+      activePageId: selection.activePageId,
+      selectedLayerIds: [...selection.selectedLayerIds],
+      primaryLayerId: selection.primaryLayerId,
+    };
+  }
+
   getUiState(): SandboxUiState | null {
     return this.uiState;
   }
 
   /** Close the modal iframe only — does not stop the isolate. */
-  closeUi(extensionId?: string): void {
-    if (
-      this.uiState &&
-      (extensionId === undefined || this.uiState.extensionId === extensionId)
-    ) {
-      this.setUi(null);
+  closeUi(extensionId?: string, layerId?: string): void {
+    if (!this.uiState) {
+      return;
     }
+    if (extensionId !== undefined && this.uiState.extensionId !== extensionId) {
+      return;
+    }
+    if (layerId !== undefined && this.uiState.layerId !== layerId) {
+      return;
+    }
+    this.setUi(null);
   }
 
   /**
    * Deliver a JSON-cloned UI message to the running isolate for this extension.
-   * Path B: iframe → host → isolate `openenvx.ui.onmessage` only.
+   * Path B: iframe → host → isolate `openenvx.ui.onmessage`.
    */
   deliverUiMessage(
     extensionId: string,
@@ -213,7 +282,10 @@ export class SandboxExtensionController {
     const isolate = this.isolates.get(key);
     isolate?.dispose();
     this.isolates.delete(key);
-    if (this.uiState?.extensionId === extensionId) {
+    if (
+      this.uiState?.extensionId === extensionId &&
+      (layerId === undefined || this.uiState.layerId === layerId)
+    ) {
       this.setUi(null);
     }
   }
@@ -237,6 +309,14 @@ export class SandboxExtensionController {
     for (const key of stale) {
       this.isolates.get(key)?.dispose();
       this.isolates.delete(key);
+      const layerId = layerIdFromIsolateKey(key);
+      if (
+        this.uiState?.layerId &&
+        layerId &&
+        this.uiState.layerId === layerId
+      ) {
+        this.setUi(null);
+      }
     }
   }
 
@@ -281,6 +361,36 @@ export class SandboxExtensionController {
     }
   }
 
+  private ownsOpenUi(grantId: string, layerId?: string): boolean {
+    if (!this.uiState || this.uiState.extensionId !== grantId) {
+      return false;
+    }
+    if (layerId !== undefined && this.uiState.layerId !== layerId) {
+      return false;
+    }
+    return true;
+  }
+
+  private emitUiOutbound(pluginMessage: unknown): void {
+    assertUiMessagePolicy(pluginMessage);
+    for (const listener of this.uiOutboundListeners) {
+      listener(pluginMessage);
+    }
+  }
+
+  private emitNotify(extensionId: string, message: string): void {
+    this.assertNotifyAllowed(extensionId, message);
+    this.notifySeq += 1;
+    const event: SandboxNotifyEvent = {
+      id: `${extensionId}:${this.notifySeq}`,
+      extensionId,
+      message,
+    };
+    for (const listener of this.notifyListeners) {
+      listener(event);
+    }
+  }
+
   private assertNotifyAllowed(extensionId: string, message: string): void {
     const updated = assertNotifyPolicy({
       message,
@@ -320,7 +430,7 @@ export class SandboxExtensionController {
         return { executed: result.executed };
       },
       showUI: (html, options) => {
-        const resolved = html || grant.uiHtml || '<p>Plugin</p>';
+        const resolved = html || grant.uiHtml || '<p>Extension</p>';
         if (resolved.length > MAX_SHOW_UI_HTML_CHARS) {
           throw new Error('showUI HTML too large');
         }
@@ -334,19 +444,24 @@ export class SandboxExtensionController {
         });
       },
       resizeUI: (width, height) => {
-        if (!this.uiState || this.uiState.extensionId !== grant.id) {
+        if (!this.ownsOpenUi(grant.id, layerId)) {
           return;
         }
-        this.setUi({ ...this.uiState, width, height });
+        this.setUi({ ...this.uiState!, width, height });
       },
       closeUI: () => {
-        if (this.uiState?.extensionId === grant.id) {
+        if (this.ownsOpenUi(grant.id, layerId)) {
           this.setUi(null);
         }
       },
+      postToUI: (pluginMessage) => {
+        if (!this.ownsOpenUi(grant.id, layerId)) {
+          throw new Error('No open UI for this extension');
+        }
+        this.emitUiOutbound(pluginMessage);
+      },
       notify: (message) => {
-        this.assertNotifyAllowed(grant.id, message);
-        // Host toast reserved; length + rate already gated.
+        this.emitNotify(grant.id, message);
       },
       closePlugin: () => {
         this.stop(grant.id, layerId);

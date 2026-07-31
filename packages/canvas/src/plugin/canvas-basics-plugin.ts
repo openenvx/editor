@@ -159,20 +159,20 @@ export class InsertOpenEnvxWidgetCommand extends Command {
       createLayerId('widget'),
       page
     );
-    const pluginId =
+    const extensionId =
       args &&
       typeof args === 'object' &&
-      typeof (args as { pluginId?: unknown }).pluginId === 'string'
-        ? (args as { pluginId: string }).pluginId.trim()
+      typeof (args as { extensionId?: unknown }).extensionId === 'string'
+        ? (args as { extensionId: string }).extensionId.trim()
         : '';
-    if (pluginId) {
+    if (extensionId) {
       layer.data = {
         ...(layer.data as Record<string, unknown>),
-        pluginId,
-        label: pluginId,
+        extensionId,
+        label: extensionId,
         syncedState: {},
       };
-      layer.name = pluginId;
+      layer.name = extensionId;
     }
     insertCanvasLayer(ctx, layer);
   }

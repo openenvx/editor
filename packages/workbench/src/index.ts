@@ -167,16 +167,17 @@ export {
 } from './sandbox/fetch-artifact';
 export { createSandboxHostBridge } from './sandbox/host-bridge';
 export {
-  PluginUiFrame,
-  MAX_UI_MESSAGE_JSON_CHARS,
-  type PluginUiFrameProps,
-} from './sandbox/plugin-ui-frame';
+  SandboxUiFrame,
+  type SandboxUiFrameProps,
+} from './sandbox/sandbox-ui-frame';
+export { postSandboxUiMessage } from './sandbox/sandbox-ui-protocol';
 export {
   assertNotifyPolicy,
   MAX_CONCURRENT_ISOLATES,
   MAX_NOTIFY_MESSAGE_CHARS,
   MAX_NOTIFY_PER_SECOND,
   MAX_SHOW_UI_HTML_CHARS,
+  MAX_UI_MESSAGE_JSON_CHARS,
   SANDBOX_CPU_LIMIT_MS,
   SANDBOX_EVAL_TIMEOUT_MS,
   SANDBOX_MEMORY_LIMIT_BYTES,

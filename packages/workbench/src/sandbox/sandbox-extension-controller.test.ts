@@ -226,4 +226,103 @@ describe('SandboxExtensionController', () => {
       })
     ).toThrow(/notify rate limit exceeded/);
   });
+
+  it('emits toast notify events when isolate calls notify', async () => {
+    const grant = await grantForSource('notify-ext', `openenvx.notify('hello toast');`);
+    const controller = new SandboxExtensionController({
+      grants: [grant],
+      permission: 'edit',
+      ctx: mockCtx(),
+      preferInProcess: true,
+      fetchImpl: async () =>
+        new Response(`openenvx.notify('hello toast');`, { status: 200 }),
+    });
+    const seen: string[] = [];
+    controller.subscribeNotify((event) => {
+      seen.push(event.message);
+    });
+    await controller.start(grant);
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 50);
+    });
+    expect(seen).toContain('hello toast');
+    controller.dispose();
+  }, 30_000);
+
+  it('emits ui outbound events for postToUI without holding a Window', async () => {
+    const source = `
+      openenvx.showUI('<p>x</p>', { width: 100, height: 80 });
+      openenvx.ui.postMessage({ type: 'from-isolate' });
+    `;
+    const grant = await grantForSource('outbound', source);
+    const controller = new SandboxExtensionController({
+      grants: [grant],
+      permission: 'edit',
+      ctx: mockCtx(),
+      preferInProcess: true,
+      fetchImpl: async () => new Response(source, { status: 200 }),
+    });
+    const outbound: unknown[] = [];
+    controller.subscribeUiOutbound((message) => {
+      outbound.push(message);
+    });
+    await controller.start(grant);
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 50);
+    });
+    expect(outbound).toContainEqual({ type: 'from-isolate' });
+    controller.dispose();
+  }, 30_000);
+
+  it('closeUi matches layerId so widget instances do not clobber each other', async () => {
+    const source = `openenvx.showUI('<p>x</p>');`;
+    const grant = await grantForSource('layer-ui', source);
+    const controller = new SandboxExtensionController({
+      grants: [grant],
+      permission: 'edit',
+      ctx: mockCtx(),
+      preferInProcess: true,
+      fetchImpl: async () => new Response(source, { status: 200 }),
+    });
+    await controller.start(grant, 'layer-a');
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 50);
+    });
+    expect(controller.getUiState()?.layerId).toBe('layer-a');
+    controller.closeUi(grant.id, 'layer-b');
+    expect(controller.getUiState()?.layerId).toBe('layer-a');
+    controller.closeUi(grant.id, 'layer-a');
+    expect(controller.getUiState()).toBeNull();
+    controller.dispose();
+  }, 30_000);
+
+  it('omits selection from ui context without document:read', async () => {
+    const grant = await grantForSource('ctx-gate', 'globalThis.ok = 1;');
+    const controller = new SandboxExtensionController({
+      grants: [{ ...grant, capabilities: ['ui:show'] }],
+      permission: 'edit',
+      ctx: mockCtx(),
+      preferInProcess: true,
+      fetchImpl: async () => new Response('globalThis.ok = 1;', { status: 200 }),
+    });
+    expect(controller.getUiContextSelection(grant.id)).toBeNull();
+    controller.dispose();
+  });
+
+  it('returns selection for ui context when document:read is granted', async () => {
+    const grant = await grantForSource('ctx-read', 'globalThis.ok = 1;');
+    const controller = new SandboxExtensionController({
+      grants: [{ ...grant, capabilities: ['ui:show', 'document:read'] }],
+      permission: 'edit',
+      ctx: mockCtx(),
+      preferInProcess: true,
+      fetchImpl: async () => new Response('globalThis.ok = 1;', { status: 200 }),
+    });
+    expect(controller.getUiContextSelection(grant.id)).toEqual({
+      activePageId: 'page-1',
+      selectedLayerIds: [],
+      primaryLayerId: null,
+    });
+    controller.dispose();
+  });
 });

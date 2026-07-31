@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>OpenEnvx — React-style showUI demo (reference)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        font:
+          14px/1.4 system-ui,
+          sans-serif;
+        background: #0b1220;
+        color: #e2e8f0;
+        padding: 24px;
+      }
+      code {
+        font-size: 12px;
+      }
+      pre {
+        overflow: auto;
+        padding: 12px;
+        background: #111827;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>React-in-showUI (reference)</h1>
+    <p>
+      Sandbox extensions may ship React (or any UI framework) inside
+      <code>showUI</code> HTML. Studio never mounts author React in the editor
+      main world. See
+      <code>packages/workbench/src/sandbox/fixtures/react-showui-demo.ts</code>
+      for the runnable fixture used by tests (tiny createElement/useState
+      runtime — production authors bundle real React the same way).
+    </p>
+    <p>Duplex contract:</p>
+    <ul>
+      <li>
+        Iframe → isolate: <code>postPluginMessage(msg)</code> →
+        <code>openenvx.ui.onmessage</code>
+      </li>
+      <li>
+        Isolate → iframe: <code>openenvx.ui.postMessage(msg)</code> →
+        <code>onPluginMessage</code>
+      </li>
+      <li>
+        Host → iframe: <code>ui:context</code> (theme; selection only with
+        <code>document:read</code>) → <code>onPluginContext</code>
+      </li>
+    </ul>
+    <p>
+      Demo grant HTML/source lives at
+      <code>packages/workbench/src/sandbox/fixtures/react-showui-demo.ts</code>
+      (test/fixture import — not a workbench public export).
+    </p>
+  </body>
+</html>

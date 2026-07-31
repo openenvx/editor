@@ -12,15 +12,19 @@ import type { SandboxExtensionGrant } from '@xmazu/openenvxee-plugin-protocol';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
-import { PluginUiModal } from './plugin-ui-modal';
 import { SandboxExtensionController } from './sandbox-extension-controller';
+import { SandboxUiModal } from './sandbox-ui-modal';
 
 const DEFAULT_WIDGET_LAYER_TYPE = 'openenvx.widget';
 
 export interface SandboxExtensionPluginOptions {
   grants: SandboxExtensionGrant[];
   permission?: 'read' | 'edit';
-  /** When true, start plugin-kind grants on activate. Widgets start when layers appear. */
+  /**
+   * When true, start plugin-kind grants on activate.
+   * Production default is false (Figma-shaped: user runs via command).
+   * Widgets always start when matching layers appear.
+   */
   autoStartPlugins?: boolean;
   /** Absolute Worker URL. Required for non-source hosts that do not co-locate the worker. */
   workerUrl?: string | URL;
@@ -41,7 +45,7 @@ export interface SandboxExtensionPluginOptions {
 /**
  * Host plugin: loads session-granted QuickJS bundles in a Worker, mounts plugin
  * showUI as a floating modal iframe (Figma-shaped), and binds widget isolates to
- * widget canvas layers (on-canvas object — no default iframe).
+ * widget canvas layers (on-canvas object — no default iframe; one isolate per layer).
  */
 export class SandboxExtensionPlugin extends WorkbenchPlugin {
   readonly id = 'openenvx.sandbox-extensions';
@@ -57,6 +61,7 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
   ) => () => void;
   private controller: SandboxExtensionController | null = null;
   private widgetWatchDispose: (() => void) | null = null;
+  private selectionWatchDispose: (() => void) | null = null;
   private widgetClickDispose: (() => void) | null = null;
   private modalHost: HTMLDivElement | null = null;
   private modalRoot: Root | null = null;
@@ -65,7 +70,7 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
     super();
     this.grants = options.grants;
     this.permission = options.permission ?? 'read';
-    this.autoStartPlugins = options.autoStartPlugins ?? true;
+    this.autoStartPlugins = options.autoStartPlugins ?? false;
     this.workerUrl = options.workerUrl;
     this.preferInProcess = options.preferInProcess;
     this.widgetLayerType = options.widgetLayerType ?? DEFAULT_WIDGET_LAYER_TYPE;
@@ -146,7 +151,7 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
     document.body.append(host);
     this.modalHost = host;
     this.modalRoot = createRoot(host);
-    this.modalRoot.render(createElement(PluginUiModal, { controller }));
+    this.modalRoot.render(createElement(SandboxUiModal, { controller }));
 
     for (const grant of this.grants) {
       if (grant.kind !== 'plugin') {
@@ -156,7 +161,7 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
       ctx.register(
         new (class extends Command {
           readonly id = `openenvx.sandbox.run.${extensionId}`;
-          readonly title = `Run extension ${extensionId}`;
+          readonly title = grant.title?.trim() || `Run ${extensionId}`;
           async execute(): Promise<{ started: boolean }> {
             await controller.start(grant);
             return { started: true };
@@ -194,9 +199,9 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
           if (layer.type !== widgetLayerType) {
             return;
           }
-          const data = layer.data as { pluginId?: string };
-          const grant = data.pluginId
-            ? widgetGrants.get(data.pluginId)
+          const data = layer.data as { extensionId?: string };
+          const grant = data.extensionId
+            ? widgetGrants.get(data.extensionId)
             : undefined;
           if (!grant) {
             return;
@@ -214,6 +219,9 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
     this.widgetWatchDispose = ctx.scene.onDidChangeScene(() => {
       syncWidgets();
     });
+    this.selectionWatchDispose = ctx.events.onDidChangeSelection(() => {
+      controller.notifyUiContextChanged();
+    }).dispose;
     if (this.bindWidgetClick) {
       this.widgetClickDispose = this.bindWidgetClick((layerId) => {
         controller.dispatchWidgetClick(layerId);
@@ -224,6 +232,8 @@ export class SandboxExtensionPlugin extends WorkbenchPlugin {
   override deactivate(): void {
     this.widgetWatchDispose?.();
     this.widgetWatchDispose = null;
+    this.selectionWatchDispose?.();
+    this.selectionWatchDispose = null;
     this.widgetClickDispose?.();
     this.widgetClickDispose = null;
     this.controller?.dispose();

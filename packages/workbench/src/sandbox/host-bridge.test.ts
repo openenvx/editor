@@ -26,6 +26,7 @@ describe('createSandboxHostBridge', () => {
         showUI: () => {},
         resizeUI: () => {},
         closeUI: () => {},
+        postToUI: () => {},
         notify: () => {},
         closePlugin: () => {},
         getClientStorage: () => null,

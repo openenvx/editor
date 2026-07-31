@@ -13,6 +13,12 @@ export function isSandboxCapability(value: string): value is SandboxCapability {
   return (SANDBOX_CAPABILITIES as readonly string[]).includes(value);
 }
 
+/**
+ * Figma-shaped grant kind:
+ * - `plugin` — off-canvas tool (user-run, clientStorage, primary showUI)
+ * - `widget` — on-canvas object (syncedState, isolate per layer)
+ * See Plugin-boundaries.md “Plugins vs widgets”.
+ */
 export type SandboxExtensionKind = 'plugin' | 'widget';
 
 /** Session/mint grant for a first-party sandboxed extension. */
@@ -31,6 +37,8 @@ export interface SandboxExtensionGrant {
 
 export const SANDBOX_BRIDGE_SOURCE = 'openenvx-sandbox-bridge' as const;
 export const SANDBOX_UI_SOURCE = 'openenvx-sandbox-ui' as const;
+/** Host → sandboxed showUI iframe (opaque origin; targetOrigin '*'). */
+export const SANDBOX_HOST_UI_SOURCE = 'openenvx-sandbox-host-ui' as const;
 
 export type SandboxHostMethod =
   | 'getSelection'
@@ -39,6 +47,7 @@ export type SandboxHostMethod =
   | 'showUI'
   | 'resizeUI'
   | 'closeUI'
+  | 'postToUI'
   | 'notify'
   | 'closePlugin'
   | 'getClientStorage'
@@ -64,9 +73,34 @@ export interface SandboxBridgeResponse {
   error?: string;
 }
 
+/** Selection snapshot pushed to showUI (requires `document:read` on the grant). */
+export interface SandboxUiSelection {
+  activePageId: string | null;
+  selectedLayerIds: string[];
+  primaryLayerId: string | null;
+}
+
+/** Iframe → host messages. */
 export interface SandboxUiMessage {
   source: typeof SANDBOX_UI_SOURCE;
   v: 1;
   type: 'ui:message' | 'ui:ready' | 'ui:close';
   pluginMessage?: unknown;
 }
+
+/** Host → iframe messages (theme/selection push + isolate postMessage). */
+export type SandboxHostUiMessage =
+  | {
+      source: typeof SANDBOX_HOST_UI_SOURCE;
+      v: 1;
+      type: 'ui:message';
+      pluginMessage: unknown;
+    }
+  | {
+      source: typeof SANDBOX_HOST_UI_SOURCE;
+      v: 1;
+      type: 'ui:context';
+      theme: 'light' | 'dark';
+      /** Omitted when the grant lacks `document:read`. */
+      selection?: SandboxUiSelection;
+    };

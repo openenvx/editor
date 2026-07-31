@@ -131,6 +131,23 @@ describe('sandbox capabilities', () => {
     ).not.toThrow();
   });
 
+  it('gates postToUI behind ui:show', () => {
+    expect(() =>
+      assertMethodAllowed({
+        grant: { ...grant, capabilities: ['document:read'] },
+        method: 'postToUI',
+        permission: 'edit',
+      })
+    ).toThrow(/Capability denied: ui:show/);
+    expect(() =>
+      assertMethodAllowed({
+        grant,
+        method: 'postToUI',
+        permission: 'edit',
+      })
+    ).not.toThrow();
+  });
+
   it('denies clientStorage on widgets', () => {
     expect(() =>
       assertMethodAllowed({

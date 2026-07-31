@@ -84,6 +84,7 @@ export {
   isSandboxCapability,
   SANDBOX_BRIDGE_SOURCE,
   SANDBOX_UI_SOURCE,
+  SANDBOX_HOST_UI_SOURCE,
   type SandboxCapability,
   type SandboxExtensionKind,
   type SandboxExtensionGrant,
@@ -91,4 +92,6 @@ export {
   type SandboxBridgeRequest,
   type SandboxBridgeResponse,
   type SandboxUiMessage,
+  type SandboxHostUiMessage,
+  type SandboxUiSelection,
 } from './sandbox';

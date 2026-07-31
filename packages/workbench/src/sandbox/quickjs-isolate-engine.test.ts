@@ -113,4 +113,26 @@ describe('QuickJS isolate', () => {
     `);
     engine.dispose();
   });
+
+  it('routes openenvx.ui.postMessage through postToUI host call', async () => {
+    const calls: { method: string; params: unknown }[] = [];
+    const engine = await createQuickJsEngine({
+      onHostCall: async (request) => {
+        calls.push({ method: request.method, params: request.params });
+        return {
+          source: SANDBOX_BRIDGE_SOURCE,
+          v: 1,
+          id: request.id,
+          ok: true,
+          result: null,
+        };
+      },
+    });
+    await engine.evalModule(`openenvx.ui.postMessage({ type: 'hello' });`);
+    await delay(50);
+    expect(calls.some((c) => c.method === 'postToUI')).toBe(true);
+    const post = calls.find((c) => c.method === 'postToUI');
+    expect(post?.params).toEqual({ pluginMessage: { type: 'hello' } });
+    engine.dispose();
+  });
 });

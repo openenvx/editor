@@ -19,6 +19,7 @@ const METHOD_CAPABILITY: Partial<Record<SandboxHostMethod, SandboxCapability>> =
     showUI: 'ui:show',
     resizeUI: 'ui:show',
     closeUI: 'ui:show',
+    postToUI: 'ui:show',
     getClientStorage: 'storage:client',
     setClientStorage: 'storage:client',
     getSyncedState: 'widget:syncedState',

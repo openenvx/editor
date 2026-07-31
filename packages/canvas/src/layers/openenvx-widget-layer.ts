@@ -16,8 +16,13 @@ import { z } from 'zod';
 
 export const WIDGET_LAYER_TYPE = 'openenvx.widget';
 
+/**
+ * On-canvas sandbox widget node (Figma widget–class).
+ * `syncedState` is local scene state until multiplayer/CRDT; API matches Figma useSyncedState shape.
+ */
 export const openenvxWidgetSchema = z.object({
-  pluginId: z.string().min(1),
+  /** Sandbox extension grant id (`kind: 'widget'`). */
+  extensionId: z.string().min(1),
   /** Local synced state blob (Figma useSyncedState-class); no CRDT yet. */
   syncedState: z.unknown().optional(),
   label: z.string().optional(),
@@ -37,7 +42,7 @@ export class OpenEnvxWidgetLayer extends LayerDefinition<OpenEnvxWidgetModel> {
   createDefault(id: string, _page: Page): Layer {
     return {
       data: {
-        pluginId: 'demo-widget',
+        extensionId: 'demo-widget',
         syncedState: {},
         label: 'Widget',
       },
@@ -54,22 +59,24 @@ export class OpenEnvxWidgetLayer extends LayerDefinition<OpenEnvxWidgetModel> {
 
   deserialize(data: unknown): OpenEnvxWidgetModel {
     const parsed = openenvxWidgetSchema.safeParse(data);
-    return parsed.success
-      ? parsed.data
-      : { pluginId: 'demo-widget', syncedState: {}, label: 'Widget' };
+    if (parsed.success) {
+      return parsed.data;
+    }
+    // Invalid data: empty extensionId so we do not silently bind a real grant.
+    return { extensionId: '', syncedState: {}, label: 'Widget' };
   }
 
   properties(_ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
     return createPropertyBuilder()
       .section('Widget')
-      .text('pluginId', 'Plugin id')
+      .text('extensionId', 'Extension id')
       .text('label', 'Label')
       .build();
   }
 
   renderPreview(ctx: LayerPreviewContext<OpenEnvxWidgetModel>) {
     const label = escapeHtml(
-      ctx.model.label?.trim() || ctx.model.pluginId || 'Widget'
+      ctx.model.label?.trim() || ctx.model.extensionId || 'Widget'
     );
     // On-canvas object face (not an iframe). Clicks route to the sandbox.
     return createLayerPreviewBuilder().richText(
