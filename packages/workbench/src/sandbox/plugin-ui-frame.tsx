@@ -4,6 +4,8 @@ import {
 } from '@xmazu/openenvxee-plugin-protocol';
 import { useEffect, useRef } from 'react';
 
+export { MAX_UI_MESSAGE_JSON_CHARS } from './sandbox-caps';
+
 export interface PluginUiFrameProps {
   html: string;
   width: number;
@@ -12,6 +14,20 @@ export interface PluginUiFrameProps {
   onClose?: () => void;
 }
 
+function isValidUiMessage(data: unknown): data is SandboxUiMessage {
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+  const message = data as SandboxUiMessage;
+  return message.source === SANDBOX_UI_SOURCE && message.v === 1;
+}
+
+/**
+ * Sandboxed plugin UI iframe.
+ * `sandbox="allow-scripts"` without `allow-same-origin` → opaque (null) origin,
+ * so iframe↔parent `postMessage` must use `'*'` as targetOrigin.
+ * Size/JSON policy is enforced by SandboxExtensionController.deliverUiMessage.
+ */
 export function PluginUiFrame({
   html,
   width,
@@ -27,10 +43,10 @@ export function PluginUiFrame({
       if (!frame || event.source !== frame) {
         return;
       }
-      const data = event.data as SandboxUiMessage | null;
-      if (!data || data.source !== SANDBOX_UI_SOURCE || data.v !== 1) {
+      if (!isValidUiMessage(event.data)) {
         return;
       }
+      const data = event.data;
       if (data.type === 'ui:close') {
         onClose?.();
         return;
@@ -43,6 +59,7 @@ export function PluginUiFrame({
     return () => window.removeEventListener('message', onWindowMessage);
   }, [onClose, onMessage]);
 
+  // Opaque-origin iframe: targetOrigin must be '*'.
   const srcDoc = `<!doctype html><html><head><meta charset="utf-8" />
 <script>
 window.parent.postMessage({ source: '${SANDBOX_UI_SOURCE}', v: 1, type: 'ui:ready' }, '*');

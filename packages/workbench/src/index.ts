@@ -154,12 +154,31 @@ export {
 export {
   assertJsonSerializable,
   assertMethodAllowed,
+  assertUiMessagePolicy,
+  freezeGrant,
   hasCapability,
   normalizeCapabilities,
 } from './sandbox/capabilities';
-export { fetchAndVerifyArtifact, sha256Hex } from './sandbox/fetch-artifact';
+export {
+  assertArtifactUrl,
+  fetchAndVerifyArtifact,
+  MAX_ARTIFACT_BYTES,
+  sha256Hex,
+} from './sandbox/fetch-artifact';
 export { createSandboxHostBridge } from './sandbox/host-bridge';
 export {
   PluginUiFrame,
+  MAX_UI_MESSAGE_JSON_CHARS,
   type PluginUiFrameProps,
 } from './sandbox/plugin-ui-frame';
+export {
+  assertNotifyPolicy,
+  MAX_CONCURRENT_ISOLATES,
+  MAX_NOTIFY_MESSAGE_CHARS,
+  MAX_NOTIFY_PER_SECOND,
+  MAX_SHOW_UI_HTML_CHARS,
+  SANDBOX_CPU_LIMIT_MS,
+  SANDBOX_EVAL_TIMEOUT_MS,
+  SANDBOX_MEMORY_LIMIT_BYTES,
+  SANDBOX_WORKER_READY_MS,
+} from './sandbox/sandbox-caps';

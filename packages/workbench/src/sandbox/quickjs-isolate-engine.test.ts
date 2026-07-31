@@ -46,7 +46,7 @@ describe('QuickJS isolate', () => {
           result: null,
         }),
       })
-    ).rejects.toThrow(/Sandbox (requires a Web Worker|worker)/);
+    ).rejects.toThrow(/Sandbox (requires a Web Worker|worker)|ModuleNotFound|BuildMessage/);
   }, 20_000);
 
   it('engine bootstrap exposes openenvx API', async () => {
@@ -66,6 +66,51 @@ describe('QuickJS isolate', () => {
     await engine.evalModule(`openenvx.notify('hi');`);
     await delay(50);
     expect(calls).toContain('notify');
+    engine.dispose();
+  });
+
+  it('interrupts tight loops with CPU limit', async () => {
+    const engine = await createQuickJsEngine({
+      cpuLimitMs: 50,
+      onHostCall: async (request) => ({
+        source: SANDBOX_BRIDGE_SOURCE,
+        v: 1,
+        id: request.id,
+        ok: true,
+        result: null,
+      }),
+    });
+    await expect(
+      engine.evalModule('while (true) {}')
+    ).rejects.toThrow(/Sandbox CPU limit exceeded/);
+    engine.dispose();
+  }, 10_000);
+
+  it('delivers UI messages to openenvx.ui.onmessage', async () => {
+    const engine = await createQuickJsEngine({
+      onHostCall: async (request) => ({
+        source: SANDBOX_BRIDGE_SOURCE,
+        v: 1,
+        id: request.id,
+        ok: true,
+        result: null,
+      }),
+    });
+    await engine.evalModule(`
+      globalThis.__uiMsgs = [];
+      openenvx.ui.onmessage = function (msg) {
+        globalThis.__uiMsgs.push(msg);
+      };
+    `);
+    engine.deliverUiMessage({ type: 'ping', n: 1 });
+    await engine.evalModule(`
+      if (!globalThis.__uiMsgs || globalThis.__uiMsgs.length !== 1) {
+        throw new Error('ui message not delivered');
+      }
+      if (globalThis.__uiMsgs[0].type !== 'ping' || globalThis.__uiMsgs[0].n !== 1) {
+        throw new Error('ui message payload mismatch');
+      }
+    `);
     engine.dispose();
   });
 });

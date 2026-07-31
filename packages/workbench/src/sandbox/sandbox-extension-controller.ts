@@ -4,12 +4,27 @@ import type {
   SandboxBridgeRequest,
 } from '@xmazu/openenvxee-plugin-protocol';
 
+import { freezeGrant, assertUiMessagePolicy } from './capabilities';
 import { fetchAndVerifyArtifact } from './fetch-artifact';
 import {
   createSandboxHostBridge,
   type SandboxHostHandlers,
 } from './host-bridge';
 import { createQuickJsIsolate, type SandboxIsolate } from './quickjs-runtime';
+import {
+  assertNotifyPolicy,
+  MAX_CONCURRENT_ISOLATES,
+  MAX_SHOW_UI_HTML_CHARS,
+} from './sandbox-caps';
+
+export {
+  assertNotifyPolicy,
+  MAX_CONCURRENT_ISOLATES,
+  MAX_NOTIFY_MESSAGE_CHARS,
+  MAX_NOTIFY_PER_SECOND,
+  MAX_SHOW_UI_HTML_CHARS,
+} from './sandbox-caps';
+export { assertUiMessagePolicy } from './capabilities';
 
 export interface SandboxUiState {
   extensionId: string;
@@ -36,7 +51,11 @@ function layerIdFromIsolateKey(key: string): string | null {
 
 export class SandboxExtensionController {
   private readonly isolates = new Map<string, SandboxIsolate>();
+  /** Keys reserved while fetch/worker/eval are in flight (TOCTOU guard). */
+  private readonly starting = new Set<string>();
   private readonly clientStorage = new Map<string, unknown>();
+  private readonly grantById = new Map<string, SandboxExtensionGrant>();
+  private readonly notifyTimestamps = new Map<string, number[]>();
   private uiState: SandboxUiState | null = null;
   private readonly uiListeners = new Set<SandboxUiListener>();
   private disposed = false;
@@ -59,7 +78,12 @@ export class SandboxExtensionController {
         height: number
       ) => void;
     }
-  ) {}
+  ) {
+    for (const grant of options.grants) {
+      const frozen = freezeGrant(grant);
+      this.grantById.set(frozen.id, frozen);
+    }
+  }
 
   subscribeUi(listener: SandboxUiListener): () => void {
     this.uiListeners.add(listener);
@@ -81,8 +105,38 @@ export class SandboxExtensionController {
     }
   }
 
+  /**
+   * Deliver a JSON-cloned UI message to the running isolate for this extension.
+   * Path B: iframe → host → isolate `openenvx.ui.onmessage` only.
+   */
+  deliverUiMessage(
+    extensionId: string,
+    layerId: string | undefined,
+    message: unknown
+  ): void {
+    if (this.disposed) {
+      return;
+    }
+    try {
+      assertUiMessagePolicy(message);
+    } catch {
+      return;
+    }
+    const key = isolateKey(extensionId, layerId);
+    const isolate =
+      this.isolates.get(key) ?? this.isolates.get(extensionId) ?? null;
+    if (!isolate) {
+      return;
+    }
+    try {
+      isolate.deliverUiMessage(message);
+    } catch (error) {
+      console.error('[sandbox] ui message delivery failed', extensionId, error);
+    }
+  }
+
   async startAll(): Promise<void> {
-    for (const grant of this.options.grants) {
+    for (const grant of this.grantById.values()) {
       await this.start(grant);
     }
   }
@@ -91,45 +145,67 @@ export class SandboxExtensionController {
     if (this.disposed) {
       return;
     }
-    const key = isolateKey(grant.id, layerId);
-    if (this.isolates.has(key)) {
+    const frozen = this.grantById.get(grant.id);
+    if (!frozen) {
+      throw new Error(`Unknown sandbox grant: ${grant.id}`);
+    }
+    const key = isolateKey(frozen.id, layerId);
+    if (this.isolates.has(key) || this.starting.has(key)) {
       return;
     }
-
-    const source = await fetchAndVerifyArtifact({
-      url: grant.artifactUrl,
-      contentHash: grant.contentHash,
-      fetchImpl: this.options.fetchImpl,
-    });
-    if (this.disposed) {
-      return;
+    if (this.isolates.size + this.starting.size >= MAX_CONCURRENT_ISOLATES) {
+      throw new Error('Sandbox isolate limit exceeded');
     }
 
-    const handlers = this.createHandlers(grant, layerId);
-    const bridge = createSandboxHostBridge({
-      grant,
-      permission: this.options.permission,
-      handlers,
-    });
-
-    const isolate = await createQuickJsIsolate({
-      onHostCall: (request: SandboxBridgeRequest) => bridge.handle(request),
-      workerUrl: this.options.workerUrl,
-      preferInProcess: this.options.preferInProcess,
-    });
-    if (this.disposed) {
-      isolate.dispose();
-      return;
-    }
-
+    this.starting.add(key);
     try {
-      await isolate.evalModule(source);
-    } catch (error) {
-      isolate.dispose();
-      throw error;
-    }
+      const source = await fetchAndVerifyArtifact({
+        url: frozen.artifactUrl,
+        contentHash: frozen.contentHash,
+        fetchImpl: this.options.fetchImpl,
+      });
+      if (this.disposed) {
+        return;
+      }
 
-    this.isolates.set(key, isolate);
+      const handlers = this.createHandlers(frozen, layerId);
+      const bridge = createSandboxHostBridge({
+        grant: frozen,
+        permission: this.options.permission,
+        handlers,
+      });
+
+      const isolateRef: { current: SandboxIsolate | null } = { current: null };
+      const isolate = await createQuickJsIsolate({
+        onHostCall: (request: SandboxBridgeRequest) => bridge.handle(request),
+        workerUrl: this.options.workerUrl,
+        preferInProcess: this.options.preferInProcess,
+        onTerminated: () => {
+          if (
+            isolateRef.current &&
+            this.isolates.get(key) === isolateRef.current
+          ) {
+            this.isolates.delete(key);
+          }
+        },
+      });
+      isolateRef.current = isolate;
+      if (this.disposed) {
+        isolate.dispose();
+        return;
+      }
+
+      try {
+        await isolate.evalModule(source);
+      } catch (error) {
+        isolate.dispose();
+        throw error;
+      }
+
+      this.isolates.set(key, isolate);
+    } finally {
+      this.starting.delete(key);
+    }
   }
 
   stop(extensionId: string, layerId?: string): void {
@@ -194,6 +270,7 @@ export class SandboxExtensionController {
       isolate.dispose();
     }
     this.isolates.clear();
+    this.starting.clear();
     this.setUi(null);
   }
 
@@ -202,6 +279,14 @@ export class SandboxExtensionController {
     for (const listener of this.uiListeners) {
       listener(state);
     }
+  }
+
+  private assertNotifyAllowed(extensionId: string, message: string): void {
+    const updated = assertNotifyPolicy({
+      message,
+      recentTimestamps: this.notifyTimestamps.get(extensionId) ?? [],
+    });
+    this.notifyTimestamps.set(extensionId, updated);
   }
 
   private createHandlers(
@@ -235,9 +320,13 @@ export class SandboxExtensionController {
         return { executed: result.executed };
       },
       showUI: (html, options) => {
+        const resolved = html || grant.uiHtml || '<p>Plugin</p>';
+        if (resolved.length > MAX_SHOW_UI_HTML_CHARS) {
+          throw new Error('showUI HTML too large');
+        }
         this.setUi({
           extensionId: grant.id,
-          html: html || grant.uiHtml || '<p>Plugin</p>',
+          html: resolved,
           width: options?.width ?? 320,
           height: options?.height ?? 240,
           kind: grant.kind,
@@ -255,8 +344,9 @@ export class SandboxExtensionController {
           this.setUi(null);
         }
       },
-      notify: (_message) => {
-        // Host toast reserved; capability + serialization already gated.
+      notify: (message) => {
+        this.assertNotifyAllowed(grant.id, message);
+        // Host toast reserved; length + rate already gated.
       },
       closePlugin: () => {
         this.stop(grant.id, layerId);

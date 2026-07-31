@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   assertJsonSerializable,
   assertMethodAllowed,
+  freezeGrant,
   normalizeCapabilities,
 } from './capabilities';
 import type { SandboxExtensionGrant } from '@xmazu/openenvxee-plugin-protocol';
@@ -11,16 +12,40 @@ const grant: SandboxExtensionGrant = {
   id: 'demo',
   kind: 'plugin',
   artifactUrl: 'https://example.com/a.js',
-  contentHash: 'abc',
+  contentHash: 'a'.repeat(64),
   capabilities: ['document:read', 'document:write', 'ui:show'],
   allowedCommands: ['canvas.insertRect'],
 };
 
 describe('sandbox capabilities', () => {
   it('drops unknown capability ids', () => {
-    expect(normalizeCapabilities(['document:read', 'nope', 'document:read'])).toEqual([
-      'document:read',
-    ]);
+    expect(
+      normalizeCapabilities(['document:read', 'nope', 'document:read'])
+    ).toEqual(['document:read']);
+  });
+
+  it('freezes grant snapshots and rejects unknown kinds', () => {
+    const mutable: SandboxExtensionGrant = {
+      ...grant,
+      capabilities: ['document:read', 'nope', 'ui:show'],
+      allowedCommands: ['canvas.insertRect'],
+    };
+    const frozen = freezeGrant(mutable);
+    expect(frozen.capabilities).toEqual(['document:read', 'ui:show']);
+    expect(() => {
+      (frozen.capabilities as string[]).push('document:write');
+    }).toThrow();
+    mutable.allowedCommands.push('evil.command');
+    expect(frozen.allowedCommands).toEqual(['canvas.insertRect']);
+    expect(() =>
+      freezeGrant({ ...grant, kind: 'evil' as SandboxExtensionGrant['kind'] })
+    ).toThrow(/Unknown sandbox grant kind/);
+    expect(() =>
+      freezeGrant({ ...grant, contentHash: 'not-a-hash' })
+    ).toThrow(/Invalid contentHash/);
+    expect(() =>
+      freezeGrant({ ...grant, artifactUrl: 'http://evil.example.com/a.js' })
+    ).toThrow(/protocol not allowed/);
   });
 
   it('denies methods without capability', () => {

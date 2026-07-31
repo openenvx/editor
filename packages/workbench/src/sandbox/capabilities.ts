@@ -5,6 +5,12 @@ import {
   type SandboxHostMethod,
 } from '@xmazu/openenvxee-plugin-protocol';
 
+import {
+  assertArtifactUrl,
+  MAX_SHOW_UI_HTML_CHARS,
+  MAX_UI_MESSAGE_JSON_CHARS,
+} from './sandbox-caps';
+
 const METHOD_CAPABILITY: Partial<Record<SandboxHostMethod, SandboxCapability>> =
   {
     getSelection: 'document:read',
@@ -51,6 +57,43 @@ export function normalizeCapabilities(
     out.push(value);
   }
   return out;
+}
+
+/** Snapshot a grant so host-mutated arrays cannot widen the session. */
+export function freezeGrant(
+  grant: SandboxExtensionGrant
+): SandboxExtensionGrant {
+  if (grant.kind !== 'plugin' && grant.kind !== 'widget') {
+    throw new Error(`Unknown sandbox grant kind: ${String(grant.kind)}`);
+  }
+  assertArtifactUrl(grant.artifactUrl);
+  const contentHash = grant.contentHash.trim().toLowerCase();
+  if (!/^[a-f0-9]{64}$/.test(contentHash)) {
+    throw new Error('Invalid contentHash');
+  }
+  if (
+    grant.uiHtml !== undefined &&
+    grant.uiHtml.length > MAX_SHOW_UI_HTML_CHARS
+  ) {
+    throw new Error('showUI HTML too large');
+  }
+  const frozen: SandboxExtensionGrant = {
+    id: grant.id,
+    kind: grant.kind,
+    artifactUrl: grant.artifactUrl,
+    contentHash,
+    capabilities: normalizeCapabilities(grant.capabilities),
+    allowedCommands: [...grant.allowedCommands],
+  };
+  if (grant.title !== undefined) {
+    frozen.title = grant.title;
+  }
+  if (grant.uiHtml !== undefined) {
+    frozen.uiHtml = grant.uiHtml;
+  }
+  Object.freeze(frozen.capabilities);
+  Object.freeze(frozen.allowedCommands);
+  return Object.freeze(frozen);
 }
 
 export function hasCapability(
@@ -142,5 +185,14 @@ export function assertJsonSerializable(
     JSON.stringify(value);
   } catch {
     throw new Error(`${label} is not JSON-serializable`);
+  }
+}
+
+/** JSON + size gate for UI→isolate payloads (host trust boundary). */
+export function assertUiMessagePolicy(message: unknown): void {
+  assertJsonSerializable(message ?? null, 'pluginMessage');
+  const encoded = JSON.stringify(message ?? null);
+  if (encoded.length > MAX_UI_MESSAGE_JSON_CHARS) {
+    throw new Error('UI message too large');
   }
 }

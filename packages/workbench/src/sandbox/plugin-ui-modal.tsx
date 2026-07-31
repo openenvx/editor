@@ -58,6 +58,9 @@ export function PluginUiModal({
           width={ui.width}
           height={ui.height}
           onClose={() => controller.closeUi(ui.extensionId)}
+          onMessage={(message) => {
+            controller.deliverUiMessage(ui.extensionId, ui.layerId, message);
+          }}
         />
       </div>
     </div>

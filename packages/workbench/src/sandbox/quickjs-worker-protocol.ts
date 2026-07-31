@@ -16,5 +16,6 @@ export type WorkerToHost =
 
 export type HostToWorker =
   | { type: 'eval'; requestId: string; source: string }
+  | { type: 'uiMessage'; payload: unknown }
   | { type: 'hostResult'; callId: string; response: SandboxBridgeResponse }
   | { type: 'dispose' };

@@ -81,9 +81,29 @@ The protocol shape is enough as the **interaction model**. Seal these before tre
 
 Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/public/embed-parent.html) at `/embed-parent.html`; the iframe loads `/?embed=1` with `PluginPanelPlugin` (`contextScope: 'selection'`, empty `allowedCommands`, no manifest).
 
-## QuickJS sandbox (Phase V.1)
+## QuickJS sandbox (Phase V.1 / V.1.1)
 
-Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionPlugin` (workbench `SandboxExtensionPlugin` + canvas widget click bind): **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe; `openenvx.widget` canvas nodes carry local synced state. Bundles load from session-granted signed URLs + content hashes (minted by openenvx-cloud). Marketplace distribution remains deferred.
+Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionPlugin` (workbench `SandboxExtensionPlugin` + canvas widget click bind): **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` canvas nodes carry local synced state. Bundles load from session-granted signed URLs + content hashes (minted by openenvx-cloud).
+
+**OK to run:** cloud-minted, hash-pinned, capability-scoped extensions that you (or a customer org admin) explicitly installed for a session.
+
+**Not OK yet:** open marketplace / “anyone uploads JS and it runs in every Studio” — that needs cloud grant/signing, kill switch, version pinning, and further CPU/UI hardening beyond this boundary. Marketplace distribution remains deferred.
+
+### Isolation caps (V.1.1)
+
+| Cap | Value |
+| --- | --- |
+| Memory | 8 MiB QuickJS soft limit |
+| CPU interrupt | 5s wall-clock per sync eval / pending-jobs burst (`setInterruptHandler`) |
+| Worker eval timeout | 15s → terminate Worker |
+| Artifact size | 2 MiB; `https:` only (`http:` localhost/127.0.0.1 for tests) |
+| Concurrent isolates | 8 |
+| `showUI` HTML | 512 KiB |
+| UI→isolate message | JSON-serializable, 64 KiB; `openenvx.ui.onmessage` only (no host→UI / isolate→iframe duplex yet) |
+| `notify` | 500 chars, 10/s per extension (toast reserved; not capability-gated) |
+| Grant ingest | Constructor-only: URL/hash/`uiHtml` size + `normalizeCapabilities` + frozen `allowedCommands` |
+
+UI iframe messages use `postMessage(..., '*')` because the sandboxed frame has an opaque null origin — the host still checks `event.source === iframe.contentWindow`.
 
 See openenvx-cloud `docs/embed/plugin-api.md`.
 
@@ -117,7 +137,7 @@ Rules if you sandbox JS:
 
 - No DOM, no `fetch` by default, no Studio imports
 - Only I/O is the protocol (context/event in → tree/command out)
-- Cap CPU, memory, and tree size (tree caps already exist)
+- Cap CPU (5s interrupt + 15s Worker eval timeout), memory (8 MiB), artifact size, and tree size (tree caps already exist)
 - Run in a **Worker** only in production hosts (never `eval` / dynamic `import()` / in-process QuickJS on the editor UI thread). Unit tests may set `preferInProcess: true`.
 - Capabilities stay host-side (`allowedCommands`, `contextScope`, privileged `panel:manifest`)
 

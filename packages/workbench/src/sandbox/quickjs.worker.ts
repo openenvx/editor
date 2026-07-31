@@ -22,6 +22,8 @@ const pendingHost = new Map<
 >();
 
 let engine: QuickJsEngine | null = null;
+/** Serialize eval + uiMessage — QuickJS context is single-entry. */
+let isolateChain: Promise<void> = Promise.resolve();
 
 function post(message: WorkerToHost): void {
   // oxlint-disable-next-line unicorn/require-post-message-target-origin -- DedicatedWorker
@@ -43,46 +45,61 @@ async function ensureEngine(): Promise<QuickJsEngine> {
   return engine;
 }
 
+function enqueueIsolateWork(task: () => Promise<void>): void {
+  isolateChain = isolateChain.then(task, task);
+}
+
 self.onmessage = (event: MessageEvent<HostToWorker>) => {
   const message = event.data;
-  void (async () => {
-    try {
-      if (message.type === 'dispose') {
-        for (const pending of pendingHost.values()) {
-          pending.reject(new Error('Sandbox disposed'));
-        }
-        pendingHost.clear();
-        engine?.dispose();
-        engine = null;
-        return;
+  if (message.type === 'dispose') {
+    for (const pending of pendingHost.values()) {
+      pending.reject(new Error('Sandbox disposed'));
+    }
+    pendingHost.clear();
+    engine?.dispose();
+    engine = null;
+    isolateChain = Promise.resolve();
+    return;
+  }
+  if (message.type === 'hostResult') {
+    const pending = pendingHost.get(message.callId);
+    if (!pending) {
+      return;
+    }
+    pendingHost.delete(message.callId);
+    pending.resolve(message.response);
+    return;
+  }
+
+  if (message.type === 'uiMessage') {
+    enqueueIsolateWork(async () => {
+      try {
+        const qjs = await ensureEngine();
+        qjs.deliverUiMessage(message.payload);
+      } catch (error) {
+        const text = error instanceof Error ? error.message : String(error);
+        post({ type: 'fatal', error: text });
       }
-      if (message.type === 'hostResult') {
-        const pending = pendingHost.get(message.callId);
-        if (!pending) {
-          return;
-        }
-        pendingHost.delete(message.callId);
-        pending.resolve(message.response);
-        return;
-      }
-      if (message.type === 'eval') {
+    });
+    return;
+  }
+
+  if (message.type === 'eval') {
+    enqueueIsolateWork(async () => {
+      try {
         const qjs = await ensureEngine();
         await qjs.evalModule(message.source);
         post({ type: 'evalDone', requestId: message.requestId });
-      }
-    } catch (error) {
-      const text = error instanceof Error ? error.message : String(error);
-      if (message.type === 'eval') {
+      } catch (error) {
+        const text = error instanceof Error ? error.message : String(error);
         post({
           type: 'evalError',
           requestId: message.requestId,
           error: text,
         });
-        return;
       }
-      post({ type: 'fatal', error: text });
-    }
-  })();
+    });
+  }
 };
 
 post({ type: 'ready' });
