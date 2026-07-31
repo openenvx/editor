@@ -1,23 +1,12 @@
-/* shadcn Dialog grammar → CSS modules + --wb-* tokens (Design.md). */
+/* Floating showUI panel — Design.md popover / float grammar. */
 
-.portal {
+.panel {
   position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.backdrop {
-  position: absolute;
-  inset: 0;
-  background: var(--wb-backdrop-overlay);
-}
-
-.dialog {
-  position: relative;
-  z-index: 1;
+  right: var(--wb-space-4);
+  /* Clear toast stack (bottom-right). */
+  bottom: calc(var(--wb-space-4) + 4rem);
+  /* Above canvas chrome (10); below workbench overlays / palette / confirm (100). */
+  z-index: 40;
   display: flex;
   flex-direction: column;
   gap: var(--wb-space-2);
@@ -33,11 +22,23 @@
   outline: none;
 }
 
+.panelDragged {
+  right: auto;
+  bottom: auto;
+}
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--wb-space-3);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.headerDragging {
+  cursor: grabbing;
 }
 
 .title {
@@ -57,13 +58,14 @@
   display: flex;
   flex-shrink: 0;
   gap: var(--wb-space-2);
+  cursor: default;
 }
 
 .toastStack {
   position: fixed;
   right: var(--wb-space-4);
   bottom: var(--wb-space-4);
-  z-index: 210;
+  z-index: 45;
   display: flex;
   flex-direction: column;
   gap: var(--wb-space-2);

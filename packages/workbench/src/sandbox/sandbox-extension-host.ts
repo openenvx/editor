@@ -10,7 +10,7 @@ import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
 import { SandboxExtensionController } from './sandbox-extension-controller';
-import { SandboxUiModal } from './sandbox-ui-modal';
+import { SandboxUiPanel } from './sandbox-ui-panel';
 
 const DEFAULT_WIDGET_LAYER_TYPE = 'openenvx.widget';
 
@@ -61,8 +61,8 @@ export class SandboxExtensionHost {
   private widgetWatchDispose: (() => void) | null = null;
   private selectionWatchDispose: (() => void) | null = null;
   private widgetClickDispose: (() => void) | null = null;
-  private modalHost: HTMLDivElement | null = null;
-  private modalRoot: Root | null = null;
+  private uiHost: HTMLDivElement | null = null;
+  private uiRoot: Root | null = null;
 
   constructor(options: SandboxExtensionHostOptions) {
     this.grants = options.grants;
@@ -148,12 +148,12 @@ export class SandboxExtensionHost {
     });
     this.controller = controller;
 
-    const modalHost = document.createElement('div');
-    modalHost.dataset.openenvxSandboxUi = '1';
-    document.body.append(modalHost);
-    this.modalHost = modalHost;
-    this.modalRoot = createRoot(modalHost);
-    this.modalRoot.render(createElement(SandboxUiModal, { controller }));
+    const uiHost = document.createElement('div');
+    uiHost.dataset.openenvxSandboxUi = '1';
+    document.body.append(uiHost);
+    this.uiHost = uiHost;
+    this.uiRoot = createRoot(uiHost);
+    this.uiRoot.render(createElement(SandboxUiPanel, { controller }));
 
     for (const grant of this.grants) {
       if (grant.kind !== 'plugin') {
@@ -245,10 +245,10 @@ export class SandboxExtensionHost {
     }
     this.controller?.dispose();
     this.controller = null;
-    this.modalRoot?.unmount();
-    this.modalRoot = null;
-    this.modalHost?.remove();
-    this.modalHost = null;
+    this.uiRoot?.unmount();
+    this.uiRoot = null;
+    this.uiHost?.remove();
+    this.uiHost = null;
     this.mounted = false;
   }
 }

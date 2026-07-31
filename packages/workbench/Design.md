@@ -432,9 +432,10 @@ Non-modal floating host chrome for sandbox `showUI` (Figma-shaped plugin window)
 - Background: `--wb-popover`
 - Ring: `--wb-shadow-float`
 - Radius: `--wb-radius-lg` (same shell as floating toolbar)
-- Default dock: bottom-right; title-bar drag; clamp to viewport
+- Default dock: CSS bottom-right (toast clearance); title-bar drag switches to clamped `left`/`top`
+- Stack: `z-index` 40 (above canvas chrome 10; below overlays / palette / confirm 100); toasts 45
 - No backdrop — canvas stays interactive; click-outside does not dismiss
-- Close / Stop / Esc / `closeUI` dismiss; Close ≠ Stop isolate
+- Close / Stop / Esc (when panel chrome focused) / `closeUI` dismiss; Close ≠ Stop isolate
 - Title: `--wb-text-sm` / `--wb-muted-foreground`; actions use existing `Button` (`sm` outline + ghost)
 - Theme: `data-owb-theme` on the body portal host (outside shell DOM)
 

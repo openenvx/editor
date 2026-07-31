@@ -160,7 +160,7 @@ export class SandboxExtensionController {
     return this.uiState;
   }
 
-  /** Close the modal iframe only — does not stop the isolate. */
+  /** Close the floating UI panel only — does not stop the isolate. */
   closeUi(extensionId?: string, layerId?: string): void {
     if (!this.uiState) {
       return;
