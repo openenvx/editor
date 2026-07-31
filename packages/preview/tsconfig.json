@@ -1,7 +1,6 @@
 {
   "extends": "@openenvx/typescript-config/base.json",
   "compilerOptions": {
-    "lib": ["ESNext"],
     "strictNullChecks": true
   },
   "include": ["src"],

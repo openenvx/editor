@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/schema';
+import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { Rect } from 'react-konva';
 
 import type { CanvasStageLayer } from './canvas-stage-types';

@@ -9,7 +9,7 @@ Hub: [Architecture.md](../../Architecture.md).
 ## Mental model
 
 ```text
-Scene JSON (@openenvx/schema)
+Scene JSON (@xmazu/openenvxee-schema)
         │
         ▼
 EditorRuntime + PluginManager (@openenvx/core)

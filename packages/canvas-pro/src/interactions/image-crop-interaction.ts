@@ -6,7 +6,7 @@ import {
   type CanvasLayerActivateContext,
   type CanvasTransformResult,
 } from '@openenvx/canvas';
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
+import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
 import type Konva from 'konva';
 
 import { layoutCropHandles } from '../crop/image-crop-handle-geometry';
@@ -58,7 +58,7 @@ function toLiveTransform(
     y: number;
   },
   opacity: number
-): import('@openenvx/schema').Transform {
+): import('@xmazu/openenvxee-schema').Transform {
   return {
     height: box.height,
     opacity,

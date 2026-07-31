@@ -6,7 +6,7 @@ import type {
   Page,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import { createDefaultTransform } from '@openenvx/schema';
+import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { z } from 'zod';
 
 export const canvasImageSchema = z

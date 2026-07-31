@@ -1,7 +1,11 @@
 {
   "extends": "@openenvx/typescript-config/base.json",
   "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/generate-json-schema.ts"
+  ],
   "compilerOptions": {
     "strictNullChecks": true
   }

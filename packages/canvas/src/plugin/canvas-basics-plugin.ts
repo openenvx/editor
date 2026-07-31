@@ -9,7 +9,7 @@ import {
   SingletonServiceContribution,
 } from '@openenvx/core';
 import type { CommandContext, Layer, PluginContext } from '@openenvx/core';
-import { normalizeScene } from '@openenvx/schema';
+import { normalizeScene } from '@xmazu/openenvxee-schema';
 
 import { AbsolutePageRules } from '../absolute-page-rules';
 import {

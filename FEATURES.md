@@ -15,7 +15,7 @@ Agents: update this file when you add, remove, or materially change a user-facin
 
 | Tier | Meaning |
 | --- | --- |
-| **OSS** | Available in `@openenvx/core`, `@openenvx/schema`, `@openenvx/canvas`, `@openenvx/headless`, drivers |
+| **OSS** | Available in `@openenvx/core`, `@xmazu/openenvxee-schema`, `@openenvx/canvas`, `@openenvx/headless`, drivers |
 | **Pro** | Lives in `@xmazu/openenvxee-canvas-pro`, `@xmazu/openenvxee-studio`, or other closed packages |
 
 ## Polotno parity matrix
@@ -30,7 +30,7 @@ Baseline competitor: [Polotno SDK](https://polotno.com/) drag-and-drop canvas (z
 | Snap to grid / guides / alignment | **Done** | Pro | `packages/canvas-pro/src/snap/smart-guides/`, `packages/canvas/src/snap/grid-snap.ts`, `packages/canvas/src/rulers/`, `packages/canvas-pro/src/stage/smart-guides-stage-interaction.ts`, `packages/canvas-pro/src/commands/align-layers-commands.ts` | Smart guides + align/distribute + snap-to-grid + user-placed guides (drag from rulers). Guides persist on `Page.guides` and participate in undo. |
 | Grid controls | **Done** | OSS + Pro | `packages/canvas` (`CanvasGridSettings`, overlay), studio/canvas-pro toolbar | Overlay + snap toggle (`canvas.toggleGrid`); size picker (`canvas.setGridSize`, presets 4 / 8 / 16 / 32). |
 | Multi-page / artboards | **Done** | OSS model + Pro UI | `packages/schema` (`Scene.pages`), `packages/core` (`setActivePage`, `scene.addPage` / `removePage` / `duplicatePage` / `renamePage`), `packages/workbench` Pages sidebar (`workbench.pages`) | Multi-page document, switch page, add / delete / duplicate / drag-reorder / inline rename. |
-| Bleed and trim | **Done** | OSS + Pro UI | `packages/schema` (`bleedMm` / `safeMm`, `page-print.ts`), `packages/canvas/src/page-margins.ts`, `packages/driver-image/src/crop-marks.ts`, `apps/export-service`, canvas-pro page inspector | Page size = trim; defaults bleed 3 mm / safe 10 mm on print-eligible pages. Canvas print-guide overlay (safe + bleed edge). Inspector fields when nothing selected (`canvas.setBleedMm` / `setSafeMm`). SVG/PDF crop marks when bleed > 0; PNG/JPG stay trim-only. |
+| Bleed and trim | **Done** | OSS + Pro UI | `packages/schema` (`bleedMm` / `safeMm`, `page-print.ts`), `packages/canvas/src/page-margins.ts`, openenvx-cloud `render-ir` + `export-service`, canvas-pro page inspector | Page size = trim; defaults bleed 3 mm / safe 10 mm on print-eligible pages. Canvas print-guide overlay (safe + bleed edge). Inspector fields when nothing selected (`canvas.setBleedMm` / `setSafeMm`). SVG/PDF crop marks when bleed > 0; PNG/JPG stay trim-only. |
 | Rulers and measurements | **Done** | OSS + Pro | `packages/canvas/src/rulers/`, canvas-pro toolbar (`canvas.toggleRulers`), selection size label + inspector | Top/left rulers with ticks + cursor markers; drag-out guides. |
 | Undo / redo history | **Done** | OSS | `packages/core/src/scene/history-stack.ts`, `packages/core/src/scene/scene-store.ts`, `packages/core/src/plugins/scene-plugin.ts` (`scene.undo` / `scene.redo`) | Snapshot history (depth 100). Session-local only — not document version history. |
 | Document version history | **Partial** | Pro UI + host provider | `VersionHistoryProvider` (`@openenvx/headless`), `VersionHistoryPlugin` + panel (`@xmazu/openenvxee-workbench`), `versionHistory.restore` | Figma-style list UI + restore. Host implements `listVersions` / `loadVersion`. Create / rename / delete not in the provider contract yet. |
@@ -46,7 +46,7 @@ Baseline competitor: [Polotno SDK](https://polotno.com/) drag-and-drop canvas (z
 | Grouping | **Done** | OSS | `packages/canvas/src/commands/canvas-group-commands.ts`, `packages/canvas/src/scene/group-layers.ts` | Nested groups; layers tree shows children. |
 | Rotation / transforms | **Done** | OSS | Schema `rotation` (+ optional `scaleX`/`scaleY`), Konva rotater, `canvas.rotateLeft` / `rotateRight` | Free rotation + box resize. Independent scale tool is not first-class. |
 | Lock layers | **Done** | OSS | Schema `locked` / `writeMode`, `scene.toggleLayerLock` | Runtime lock + template writeMode. |
-| Export | **Partial** | OSS + service | `packages/canvas/src/export/`, `packages/driver-image`, `apps/export-service` | Client SVG/PNG/JPG; PDF via export-service; page presets mm/dpi. Hidden layers skipped. SVG/PDF include bleed + crop marks when `bleedMm` > 0. **No CMYK/spot-color print pipeline.** |
+| Export | **Partial** | OSS + service | `openenvx-cloud` `render-ir` + `export-service` | Server SVG/PNG/JPG/PDF via openenvx-cloud export-service API; page presets mm/dpi. Hidden layers skipped. SVG/PDF include bleed + crop marks when `bleedMm` > 0. **No CMYK/spot-color print pipeline.** |
 
 ## Better than Polotno — differentiators
 
@@ -69,12 +69,12 @@ OpenEnvx should not stop at parity. These are existing or planned edges.
 | Differentiator | Status | Target packages | Notes |
 | --- | --- | --- | --- |
 | Full page CRUD UX | **Done** | `packages/core`, `packages/workbench` | Add / delete / duplicate / rename / reorder pages as first-class commands + Pages sidebar / palette / context menu. |
-| Layer visibility | **Done** | `packages/schema`, `packages/core`, canvas-pro layers UI, canvas stage, driver-image export | Schema `visible` + `scene.toggleLayerVisibility` + layers panel eye toggle; hidden layers skipped in render/export. |
+| Layer visibility | **Done** | `packages/schema`, `packages/core`, canvas-pro layers UI, canvas stage, export-service | Schema `visible` + `scene.toggleLayerVisibility` + layers panel eye toggle; hidden layers skipped in render/export. |
 | Grid overlay + snap-to-grid | **Done** | `packages/canvas` (+ pro chrome) | Grid overlay + snap toggle (`canvas.toggleGrid`); size picker (`canvas.setGridSize`, 4 / 8 / 16 / 32); smart guides win over grid when both hit. |
 | User guides + rulers | **Done** | `packages/schema` (`Page.guides`), `packages/canvas`, `packages/canvas-pro` | Top/left rulers; drag-out guides persist on the page and undo via `canvas.addGuide` / `moveGuide` / `removeGuide` / `clearGuides`; `canvas.toggleRulers` is session-only. |
-| True bleed / trim / crop marks | **Done** | `packages/schema`, `packages/canvas`, `packages/canvas-pro`, `packages/driver-image`, `apps/export-service` | Schema `bleedMm`/`safeMm`; canvas overlays; page inspector when nothing selected; SVG/PDF crop marks. |
+| True bleed / trim / crop marks | **Done** | `packages/schema`, `packages/canvas`, `packages/canvas-pro`, openenvx-cloud `export-service` | Schema `bleedMm`/`safeMm`; canvas overlays; page inspector when nothing selected; SVG/PDF crop marks. |
 | Video layer + timeline | **Planned** | `packages/schema`, `packages/canvas` | First-class `canvas.video` (and later animation timeline). |
-| Dedicated SVG layer | **Partial** | `packages/schema`, `packages/canvas`, `packages/canvas-pro`, `packages/driver-image` | `canvas.svg` with markup + optional fill/stroke; Konva via data-URL; vector export; lite node attribute editor (select element → edit fill/stroke/`d`/… → rewrite `data.svg`). No Bezier path tool. |
+| Dedicated SVG layer | **Partial** | `packages/schema`, `packages/canvas`, `packages/canvas-pro`, openenvx-cloud `export-service` | `canvas.svg` with markup + optional fill/stroke; Konva via data-URL; vector export; lite node attribute editor (select element → edit fill/stroke/`d`/… → rewrite `data.svg`). No Bezier path tool. |
 | Print pipeline (CMYK / spot) | **Planned** | drivers + export-service | Beyond RGB raster PDF for packaging/print SaaS. |
 | Component / instance system | **Partial** | `packages/schema`, `packages/core`, `packages/canvas` | One-way symbols: `scene.components` + `canvas.instance`; expand at render/export with per-instance surface ids; commands `canvas.createComponent` / `insertInstance` / `updateComponent`. Expanded definition children are display-only on canvas (select/transform the instance). Nested instances, detach, override UX, and in-instance editing deferred. |
 | Real-time collaboration | **Planned** | core persistence + future collab package | Multiplayer editing for internal design tools. |
@@ -93,7 +93,7 @@ Gaps and differentiators grouped by priority. Implement in separate PRs; update 
 ### P1 — Production and media parity
 
 - ~~**User-placed guides**~~ **Done** — `Page.guides` in schema; `canvas.addGuide` / `moveGuide` / `removeGuide` / `clearGuides` via `scene.apply`; snap via smart guides; rulers visibility remains session-only (`canvas.toggleRulers`).
-- ~~**Bleed / trim / crop marks**~~ **Done** — schema `bleedMm` / `safeMm` (defaults 3 mm / 10 mm on print pages); canvas safe + bleed-edge overlays; page inspector (`canvas.setBleedMm` / `setSafeMm`); SVG/PDF crop marks via `driver-image` + export-service. PNG/JPG trim-only.
+- ~~**Bleed / trim / crop marks**~~ **Done** — schema `bleedMm` / `safeMm` (defaults 3 mm / 10 mm on print pages); canvas safe + bleed-edge overlays; page inspector (`canvas.setBleedMm` / `setSafeMm`); SVG/PDF crop marks via openenvx-cloud export-service. PNG/JPG trim-only.
 - ~~**Dynamic templates / modifications**~~ **Done** — named layers + `applyModifications` / `extractTemplateManifest`; Template data live preview; [template API contract](apps/docs/template-api-contract.md).
 - ~~**Text shrink-to-fit**~~ **Done** — `data.autoFit: 'shrink'` + `minFontSize`; `fitFontSize` in canvas + SVG export estimate.
 - ~~**Text box fit-to-content**~~ **Done** — `fitCanvasTextLayerToContent` / `applyModificationsWithTextFit` remasure height after injected copy (and on canvas typography edits); skips shrink + curved text.

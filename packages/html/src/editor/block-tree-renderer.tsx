@@ -12,7 +12,7 @@ import {
   isLayerLocked,
   isLayerVisible,
 } from '@openenvx/core';
-import type { Layer, Scene } from '@openenvx/schema';
+import type { Layer, Scene } from '@xmazu/openenvxee-schema';
 import {
   Fragment,
   memo,

@@ -12,12 +12,13 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "vitest"
+    "test": "vitest",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@openenvx/core": "workspace:*",
-    "@openenvx/preview": "workspace:*",
-    "@openenvx/schema": "workspace:*",
+    "@xmazu/openenvxee-preview": "workspace:*",
+    "@xmazu/openenvxee-schema": "workspace:*",
     "@xmazu/openenvxee-plugin-protocol": "workspace:*"
   },
   "peerDependencies": {

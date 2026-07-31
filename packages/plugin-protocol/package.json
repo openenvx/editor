@@ -1,6 +1,6 @@
 {
   "name": "@xmazu/openenvxee-plugin-protocol",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Declarative plugin UI protocol — inspector/chrome trees, h/jsx runtime, message union",
   "license": "MIT",
   "type": "module",
@@ -30,7 +30,8 @@
   "scripts": {
     "build": "tsup",
     "prepack": "bun run build",
-    "test": "vitest"
+    "test": "vitest",
+    "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "@openenvx/typescript-config": "workspace:*",

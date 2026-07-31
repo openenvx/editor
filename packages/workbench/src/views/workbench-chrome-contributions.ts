@@ -20,7 +20,7 @@ import {
   type StatusBarBuilder,
   type TreeItem,
 } from '@openenvx/headless';
-import type { Page } from '@openenvx/schema';
+import type { Page } from '@xmazu/openenvxee-schema';
 
 export const WORKBENCH_SIDEBAR_CONTAINER_ID = 'workbench.sidebar';
 export const WORKBENCH_PAGES_VIEW_ID = 'workbench.pages';

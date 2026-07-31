@@ -1,10 +1,8 @@
 import { createLibraryConfig } from '@openenvx/typescript-config/tsup.library';
 
+// Single bundled entry so published ESM has no extensionless relative imports
+// (Node cannot resolve `./types` without `.js` when bundle:false).
 export default createLibraryConfig({
-  entry: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.test.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/generate-json-schema.ts',
-  ],
+  bundle: true,
+  entry: ['src/index.ts'],
 });

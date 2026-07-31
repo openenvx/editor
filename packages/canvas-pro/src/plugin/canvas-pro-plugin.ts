@@ -1,12 +1,10 @@
 import {
   AbsoluteEditorPane,
-  CanvasDocumentExportServiceId,
   CanvasStageInteractionServiceId,
   registerCanvasContribution,
 } from '@openenvx/canvas';
 import { Plugin, SingletonServiceContribution } from '@openenvx/core';
 import type { PluginContext } from '@openenvx/core';
-import { registerPreviewKindSvgSerializer } from '@openenvx/driver-image';
 import type { WorkbenchPluginContext } from '@openenvx/headless';
 
 import {
@@ -27,7 +25,6 @@ import {
   CanvasToolbarContribution,
 } from '../contributions/canvas-shell-contributions';
 import { proImageCanvasContributions } from '../contributions/pro-image-contributions';
-import { ProImageSvgSerializer } from '../export/pro-image-svg-serializer';
 import { SvgNodesFieldRenderer } from '../fields/svg-nodes-field';
 import { SmartGuidesStageInteraction } from '../stage/smart-guides-stage-interaction';
 
@@ -54,11 +51,6 @@ export class CanvasProPlugin extends Plugin {
     registerCanvasContribution(ctx, [...proImageCanvasContributions], {
       override: true,
     });
-    if (ctx.services.has(CanvasDocumentExportServiceId)) {
-      registerPreviewKindSvgSerializer(ctx, new ProImageSvgSerializer(), {
-        override: true,
-      });
-    }
     ctx.register(new AlignLayersLeftCommand());
     ctx.register(new AlignLayersCenterCommand());
     ctx.register(new AlignLayersRightCommand());

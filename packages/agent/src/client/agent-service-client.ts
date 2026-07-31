@@ -70,18 +70,19 @@ export function readSceneId(editorUri?: string): string {
   return readOrCreateSceneId(editorUri ?? 'untitled://scene');
 }
 
+type ViteImportMeta = ImportMeta & {
+  env?: {
+    VITE_AGENT_SERVICE?: string;
+    VITE_AGENT_SERVICE_URL?: string;
+  };
+};
+
 export function readAgentServiceUrl(): string | null {
-  if (
-    import.meta !== undefined &&
-    import.meta.env?.VITE_AGENT_SERVICE === 'false'
-  ) {
+  const env = (import.meta as ViteImportMeta).env;
+  if (env?.VITE_AGENT_SERVICE === 'false') {
     return null;
   }
-  const url =
-    import.meta !== undefined
-      ? import.meta.env?.VITE_AGENT_SERVICE_URL
-      : undefined;
-  return url ?? 'http://localhost:8789';
+  return env?.VITE_AGENT_SERVICE_URL ?? 'http://localhost:8789';
 }
 
 export function readActiveThreadId(sceneId: string): string | null {

@@ -1,6 +1,0 @@
-name = "openworkbench-export"
-main = "src/index.ts"
-compatibility_date = "2025-03-01"
-
-[browser]
-binding = "BROWSER"

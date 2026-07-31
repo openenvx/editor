@@ -1,6 +1,6 @@
 import { Command, localize } from '@openenvx/core';
 import type { CommandContext } from '@openenvx/core';
-import type { PageGuide, PageGuideOrientation } from '@openenvx/schema';
+import type { PageGuide, PageGuideOrientation } from '@xmazu/openenvxee-schema';
 
 import { CanvasRulerGuidesSettingsServiceId } from '../canvas-service-tokens';
 

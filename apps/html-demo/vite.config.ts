@@ -9,7 +9,7 @@ const workspacePackages = [
   '@openenvx/core',
   '@openenvx/headless',
   '@openenvx/html',
-  '@openenvx/schema',
+  '@xmazu/openenvxee-schema',
   '@xmazu/openenvxee-workbench',
   '@xmazu/openenvxee-html-studio',
 ];

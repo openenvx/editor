@@ -1,5 +1,5 @@
 import type { Layer } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
+import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
 
 export interface CanvasLayerSurfaceItem {
   layer: Layer;

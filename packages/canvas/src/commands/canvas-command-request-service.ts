@@ -1,4 +1,4 @@
-import type { Transform } from '@openenvx/schema';
+import type { Transform } from '@xmazu/openenvxee-schema';
 
 export class CanvasCommandRequestService {
   private pendingTransform: {

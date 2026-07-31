@@ -4,7 +4,7 @@ import {
   type ImageEdgeAnchor,
 } from '@openenvx/canvas';
 import { MIN_LAYER_SIZE } from '@openenvx/core';
-import type { Transform } from '@openenvx/schema';
+import type { Transform } from '@xmazu/openenvxee-schema';
 
 import {
   clampNormalizedCrop,

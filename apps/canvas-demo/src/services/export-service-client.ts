@@ -1,16 +1,20 @@
 import type { CanvasExportFormat } from '@openenvx/canvas';
-import type { IrRenderMode, RenderIrDocument } from '@openenvx/preview';
+import type { IrRenderMode, RenderIrDocument } from '@xmazu/openenvxee-preview';
+import type { Scene } from '@xmazu/openenvxee-schema';
 
-export interface ExportServiceRequest {
+export type ExportServiceRequest = {
   background?: 'transparent' | 'white' | string;
   dpi?: number;
-  document: RenderIrDocument;
   fileName?: string;
   format: CanvasExportFormat;
   mode?: IrRenderMode;
+  pageId?: string;
   quality?: number;
   scale?: number;
-}
+} & (
+  | { document: RenderIrDocument; scene?: never }
+  | { scene: Scene; document?: never }
+);
 
 export interface ExportServiceResponse {
   blob: Blob;

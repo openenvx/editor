@@ -4,7 +4,6 @@ import {
   setOpenEnvxWidgetClickHandler,
   WIDGET_LAYER_TYPE,
 } from '@openenvx/canvas';
-import { DriverImagePlugin } from '@openenvx/driver-image';
 import {
   CanvasProPlugin,
   CanvasTemplatePlugin,
@@ -19,7 +18,6 @@ export * from '@openenvx/headless';
 export * from '@openenvx/canvas';
 export * from '@xmazu/openenvxee-canvas-pro';
 export * from '@openenvx/agent';
-export * from '@openenvx/driver-image';
 
 /**
  * Workbench host surface — shell + plugins + chrome helpers only.
@@ -97,12 +95,12 @@ export function createSandboxExtensionHost(
 
 /**
  * Default plugin set for a full OpenEnvx Studio host app
- * (canvas basics + image driver + canvas-pro chrome + agent).
+ * (canvas basics + canvas-pro chrome + agent).
  * Pages/Layers sidebar + dirty status come from WorkbenchShell defaults.
+ * Document export is via cloud export-service API (not in-browser driver).
  */
 export const DEFAULT_STUDIO_PLUGINS = [
   new CanvasBasicsPlugin(),
-  new DriverImagePlugin(),
   new CanvasProPlugin(),
   new CanvasTemplatePlugin(),
   new AgentChatPlugin(),

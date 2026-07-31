@@ -1,6 +1,6 @@
 # Template API contract
 
-Stable contract for building a cloud render API against OpenEnvx templates. Editor and server share `@openenvx/schema` helpers: `extractTemplateManifest`, `applyModifications`, and `validateTemplateNames`.
+Stable contract for building a cloud render API against OpenEnvx templates. Editor and server share `@xmazu/openenvxee-schema` helpers: `extractTemplateManifest`, `applyModifications`, and `validateTemplateNames`.
 
 Pin clients to the scene `schemaVersion` (currently `2`). When the modification shape or resolution rules change incompatibly, bump `schemaVersion` and document the delta here.
 
@@ -104,7 +104,7 @@ Server steps:
 3. If `validateTemplateNames(scene).duplicates.length > 0` → `400` with duplicate names.
 4. Reject unknown modification names (recommended) or skip them.
 5. `const resolved = applyModificationsWithTextFit(scene, modifications)` (or `applyModifications` then `fitSceneCanvasTextToContent` when you need the pure schema step separately).
-6. Render resolved scene (reuse export-service / driver-image). Honor shrink-to-fit and image fit during rasterization.
+6. Render resolved scene (reuse openenvx-cloud export-service). Honor shrink-to-fit and image fit during rasterization.
 
 ## End-to-end example
 

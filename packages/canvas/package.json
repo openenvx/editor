@@ -20,7 +20,8 @@
   },
   "scripts": {
     "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/ dist/ && cp src/fonts/fonts.css dist/fonts.css",
-    "test": "vitest"
+    "test": "vitest",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "^5.2.11",
@@ -28,8 +29,8 @@
     "@fontsource/parisienne": "^5.2.8",
     "@openenvx/core": "workspace:*",
     "@openenvx/headless": "workspace:*",
-    "@openenvx/preview": "workspace:*",
-    "@openenvx/schema": "workspace:*",
+    "@xmazu/openenvxee-preview": "workspace:*",
+    "@xmazu/openenvxee-schema": "workspace:*",
     "@tiptap/extension-color": "^3.27.3",
     "@tiptap/extension-font-family": "^3.27.3",
     "@tiptap/extension-text-style": "^3.27.3",

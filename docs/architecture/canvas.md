@@ -23,7 +23,7 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 
 ### Enterprise / override hooks
 
-- Per-kind override of OSS renderers / interactions / preview / driver-image SVG serializers via `{ override: true }`
+- Per-kind override of OSS renderers / interactions / preview / SVG export (server) via `{ override: true }`
 - Generic layer handles on `CanvasLayerInteractionContribution` (`providesHandles`, `layoutHandles`, `onHandleDrag*`)
 - Optional `dataPatch` on `canvas.updateLayerTransform` (merges into `layer.data`)
 

@@ -3,7 +3,7 @@ import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
-import type { Layer } from '@openenvx/schema';
+import type { Layer } from '@xmazu/openenvxee-schema';
 import { memo, useCallback } from 'react';
 
 import { defaultBlockRegistry } from '../block-registry';

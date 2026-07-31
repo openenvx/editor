@@ -41,7 +41,6 @@ export {
   ImageCropInteraction,
   canResetImageCrop,
 } from './interactions/image-crop-interaction';
-export { ProImageSvgSerializer } from './export/pro-image-svg-serializer';
 export { proImageCanvasContributions } from './contributions/pro-image-contributions';
 export {
   hasActiveCrop,

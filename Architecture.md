@@ -27,7 +27,7 @@ Author how-to: [apps/docs/extension-guide.md](apps/docs/extension-guide.md).
 | **Rendering-only** | `schema`, `canvas` | Embed `CanvasStage` in a custom React app with own state. No plugin host. |
 | **Editor backbone** | `core`, `headless`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
 | **Workbench UI** | `workbench` | React shell (`WorkbenchShell`); workspace-private. |
-| **Published product** | `studio` (+ `schema`, `plugin-protocol`) | Fat bundle of workbench + canvas + canvas-pro + agent + driver-image into `dist`; protocol also published standalone for embed panel authors. |
+| **Published product** | `studio` (+ `schema`, `plugin-protocol`) | Fat bundle of workbench + canvas + canvas-pro + agent into `dist`; protocol also published standalone for embed panel authors. |
 | **HTML studio** | `html`, `html-studio` | Puck-style block editor + thin studio re-exports (workspace-private). |
 
 **Hard rules:** All canvas code lives in `@openenvx/canvas` (not `core`). HTML block editing lives in `@openenvx/html`. Untrusted extension code never runs in the editor main world.
@@ -39,13 +39,13 @@ Author how-to: [apps/docs/extension-guide.md](apps/docs/extension-guide.md).
 | Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives |
 | Embed protocol | `plugin-protocol` | Published (public) | Declarative panel JSON tree, `h`/jsx, `postMessage` unions, `validatePluginTree` |
 | Product libs | `headless`, `canvas`, `html`, `driver-*`, `workbench`, `canvas-pro`, `agent`, `html-studio` | Private (workspace) | Workbench runtime, canvas engine, HTML editor, drivers, React shell, pro chrome, agent |
-| Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + canvas-pro + agent + driver-image |
+| Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + canvas-pro + agent |
 
 ## Placement cheat sheet
 
 | Put it here | Examples |
 | --- | --- |
-| `@openenvx/schema` | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
+| `@xmazu/openenvxee-schema` | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
 | `@openenvx/headless` | `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context, external host mount surfaces |
 | `@openenvx/canvas` | Konva stage, layers, renderers, `CanvasBasicsPlugin`, `CanvasEditor` |

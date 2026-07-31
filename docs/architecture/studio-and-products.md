@@ -16,12 +16,11 @@ Publishing intent: [PUBLISHING.md](../../PUBLISHING.md). Only `studio`, `schema`
 
 ## `@xmazu/openenvxee-studio` (canvas product)
 
-Re-exports: `core`, `headless`, `canvas`, `canvas-pro`, `agent`, `driver-image`, plus workbench host surface (`WorkbenchShell`, embed/sandbox mounts, themes, default chrome plugins).
+Re-exports: `core`, `headless`, `canvas`, `canvas-pro`, `agent`, plus workbench host surface (`WorkbenchShell`, embed/sandbox mounts, themes, default chrome plugins).
 
 ```ts
 export const DEFAULT_STUDIO_PLUGINS = [
   new CanvasBasicsPlugin(),
-  new DriverImagePlugin(),
   new CanvasProPlugin(),
   new CanvasTemplatePlugin(),
   new AgentChatPlugin(),

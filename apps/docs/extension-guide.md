@@ -4,11 +4,11 @@ How to extend the OpenEnvx canvas engine with plugins.
 
 Under-the-hood map (packages, workbench, studio, trust): [Architecture.md](../../Architecture.md) and [docs/architecture/](../../docs/architecture/overview.md). Trust / embed / sandbox: [Plugin-boundaries.md](../../Plugin-boundaries.md).
 
-## Scene document (`@openenvx/schema`)
+## Scene document (`@xmazu/openenvxee-schema`)
 
-The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@openenvx/schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
+The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@xmazu/openenvxee-schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
 
-Backend services depend on `@openenvx/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it), and `apps/export-service` imports overlapping leaf schemas (`paddingSchema`, `layerStyleShadowSchema`, …) into its Render IR request schema while keeping Render-IR-specific document shapes local.
+Backend services depend on `@xmazu/openenvxee-schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Cloud `export-service` (openenvx-cloud) imports overlapping leaf schemas (`paddingSchema`, `layerStyleShadowSchema`, …) into its Render IR request schema while keeping Render-IR-specific document shapes local.
 
 ## OSS vs enterprise shell
 
@@ -232,15 +232,7 @@ registerCanvasContribution(
 );
 ```
 
-For SVG export, override the preview-kind serializer from `@openenvx/driver-image`:
-
-```ts
-import { registerPreviewKindSvgSerializer } from '@openenvx/driver-image';
-
-registerPreviewKindSvgSerializer(ctx, new ProImageSvgSerializer(), {
-  override: true,
-});
-```
+Raster/PDF/SVG export is server-side (openenvx-cloud `export-service`); there is no in-browser SVG serializer registry to override.
 
 ## Generic layer handles
 

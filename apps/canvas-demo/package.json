@@ -7,15 +7,15 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "test": "vitest run --passWithNoTests",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@openenvx/canvas": "workspace:*",
     "@openenvx/core": "workspace:*",
-    "@openenvx/driver-image": "workspace:*",
     "@openenvx/headless": "workspace:*",
-    "@openenvx/preview": "workspace:*",
-    "@openenvx/schema": "workspace:*",
+    "@xmazu/openenvxee-preview": "workspace:*",
+    "@xmazu/openenvxee-schema": "workspace:*",
     "@xmazu/openenvxee-studio": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7"

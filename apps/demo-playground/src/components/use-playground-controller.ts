@@ -1,9 +1,6 @@
 import { CanvasBasicsPlugin, createCanvasDemoScene } from '@openenvx/canvas';
-import { DriverImagePlugin } from '@openenvx/driver-image';
 import { WorkbenchController } from '@openenvx/headless';
 import { useEffect, useState } from 'react';
-
-import { PlaygroundExportPlugin } from './playground-export-plugin';
 
 export function usePlaygroundController() {
   const [controller, setController] = useState<WorkbenchController | null>(
@@ -13,11 +10,7 @@ export function usePlaygroundController() {
   useEffect(() => {
     const nextController = new WorkbenchController({
       initialScene: createCanvasDemoScene(),
-      plugins: [
-        new CanvasBasicsPlugin(),
-        new DriverImagePlugin(),
-        new PlaygroundExportPlugin(),
-      ],
+      plugins: [new CanvasBasicsPlugin()],
     });
 
     let cancelled = false;

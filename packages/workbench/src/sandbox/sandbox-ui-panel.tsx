@@ -27,7 +27,8 @@ function readDocumentTheme(): string {
     return DEFAULT_THEME;
   }
   const scoped = document.querySelector('[data-owb-theme]');
-  const attr = scoped?.dataset.owbTheme?.trim();
+  const attr =
+    scoped instanceof HTMLElement ? scoped.dataset.owbTheme?.trim() : undefined;
   return attr || DEFAULT_THEME;
 }
 

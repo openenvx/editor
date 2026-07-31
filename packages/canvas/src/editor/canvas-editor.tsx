@@ -1,6 +1,6 @@
 import type { EditorViewportApi } from '@openenvx/core';
 import { canEditLayerData, canSelectLayer } from '@openenvx/core';
-import type { Page } from '@openenvx/schema';
+import type { Page } from '@xmazu/openenvxee-schema';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useCanvasHost } from '../canvas-host-context';

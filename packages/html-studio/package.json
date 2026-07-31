@@ -12,7 +12,8 @@
     "./theme.css": "./src/theme.css"
   },
   "scripts": {
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@openenvx/core": "workspace:*",

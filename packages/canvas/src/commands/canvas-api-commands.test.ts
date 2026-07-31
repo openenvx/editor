@@ -5,7 +5,7 @@ import {
   WorkbenchEventService,
 } from '@openenvx/core';
 import type { CommandContext } from '@openenvx/core';
-import { createDefaultTransform, normalizeScene } from '@openenvx/schema';
+import { createDefaultTransform, normalizeScene } from '@xmazu/openenvxee-schema';
 import { describe, expect, it } from 'vitest';
 
 import { UpdateLayerTransformCommand } from './canvas-api-commands';

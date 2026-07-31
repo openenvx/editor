@@ -133,14 +133,24 @@ export class SandboxExtensionHost {
             ...scene,
             pages: scene.pages.map((page) => ({
               ...page,
-              layers: updateLayerInTree(page.layers, layerId, (current) => ({
-                ...current,
-                transform: {
-                  ...current.transform,
-                  width,
-                  height,
-                },
-              })),
+              layers: updateLayerInTree(page.layers, layerId, (current) => {
+                const prev = current.transform ?? {
+                  x: 0,
+                  y: 0,
+                  width: 0,
+                  height: 0,
+                  rotation: 0,
+                  opacity: 1,
+                };
+                return {
+                  ...current,
+                  transform: {
+                    ...prev,
+                    width,
+                    height,
+                  },
+                };
+              }),
             })),
           }),
         });

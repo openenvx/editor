@@ -1,6 +1,14 @@
 {
   "publish": [
     {
+      "name": "@xmazu/openenvxee-schema",
+      "dir": "packages/schema"
+    },
+    {
+      "name": "@xmazu/openenvxee-preview",
+      "dir": "packages/preview"
+    },
+    {
       "name": "@xmazu/openenvxee-plugin-protocol",
       "dir": "packages/plugin-protocol"
     },
@@ -14,7 +22,9 @@
       "repo": "../openenvx-cloud",
       "deps": [
         "@xmazu/openenvxee-studio",
-        "@xmazu/openenvxee-plugin-protocol"
+        "@xmazu/openenvxee-plugin-protocol",
+        "@xmazu/openenvxee-schema",
+        "@xmazu/openenvxee-preview"
       ]
     }
   ]

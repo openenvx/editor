@@ -4,14 +4,14 @@ import {
   normalizeScene,
   pruneEditorState,
   validateScene,
-} from '@openenvx/schema';
+} from '@xmazu/openenvxee-schema';
 import type {
   EditorState,
   Page,
   Scene,
   Selection,
   ValidationError,
-} from '@openenvx/schema';
+} from '@xmazu/openenvxee-schema';
 
 import type { PageRulesContribution } from '../contributions/page-rules-contribution';
 import { Emitter } from '../runtime/emitter';

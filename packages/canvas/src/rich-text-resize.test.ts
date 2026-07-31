@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/schema';
+import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { describe, expect, it } from 'vitest';
 
 import { computeCornerResize, computeHorizontalResize, computeHorizontalResizeFromNode, constrainRichTextHorizontalBox, horizontalResizeBoxFromPointer, MIN_RICH_TEXT_FONT_SIZE } from './rich-text-resize';

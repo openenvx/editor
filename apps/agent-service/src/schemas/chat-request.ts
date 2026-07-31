@@ -1,4 +1,7 @@
-import { editorStateSchemaLenient, sceneSchemaLenient } from '@openenvx/schema';
+import {
+  editorStateSchemaLenient,
+  sceneSchemaLenient,
+} from '@xmazu/openenvxee-schema';
 import { z } from 'zod';
 
 export const chatMessageSchema = z.object({

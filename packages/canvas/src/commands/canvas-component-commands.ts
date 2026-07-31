@@ -7,8 +7,8 @@ import {
   localize,
 } from '@openenvx/core';
 import type { CommandContext, Layer } from '@openenvx/core';
-import type { SceneComponent } from '@openenvx/schema';
-import { createDefaultTransform } from '@openenvx/schema';
+import type { SceneComponent } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 
 import { createGroupFromLayers } from '../scene/group-layers';
 

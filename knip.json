@@ -42,10 +42,6 @@
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
-    "packages/driver-image": {
-      "entry": ["src/index.ts!"],
-      "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
-    },
     "packages/agent": {
       "entry": ["src/index.ts!", "src/schemas/index.ts!"],
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
@@ -88,8 +84,8 @@
         "react-konva",
         "zod",
         "@openenvx/core",
-        "@openenvx/preview",
-        "@openenvx/schema"
+        "@xmazu/openenvxee-preview",
+        "@xmazu/openenvxee-schema"
       ]
     },
     "packages/canvas-pro": {
@@ -108,9 +104,6 @@
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.{ts,tsx}"]
     },
-    "packages/registry-contract": {
-      "project": ["src/**/*.{ts,tsx}"]
-    },
     "apps/demo-playground": {
       "entry": [
         "src/router.tsx",
@@ -121,10 +114,6 @@
       "project": ["src/**/*.{ts,tsx}"]
     },
     "apps/agent-service": {
-      "entry": ["src/**/*.test.ts"],
-      "project": ["src/**/*.{ts,tsx}"]
-    },
-    "apps/export-service": {
       "entry": ["src/**/*.test.ts"],
       "project": ["src/**/*.{ts,tsx}"]
     },

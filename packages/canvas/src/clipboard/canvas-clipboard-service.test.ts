@@ -1,6 +1,6 @@
 import { AssetServiceId, InstantiationService } from '@openenvx/core';
 import type { AssetService } from '@openenvx/core';
-import { normalizeScene } from '@openenvx/schema';
+import { normalizeScene } from '@xmazu/openenvxee-schema';
 import { describe, expect, it, vi } from 'vitest';
 
 import { CanvasClipboardService } from './canvas-clipboard-service';

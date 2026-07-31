@@ -63,13 +63,13 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 
 ## Licensing / publishing intent
 
-Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `driver-image`, `workbench`, `canvas-pro`, `agent`, …) are **private** and not published. Their `exports` point at **TypeScript `src/`** so Vite/Bun apps hot-reload and TypeScript resolves types from source without rebuilding.
+Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `workbench`, `canvas-pro`, `agent`, …) are **private** and not published. Their `exports` point at **TypeScript `src/`** so Vite/Bun apps hot-reload and TypeScript resolves types from source without rebuilding.
 
 Published packages:
 
-- **`@openenvx/schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](PUBLISHING.md).
+- **`@xmazu/openenvxee-schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](PUBLISHING.md).
 - **`@xmazu/openenvxee-plugin-protocol`** — declarative embed panel protocol (`h`, jsx runtimes, `validatePluginTree`, message types). Ships `dist/`; published `exports` are dist-only (see [PUBLISHING.md](PUBLISHING.md)).
-- **`@xmazu/openenvxee-studio`** — product fat bundle. Build inlines `@xmazu/openenvxee-workbench`, `@openenvx/canvas`, `@xmazu/openenvxee-canvas-pro`, `@openenvx/agent`, `@openenvx/driver-image`, and their `@openenvx/*` deps into `dist/`. Re-exports `@openenvx/core` + `@openenvx/headless` so host apps can author plugins without private workspace packages. Published `exports` resolve to `dist/` only. Monorepo apps that need `src/` HMR alias studio in Vite/tsconfig (see `apps/canvas-demo`).
+- **`@xmazu/openenvxee-studio`** — product fat bundle. Build inlines `@xmazu/openenvxee-workbench`, `@openenvx/canvas`, `@xmazu/openenvxee-canvas-pro`, `@openenvx/agent`, and their `@openenvx/*` deps into `dist/`. Re-exports `@openenvx/core` + `@openenvx/headless` so host apps can author plugins without private workspace packages. Published `exports` resolve to `dist/` only. Monorepo apps that need `src/` HMR alias studio in Vite/tsconfig (see `apps/canvas-demo`). PNG/JPG/PDF/SVG export is server-side via openenvx-cloud `apps/export-service`.
 
 ## Host sidebar panels (product hosts)
 
@@ -163,20 +163,21 @@ bun run build         # all packages (CI gate)
 bun run dev:playground
 bun run fix           # auto-fix lint/format (ultracite)
 bun run check         # lint (ultracite) + knip
-bun run precommit     # check + build/test packages dirty vs HEAD (excl. apps)
+bun run check-types   # tsc --noEmit across packages (excl. apps)
+bun run precommit     # check + build/check-types/test packages dirty vs HEAD (excl. apps)
 bun run changeset     # create a release changeset
 ```
 
 ## Publishing
 
-Only `packages/studio` (`@xmazu/openenvxee-studio`), `packages/schema` (`@openenvx/schema`), and `packages/plugin-protocol` (`@xmazu/openenvxee-plugin-protocol`) are published (private registry via `publishConfig`). See [README.md](README.md), [PUBLISHING.md](PUBLISHING.md), and the `publish-packages` script in root `package.json`.
+Only `packages/schema` (`@xmazu/openenvxee-schema`), `packages/preview` (`@xmazu/openenvxee-preview`), `packages/plugin-protocol` (`@xmazu/openenvxee-plugin-protocol`), and `packages/studio` (`@xmazu/openenvxee-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)). Export Worker lives in openenvx-cloud.
 
 ## Before you finish
 
 After all code changes for the task are done, **always** run these from the repo root and fix every failure before stopping:
 
 1. `bun run fix` — apply Ultracite auto-fixes
-2. `bun run precommit` — `check` + Turbo build/test for packages changed vs `HEAD` (and their dependents), excluding `apps/*`. Full-repo gate is `bun run build && bun run test` (what CI runs).
+2. `bun run precommit` — `check` + Turbo build/check-types/test for packages changed vs `HEAD` (and their dependents), excluding `apps/*`. Full-repo gate is `bun run build && bun run test` (what CI runs).
 
 If either command fails, fix the reported errors, then re-run both until they pass. Do not leave lint, format, knip, build, or test failures unresolved.
 

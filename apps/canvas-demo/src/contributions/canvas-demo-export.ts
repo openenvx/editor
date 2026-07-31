@@ -1,22 +1,11 @@
-import { CanvasDocumentExportServiceId } from '@openenvx/canvas';
-import type {
-  CanvasDocumentExportService,
-  CanvasExportFormat,
-} from '@openenvx/canvas';
-import { bytesToDataUrl, downloadBytes } from '@openenvx/canvas/export-bytes';
-import {
-  AssetServiceId,
-  Command,
-  getActivePage,
-  LayerRegistryServiceId,
-} from '@openenvx/core';
+import type { CanvasExportFormat } from '@openenvx/canvas';
+import { AssetServiceId, Command, getActivePage } from '@openenvx/core';
 import type { CommandContext } from '@openenvx/core';
-import { flattenSceneToIR } from '@openenvx/driver-image';
 import {
   StatusBarContribution,
   type StatusBarBuilder,
 } from '@openenvx/headless';
-import type { Scene } from '@openenvx/schema';
+import type { Scene } from '@xmazu/openenvxee-schema';
 
 import { CanvasDemoExportServiceId } from '../services/canvas-demo-export-service';
 import type { CanvasDemoExportService } from '../services/canvas-demo-export-service';
@@ -43,15 +32,6 @@ function getExportService(ctx: CommandContext): CanvasDemoExportService | null {
   return ctx.services.get(CanvasDemoExportServiceId);
 }
 
-function getDocumentExporter(
-  ctx: CommandContext
-): CanvasDocumentExportService | undefined {
-  if (!ctx.services.has(CanvasDocumentExportServiceId)) {
-    return undefined;
-  }
-  return ctx.services.get(CanvasDocumentExportServiceId);
-}
-
 function prepareExportScene(ctx: CommandContext): Scene {
   const scene = structuredClone(ctx.scene.getScene());
   if (!ctx.services.has(AssetServiceId)) {
@@ -67,16 +47,6 @@ function prepareExportScene(ctx: CommandContext): Scene {
   return { ...scene, assets: referenced };
 }
 
-function exportStatusLabel(
-  format: CanvasExportFormat,
-  fallback?: { actualFormat: CanvasExportFormat }
-): string {
-  if (fallback) {
-    return `Exported ${fallback.actualFormat.toUpperCase()} (raster fallback)`;
-  }
-  return `Exported ${format.toUpperCase()}`;
-}
-
 export class CanvasDemoExportCommand extends Command {
   constructor(
     readonly id: string,
@@ -87,14 +57,7 @@ export class CanvasDemoExportCommand extends Command {
 
   canExecute(ctx: CommandContext): boolean {
     const exportService = getExportService(ctx);
-    if (exportService?.getConfig().exportServiceUrl !== null) {
-      return true;
-    }
-    const exporter = getDocumentExporter(ctx);
-    if (!exporter) {
-      return false;
-    }
-    return exporter.supportsFormat(this.format);
+    return exportService?.getConfig().exportServiceUrl !== null;
   }
 
   async execute(ctx: CommandContext): Promise<void> {
@@ -104,7 +67,10 @@ export class CanvasDemoExportCommand extends Command {
     }
 
     const { exportServiceUrl } = exportService.getConfig();
-    const exporter = getDocumentExporter(ctx);
+    if (exportServiceUrl === null) {
+      exportService.setExportStatus('Export service URL not configured');
+      return;
+    }
 
     exportService.setExportStatus('Exporting…');
     exportService.setExportResult(null);
@@ -112,72 +78,14 @@ export class CanvasDemoExportCommand extends Command {
     try {
       const scene = prepareExportScene(ctx);
       const page = getActivePage(scene);
-
-      if (exportServiceUrl !== null) {
-        const layerRegistry = ctx.services.get(LayerRegistryServiceId);
-        const document = flattenSceneToIR(scene, layerRegistry, page.id);
-        const result = await exportViaService(exportServiceUrl, {
-          document,
-          format: this.format,
-        });
-        downloadBlob(result.blob, result.fileName);
-        exportService.setExportStatus(`Exported ${this.format.toUpperCase()}`);
-        return;
-      }
-
-      if (!exporter) {
-        exportService.setExportStatus('Export unavailable');
-        return;
-      }
-
-      const result = await exporter.exportDocument(scene, page.id, {
+      const result = await exportViaService(exportServiceUrl, {
         format: this.format,
+        pageId: page.id,
+        scene,
       });
-      const previewMimeType =
-        result.mimeType === 'image/jpeg' ? 'image/png' : result.mimeType;
-      if (
-        previewMimeType === 'image/png' ||
-        previewMimeType === 'image/svg+xml'
-      ) {
-        exportService.setExportResult({
-          dataUrl: bytesToDataUrl(result.data, result.mimeType),
-          mimeType: previewMimeType,
-        });
-      }
-
-      downloadBytes(
-        result.data,
-        result.mimeType,
-        result.fileName ??
-          `artboard.${this.format === 'jpg' ? 'jpg' : this.format}`
-      );
-      exportService.setExportStatus(
-        exportStatusLabel(this.format, result.fallback)
-      );
+      downloadBlob(result.blob, result.fileName);
+      exportService.setExportStatus(`Exported ${this.format.toUpperCase()}`);
     } catch (error) {
-      if (exportServiceUrl !== null && this.format === 'png' && exporter) {
-        try {
-          const scene = prepareExportScene(ctx);
-          const page = getActivePage(scene);
-          const result = await exporter.exportDocument(scene, page.id, {
-            format: 'png',
-          });
-          exportService.setExportResult({
-            dataUrl: bytesToDataUrl(result.data, result.mimeType),
-            mimeType: 'image/png',
-          });
-          downloadBytes(
-            result.data,
-            result.mimeType,
-            result.fileName ?? 'artboard.png'
-          );
-          exportService.setExportStatus('Exported PNG (local fallback)');
-          return;
-        } catch {
-          // Fall through to the original error message.
-        }
-      }
-
       exportService.setExportStatus(
         error instanceof Error ? error.message : 'Export failed'
       );

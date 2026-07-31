@@ -1,4 +1,8 @@
-import type { CornerRadius, LayerShadow, Padding } from '@openenvx/schema';
+import type {
+  CornerRadius,
+  LayerShadow,
+  Padding,
+} from '@xmazu/openenvxee-schema';
 
 export type BuiltinLayerPreviewDescriptor =
   | { kind: 'image'; src: string; alt?: string; [key: string]: unknown }

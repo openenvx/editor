@@ -8,7 +8,7 @@ import {
   type Page,
   type PropertySectionDescriptor,
 } from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@openenvx/preview';
+import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
 
 import type { BlockConfig, FieldDef, SlotDef } from './block-config';
 import { BlockRegistryServiceId, type BlockRegistry } from './block-registry';

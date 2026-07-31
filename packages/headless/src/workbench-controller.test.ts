@@ -1,4 +1,4 @@
-import { createLayerPreviewBuilder } from '@openenvx/preview';
+import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
 import {
   Command,
   createPropertyBuilder,
@@ -14,7 +14,7 @@ import type {
   PluginContext,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import { normalizeScene, normalizeSceneSnapshot } from '@openenvx/schema';
+import { normalizeScene, normalizeSceneSnapshot } from '@xmazu/openenvxee-schema';
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -479,7 +479,7 @@ describe(WorkbenchController, () => {
 
   it("rejects invalid scenes on loadScene", async () => {
     const { SceneValidationError } = await import('@openenvx/core');
-    const { SCHEMA_VERSION } = await import('@openenvx/schema');
+    const { SCHEMA_VERSION } = await import('@xmazu/openenvxee-schema');
     const controller = new WorkbenchController({
       plugins: [new EmptyPlugin()],
     });

@@ -9,10 +9,9 @@ const monorepoRoot = path.resolve(import.meta.dirname, '../..');
 const workspacePackages = [
   '@openenvx/core',
   '@openenvx/canvas',
-  '@openenvx/driver-image',
   '@openenvx/headless',
-  '@openenvx/preview',
-  '@openenvx/schema',
+  '@xmazu/openenvxee-preview',
+  '@xmazu/openenvxee-schema',
   '@openenvx/agent',
   '@xmazu/openenvxee-canvas-pro',
   '@xmazu/openenvxee-workbench',

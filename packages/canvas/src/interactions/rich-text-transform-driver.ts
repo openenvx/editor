@@ -1,6 +1,6 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
-import { createDefaultTransform } from '@openenvx/schema';
-import type { Transform } from '@openenvx/schema';
+import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
+import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import type { Transform } from '@xmazu/openenvxee-schema';
 import type Konva from 'konva';
 
 import {

@@ -197,9 +197,7 @@ export async function createQuickJsEngine(input: {
 
   return {
     async evalModule(source: string) {
-      const result = withCpuBudget(() =>
-        context.evalCode(source, { type: 'global' })
-      );
+      const result = withCpuBudget(() => context.evalCode(source));
       throwIfEvalFailed(result);
       withCpuBudget(() => {
         context.runtime.executePendingJobs();

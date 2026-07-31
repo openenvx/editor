@@ -1,4 +1,4 @@
-import { normalizeScene } from '@openenvx/schema';
+import { normalizeScene } from '@xmazu/openenvxee-schema';
 import { describe, expect, it } from "vitest";
 
 import { createContextKeyService } from "./context-key-service";

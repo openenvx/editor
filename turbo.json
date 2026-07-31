@@ -20,6 +20,10 @@
     },
     "lint": {
       "outputs": []
+    },
+    "check-types": {
+      "dependsOn": ["^build"],
+      "outputs": []
     }
   }
 }
