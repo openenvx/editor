@@ -6,8 +6,9 @@ import type {
 } from '@openenvx/core';
 
 /**
- * Narrow host surface for sandbox extensions.
- * Deliberately omits InstantiationService / PluginContext.
+ * Host surface for sandbox extensions (first-party adapter only).
+ * Omits InstantiationService / PluginContext; still grants scene + commands.
+ * Isolates never receive this — capability gates stay on the host bridge.
  */
 export interface SandboxHostSurface {
   getSelection(): Selection;

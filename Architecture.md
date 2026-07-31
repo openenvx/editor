@@ -109,7 +109,7 @@ Trust model, message allowlists, and cloud/marketplace runners: [Plugin-boundari
 
 ## What belongs in `@xmazu/openenvxee-workbench`
 
-- `WorkbenchShell` — React chrome host; auto-injects default plugins; optional `sandboxHost` / `embedPanels` mounted off PluginManager after start
+- `WorkbenchShell` — React chrome host; auto-injects default plugins; optional `mountExternalHosts` mounts sandbox/embed off PluginManager after start
 - `SandboxExtensionHost` + `mountSandboxExtensions`, `EmbedPanelHost` + `mountEmbedPanel`
 - `DefaultWorkbenchChromePlugin` — scene-generic `workbench.sidebar` (Pages + Layers), dirty Saved/Unsaved status (`workbench-saved` / `workbench-unsaved`)
 - Default inspector container + field renderer plugins

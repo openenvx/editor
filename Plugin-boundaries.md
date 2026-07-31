@@ -14,6 +14,8 @@ How **internal** (first-party) and **external** (embed / sandbox) extensions rel
 
 **Do not share the PluginManager DI tree with external hosts.** Trusted OOP plugins activate with full `WorkbenchPluginContext` (`services`). Sandbox and embed hosts mount on narrow surfaces (`SandboxHostSurface` / `EmbedPanelHostSurface`) that never expose `InstantiationService`. Untrusted isolates / `panel:*` parents never see either surface.
 
+This is **DI isolation**, not registry isolation: sandbox still registers run commands on the shared `CommandService`, and embed panels still register workbench contributions / view panels / icons so the shell palette and sidebars can render them. `SandboxHostSurface` is privileged for the first-party adapter (scene read/write + `executeCommand`) — isolates never receive it; capability gates stay on the host bridge.
+
 Figma parity (plugins vs widgets, isolate + `showUI` iframe) lives on the **sandbox** path only. Embed panels stay a separate, safer/weaker trust path — do not force them onto QuickJS.
 
 ## Hard rule
@@ -136,11 +138,11 @@ The protocol shape is enough as the **interaction model**. Seal these before tre
 4. **Mandatory origin checks** on the transport.
 5. **Capability negotiation** — grow beyond `v: 1` with an explicit capabilities list so the surface can evolve without silent breakage.
 
-Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/public/embed-parent.html) at `/embed-parent.html`; the iframe loads `/?embed=1` with `EmbedPanelHost` via `WorkbenchShell` `embedPanels` (`contextScope: 'selection'`, empty `allowedCommands`, no manifest).
+Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/public/embed-parent.html) at `/embed-parent.html`; the iframe loads `/?embed=1` with `EmbedPanelHost` via `WorkbenchShell` `mountExternalHosts` (`contextScope: 'selection'`, empty `allowedCommands`, no manifest).
 
 ## QuickJS sandbox (Phase V.1 / V.1.1)
 
-Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workbench `SandboxExtensionHost` + canvas widget click bind), mounted with `mountSandboxExtensions` / `WorkbenchShell` `sandboxHost`: **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` canvas nodes carry **local** synced state (collaborative CRDT deferred). Bundles load from session-granted signed URLs + content hashes (minted by openenvx-cloud).
+Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workbench `SandboxExtensionHost` + canvas widget click bind), mounted with `mountSandboxExtensions` / `WorkbenchShell` `mountExternalHosts`: **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` canvas nodes carry **local** synced state (collaborative CRDT deferred). Bundles load from session-granted signed URLs + content hashes (minted by openenvx-cloud).
 
 **Plugin lifecycle:** production hosts default `autoStartPlugins: false` — sandbox plugins start via `openenvx.sandbox.run.<id>` (user-run). Demos may opt into auto-start. Closing the UI modal does not stop the isolate; **Stop** / `closePlugin` does.
 

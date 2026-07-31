@@ -1,5 +1,6 @@
 export interface IconRegistry {
   register(id: string, glyph: unknown): void;
+  unregister(id: string): boolean;
   registerDefaults(glyphs: Record<string, unknown>): void;
   resolve(id: string): unknown | null;
 }
@@ -9,6 +10,10 @@ export class IconRegistryImpl implements IconRegistry {
 
   register(id: string, glyph: unknown): void {
     this.glyphs.set(id, glyph);
+  }
+
+  unregister(id: string): boolean {
+    return this.glyphs.delete(id);
   }
 
   registerDefaults(glyphs: Record<string, unknown>): void {

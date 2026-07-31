@@ -44,23 +44,19 @@ export class ExternalHostMount {
   mountSandbox(
     activate: (surface: SandboxHostSurface) => void | (() => void)
   ): () => void {
-    const tracked: WorkbenchContributionDisposable[] = [];
-    const surface = this.createSandboxHostSurface((disposable) => {
-      tracked.push(disposable);
-    });
-    const hostDispose = activate(surface);
-    return this.trackMount(hostDispose, tracked);
+    return this.mountHost(
+      (track) => this.createSandboxHostSurface(track),
+      activate
+    );
   }
 
   mountEmbedPanel(
     activate: (surface: EmbedPanelHostSurface) => void | (() => void)
   ): () => void {
-    const tracked: WorkbenchContributionDisposable[] = [];
-    const surface = this.createEmbedPanelHostSurface((disposable) => {
-      tracked.push(disposable);
-    });
-    const hostDispose = activate(surface);
-    return this.trackMount(hostDispose, tracked);
+    return this.mountHost(
+      (track) => this.createEmbedPanelHostSurface(track),
+      activate
+    );
   }
 
   dispose(): void {
@@ -69,6 +65,19 @@ export class ExternalHostMount {
     for (const dispose of disposers) {
       dispose();
     }
+  }
+
+  private mountHost<TSurface>(
+    createSurface: (
+      trackDisposable: (disposable: WorkbenchContributionDisposable) => void
+    ) => TSurface,
+    activate: (surface: TSurface) => void | (() => void)
+  ): () => void {
+    const tracked: WorkbenchContributionDisposable[] = [];
+    const surface = createSurface((disposable) => {
+      tracked.push(disposable);
+    });
+    return this.trackMount(activate(surface), tracked);
   }
 
   private trackMount(
@@ -147,7 +156,7 @@ export class ExternalHostMount {
         deps.onContributionsChanged();
         return track({
           dispose: () => {
-            // IconRegistry has no unregister; remount replaces via overwrite if needed.
+            deps.iconRegistry.unregister(id);
             deps.onContributionsChanged();
           },
         });

@@ -55,7 +55,9 @@ export class SandboxExtensionHost {
   private readonly bindWidgetClick?: (
     handler: (layerId: string) => void
   ) => () => void;
+  private mounted = false;
   private controller: SandboxExtensionController | null = null;
+  private readonly surfaceDisposables: { dispose(): void }[] = [];
   private widgetWatchDispose: (() => void) | null = null;
   private selectionWatchDispose: (() => void) | null = null;
   private widgetClickDispose: (() => void) | null = null;
@@ -74,11 +76,13 @@ export class SandboxExtensionHost {
 
   /** Attach to a narrow host surface. Call once per mount. */
   mount(host: SandboxHostSurface): void {
+    if (this.mounted) {
+      throw new Error('SandboxExtensionHost already mounted');
+    }
+    this.mounted = true;
+
     if (this.grants.length === 0) {
       return;
-    }
-    if (this.controller) {
-      throw new Error('SandboxExtensionHost already mounted');
     }
 
     const widgetLayerType = this.widgetLayerType;
@@ -156,15 +160,17 @@ export class SandboxExtensionHost {
         continue;
       }
       const extensionId = grant.id;
-      host.registerCommand(
-        new (class extends Command {
-          readonly id = `openenvx.sandbox.run.${extensionId}`;
-          readonly title = grant.title?.trim() || `Run ${extensionId}`;
-          async execute(): Promise<{ started: boolean }> {
-            await controller.start(grant);
-            return { started: true };
-          }
-        })()
+      this.surfaceDisposables.push(
+        host.registerCommand(
+          new (class extends Command {
+            readonly id = `openenvx.sandbox.run.${extensionId}`;
+            readonly title = grant.title?.trim() || `Run ${extensionId}`;
+            async execute(): Promise<{ started: boolean }> {
+              await controller.start(grant);
+              return { started: true };
+            }
+          })()
+        )
       );
     }
 
@@ -234,12 +240,16 @@ export class SandboxExtensionHost {
     this.selectionWatchDispose = null;
     this.widgetClickDispose?.();
     this.widgetClickDispose = null;
+    for (const disposable of this.surfaceDisposables.splice(0)) {
+      disposable.dispose();
+    }
     this.controller?.dispose();
     this.controller = null;
     this.modalRoot?.unmount();
     this.modalRoot = null;
     this.modalHost?.remove();
     this.modalHost = null;
+    this.mounted = false;
   }
 }
 

@@ -154,11 +154,6 @@ export {
   type SandboxExtensionHostOptions,
 } from './sandbox/sandbox-extension-host';
 export {
-  SandboxExtensionController,
-  type SandboxNotifyEvent,
-  type SandboxUiState,
-} from './sandbox/sandbox-extension-controller';
-export {
   assertJsonSerializable,
   assertMethodAllowed,
   assertUiMessagePolicy,

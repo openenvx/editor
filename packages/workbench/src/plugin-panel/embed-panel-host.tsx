@@ -65,6 +65,7 @@ export class EmbedPanelHost {
   private readonly componentId: string;
   private readonly iconId: string;
   private mounted = false;
+  private readonly surfaceDisposables: { dispose(): void }[] = [];
 
   constructor(options: EmbedPanelHostOptions) {
     this.declaration = options.declaration;
@@ -75,10 +76,10 @@ export class EmbedPanelHost {
     this.location = options.location ?? 'secondary';
     this.sidebarOrder = options.sidebarOrder ?? 50;
     this.id = `openenvx.embed-panel.${options.declaration.id}`;
-    this.containerId = `plugin.panel.${options.declaration.id}`;
+    this.containerId = `openenvx.embed-panel.${options.declaration.id}`;
     this.viewId = `${this.containerId}.view`;
     this.componentId = `${this.containerId}.component`;
-    this.iconId = `plugin.panel.icon.${options.declaration.id}`;
+    this.iconId = `openenvx.embed-panel.icon.${options.declaration.id}`;
   }
 
   mount(surface: EmbedPanelHostSurface): void {
@@ -88,7 +89,12 @@ export class EmbedPanelHost {
     this.mounted = true;
 
     if (this.declaration.icon) {
-      surface.registerIcon(this.iconId, createIconGlyph(this.declaration.icon));
+      this.surfaceDisposables.push(
+        surface.registerIcon(
+          this.iconId,
+          createIconGlyph(this.declaration.icon)
+        )
+      );
     }
 
     const declaration = this.declaration;
@@ -134,11 +140,18 @@ export class EmbedPanelHost {
       );
     };
 
-    surface.registerWorkbench(new Container(), new View());
-    surface.registerViewPanel(componentId, BoundPanel);
+    this.surfaceDisposables.push(
+      surface.registerWorkbench(new Container(), new View())
+    );
+    this.surfaceDisposables.push(
+      surface.registerViewPanel(componentId, BoundPanel)
+    );
   }
 
   dispose(): void {
+    for (const disposable of this.surfaceDisposables.splice(0)) {
+      disposable.dispose();
+    }
     this.mounted = false;
   }
 }

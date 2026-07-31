@@ -41,31 +41,52 @@ function createMount() {
       register: (id, glyph) => {
         icons.set(id, glyph);
       },
+      unregister: (id) => icons.delete(id),
       registerDefaults: () => {},
       resolve: (id) => icons.get(id) ?? null,
     },
     onContributionsChanged: vi.fn(),
   });
-  return { mount, commands, viewPanelRegistry };
+  return { mount, commands, viewPanelRegistry, icons };
 }
 
 describe('ExternalHostMount', () => {
   it('unregisters surface registrations when the mount is disposed', () => {
-    const { mount, commands, viewPanelRegistry } = createMount();
+    const { mount, commands, viewPanelRegistry, icons } = createMount();
 
     mount.mountSandbox((surface) => {
       surface.registerCommand(new TestCommand('sandbox.run.demo'));
     });
     mount.mountEmbedPanel((surface) => {
       surface.registerViewPanel('embed.panel.demo', { kind: 'panel' });
+      surface.registerIcon('embed.icon.demo', { glyph: true });
     });
 
     expect(commands.has('sandbox.run.demo')).toBe(true);
     expect(viewPanelRegistry.has('embed.panel.demo')).toBe(true);
+    expect(icons.has('embed.icon.demo')).toBe(true);
 
     mount.dispose();
 
     expect(commands.has('sandbox.run.demo')).toBe(false);
     expect(viewPanelRegistry.has('embed.panel.demo')).toBe(false);
+    expect(icons.has('embed.icon.demo')).toBe(false);
+  });
+
+  it('allows remount after dispose without duplicating registrations', () => {
+    const { mount, commands } = createMount();
+
+    const disposeFirst = mount.mountSandbox((surface) => {
+      surface.registerCommand(new TestCommand('sandbox.run.demo'));
+    });
+    disposeFirst();
+
+    mount.mountSandbox((surface) => {
+      surface.registerCommand(new TestCommand('sandbox.run.demo'));
+    });
+
+    expect(commands.has('sandbox.run.demo')).toBe(true);
+    mount.dispose();
+    expect(commands.has('sandbox.run.demo')).toBe(false);
   });
 });
