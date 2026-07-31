@@ -104,6 +104,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
       if (!layerSelectable) {
         return;
       }
+      interaction?.onClick?.(layer.id);
       if (
         interaction?.usesEditOverlay &&
         layer.id === selectedPrimary &&

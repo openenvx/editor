@@ -1,10 +1,11 @@
+import { Check } from 'lucide-react';
 import type { ButtonHTMLAttributes } from 'react';
 
 import { cn } from '../lib/cn';
 
-import styles from './switch.module.css';
+import styles from './checkbox.module.css';
 
-export interface SwitchProps extends Omit<
+export interface CheckboxProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'onChange' | 'role'
 > {
@@ -12,20 +13,20 @@ export interface SwitchProps extends Omit<
   onChange: (checked: boolean) => void;
 }
 
-/** shadcn-style pill switch — property toggles and section header enables. */
-export function Switch({
+/** shadcn-style checkbox — square control with check indicator. */
+export function Checkbox({
   checked,
   onChange,
   className,
   disabled,
   ...props
-}: SwitchProps) {
+}: CheckboxProps) {
   return (
     <button
       aria-checked={checked}
       className={cn(styles.root, checked && styles.checked, className)}
       disabled={disabled}
-      role="switch"
+      role="checkbox"
       type="button"
       onClick={(event) => {
         event.stopPropagation();
@@ -36,10 +37,14 @@ export function Switch({
       }}
       {...props}
     >
-      <span
-        className={styles.thumb}
-        data-state={checked ? 'checked' : 'unchecked'}
-      />
+      {checked ? (
+        <Check
+          aria-hidden
+          className={styles.indicator}
+          size={12}
+          strokeWidth={3}
+        />
+      ) : null}
     </button>
   );
 }

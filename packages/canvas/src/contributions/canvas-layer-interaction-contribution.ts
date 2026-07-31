@@ -37,6 +37,7 @@ export function toCanvasLayerInteractionRegistration(
     onDoubleClick: contribution.onDoubleClick?.bind(contribution),
     onLayerActivate: contribution.onLayerActivate?.bind(contribution),
     onLayerDeactivate: contribution.onLayerDeactivate?.bind(contribution),
+    onClick: contribution.onClick?.bind(contribution),
     onHandleDragEnd: contribution.onHandleDragEnd?.bind(contribution),
     onHandleDragMove: contribution.onHandleDragMove?.bind(contribution),
     onHandleDragStart: contribution.onHandleDragStart?.bind(contribution),
@@ -95,6 +96,8 @@ export abstract class CanvasLayerInteractionContribution {
   onLayerActivate?(ctx: CanvasLayerActivateContext): void;
 
   onLayerDeactivate?(layerId: string): void;
+
+  onClick?(layerId: string): void;
 
   onDoubleClick?(layerId: string): void;
 }

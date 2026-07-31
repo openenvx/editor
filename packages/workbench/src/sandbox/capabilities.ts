@@ -1,0 +1,146 @@
+import {
+  isSandboxCapability,
+  type SandboxCapability,
+  type SandboxExtensionGrant,
+  type SandboxHostMethod,
+} from '@xmazu/openenvxee-plugin-protocol';
+
+const METHOD_CAPABILITY: Partial<Record<SandboxHostMethod, SandboxCapability>> =
+  {
+    getSelection: 'document:read',
+    getPageId: 'document:read',
+    executeCommand: 'document:write',
+    showUI: 'ui:show',
+    resizeUI: 'ui:show',
+    closeUI: 'ui:show',
+    getClientStorage: 'storage:client',
+    setClientStorage: 'storage:client',
+    getSyncedState: 'widget:syncedState',
+    setSyncedState: 'widget:syncedState',
+    resizeWidget: 'widget:syncedState',
+  };
+
+/**
+ * Figma-shaped kind gates (docs):
+ * - showUI iframe is available to plugins AND widgets (optional for widgets;
+ *   primary widget UI is the on-canvas object).
+ * - clientStorage is plugin-oriented; widgets use syncedState on the node.
+ * - syncedState / resizeWidget require a widget layer.
+ */
+const PLUGIN_ONLY_METHODS = new Set<SandboxHostMethod>([
+  'getClientStorage',
+  'setClientStorage',
+]);
+
+const WIDGET_ONLY_METHODS = new Set<SandboxHostMethod>([
+  'getSyncedState',
+  'setSyncedState',
+  'resizeWidget',
+]);
+
+export function normalizeCapabilities(
+  values: readonly string[]
+): SandboxCapability[] {
+  const out: SandboxCapability[] = [];
+  const seen = new Set<string>();
+  for (const value of values) {
+    if (!isSandboxCapability(value) || seen.has(value)) {
+      continue;
+    }
+    seen.add(value);
+    out.push(value);
+  }
+  return out;
+}
+
+export function hasCapability(
+  grant: Pick<SandboxExtensionGrant, 'capabilities'>,
+  capability: SandboxCapability
+): boolean {
+  return grant.capabilities.includes(capability);
+}
+
+export function assertMethodAllowed(input: {
+  grant: SandboxExtensionGrant;
+  method: SandboxHostMethod;
+  permission: 'read' | 'edit';
+  commandId?: string;
+}): void {
+  if (PLUGIN_ONLY_METHODS.has(input.method) && input.grant.kind !== 'plugin') {
+    throw new Error(`${input.method} is plugin-only`);
+  }
+  if (WIDGET_ONLY_METHODS.has(input.method) && input.grant.kind !== 'widget') {
+    throw new Error(`${input.method} is widget-only`);
+  }
+
+  const required = METHOD_CAPABILITY[input.method];
+  if (required && !hasCapability(input.grant, required)) {
+    throw new Error(`Capability denied: ${required}`);
+  }
+
+  const requiresEdit =
+    input.method === 'executeCommand' ||
+    input.method === 'setSyncedState' ||
+    input.method === 'resizeWidget' ||
+    input.method === 'setClientStorage';
+  if (requiresEdit && input.permission !== 'edit') {
+    throw new Error('Session is read-only');
+  }
+
+  if (input.method === 'executeCommand') {
+    const commandId = input.commandId?.trim() ?? '';
+    if (!commandId) {
+      throw new Error('commandId required');
+    }
+    if (!input.grant.allowedCommands.includes(commandId)) {
+      throw new Error(`Command not allowlisted: ${commandId}`);
+    }
+  }
+}
+
+export function assertJsonSerializable(
+  value: unknown,
+  label = 'payload'
+): void {
+  const seen = new Set<unknown>();
+  const walk = (node: unknown): void => {
+    if (
+      node === null ||
+      typeof node === 'string' ||
+      typeof node === 'number' ||
+      typeof node === 'boolean'
+    ) {
+      return;
+    }
+    if (
+      typeof node === 'bigint' ||
+      typeof node === 'function' ||
+      typeof node === 'symbol' ||
+      node === undefined
+    ) {
+      throw new TypeError(`${label} is not JSON-serializable`);
+    }
+    if (typeof node !== 'object') {
+      throw new TypeError(`${label} is not JSON-serializable`);
+    }
+    if (seen.has(node)) {
+      throw new Error(`${label} is not JSON-serializable`);
+    }
+    seen.add(node);
+    if (Array.isArray(node)) {
+      for (const item of node) {
+        walk(item);
+      }
+      return;
+    }
+    for (const child of Object.values(node as Record<string, unknown>)) {
+      walk(child);
+    }
+  };
+  try {
+    walk(value);
+    JSON.stringify(value);
+  } catch {
+    throw new Error(`${label} is not JSON-serializable`);
+  }
+}

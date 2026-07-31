@@ -130,11 +130,18 @@ function createPropertyLayoutVisitor(
         );
       }
 
+      const rowVariant =
+        node.field.kind === 'toggle' || node.field.kind === 'checkbox'
+          ? 'switch'
+          : node.field.kind === 'select'
+            ? 'inline'
+            : 'default';
+
       return (
         <PropertyFieldRow
           htmlFor={getFieldId(context.layerId, node.field.key)}
           label={node.label}
-          variant={node.field.kind === 'toggle' ? 'switch' : 'default'}
+          variant={rowVariant}
         >
           {control}
         </PropertyFieldRow>

@@ -11,7 +11,7 @@
   align-items: center;
   gap: var(--wb-space-1);
   min-height: 36px;
-  padding: 0 var(--wb-space-3);
+  padding: var(--wb-space-3) var(--wb-space-4);
 }
 
 .header,
@@ -59,5 +59,13 @@
 }
 
 .body {
-  padding: 0 var(--wb-space-3) var(--wb-space-3);
+  padding: 0 var(--wb-space-4) var(--wb-space-4);
+}
+
+/* Flat properties views (collapsible: false, no section header) */
+.flatBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-space-1);
+  padding: var(--wb-space-4);
 }

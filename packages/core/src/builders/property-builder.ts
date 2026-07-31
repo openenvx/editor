@@ -13,6 +13,7 @@ export type PropertyFieldKind =
   | 'text'
   | 'number'
   | 'toggle'
+  | 'checkbox'
   | 'select'
   | 'font'
   | 'color'
@@ -93,6 +94,12 @@ export class PropertyBuilder implements FieldHost {
 
   toggle(key: string, label?: string, config?: FieldConfigOptions): this {
     this.pushField({ key, kind: 'toggle', label: label ?? key });
+    this.applyConfigToLast(config);
+    return this;
+  }
+
+  checkbox(key: string, label?: string, config?: FieldConfigOptions): this {
+    this.pushField({ key, kind: 'checkbox', label: label ?? key });
     this.applyConfigToLast(config);
     return this;
   }
@@ -316,6 +323,12 @@ class PropertySectionBuilder {
 
   toggle(key: string, label?: string, config?: FieldConfigOptions): this {
     this.pushField({ key, kind: 'toggle', label: label ?? key });
+    this.applyConfigToLast(config);
+    return this;
+  }
+
+  checkbox(key: string, label?: string, config?: FieldConfigOptions): this {
+    this.pushField({ key, kind: 'checkbox', label: label ?? key });
     this.applyConfigToLast(config);
     return this;
   }

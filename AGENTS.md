@@ -7,6 +7,17 @@ Instructions for coding agents working in the OpenEnvx monorepo.
 - **Never create or use git worktrees** (`git worktree`, isolated worktree agents, etc.). Work only in this checkout.
 - **Never commit** (and never push). Leave staging and commits to the human; do not run `git commit` unless they explicitly ask in that message.
 
+## Thermos / thermo-nuclear reviews
+
+When using thermos skills (thermo-nuclear review, thermo-nuclear code-quality review, or similar) to review code, go beyond bugs and style. **Especially** look for:
+
+- **Architecture** — package/module boundaries, contribution flow, whether code lives in the right package (`core` / `headless` / `canvas` / host), and fit with [Architecture.md](Architecture.md) / [Plugin-boundaries.md](Plugin-boundaries.md)
+- **Tight coupling** — cross-package imports that skip the public surface, host/shell leaking into libraries, scene/UI entangled with protocol or sandbox concerns; flag spaghetti and push SOLID / KISS so modules stay loosely coupled and easy to change
+- **Design patterns** — where a known pattern would clarify or shrink the design (and whether existing ones—contributions, registries, property paths, sandbox bridges—are followed or duplicated ad hoc)
+- **Refactor opportunities** — extract shared helpers once, delete dead paths, simplify over-built abstractions; prefer a concrete follow-up over vague “could be cleaner”
+
+Call these out as first-class findings, not afterthoughts.
+
 ## What this repo is
 
 OpenEnvx is a composable visual editor framework: plugins register layers, commands, and UI contributions; a headless controller owns scene state; apps compose their own React shell. The monorepo uses **Bun** workspaces:

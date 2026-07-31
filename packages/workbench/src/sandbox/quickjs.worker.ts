@@ -1,0 +1,88 @@
+/// <reference lib="webworker" />
+
+import type {
+  SandboxBridgeRequest,
+  SandboxBridgeResponse,
+} from '@xmazu/openenvxee-plugin-protocol';
+
+import {
+  createQuickJsEngine,
+  type QuickJsEngine,
+} from './quickjs-isolate-engine';
+import type { HostToWorker, WorkerToHost } from './quickjs-worker-protocol';
+
+declare const self: DedicatedWorkerGlobalScope;
+
+const pendingHost = new Map<
+  string,
+  {
+    resolve: (value: SandboxBridgeResponse) => void;
+    reject: (error: Error) => void;
+  }
+>();
+
+let engine: QuickJsEngine | null = null;
+
+function post(message: WorkerToHost): void {
+  // oxlint-disable-next-line unicorn/require-post-message-target-origin -- DedicatedWorker
+  self.postMessage(message);
+}
+
+async function ensureEngine(): Promise<QuickJsEngine> {
+  if (engine) {
+    return engine;
+  }
+  engine = await createQuickJsEngine({
+    onHostCall: (request: SandboxBridgeRequest) =>
+      new Promise<SandboxBridgeResponse>((resolve, reject) => {
+        const callId = Math.random().toString(36).slice(2);
+        pendingHost.set(callId, { resolve, reject });
+        post({ type: 'hostCall', callId, request });
+      }),
+  });
+  return engine;
+}
+
+self.onmessage = (event: MessageEvent<HostToWorker>) => {
+  const message = event.data;
+  void (async () => {
+    try {
+      if (message.type === 'dispose') {
+        for (const pending of pendingHost.values()) {
+          pending.reject(new Error('Sandbox disposed'));
+        }
+        pendingHost.clear();
+        engine?.dispose();
+        engine = null;
+        return;
+      }
+      if (message.type === 'hostResult') {
+        const pending = pendingHost.get(message.callId);
+        if (!pending) {
+          return;
+        }
+        pendingHost.delete(message.callId);
+        pending.resolve(message.response);
+        return;
+      }
+      if (message.type === 'eval') {
+        const qjs = await ensureEngine();
+        await qjs.evalModule(message.source);
+        post({ type: 'evalDone', requestId: message.requestId });
+      }
+    } catch (error) {
+      const text = error instanceof Error ? error.message : String(error);
+      if (message.type === 'eval') {
+        post({
+          type: 'evalError',
+          requestId: message.requestId,
+          error: text,
+        });
+        return;
+      }
+      post({ type: 'fatal', error: text });
+    }
+  })();
+};
+
+post({ type: 'ready' });

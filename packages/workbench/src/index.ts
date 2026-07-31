@@ -146,3 +146,20 @@ export {
   MAX_PLUGIN_TREE_JSON_CHARS,
   type PluginTreeValidationResult,
 } from '@xmazu/openenvxee-plugin-protocol';
+
+export {
+  SandboxExtensionPlugin,
+  type SandboxExtensionPluginOptions,
+} from './sandbox/sandbox-extension-plugin';
+export {
+  assertJsonSerializable,
+  assertMethodAllowed,
+  hasCapability,
+  normalizeCapabilities,
+} from './sandbox/capabilities';
+export { fetchAndVerifyArtifact, sha256Hex } from './sandbox/fetch-artifact';
+export { createSandboxHostBridge } from './sandbox/host-bridge';
+export {
+  PluginUiFrame,
+  type PluginUiFrameProps,
+} from './sandbox/plugin-ui-frame';

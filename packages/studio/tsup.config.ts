@@ -42,7 +42,14 @@ function externalCssRelativeToDist(): Plugin {
 }
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: {
+    index: 'src/index.ts',
+    // Dedicated Worker entry — QuickJS runs off the editor UI thread (Figma-style).
+    'sandbox-worker': path.join(
+      packagesRoot,
+      'workbench/src/sandbox/quickjs.worker.ts'
+    ),
+  },
   format: ['esm'],
   dts: false,
   bundle: true,
@@ -53,6 +60,7 @@ export default defineConfig({
   tsconfig: 'tsconfig.build.json',
   noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/],
   external: [
+    'quickjs-emscripten',
     'react',
     'react-dom',
     'react/jsx-runtime',

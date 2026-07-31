@@ -9,8 +9,12 @@ export interface PropertyFieldRowProps {
   htmlFor?: string;
   children: ReactNode;
   className?: string;
-  /** `switch`: flex h-9 truncate label + trailing control (toggles). Default: 56px grid. */
-  variant?: 'default' | 'switch';
+  /**
+   * `switch`: flex label + trailing toggle.
+   * `inline`: flex label + growing control (select / settings).
+   * Default: 56px label grid (X/Y/W/H).
+   */
+  variant?: 'default' | 'switch' | 'inline';
 }
 
 export function PropertyFieldRow({
@@ -25,6 +29,7 @@ export function PropertyFieldRow({
       className={cn(
         styles.fieldRow,
         variant === 'switch' && styles.fieldRowSwitch,
+        variant === 'inline' && styles.fieldRowInline,
         className
       )}
     >

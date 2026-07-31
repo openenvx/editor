@@ -22,6 +22,8 @@ import { PanelSection } from '../primitives/panel-section';
 import { PropertyContentRenderer } from './property-content-renderer';
 import { ViewPanelRenderer } from './view-panel-renderer';
 
+import panelSectionStyles from '../primitives/panel-section.module.css';
+
 function defaultPropertyHostContext(
   options: PropertyPathContextOptions
 ): PropertyHostContext {
@@ -200,7 +202,7 @@ function PropertiesViewSection({
             {body}
           </PanelSection>
         ) : (
-          body
+          <div className={panelSectionStyles.flatBody}>{body}</div>
         )}
       </div>
     );

@@ -1,7 +1,7 @@
 {
   "name": "@xmazu/openenvxee-studio",
-  "version": "0.1.19",
-  "description": "OpenEnvx Studio — workbench UI, canvas, canvas-pro, and agent bundled for host apps",
+  "version": "0.2.4",
+  "description": "OpenEnvx Studio \u2014 workbench UI, canvas, canvas-pro, and agent bundled for host apps",
   "license": "UNLICENSED",
   "type": "module",
   "files": [
@@ -56,7 +56,8 @@
     "react-colorful": "^5.7.0",
     "react-i18next": "^17.0.8",
     "react-konva": "^19.2.5",
-    "zod": "4.4.3"
+    "zod": "4.4.3",
+    "quickjs-emscripten": "0.32.0"
   },
   "devDependencies": {
     "@openenvx/agent": "workspace:*",

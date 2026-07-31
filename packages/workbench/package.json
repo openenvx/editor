@@ -1,7 +1,7 @@
 {
   "name": "@xmazu/openenvxee-workbench",
   "version": "0.1.4",
-  "description": "React workbench UI — editor layout, primitives, and descriptor renderers",
+  "description": "React workbench UI \u2014 editor layout, primitives, and descriptor renderers",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
@@ -35,7 +35,8 @@
     "lucide-react": "1.23.0",
     "react-colorful": "^5.7.0",
     "react-i18next": "^17.0.8",
-    "zod": "4.4.3"
+    "zod": "4.4.3",
+    "quickjs-emscripten": "0.32.0"
   },
   "devDependencies": {
     "@openenvx/typescript-config": "workspace:*",

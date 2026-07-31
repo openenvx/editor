@@ -467,6 +467,7 @@ Property form controls are **descriptor → registered renderer**, not ad-hoc JS
 | `number` | Scrub / NumberInput | Dimensions, gaps, sizes |
 | `select` | Select | Discrete enums (H1–H4, fit mode) |
 | `toggle` | Switch (pill) | Optional visibility, flags |
+| `checkbox` | Checkbox (square) | Multi-select flags, list row booleans |
 | `color` | Color swatch + popover | Fill, overlay, text color |
 | `image` | Image input (+ optional upload) | Backgrounds, media refs — **not** a plain text URL field |
 | `richText` | TipTap-backed rich text | Body / heading content |

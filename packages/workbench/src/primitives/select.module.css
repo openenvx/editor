@@ -9,13 +9,14 @@
   justify-content: space-between;
   gap: var(--wb-space-2);
   width: 100%;
-  height: var(--wb-icon-button-size);
-  padding: var(--wb-space-1) 10px;
+  height: var(--wb-control-height);
+  padding: 0 var(--wb-space-3);
   border: none;
   border-radius: var(--wb-radius-control);
   background: var(--wb-muted);
   color: var(--wb-foreground);
   font-size: var(--wb-text-sm);
+  line-height: 1;
   box-shadow: var(--wb-shadow-control);
   cursor: pointer;
 }

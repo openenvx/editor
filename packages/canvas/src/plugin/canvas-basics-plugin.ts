@@ -84,6 +84,7 @@ import { CanvasInstanceLayer } from '../layers/canvas-instance-layer';
 import { CanvasRectLayer } from '../layers/canvas-rect-layer';
 import { CanvasSvgLayer } from '../layers/canvas-svg-layer';
 import { CanvasTextLayer } from '../layers/canvas-text-layer';
+import { OpenEnvxWidgetLayer } from '../layers/openenvx-widget-layer';
 import { getDefaultPageDimensions } from '../page-presets';
 import { resizeSceneToPagePreset } from '../page-resize/apply-page-preset-resize';
 import {
@@ -141,6 +142,38 @@ export class InsertCanvasTextCommand extends Command {
       createLayerId('text'),
       page
     );
+    insertCanvasLayer(ctx, layer);
+  }
+}
+
+export class InsertOpenEnvxWidgetCommand extends Command {
+  readonly id = 'canvas.insertWidget';
+
+  canExecute(ctx: CommandContext): boolean {
+    return canInsertOnActivePage(ctx);
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const page = ctx.scene.getActivePage();
+    const layer = new OpenEnvxWidgetLayer().createDefault(
+      createLayerId('widget'),
+      page
+    );
+    const pluginId =
+      args &&
+      typeof args === 'object' &&
+      typeof (args as { pluginId?: unknown }).pluginId === 'string'
+        ? (args as { pluginId: string }).pluginId.trim()
+        : '';
+    if (pluginId) {
+      layer.data = {
+        ...(layer.data as Record<string, unknown>),
+        pluginId,
+        label: pluginId,
+        syncedState: {},
+      };
+      layer.name = pluginId;
+    }
     insertCanvasLayer(ctx, layer);
   }
 }
@@ -283,7 +316,9 @@ export class CanvasBasicsPlugin extends Plugin {
       new CanvasCircleLayer(),
       new CanvasGroupLayer(),
       new CanvasInstanceLayer(),
+      new OpenEnvxWidgetLayer(),
       new InsertCanvasTextCommand(),
+      new InsertOpenEnvxWidgetCommand(),
       new InsertCanvasImageCommand(),
       new InsertCanvasSvgCommand(),
       new InsertCanvasRectCommand(),

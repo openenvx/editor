@@ -107,5 +107,7 @@ export interface CanvasLayerInteractionRegistration {
   ) => boolean;
   onLayerActivate?: (ctx: CanvasLayerActivateContext) => void;
   onLayerDeactivate?: (layerId: string) => void;
+  /** Fired on canvas pointer click (before/with selection). */
+  onClick?: (layerId: string) => void;
   onDoubleClick?: (layerId: string) => void;
 }

@@ -1,20 +1,22 @@
-/* shadcn Switch grammar — primary track, contrasting thumb, inset ring */
+/* shadcn Checkbox grammar — square, primary fill when checked */
 .root {
-  position: relative;
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  width: 32px;
-  height: 18px;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
   padding: 0;
-  border: 1px solid transparent;
-  border-radius: var(--wb-radius-full);
+  border: 1px solid var(--wb-border-subtle);
+  border-radius: var(--wb-radius-sm);
   background: var(--wb-muted);
+  color: var(--wb-primary-foreground);
   box-shadow: var(--wb-shadow-control);
   cursor: pointer;
   outline: none;
   transition:
     background 0.15s ease,
+    border-color 0.15s ease,
     box-shadow 0.15s ease;
 }
 
@@ -32,6 +34,7 @@
 }
 
 .checked {
+  border-color: var(--wb-primary);
   background: var(--wb-primary);
   box-shadow: none;
 }
@@ -40,21 +43,7 @@
   opacity: 0.92;
 }
 
-.thumb {
+.indicator {
   display: block;
-  width: 14px;
-  height: 14px;
-  border-radius: var(--wb-radius-full);
-  background: var(--wb-foreground);
-  box-shadow: var(--wb-shadow-sm);
-  transform: translateX(2px);
-  transition:
-    transform 0.15s ease,
-    background 0.15s ease;
   pointer-events: none;
-}
-
-.checked .thumb {
-  background: var(--wb-primary-foreground);
-  transform: translateX(16px);
 }

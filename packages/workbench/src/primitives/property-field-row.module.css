@@ -9,10 +9,11 @@
 .fieldRowSwitch {
   display: flex;
   grid-template-columns: unset;
-  height: 36px;
+  align-items: center;
+  min-height: 36px;
   margin-bottom: 0;
-  gap: var(--wb-space-1);
-  padding: 0;
+  gap: var(--wb-space-3);
+  padding: var(--wb-space-1) 0;
 }
 
 .fieldRowSwitch .label {
@@ -24,7 +25,7 @@
   font-size: var(--wb-text-sm);
   font-weight: 500;
   line-height: 16px;
-  color: var(--wb-muted-foreground);
+  color: var(--wb-foreground);
 }
 
 .fieldRowSwitch .control {
@@ -32,6 +33,35 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+
+/* Label + growing control (select / settings rows) */
+.fieldRowInline {
+  display: flex;
+  grid-template-columns: unset;
+  align-items: center;
+  gap: var(--wb-space-3);
+  min-height: 36px;
+  margin-bottom: var(--wb-space-2);
+}
+
+.fieldRowInline .label {
+  flex: 0 1 auto;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--wb-text-sm);
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--wb-muted-foreground);
+}
+
+.fieldRowInline .control {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
 }
 
 .label {

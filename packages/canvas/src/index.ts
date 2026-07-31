@@ -113,6 +113,10 @@ export {
   type ImageNaturalSize,
 } from './image-fit';
 export { ImageCanvasInteraction } from './interactions/image-canvas-interaction';
+export {
+  emitOpenEnvxWidgetClick,
+  setOpenEnvxWidgetClickHandler,
+} from './interactions/widget-click-handler';
 export { useLoadedImage } from './renderers/image-canvas-renderer';
 export {
   CANVAS_FONT_CATALOG,
@@ -158,6 +162,12 @@ export {
   canvasTextSchema,
   type CanvasTextModel,
 } from './layers/canvas-text-layer';
+export {
+  OpenEnvxWidgetLayer,
+  WIDGET_LAYER_TYPE,
+  openenvxWidgetSchema,
+  type OpenEnvxWidgetModel,
+} from './layers/openenvx-widget-layer';
 export {
   CanvasImageLayer,
   canvasImageSchema,

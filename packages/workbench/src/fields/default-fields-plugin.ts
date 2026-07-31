@@ -16,6 +16,7 @@ import {
   PaddingFieldRenderer,
   ShadowFieldRenderer,
 } from './advanced/spatial-field';
+import { CheckboxFieldRenderer } from './basic/checkbox-field';
 import { NumberFieldRenderer } from './basic/number-field';
 import { SelectFieldRenderer } from './basic/select-field';
 import { TextFieldRenderer } from './basic/text-field';
@@ -24,6 +25,7 @@ import { ToggleFieldRenderer } from './basic/toggle-field';
 const DEFAULT_FIELD_RENDERERS: { kind: string; Component: unknown }[] = [
   { kind: 'align', Component: AlignFieldRenderer },
   { kind: 'border', Component: BorderFieldRenderer },
+  { kind: 'checkbox', Component: CheckboxFieldRenderer },
   { kind: 'color', Component: ColorFieldRenderer },
   { kind: 'cornerRadius', Component: CornerRadiusFieldRenderer },
   { kind: 'font', Component: FontFieldRenderer },

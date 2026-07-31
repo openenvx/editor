@@ -81,6 +81,12 @@ The protocol shape is enough as the **interaction model**. Seal these before tre
 
 Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/public/embed-parent.html) at `/embed-parent.html`; the iframe loads `/?embed=1` with `PluginPanelPlugin` (`contextScope: 'selection'`, empty `allowedCommands`, no manifest).
 
+## QuickJS sandbox (Phase V.1)
+
+Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionPlugin` (workbench `SandboxExtensionPlugin` + canvas widget click bind): **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe; `openenvx.widget` canvas nodes carry local synced state. Bundles load from session-granted signed URLs + content hashes (minted by openenvx-cloud). Marketplace distribution remains deferred.
+
+See openenvx-cloud `docs/embed/plugin-api.md`.
+
 ## Cloud-hosted / marketplace plugins
 
 If OpenEnvx Cloud hosts plugins “added by people,” **only the other endpoint moves**. Studio’s job stays the same: speak the protocol.
@@ -112,7 +118,7 @@ Rules if you sandbox JS:
 - No DOM, no `fetch` by default, no Studio imports
 - Only I/O is the protocol (context/event in → tree/command out)
 - Cap CPU, memory, and tree size (tree caps already exist)
-- Run in a **Worker or side iframe**, never `eval` / dynamic `import()` in the editor bundle
+- Run in a **Worker** only in production hosts (never `eval` / dynamic `import()` / in-process QuickJS on the editor UI thread). Unit tests may set `preferInProcess: true`.
 - Capabilities stay host-side (`allowedCommands`, `contextScope`, privileged `panel:manifest`)
 
 Cloudflare Workers already provide V8 isolates — often enough without shipping QuickJS yourself. QuickJS-in-Wasm is useful when the same tiny sandbox must run in browser _and_ on the server.

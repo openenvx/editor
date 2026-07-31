@@ -51,7 +51,7 @@
       "project": ["src/**/*.{ts,tsx}", "!src/**/*.test.ts"]
     },
     "packages/workbench": {
-      "entry": ["src/index.ts!"],
+      "entry": ["src/index.ts!", "src/sandbox/quickjs.worker.ts!"],
       "project": [
         "src/**/*.{ts,tsx}",
         "!src/**/*.test.ts",
@@ -82,6 +82,7 @@
         "i18next",
         "konva",
         "lucide-react",
+        "quickjs-emscripten",
         "react-colorful",
         "react-i18next",
         "react-konva",
