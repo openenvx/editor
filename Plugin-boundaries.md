@@ -213,7 +213,7 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 | Concern | Package |
 | --- | --- |
 | Element vocabulary, `h`/jsx, messages, `validatePluginTree`, sandbox grant types | `@xmazu/openenvxee-plugin-protocol` (published) |
-| Tree → builder mappers, plugin host context, manifest → contributions, `SandboxHostSurface` / `EmbedPanelHostSurface`, `mountSandboxHost` / `mountEmbedPanelHost` | `@openenvx/headless` |
+| Tree → builder mappers, plugin host context, manifest → contributions, `ExternalHostMount`, `SandboxHostSurface` / `EmbedPanelHostSurface`, `mountSandboxHost` / `mountEmbedPanelHost` | `@openenvx/headless` |
 | `EmbedPanelHost`, `SandboxExtensionHost`, `PluginPanel`, postMessage transport, command gate, sandbox runtime | `@xmazu/openenvxee-workbench` |
 | Internal OOP plugins + builders | `@openenvx/core`, `@openenvx/headless`, product plugins (`canvas-pro`, …) |
 

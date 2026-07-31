@@ -11,7 +11,6 @@ import {
   setTemplatePolicyEnforced,
   updateLayerInTree,
   WorkbenchEvents,
-  type Command,
   type CommandExecutionResult,
   type EditorInput,
   type Plugin,
@@ -25,8 +24,7 @@ import {
 
 import { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
 import type { ViewContainerLocation } from './contributions/view-contribution';
-import type { EmbedPanelHostSurface } from './external-host/embed-panel-host-surface';
-import type { SandboxHostSurface } from './external-host/sandbox-host-surface';
+import { ExternalHostMount } from './external-host/external-host-mount';
 import { ViewProviderRegistryImpl } from './registries/view-provider-registry';
 import type { WorkbenchProviderRegistries } from './registries/workbench-provider-registries';
 import {
@@ -103,7 +101,7 @@ export class WorkbenchController {
     WorkbenchContributionDisposable[]
   >();
   /** External hosts (sandbox / embed) — separate from PluginManager. */
-  private readonly externalHostDisposables = new Set<() => void>();
+  private readonly externalHosts: ExternalHostMount;
   private applyingLayoutSnapshot = false;
 
   constructor(private readonly options: WorkbenchControllerOptions) {
@@ -123,6 +121,29 @@ export class WorkbenchController {
     );
     this.manager = new PluginManager(this.runtime);
     this.registerCoreServices();
+    this.externalHosts = new ExternalHostMount({
+      getSceneStore: () => this.runtime.getScene(),
+      getEvents: () => this.runtime.getEvents(),
+      runCommand: async (commandId, args) => {
+        const result = await this.runCommand(commandId, args);
+        return { executed: result.executed };
+      },
+      registerCommand: (command) => {
+        this.manager.getRegistries().commands.register(command);
+      },
+      unregisterCommand: (commandId) => {
+        this.manager.getRegistries().commands.unregister(commandId);
+      },
+      onCommandsChanged: () => {
+        this.stateCache.invalidateCommands();
+        this.notify();
+      },
+      registerWorkbenchContributions: (...contributions) =>
+        this.registerWorkbenchContributions(...contributions),
+      viewPanelRegistry: this.providerRegistries.viewPanelRegistry,
+      iconRegistry: this.runtime.services.get(IconRegistryId),
+      onContributionsChanged: () => this.invalidateContributions(),
+    });
     this.syncLayoutContextKeys();
     this.wireStateRefresh();
   }
@@ -244,8 +265,9 @@ export class WorkbenchController {
       getService: (token) => this.getService(token),
       registerWorkbenchContributions: (...contributions) =>
         this.registerWorkbenchContributions(...contributions),
-      mountSandboxHost: (activate) => this.mountSandboxHost(activate),
-      mountEmbedPanelHost: (activate) => this.mountEmbedPanelHost(activate),
+      mountSandboxHost: (activate) => this.externalHosts.mountSandbox(activate),
+      mountEmbedPanelHost: (activate) =>
+        this.externalHosts.mountEmbedPanel(activate),
       getSnapshot: () => this.getState(),
       loadScene: (scene) => this.loadScene(scene),
       moveViewItem: (viewId, source, target, position) =>
@@ -413,127 +435,6 @@ export class WorkbenchController {
           disposable.dispose();
         }
         this.invalidateContributions();
-      },
-    };
-  }
-
-  /**
-   * Mount a sandbox extension host on a narrow {@link SandboxHostSurface}.
-   * Not a PluginManager activation — untrusted isolates never see this surface.
-   */
-  mountSandboxHost(
-    activate: (surface: SandboxHostSurface) => void | (() => void)
-  ): () => void {
-    const tracked: WorkbenchContributionDisposable[] = [];
-    const surface = this.createSandboxHostSurface((disposable) => {
-      tracked.push(disposable);
-    });
-    const hostDispose = activate(surface);
-    const dispose = () => {
-      hostDispose?.();
-      for (const disposable of tracked) {
-        disposable.dispose();
-      }
-      tracked.length = 0;
-      this.externalHostDisposables.delete(dispose);
-    };
-    this.externalHostDisposables.add(dispose);
-    return dispose;
-  }
-
-  /**
-   * Mount an embed panel host on a narrow {@link EmbedPanelHostSurface}.
-   * Not a PluginManager activation — protocol authors never see this surface.
-   */
-  mountEmbedPanelHost(
-    activate: (surface: EmbedPanelHostSurface) => void | (() => void)
-  ): () => void {
-    const tracked: WorkbenchContributionDisposable[] = [];
-    const surface = this.createEmbedPanelHostSurface((disposable) => {
-      tracked.push(disposable);
-    });
-    const hostDispose = activate(surface);
-    const dispose = () => {
-      hostDispose?.();
-      for (const disposable of tracked) {
-        disposable.dispose();
-      }
-      tracked.length = 0;
-      this.externalHostDisposables.delete(dispose);
-    };
-    this.externalHostDisposables.add(dispose);
-    return dispose;
-  }
-
-  private createSandboxHostSurface(
-    trackDisposable: (disposable: WorkbenchContributionDisposable) => void
-  ): SandboxHostSurface {
-    const scene = this.runtime.getScene();
-    const events = this.runtime.getEvents();
-    return {
-      getSelection: () => scene.getSelection(),
-      getScene: () => scene.getScene(),
-      apply: (transaction) => scene.apply(transaction),
-      onDidChangeScene: (listener) =>
-        scene.onDidChangeScene(() => listener()).dispose,
-      onDidChangeSelection: (listener) =>
-        events.onDidChangeSelection(() => listener()).dispose,
-      executeCommand: async (commandId, args) => {
-        const result = await this.runCommand(commandId, args);
-        return { executed: result.executed };
-      },
-      registerCommand: (command: Command) => {
-        this.manager.getRegistries().commands.register(command);
-        this.stateCache.invalidateCommands();
-        this.notify();
-        const disposable: WorkbenchContributionDisposable = {
-          dispose: () => {
-            this.manager.getRegistries().commands.unregister(command.id);
-            this.stateCache.invalidateCommands();
-            this.notify();
-          },
-        };
-        trackDisposable(disposable);
-        return disposable;
-      },
-    };
-  }
-
-  private createEmbedPanelHostSurface(
-    trackDisposable: (disposable: WorkbenchContributionDisposable) => void
-  ): EmbedPanelHostSurface {
-    const track = (
-      disposable: WorkbenchContributionDisposable
-    ): WorkbenchContributionDisposable => {
-      trackDisposable(disposable);
-      return disposable;
-    };
-    return {
-      registerWorkbench: (...contributions) =>
-        track(this.registerWorkbenchContributions(...contributions)),
-      registerViewPanel: (componentId, component) => {
-        this.providerRegistries.viewPanelRegistry.register(
-          componentId,
-          component
-        );
-        this.invalidateContributions();
-        return track({
-          dispose: () => {
-            this.providerRegistries.viewPanelRegistry.unregister(componentId);
-            this.invalidateContributions();
-          },
-        });
-      },
-      registerIcon: (id, glyph) => {
-        const registry = this.runtime.services.get(IconRegistryId);
-        registry.register(id, glyph);
-        this.invalidateContributions();
-        return track({
-          dispose: () => {
-            // IconRegistry has no unregister; remount replaces via overwrite if needed.
-            this.invalidateContributions();
-          },
-        });
       },
     };
   }
@@ -834,11 +735,7 @@ export class WorkbenchController {
       return;
     }
     this.disposed = true;
-    const externalDisposers = [...this.externalHostDisposables];
-    this.externalHostDisposables.clear();
-    for (const dispose of externalDisposers) {
-      dispose();
-    }
+    this.externalHosts.dispose();
     this.detachKeybindings?.();
     this.detachKeybindings = null;
     for (const dispose of this.eventDisposables) {

@@ -1,0 +1,157 @@
+import type {
+  Command,
+  IconRegistry,
+  Registry,
+  Scene,
+  SceneStore,
+  SceneTransaction,
+} from '@openenvx/core';
+
+import type { WorkbenchContributionDisposable } from '../registries/workbench-registries';
+import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
+import type { EmbedPanelHostSurface } from './embed-panel-host-surface';
+import type { SandboxHostSurface } from './sandbox-host-surface';
+
+export interface ExternalHostMountDeps {
+  getSceneStore: () => SceneStore;
+  getEvents: () => {
+    onDidChangeSelection: (listener: () => void) => { dispose: () => void };
+  };
+  runCommand: (
+    commandId: string,
+    args?: unknown
+  ) => Promise<{ executed: boolean }>;
+  registerCommand: (command: Command) => void;
+  unregisterCommand: (commandId: string) => void;
+  onCommandsChanged: () => void;
+  registerWorkbenchContributions: (
+    ...contributions: WorkbenchContribution[]
+  ) => WorkbenchContributionDisposable;
+  viewPanelRegistry: Registry<string, unknown>;
+  iconRegistry: IconRegistry;
+  onContributionsChanged: () => void;
+}
+
+/**
+ * Deep module for external host mount lifecycle + narrow surface construction.
+ * Isolates / iframes never see this — only first-party Host adapters hold surfaces.
+ */
+export class ExternalHostMount {
+  private readonly disposables = new Set<() => void>();
+
+  constructor(private readonly deps: ExternalHostMountDeps) {}
+
+  mountSandbox(
+    activate: (surface: SandboxHostSurface) => void | (() => void)
+  ): () => void {
+    const tracked: WorkbenchContributionDisposable[] = [];
+    const surface = this.createSandboxHostSurface((disposable) => {
+      tracked.push(disposable);
+    });
+    const hostDispose = activate(surface);
+    return this.trackMount(hostDispose, tracked);
+  }
+
+  mountEmbedPanel(
+    activate: (surface: EmbedPanelHostSurface) => void | (() => void)
+  ): () => void {
+    const tracked: WorkbenchContributionDisposable[] = [];
+    const surface = this.createEmbedPanelHostSurface((disposable) => {
+      tracked.push(disposable);
+    });
+    const hostDispose = activate(surface);
+    return this.trackMount(hostDispose, tracked);
+  }
+
+  dispose(): void {
+    const disposers = [...this.disposables];
+    this.disposables.clear();
+    for (const dispose of disposers) {
+      dispose();
+    }
+  }
+
+  private trackMount(
+    hostDispose: void | (() => void),
+    tracked: WorkbenchContributionDisposable[]
+  ): () => void {
+    const dispose = () => {
+      hostDispose?.();
+      for (const disposable of tracked) {
+        disposable.dispose();
+      }
+      tracked.length = 0;
+      this.disposables.delete(dispose);
+    };
+    this.disposables.add(dispose);
+    return dispose;
+  }
+
+  private createSandboxHostSurface(
+    trackDisposable: (disposable: WorkbenchContributionDisposable) => void
+  ): SandboxHostSurface {
+    const { deps } = this;
+    return {
+      getSelection: () => deps.getSceneStore().getSelection(),
+      getScene: (): Scene => deps.getSceneStore().getScene(),
+      apply: (transaction: SceneTransaction) =>
+        deps.getSceneStore().apply(transaction),
+      onDidChangeScene: (listener) =>
+        deps.getSceneStore().onDidChangeScene(() => listener()).dispose,
+      onDidChangeSelection: (listener) =>
+        deps.getEvents().onDidChangeSelection(() => listener()).dispose,
+      executeCommand: async (commandId, args) => {
+        const result = await deps.runCommand(commandId, args);
+        return { executed: result.executed };
+      },
+      registerCommand: (command: Command) => {
+        deps.registerCommand(command);
+        deps.onCommandsChanged();
+        const disposable: WorkbenchContributionDisposable = {
+          dispose: () => {
+            deps.unregisterCommand(command.id);
+            deps.onCommandsChanged();
+          },
+        };
+        trackDisposable(disposable);
+        return disposable;
+      },
+    };
+  }
+
+  private createEmbedPanelHostSurface(
+    trackDisposable: (disposable: WorkbenchContributionDisposable) => void
+  ): EmbedPanelHostSurface {
+    const { deps } = this;
+    const track = (
+      disposable: WorkbenchContributionDisposable
+    ): WorkbenchContributionDisposable => {
+      trackDisposable(disposable);
+      return disposable;
+    };
+    return {
+      registerWorkbench: (...contributions) =>
+        track(deps.registerWorkbenchContributions(...contributions)),
+      registerViewPanel: (componentId, component) => {
+        deps.viewPanelRegistry.register(componentId, component);
+        deps.onContributionsChanged();
+        return track({
+          dispose: () => {
+            deps.viewPanelRegistry.unregister(componentId);
+            deps.onContributionsChanged();
+          },
+        });
+      },
+      registerIcon: (id, glyph) => {
+        deps.iconRegistry.register(id, glyph);
+        deps.onContributionsChanged();
+        return track({
+          dispose: () => {
+            // IconRegistry has no unregister; remount replaces via overwrite if needed.
+            deps.onContributionsChanged();
+          },
+        });
+      },
+    };
+  }
+}
