@@ -1,4 +1,4 @@
-import type { PluginContext } from '@openenvx/core';
+import type { SandboxHostSurface } from '@openenvx/headless';
 import type {
   SandboxExtensionGrant,
   SandboxBridgeRequest,
@@ -86,7 +86,7 @@ export class SandboxExtensionController {
     private readonly options: {
       grants: SandboxExtensionGrant[];
       permission: 'read' | 'edit';
-      ctx: PluginContext;
+      host: SandboxHostSurface;
       fetchImpl?: typeof fetch;
       workerUrl?: string | URL;
       /** Test-only: allow in-process QuickJS (never for production hosts). */
@@ -148,7 +148,7 @@ export class SandboxExtensionController {
         return null;
       }
     }
-    const selection = this.options.ctx.scene.getSelection();
+    const selection = this.options.host.getSelection();
     return {
       activePageId: selection.activePageId,
       selectedLayerIds: [...selection.selectedLayerIds],
@@ -403,32 +403,19 @@ export class SandboxExtensionController {
     grant: SandboxExtensionGrant,
     layerId?: string
   ): SandboxHostHandlers {
-    const ctx = this.options.ctx;
+    const host = this.options.host;
     return {
       getSelection: () => {
-        const selection = ctx.scene.getSelection();
+        const selection = host.getSelection();
         return {
           activePageId: selection.activePageId,
           selectedLayerIds: selection.selectedLayerIds,
           primaryLayerId: selection.primaryLayerId,
         };
       },
-      getPageId: () => ctx.scene.getSelection().activePageId,
-      executeCommand: async (commandId, args) => {
-        const result = await ctx.commands.execute(
-          commandId,
-          {
-            scene: ctx.scene,
-            selection: ctx.scene.getSelection(),
-            services: ctx.services,
-            events: ctx.events,
-            editor: ctx.editor,
-          },
-          ctx.events,
-          args
-        );
-        return { executed: result.executed };
-      },
+      getPageId: () => host.getSelection().activePageId,
+      executeCommand: async (commandId, args) =>
+        host.executeCommand(commandId, args),
       showUI: (html, options) => {
         const resolved = html || grant.uiHtml || '<p>Extension</p>';
         if (resolved.length > MAX_SHOW_UI_HTML_CHARS) {

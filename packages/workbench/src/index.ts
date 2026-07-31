@@ -130,9 +130,10 @@ export {
 } from './version-history/restore-version-command';
 
 export {
-  PluginPanelPlugin,
-  type PluginPanelPluginOptions,
-} from './plugin-panel/plugin-panel-plugin';
+  EmbedPanelHost,
+  mountEmbedPanel,
+  type EmbedPanelHostOptions,
+} from './plugin-panel/embed-panel-host';
 export {
   PluginPanel,
   type PluginPanelProps,
@@ -148,9 +149,10 @@ export {
 } from '@xmazu/openenvxee-plugin-protocol';
 
 export {
-  SandboxExtensionPlugin,
-  type SandboxExtensionPluginOptions,
-} from './sandbox/sandbox-extension-plugin';
+  SandboxExtensionHost,
+  mountSandboxExtensions,
+  type SandboxExtensionHostOptions,
+} from './sandbox/sandbox-extension-host';
 export {
   assertJsonSerializable,
   assertMethodAllowed,

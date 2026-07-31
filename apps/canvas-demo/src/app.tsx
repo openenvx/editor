@@ -1,4 +1,5 @@
 import type { Plugin } from '@openenvx/core';
+import type { WorkbenchApi } from '@openenvx/headless';
 import {
   DEFAULT_STUDIO_PLUGINS,
   VersionHistoryPlugin,
@@ -8,8 +9,10 @@ import {
   createLocalStorageWorkbenchLayoutStore,
   createPostMessagePluginPanelTransport,
   DEFAULT_CANVAS_LAYOUT,
-  PluginPanelPlugin,
+  EmbedPanelHost,
+  mountEmbedPanel,
 } from '@xmazu/openenvxee-studio';
+import { useMemo } from 'react';
 
 import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
 import { CanvasDemoPlugin } from './plugins/canvas-demo-plugin';
@@ -26,7 +29,7 @@ function isEmbedMode(): boolean {
 }
 
 function createPlugins(): Plugin[] {
-  const plugins: Plugin[] = [
+  return [
     ...DEFAULT_STUDIO_PLUGINS,
     new CanvasDemoPlugin(),
     new CanvasDemoChromePlugin(),
@@ -34,25 +37,6 @@ function createPlugins(): Plugin[] {
       provider: createDemoVersionHistoryProvider(),
     }),
   ];
-
-  if (isEmbedMode()) {
-    plugins.push(
-      new PluginPanelPlugin({
-        declaration: {
-          id: EMBED_PANEL_ID,
-          title: 'Embed',
-          allowedCommands: [],
-          contextScope: 'selection',
-        },
-        permission: 'edit',
-        transport: createPostMessagePluginPanelTransport({
-          allowedOrigins: [window.location.origin],
-        }),
-      })
-    );
-  }
-
-  return plugins;
 }
 
 function promptUri(message: string, defaultValue?: string): string | null {
@@ -64,6 +48,26 @@ function promptUri(message: string, defaultValue?: string): string | null {
 const layoutStore = createLocalStorageWorkbenchLayoutStore(LAYOUT_STORE_KEY);
 
 export function App() {
+  const plugins = useMemo(() => createPlugins(), []);
+  const mountExternalHosts = useMemo(() => {
+    if (!isEmbedMode()) {
+      return;
+    }
+    const panel = new EmbedPanelHost({
+      declaration: {
+        id: EMBED_PANEL_ID,
+        title: 'Embed',
+        allowedCommands: [],
+        contextScope: 'selection',
+      },
+      permission: 'edit',
+      transport: createPostMessagePluginPanelTransport({
+        allowedOrigins: [window.location.origin],
+      }),
+    });
+    return (api: WorkbenchApi) => mountEmbedPanel(api, panel);
+  }, []);
+
   return (
     <div className="canvas-demo-app">
       <WorkbenchShell
@@ -74,11 +78,12 @@ export function App() {
         initialScene={createCanvasDemoScene()}
         layout={DEFAULT_CANVAS_LAYOUT}
         layoutStore={layoutStore}
+        mountExternalHosts={mountExternalHosts}
         onOpenDocument={async () => promptUri('Open document URI') ?? undefined}
         onSaveAs={async () =>
           promptUri('Save as URI', 'openworkbench://canvas-demo') ?? undefined
         }
-        plugins={createPlugins()}
+        plugins={plugins}
       />
       <style>{`
         html, body, #root { height: 100%; margin: 0; }

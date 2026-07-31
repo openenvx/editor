@@ -23,4 +23,13 @@ describe('IconRegistryImpl', () => {
     expect(registry.resolve('alignLeft')).toBe(left);
     expect(registry.resolve('alignRight')).toBe(right);
   });
+
+  it('unregisters glyphs', () => {
+    const registry = new IconRegistryImpl();
+    registry.register('test', { id: 'test-icon' });
+
+    expect(registry.unregister('test')).toBe(true);
+    expect(registry.resolve('test')).toBeNull();
+    expect(registry.unregister('test')).toBe(false);
+  });
 });

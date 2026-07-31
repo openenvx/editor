@@ -10,8 +10,8 @@ import {
   CanvasTemplatePlugin,
 } from '@xmazu/openenvxee-canvas-pro';
 import {
-  SandboxExtensionPlugin,
-  type SandboxExtensionPluginOptions,
+  SandboxExtensionHost,
+  type SandboxExtensionHostOptions,
 } from '@xmazu/openenvxee-workbench';
 
 export * from '@openenvx/core';
@@ -41,11 +41,13 @@ export {
   DefaultInspectorContainerPlugin,
   DefaultWorkbenchChromePlugin,
   DefaultWorkbenchFieldsPlugin,
-  PluginPanelPlugin,
-  type PluginPanelPluginOptions,
+  EmbedPanelHost,
+  mountEmbedPanel,
+  type EmbedPanelHostOptions,
   type PluginPanelTransport,
-  SandboxExtensionPlugin,
-  type SandboxExtensionPluginOptions,
+  SandboxExtensionHost,
+  mountSandboxExtensions,
+  type SandboxExtensionHostOptions,
   assertJsonSerializable,
   assertMethodAllowed,
   fetchAndVerifyArtifact,
@@ -77,16 +79,16 @@ export {
  * Studio factory: wires canvas widget click handler + layer type so extension JS
  * stays in a Worker and workbench never imports canvas.
  */
-export function createSandboxExtensionPlugin(
+export function createSandboxExtensionHost(
   options: Omit<
-    SandboxExtensionPluginOptions,
+    SandboxExtensionHostOptions,
     'bindWidgetClick' | 'widgetLayerType'
   > &
     Partial<
-      Pick<SandboxExtensionPluginOptions, 'bindWidgetClick' | 'widgetLayerType'>
+      Pick<SandboxExtensionHostOptions, 'bindWidgetClick' | 'widgetLayerType'>
     >
-): SandboxExtensionPlugin {
-  return new SandboxExtensionPlugin({
+): SandboxExtensionHost {
+  return new SandboxExtensionHost({
     widgetLayerType: WIDGET_LAYER_TYPE,
     bindWidgetClick: (handler) => setOpenEnvxWidgetClickHandler(handler),
     ...options,

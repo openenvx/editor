@@ -89,6 +89,7 @@ Built-in layer types (`canvas.rect`, `canvas.image`, `canvas.text`, `canvas.circ
 - `bootstrapWorkbenchServices()` - registers headless-specific DI services on an `EditorRuntime`
 - `WorkbenchPlugin`, `WorkbenchRegistries`, `WorkbenchPluginContext.registerWorkbench()` - workbench UI contribution registration
 - `WorkbenchPluginContext.registerTreeDataProvider()`, `registerFieldRenderer()`, `registerStatusBarItemRenderer()`, `registerEditorPane()` - runtime provider registries
+- External hosts (not PluginManager): `ExternalHostMount`, `SandboxHostSurface`, `EmbedPanelHostSurface`, `WorkbenchApi.mountSandboxHost` / `mountEmbedPanelHost`
 - Workbench contribution points: `Toolbar`, `CommandPalette`, `ViewContainer`, `View`, `ContextMenu`, `StatusBar`, `Overlay`, `PropertyPane`
 - Provider registries: `ViewProviderRegistry`, `FieldRendererRegistry`, `StatusBarItemRendererRegistry`, `EditorPaneRegistry`
 - Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `PropertyPaneBuilder`
@@ -108,7 +109,8 @@ Trust model, message allowlists, and cloud/marketplace runners: [Plugin-boundari
 
 ## What belongs in `@xmazu/openenvxee-workbench`
 
-- `WorkbenchShell` — React chrome host; auto-injects default plugins
+- `WorkbenchShell` — React chrome host; auto-injects default plugins; optional `mountExternalHosts` mounts sandbox/embed off PluginManager after start
+- `SandboxExtensionHost` + `mountSandboxExtensions`, `EmbedPanelHost` + `mountEmbedPanel`
 - `DefaultWorkbenchChromePlugin` — scene-generic `workbench.sidebar` (Pages + Layers), dirty Saved/Unsaved status (`workbench-saved` / `workbench-unsaved`)
 - Default inspector container + field renderer plugins
 - Shared by canvas studio and HTML studio (no canvas branding on generic chrome)

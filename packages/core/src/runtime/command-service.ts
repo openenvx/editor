@@ -14,6 +14,10 @@ export class CommandService {
     this.commands.set(command.id, command);
   }
 
+  unregister(id: string): boolean {
+    return this.commands.delete(id);
+  }
+
   get(id: string): Command | undefined {
     return this.commands.get(id);
   }

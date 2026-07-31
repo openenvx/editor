@@ -85,6 +85,12 @@ export interface WorkbenchShellProps {
     layerSurface: LayerSurfaceItem[];
     editorPaneKind: string;
   }) => ReactNode;
+  /**
+   * Mount external hosts (sandbox / embed) after start — off PluginManager.
+   * Memoize the callback; shell mounts once. Call `mountSandboxExtensions` /
+   * `mountEmbedPanel` inside and return a combined disposer.
+   */
+  mountExternalHosts?: (api: WorkbenchApi) => () => void;
 }
 
 const ChromeRegion = memo(
@@ -278,6 +284,22 @@ const LayoutRegion = memo(
   }
 );
 
+function ExternalHostsBinding({
+  api,
+  mountExternalHosts,
+}: {
+  api: WorkbenchApi;
+  mountExternalHosts?: (api: WorkbenchApi) => () => void;
+}) {
+  useMountEffect(() => {
+    if (!mountExternalHosts) {
+      return;
+    }
+    return mountExternalHosts(api);
+  });
+  return null;
+}
+
 function ThemeServiceBinding({
   api,
   theme,
@@ -413,6 +435,7 @@ export function WorkbenchShell({
   onSaveAs,
   createPropertyHostContext,
   renderEditorPane,
+  mountExternalHosts,
 }: WorkbenchShellProps) {
   const [activeTheme, setActiveTheme] = useState(theme);
   const [prevThemeProp, setPrevThemeProp] = useState(theme);
@@ -538,6 +561,10 @@ export function WorkbenchShell({
                 key={`${Boolean(onOpenDocument)}:${Boolean(onSaveAs)}`}
                 onOpenDocument={onOpenDocument}
                 onSaveAs={onSaveAs}
+              />
+              <ExternalHostsBinding
+                api={api}
+                mountExternalHosts={mountExternalHosts}
               />
               <WorkbenchShellSubscriptions
                 api={api}
