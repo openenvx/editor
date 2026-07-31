@@ -67,9 +67,9 @@ Sandbox grants use `kind: 'plugin' | 'widget'` with the same product contract as
 |  | **Sandbox plugin** | **Sandbox widget** |
 | --- | --- | --- |
 | Mental model | A **tool you run** | An **object on the canvas** |
-| Primary UI | Off-canvas iframe (`showUI`) | On-canvas `openenvx.widget` face; iframe optional |
+| Primary UI | Off-canvas floating panel (`showUI` iframe) | On-canvas `openenvx.widget` face; iframe optional |
 | Who sees it | Only the user who ran it | Everyone in the file (same layer instance) |
-| Lifetime | Starts on user action (`openenvx.sandbox.run.<id>`); one UI modal at a time | Lives while the layer is in the document; one isolate per `extensionId:layerId`; many at once |
+| Lifetime | Starts on user action (`openenvx.sandbox.run.<id>`); one floating UI panel at a time | Lives while the layer is in the document; one isolate per `extensionId:layerId`; many at once |
 | State | `clientStorage` (per-user, session-local today) | `syncedState` on the node (**local until CRDT / multiplayer** — API shape is Figma-like; collaborative sync deferred) |
 | Best for | Automation, import/export, setup | Collaborative / on-canvas interaction |
 
@@ -144,7 +144,7 @@ Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/p
 
 Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workbench `SandboxExtensionHost` + canvas widget click bind), mounted with `mountSandboxExtensions` / `WorkbenchShell` `mountExternalHosts`: **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` canvas nodes carry **local** synced state (collaborative CRDT deferred). Bundles load from session-granted signed URLs + content hashes (minted by openenvx-cloud).
 
-**Plugin lifecycle:** production hosts default `autoStartPlugins: false` — sandbox plugins start via `openenvx.sandbox.run.<id>` (user-run). Demos may opt into auto-start. Closing the UI modal does not stop the isolate; **Stop** / `closePlugin` does.
+**Plugin lifecycle:** production hosts default `autoStartPlugins: false` — sandbox plugins start via `openenvx.sandbox.run.<id>` (user-run). Demos may opt into auto-start. Closing the floating UI panel does not stop the isolate; **Stop** / `closePlugin` does.
 
 **OK to run:** cloud-minted, hash-pinned, capability-scoped extensions that you (or a customer org admin) explicitly installed for a session.
 
@@ -221,6 +221,7 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 
 ## Related
 
-- [Architecture.md](Architecture.md) — package boundaries and contribution flow
+- [Architecture.md](Architecture.md) — package boundaries hub
+- [docs/architecture/extensions.md](docs/architecture/extensions.md) — short extensions summary for agents
 - [FEATURES.md](FEATURES.md) — embed panels + sandbox extensions rows
 - [PUBLISHING.md](PUBLISHING.md) — protocol publish / link notes

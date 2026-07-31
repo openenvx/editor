@@ -2,6 +2,8 @@
 
 How to extend the OpenEnvx canvas engine with plugins.
 
+Under-the-hood map (packages, workbench, studio, trust): [Architecture.md](../../Architecture.md) and [docs/architecture/](../../docs/architecture/overview.md). Trust / embed / sandbox: [Plugin-boundaries.md](../../Plugin-boundaries.md).
+
 ## Scene document (`@openenvx/schema`)
 
 The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@openenvx/schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.

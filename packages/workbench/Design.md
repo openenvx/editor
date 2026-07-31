@@ -425,6 +425,19 @@ Radix Tabs primitive (`primitives/tabs.tsx`) — full-width pill segments in the
 - Dividers: 1px × 20px, `rgb(255 255 255 / 8%)`
 - Zoom chip: mono 11px, ghost, min-width 44px
 
+### SandboxUiPanel
+
+Non-modal floating host chrome for sandbox `showUI` (Figma-shaped plugin window):
+
+- Background: `--wb-popover`
+- Ring: `--wb-shadow-float`
+- Radius: `--wb-radius-lg` (same shell as floating toolbar)
+- Default dock: bottom-right; title-bar drag; clamp to viewport
+- No backdrop — canvas stays interactive; click-outside does not dismiss
+- Close / Stop / Esc / `closeUI` dismiss; Close ≠ Stop isolate
+- Title: `--wb-text-sm` / `--wb-muted-foreground`; actions use existing `Button` (`sm` outline + ghost)
+- Theme: `data-owb-theme` on the body portal host (outside shell DOM)
+
 ### PropertyPopover
 
 Popup shell for per-side/per-corner/per-shadow controls:

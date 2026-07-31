@@ -47,6 +47,13 @@ Published packages (see [PUBLISHING.md](PUBLISHING.md)):
 - Plugins that register layers, commands, views, and services
 - Commands as the mutation hub - scene state flows through one path
 
+## Architecture docs
+
+- [Architecture.md](Architecture.md) — hub (tiers, placement, contribution sketch)
+- [docs/architecture/](docs/architecture/overview.md) — under-the-hood chapters
+- [Plugin-boundaries.md](Plugin-boundaries.md) — internal vs embed vs sandbox trust model
+- [apps/docs/extension-guide.md](apps/docs/extension-guide.md) — plugin author API
+
 ---
 
 [GitHub](https://github.com/openenvx/openenvx)
