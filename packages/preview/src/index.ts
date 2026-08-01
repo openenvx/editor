@@ -1,4 +1,9 @@
 export {
+  encodeQrToSvg,
+  type EncodeQrToSvgOptions,
+  type QrErrorCorrection,
+} from './encode-qr-to-svg';
+export {
   LayerPreviewBuilder,
   createLayerPreviewBuilder,
   type BuiltinLayerPreviewDescriptor,

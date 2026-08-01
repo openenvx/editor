@@ -27,7 +27,7 @@ interface TemplateManifest {
 
 interface TemplateField {
   name: string;
-  kind: 'text' | 'image' | 'color';
+  kind: 'text' | 'image' | 'color' | 'qr';
   layerType: string; // e.g. canvas.text
   layerId: string;
   pageId: string;
@@ -40,6 +40,7 @@ Kind mapping:
 | Layer type                     | `kind`                |
 | ------------------------------ | --------------------- |
 | `canvas.text`                  | `text`                |
+| `canvas.qr`                    | `qr`                  |
 | `canvas.image`                 | `image`               |
 | `canvas.rect`, `canvas.circle` | `color`               |
 | Other / unnamed                | omitted from manifest |
@@ -49,9 +50,9 @@ Kind mapping:
 ```ts
 interface Modification {
   name: string;
-  text?: string; // plain text → stored as escaped <p>…</p> HTML
+  text?: string; // plain text → canvas.text HTML, or canvas.qr data.url
   imageUrl?: string; // → canvas.image data.assetRef
-  color?: string; // → text/shape data.fill
+  color?: string; // → text/shape data.fill, or canvas.qr data.foreground
   fontFamily?: string; // text only
   fontSize?: number; // text only (max / starting size when autoFit=shrink)
   hidden?: boolean; // → layer.visible = !hidden
@@ -60,11 +61,12 @@ interface Modification {
 
 Valid fields by kind:
 
-| Kind    | Valid modification fields                           |
-| ------- | --------------------------------------------------- |
-| `text`  | `text`, `color`, `fontFamily`, `fontSize`, `hidden` |
-| `image` | `imageUrl`, `hidden`                                |
-| `color` | `color`, `hidden`                                   |
+| Kind    | Valid modification fields                                      |
+| ------- | -------------------------------------------------------------- |
+| `text`  | `text`, `color`, `fontFamily`, `fontSize`, `hidden`            |
+| `qr`    | `text` (→ `data.url`), `color` (→ `data.foreground`), `hidden` |
+| `image` | `imageUrl`, `hidden`                                           |
+| `color` | `color`, `hidden`                                              |
 
 Unknown `name` values are skipped (no error from `applyModifications`). Prefer validating against the manifest first in the cloud API.
 

@@ -36,6 +36,11 @@ export class CanvasCommandPaletteItems extends CommandPaletteContribution {
       .tab('assets')
       .keywords('photo', 'picture');
     builder
+      .item('canvas.insertQr')
+      .label(ctx.t('canvas.command.qr', 'QR code'))
+      .tab('assets')
+      .keywords('qr', 'barcode', 'link');
+    builder
       .item('canvas.uploadAsset')
       .label(ctx.t('canvas.command.uploadAsset', 'Upload asset'))
       .tab('assets')

@@ -20,7 +20,9 @@ Published shape:
 - `files`: `dist/`, `scene.schema.json`
 - Single bundled `dist/index.js` (no extensionless relative imports — Node-safe)
 - `exports["."].default` → `./dist/index.js`
-- `exports["."].development` / `exports["."].bun` → `./src/index.ts` (monorepo + linked local dev)
+- `exports["."].development` → `./src/index.ts` (Vite monorepo / linked local dev)
+- `exports["."].bun` → `./dist/index.js` (published tarballs omit `src/`; Bun must not resolve to missing sources)
+- **Monorepo note:** Bun prefers the `bun` condition, so workspace Bun consumers read `dist/`, not live `src/`. Rebuild schema/preview after editing their sources (`bun run build --filter=@xmazu/openenvxee-schema --filter=@xmazu/openenvxee-preview`), or use Vite/`development` resolution. Vite apps are unaffected.
 - `prepack` runs `build` automatically before publish
 - `publishConfig.registry`: `https://npm.pkg.github.com`
 

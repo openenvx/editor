@@ -5,6 +5,7 @@
 import type {
   CanvasCircleData,
   CanvasImageData,
+  CanvasQrData,
   CanvasRectData,
   CanvasTextData,
   Layer,
@@ -42,7 +43,7 @@ function stripHtmlToPlainText(html: string): string {
     .trim();
 }
 
-export type TemplateFieldKind = 'text' | 'image' | 'color';
+export type TemplateFieldKind = 'text' | 'image' | 'color' | 'qr';
 
 export interface TemplateField {
   name: string;
@@ -113,6 +114,9 @@ function fieldKindForLayer(layer: Layer): TemplateFieldKind | null {
     case 'canvas.text': {
       return 'text';
     }
+    case 'canvas.qr': {
+      return 'qr';
+    }
     case 'canvas.image': {
       return 'image';
     }
@@ -130,24 +134,32 @@ function sampleForLayer(
   layer: Layer,
   kind: TemplateFieldKind
 ): string | undefined {
-  if (kind === 'text') {
-    const data = layer.data as CanvasTextData;
-    return typeof data.html === 'string'
-      ? stripHtmlToPlainText(data.html)
-      : undefined;
+  switch (kind) {
+    case 'text': {
+      const data = layer.data as CanvasTextData;
+      return typeof data.html === 'string'
+        ? stripHtmlToPlainText(data.html)
+        : undefined;
+    }
+    case 'qr': {
+      const data = layer.data as CanvasQrData;
+      return typeof data.url === 'string' ? data.url : undefined;
+    }
+    case 'image': {
+      const data = layer.data as CanvasImageData;
+      return typeof data.assetRef === 'string' ? data.assetRef : undefined;
+    }
+    case 'color': {
+      const data = layer.data as
+        | CanvasRectData
+        | CanvasCircleData
+        | CanvasTextData;
+      return typeof data.fill === 'string' ? data.fill : undefined;
+    }
+    default: {
+      return undefined;
+    }
   }
-  if (kind === 'image') {
-    const data = layer.data as CanvasImageData;
-    return typeof data.assetRef === 'string' ? data.assetRef : undefined;
-  }
-  if (kind === 'color') {
-    const data = layer.data as
-      | CanvasRectData
-      | CanvasCircleData
-      | CanvasTextData;
-    return typeof data.fill === 'string' ? data.fill : undefined;
-  }
-  return undefined;
 }
 
 /** Collect named layers into a stable public template manifest. */
@@ -266,6 +278,15 @@ function applyModificationToLayer(layer: Layer, mod: Modification): Layer {
     }
     if (mod.fontSize !== undefined) {
       data = { ...data, fontSize: mod.fontSize };
+      dataChanged = true;
+    }
+  } else if (layer.type === 'canvas.qr') {
+    if (mod.text !== undefined) {
+      data = { ...data, url: mod.text };
+      dataChanged = true;
+    }
+    if (mod.color !== undefined) {
+      data = { ...data, foreground: mod.color };
       dataChanged = true;
     }
   } else if (layer.type === 'canvas.image') {

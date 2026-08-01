@@ -76,6 +76,7 @@ OpenEnvx should not stop at parity. These are existing or planned edges.
 | True bleed / trim / crop marks | **Done** | `packages/schema`, `packages/canvas`, `packages/canvas-pro`, openenvx-cloud `export-service` | Schema `bleedMm`/`safeMm`; canvas overlays; page inspector when nothing selected; SVG/PDF crop marks. |
 | Video layer + timeline | **Planned** | `packages/schema`, `packages/canvas` | First-class `canvas.video` (and later animation timeline). |
 | Dedicated SVG layer | **Partial** | `packages/schema`, `packages/canvas`, `packages/canvas-pro`, openenvx-cloud `export-service` | `canvas.svg` with markup + optional fill/stroke; Konva via data-URL; vector export; lite node attribute editor (select element → edit fill/stroke/`d`/… → rewrite `data.svg`). No Bezier path tool. |
+| QR code layer | **Partial** | `packages/schema`, `packages/preview` (`encodeQrToSvg`), `packages/canvas`, `packages/canvas-pro`; openenvx-cloud `render-ir` (pending publish) | Editor-core Done: `canvas.qr` → SVG via `encodeQrToSvg`; manifest kind `qr`; `modifications.text`→`url` / `color`→`foreground`; toolbar / palette insert. Cloud export coded against schema/preview **0.5.4** — mark Done after those packages publish and cloud installs them. |
 | Print pipeline (CMYK / spot) | **Planned** | drivers + export-service | Beyond RGB raster PDF for packaging/print SaaS. |
 | Component / instance system | **Partial** | `packages/schema`, `packages/core`, `packages/canvas` | One-way symbols: `scene.components` + `canvas.instance`; expand at render/export with per-instance surface ids; commands `canvas.createComponent` / `insertInstance` / `updateComponent`. Expanded definition children are display-only on canvas (select/transform the instance). Nested instances, detach, override UX, and in-instance editing deferred. |
 | Real-time collaboration | **Planned** | core persistence + future collab package | Multiplayer editing for internal design tools. |
@@ -101,6 +102,7 @@ Gaps and differentiators grouped by priority. Implement in separate PRs; update 
 - ~~**Image fit + focal point**~~ **Done** — `data.fit` (`cover` / `contain` / `fill`) + `focalPoint`; canvas + SVG `preserveAspectRatio`.
 - **Video layer** — `canvas.video` in schema + Konva/HTML media renderer in `packages/canvas`.
 - ~~**Dedicated SVG layer**~~ **Partial** — `canvas.svg` stores markup (icons/agent SVG); canvas + SVG export; lite node attribute editor in canvas-pro inspector. Bezier path tool still planned.
+- ~~**QR code layer**~~ **Partial** — editor-core: `canvas.qr` + `encodeQrToSvg`; manifest kind `qr`; modifications `text`→`url` / `color`→`foreground`; toolbar insert. Cloud `render-ir` waits on published schema/preview 0.5.4.
 - **Hide remaining export gaps** — document DPI in exports; tighten print presets; optional PNG-with-marks flag.
 
 ### P2 — Exceed Polotno

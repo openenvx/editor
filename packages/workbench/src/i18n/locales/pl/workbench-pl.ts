@@ -19,6 +19,7 @@ export default {
   'toolbar.rulers': 'Linijki',
   'toolbar.textTool': 'Narzędzie tekstu',
   'toolbar.imageTool': 'Narzędzie obrazu',
+  'toolbar.qrTool': 'Narzędzie kodu QR',
   'zoom.in': 'Powiększ',
   'zoom.out': 'Pomniejsz',
   'zoom.to100': 'Powiększ do 100%',

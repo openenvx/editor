@@ -72,6 +72,7 @@ export const BUILTIN_LAYER_TYPES = [
   'canvas.rect',
   'canvas.image',
   'canvas.svg',
+  'canvas.qr',
   'canvas.text',
   'canvas.circle',
   'canvas.group',
@@ -135,6 +136,18 @@ export interface CanvasSvgData {
   /** Optional tint for monochrome icons (e.g. currentColor icons). */
   fill?: string;
   stroke?: string;
+}
+
+export type QrErrorCorrection = 'L' | 'M' | 'Q' | 'H';
+
+export interface CanvasQrData {
+  /** Payload encoded into the QR (usually a URL). */
+  url: string;
+  foreground?: string;
+  background?: string;
+  errorCorrection?: QrErrorCorrection;
+  /** Quiet-zone modules around the code. */
+  margin?: number;
 }
 
 export type TextAutoFit = 'none' | 'shrink';
@@ -206,6 +219,11 @@ export interface CanvasSvgLayer extends LayerBase {
   data: CanvasSvgData;
 }
 
+export interface CanvasQrLayer extends LayerBase {
+  type: 'canvas.qr';
+  data: CanvasQrData;
+}
+
 export interface CanvasTextLayer extends LayerBase {
   type: 'canvas.text';
   data: CanvasTextData;
@@ -249,6 +267,7 @@ export type Layer =
   | CanvasRectLayer
   | CanvasImageLayer
   | CanvasSvgLayer
+  | CanvasQrLayer
   | CanvasTextLayer
   | CanvasCircleLayer
   | CanvasGroupLayer

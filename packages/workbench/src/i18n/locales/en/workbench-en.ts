@@ -19,6 +19,7 @@ export default {
   'toolbar.rulers': 'Rulers',
   'toolbar.textTool': 'Text tool',
   'toolbar.imageTool': 'Image tool',
+  'toolbar.qrTool': 'QR code tool',
   'zoom.in': 'Zoom In',
   'zoom.out': 'Zoom Out',
   'zoom.to100': 'Zoom to 100%',

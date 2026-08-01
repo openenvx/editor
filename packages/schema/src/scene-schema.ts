@@ -142,6 +142,23 @@ function build(o: typeof z.object) {
       .describe('Optional viewBox; parsed from svg root when absent.'),
   });
 
+  const canvasQrData = o({
+    background: z
+      .string()
+      .optional()
+      .describe('QR background / quiet-zone color.'),
+    errorCorrection: z
+      .enum(['L', 'M', 'Q', 'H'])
+      .optional()
+      .describe('QR error correction level.'),
+    foreground: z.string().optional().describe('QR module color.'),
+    margin: z
+      .number()
+      .optional()
+      .describe('Quiet-zone modules around the code.'),
+    url: z.string().describe('Payload encoded into the QR (usually a URL).'),
+  });
+
   const canvasTextData = o({
     align: z.enum(['left', 'center', 'right']).optional(),
     autoFit: z
@@ -188,6 +205,11 @@ function build(o: typeof z.object) {
         ...layerBase,
         data: canvasSvgData,
         type: z.literal('canvas.svg'),
+      }),
+      o({
+        ...layerBase,
+        data: canvasQrData,
+        type: z.literal('canvas.qr'),
       }),
       o({
         ...layerBase,
@@ -364,6 +386,7 @@ function build(o: typeof z.object) {
   const leafShapes = {
     canvasCircleData,
     canvasImageData,
+    canvasQrData,
     canvasRectData,
     canvasSvgData,
     canvasTextData,
@@ -403,6 +426,7 @@ export const sceneSnapshotSchemaCanonical = build(
 export const leafSchemas = {
   canvasCircleData: lenient.leafShapes.canvasCircleData,
   canvasImageData: lenient.leafShapes.canvasImageData,
+  canvasQrData: lenient.leafShapes.canvasQrData,
   canvasRectData: lenient.leafShapes.canvasRectData,
   canvasSvgData: lenient.leafShapes.canvasSvgData,
   canvasTextData: lenient.leafShapes.canvasTextData,

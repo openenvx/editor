@@ -145,6 +145,7 @@ export {
   InsertCanvasTextCommand,
   InsertCanvasImageCommand,
   InsertCanvasSvgCommand,
+  InsertCanvasQrCommand,
   InsertCanvasRectCommand,
   InsertCanvasCircleCommand,
   UploadAssetCommand,
@@ -186,6 +187,11 @@ export {
   canvasSvgSchema,
   type CanvasSvgModel,
 } from './layers/canvas-svg-layer';
+export {
+  CanvasQrLayer,
+  canvasQrSchema,
+  type CanvasQrModel,
+} from './layers/canvas-qr-layer';
 export {
   editableAttrsForTag,
   parseSvgElements,

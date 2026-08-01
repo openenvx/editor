@@ -180,6 +180,44 @@ describe('schema', () => {
     expect(result.valid).toBe(false);
   });
 
+  it('accepts canvas.qr with url payload', () => {
+    const result = validateScene({
+      pages: [
+        {
+          id: 'p1',
+          layout: 'absolute',
+          name: 'Page',
+          layers: [
+            {
+              data: {
+                foreground: '#000',
+                url: 'https://example.com',
+              },
+              id: 'qr-1',
+              name: 'qr',
+              type: 'canvas.qr',
+            },
+          ],
+        },
+      ],
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('rejects canvas.qr without url', () => {
+    const result = validateScene({
+      pages: [
+        {
+          id: 'p1',
+          layout: 'absolute',
+          name: 'Page',
+          layers: [{ id: 'qr-1', type: 'canvas.qr', data: {} }],
+        },
+      ],
+    });
+    expect(result.valid).toBe(false);
+  });
+
   it('throws when normalizeScene cannot parse input', () => {
     expect(() =>
       normalizeScene({

@@ -36,6 +36,16 @@ function sampleScene() {
           },
           {
             data: {
+              background: '#ffffff',
+              foreground: '#000000',
+              url: 'https://example.com/demo',
+            },
+            id: 'q1',
+            name: 'qr',
+            type: 'canvas.qr',
+          },
+          {
+            data: {
               children: [
                 {
                   data: { html: '<p>Nested</p>' },
@@ -70,10 +80,15 @@ describe('template', () => {
       'accent',
       'headline',
       'hero',
+      'qr',
       'subtitle',
     ]);
     expect(manifest.fields.find((f) => f.name === 'headline')?.kind).toBe(
       'text'
+    );
+    expect(manifest.fields.find((f) => f.name === 'qr')?.kind).toBe('qr');
+    expect(manifest.fields.find((f) => f.name === 'qr')?.sample).toBe(
+      'https://example.com/demo'
     );
     expect(manifest.fields.find((f) => f.name === 'hero')?.kind).toBe('image');
     expect(manifest.fields.find((f) => f.name === 'accent')?.kind).toBe(
@@ -123,6 +138,11 @@ describe('template', () => {
       { imageUrl: 'https://cdn.example/b.png', name: 'hero' },
       { color: '#ff0000', name: 'accent' },
       { hidden: true, name: 'subtitle' },
+      {
+        color: '#1d4ed8',
+        name: 'qr',
+        text: 'https://weselnemomenty.pl/e/abc',
+      },
     ]);
 
     const headline = findTemplateLayerByName(resolved, 'headline');
@@ -147,6 +167,13 @@ describe('template', () => {
 
     const subtitle = findTemplateLayerByName(resolved, 'subtitle');
     expect(subtitle?.visible).toBe(false);
+
+    const qr = findTemplateLayerByName(resolved, 'qr');
+    expect(qr?.type).toBe('canvas.qr');
+    if (qr?.type === 'canvas.qr') {
+      expect(qr.data.url).toBe('https://weselnemomenty.pl/e/abc');
+      expect(qr.data.foreground).toBe('#1d4ed8');
+    }
   });
 
   it('applyModifications does not mutate the source scene', () => {

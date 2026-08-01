@@ -87,6 +87,12 @@ export class CanvasToolbarContribution extends ToolbarContribution {
         labelKey: 'toolbar.imageTool',
         priority: 11,
       })
+      .command('canvas-toolbar-qr', {
+        commandId: 'canvas.insertQr',
+        icon: 'qr-code',
+        labelKey: 'toolbar.qrTool',
+        priority: 12,
+      })
       .separator('canvas-toolbar-separator-2', { priority: 20 })
       .command('canvas-toolbar-grid', {
         commandId: 'canvas.toggleGrid',

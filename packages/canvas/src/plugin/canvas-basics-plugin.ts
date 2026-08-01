@@ -81,6 +81,7 @@ import { CanvasCircleLayer } from '../layers/canvas-circle-layer';
 import { CanvasGroupLayer } from '../layers/canvas-group-layer';
 import { CanvasImageLayer } from '../layers/canvas-image-layer';
 import { CanvasInstanceLayer } from '../layers/canvas-instance-layer';
+import { CanvasQrLayer } from '../layers/canvas-qr-layer';
 import { CanvasRectLayer } from '../layers/canvas-rect-layer';
 import { CanvasSvgLayer } from '../layers/canvas-svg-layer';
 import { CanvasTextLayer } from '../layers/canvas-text-layer';
@@ -212,6 +213,20 @@ export class InsertCanvasSvgCommand extends Command {
   }
 }
 
+export class InsertCanvasQrCommand extends Command {
+  readonly id = 'canvas.insertQr';
+
+  canExecute(ctx: CommandContext): boolean {
+    return canInsertOnActivePage(ctx);
+  }
+
+  execute(ctx: CommandContext): void {
+    const page = ctx.scene.getActivePage();
+    const layer = new CanvasQrLayer().createDefault(createLayerId('qr'), page);
+    insertCanvasLayer(ctx, layer);
+  }
+}
+
 export class InsertCanvasRectCommand extends Command {
   readonly id = 'canvas.insertRect';
 
@@ -312,6 +327,7 @@ export class CanvasBasicsPlugin extends Plugin {
       new CanvasTextLayer(),
       new CanvasImageLayer(),
       new CanvasSvgLayer(),
+      new CanvasQrLayer(),
       new CanvasRectLayer(),
       new CanvasCircleLayer(),
       new CanvasGroupLayer(),
@@ -321,6 +337,7 @@ export class CanvasBasicsPlugin extends Plugin {
       new InsertOpenEnvxWidgetCommand(),
       new InsertCanvasImageCommand(),
       new InsertCanvasSvgCommand(),
+      new InsertCanvasQrCommand(),
       new InsertCanvasRectCommand(),
       new InsertCanvasCircleCommand(),
       new InsertCanvasGroupCommand(),

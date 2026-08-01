@@ -24,7 +24,11 @@ function modificationFromField(
   previous?: Modification
 ): Modification {
   const base: Modification = { name: field.name, ...previous };
-  if (field.kind === 'text' && base.text === undefined && field.sample) {
+  if (
+    (field.kind === 'text' || field.kind === 'qr') &&
+    base.text === undefined &&
+    field.sample
+  ) {
     return { ...base, text: field.sample };
   }
   if (field.kind === 'image' && base.imageUrl === undefined && field.sample) {
@@ -139,7 +143,7 @@ export const TemplateDataPanel = memo(() => {
           </p>
         </div>
         <p className={styles.empty}>
-          No named text, image, or shape layers yet.
+          No named text, QR, image, or shape layers yet.
         </p>
       </div>
     );
@@ -177,7 +181,7 @@ export const TemplateDataPanel = memo(() => {
               <span className={styles.label}>
                 {field.name} <span className={styles.kind}>({field.kind})</span>
               </span>
-              {field.kind === 'text' ? (
+              {field.kind === 'text' || field.kind === 'qr' ? (
                 <textarea
                   className={styles.textarea}
                   onChange={(event) =>
@@ -214,7 +218,7 @@ export const TemplateDataPanel = memo(() => {
                   />
                 </div>
               ) : null}
-              {field.kind === 'text' ? (
+              {field.kind === 'text' || field.kind === 'qr' ? (
                 <div className={styles.row}>
                   <input
                     className={styles.input}
@@ -223,7 +227,9 @@ export const TemplateDataPanel = memo(() => {
                         color: event.target.value || undefined,
                       })
                     }
-                    placeholder="Text color"
+                    placeholder={
+                      field.kind === 'qr' ? 'Foreground color' : 'Text color'
+                    }
                     value={value.color ?? ''}
                   />
                   <label className={styles.row}>
