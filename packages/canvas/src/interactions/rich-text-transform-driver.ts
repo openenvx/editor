@@ -1,3 +1,9 @@
+/**
+ * Live rich-text transforms are pointer-driven (see rich-text-resize /
+ * rich-text-interaction-contracts). Konva Transformer scale must never be the
+ * source of truth during a corner/edge bake — otherwise bake + Transformer
+ * fight and the box jumps.
+ */
 import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
 import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import type { Transform } from '@xmazu/openenvxee-schema';
@@ -12,9 +18,12 @@ import { applyRichTextToGroup } from '../rich-text-konva-driver';
 import { measureRichTextHeight } from '../rich-text-layout';
 import {
   computeCornerResize,
+  computeCornerResizeFromPointer,
   computeHorizontalResize,
   computeHorizontalResizeFromNode,
+  constrainRichTextCornerBox,
   constrainRichTextHorizontalBox,
+  isRichTextCornerAnchor,
   isRichTextHorizontalAnchor,
 } from '../rich-text-resize';
 import type {
@@ -36,9 +45,11 @@ export type RichTextView = Extract<
 >;
 
 export interface RichTextCornerSession {
-  fontSize: number;
+  /** Immutable font size at drag start — never overwrite during live bake. */
+  startFontSize: number;
   layerId: string;
   origin: Transform;
+  /** Last baked transform (for end-of-drag fallback). */
   transform: Transform;
   view: RichTextView;
 }
@@ -90,6 +101,23 @@ function measureRichTextHeightForView(
   });
 }
 
+function resizeSessionFrom(
+  session: RichTextCornerSession,
+  anchor: string
+): {
+  anchor: RichTextResizeAnchor;
+  origin: Transform;
+  snapshot: Transform;
+  startFontSize: number;
+} {
+  return {
+    anchor: anchor as RichTextResizeAnchor,
+    origin: session.origin,
+    snapshot: session.origin,
+    startFontSize: session.startFontSize,
+  };
+}
+
 export function startRichTextTransform(
   runtime: RichTextTransformRuntime
 ): void {
@@ -103,20 +131,23 @@ export function startRichTextTransform(
     x: node.x(),
     y: node.y(),
   };
-  const fontSize = view.fontSize ?? DEFAULT_RICH_TEXT_FONT_SIZE;
+  const startFontSize = view.fontSize ?? DEFAULT_RICH_TEXT_FONT_SIZE;
   sessionRef.current = {
-    fontSize,
     layerId: runtime.layerId,
     origin: capturedTransform,
+    startFontSize,
     transform: capturedTransform,
     view,
   };
-  applyRichTextToGroup(node, view, capturedTransform, fontSize);
+  // Reset any leftover Konva scale before the drag owns the node.
+  applyRichTextToGroup(node, view, capturedTransform, startFontSize);
 
   if (transformer && anchor) {
-    dragRef.current = isRichTextHorizontalAnchor(anchor)
-      ? createTransformDragContextFromOrigin(anchor, capturedTransform, node)
-      : createTransformDragContext(transformer);
+    dragRef.current = createTransformDragContextFromOrigin(
+      anchor,
+      capturedTransform,
+      node
+    );
   } else {
     dragRef.current = transformer
       ? createTransformDragContext(transformer)
@@ -154,17 +185,25 @@ export function boundRichTextBox(
   },
   pointer: { x: number; y: number } | null
 ) {
+  const resizeSession = resizeSessionFrom(session, anchor);
+  const measure = (width: number, fontSize: number) =>
+    measureRichTextHeightForView(session.view, width, fontSize);
+
+  if (isRichTextCornerAnchor(anchor)) {
+    return constrainRichTextCornerBox(
+      resizeSession,
+      oldBox,
+      newBox,
+      measure,
+      pointer
+    );
+  }
+
   return constrainRichTextHorizontalBox(
-    {
-      anchor: anchor as RichTextResizeAnchor,
-      origin: session.origin,
-      snapshot: session.transform,
-      startFontSize: session.fontSize,
-    },
+    resizeSession,
     oldBox,
     newBox,
-    (width, fontSize) =>
-      measureRichTextHeightForView(session.view, width, fontSize),
+    measure,
     pointer
   );
 }
@@ -181,25 +220,35 @@ export function runRichTextLiveBake(runtime: RichTextTransformRuntime): void {
     view,
   } = runtime;
 
-  const runBake = () => {
-    if (bakeInProgressRef.current) {
+  // Drop any pending RAF from older corner-bake path.
+  if (cornerBakeRafRef.current !== null) {
+    cancelAnimationFrame(cornerBakeRafRef.current);
+    cornerBakeRafRef.current = null;
+  }
+
+  if (bakeInProgressRef.current) {
+    return;
+  }
+  bakeInProgressRef.current = true;
+  try {
+    const session = sessionRef.current;
+    const node = nodeRefs.get(layerId);
+    const anchor = dragRef.current?.anchor ?? 'bottom-right';
+    if (!session || !node || session.layerId !== layerId) {
       return;
     }
-    bakeInProgressRef.current = true;
-    try {
-      const session = sessionRef.current;
-      const node = nodeRefs.get(layerId);
-      const anchor = dragRef.current?.anchor ?? 'bottom-right';
-      if (!session || !node || session.layerId !== layerId) {
-        return;
-      }
 
-      const resizeSession = {
-        anchor: anchor as RichTextResizeAnchor,
-        origin: session.origin,
-        snapshot: session.transform,
-        startFontSize: session.fontSize,
-      };
+    const resizeSession = resizeSessionFrom(session, anchor);
+    const measureHeight = (width: number, fontSize: number) =>
+      measureRichTextHeightForView(view, width, fontSize);
+
+    const stage = node.getStage();
+    const parent = node.getParent();
+    const pointer =
+      stage && parent ? pointerToParentLocal(stage, parent) : null;
+
+    let result: RichTextResizeResult;
+    if (isRichTextHorizontalAnchor(anchor)) {
       const nodeState = {
         height: node.height(),
         rotation: node.rotation(),
@@ -209,59 +258,47 @@ export function runRichTextLiveBake(runtime: RichTextTransformRuntime): void {
         x: node.x(),
         y: node.y(),
       };
-      const measureHeight = (width: number, fontSize: number) =>
-        measureRichTextHeightForView(view, width, fontSize);
-
-      let result: RichTextResizeResult;
-      if (isRichTextHorizontalAnchor(anchor)) {
-        const stage = node.getStage();
-        const parent = node.getParent();
-        const pointer =
-          stage && parent ? pointerToParentLocal(stage, parent) : null;
-        result = pointer
-          ? computeHorizontalResize(resizeSession, pointer, measureHeight)
-          : computeHorizontalResizeFromNode(
-              resizeSession,
-              nodeState,
-              measureHeight
-            );
-      } else {
-        result = computeCornerResize(resizeSession, nodeState, measureHeight);
-      }
-
-      applyRichTextToGroup(node, view, result.transform, result.fontSize);
-      sessionRef.current = {
-        fontSize: result.fontSize,
-        layerId,
-        origin: session.origin,
-        transform: result.transform,
-        view: session.view,
-      };
-      onUpdateSizeLabel({
-        height: result.transform.height,
-        width: result.transform.width,
-        x: result.transform.x,
-        y: result.transform.y,
-      });
-      runtime.transformer?.forceUpdate();
-      runtime.transformer?.getLayer()?.batchDraw();
-    } finally {
-      bakeInProgressRef.current = false;
+      result = pointer
+        ? computeHorizontalResize(resizeSession, pointer, measureHeight)
+        : computeHorizontalResizeFromNode(
+            resizeSession,
+            nodeState,
+            measureHeight
+          );
+    } else {
+      result = pointer
+        ? computeCornerResizeFromPointer(resizeSession, pointer, measureHeight)
+        : computeCornerResize(
+            resizeSession,
+            {
+              height: node.height(),
+              rotation: node.rotation(),
+              scaleX: node.scaleX(),
+              scaleY: node.scaleY(),
+              width: node.width(),
+              x: node.x(),
+              y: node.y(),
+            },
+            measureHeight
+          );
     }
-  };
 
-  if (isRichTextHorizontalAnchor(dragRef.current?.anchor ?? '')) {
-    runBake();
-    return;
+    applyRichTextToGroup(node, view, result.transform, result.fontSize);
+    sessionRef.current = {
+      ...session,
+      transform: result.transform,
+    };
+    onUpdateSizeLabel({
+      height: result.transform.height,
+      width: result.transform.width,
+      x: result.transform.x,
+      y: result.transform.y,
+    });
+    runtime.transformer?.forceUpdate();
+    runtime.transformer?.getLayer()?.batchDraw();
+  } finally {
+    bakeInProgressRef.current = false;
   }
-
-  if (cornerBakeRafRef.current !== null) {
-    return;
-  }
-  cornerBakeRafRef.current = requestAnimationFrame(() => {
-    cornerBakeRafRef.current = null;
-    runBake();
-  });
 }
 
 export function bakeRichTextTransformEnd(
@@ -273,17 +310,28 @@ export function bakeRichTextTransformEnd(
     return null;
   }
   const anchor = runtime.dragRef.current?.anchor ?? 'bottom-right';
-  const result = bakeRichTextNodeTransform(
-    {
-      anchor: anchor as RichTextResizeAnchor,
-      origin: session.origin,
-      snapshot: session.transform,
-      startFontSize: session.fontSize,
-    },
-    node,
-    (width, fontSize) =>
-      measureRichTextHeightForView(session.view, width, fontSize)
-  );
+  const stage = node.getStage();
+  const parent = node.getParent();
+  const pointer = stage && parent ? pointerToParentLocal(stage, parent) : null;
+  const resizeSession = resizeSessionFrom(session, anchor);
+  const measureHeight = (width: number, fontSize: number) =>
+    measureRichTextHeightForView(session.view, width, fontSize);
+
+  let result: RichTextResizeResult;
+  if (pointer && isRichTextCornerAnchor(anchor)) {
+    result = computeCornerResizeFromPointer(
+      resizeSession,
+      pointer,
+      measureHeight
+    );
+    applyRichTextToGroup(node, session.view, result.transform, result.fontSize);
+  } else if (pointer && isRichTextHorizontalAnchor(anchor)) {
+    result = computeHorizontalResize(resizeSession, pointer, measureHeight);
+    applyRichTextToGroup(node, session.view, result.transform, result.fontSize);
+  } else {
+    result = bakeRichTextNodeTransform(resizeSession, node, measureHeight);
+  }
+
   node.destroyChildren();
   node.getLayer()?.batchDraw();
   return { fontSize: result.fontSize, transform: result.transform };
