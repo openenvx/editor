@@ -53,7 +53,7 @@ This is the VS Code webview / Figma widget model: **UI description + message bus
 |  | Internal | External (embed panel) | External (sandbox) |
 | --- | --- | --- | --- |
 | Runs where | Same JS bundle as the editor | Other document / origin | QuickJS Worker isolate |
-| Authors with | OOP `Plugin` + fluent builders | `@xmazu/openenvxee-elements` → `RenderNode` | JS/TS + elements / `openenvx.*`; optional `showUI` |
+| Authors with | OOP `Plugin` + fluent builders | `@xmazu/openenvxee-elements/panel` → `RenderNode` | JS/TS + widget-sdk / elements / `openenvx.*`; optional `showUI` |
 | Trust | First-party | Must not execute arbitrary code in-editor | Must not execute in editor main world |
 | Mutation path | Direct `ctx.register` / workbench API | Only `command` through allowlist | Allowlisted `executeCommand` + widget `values` / face render |
 | UI path | Builders → descriptors → renderers | Tree → validate → **same** mappers/builders → renderers | Sandboxed iframe (`showUI`) or on-canvas widget face |
@@ -98,11 +98,11 @@ flowchart TB
 | Surface | Supported? | Notes |
 | --- | --- | --- |
 | React (or any framework) in `showUI` iframe | **Yes** | Authors bundle UI into HTML; host never loads it into Studio’s main React tree. Duplex: `openenvx.ui.postMessage` ↔ iframe `postPluginMessage` / `onPluginMessage`. |
-| React components via `@xmazu/openenvxee-elements` | **Yes** | Preact host inside QuickJS; `renderToElementTree` / mounted render emit element JSON; host maps to layers. |
+| React/Preact via `@xmazu/openenvxee-widget-sdk` + elements | **Yes** | Preact expand inside QuickJS; `renderToElementTree` emits `RenderNode`; host maps to layers. |
 | ReactDOM as widget canvas face | **No** | Would put untrusted UI on the editor render path. |
 | Backend `renderToElementTree` round-trip | **Yes** | Same package emits element JSON; host applicators map to scene layers. |
 
-**V.1 author promise:** write your panel in React inside `showUI`; talk to the sandbox over `postMessage`. Widget faces are authored with `@xmazu/openenvxee-elements` and stored as ordinary layers under `data.children`.
+**V.1 author promise:** write your panel in React inside `showUI`; talk to the sandbox over `postMessage`. Widget faces are authored with `@xmazu/openenvxee-widget-sdk` + `@xmazu/openenvxee-elements` and stored as ordinary layers under `data.children`.
 
 ## Protocol surface (public for untrusted embed / sandbox code)
 
@@ -219,7 +219,8 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 | Concern | Package |
 | --- | --- |
 | Element vocabulary, messages, `validatePluginTree` / `validateExtensionManifest`, sandbox grant types | `@xmazu/openenvxee-protocol` (published) |
-| Preact authoring SDK (`defineExtension`, `/canvas` `/html` `/panel`) | `@xmazu/openenvxee-elements` (published) |
+| Preact element vocabulary (`/canvas` `/html` `/panel`) | `@xmazu/openenvxee-elements` (published) |
+| Widget authoring (`defineExtension`, expand, Vite packaging) | `@xmazu/openenvxee-widget-sdk` (published) |
 | Tree → builder mappers, plugin host context, manifest → contributions, `ExternalHostMount`, `SandboxHostSurface` / `EmbedPanelHostSurface`, `mountSandboxHost` / `mountEmbedPanelHost` | `@openenvx/headless` |
 | `EmbedPanelHost`, `SandboxExtensionHost`, `PluginPanel`, postMessage transport, command gate, sandbox runtime | `@xmazu/openenvxee-workbench` |
 | Internal OOP plugins + builders | `@openenvx/core`, `@openenvx/headless`, product plugins (`canvas-pro`, …) |

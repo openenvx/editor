@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import type { Plugin, ResolvedConfig } from 'vite';
 
-export interface OpenEnvxWidgetsOptions {
+export interface BundleWidgetSourcesOptions {
   /** Optional esbuild alias map. Rarely needed — packages resolve from exports. */
   alias?: Record<string, string>;
 }
@@ -13,18 +13,22 @@ export const OPENENVX_WIDGET_PREFIX = 'openenvx-widget:';
 const RESOLVED_PREFIX = `\0${OPENENVX_WIDGET_PREFIX}`;
 
 /**
- * Vite plugin: turn a widget TSX entry into an IIFE **string** for QuickJS.
+ * Vite packaging plugin: turn a widget TSX entry into an IIFE **string** for QuickJS.
+ * Not a runtime API — only delivery. After eval the module must call
+ * `openenvx.widget.register` (or `define*Component`, which does).
  *
  * ```ts
  * // vite.config.ts
- * plugins: [openenvxWidgets()]
+ * plugins: [bundleWidgetSources()]
  *
  * // app.tsx — host never runs this; only a string payload for the isolate
  * import source from 'openenvx-widget:./seating.widget.tsx'
  * await sandbox.pushWidgetSource('wm.seating', source)
  * ```
  */
-export function openenvxWidgets(options: OpenEnvxWidgetsOptions = {}): Plugin {
+export function bundleWidgetSources(
+  options: BundleWidgetSourcesOptions = {}
+): Plugin {
   let root = process.cwd();
   const alias = options.alias ?? {};
   const watched = new Set<string>();
@@ -32,7 +36,7 @@ export function openenvxWidgets(options: OpenEnvxWidgetsOptions = {}): Plugin {
   async function bundleWidget(entry: string): Promise<string> {
     const abs = path.isAbsolute(entry) ? entry : path.resolve(root, entry);
     if (!fs.existsSync(abs)) {
-      throw new Error(`openenvxWidgets: entry not found: ${abs}`);
+      throw new Error(`bundleWidgetSources: entry not found: ${abs}`);
     }
 
     const esbuild = await import('esbuild');
@@ -52,7 +56,9 @@ export function openenvxWidgets(options: OpenEnvxWidgetsOptions = {}): Plugin {
     });
     const file = result.outputFiles?.[0];
     if (!file) {
-      throw new Error(`openenvxWidgets: esbuild produced no output for ${abs}`);
+      throw new Error(
+        `bundleWidgetSources: esbuild produced no output for ${abs}`
+      );
     }
 
     for (const input of Object.keys(result.metafile?.inputs ?? {})) {
@@ -64,7 +70,7 @@ export function openenvxWidgets(options: OpenEnvxWidgetsOptions = {}): Plugin {
   }
 
   return {
-    name: 'openenvx-widgets',
+    name: 'openenvx-bundle-widget-sources',
     configResolved(config: ResolvedConfig) {
       root = config.root;
     },
@@ -107,11 +113,4 @@ export function openenvxWidgets(options: OpenEnvxWidgetsOptions = {}): Plugin {
       return [];
     },
   };
-}
-
-/** @deprecated Use {@link openenvxWidgets}. */
-export function openenvxWidgetSources(
-  options: OpenEnvxWidgetsOptions = {}
-): Plugin {
-  return openenvxWidgets(options);
 }

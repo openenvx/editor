@@ -1,13 +1,11 @@
 /** @jsxImportSource preact */
+import { Grid, Stack, Text } from '@xmazu/openenvxee-elements/canvas';
 import {
   defineCanvasComponent,
-  Grid,
   list,
   select,
-  Stack,
   string,
-  Text,
-} from '@xmazu/openenvxee-elements';
+} from '@xmazu/openenvxee-widget-sdk';
 
 const STATUS = ['free', 'held', 'seated'] as const;
 const COLORS: Record<(typeof STATUS)[number], string> = {
@@ -23,7 +21,7 @@ const DEFAULT_TABLES = [
   { id: 't4', label: '4', status: 'seated' as const },
 ];
 
-/** Seating plan canvas widget — authored with the elements SDK. */
+/** Seating plan canvas widget — authored with the widget SDK. */
 export const seatingWidget = defineCanvasComponent({
   id: 'wm.seating',
   label: 'Seating plan',

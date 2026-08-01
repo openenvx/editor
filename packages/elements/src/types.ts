@@ -1,48 +1,3 @@
-import type { RenderChild, RenderNode } from '@xmazu/openenvxee-protocol';
-
-/** Field kinds that map onto PropertyBuilder / PLUGIN_FIELD_KINDS. */
-export type WidgetFieldKind =
-  | 'text'
-  | 'textarea'
-  | 'number'
-  | 'color'
-  | 'image'
-  | 'richText'
-  | 'align'
-  | 'toggle'
-  | 'select'
-  | 'font'
-  | 'repeater'
-  | 'border'
-  | 'cornerRadius'
-  | 'padding'
-  | 'shadow';
-
-export type WidgetFieldDef =
-  | { kind: Exclude<WidgetFieldKind, 'select' | 'repeater'>; label: string }
-  | {
-      kind: 'select';
-      label: string;
-      options: { label: string; value: string }[];
-    }
-  | {
-      kind: 'repeater';
-      label: string;
-      of: Record<string, WidgetFieldDef>;
-    };
-
-export type WidgetKind = 'canvas' | 'html';
-
-/** Persisted on the widget layer so Inspector works without the source. */
-export interface WidgetManifest {
-  id: string;
-  label: string;
-  icon?: string;
-  kinds: WidgetKind[];
-  fields: Record<string, WidgetFieldDef>;
-  defaults?: Record<string, unknown>;
-}
-
 export type CanvasElementType =
   | 'Group'
   | 'Stack'
@@ -69,10 +24,6 @@ export type HtmlElementType =
   | 'Block';
 
 export type WidgetElementType = CanvasElementType | HtmlElementType;
-
-/** Shared envelope with panels (`RenderNode` in `@xmazu/openenvxee-protocol`). */
-export type WidgetNode = RenderNode;
-export type WidgetChild = RenderChild;
 
 export type StackDirection = 'horizontal' | 'vertical';
 export type StackAlign = 'start' | 'center' | 'end' | 'stretch';
@@ -108,6 +59,7 @@ export interface TextProps {
   bind?: string;
   onClick?: unknown;
   children?: unknown;
+  value?: string;
 }
 
 export interface RectangleProps {

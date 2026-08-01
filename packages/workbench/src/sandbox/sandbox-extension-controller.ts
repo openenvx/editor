@@ -311,8 +311,11 @@ export class SandboxExtensionController {
   }
 
   /**
-   * Ask the widget isolate to render its face for the given values.
+   * Ask the widget isolate to expand its face for the given values.
    * Returns the element tree JSON (RenderNode) or null.
+   *
+   * **Ownership:** document state stays on the host (`data.values`). The isolate
+   * only expands Preact → RenderNode; the host maps that to scene layers.
    * Handlers are stored per `layerId` so multi-instance widgets do not cross-wire.
    */
   async renderWidgetFace(
@@ -333,30 +336,36 @@ export class SandboxExtensionController {
     return this.withWidgetLayerContext(layerId, async () =>
       isolate.evalModule(
         `(function () {
-          var registry = globalThis.__openenvxWidgetRegistry;
-          if (!registry) return null;
-          var entry = registry[${JSON.stringify(lookupId)}]
-            || registry[${JSON.stringify(extensionId)}];
-          if (!entry) {
-            var keys = Object.keys(registry);
-            entry = keys.length === 1 ? registry[keys[0]] : null;
-          }
+          var widget = globalThis.openenvx && globalThis.openenvx.widget;
+          if (!widget || !widget._registry) return null;
+          var entry = widget._registry[${JSON.stringify(lookupId)}]
+            || widget._registry[${JSON.stringify(extensionId)}];
           if (!entry || typeof entry.render !== 'function') return null;
           var values = ${JSON.stringify(values)};
-          globalThis.__openenvxSetProps = function (patch) {
+          widget._renderValues = values;
+          widget.rendering = true;
+          widget.applyProps = function (patch) {
             Object.assign(values, patch || {});
             return globalThis.openenvx.setSyncedState(values);
           };
-          try {
-            var tree = entry.render(values);
-            var bag = globalThis.__openenvxWidgetHandlers || {};
-            globalThis.__openenvxWidgetHandlersByLayer =
-              globalThis.__openenvxWidgetHandlersByLayer || {};
-            globalThis.__openenvxWidgetHandlersByLayer[${JSON.stringify(layerId)}] = bag;
-            return tree;
-          } finally {
-            delete globalThis.__openenvxSetProps;
+          // Cleared by the engine after pending jobs so microtasks cannot escape the gate.
+          widget._endRenderPass = function () {
+            widget.rendering = false;
+            widget.applyProps = null;
+            widget._renderValues = null;
+            widget._endRenderPass = null;
+          };
+          var result = entry.render(values);
+          if (!result || typeof result !== 'object' || !('tree' in result)) {
+            throw new Error('openenvx.widget render must return { tree, handlers }');
           }
+          var bag =
+            result.handlers && typeof result.handlers === 'object'
+              ? result.handlers
+              : {};
+          widget._handlersByLayer = widget._handlersByLayer || Object.create(null);
+          widget._handlersByLayer[${JSON.stringify(layerId)}] = bag;
+          return result.tree;
         })()`
       )
     );
@@ -402,7 +411,8 @@ export class SandboxExtensionController {
 
   /**
    * Invoke a handler id inside the extension isolate for a widget layer.
-   * Installs setProps for the full handler lifetime (including async).
+   * Installs applyProps for the full handler lifetime (including async).
+   * Handler pass is not a face-render pass — executeCommand / showUI allowed.
    */
   invokeWidgetHandler(
     extensionId: string,
@@ -421,24 +431,32 @@ export class SandboxExtensionController {
       try {
         await isolate.evalModule(
           `(async function () {
+            var widget = globalThis.openenvx && globalThis.openenvx.widget;
             var current = await globalThis.openenvx.getSyncedState();
             var values =
               current && typeof current === 'object' && !Array.isArray(current)
                 ? Object.assign({}, current)
                 : {};
-            globalThis.__openenvxSetProps = function (patch) {
-              Object.assign(values, patch || {});
-              return globalThis.openenvx.setSyncedState(values);
-            };
+            if (widget) {
+              widget._renderValues = values;
+              widget.rendering = false;
+              widget.applyProps = function (patch) {
+                Object.assign(values, patch || {});
+                return globalThis.openenvx.setSyncedState(values);
+              };
+            }
             try {
-              var bags = globalThis.__openenvxWidgetHandlersByLayer || {};
+              var bags = (widget && widget._handlersByLayer) || {};
               var bag = bags[${JSON.stringify(layerId)}] || {};
               var fn = bag[${JSON.stringify(handlerId)}];
               if (typeof fn === 'function') {
                 await fn(${JSON.stringify(payload ?? null)});
               }
             } finally {
-              delete globalThis.__openenvxSetProps;
+              if (widget) {
+                widget.applyProps = null;
+                widget._renderValues = null;
+              }
             }
           })()`
         );

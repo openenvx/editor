@@ -1,15 +1,15 @@
 import path from 'node:path';
 
 import react from '@vitejs/plugin-react';
-import { openenvxWidgets } from '@xmazu/openenvxee-elements/vite';
+import { bundleWidgetSources } from '@xmazu/openenvxee-widget-sdk/vite';
 import { defineConfig } from 'vite';
 
 const monorepoRoot = path.resolve(import.meta.dirname, '../..');
 
 export default defineConfig({
-  plugins: [react(), openenvxWidgets()],
+  plugins: [react(), bundleWidgetSources()],
   server: {
     fs: { allow: [monorepoRoot] },
-    port: 5176,
+    port: 5181,
   },
 });

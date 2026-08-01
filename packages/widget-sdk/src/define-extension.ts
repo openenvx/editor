@@ -14,6 +14,11 @@ export interface DefineExtensionOptions {
   version?: string;
   activation?: ExtensionActivationEvent[];
   permissions?: SandboxCapability[];
+  /**
+   * Command ids the isolate may call via `openenvx.executeCommand`.
+   * Distinct from `contributes.commands` (UI commands the host registers).
+   */
+  requestedCommands?: string[];
   contributes: {
     widgets?: RegisteredWidget[];
     blocks?: RegisteredWidget[];
@@ -33,11 +38,13 @@ export function defineExtension(
   options: DefineExtensionOptions
 ): ExtensionManifest {
   if (!options.id || typeof options.id !== 'string') {
-    throw new Error('@xmazu/openenvxee-elements: defineExtension requires id');
+    throw new Error(
+      '@xmazu/openenvxee-widget-sdk: defineExtension requires id'
+    );
   }
   if (!options.name || typeof options.name !== 'string') {
     throw new Error(
-      '@xmazu/openenvxee-elements: defineExtension requires name'
+      '@xmazu/openenvxee-widget-sdk: defineExtension requires name'
     );
   }
 
@@ -56,6 +63,9 @@ export function defineExtension(
     ...(options.version ? { version: options.version } : {}),
     ...(options.activation ? { activation: options.activation } : {}),
     ...(options.permissions ? { permissions: options.permissions } : {}),
+    ...(options.requestedCommands
+      ? { requestedCommands: options.requestedCommands }
+      : {}),
     contributes: {
       ...(options.contributes.widgets
         ? { widgets: options.contributes.widgets.map(toWidgetContrib) }

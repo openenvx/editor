@@ -1,12 +1,11 @@
 {
   "name": "@xmazu/openenvxee-elements",
   "version": "0.1.0",
-  "description": "OpenEnvx widget element SDK — React-shaped components that render to scene JSON",
+  "description": "OpenEnvx Preact element vocabulary — canvas, HTML, and panel intrinsics",
   "license": "MIT",
   "type": "module",
   "files": [
-    "dist",
-    "src/vite"
+    "dist"
   ],
   "main": "./src/index.ts",
   "module": "./src/index.ts",
@@ -16,20 +15,14 @@
     "./canvas": "./src/canvas.ts",
     "./html": "./src/html.ts",
     "./panel": "./src/panel.ts",
-    "./vite": "./src/vite/openenvx-widget-sources-plugin.ts",
-    "./vite/client": "./src/vite/client.d.ts",
     "./jsx-runtime": "./src/jsx-runtime.ts",
     "./jsx-dev-runtime": "./src/jsx-dev-runtime.ts"
   },
   "scripts": {
     "build": "tsup",
     "prepack": "bun run build",
-    "test": "vitest",
-    "check-types": "tsc --noEmit",
-    "openenvx-manifest": "bun run ./src/cli/openenvx-manifest.ts"
-  },
-  "bin": {
-    "openenvx-manifest": "./src/cli/openenvx-manifest.ts"
+    "test": "vitest run --passWithNoTests",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@xmazu/openenvxee-protocol": "workspace:*",
@@ -37,19 +30,9 @@
   },
   "devDependencies": {
     "@openenvx/typescript-config": "workspace:*",
-    "esbuild": "^0.25.0",
     "tsup": "catalog:dev",
     "typescript": "catalog:dev",
-    "vite": "8.1.3",
     "vitest": "catalog:testing"
-  },
-  "peerDependencies": {
-    "esbuild": "^0.25.0",
-    "vite": ">=5"
-  },
-  "peerDependenciesMeta": {
-    "esbuild": { "optional": true },
-    "vite": { "optional": true }
   },
   "publishConfig": {
     "access": "public",
@@ -78,8 +61,6 @@
         "import": "./dist/panel.js",
         "default": "./dist/panel.js"
       },
-      "./vite": "./src/vite/openenvx-widget-sources-plugin.ts",
-      "./vite/client": "./src/vite/client.d.ts",
       "./jsx-runtime": {
         "types": "./dist/jsx-runtime.d.ts",
         "import": "./dist/jsx-runtime.js",

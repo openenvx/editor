@@ -1,14 +1,5 @@
-import type { PluginElementType, PluginNode } from '@xmazu/openenvxee-protocol';
-import { validatePluginTree } from '@xmazu/openenvxee-protocol';
+import type { PluginElementType } from '@xmazu/openenvxee-protocol';
 import { h, type ComponentChildren, type JSX } from 'preact';
-
-import {
-  beginHandlers,
-  endHandlers,
-  type HandlerRegistry,
-  type WidgetHandler,
-} from './host/handlers';
-import { expandToWidgetTree } from './host/walk-tree';
 
 type PropsWithChildren = Record<string, unknown> & {
   children?: ComponentChildren;
@@ -67,37 +58,3 @@ export const Palette = definePanel('Palette');
 export const PaletteTab = definePanel('PaletteTab');
 export const PaletteCategory = definePanel('PaletteCategory');
 export const PaletteItem = definePanel('PaletteItem');
-
-export interface RenderPanelResult {
-  tree: PluginNode | null;
-  handlers: HandlerRegistry;
-}
-
-/**
- * Render a Preact panel tree to the serializable PluginNode envelope
- * (same shape the host validators and mappers already consume).
- */
-export function renderPanelTree(
-  element: JSX.Element | null
-): RenderPanelResult {
-  const handlers: HandlerRegistry = new Map();
-  beginHandlers(handlers);
-  try {
-    if (!element) {
-      return { tree: null, handlers };
-    }
-    const tree = expandToWidgetTree(element as never, handlers);
-    if (tree) {
-      const result = validatePluginTree(tree);
-      if (!result.ok) {
-        throw new Error(result.reason || 'Invalid panel tree');
-      }
-      return { tree: result.root, handlers };
-    }
-    return { tree: null, handlers };
-  } finally {
-    endHandlers();
-  }
-}
-
-export type { HandlerRegistry, WidgetHandler };

@@ -5,7 +5,7 @@ OpenEnvx has **three different extension trees**. They are not interchangeable. 
 | Path | Trust | Runs where | Author with | Guide |
 | --- | --- | --- | --- | --- |
 | **Internal plugin** | First-party, trusted | Same JS bundle as Studio (`PluginManager`) | OOP `Plugin` / `WorkbenchPlugin`, builders | [Internal plugin guide](extension-guide.md) |
-| **Sandbox widget / plugin** | Untrusted | QuickJS Worker isolate (+ optional `showUI` iframe) | `@xmazu/openenvxee-elements` (`defineExtension`, `defineCanvasComponent` / `defineHtmlComponent`) | [Sandbox & embed guide](sandbox-extension-guide.md) |
+| **Sandbox widget / plugin** | Untrusted | QuickJS Worker isolate (+ optional `showUI` iframe) | `@xmazu/openenvxee-widget-sdk` + `@xmazu/openenvxee-elements` | [Sandbox & embed guide](sandbox-extension-guide.md) |
 | **Embed panel** | Parent page | Other document / origin (`postMessage`) | Protocol `RenderNode` trees (+ optional elements `/panel`) | [Sandbox & embed guide](sandbox-extension-guide.md#embed-panels) |
 
 ```text

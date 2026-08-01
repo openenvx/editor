@@ -1,8 +1,10 @@
-import type { RenderPropValue } from '@xmazu/openenvxee-protocol';
+import type {
+  RenderChild,
+  RenderNode,
+  RenderPropValue,
+} from '@xmazu/openenvxee-protocol';
 import type { ComponentChild, VNode } from 'preact';
 
-import type { WidgetChild, WidgetNode } from '../types';
-import type { HostNode } from './fake-dom';
 import { serializePropValue, type HandlerRegistry } from './handlers';
 
 function isVNode(value: unknown): value is VNode {
@@ -43,13 +45,13 @@ function serializeProps(
 }
 
 /**
- * Expand a Preact element tree into serializable WidgetNodes.
- * Function components are invoked synchronously (hooks require a mounted host).
+ * Expand a Preact element tree into serializable {@link RenderNode}s.
+ * Function components are invoked synchronously.
  */
-export function expandToWidgetTree(
+export function expandToRenderTree(
   input: ComponentChild,
   registry: HandlerRegistry | null = null
-): WidgetNode | null {
+): RenderNode | null {
   if (input === null || input === undefined || typeof input === 'boolean') {
     return null;
   }
@@ -62,8 +64,8 @@ export function expandToWidgetTree(
   }
   if (Array.isArray(input)) {
     const kids = input
-      .map((child) => expandToWidgetTree(child as ComponentChild, registry))
-      .filter((node): node is WidgetNode => node !== null);
+      .map((child) => expandToRenderTree(child as ComponentChild, registry))
+      .filter((node): node is RenderNode => node !== null);
     if (kids.length === 0) {
       return null;
     }
@@ -85,18 +87,18 @@ export function expandToWidgetTree(
     const result = (type as (p: Record<string, unknown>) => ComponentChild)(
       (props ?? {}) as Record<string, unknown>
     );
-    return expandToWidgetTree(result, registry);
+    return expandToRenderTree(result, registry);
   }
 
   const record = (props ?? {}) as Record<string, unknown>;
   const { children } = record;
-  const childNodes: WidgetChild[] = [];
+  const childNodes: RenderChild[] = [];
   for (const child of flattenChildren(children)) {
     if (typeof child === 'string' || typeof child === 'number') {
       childNodes.push(child);
       continue;
     }
-    const node = expandToWidgetTree(child, registry);
+    const node = expandToRenderTree(child, registry);
     if (node) {
       childNodes.push(node);
     }
@@ -106,56 +108,5 @@ export function expandToWidgetTree(
     type: String(type),
     props: serializeProps(record, registry),
     children: childNodes,
-  };
-}
-
-/** Recover a WidgetNode tree from a fake-DOM host after Preact render. */
-export function hostNodeToWidgetTree(
-  node: HostNode,
-  registry: HandlerRegistry | null = null
-): WidgetNode | null {
-  if (node.nodeType === 3) {
-    const text = node.textContent;
-    if (!text) {
-      return null;
-    }
-    return { type: 'Text', props: {}, children: [text] };
-  }
-
-  const kids: WidgetChild[] = [];
-  for (const child of node.childNodes) {
-    if (child.nodeType === 3) {
-      if (child.textContent) {
-        kids.push(child.textContent);
-      }
-      continue;
-    }
-    const mapped = hostNodeToWidgetTree(child, registry);
-    if (mapped) {
-      kids.push(mapped);
-    }
-  }
-
-  // Skip the synthetic mount root.
-  if (node.localName === 'openenvx-root' || node.nodeName === 'openenvx-root') {
-    if (kids.length === 1 && typeof kids[0] === 'object') {
-      return kids[0];
-    }
-    if (kids.length === 0) {
-      return null;
-    }
-    return {
-      type: 'Stack',
-      props: { direction: 'vertical', spacing: 0 },
-      children: kids,
-    };
-  }
-
-  const props = serializeProps({ ...node.__oxProps }, registry);
-  delete props.children;
-  return {
-    type: node.nodeName,
-    props,
-    children: kids,
   };
 }

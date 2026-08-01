@@ -15,6 +15,7 @@
     "@openenvx/core": "workspace:*",
     "@openenvx/headless": "workspace:*",
     "@xmazu/openenvxee-elements": "workspace:*",
+    "@xmazu/openenvxee-widget-sdk": "workspace:*",
     "@xmazu/openenvxee-preview": "workspace:*",
     "@xmazu/openenvxee-schema": "workspace:*",
     "@xmazu/openenvxee-studio": "workspace:*",

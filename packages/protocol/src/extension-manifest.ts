@@ -79,6 +79,11 @@ export interface ExtensionManifest {
   activation?: ExtensionActivationEvent[];
   /** Requested capabilities — intersected with the host grant. */
   permissions?: SandboxCapability[];
+  /**
+   * Command ids the isolate may call via `executeCommand`.
+   * Distinct from `contributes.commands` (UI commands the host registers).
+   */
+  requestedCommands?: string[];
   contributes: ExtensionContributes;
 }
 

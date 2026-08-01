@@ -52,8 +52,8 @@ Hard rules:
 | HTML product host | `@xmazu/openenvxee-html-studio` |
 | Custom shell / playground | `@openenvx/core` + `@openenvx/headless` (+ canvas or html) |
 | In-repo **internal** plugin author | `core` + `headless` contributions; canvas APIs from `@openenvx/canvas` — [extension-guide.md](../../apps/docs/extension-guide.md) |
-| **Sandbox** widget / plugin author | `@xmazu/openenvxee-elements` (+ protocol) — [sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md) |
-| Embed parent author | protocol (+ elements `/panel`) — [sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md#embed-panels) |
+| **Sandbox** widget / plugin author | `@xmazu/openenvxee-widget-sdk` + `@xmazu/openenvxee-elements` — [sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md) |
+| Embed parent author | protocol (+ elements `/panel` + widget-sdk `renderPanelTree`) — [sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md#embed-panels) |
 | Scene / export / LLM schemas | `@xmazu/openenvxee-schema` (+ preview / protocol as needed) |
 
 ## Package catalog
@@ -63,7 +63,8 @@ Hard rules:
 | `@xmazu/openenvxee-schema` | yes | Scene Zod model, normalize/validate, template helpers | `.`, `./scene.schema.json` |
 | `@xmazu/openenvxee-preview` | yes | Layer preview descriptors, Render IR types | `.` |
 | `@xmazu/openenvxee-protocol` | yes | `RenderNode`, manifests, validators, sandbox grants/messages | `.` |
-| `@xmazu/openenvxee-elements` | yes | Widget/element SDK (`defineExtension`, `renderToLayers`, Preact host) | `.`, `./canvas`, `./html`, `./panel`, `./vite`, jsx runtimes |
+| `@xmazu/openenvxee-elements` | yes | Preact element vocabulary (`/canvas` `/html` `/panel`) | `.`, `./canvas`, `./html`, `./panel`, jsx runtimes |
+| `@xmazu/openenvxee-widget-sdk` | yes | `defineExtension` / `define*Component`, props, `renderToElementTree`, Vite packaging, ambient `openenvx` | `.`, `./vite`, `./openenvx` |
 | `@openenvx/core` | private | `EditorRuntime`, `PluginManager`, commands, layers, DI, scene store | `.` |
 | `@openenvx/headless` | private | `WorkbenchController`, UI contribution descriptors, property host, `ExternalHostMount` | `.`, `./react` |
 | `@openenvx/canvas` | private | Konva engine, layers, `CanvasBasicsPlugin`, `CanvasEditor` | `.` (+ export/registry subpaths) |
@@ -86,9 +87,11 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@xmazu/openenvxee-preview`** — `LayerPreviewBuilder`; Render IR document/node types; IR guards; `RENDER_IR_VERSION`.
 
-**`@xmazu/openenvxee-protocol`** — `RenderNode` / manifest types; `validateRenderTree` / `validatePluginTree` / `validateWidgetTree` / `validateExtensionManifest`; sandbox grants + host/parent message unions.
+**`@xmazu/openenvxee-protocol`** — `RenderNode` / manifest types; `WidgetFaceRenderResult` / `WidgetRegistryEntry`; `validateRenderTree` / `validatePluginTree` / `validateWidgetTree` / `validateExtensionManifest`; sandbox grants + host/parent message unions.
 
-**`@xmazu/openenvxee-elements`** — `defineExtension`, `defineCanvasComponent` / `defineHtmlComponent`, `renderToLayers`; prop helpers; canvas/HTML/panel element sets; Vite plugin via `./vite`.
+**`@xmazu/openenvxee-elements`** — Preact canvas/HTML/panel intrinsics only.
+
+**`@xmazu/openenvxee-widget-sdk`** — `defineExtension`, `defineCanvasComponent` / `defineHtmlComponent`, `renderToElementTree`, `renderPanelTree`, `buildGrantFromManifest`; Vite `bundleWidgetSources` via `./vite`; isolate ambient via `./openenvx`.
 
 ### Editor backbone (private; re-exported by studio)
 
@@ -133,7 +136,7 @@ Packages are pre-1.0: breaking changes are allowed and preferred over shims ([AG
 
 | Surface | Stability expectation |
 | --- | --- |
-| **Published** (`schema`, `preview`, `protocol`, `elements`, `studio`) | Treat as the external contract. Prefer additive changes. Document removals/renames in the PR / changeset. Bump version on every publish. |
+| **Published** (`schema`, `preview`, `protocol`, `elements`, `widget-sdk`, `studio`) | Treat as the external contract. Prefer additive changes. Document removals/renames in the PR / changeset. Bump version on every publish. |
 | **Studio re-export allowlist** (workbench symbols in `studio/src/index.ts`) | Host apps depend on this list. Adding is fine; removing/renaming is a host break — update openenvx-cloud / embed hosts in the same change window. |
 | **Private workspace libs** (`core`, `headless`, `canvas`, …) | Free to break inside the monorepo in one PR (update all callers). Do **not** add deprecated dual paths. |
 | **Contribution class hierarchy** (`Plugin`, `Command`, `LayerDefinition`, workbench contributions) | Highest-value internal API. Change carefully; update extension-guide when the authoring shape moves. |

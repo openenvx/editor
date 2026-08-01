@@ -1,11 +1,6 @@
 /** @jsxImportSource preact */
-import {
-  defineCanvasComponent,
-  QR as Qr,
-  Stack,
-  string,
-  Text,
-} from '@xmazu/openenvxee-elements';
+import { QR as Qr, Stack, Text } from '@xmazu/openenvxee-elements/canvas';
+import { defineCanvasComponent, string } from '@xmazu/openenvxee-widget-sdk';
 
 /** Save-the-date canvas widget — QR + bound title. */
 export const saveTheDateWidget = defineCanvasComponent({

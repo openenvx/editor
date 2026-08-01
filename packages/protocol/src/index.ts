@@ -55,6 +55,10 @@ export {
   validateExtensionManifest,
   type ExtensionManifestValidationResult,
 } from './validate-extension-manifest';
+export type {
+  WidgetFaceRenderResult,
+  WidgetRegistryEntry,
+} from './widget-host-api';
 export {
   validateRenderTree,
   isRenderPropValue,

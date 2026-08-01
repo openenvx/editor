@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@xmazu/openenvxee-elements": "workspace:*",
+    "@xmazu/openenvxee-widget-sdk": "workspace:*",
     "@xmazu/openenvxee-html-studio": "workspace:*",
     "preact": "^10.26.5",
     "react": "19.2.7",

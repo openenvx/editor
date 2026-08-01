@@ -333,9 +333,10 @@ describe('SandboxExtensionController', () => {
 
   it('refuses renderWidgetFace without widget:render', async () => {
     const source = `
-      globalThis.__openenvxWidgetRegistry = {
-        'wm.box': { render: function () { return { type: 'Rect', props: {}, children: [] }; } }
-      };
+      openenvx.widget.register({
+        id: 'wm.box',
+        render: function () { return { tree: { type: 'Rect', props: {}, children: [] }, handlers: {} }; }
+      });
     `;
     const grant: SandboxExtensionGrant = {
       id: 'wm.box',
@@ -358,16 +359,15 @@ describe('SandboxExtensionController', () => {
 
   it('scopes synced values to the active widget layer, not the first start id', async () => {
     const source = `
-      globalThis.__openenvxWidgetRegistry = {
-        'wm.vals': {
-          render: function (values) {
-            if (globalThis.__openenvxSetProps) {
-              globalThis.__openenvxSetProps({ n: (values.n || 0) + 100 });
-            }
-            return { type: 'Text', props: { value: 'ok' }, children: [] };
+      openenvx.widget.register({
+        id: 'wm.vals',
+        render: function (values) {
+          if (openenvx.widget.applyProps) {
+            openenvx.widget.applyProps({ n: (values.n || 0) + 100 });
           }
+          return { tree: { type: 'Text', props: { value: 'ok' }, children: [] }, handlers: {} };
         }
-      };
+      });
     `;
     const grant: SandboxExtensionGrant = {
       id: 'wm.vals',
@@ -398,6 +398,47 @@ describe('SandboxExtensionController', () => {
     await controller.renderWidgetFace('wm.vals', 'layer-b', { n: 2 });
     expect(writes).toEqual([{ layerId: 'layer-b', value: { n: 102 } }]);
     expect(valuesByLayer.get('layer-a')).toEqual({ n: 1 });
+    controller.dispose();
+  }, 30_000);
+
+  it('denies executeCommand during face render', async () => {
+    const source = `
+      openenvx.widget.register({
+        id: 'wm.pure',
+        render: function () {
+          try {
+            openenvx.executeCommand('canvas.insertRect', {});
+            return { tree: { type: 'Text', props: { value: 'bad' }, children: [] }, handlers: {} };
+          } catch (error) {
+            return {
+              tree: { type: 'Text', props: { value: String(error && error.message || error) }, children: [] },
+              handlers: {}
+            };
+          }
+        }
+      });
+    `;
+    const grant: SandboxExtensionGrant = {
+      id: 'wm.pure',
+      kind: 'widget',
+      source,
+      capabilities: ['widget:render', 'document:write'],
+      allowedCommands: ['canvas.insertRect'],
+    };
+    const controller = new SandboxExtensionController({
+      grants: [grant],
+      permission: 'edit',
+      host: mockHost(),
+      preferInProcess: true,
+    });
+    await controller.start(grant);
+    const tree = await controller.renderWidgetFace('wm.pure', 'layer-1', {});
+    expect(tree).toMatchObject({
+      type: 'Text',
+      props: {
+        value: expect.stringContaining('not allowed during widget face render'),
+      },
+    });
     controller.dispose();
   }, 30_000);
 });

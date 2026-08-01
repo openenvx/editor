@@ -54,6 +54,7 @@
         "@xmazu/openenvxee-preview": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
         "@xmazu/openenvxee-studio": "workspace:*",
+        "@xmazu/openenvxee-widget-sdk": "workspace:*",
         "preact": "^10.26.5",
         "react": "19.2.7",
         "react-dom": "19.2.7",
@@ -100,6 +101,7 @@
       "dependencies": {
         "@xmazu/openenvxee-elements": "workspace:*",
         "@xmazu/openenvxee-html-studio": "workspace:*",
+        "@xmazu/openenvxee-widget-sdk": "workspace:*",
         "preact": "^10.26.5",
         "react": "19.2.7",
         "react-dom": "19.2.7",
@@ -217,29 +219,16 @@
     "packages/elements": {
       "name": "@xmazu/openenvxee-elements",
       "version": "0.1.0",
-      "bin": {
-        "openenvx-manifest": "./src/cli/openenvx-manifest.ts",
-      },
       "dependencies": {
         "@xmazu/openenvxee-protocol": "workspace:*",
         "preact": "^10.26.5",
       },
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
-        "esbuild": "^0.25.0",
         "tsup": "catalog:dev",
         "typescript": "catalog:dev",
-        "vite": "8.1.3",
         "vitest": "catalog:testing",
       },
-      "peerDependencies": {
-        "esbuild": "^0.25.0",
-        "vite": ">=5",
-      },
-      "optionalPeers": [
-        "esbuild",
-        "vite",
-      ],
     },
     "packages/headless": {
       "name": "@openenvx/headless",
@@ -419,6 +408,34 @@
       "dependencies": {
         "tsup": "catalog:dev",
       },
+    },
+    "packages/widget-sdk": {
+      "name": "@xmazu/openenvxee-widget-sdk",
+      "version": "0.1.0",
+      "bin": {
+        "openenvx-manifest": "./src/cli/openenvx-manifest.ts",
+      },
+      "dependencies": {
+        "@xmazu/openenvxee-elements": "workspace:*",
+        "@xmazu/openenvxee-protocol": "workspace:*",
+        "preact": "^10.26.5",
+      },
+      "devDependencies": {
+        "@openenvx/typescript-config": "workspace:*",
+        "esbuild": "^0.25.0",
+        "tsup": "catalog:dev",
+        "typescript": "catalog:dev",
+        "vite": "8.1.3",
+        "vitest": "catalog:testing",
+      },
+      "peerDependencies": {
+        "esbuild": "^0.25.0",
+        "vite": ">=5",
+      },
+      "optionalPeers": [
+        "esbuild",
+        "vite",
+      ],
     },
     "packages/workbench": {
       "name": "@xmazu/openenvxee-workbench",
@@ -1475,6 +1492,8 @@
     "@xmazu/openenvxee-schema": ["@xmazu/openenvxee-schema@workspace:packages/schema"],
 
     "@xmazu/openenvxee-studio": ["@xmazu/openenvxee-studio@workspace:packages/studio"],
+
+    "@xmazu/openenvxee-widget-sdk": ["@xmazu/openenvxee-widget-sdk@workspace:packages/widget-sdk"],
 
     "@xmazu/openenvxee-workbench": ["@xmazu/openenvxee-workbench@workspace:packages/workbench"],
 

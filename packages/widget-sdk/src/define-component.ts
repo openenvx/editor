@@ -1,12 +1,18 @@
+import type {
+  WidgetFaceRenderResult,
+  WidgetRegistryEntry,
+} from '@xmazu/openenvxee-protocol';
 import { h, type ComponentChild } from 'preact';
 
+import type { HandlerRegistry, WidgetHandler } from './host/handlers';
+import { applyPropsPatch } from './host/values-pass';
 import {
   compilePropsSchema,
   defaultsFromProps,
   type InferProps,
   type PropsSchema,
 } from './props';
-import { renderToElementTree } from './render-to-layers';
+import { renderToElementTree } from './render-to-element-tree';
 import type { WidgetKind, WidgetManifest } from './types';
 
 export type SetProps<P extends Record<string, unknown>> = (
@@ -20,6 +26,7 @@ export interface DefineComponentOptions<S extends PropsSchema> {
   props: S;
   render: (ctx: {
     props: InferProps<S>;
+    /** Batch-patch document values (host `data.values` via bridge). */
     setProps: SetProps<InferProps<S>>;
   }) => ComponentChild;
 }
@@ -32,44 +39,47 @@ export interface RegisteredWidget {
   propsSchema: PropsSchema;
 }
 
-const registry = new Map<string, RegisteredWidget>();
+export type { WidgetRegistryEntry, WidgetFaceRenderResult };
 
-interface GlobalWidgetEntry {
-  render: (values: Record<string, unknown>) => unknown;
-  manifest: WidgetManifest;
+function hostWidgetApi(): {
+  register?: (entry: WidgetRegistryEntry) => void;
+} | null {
+  return (
+    (
+      globalThis as typeof globalThis & {
+        openenvx?: {
+          widget?: { register?: (entry: WidgetRegistryEntry) => void };
+        };
+      }
+    ).openenvx?.widget ?? null
+  );
 }
 
-interface IsolateBridge {
-  setSyncedState?: (value: unknown) => unknown;
-}
-
-function writeValuesToHost(values: Record<string, unknown>): void {
-  const bridge = (
-    globalThis as typeof globalThis & { openenvx?: IsolateBridge }
-  ).openenvx;
-  bridge?.setSyncedState?.(values);
-}
-
-function publishToGlobal(
+function publishToHost(
   component: WidgetComponent,
   manifest: WidgetManifest
 ): void {
-  const globalObject = globalThis as typeof globalThis & {
-    __openenvxWidgetRegistry?: Record<string, GlobalWidgetEntry>;
-    __openenvxOnWidgetRegistered?: (manifest: WidgetManifest) => void;
-  };
-  const bag = globalObject.__openenvxWidgetRegistry ?? {};
-  bag[manifest.id] = {
+  const widget = hostWidgetApi();
+  if (!widget?.register) {
+    return;
+  }
+  widget.register({
+    id: manifest.id,
     manifest,
-    render(values: Record<string, unknown>) {
-      return renderToElementTree(h(component as never, values as never), {
+    render(values: Record<string, unknown>): WidgetFaceRenderResult {
+      const handlers: HandlerRegistry = new Map();
+      // Host installs openenvx.widget.applyProps for setProps → setSyncedState.
+      const tree = renderToElementTree(h(component as never, values as never), {
         values,
-        onValuesChange: writeValuesToHost,
+        handlers,
       });
+      const bag: Record<string, WidgetHandler> = {};
+      for (const [id, handler] of handlers) {
+        bag[id] = handler;
+      }
+      return { tree, handlers: bag };
     },
-  };
-  globalObject.__openenvxWidgetRegistry = bag;
-  globalObject.__openenvxOnWidgetRegistered?.(manifest);
+  });
 }
 
 function defineComponent<S extends PropsSchema>(
@@ -77,19 +87,16 @@ function defineComponent<S extends PropsSchema>(
   kinds: WidgetKind[]
 ): RegisteredWidget {
   if (!options.id || typeof options.id !== 'string') {
-    throw new Error('@xmazu/openenvxee-elements: define*Component requires id');
+    throw new Error(
+      '@xmazu/openenvxee-widget-sdk: define*Component requires id'
+    );
   }
   const { fields, defaults } = compilePropsSchema(options.props);
 
   const component: WidgetComponent = (values) => {
     const props = defaultsFromProps(options.props, values) as InferProps<S>;
     const setProps: SetProps<InferProps<S>> = (patch) => {
-      const store = (
-        globalThis as typeof globalThis & {
-          __openenvxSetProps?: (patch: Record<string, unknown>) => void;
-        }
-      ).__openenvxSetProps;
-      store?.(patch as Record<string, unknown>);
+      applyPropsPatch(patch as Record<string, unknown>);
     };
     return options.render({ props, setProps });
   };
@@ -108,14 +115,13 @@ function defineComponent<S extends PropsSchema>(
     manifest,
     propsSchema: options.props,
   };
-  registry.set(options.id, entry);
-  publishToGlobal(component, manifest);
+  publishToHost(component, manifest);
   return entry;
 }
 
 /**
- * Define a canvas widget. Returns the registered entry; also publishes to the
- * isolate global registry when evaluated in QuickJS.
+ * Define a canvas widget. When evaluated in QuickJS, also calls
+ * host-injected `openenvx.widget.register`.
  */
 export function defineCanvasComponent<S extends PropsSchema>(
   options: DefineComponentOptions<S>
@@ -128,20 +134,4 @@ export function defineHtmlComponent<S extends PropsSchema>(
   options: DefineComponentOptions<S>
 ): RegisteredWidget {
   return defineComponent(options, ['html']);
-}
-
-export function getRegisteredWidget(id: string): RegisteredWidget | undefined {
-  return registry.get(id);
-}
-
-export function getRegisteredWidgets(): RegisteredWidget[] {
-  return [...registry.values()];
-}
-
-export function clearRegisteredWidgets(): void {
-  registry.clear();
-  const globalObject = globalThis as typeof globalThis & {
-    __openenvxWidgetRegistry?: Record<string, GlobalWidgetEntry>;
-  };
-  globalObject.__openenvxWidgetRegistry = {};
 }

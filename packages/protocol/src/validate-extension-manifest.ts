@@ -154,6 +154,20 @@ export function validateExtensionManifest(
     }
   }
 
+  if (input.requestedCommands !== undefined) {
+    if (!Array.isArray(input.requestedCommands)) {
+      return { ok: false, reason: 'requestedCommands must be an array' };
+    }
+    for (const commandId of input.requestedCommands) {
+      if (typeof commandId !== 'string' || !commandId) {
+        return {
+          ok: false,
+          reason: 'requestedCommands items must be non-empty strings',
+        };
+      }
+    }
+  }
+
   const contributes = input.contributes as ExtensionContributes;
   const widgets = validateWidgetList('widgets', contributes.widgets);
   if (!widgets.ok) {
@@ -238,6 +252,11 @@ export function validateExtensionManifest(
       ...(Array.isArray(input.permissions)
         ? {
             permissions: input.permissions as ExtensionManifest['permissions'],
+          }
+        : {}),
+      ...(Array.isArray(input.requestedCommands)
+        ? {
+            requestedCommands: input.requestedCommands as string[],
           }
         : {}),
       contributes: {

@@ -52,7 +52,7 @@ describe('sandbox capabilities', () => {
     const frozen = freezeGrant({
       id: 'wm.guest-tables',
       kind: 'widget',
-      source: 'globalThis.__openenvxWidgetRegistry = {};',
+      source: 'openenvx.widget._registry = Object.create(null);',
       capabilities: [],
       allowedCommands: [],
     });
