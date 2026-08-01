@@ -41,6 +41,8 @@ export interface FieldConfigOptions {
   actions?: FieldAction[];
   icon?: string;
   chrome?: boolean;
+  /** Debounce property commits (ms). Useful for expensive preview regenerations. */
+  debounceMs?: number;
 }
 
 export interface CornerRadiusValue {
@@ -151,6 +153,7 @@ export interface FieldConfigTarget {
   actions?: FieldAction[];
   icon?: string;
   chrome?: boolean;
+  debounceMs?: number;
 }
 
 export const DEFAULT_ALIGN_OPTIONS: PropertyFieldOption[] = [
@@ -180,5 +183,8 @@ export function applyFieldConfig(
   }
   if (config.chrome !== undefined) {
     field.chrome = config.chrome;
+  }
+  if (config.debounceMs !== undefined) {
+    field.debounceMs = config.debounceMs;
   }
 }

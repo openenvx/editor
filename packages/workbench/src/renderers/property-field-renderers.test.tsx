@@ -3,6 +3,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { NumericControl } from '../inputs/basic/numeric-control';
+import { InputGroup } from '../primitives/input-group';
 
 describe('NumericControl', () => {
   afterEach(() => {
@@ -22,5 +23,35 @@ describe('NumericControl', () => {
 
     expect(screen.queryByRole('spinbutton')).toBeNull();
     expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('12');
+  });
+});
+
+describe('InputGroup', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('renders non-scrub cells without native stepper controls', () => {
+    const field: PropertyFieldDescriptor = {
+      key: 'x',
+      kind: 'number',
+      label: 'X',
+    };
+
+    render(
+      <InputGroup
+        fields={[
+          {
+            field,
+            label: 'X',
+            onChange: () => {},
+            value: 10,
+          },
+        ]}
+      />
+    );
+
+    expect(screen.queryByRole('spinbutton')).toBeNull();
+    expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('10');
   });
 });

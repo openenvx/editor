@@ -11,20 +11,6 @@ export function Input({
   return <input className={cn(styles.root, className)} {...props} />;
 }
 
-export function NumberInput({
-  className,
-  ...props
-}: InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      className={cn(styles.root, styles.number, className)}
-      inputMode="decimal"
-      {...props}
-      type="text"
-    />
-  );
-}
-
 export function Textarea({
   className,
   ...props

@@ -339,7 +339,7 @@ Use `--wb-shadow-xs` on inputs at rest. Use `--wb-shadow-float` only on floating
 
 Height: 32px default, 28px sm. No colored fills except `default` (Export CTA).
 
-### Input / NumberInput
+### Input / NumericInput
 
 - Height: 32px
 - Background: `--wb-muted`
@@ -347,7 +347,7 @@ Height: 32px default, 28px sm. No colored fills except `default` (Export CTA).
 - Radius: 10px
 - Padding: 4px 10px
 - Focus: `--wb-shadow-control-focus` (light: soft gray halo; dark: double ring)
-- NumberInput: right-aligned mono, used in X/Y/W/H pairs
+- NumericInput: right-aligned mono, optional scrub handle; used in X/Y/W/H pairs
 
 ### StepperField
 
@@ -478,7 +478,7 @@ Property form controls are **descriptor → registered renderer**, not ad-hoc JS
 | Kind | Control | Use for |
 | --- | --- | --- |
 | `text` | Compact text input | Short strings, URLs without media chrome |
-| `number` | Scrub / NumberInput | Dimensions, gaps, sizes |
+| `number` | Scrub / NumericInput | Dimensions, gaps, sizes |
 | `select` | Select | Discrete enums (H1–H4, fit mode) |
 | `toggle` | Switch (pill) | Optional visibility, flags |
 | `checkbox` | Checkbox (square) | Multi-select flags, list row booleans |
@@ -506,7 +506,7 @@ Rules:
 | Direction | Icon toggle pair (→ ↓) | Phase 2 |
 | Align / Justify | Icon button groups | Phase 2 |
 | Wrap | SegmentedControl `Yes \| No` | Phase 2 |
-| Gap | NumberInput |  |
+| Gap | NumericInput |  |
 | Padding | StepperField popup (T/R/B/L) | Bound to `layer.data.padding`; directional icon inside the field |
 
 ### Layer pane
@@ -532,7 +532,7 @@ Bind to `layer.transform` when canvas layer selected.
 | Field   | Control                                        |
 | ------- | ---------------------------------------------- |
 | Rotate  | Scrub numeric + ° suffix + rotate/flip actions |
-| Opacity | NumberInput 0–100                              |
+| Opacity | NumericInput 0–100                             |
 
 ---
 

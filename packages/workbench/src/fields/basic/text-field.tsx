@@ -11,6 +11,7 @@ export const TextFieldRenderer: PropertyFieldComponent = ({
   const id = getFieldId(layerId, field.key);
   return (
     <TextInput
+      debounceMs={field.debounceMs}
       id={id}
       onChange={(next) => onUpdate(field.key, next)}
       value={String(value ?? '')}

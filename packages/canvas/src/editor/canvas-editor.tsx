@@ -1,5 +1,6 @@
 import type { EditorViewportApi } from '@openenvx/core';
 import { canEditLayerData, canSelectLayer } from '@openenvx/core';
+import { isTypingTarget } from '@openenvx/headless';
 import type { Page } from '@xmazu/openenvxee-schema';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -48,15 +49,6 @@ import { ViewportController } from '../viewport';
 import { CanvasRichTextOverlay } from './canvas-rich-text-overlay';
 
 import styles from './canvas-editor.module.css';
-
-function isEditablePasteTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof Element)) {
-    return false;
-  }
-  return Boolean(
-    target.closest('input, textarea, select, [contenteditable="true"]')
-  );
-}
 
 export interface CanvasEditorProps {
   layerSurface: CanvasLayerSurfaceItem[];
@@ -470,7 +462,7 @@ export const CanvasEditor = memo(
         if (canvasClipboardService.isEditingText()) {
           return;
         }
-        if (isEditablePasteTarget(event.target)) {
+        if (isTypingTarget(event.target)) {
           return;
         }
         if (canvasClipboardService.consumeSkipNextPasteEvent()) {

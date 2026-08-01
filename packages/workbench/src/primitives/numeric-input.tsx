@@ -151,10 +151,26 @@ export function NumericInput({
   const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       inputRef.current?.blur();
+      return;
     }
     if (event.key === 'Escape') {
       setDraft(null);
       inputRef.current?.blur();
+      return;
+    }
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      event.preventDefault();
+      const draftNumber = draft === null ? Number.NaN : Number(draft);
+      const base = Number.isNaN(draftNumber) ? value : draftNumber;
+      const direction = event.key === 'ArrowUp' ? 1 : -1;
+      commitValue(
+        computeScrubValue(
+          base,
+          direction,
+          { max, min, precision, step },
+          { alt: event.altKey, shift: event.shiftKey }
+        )
+      );
     }
   };
 

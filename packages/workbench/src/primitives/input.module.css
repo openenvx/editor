@@ -19,12 +19,6 @@
   color: var(--wb-muted-foreground);
 }
 
-.number {
-  font-family: var(--wb-font-mono);
-  font-size: var(--wb-text-mono);
-  text-align: right;
-}
-
 .color {
   height: var(--wb-control-height);
   padding: var(--wb-space-1);

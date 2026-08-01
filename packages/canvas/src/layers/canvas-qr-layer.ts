@@ -24,6 +24,7 @@ export const canvasQrSchema = z.object({
 export type CanvasQrModel = z.infer<typeof canvasQrSchema>;
 
 const DEFAULT_URL = 'https://example.com';
+const URL_DEBOUNCE_MS = 300;
 
 export class CanvasQrLayer extends LayerDefinition<CanvasQrModel> {
   readonly type = 'canvas.qr';
@@ -70,7 +71,7 @@ export class CanvasQrLayer extends LayerDefinition<CanvasQrModel> {
   properties(_ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
     return createPropertyBuilder()
       .section('qr')
-      .text('url', 'URL / payload')
+      .text('url', 'URL / payload', { debounceMs: URL_DEBOUNCE_MS })
       .color('foreground', 'Foreground')
       .color('background', 'Background')
       .select(
@@ -83,7 +84,9 @@ export class CanvasQrLayer extends LayerDefinition<CanvasQrModel> {
         ],
         'Error correction'
       )
-      .number('margin', 'Quiet zone')
+      .number('margin', 'Quiet zone', {
+        numeric: { min: 0, precision: 0, scrub: true },
+      })
       .build();
   }
 

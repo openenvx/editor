@@ -50,6 +50,8 @@ export interface PropertyFieldDescriptor {
   label: string;
   icon?: string;
   chrome?: boolean;
+  /** Debounce property commits (ms). Useful for expensive preview regenerations. */
+  debounceMs?: number;
   options?: PropertyFieldOption[];
   repeaterFields?: RepeaterFieldConfig[];
   slotList?: SlotListFieldConfig;

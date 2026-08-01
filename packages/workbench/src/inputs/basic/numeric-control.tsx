@@ -1,4 +1,3 @@
-import { NumberInput } from '../../primitives/input';
 import { NumericInput } from '../../primitives/numeric-input';
 import type { NumericFieldLike } from '../types';
 
@@ -14,25 +13,16 @@ export function NumericControl({
   onChange: (next: number) => void;
 }) {
   const numeric = field.numeric;
-  if (numeric?.scrub) {
-    return (
-      <NumericInput
-        id={id}
-        max={numeric.max}
-        min={numeric.min}
-        onChange={onChange}
-        precision={numeric.precision}
-        scrub
-        step={numeric.step}
-        unit={numeric.unit}
-        value={Number(value ?? 0)}
-      />
-    );
-  }
   return (
-    <NumberInput
+    <NumericInput
       id={id}
-      onChange={(event) => onChange(Number(event.target.value))}
+      max={numeric?.max}
+      min={numeric?.min}
+      onChange={onChange}
+      precision={numeric?.precision}
+      scrub={numeric?.scrub}
+      step={numeric?.step}
+      unit={numeric?.unit}
       value={Number(value ?? 0)}
     />
   );

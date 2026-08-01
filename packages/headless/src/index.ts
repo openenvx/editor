@@ -187,6 +187,7 @@ export type {
 export { VersionHistoryProviderId } from './version-history/version-history-service-id';
 
 export { getNestedValue, setNestedValue } from './utils/nested-value';
+export { isTypingTarget } from './utils/is-typing-target';
 
 export { mapPluginTreeToPropertyPane } from './plugin-protocol/map-plugin-tree-to-property-pane';
 export {

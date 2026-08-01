@@ -21,43 +21,32 @@ export interface InputGroupProps {
 export function InputGroup({ fields, className }: InputGroupProps) {
   return (
     <div className={cn(styles.group, className)}>
-      {fields.map((cell) => (
-        <div className={styles.cell} key={cell.label}>
-          {cell.field.numeric?.scrub ? (
+      {fields.map((cell) => {
+        const numeric = cell.field.numeric;
+        const scrub = Boolean(numeric?.scrub);
+        return (
+          <div className={styles.cell} key={cell.label}>
+            {scrub ? null : <span className={styles.label}>{cell.label}</span>}
             <NumericInput
-              handleIcon={<span className={styles.label}>{cell.label}</span>}
+              handleIcon={
+                scrub ? (
+                  <span className={styles.label}>{cell.label}</span>
+                ) : undefined
+              }
               id={cell.id}
-              max={cell.field.numeric.max}
-              min={cell.field.numeric.min}
+              max={numeric?.max}
+              min={numeric?.min}
               onChange={(value) => cell.onChange(value)}
-              precision={cell.field.numeric.precision}
-              scrub
-              step={cell.field.numeric.step}
-              unit={cell.field.numeric.unit}
+              precision={numeric?.precision}
+              scrub={scrub}
+              step={numeric?.step}
+              unit={numeric?.unit}
               value={Number(cell.value ?? 0)}
               variant="compact"
             />
-          ) : (
-            <>
-              <span className={styles.label}>{cell.label}</span>
-              <input
-                className={styles.input}
-                id={cell.id}
-                onChange={(event) => onChange(cell, event.target.value)}
-                type="number"
-                value={cell.value}
-              />
-            </>
-          )}
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
-}
-
-function onChange(cell: InputGroupField, raw: string): void {
-  const next = Number(raw);
-  if (!Number.isNaN(next)) {
-    cell.onChange(next);
-  }
 }

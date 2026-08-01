@@ -140,7 +140,7 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
       createPropertyBuilder()
         .section('text', 'Text')
         // .richText('html', 'Content')
-        .number('fontSize', 'Font size')
+        .number('fontSize', 'Font size', { numeric: scrubPx })
         .font('fontFamily', fontOptions.options, 'Font')
         .color('fill', 'Fill')
         .align('align', 'Align')
