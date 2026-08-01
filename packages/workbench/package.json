@@ -29,7 +29,7 @@
     "@radix-ui/react-tabs": "1.1.17",
     "@radix-ui/react-tooltip": "1.2.12",
     "@tanstack/react-virtual": "^3.13.12",
-    "@xmazu/openenvxee-plugin-protocol": "workspace:*",
+    "@xmazu/openenvxee-protocol": "workspace:*",
     "@xmazu/openenvxee-schema": "workspace:*",
     "clsx": "2.1.1",
     "cmdk": "1.1.1",

@@ -74,6 +74,7 @@ import {
   CanvasZoomTo100Command,
   CanvasZoomToFitCommand,
 } from '../commands/canvas-zoom-commands';
+import { DetachWidgetCommand } from '../commands/widget-detach-command';
 import { canvasFontService } from '../fonts/canvas-font-service';
 import { CanvasGridSettings } from '../grid/canvas-grid-settings';
 import { CanvasI18nBundle } from '../i18n/canvas-i18n-bundle';
@@ -171,7 +172,8 @@ export class InsertOpenEnvxWidgetCommand extends Command {
         ...(layer.data as Record<string, unknown>),
         extensionId,
         label: extensionId,
-        syncedState: {},
+        values: {},
+        children: [],
       };
       layer.name = extensionId;
     }
@@ -335,6 +337,7 @@ export class CanvasBasicsPlugin extends Plugin {
       new OpenEnvxWidgetLayer(),
       new InsertCanvasTextCommand(),
       new InsertOpenEnvxWidgetCommand(),
+      new DetachWidgetCommand(),
       new InsertCanvasImageCommand(),
       new InsertCanvasSvgCommand(),
       new InsertCanvasQrCommand(),

@@ -143,15 +143,20 @@ export { createPostMessagePluginPanelTransport } from './plugin-panel/create-pos
 export type { PostMessagePluginPanelTransportOptions } from './plugin-panel/create-post-message-plugin-panel-transport';
 export {
   validatePluginTree,
+  validateRenderTree,
   MAX_PLUGIN_TREE_NODES,
   MAX_PLUGIN_TREE_JSON_CHARS,
+  MAX_RENDER_TREE_NODES,
+  MAX_RENDER_TREE_JSON_CHARS,
   type PluginTreeValidationResult,
-} from '@xmazu/openenvxee-plugin-protocol';
+  type RenderTreeValidationResult,
+} from '@xmazu/openenvxee-protocol';
 
 export {
   SandboxExtensionHost,
   mountSandboxExtensions,
   type SandboxExtensionHostOptions,
+  type ApplyWidgetFaceFn,
 } from './sandbox/sandbox-extension-host';
 export {
   assertJsonSerializable,

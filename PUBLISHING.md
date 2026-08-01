@@ -6,7 +6,9 @@ Packages that leave this monorepo:
 | --- | --- | --- |
 | `@xmazu/openenvxee-schema` | GitHub npm (`npm.pkg.github.com`) | Built `dist/` + `scene.schema.json` |
 | `@xmazu/openenvxee-preview` | GitHub npm | Built `dist/` — preview descriptors + Render IR |
-| `@xmazu/openenvxee-plugin-protocol` | `registry.openenvx.com` (public) | Declarative panel tree + `h`/jsx runtime (no React) |
+| `@xmazu/openenvxee-elements` | `registry.openenvx.com` (public) | Preact element vocabulary (`/canvas` `/html` `/panel`) |
+| `@xmazu/openenvxee-widget-sdk` | `registry.openenvx.com` (public) | Authoring SDK (`define*`, `renderToElementTree`, Vite packaging) |
+| `@xmazu/openenvxee-protocol` | `registry.openenvx.com` (public) | `RenderNode`, manifests, validators, sandbox grants |
 | `@xmazu/openenvxee-studio` | `registry.openenvx.com` (restricted) | Single bundled `dist/` (inlines workbench, canvas, canvas-pro, agent, and their `@openenvx/*` deps) |
 
 Export Worker lives in **openenvx-cloud** (`apps/export-service`), not this repo.
@@ -51,4 +53,32 @@ bun add @xmazu/openenvxee-preview
 # local: bun run link:preview then bun link @xmazu/openenvxee-preview
 ```
 
-## `@xmazu/openenvxee-plugin-protocol`
+## `@xmazu/openenvxee-elements`
+
+Preact element vocabulary only (`/canvas`, `/html`, `/panel`). Workspace `exports` point at `src/` for HMR; `publishConfig.exports` are dist-only. Publish to `registry.openenvx.com`.
+
+```bash
+bun add @xmazu/openenvxee-elements
+```
+
+## `@xmazu/openenvxee-widget-sdk`
+
+Authoring SDK (`defineExtension`, `define*Component`, `renderToElementTree`, `buildGrantFromManifest`, Vite `bundleWidgetSources`). Publish to `registry.openenvx.com`.
+
+```bash
+bun add @xmazu/openenvxee-widget-sdk
+```
+
+Backend round-trip: call `renderToElementTree()` in Node to emit `RenderNode` JSON for the templates API, then map with host applicators.
+
+## `@xmazu/openenvxee-protocol`
+
+Wire contract (`RenderNode`, `ExtensionManifest`, validators, sandbox grants). Workspace `exports` → `src/`; `publishConfig.exports` → `dist/`. Publish to `registry.openenvx.com`.
+
+```bash
+bun add @xmazu/openenvxee-protocol
+```
+
+## `@xmazu/openenvxee-studio`
+
+Fat host bundle. Workspace `exports` → `src/` for HMR; `publishConfig.exports` → `dist/` only. Publish to `registry.openenvx.com` (restricted).

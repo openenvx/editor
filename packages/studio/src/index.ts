@@ -1,13 +1,10 @@
-import { AgentChatPlugin } from '@openenvx/agent';
 import {
+  applyWidgetFace,
   CanvasBasicsPlugin,
   setOpenEnvxWidgetClickHandler,
   WIDGET_LAYER_TYPE,
 } from '@openenvx/canvas';
-import {
-  CanvasProPlugin,
-  CanvasTemplatePlugin,
-} from '@xmazu/openenvxee-canvas-pro';
+import { CanvasProPlugin } from '@xmazu/openenvxee-canvas-pro';
 import {
   SandboxExtensionHost,
   type SandboxExtensionHostOptions,
@@ -81,15 +78,19 @@ export {
 export function createSandboxExtensionHost(
   options: Omit<
     SandboxExtensionHostOptions,
-    'bindWidgetClick' | 'widgetLayerType'
+    'bindWidgetClick' | 'widgetLayerType' | 'applyWidgetFace'
   > &
     Partial<
-      Pick<SandboxExtensionHostOptions, 'bindWidgetClick' | 'widgetLayerType'>
+      Pick<
+        SandboxExtensionHostOptions,
+        'bindWidgetClick' | 'widgetLayerType' | 'applyWidgetFace'
+      >
     >
 ): SandboxExtensionHost {
   return new SandboxExtensionHost({
     widgetLayerType: WIDGET_LAYER_TYPE,
     bindWidgetClick: (handler) => setOpenEnvxWidgetClickHandler(handler),
+    applyWidgetFace: (layer, tree) => applyWidgetFace(layer, tree),
     ...options,
   });
 }
@@ -103,6 +104,6 @@ export function createSandboxExtensionHost(
 export const DEFAULT_STUDIO_PLUGINS = [
   new CanvasBasicsPlugin(),
   new CanvasProPlugin(),
-  new CanvasTemplatePlugin(),
-  new AgentChatPlugin(),
+  // new CanvasTemplatePlugin(),
+  // new AgentChatPlugin(),
 ];

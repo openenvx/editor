@@ -142,7 +142,11 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   subscribe: (listener: (state: WorkbenchState) => void) => () => void;
   registerServiceInstance: <T>(id: ServiceId<T>, instance: T) => void;
   updateProperty: (layerId: string, key: string, value: unknown) => void;
-  selectViewItem: (viewId: string, item: unknown) => void;
+  selectViewItem: (
+    viewId: string,
+    item: unknown,
+    options?: { additive?: boolean }
+  ) => void;
   moveViewItem: (
     viewId: string,
     source: unknown,
@@ -168,7 +172,8 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   toggleSecondarySidebar: () => void;
   getService: <T>(token: ServiceId<T>) => T | undefined;
   /**
-   * Register workbench contributions at runtime (e.g. external panel:manifest).
+   * Register workbench contributions at runtime (e.g. from a validated
+   * ExtensionManifest via createExtensionContributions).
    * Dispose to remove them and refresh chrome/scene slices.
    */
   registerWorkbenchContributions: (

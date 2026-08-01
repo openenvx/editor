@@ -4,7 +4,7 @@
  * authored here because Zod cannot cleanly infer the recursive group type.
  */
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 4;
 
 /** Provider-defined page layout / editor-pane kind (e.g. `'absolute'`, `'html'`). */
 export type PageLayout = string;
@@ -77,6 +77,7 @@ export const BUILTIN_LAYER_TYPES = [
   'canvas.circle',
   'canvas.group',
   'canvas.instance',
+  'openenvx.widget',
 ] as const;
 
 export type BuiltinLayerType = (typeof BUILTIN_LAYER_TYPES)[number];
@@ -257,6 +258,53 @@ export interface CanvasInstanceLayer extends LayerBase {
   data: CanvasInstanceData;
 }
 
+/** Field def persisted on a widget layer for Inspector without the source. */
+export type WidgetFieldDef =
+  | { kind: string; label: string }
+  | {
+      kind: 'select';
+      label: string;
+      options: { label: string; value: string }[];
+    }
+  | {
+      kind: 'repeater';
+      label: string;
+      of: Record<string, WidgetFieldDef>;
+    };
+
+/** Manifest snapshot stored on the widget so Inspector works offline. */
+export interface WidgetManifestSnapshot {
+  id: string;
+  label: string;
+  icon?: string;
+  kinds: ('canvas' | 'html')[];
+  fields: Record<string, WidgetFieldDef>;
+  defaults?: Record<string, unknown>;
+}
+
+/**
+ * Sandbox widget on the canvas/HTML page.
+ * `values` is the synced state / Unlayer options bag; `children` is the last
+ * rendered face (hidden from Layers, locked for editing).
+ */
+export interface OpenEnvxWidgetData {
+  extensionId: string;
+  values: Record<string, unknown>;
+  manifest?: WidgetManifestSnapshot;
+  children: Layer[];
+  /**
+   * Face event handlers: child layer id → event name → isolate handler id.
+   * e.g. `{ "w1:0": { click: "h1" } }`
+   */
+  handlers?: Record<string, Record<string, string>>;
+  label?: string;
+}
+
+export interface OpenEnvxWidgetLayer extends LayerBase {
+  type: 'openenvx.widget';
+  data: OpenEnvxWidgetData;
+}
+
 /** Unknown plugin layer — structural fields validated; data opaque. */
 export interface PluginLayer extends LayerBase {
   type: string;
@@ -272,6 +320,7 @@ export type Layer =
   | CanvasCircleLayer
   | CanvasGroupLayer
   | CanvasInstanceLayer
+  | OpenEnvxWidgetLayer
   | PluginLayer;
 
 export type PageGuideOrientation = 'horizontal' | 'vertical';

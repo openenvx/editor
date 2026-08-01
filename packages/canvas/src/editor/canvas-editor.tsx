@@ -18,6 +18,7 @@ import { captureClipboardDataTransferSync } from '../clipboard/read-external-cli
 import { collectCanvasFontFamilies } from '../collect-canvas-font-families';
 import {
   flattenLayerSurface,
+  flattenStageLayers,
   findLayerSurfaceItem,
 } from '../flatten-layer-surface';
 import {
@@ -336,15 +337,21 @@ export const CanvasEditor = memo(
 
     const overlayLayers = useMemo(
       () =>
-        flatLayerSurface.flatMap((item) => {
+        flattenStageLayers(layerSurface).flatMap((item) => {
           const interaction = canvasLayerInteractions.find(
             (entry) => entry.kind === item.view.kind
           );
           return interaction?.usesEditOverlay
-            ? [{ layer: item.layer, view: item.view }]
+            ? [
+                {
+                  absoluteTransform: item.absoluteTransform,
+                  layer: item.layer,
+                  view: item.view,
+                },
+              ]
             : [];
         }),
-      [canvasLayerInteractions, flatLayerSurface]
+      [canvasLayerInteractions, layerSurface]
     );
 
     const fontFamilies = useMemo(

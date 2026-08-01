@@ -1,10 +1,8 @@
 import {
   mapPluginTreeToPropertyPane,
   createPluginPropertyHostContext,
-  createManifestContributions,
   decodePluginHandlerCommand,
   type PropertyPaneDescriptor,
-  type WorkbenchContributionDisposable,
 } from '@openenvx/headless';
 import {
   PLUGIN_HOST_SOURCE,
@@ -15,7 +13,7 @@ import {
   type PluginPanelDeclaration,
   type PluginPanelSelection,
   validatePluginTree,
-} from '@xmazu/openenvxee-plugin-protocol';
+} from '@xmazu/openenvxee-protocol';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -94,13 +92,10 @@ export function PluginPanel({
   const lastTreeAtRef = useRef(0);
   const pendingTreeRef = useRef<PluginNode | null>(null);
   const throttleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const manifestDisposableRef = useRef<WorkbenchContributionDisposable | null>(
-    null
-  );
 
   const buildContext = useCallback((): PluginPanelContext => {
     const payload: PluginPanelContext = {
-      panelId: declaration.id,
+      surfaceId: declaration.id,
       templateId,
       permission,
       theme,
@@ -176,41 +171,20 @@ export function PluginPanel({
       if (message.source !== PLUGIN_PARENT_SOURCE || message.v !== 1) {
         return;
       }
-      if (message.payload.panelId !== declaration.id) {
+      if (
+        message.type === 'widget:source' ||
+        message.type === 'extension:manifest'
+      ) {
         return;
       }
-      if (message.type === 'panel:tree') {
+      if (message.payload.surfaceId !== declaration.id) {
+        return;
+      }
+      if (message.type === 'render') {
         scheduleTree(message.payload.root);
         return;
       }
-      if (message.type === 'panel:manifest') {
-        manifestDisposableRef.current?.dispose();
-        manifestDisposableRef.current = null;
-        if (!declaration.allowManifest) {
-          setPanelError(
-            'panel:manifest requires allowManifest on the declaration'
-          );
-          return;
-        }
-        if (permission !== 'edit') {
-          setPanelError('Session is read-only');
-          return;
-        }
-        const result = createManifestContributions(message.payload.manifest, {
-          allowedCommands: declaration.allowedCommands,
-        });
-        if (!result.ok) {
-          setPanelError(result.reason);
-          return;
-        }
-        if (result.contributions.length > 0) {
-          manifestDisposableRef.current = api.registerWorkbenchContributions(
-            ...result.contributions
-          );
-        }
-        return;
-      }
-      if (message.type === 'panel:command') {
+      if (message.type === 'command') {
         const { commandId, args } = message.payload;
         if (!canRunPluginPanelCommand(declaration, permission, commandId)) {
           setPanelError(
@@ -238,7 +212,7 @@ export function PluginPanel({
     transport.send({
       source: PLUGIN_HOST_SOURCE,
       v: 1,
-      type: 'panel:context',
+      type: 'context',
       payload: buildContext(),
     });
   }, [buildContext, transport]);
@@ -279,8 +253,6 @@ export function PluginPanel({
       if (throttleTimerRef.current) {
         clearTimeout(throttleTimerRef.current);
       }
-      manifestDisposableRef.current?.dispose();
-      manifestDisposableRef.current = null;
     },
     []
   );
@@ -290,9 +262,9 @@ export function PluginPanel({
       transport.send({
         source: PLUGIN_HOST_SOURCE,
         v: 1,
-        type: 'panel:event',
+        type: 'invoke',
         payload: {
-          panelId: declaration.id,
+          surfaceId: declaration.id,
           handlerId,
           ...(args === undefined ? {} : { args }),
         },
@@ -353,7 +325,7 @@ export function PluginPanel({
     );
   }
 
-  if (!root || !pane) {
+  if (!(root && pane)) {
     return (
       <div className={styles.root}>
         <p className={styles.waiting}>Waiting for {declaration.title}…</p>

@@ -16,6 +16,16 @@ export class CanvasContextMenu extends ContextMenuContribution {
       .label(ctx.t('canvas.command.paste', 'Paste'))
       .when('page.layoutAbsolute');
     builder
+      .item('canvas.groupSelection')
+      .label(ctx.t('canvas.command.group', 'Create group'))
+      .when('page.layoutAbsolute && scene.multiSelect');
+    builder
+      .item('canvas.ungroup')
+      .label(ctx.t('canvas.command.ungroup', 'Ungroup'))
+      .when(
+        "page.layoutAbsolute && scene.layerSelected && scene.primaryLayerType == 'canvas.group'"
+      );
+    builder
       .item('scene.deleteLayer')
       .label(ctx.t('canvas.command.delete', 'Delete'))
       .when('scene.layerSelected');

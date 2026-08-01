@@ -1,10 +1,11 @@
 import { getActivePage } from '@openenvx/core';
+import { extensionBlockStore } from '@openenvx/headless';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
 import type { Layer } from '@xmazu/openenvxee-schema';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useSyncExternalStore } from 'react';
 
 import { defaultBlockRegistry } from '../block-registry';
 import { findBlock, getPageRootId } from '../tree/block-tree';
@@ -37,6 +38,11 @@ export const BlockPalettePanel = memo(() => {
   const { executeCommand } = useWorkbenchContext();
   const scene = useWorkbenchContextSelector((state) => state.scene);
   const selection = useWorkbenchContextSelector((state) => state.selection);
+  const extensionBlocks = useSyncExternalStore(
+    extensionBlockStore.subscribe,
+    extensionBlockStore.getSnapshot,
+    extensionBlockStore.getSnapshot
+  );
 
   const handleInsert = useCallback(
     (blockType: string) => {
@@ -60,6 +66,13 @@ export const BlockPalettePanel = memo(() => {
     [executeCommand, scene, selection]
   );
 
+  const handleExtensionInsert = useCallback(
+    (insertCommandId: string) => {
+      void executeCommand(insertCommandId);
+    },
+    [executeCommand]
+  );
+
   return (
     <div className={styles.palettePanel}>
       {defaultBlockRegistry.getPaletteBlocks().map((block) => (
@@ -67,6 +80,16 @@ export const BlockPalettePanel = memo(() => {
           className={styles.paletteItem}
           key={block.type}
           onClick={() => handleInsert(block.type)}
+          type="button"
+        >
+          {block.label}
+        </button>
+      ))}
+      {extensionBlocks.map((block) => (
+        <button
+          className={styles.paletteItem}
+          key={block.id}
+          onClick={() => handleExtensionInsert(block.insertCommandId)}
           type="button"
         >
           {block.label}

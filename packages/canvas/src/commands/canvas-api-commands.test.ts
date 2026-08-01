@@ -123,3 +123,86 @@ describe('UpdateLayerTransformCommand dataPatch', () => {
     });
   });
 });
+
+describe('UpdateLayerTransformCommand group child isolation', () => {
+  it('updates only the moved child — siblings and group origin stay put', () => {
+    const siblingTransform = {
+      ...createDefaultTransform(),
+      height: 40,
+      width: 40,
+      x: 100,
+      y: 10,
+    };
+    const groupTransform = {
+      ...createDefaultTransform(),
+      height: 200,
+      width: 300,
+      x: 50,
+      y: 50,
+    };
+    const scene = normalizeScene({
+      activePageId: 'p1',
+      pages: [
+        {
+          id: 'p1',
+          layout: 'absolute',
+          layers: [
+            {
+              data: {
+                children: [
+                  {
+                    data: { fill: '#000' },
+                    id: 'child-a',
+                    transform: {
+                      ...createDefaultTransform(),
+                      height: 40,
+                      width: 40,
+                      x: 0,
+                      y: 0,
+                    },
+                    type: 'canvas.rect',
+                  },
+                  {
+                    data: { fill: '#111' },
+                    id: 'child-b',
+                    transform: siblingTransform,
+                    type: 'canvas.rect',
+                  },
+                ],
+              },
+              id: 'group-1',
+              transform: groupTransform,
+              type: 'canvas.group',
+            },
+          ],
+          name: 'Page',
+        },
+      ],
+      selection: {
+        activePageId: 'p1',
+        primaryLayerId: 'child-a',
+        selectedLayerIds: ['child-a'],
+      },
+    });
+    const store = new SceneStore(scene);
+    const command = new UpdateLayerTransformCommand();
+
+    command.execute(createContext(store), {
+      layerId: 'child-a',
+      transform: {
+        ...createDefaultTransform(),
+        height: 40,
+        width: 40,
+        x: -30,
+        y: -20,
+      },
+    });
+
+    const group = store.getScene().pages[0]!.layers[0]!;
+    const children = (group.data as { children: typeof scene.pages[0]['layers'] })
+      .children;
+    expect(group.transform).toMatchObject(groupTransform);
+    expect(children[0]?.transform).toMatchObject({ x: -30, y: -20 });
+    expect(children[1]?.transform).toMatchObject(siblingTransform);
+  });
+});

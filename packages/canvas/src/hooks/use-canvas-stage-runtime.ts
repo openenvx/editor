@@ -8,7 +8,7 @@ import type { RefObject } from 'react';
 import type { CanvasStageProps, SelectionBounds } from '../canvas-stage-types';
 import { getInteraction } from '../canvas-transformer-utils';
 import { flattenStageLayers } from '../flatten-layer-surface';
-import { CANVAS_GROUP_LAYER_TYPE } from '../layers/canvas-group-layer';
+import { isCanvasContainerLayerType } from '../layers/is-canvas-container-layer';
 import { userGuidesToSnapAxes } from '../rulers/ruler-math';
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
 import type {
@@ -183,7 +183,9 @@ export function useCanvasStageRuntime(
   const selectedLayer = selectedPrimary
     ? flattenedLayerById.get(selectedPrimary)
     : undefined;
-  const selectedTransform = selectedLayer?.layer.transform ?? null;
+  // Size label / handle layout sit at artboard root — use absolute transform.
+  const selectedTransform =
+    selectedLayer?.absoluteTransform ?? selectedLayer?.layer.transform ?? null;
   const selectedInteraction = selectedLayer
     ? getInteraction(canvasLayerInteractions, selectedLayer.view.kind)
     : undefined;
@@ -281,7 +283,8 @@ export function useCanvasStageRuntime(
   const { getTransformModifiers } = useTransformModifiers();
 
   const isNonEmptyGroupSelected =
-    selectedLayer?.layer.type === CANVAS_GROUP_LAYER_TYPE &&
+    selectedLayer !== undefined &&
+    isCanvasContainerLayerType(selectedLayer.layer.type) &&
     getLayerChildren(selectedLayer.layer).length > 0;
 
   const isRichTextSelected = selectedInteraction?.kind === 'richText';

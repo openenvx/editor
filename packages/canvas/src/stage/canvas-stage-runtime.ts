@@ -214,7 +214,11 @@ export class CanvasStageRuntime implements ExternalStore<CanvasStageSnapshot> {
     const selectedLayerIds = this.selectedLayerIdsRef.current ?? [];
     const selectedLayerIdSet = this.selectedLayerIdSetRef.current ?? new Set();
 
-    this.selectLayer(layerId, { setPrimary: true });
+    // Avoid selection churn while already dragging the primary — React re-applying
+    // x/y from scene props mid-drag cancels the Konva move (looks like no-op).
+    if (!selectedLayerIdSet.has(layerId)) {
+      this.selectLayer(layerId, { setPrimary: true });
+    }
 
     if (!selectedLayerIdSet.has(layerId) || selectedLayerIds.length <= 1) {
       this.dragSessionRef.current = null;

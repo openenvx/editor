@@ -1,3 +1,5 @@
+import { sanitizeHtml } from '@openenvx/core';
+
 import type { BlockConfig } from '../block-config';
 import { buttonBlock } from './button-block';
 import { heroBlock } from './hero-block';
@@ -21,7 +23,7 @@ export const headingBlock: BlockConfig = {
   },
   defaultData: { html: 'Heading', level: '2', color: '#111827' },
   render: ({ data, children }) => {
-    const html = String(data.html ?? '');
+    const html = sanitizeHtml(String(data.html ?? ''));
     const level = String(data.level ?? '2');
     const color = String(data.color ?? '#111827');
     const style = { margin: '0 0 0.5rem', color } as const;
@@ -53,7 +55,9 @@ export const textBlock: BlockConfig = {
     }
     return (
       <div
-        dangerouslySetInnerHTML={{ __html: String(data.html ?? '') }}
+        dangerouslySetInnerHTML={{
+          __html: sanitizeHtml(String(data.html ?? '')),
+        }}
         style={style}
       />
     );
@@ -229,6 +233,19 @@ export const rootBlock: BlockConfig = {
   ),
 };
 
+export const rawHtmlBlock: BlockConfig = {
+  type: 'html.raw',
+  label: 'Raw HTML',
+  fields: {
+    markup: { kind: 'textarea', label: 'Markup' },
+  },
+  defaultData: { markup: '<div></div>' },
+  render: ({ data }) => {
+    const markup = sanitizeHtml(String(data.markup ?? ''));
+    return <div dangerouslySetInnerHTML={{ __html: markup }} />;
+  },
+};
+
 export const builtinBlocks: BlockConfig[] = [
   rootBlock,
   flexBlock,
@@ -239,6 +256,7 @@ export const builtinBlocks: BlockConfig[] = [
   textBlock,
   imageBlock,
   buttonBlock,
+  rawHtmlBlock,
 ];
 
 export function isHtmlTextBlockType(type: string): boolean {

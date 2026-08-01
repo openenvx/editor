@@ -50,8 +50,11 @@ Published packages (see [PUBLISHING.md](PUBLISHING.md)):
 
 - [Architecture.md](Architecture.md) — hub (tiers, placement, contribution sketch)
 - [docs/architecture/](docs/architecture/overview.md) — under-the-hood chapters
+- [Packages & public API](docs/architecture/packages-and-api.md) — package map, exports, stability
 - [Plugin-boundaries.md](Plugin-boundaries.md) — internal vs embed vs sandbox trust model
-- [apps/docs/extension-guide.md](apps/docs/extension-guide.md) — plugin author API
+- [apps/docs/README.md](apps/docs/README.md) — extension authoring hub (internal vs sandbox vs embed)
+- [apps/docs/extension-guide.md](apps/docs/extension-guide.md) — internal OOP plugins
+- [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) — sandbox widgets/plugins + embed panels
 
 ---
 

@@ -11,5 +11,6 @@ Deep under-the-hood docs for OpenEnvx. Start at the hub: [Architecture.md](../..
 | [html.md](html.md) | HTML block editor and slots |
 | [studio-and-products.md](studio-and-products.md) | Studio / html-studio fat bundles |
 | [extensions.md](extensions.md) | Internal vs embed vs sandbox (summary) |
+| [packages-and-api.md](packages-and-api.md) | Package map, public exports, stability rules |
 
-Companion: [Plugin-boundaries.md](../../Plugin-boundaries.md) · Author API: [extension-guide.md](../../apps/docs/extension-guide.md).
+Companion: [Plugin-boundaries.md](../../Plugin-boundaries.md) · Author hub: [apps/docs/README.md](../../apps/docs/README.md).

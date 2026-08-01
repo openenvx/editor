@@ -19,6 +19,7 @@ import {
   ViewContribution,
   type StatusBarBuilder,
   type TreeItem,
+  type TreeSelectOptions,
 } from '@openenvx/headless';
 import type { Page } from '@xmazu/openenvxee-schema';
 
@@ -130,8 +131,25 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
     };
   }
 
-  onSelect(node: Layer, ctx: CommandContext): void {
+  onSelect(
+    node: Layer,
+    ctx: CommandContext,
+    options?: TreeSelectOptions
+  ): void {
     if (!isLayerEditable(node)) {
+      return;
+    }
+    if (options?.additive) {
+      const current = ctx.selection.selectedLayerIds;
+      if (current.includes(node.id)) {
+        const next = current.filter((id) => id !== node.id);
+        ctx.scene.selectLayers(next, next[0] ?? null);
+        return;
+      }
+      ctx.scene.selectLayers(
+        [...current, node.id],
+        ctx.selection.primaryLayerId ?? node.id
+      );
       return;
     }
     ctx.scene.selectLayers([node.id], node.id);

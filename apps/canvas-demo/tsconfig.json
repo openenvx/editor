@@ -1,17 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "ES2023",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
-    "customConditions": [
-      "development"
-    ],
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
@@ -20,15 +13,7 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@xmazu/openenvxee-studio": [
-        "../../packages/studio/src/index.ts"
-      ]
-    }
+    "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "src",
-    "../../packages/typescript-config/css-modules.d.ts"
-  ]
+  "include": ["src", "../../packages/typescript-config/css-modules.d.ts"]
 }

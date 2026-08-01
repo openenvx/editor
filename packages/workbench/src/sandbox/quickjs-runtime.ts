@@ -1,7 +1,7 @@
 import type {
   SandboxBridgeRequest,
   SandboxBridgeResponse,
-} from '@xmazu/openenvxee-plugin-protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import { createQuickJsEngine } from './quickjs-isolate-engine';
 import type { HostToWorker, WorkerToHost } from './quickjs-worker-protocol';
@@ -13,7 +13,7 @@ import {
 export { SANDBOX_EVAL_TIMEOUT_MS } from './sandbox-caps';
 
 export interface SandboxIsolate {
-  evalModule: (source: string) => Promise<void>;
+  evalModule: (source: string) => Promise<unknown>;
   deliverUiMessage: (payload: unknown) => void;
   dispose: () => void;
 }
@@ -92,7 +92,7 @@ async function createWorkerIsolate(
   const pendingEval = new Map<
     string,
     {
-      resolve: () => void;
+      resolve: (result: unknown) => void;
       reject: (error: Error) => void;
       timer: ReturnType<typeof setTimeout>;
     }
@@ -176,7 +176,7 @@ async function createWorkerIsolate(
           return;
         }
         clearTimeout(pending.timer);
-        pending.resolve();
+        pending.resolve(message.result);
         pendingEval.delete(message.requestId);
         return;
       }
@@ -212,7 +212,7 @@ async function createWorkerIsolate(
         return Promise.reject(new Error('Sandbox disposed'));
       }
       const requestId = Math.random().toString(36).slice(2);
-      return new Promise<void>((resolve, reject) => {
+      return new Promise<unknown>((resolve, reject) => {
         const timer = setTimeout(() => {
           pendingEval.delete(requestId);
           const reason = new Error('Sandbox eval timeout');

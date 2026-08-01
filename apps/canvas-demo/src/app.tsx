@@ -8,12 +8,18 @@ import {
   createCanvasPropertyHostContextWithApi,
   createLocalStorageWorkbenchLayoutStore,
   createPostMessagePluginPanelTransport,
+  createSandboxExtensionHost,
   DEFAULT_CANVAS_LAYOUT,
   EmbedPanelHost,
   mountEmbedPanel,
+  mountSandboxExtensions,
 } from '@xmazu/openenvxee-studio';
+import saveTheDateSource from 'openenvx-widget:./extensions/save-the-date.widget.tsx';
+import seatingSource from 'openenvx-widget:./extensions/seating.widget.tsx';
 import { useMemo } from 'react';
 
+import saveTheDateManifest from './extensions/save-the-date.extension';
+import seatingManifest from './extensions/seating.extension';
 import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
 import { CanvasDemoPlugin } from './plugins/canvas-demo-plugin';
 import { createDemoVersionHistoryProvider } from './providers/demo-version-history-provider';
@@ -47,25 +53,72 @@ function promptUri(message: string, defaultValue?: string): string | null {
 
 const layoutStore = createLocalStorageWorkbenchLayoutStore(LAYOUT_STORE_KEY);
 
+function preferSandboxInProcess(): boolean {
+  const enabled = new URLSearchParams(window.location.search).has(
+    'sandboxInProcess'
+  );
+  if (enabled) {
+    console.warn(
+      '[openenvx] ?sandboxInProcess=1 enables in-process QuickJS (test-only). Production hosts must use a Worker.'
+    );
+  }
+  return enabled;
+}
+
 export function App() {
   const plugins = useMemo(() => createPlugins(), []);
   const mountExternalHosts = useMemo(() => {
-    if (!isEmbedMode()) {
-      return;
-    }
-    const panel = new EmbedPanelHost({
-      declaration: {
-        id: EMBED_PANEL_ID,
-        title: 'Embed',
-        allowedCommands: [],
-        contextScope: 'selection',
-      },
+    const sandbox = createSandboxExtensionHost({
       permission: 'edit',
-      transport: createPostMessagePluginPanelTransport({
-        allowedOrigins: [window.location.origin],
-      }),
+      preferInProcess: preferSandboxInProcess(),
+      manifests: [seatingManifest, saveTheDateManifest],
+      grants: [
+        {
+          id: 'wm.seating',
+          kind: 'widget',
+          source: seatingSource,
+          capabilities: ['widget:render', 'widget:values'],
+          allowedCommands: ['wm.seating.insert'],
+          title: 'Seating',
+        },
+        {
+          id: 'wm.save-the-date',
+          kind: 'widget',
+          source: saveTheDateSource,
+          capabilities: ['widget:render', 'widget:values'],
+          allowedCommands: ['wm.save-the-date.insert'],
+          title: 'Save the date',
+        },
+      ],
     });
-    return (api: WorkbenchApi) => mountEmbedPanel(api, panel);
+
+    return (api: WorkbenchApi) => {
+      const disposeSandbox = mountSandboxExtensions(api, sandbox);
+      void sandbox.pushWidgetSource('wm.seating', seatingSource);
+      void sandbox.pushWidgetSource('wm.save-the-date', saveTheDateSource);
+
+      if (!isEmbedMode()) {
+        return disposeSandbox;
+      }
+
+      const panel = new EmbedPanelHost({
+        declaration: {
+          id: EMBED_PANEL_ID,
+          title: 'Embed',
+          allowedCommands: [],
+          contextScope: 'selection',
+        },
+        permission: 'edit',
+        transport: createPostMessagePluginPanelTransport({
+          allowedOrigins: [window.location.origin],
+        }),
+      });
+      const disposeEmbed = mountEmbedPanel(api, panel);
+      return () => {
+        disposeEmbed();
+        disposeSandbox();
+      };
+    };
   }, []);
 
   return (

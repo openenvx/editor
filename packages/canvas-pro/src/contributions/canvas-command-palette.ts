@@ -31,6 +31,20 @@ export class CanvasCommandPaletteItems extends CommandPaletteContribution {
       .category('canvas')
       .when('page.layoutAbsolute');
     builder
+      .item('canvas.groupSelection')
+      .label(ctx.t('canvas.command.group', 'Create group'))
+      .category('canvas')
+      .keywords('group', 'combine')
+      .when('page.layoutAbsolute && scene.multiSelect');
+    builder
+      .item('canvas.ungroup')
+      .label(ctx.t('canvas.command.ungroup', 'Ungroup'))
+      .category('canvas')
+      .keywords('ungroup', 'split')
+      .when(
+        "page.layoutAbsolute && scene.layerSelected && scene.primaryLayerType == 'canvas.group'"
+      );
+    builder
       .item('canvas.insertImage')
       .label(ctx.t('canvas.command.image', 'Image'))
       .tab('assets')

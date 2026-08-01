@@ -83,6 +83,28 @@ describe('canvas-stage-selectors', () => {
     });
   });
 
+  it('selectLayerSlice disables dragging when the layer is not selected', () => {
+    const base = createDefaultTransform();
+    const snapshot = createCanvasStageSnapshot({
+      mode: { type: 'idle' },
+    });
+
+    expect(
+      selectLayerSlice(
+        snapshot,
+        'layer-1',
+        base,
+        undefined,
+        null,
+        true,
+        true,
+        false
+      )
+    ).toMatchObject({
+      draggable: false,
+    });
+  });
+
   it('selectLayerSlice hides non-visible layers', () => {
     const base = createDefaultTransform();
     const snapshot = createCanvasStageSnapshot({

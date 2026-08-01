@@ -1,8 +1,13 @@
-# Canvas extension guide
+# Internal plugin guide
 
-How to extend the OpenEnvx canvas engine with plugins.
+How to extend OpenEnvx with **first-party, in-process** plugins (`PluginManager`, OOP `Plugin` / `WorkbenchPlugin`, canvas layer definitions).
 
-Under-the-hood map (packages, workbench, studio, trust): [Architecture.md](../../Architecture.md) and [docs/architecture/](../../docs/architecture/overview.md). Trust / embed / sandbox: [Plugin-boundaries.md](../../Plugin-boundaries.md).
+This is **not** how to write sandbox widgets, sandbox plugins, or embed panels. Those are untrusted paths — see the hub and the sandbox guide:
+
+- **[Authoring hub — pick a path](README.md)**
+- **[Sandbox & embed guide](sandbox-extension-guide.md)**
+
+Under-the-hood map: [Architecture.md](../../Architecture.md) · [docs/architecture/](../../docs/architecture/overview.md). Trust model: [Plugin-boundaries.md](../../Plugin-boundaries.md).
 
 ## Scene document (`@xmazu/openenvxee-schema`)
 

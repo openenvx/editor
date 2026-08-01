@@ -5,7 +5,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
-    "customConditions": ["development"],
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
@@ -14,18 +13,7 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@xmazu/openenvxee-plugin-protocol": [
-        "../../packages/plugin-protocol/src/index.ts"
-      ],
-      "@xmazu/openenvxee-plugin-protocol/jsx-runtime": [
-        "../../packages/plugin-protocol/src/jsx-runtime.ts"
-      ],
-      "@xmazu/openenvxee-plugin-protocol/jsx-dev-runtime": [
-        "../../packages/plugin-protocol/src/jsx-dev-runtime.ts"
-      ]
-    }
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src", "../../packages/typescript-config/css-modules.d.ts"]
 }

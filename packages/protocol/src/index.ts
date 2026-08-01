@@ -1,0 +1,100 @@
+export {
+  PLUGIN_HOST_SOURCE,
+  PLUGIN_PARENT_SOURCE,
+  type HostToParentMessage,
+  type ParentToHostMessage,
+  type PluginPanelMessage,
+  type PluginPanelManifest,
+} from './messages';
+export {
+  PLUGIN_ELEMENT_TYPES,
+  PLUGIN_PROPERTY_ELEMENT_TYPES,
+  PLUGIN_CHROME_ELEMENT_TYPES,
+  PLUGIN_FIELD_KINDS,
+  PLUGIN_FIELD_ELEMENT_TO_KIND,
+  CANVAS_ELEMENT_TYPES,
+  HTML_ELEMENT_TYPES,
+  type PluginElementType,
+  type PluginInspectorElementType,
+  type PluginChromeElementType,
+  type CanvasElementType,
+  type HtmlElementType,
+  type PluginFieldKind,
+  type PluginTone,
+  type PluginSize,
+  type PluginGap,
+  type PluginAlign,
+  type PluginDirection,
+  type PluginPropValue,
+  type PluginNode,
+  type PluginChild,
+  type PluginHandler,
+  type PluginElement,
+  type PluginComponent,
+  type PluginContextScope,
+  type PluginPanelSelection,
+  type PluginPanelContext,
+  type PluginPanelDeclaration,
+  type RenderNode,
+  type RenderChild,
+  type RenderPropValue,
+} from './types';
+export {
+  type ExtensionKind,
+  type ExtensionCommandContribution,
+  type ExtensionViewContainerContribution,
+  type ExtensionViewContribution,
+  type ExtensionWidgetContribution,
+  type ExtensionWidgetFieldDef,
+  type ExtensionChromeContribution,
+  type ExtensionContributes,
+  type ExtensionActivationEvent,
+  type ExtensionManifest,
+} from './extension-manifest';
+export {
+  validateExtensionManifest,
+  type ExtensionManifestValidationResult,
+} from './validate-extension-manifest';
+export type {
+  WidgetFaceRenderResult,
+  WidgetRegistryEntry,
+} from './widget-host-api';
+export {
+  validateRenderTree,
+  isRenderPropValue,
+  MAX_RENDER_TREE_NODES,
+  MAX_RENDER_TREE_JSON_CHARS,
+  type RenderTreeValidationResult,
+  type ValidateRenderTreeOptions,
+} from './validate-render-tree';
+export {
+  validateWidgetTree,
+  WidgetTreeValidationError,
+  WIDGET_LAYER_ESCAPE_TYPES,
+  WIDGET_BLOCK_ESCAPE_TYPES,
+  type WidgetTreeKind,
+} from './validate-widget-tree';
+export {
+  validatePluginTree,
+  MAX_PLUGIN_TREE_NODES,
+  MAX_PLUGIN_TREE_JSON_CHARS,
+  type PluginTreeValidationResult,
+  type ValidatePluginTreeOptions,
+} from './validate-plugin-tree';
+
+export {
+  SANDBOX_CAPABILITIES,
+  isSandboxCapability,
+  SANDBOX_BRIDGE_SOURCE,
+  SANDBOX_UI_SOURCE,
+  SANDBOX_HOST_UI_SOURCE,
+  type SandboxCapability,
+  type SandboxExtensionKind,
+  type SandboxExtensionGrant,
+  type SandboxHostMethod,
+  type SandboxBridgeRequest,
+  type SandboxBridgeResponse,
+  type SandboxUiMessage,
+  type SandboxHostUiMessage,
+  type SandboxUiSelection,
+} from './sandbox';

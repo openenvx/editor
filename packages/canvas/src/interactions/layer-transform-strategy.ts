@@ -14,7 +14,10 @@ import type {
   CanvasTransformModifiers,
   CanvasTransformResult,
 } from '../registry/canvas-registry-types';
-import { isRichTextHorizontalAnchor } from '../rich-text-resize';
+import {
+  isRichTextCornerAnchor,
+  isRichTextHorizontalAnchor,
+} from '../rich-text-resize';
 import {
   applyGenericBoundBoxFunc,
   createGenericTransformContext,
@@ -153,7 +156,10 @@ export const richTextTransformStrategy: LayerTransformStrategy = {
   boundBox(input) {
     const session = input.refs.richTextCornerSessionRef.current;
     const anchor = input.refs.transformDragRef.current?.anchor ?? '';
-    if (!session || !isRichTextHorizontalAnchor(anchor)) {
+    if (
+      !session ||
+      !(isRichTextHorizontalAnchor(anchor) || isRichTextCornerAnchor(anchor))
+    ) {
       return null;
     }
     const transformer = input.transformerRef.current;

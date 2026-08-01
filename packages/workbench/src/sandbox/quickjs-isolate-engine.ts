@@ -2,7 +2,7 @@ import {
   SANDBOX_BRIDGE_SOURCE,
   type SandboxBridgeRequest,
   type SandboxBridgeResponse,
-} from '@xmazu/openenvxee-plugin-protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import {
   SANDBOX_CPU_LIMIT_MS,
@@ -14,7 +14,7 @@ export type HostCallFn = (
 ) => Promise<SandboxBridgeResponse>;
 
 export interface QuickJsEngine {
-  evalModule: (source: string) => Promise<void>;
+  evalModule: (source: string) => Promise<unknown>;
   deliverUiMessage: (payload: unknown) => void;
   dispose: () => void;
 }
@@ -74,7 +74,7 @@ export async function createQuickJsEngine(input: {
     return String(dumped);
   };
 
-  const throwIfEvalFailed = (result: {
+  const assertEvalOk = (result: {
     error?: { dispose: () => void };
     value?: { dispose: () => void } | null;
   }): void => {
@@ -85,7 +85,36 @@ export async function createQuickJsEngine(input: {
       }
       throw new Error(`Sandbox eval failed: ${text}`);
     }
-    result.value?.dispose();
+    try {
+      result.value?.dispose();
+    } catch {
+      // Handle already freed.
+    }
+  };
+
+  const dumpEvalResult = (result: {
+    error?: { dispose: () => void };
+    value?: { dispose: () => void } | null;
+  }): unknown => {
+    if (result.error) {
+      const text = formatEvalError(result.error);
+      if (/interrupt/i.test(text)) {
+        throw new Error('Sandbox CPU limit exceeded');
+      }
+      throw new Error(`Sandbox eval failed: ${text}`);
+    }
+    if (!result.value) {
+      return undefined;
+    }
+    try {
+      return context.dump(result.value as never);
+    } finally {
+      try {
+        result.value.dispose();
+      } catch {
+        // Handle already freed by dump/runtime.
+      }
+    }
   };
 
   const hostHandle = context.newFunction('__openenvxHostCall', (reqHandle) => {
@@ -152,37 +181,93 @@ export async function createQuickJsEngine(input: {
         }
         return response.result;
       },
+      _denyDuringFaceRender(method) {
+        if (this.widget && this.widget.rendering) {
+          throw new Error(method + ' is not allowed during widget face render');
+        }
+      },
       getSelection() { return this.call('getSelection'); },
       getPageId() { return this.call('getPageId'); },
       executeCommand(commandId, args) {
+        this._denyDuringFaceRender('executeCommand');
         return this.call('executeCommand', { commandId, args });
       },
       showUI(html, options) {
+        this._denyDuringFaceRender('showUI');
         return this.call('showUI', { html, ...(options || {}) });
       },
       resizeUI(width, height) {
         return this.call('resizeUI', { width, height });
       },
       closeUI() { return this.call('closeUI'); },
-      notify(message) { return this.call('notify', { message }); },
-      closePlugin() { return this.call('closePlugin'); },
+      notify(message) {
+        this._denyDuringFaceRender('notify');
+        return this.call('notify', { message });
+      },
+      closePlugin() {
+        this._denyDuringFaceRender('closePlugin');
+        return this.call('closePlugin');
+      },
       getClientStorage(key) { return this.call('getClientStorage', { key }); },
       setClientStorage(key, value) {
+        this._denyDuringFaceRender('setClientStorage');
         return this.call('setClientStorage', { key, value });
-      },
-      onClick(handler) {
-        globalThis.__openenvxOnClick = handler;
       },
       getSyncedState() { return this.call('getSyncedState'); },
       setSyncedState(value) { return this.call('setSyncedState', { value }); },
       resizeWidget(width, height) {
+        this._denyDuringFaceRender('resizeWidget');
         return this.call('resizeWidget', { width, height });
+      },
+      widget: {
+        _registry: Object.create(null),
+        _handlersByLayer: Object.create(null),
+        _renderValues: null,
+        rendering: false,
+        applyProps: null,
+        _endRenderPass: null,
+        register(entry) {
+          if (!entry || typeof entry !== 'object') {
+            throw new Error('openenvx.widget.register expects an entry');
+          }
+          var id = entry.id || (entry.manifest && entry.manifest.id);
+          if (!id || typeof id !== 'string') {
+            throw new Error('openenvx.widget.register requires id');
+          }
+          this._registry[id] = entry;
+        },
+        useSyncedState(key, init) {
+          var values = this._renderValues;
+          var current =
+            values && typeof values === 'object' && Object.prototype.hasOwnProperty.call(values, key)
+              ? values[key]
+              : (typeof init === 'function' ? init() : init);
+          var set = function (next) {
+            var resolved = typeof next === 'function' ? next(current) : next;
+            current = resolved;
+            var patch = {};
+            patch[key] = resolved;
+            var apply = globalThis.openenvx.widget.applyProps;
+            if (typeof apply === 'function') {
+              return apply(patch);
+            }
+            return globalThis.openenvx.getSyncedState().then(function (live) {
+              var bag =
+                live && typeof live === 'object' && !Array.isArray(live)
+                  ? Object.assign({}, live)
+                  : {};
+              bag[key] = resolved;
+              return globalThis.openenvx.setSyncedState(bag);
+            });
+          };
+          return [current, set];
+        },
       },
     };
   `;
   try {
     const bootResult = withCpuBudget(() => context.evalCode(bootstrap));
-    throwIfEvalFailed(bootResult);
+    assertEvalOk(bootResult);
   } catch (error) {
     context.dispose();
     runtime.dispose();
@@ -195,30 +280,52 @@ export async function createQuickJsEngine(input: {
     );
   }
 
+  const endHeldRenderPass = (): void => {
+    withCpuBudget(() => {
+      const result = context.evalCode(`(function () {
+        var w = globalThis.openenvx && globalThis.openenvx.widget;
+        if (w && typeof w._endRenderPass === 'function') {
+          w._endRenderPass();
+        }
+      })()`);
+      assertEvalOk(result);
+    });
+  };
+
   return {
     async evalModule(source: string) {
-      const result = withCpuBudget(() => context.evalCode(source));
-      throwIfEvalFailed(result);
-      withCpuBudget(() => {
-        context.runtime.executePendingJobs();
-      });
+      try {
+        const result = withCpuBudget(() => context.evalCode(source));
+        const dumped = dumpEvalResult(result);
+        // Drain microtasks while face-render hold is still active.
+        withCpuBudget(() => {
+          context.runtime.executePendingJobs();
+        });
+        return dumped;
+      } finally {
+        endHeldRenderPass();
+      }
     },
     deliverUiMessage(payload: unknown) {
       const encoded = JSON.stringify(payload ?? null);
-      const result = withCpuBudget(() =>
-        context.evalCode(
-          `(function (payload) {
+      try {
+        const result = withCpuBudget(() =>
+          context.evalCode(
+            `(function (payload) {
             const ui = globalThis.openenvx && globalThis.openenvx.ui;
             if (ui && typeof ui.onmessage === 'function') {
               ui.onmessage(payload);
             }
           })(${encoded})`
-        )
-      );
-      throwIfEvalFailed(result);
-      withCpuBudget(() => {
-        context.runtime.executePendingJobs();
-      });
+          )
+        );
+        assertEvalOk(result);
+        withCpuBudget(() => {
+          context.runtime.executePendingJobs();
+        });
+      } finally {
+        endHeldRenderPass();
+      }
     },
     dispose() {
       deadlineMs = Number.POSITIVE_INFINITY;

@@ -1,4 +1,9 @@
-import { HtmlBlocksPlugin } from '@openenvx/html';
+import type { Layer } from '@openenvx/core';
+import { applyHtmlWidgetFace, HtmlBlocksPlugin } from '@openenvx/html';
+import {
+  SandboxExtensionHost,
+  type SandboxExtensionHostOptions,
+} from '@xmazu/openenvxee-workbench';
 
 export * from '@openenvx/core';
 export * from '@openenvx/headless';
@@ -34,7 +39,20 @@ export {
   workbenchPlBundle,
   WorkbenchShell,
   type WorkbenchShellProps,
+  SandboxExtensionHost,
+  mountSandboxExtensions,
+  type SandboxExtensionHostOptions,
 } from '@xmazu/openenvxee-workbench';
+
+/** Sandbox host wired for HTML widget faces. */
+export function createHtmlSandboxExtensionHost(
+  options: Omit<SandboxExtensionHostOptions, 'applyWidgetFace'>
+): SandboxExtensionHost {
+  return new SandboxExtensionHost({
+    ...options,
+    applyWidgetFace: (layer, tree) => applyHtmlWidgetFace(layer as Layer, tree),
+  });
+}
 
 /** Default plugins for an HTML block studio host app. */
 export const DEFAULT_HTML_STUDIO_PLUGINS = [new HtmlBlocksPlugin()];

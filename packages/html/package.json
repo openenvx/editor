@@ -21,6 +21,7 @@
     "@openenvx/core": "workspace:*",
     "@openenvx/headless": "workspace:*",
     "@xmazu/openenvxee-preview": "workspace:*",
+    "@xmazu/openenvxee-protocol": "workspace:*",
     "@xmazu/openenvxee-schema": "workspace:*",
     "@tiptap/extension-color": "^3.27.3",
     "@tiptap/extension-font-family": "^3.27.3",

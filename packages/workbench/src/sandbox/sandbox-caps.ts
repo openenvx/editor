@@ -8,12 +8,16 @@ export const SANDBOX_EVAL_TIMEOUT_MS = 15_000;
 export const SANDBOX_WORKER_READY_MS = 15_000;
 /** Max verified artifact body size. */
 export const MAX_ARTIFACT_BYTES = 2 * 1024 * 1024;
+/** Max pushed widget/plugin source characters. */
+export const MAX_SOURCE_CHARS = 2 * 1024 * 1024;
 /** Max concurrent QuickJS isolates (including in-flight starts). */
 export const MAX_CONCURRENT_ISOLATES = 8;
 /** Max `showUI` / grant `uiHtml` character length. */
 export const MAX_SHOW_UI_HTML_CHARS = 512 * 1024;
 /** Max JSON-encoded UI→isolate message size. */
 export const MAX_UI_MESSAGE_JSON_CHARS = 64 * 1024;
+/** Max JSON-encoded widget `data.values` blob from setSyncedState. */
+export const MAX_WIDGET_VALUES_JSON_CHARS = 64 * 1024;
 export const MAX_NOTIFY_MESSAGE_CHARS = 500;
 export const MAX_NOTIFY_PER_SECOND = 10;
 

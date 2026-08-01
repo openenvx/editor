@@ -3,7 +3,7 @@ import type {
   SandboxExtensionGrant,
   SandboxBridgeRequest,
   SandboxUiSelection,
-} from '@xmazu/openenvxee-plugin-protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import {
   freezeGrant,
@@ -20,6 +20,7 @@ import {
   assertNotifyPolicy,
   MAX_CONCURRENT_ISOLATES,
   MAX_SHOW_UI_HTML_CHARS,
+  MAX_WIDGET_VALUES_JSON_CHARS,
 } from './sandbox-caps';
 
 export {
@@ -59,12 +60,10 @@ const MAX_CLIENT_STORAGE_KEYS = 64;
 const MAX_CLIENT_STORAGE_VALUE_CHARS = 32_768;
 
 function isolateKey(extensionId: string, layerId?: string): string {
-  return layerId ? `${extensionId}:${layerId}` : extensionId;
-}
-
-function layerIdFromIsolateKey(key: string): string | null {
-  const colon = key.indexOf(':');
-  return colon === -1 ? null : key.slice(colon + 1);
+  // Widgets share one isolate per extension (mounted roots per instance).
+  // Plugins still use extensionId only (layerId ignored).
+  void layerId;
+  return extensionId;
 }
 
 export class SandboxExtensionController {
@@ -81,6 +80,14 @@ export class SandboxExtensionController {
   private readonly uiContextListeners = new Set<SandboxUiContextListener>();
   private disposed = false;
   private notifySeq = 0;
+  /**
+   * Active widget layer for bridge values/resize/showUI.
+   * Set only while render/invoke runs — never fall back to a baked start() id
+   * (shared per-extension isolates serve many layer instances).
+   */
+  private activeWidgetLayerId: string | null = null;
+  /** Serialize widget face/handler ops so concurrent instances cannot cross-wire. */
+  private widgetOpTail: Promise<void> = Promise.resolve();
 
   constructor(
     private readonly options: {
@@ -91,9 +98,9 @@ export class SandboxExtensionController {
       workerUrl?: string | URL;
       /** Test-only: allow in-process QuickJS (never for production hosts). */
       preferInProcess?: boolean;
-      /** Optional: resolve widget layer synced state by layer id. */
-      getWidgetSyncedState?: (layerId: string) => unknown;
-      setWidgetSyncedState?: (layerId: string, value: unknown) => void;
+      /** Resolve widget layer `data.values` by layer id. */
+      getWidgetValues?: (layerId: string) => unknown;
+      setWidgetValues?: (layerId: string, value: unknown) => void;
       resizeWidgetLayer?: (
         layerId: string,
         width: number,
@@ -228,11 +235,18 @@ export class SandboxExtensionController {
 
     this.starting.add(key);
     try {
-      const source = await fetchAndVerifyArtifact({
-        url: frozen.artifactUrl,
-        contentHash: frozen.contentHash,
-        fetchImpl: this.options.fetchImpl,
-      });
+      let source: string;
+      if (typeof frozen.source === 'string' && frozen.source.length > 0) {
+        source = frozen.source;
+      } else if (frozen.artifactUrl && frozen.contentHash) {
+        source = await fetchAndVerifyArtifact({
+          url: frozen.artifactUrl,
+          contentHash: frozen.contentHash,
+          fetchImpl: this.options.fetchImpl,
+        });
+      } else {
+        throw new Error(`Sandbox grant ${frozen.id} has no source or artifact`);
+      }
       if (this.disposed) {
         return;
       }
@@ -277,6 +291,86 @@ export class SandboxExtensionController {
     }
   }
 
+  /**
+   * Push widget source from the parent page (no artifact fetch).
+   * Requires an existing grant — does not mint capabilities.
+   */
+  async pushWidgetSource(extensionId: string, source: string): Promise<void> {
+    const existing = this.grantById.get(extensionId);
+    if (!existing) {
+      throw new Error(`Unknown sandbox grant: ${extensionId}`);
+    }
+    const grant = freezeGrant({ ...existing, source });
+    this.grantById.set(grant.id, grant);
+    this.stop(extensionId);
+    await this.start(grant);
+  }
+
+  getGrant(extensionId: string): SandboxExtensionGrant | undefined {
+    return this.grantById.get(extensionId);
+  }
+
+  /**
+   * Ask the widget isolate to expand its face for the given values.
+   * Returns the element tree JSON (RenderNode) or null.
+   *
+   * **Ownership:** document state stays on the host (`data.values`). The isolate
+   * only expands Preact → RenderNode; the host maps that to scene layers.
+   * Handlers are stored per `layerId` so multi-instance widgets do not cross-wire.
+   */
+  async renderWidgetFace(
+    extensionId: string,
+    layerId: string,
+    values: Record<string, unknown>,
+    componentId?: string
+  ): Promise<unknown> {
+    const grant = this.grantById.get(extensionId);
+    if (!(grant && hasCapability(grant, 'widget:render'))) {
+      return null;
+    }
+    const isolate = this.isolates.get(extensionId);
+    if (!isolate) {
+      return null;
+    }
+    const lookupId = componentId ?? extensionId;
+    return this.withWidgetLayerContext(layerId, async () =>
+      isolate.evalModule(
+        `(function () {
+          var widget = globalThis.openenvx && globalThis.openenvx.widget;
+          if (!widget || !widget._registry) return null;
+          var entry = widget._registry[${JSON.stringify(lookupId)}]
+            || widget._registry[${JSON.stringify(extensionId)}];
+          if (!entry || typeof entry.render !== 'function') return null;
+          var values = ${JSON.stringify(values)};
+          widget._renderValues = values;
+          widget.rendering = true;
+          widget.applyProps = function (patch) {
+            Object.assign(values, patch || {});
+            return globalThis.openenvx.setSyncedState(values);
+          };
+          // Cleared by the engine after pending jobs so microtasks cannot escape the gate.
+          widget._endRenderPass = function () {
+            widget.rendering = false;
+            widget.applyProps = null;
+            widget._renderValues = null;
+            widget._endRenderPass = null;
+          };
+          var result = entry.render(values);
+          if (!result || typeof result !== 'object' || !('tree' in result)) {
+            throw new Error('openenvx.widget render must return { tree, handlers }');
+          }
+          var bag =
+            result.handlers && typeof result.handlers === 'object'
+              ? result.handlers
+              : {};
+          widget._handlersByLayer = widget._handlersByLayer || Object.create(null);
+          widget._handlersByLayer[${JSON.stringify(layerId)}] = bag;
+          return result.tree;
+        })()`
+      )
+    );
+  }
+
   stop(extensionId: string, layerId?: string): void {
     const key = isolateKey(extensionId, layerId);
     const isolate = this.isolates.get(key);
@@ -291,57 +385,90 @@ export class SandboxExtensionController {
   }
 
   /**
-   * Stop widget isolates whose keys are not in `desired` (`extensionId:layerId`).
-   * Plugin isolates (no `:`) are left alone.
+   * Stop widget isolates whose extension ids are not in `desired`.
    */
   reconcileWidgetIsolates(
     desired: readonly { extensionId: string; layerId: string }[]
   ): void {
-    const desiredKeys = new Set(
-      desired.map((entry) => isolateKey(entry.extensionId, entry.layerId))
-    );
+    const desiredIds = new Set(desired.map((entry) => entry.extensionId));
     const stale: string[] = [];
-    for (const key of this.isolates.keys()) {
-      if (layerIdFromIsolateKey(key) !== null && !desiredKeys.has(key)) {
-        stale.push(key);
+    for (const [id, grant] of this.grantById) {
+      if (grant.kind !== 'widget') {
+        continue;
+      }
+      if (!desiredIds.has(id) && this.isolates.has(id)) {
+        stale.push(id);
       }
     }
     for (const key of stale) {
       this.isolates.get(key)?.dispose();
       this.isolates.delete(key);
-      const layerId = layerIdFromIsolateKey(key);
-      if (
-        this.uiState?.layerId &&
-        layerId &&
-        this.uiState.layerId === layerId
-      ) {
+      if (this.uiState?.extensionId === key) {
         this.setUi(null);
       }
     }
   }
 
-  /** Figma-shaped: wake widget isolate on canvas node click. */
-  dispatchWidgetClick(layerId: string): void {
+  /**
+   * Invoke a handler id inside the extension isolate for a widget layer.
+   * Installs applyProps for the full handler lifetime (including async).
+   * Handler pass is not a face-render pass — executeCommand / showUI allowed.
+   */
+  invokeWidgetHandler(
+    extensionId: string,
+    layerId: string,
+    handlerId: string,
+    payload?: unknown
+  ): void {
     if (this.disposed) {
       return;
     }
-    for (const [key, isolate] of this.isolates) {
-      if (layerIdFromIsolateKey(key) !== layerId) {
-        continue;
-      }
-      void isolate
-        .evalModule(
-          `void Promise.resolve(
-            typeof globalThis.__openenvxOnClick === 'function'
-              ? globalThis.__openenvxOnClick()
-              : undefined
-          );`
-        )
-        .catch((error) => {
-          console.error('[sandbox] widget click failed', layerId, error);
-        });
+    const isolate = this.isolates.get(extensionId);
+    if (!isolate) {
       return;
     }
+    void this.withWidgetLayerContext(layerId, async () => {
+      try {
+        await isolate.evalModule(
+          `(async function () {
+            var widget = globalThis.openenvx && globalThis.openenvx.widget;
+            var current = await globalThis.openenvx.getSyncedState();
+            var values =
+              current && typeof current === 'object' && !Array.isArray(current)
+                ? Object.assign({}, current)
+                : {};
+            if (widget) {
+              widget._renderValues = values;
+              widget.rendering = false;
+              widget.applyProps = function (patch) {
+                Object.assign(values, patch || {});
+                return globalThis.openenvx.setSyncedState(values);
+              };
+            }
+            try {
+              var bags = (widget && widget._handlersByLayer) || {};
+              var bag = bags[${JSON.stringify(layerId)}] || {};
+              var fn = bag[${JSON.stringify(handlerId)}];
+              if (typeof fn === 'function') {
+                await fn(${JSON.stringify(payload ?? null)});
+              }
+            } finally {
+              if (widget) {
+                widget.applyProps = null;
+                widget._renderValues = null;
+              }
+            }
+          })()`
+        );
+      } catch (error) {
+        console.error(
+          '[sandbox] widget handler failed',
+          extensionId,
+          handlerId,
+          error
+        );
+      }
+    });
   }
 
   dispose(): void {
@@ -399,11 +526,40 @@ export class SandboxExtensionController {
     this.notifyTimestamps.set(extensionId, updated);
   }
 
+  /**
+   * Run `fn` with `activeWidgetLayerId` set, serialized against other widget ops
+   * on this controller (shared isolate must not interleave instance contexts).
+   */
+  private withWidgetLayerContext<T>(
+    layerId: string,
+    fn: () => Promise<T>
+  ): Promise<T> {
+    const run = async (): Promise<T> => {
+      this.activeWidgetLayerId = layerId;
+      try {
+        return await fn();
+      } finally {
+        if (this.activeWidgetLayerId === layerId) {
+          this.activeWidgetLayerId = null;
+        }
+      }
+    };
+    const next = this.widgetOpTail.then(run, run);
+    this.widgetOpTail = next.then(
+      () => {},
+      () => {}
+    );
+    return next;
+  }
+
   private createHandlers(
     grant: SandboxExtensionGrant,
     layerId?: string
   ): SandboxHostHandlers {
     const host = this.options.host;
+    /** UI ownership: prefer active render/invoke context, else start() layerId. */
+    const uiLayerId = (): string | undefined =>
+      this.activeWidgetLayerId ?? layerId;
     return {
       getSelection: () => {
         const selection = host.getSelection();
@@ -427,22 +583,22 @@ export class SandboxExtensionController {
           width: options?.width ?? 320,
           height: options?.height ?? 240,
           kind: grant.kind,
-          layerId,
+          layerId: uiLayerId(),
         });
       },
       resizeUI: (width, height) => {
-        if (!this.ownsOpenUi(grant.id, layerId)) {
+        if (!this.ownsOpenUi(grant.id, uiLayerId())) {
           return;
         }
         this.setUi({ ...this.uiState!, width, height });
       },
       closeUI: () => {
-        if (this.ownsOpenUi(grant.id, layerId)) {
+        if (this.ownsOpenUi(grant.id, uiLayerId())) {
           this.setUi(null);
         }
       },
       postToUI: (pluginMessage) => {
-        if (!this.ownsOpenUi(grant.id, layerId)) {
+        if (!this.ownsOpenUi(grant.id, uiLayerId())) {
           throw new Error('No open UI for this extension');
         }
         this.emitUiOutbound(pluginMessage);
@@ -470,22 +626,33 @@ export class SandboxExtensionController {
         this.clientStorage.set(storageKey, value);
       },
       getSyncedState: () => {
-        if (!layerId) {
+        const id = this.activeWidgetLayerId;
+        if (!id) {
           return null;
         }
-        return this.options.getWidgetSyncedState?.(layerId) ?? null;
+        return this.options.getWidgetValues?.(id) ?? null;
       },
       setSyncedState: (value) => {
-        if (!layerId) {
-          throw new Error('Synced state requires a widget layer');
+        const id = this.activeWidgetLayerId;
+        if (!id) {
+          throw new Error(
+            'Widget values require an active widget layer context'
+          );
         }
-        this.options.setWidgetSyncedState?.(layerId, value);
+        const encoded = JSON.stringify(value ?? null);
+        if (encoded.length > MAX_WIDGET_VALUES_JSON_CHARS) {
+          throw new Error('Widget values too large');
+        }
+        this.options.setWidgetValues?.(id, value);
       },
       resizeWidget: (width, height) => {
-        if (!layerId) {
-          throw new Error('resizeWidget requires a widget layer');
+        const id = this.activeWidgetLayerId;
+        if (!id) {
+          throw new Error(
+            'resizeWidget requires an active widget layer context'
+          );
         }
-        this.options.resizeWidgetLayer?.(layerId, width, height);
+        this.options.resizeWidgetLayer?.(id, width, height);
       },
     };
   }

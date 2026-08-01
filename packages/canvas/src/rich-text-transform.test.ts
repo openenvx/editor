@@ -61,7 +61,6 @@ describe('bakeRichTextNodeTransform', () => {
   const session = {
     anchor: 'bottom-right' as const,
     origin: snapshot,
-    snapshot,
     startFontSize,
   };
 
@@ -74,6 +73,8 @@ describe('bakeRichTextNodeTransform', () => {
     expect(result.fontSize).toBe(36);
     expect(result.transform.width).toBe(300);
     expect(result.transform.height).toBe(150);
+    expect(result.transform.x).toBe(10);
+    expect(result.transform.y).toBe(20);
     expect(node.scaleX()).toBe(1);
     expect(node.scaleY()).toBe(1);
   });
@@ -89,7 +90,7 @@ describe('bakeRichTextNodeTransform', () => {
     expect(result.transform.height).toBe(8);
   });
 
-  it('reads scale from baked node dimensions when scale is already 1', () => {
+  it('pins opposite corner from node fallback scale', () => {
     const scaledNode = {
       ...createMockNode(snapshot),
       height: () => 120,
@@ -98,11 +99,17 @@ describe('bakeRichTextNodeTransform', () => {
       width: () => 300,
     } as unknown as MockGroup;
 
-    const result = bakeRichTextNodeTransform(session, scaledNode, () => 150);
+    const result = bakeRichTextNodeTransform(
+      { ...session, anchor: 'top-right' },
+      scaledNode,
+      () => 150
+    );
 
     expect(result.fontSize).toBe(36);
     expect(result.transform.width).toBe(300);
     expect(result.transform.height).toBe(150);
+    expect(result.transform.x).toBe(10);
+    expect(result.transform.y).toBe(100 - 150);
   });
 
   it('keeps font size when resizing horizontally from the right', () => {
@@ -113,7 +120,6 @@ describe('bakeRichTextNodeTransform', () => {
       {
         anchor: 'middle-right',
         origin: snapshot,
-        snapshot,
         startFontSize,
       },
       node,

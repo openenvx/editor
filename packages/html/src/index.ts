@@ -12,6 +12,7 @@ export {
 export { builtinBlocks, isHtmlTextBlockType } from './blocks/builtin-blocks';
 export { buttonBlock } from './blocks/button-block';
 export { heroBlock } from './blocks/hero-block';
+export { openenvxWidgetBlock } from './blocks/openenvx-widget-block';
 export {
   DuplicateHtmlBlockCommand,
   InsertHtmlBlockCommand,
@@ -45,3 +46,8 @@ export {
   removeById,
   updateBlockData,
 } from './tree/block-tree';
+export {
+  applyHtmlWidgetFace,
+  mapWidgetTreeToHtmlLayers,
+  type MapWidgetHtmlTreeOptions,
+} from './widgets/map-widget-tree-to-html-layers';

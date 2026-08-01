@@ -17,8 +17,13 @@ Package boundaries and contribution flow for the monorepo.
 | [HTML](docs/architecture/html.md) | Block editor, slots, `HtmlBlocksPlugin` |
 | [Studio & products](docs/architecture/studio-and-products.md) | Fat bundles, what host apps import |
 | [Extensions](docs/architecture/extensions.md) | Internal vs embed vs sandbox (summary + links) |
+| [Packages & public API](docs/architecture/packages-and-api.md) | Package map, export surface, pre-1.0 stability |
 
-Author how-to: [apps/docs/extension-guide.md](apps/docs/extension-guide.md).
+Author how-to:
+
+- Hub (internal vs sandbox vs embed): [apps/docs/README.md](apps/docs/README.md)
+- Internal OOP plugins: [apps/docs/extension-guide.md](apps/docs/extension-guide.md)
+- Sandbox widgets / plugins + embed: [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md)
 
 ## Client tiers (monorepo)
 
@@ -27,7 +32,7 @@ Author how-to: [apps/docs/extension-guide.md](apps/docs/extension-guide.md).
 | **Rendering-only** | `schema`, `canvas` | Embed `CanvasStage` in a custom React app with own state. No plugin host. |
 | **Editor backbone** | `core`, `headless`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
 | **Workbench UI** | `workbench` | React shell (`WorkbenchShell`); workspace-private. |
-| **Published product** | `studio` (+ `schema`, `plugin-protocol`) | Fat bundle of workbench + canvas + canvas-pro + agent into `dist`; protocol also published standalone for embed panel authors. |
+| **Published product** | `studio` (+ `schema`, `protocol`, `elements`, `widget-sdk`) | Fat bundle of workbench + canvas + canvas-pro + agent into `dist`; protocol + elements + widget-sdk also published standalone. |
 | **HTML studio** | `html`, `html-studio` | Puck-style block editor + thin studio re-exports (workspace-private). |
 
 **Hard rules:** All canvas code lives in `@openenvx/canvas` (not `core`). HTML block editing lives in `@openenvx/html`. Untrusted extension code never runs in the editor main world.
@@ -37,7 +42,7 @@ Author how-to: [apps/docs/extension-guide.md](apps/docs/extension-guide.md).
 | Tier | Packages | License / publish (intent) | Responsibility |
 | --- | --- | --- | --- |
 | Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives |
-| Embed protocol | `plugin-protocol` | Published (public) | Declarative panel JSON tree, `h`/jsx, `postMessage` unions, `validatePluginTree` |
+| Embed / sandbox protocol | `protocol` (`@xmazu/openenvxee-protocol`) | Published (public) | `RenderNode`, manifests, validators, sandbox grants, message unions |
 | Product libs | `headless`, `canvas`, `html`, `driver-*`, `workbench`, `canvas-pro`, `agent`, `html-studio` | Private (workspace) | Workbench runtime, canvas engine, HTML editor, drivers, React shell, pro chrome, agent |
 | Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + canvas-pro + agent |
 
@@ -54,7 +59,7 @@ Author how-to: [apps/docs/extension-guide.md](apps/docs/extension-guide.md).
 | `@xmazu/openenvxee-canvas-pro` | Canvas-only chrome (zoom, transform panes, floating toolbar) |
 | `@xmazu/openenvxee-studio` | Product fat bundle + `DEFAULT_STUDIO_PLUGINS` + `createSandboxExtensionHost` |
 | `@xmazu/openenvxee-html-studio` | HTML product re-exports + `DEFAULT_HTML_STUDIO_PLUGINS` |
-| `@xmazu/openenvxee-plugin-protocol` | Embed panel vocabulary for untrusted parents |
+| `@xmazu/openenvxee-protocol` | Embed panel vocabulary for untrusted parents |
 
 ## Contribution flow (sketch)
 
@@ -109,6 +114,7 @@ Plugin API surface = classes extending contribution base classes, not plain conf
 
 ## Related
 
+- [Packages & public API](docs/architecture/packages-and-api.md) — exports, who imports what, stability
 - [FEATURES.md](FEATURES.md) — product capability matrix
 - [PUBLISHING.md](PUBLISHING.md) — what ships to the registry
 - [AGENTS.md](AGENTS.md) — agent workflow and placement rules

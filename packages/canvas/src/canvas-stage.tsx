@@ -169,6 +169,9 @@ export function CanvasStage({
           }
         }}
         onMouseDown={(event) => {
+          if (event.evt.button !== 0) {
+            return;
+          }
           if (event.target === event.target.getStage()) {
             onSelectRef.current?.('');
           }
@@ -248,6 +251,7 @@ export function CanvasStage({
                   fontLoadRevision={fontLoadRevision}
                   key={entry.layer.id}
                   runtime={runtime}
+                  selectedLayerIdSet={selectedLayerIdSet}
                   selectedPrimary={selectedPrimary}
                 />
               ))}
@@ -283,7 +287,9 @@ export function CanvasStage({
             ) : null}
             {hoveredEntry ? (
               <CanvasHoverOutline
+                artboardGroupRef={artboardGroupRef}
                 entry={hoveredEntry}
+                nodeRefs={runtime.nodeRefs}
                 stroke={themeColors.selection}
               />
             ) : null}
