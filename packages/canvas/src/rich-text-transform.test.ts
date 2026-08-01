@@ -61,7 +61,6 @@ describe('bakeRichTextNodeTransform', () => {
   const session = {
     anchor: 'bottom-right' as const,
     origin: snapshot,
-    snapshot,
     startFontSize,
   };
 
@@ -121,7 +120,6 @@ describe('bakeRichTextNodeTransform', () => {
       {
         anchor: 'middle-right',
         origin: snapshot,
-        snapshot,
         startFontSize,
       },
       node,

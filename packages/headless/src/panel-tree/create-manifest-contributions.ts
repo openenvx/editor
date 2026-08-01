@@ -72,11 +72,8 @@ export function createManifestContributions(
     return { ok: false, reason: 'manifest must be an object' };
   }
 
-  // Empty allowlist = no filter (same as palette). Non-empty Set gates command ids.
-  const allowed =
-    options.allowedCommands.length > 0
-      ? new Set(options.allowedCommands)
-      : undefined;
+  // Empty allowlist = deny all (empty Set → isAllowedCommand false).
+  const allowed = new Set(options.allowedCommands);
   const contributions: WorkbenchContribution[] = [];
 
   const entries: {

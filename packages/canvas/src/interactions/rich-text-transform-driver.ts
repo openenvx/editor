@@ -107,13 +107,11 @@ function resizeSessionFrom(
 ): {
   anchor: RichTextResizeAnchor;
   origin: Transform;
-  snapshot: Transform;
   startFontSize: number;
 } {
   return {
     anchor: anchor as RichTextResizeAnchor,
     origin: session.origin,
-    snapshot: session.origin,
     startFontSize: session.startFontSize,
   };
 }

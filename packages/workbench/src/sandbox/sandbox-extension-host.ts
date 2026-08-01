@@ -14,6 +14,7 @@ import type {
   RenderNode,
   SandboxExtensionGrant,
 } from '@xmazu/openenvxee-protocol';
+import { validatePluginTree } from '@xmazu/openenvxee-protocol';
 import type { Layer, Scene } from '@xmazu/openenvxee-schema';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -24,6 +25,16 @@ import { SandboxUiPanel } from './sandbox-ui-panel';
 import { createWidgetSceneAdapters } from './widget-scene-adapters';
 
 const DEFAULT_WIDGET_LAYER_TYPE = 'openenvx.widget';
+
+/** Resolve face medium from manifest kinds — single-kind only; ambiguous → canvas. */
+function resolveWidgetFaceKind(
+  kinds: ('canvas' | 'html')[] | undefined
+): 'canvas' | 'html' {
+  if (kinds?.length === 1 && kinds[0] === 'html') {
+    return 'html';
+  }
+  return 'canvas';
+}
 
 /** Host-injected face applicator (studio / html-studio). */
 export type ApplyWidgetFaceFn = (
@@ -173,7 +184,20 @@ export class SandboxExtensionHost {
 
   /** Apply a `render` body to a manifest-declared view / panel surface. */
   applySurfaceRender(surfaceId: string, root: RenderNode | null): void {
-    extensionSurfaceStore.set(surfaceId, root);
+    if (root === null) {
+      extensionSurfaceStore.set(surfaceId, null);
+      return;
+    }
+    const validated = validatePluginTree(root);
+    if (!validated.ok) {
+      console.error(
+        '[sandbox] applySurfaceRender rejected tree',
+        surfaceId,
+        validated.reason
+      );
+      return;
+    }
+    extensionSurfaceStore.set(surfaceId, validated.root);
   }
 
   /** Push widget source from the parent page (integrator bundle). */
@@ -243,7 +267,7 @@ export class SandboxExtensionHost {
       if (!tree || typeof tree !== 'object' || !('type' in tree)) {
         return;
       }
-      const kind = data.manifest?.kinds?.[0] === 'html' ? 'html' : 'canvas';
+      const kind = resolveWidgetFaceKind(data.manifest?.kinds);
       const next = applyFace(layer, tree as RenderNode, kind);
       if (faceEpoch.get(layerId) !== epoch) {
         return;
@@ -350,6 +374,7 @@ export class SandboxExtensionHost {
     const syncWidgets = () => {
       const scene = host.getScene();
       const desired: { extensionId: string; layerId: string }[] = [];
+      const seenLayerIds = new Set<string>();
       for (const page of scene.pages) {
         walkLayers(page.layers, (layer) => {
           if (layer.type !== widgetLayerType) {
@@ -366,6 +391,7 @@ export class SandboxExtensionHost {
             return;
           }
           desired.push({ extensionId: grant.id, layerId: layer.id });
+          seenLayerIds.add(layer.id);
           const valuesKey = JSON.stringify(
             (layer.data as { values?: unknown }).values ?? {}
           );
@@ -385,6 +411,12 @@ export class SandboxExtensionHost {
               );
             });
         });
+      }
+      for (const layerId of lastValues.keys()) {
+        if (!seenLayerIds.has(layerId)) {
+          lastValues.delete(layerId);
+          faceEpoch.delete(layerId);
+        }
       }
       controller.reconcileWidgetIsolates(desired);
     };

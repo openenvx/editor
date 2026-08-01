@@ -2,7 +2,7 @@
 
 **Audience:** Integrators and coding agents. How a developer-authored Preact component becomes pixels (or HTML) inside the hosted editor.
 
-Related: [extensions.md](extensions.md), [Plugin-boundaries.md](../../Plugin-boundaries.md).
+Related: [extensions.md](extensions.md), [Plugin-boundaries.md](../../Plugin-boundaries.md), authoring [sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md).
 
 ## Pipeline
 

@@ -48,7 +48,7 @@ export function createWidgetSceneAdapters(input: {
       height: number
     ): void => {
       const layer = findLayerById(host.getScene(), layerId);
-      if (!layer) {
+      if (!layer || layer.type !== widgetLayerType) {
         return;
       }
       host.apply({

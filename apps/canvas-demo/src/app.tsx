@@ -53,12 +53,24 @@ function promptUri(message: string, defaultValue?: string): string | null {
 
 const layoutStore = createLocalStorageWorkbenchLayoutStore(LAYOUT_STORE_KEY);
 
+function preferSandboxInProcess(): boolean {
+  const enabled = new URLSearchParams(window.location.search).has(
+    'sandboxInProcess'
+  );
+  if (enabled) {
+    console.warn(
+      '[openenvx] ?sandboxInProcess=1 enables in-process QuickJS (test-only). Production hosts must use a Worker.'
+    );
+  }
+  return enabled;
+}
+
 export function App() {
   const plugins = useMemo(() => createPlugins(), []);
   const mountExternalHosts = useMemo(() => {
     const sandbox = createSandboxExtensionHost({
       permission: 'edit',
-      preferInProcess: true,
+      preferInProcess: preferSandboxInProcess(),
       manifests: [seatingManifest, saveTheDateManifest],
       grants: [
         {

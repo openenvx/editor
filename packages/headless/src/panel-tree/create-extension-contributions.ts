@@ -96,9 +96,7 @@ export function createExtensionContributions(
 
   const commands = manifest.contributes.commands ?? [];
   if (commands.length > 0) {
-    const filtered = commands.filter((cmd) =>
-      allowedCommands.length === 0 ? true : allowedCommands.includes(cmd.id)
-    );
+    const filtered = commands.filter((cmd) => allowedCommands.includes(cmd.id));
     if (filtered.length > 0) {
       contributions.push(
         new (class extends CommandPaletteContribution {

@@ -4,7 +4,7 @@ import {
   clearRegisteredWidgets,
   defineCanvasComponent,
   Rect,
-  renderToLayers,
+  renderToElementTree,
   Stack,
   string,
   Text,
@@ -12,7 +12,7 @@ import {
   WidgetTreeValidationError,
 } from './index';
 
-describe('renderToLayers', () => {
+describe('renderToElementTree', () => {
   it('expands function components into element JSON', () => {
     function Card() {
       return (
@@ -23,7 +23,7 @@ describe('renderToLayers', () => {
       );
     }
 
-    const tree = renderToLayers(<Card />);
+    const tree = renderToElementTree(<Card />);
     expect(tree).toEqual({
       type: 'Stack',
       props: { direction: 'vertical', spacing: 8, padding: 16 },
@@ -51,7 +51,7 @@ describe('renderToLayers', () => {
         </Text>
       );
     }
-    const tree = renderToLayers(<Clickable />, { handlers });
+    const tree = renderToElementTree(<Clickable />, { handlers });
     expect(tree?.props.onClick).toBe('h1');
     expect(handlers.has('h1')).toBe(true);
   });

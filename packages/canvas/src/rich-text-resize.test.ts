@@ -27,7 +27,6 @@ describe('computeHorizontalResize', () => {
   ): RichTextResizeSession => ({
     anchor,
     origin: snapshot,
-    snapshot,
     startFontSize,
   });
 
@@ -89,7 +88,6 @@ describe('computeHorizontalResize', () => {
       {
         anchor: 'middle-right',
         origin: rotated,
-        snapshot: rotated,
         startFontSize,
       },
       // 90° CW: local +x is parent -y
@@ -125,7 +123,6 @@ describe('computeHorizontalResizeFromNode', () => {
   ): RichTextResizeSession => ({
     anchor,
     origin: snapshot,
-    snapshot,
     startFontSize,
   });
 
@@ -206,7 +203,6 @@ describe('constrainRichTextHorizontalBox', () => {
   const session: RichTextResizeSession = {
     anchor: 'middle-right',
     origin: snapshot,
-    snapshot,
     startFontSize,
   };
 
@@ -252,7 +248,6 @@ describe('horizontalResizeBoxFromPointer', () => {
   const session: RichTextResizeSession = {
     anchor: 'middle-right',
     origin: snapshot,
-    snapshot,
     startFontSize: 24,
   };
 
@@ -287,7 +282,6 @@ describe('computeCornerResizeFromPointer', () => {
   const baseSession: RichTextResizeSession = {
     anchor: 'bottom-right',
     origin: snapshot,
-    snapshot,
     startFontSize,
   };
 
@@ -376,7 +370,6 @@ describe('computeCornerResize fallback', () => {
   const baseSession: RichTextResizeSession = {
     anchor: 'bottom-right',
     origin: snapshot,
-    snapshot,
     startFontSize,
   };
 

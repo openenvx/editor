@@ -87,11 +87,7 @@ export {
 
 // HTML Row lives on the /html subpath to avoid colliding with canvas Row.
 
-export {
-  renderToElementTree,
-  renderToLayers,
-  type RenderOptions,
-} from './render-to-layers';
+export { renderToElementTree, type RenderOptions } from './render-to-layers';
 
 export {
   validateWidgetTree,

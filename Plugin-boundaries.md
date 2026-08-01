@@ -228,5 +228,8 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 
 - [Architecture.md](Architecture.md) — package boundaries hub
 - [docs/architecture/extensions.md](docs/architecture/extensions.md) — short extensions summary for agents
+- [apps/docs/README.md](apps/docs/README.md) — authoring hub (internal vs sandbox vs embed)
+- [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) — how to write widgets / sandbox plugins / embed panels
+- [apps/docs/extension-guide.md](apps/docs/extension-guide.md) — internal OOP plugins only
 - [FEATURES.md](FEATURES.md) — embed panels + sandbox extensions rows
 - [PUBLISHING.md](PUBLISHING.md) — protocol publish / link notes

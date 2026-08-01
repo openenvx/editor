@@ -330,4 +330,74 @@ describe('SandboxExtensionController', () => {
     });
     controller.dispose();
   });
+
+  it('refuses renderWidgetFace without widget:render', async () => {
+    const source = `
+      globalThis.__openenvxWidgetRegistry = {
+        'wm.box': { render: function () { return { type: 'Rect', props: {}, children: [] }; } }
+      };
+    `;
+    const grant: SandboxExtensionGrant = {
+      id: 'wm.box',
+      kind: 'widget',
+      source,
+      capabilities: ['widget:values'],
+      allowedCommands: [],
+    };
+    const controller = new SandboxExtensionController({
+      grants: [grant],
+      permission: 'edit',
+      host: mockHost(),
+      preferInProcess: true,
+    });
+    await controller.start(grant);
+    const tree = await controller.renderWidgetFace('wm.box', 'layer-1', {});
+    expect(tree).toBeNull();
+    controller.dispose();
+  }, 30_000);
+
+  it('scopes synced values to the active widget layer, not the first start id', async () => {
+    const source = `
+      globalThis.__openenvxWidgetRegistry = {
+        'wm.vals': {
+          render: function (values) {
+            if (globalThis.__openenvxSetProps) {
+              globalThis.__openenvxSetProps({ n: (values.n || 0) + 100 });
+            }
+            return { type: 'Text', props: { value: 'ok' }, children: [] };
+          }
+        }
+      };
+    `;
+    const grant: SandboxExtensionGrant = {
+      id: 'wm.vals',
+      kind: 'widget',
+      source,
+      capabilities: ['widget:render', 'widget:values'],
+      allowedCommands: [],
+    };
+    const valuesByLayer = new Map<string, unknown>([
+      ['layer-a', { n: 1 }],
+      ['layer-b', { n: 2 }],
+    ]);
+    const writes: { layerId: string; value: unknown }[] = [];
+    const controller = new SandboxExtensionController({
+      grants: [grant],
+      permission: 'edit',
+      host: mockHost(),
+      preferInProcess: true,
+      getWidgetValues: (layerId) => valuesByLayer.get(layerId) ?? null,
+      setWidgetValues: (layerId, value) => {
+        writes.push({ layerId, value });
+        valuesByLayer.set(layerId, value);
+      },
+    });
+    // First start historically baked layer-a into handlers; values must still
+    // target only the active render layer.
+    await controller.start(grant, 'layer-a');
+    await controller.renderWidgetFace('wm.vals', 'layer-b', { n: 2 });
+    expect(writes).toEqual([{ layerId: 'layer-b', value: { n: 102 } }]);
+    expect(valuesByLayer.get('layer-a')).toEqual({ n: 1 });
+    controller.dispose();
+  }, 30_000);
 });

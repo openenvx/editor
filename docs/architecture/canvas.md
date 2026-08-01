@@ -61,5 +61,5 @@ See `apps/canvas-demo` / `apps/demo-playground` and [studio-and-products.md](stu
 ## Related
 
 - Package README: [packages/canvas/README.md](../../packages/canvas/README.md)
-- Author extension: [apps/docs/extension-guide.md](../../apps/docs/extension-guide.md)
+- Author extension (internal): [apps/docs/extension-guide.md](../../apps/docs/extension-guide.md) · hub: [apps/docs/README.md](../../apps/docs/README.md)
 - Pro chrome README: [packages/canvas-pro/README.md](../../packages/canvas-pro/README.md)

@@ -17,11 +17,23 @@ import weddingManifest, {
 
 import '@xmazu/openenvxee-html-studio/theme.css';
 
+function preferSandboxInProcess(): boolean {
+  const enabled = new URLSearchParams(window.location.search).has(
+    'sandboxInProcess'
+  );
+  if (enabled) {
+    console.warn(
+      '[openenvx] ?sandboxInProcess=1 enables in-process QuickJS (test-only). Production hosts must use a Worker.'
+    );
+  }
+  return enabled;
+}
+
 export function App() {
   const mountExternalHosts = useMemo(() => {
     const sandbox = createHtmlSandboxExtensionHost({
       permission: 'edit',
-      preferInProcess: true,
+      preferInProcess: preferSandboxInProcess(),
       manifests: [weddingManifest],
       grants: [
         {

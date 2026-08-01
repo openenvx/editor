@@ -80,8 +80,14 @@ export class SandboxExtensionController {
   private readonly uiContextListeners = new Set<SandboxUiContextListener>();
   private disposed = false;
   private notifySeq = 0;
-  /** Layer id for the active widget context (values / click / render). */
+  /**
+   * Active widget layer for bridge values/resize/showUI.
+   * Set only while render/invoke runs — never fall back to a baked start() id
+   * (shared per-extension isolates serve many layer instances).
+   */
   private activeWidgetLayerId: string | null = null;
+  /** Serialize widget face/handler ops so concurrent instances cannot cross-wire. */
+  private widgetOpTail: Promise<void> = Promise.resolve();
 
   constructor(
     private readonly options: {
@@ -315,14 +321,17 @@ export class SandboxExtensionController {
     values: Record<string, unknown>,
     componentId?: string
   ): Promise<unknown> {
+    const grant = this.grantById.get(extensionId);
+    if (!(grant && hasCapability(grant, 'widget:render'))) {
+      return null;
+    }
     const isolate = this.isolates.get(extensionId);
     if (!isolate) {
       return null;
     }
-    this.activeWidgetLayerId = layerId;
     const lookupId = componentId ?? extensionId;
-    try {
-      return await isolate.evalModule(
+    return this.withWidgetLayerContext(layerId, async () =>
+      isolate.evalModule(
         `(function () {
           var registry = globalThis.__openenvxWidgetRegistry;
           if (!registry) return null;
@@ -349,10 +358,8 @@ export class SandboxExtensionController {
             delete globalThis.__openenvxSetProps;
           }
         })()`
-      );
-    } finally {
-      this.activeWidgetLayerId = null;
-    }
+      )
+    );
   }
 
   stop(extensionId: string, layerId?: string): void {
@@ -410,46 +417,40 @@ export class SandboxExtensionController {
     if (!isolate) {
       return;
     }
-    this.activeWidgetLayerId = layerId;
-    void isolate
-      .evalModule(
-        `(async function () {
-          var current = await globalThis.openenvx.getSyncedState();
-          var values =
-            current && typeof current === 'object' && !Array.isArray(current)
-              ? Object.assign({}, current)
-              : {};
-          globalThis.__openenvxSetProps = function (patch) {
-            Object.assign(values, patch || {});
-            return globalThis.openenvx.setSyncedState(values);
-          };
-          try {
-            var bags = globalThis.__openenvxWidgetHandlersByLayer || {};
-            var bag = bags[${JSON.stringify(layerId)}]
-              || globalThis.__openenvxWidgetHandlers
-              || {};
-            var fn = bag[${JSON.stringify(handlerId)}];
-            if (typeof fn === 'function') {
-              await fn(${JSON.stringify(payload ?? null)});
+    void this.withWidgetLayerContext(layerId, async () => {
+      try {
+        await isolate.evalModule(
+          `(async function () {
+            var current = await globalThis.openenvx.getSyncedState();
+            var values =
+              current && typeof current === 'object' && !Array.isArray(current)
+                ? Object.assign({}, current)
+                : {};
+            globalThis.__openenvxSetProps = function (patch) {
+              Object.assign(values, patch || {});
+              return globalThis.openenvx.setSyncedState(values);
+            };
+            try {
+              var bags = globalThis.__openenvxWidgetHandlersByLayer || {};
+              var bag = bags[${JSON.stringify(layerId)}] || {};
+              var fn = bag[${JSON.stringify(handlerId)}];
+              if (typeof fn === 'function') {
+                await fn(${JSON.stringify(payload ?? null)});
+              }
+            } finally {
+              delete globalThis.__openenvxSetProps;
             }
-          } finally {
-            delete globalThis.__openenvxSetProps;
-          }
-        })()`
-      )
-      .catch((error) => {
+          })()`
+        );
+      } catch (error) {
         console.error(
           '[sandbox] widget handler failed',
           extensionId,
           handlerId,
           error
         );
-      })
-      .finally(() => {
-        if (this.activeWidgetLayerId === layerId) {
-          this.activeWidgetLayerId = null;
-        }
-      });
+      }
+    });
   }
 
   dispose(): void {
@@ -507,11 +508,40 @@ export class SandboxExtensionController {
     this.notifyTimestamps.set(extensionId, updated);
   }
 
+  /**
+   * Run `fn` with `activeWidgetLayerId` set, serialized against other widget ops
+   * on this controller (shared isolate must not interleave instance contexts).
+   */
+  private withWidgetLayerContext<T>(
+    layerId: string,
+    fn: () => Promise<T>
+  ): Promise<T> {
+    const run = async (): Promise<T> => {
+      this.activeWidgetLayerId = layerId;
+      try {
+        return await fn();
+      } finally {
+        if (this.activeWidgetLayerId === layerId) {
+          this.activeWidgetLayerId = null;
+        }
+      }
+    };
+    const next = this.widgetOpTail.then(run, run);
+    this.widgetOpTail = next.then(
+      () => {},
+      () => {}
+    );
+    return next;
+  }
+
   private createHandlers(
     grant: SandboxExtensionGrant,
     layerId?: string
   ): SandboxHostHandlers {
     const host = this.options.host;
+    /** UI ownership: prefer active render/invoke context, else start() layerId. */
+    const uiLayerId = (): string | undefined =>
+      this.activeWidgetLayerId ?? layerId;
     return {
       getSelection: () => {
         const selection = host.getSelection();
@@ -535,22 +565,22 @@ export class SandboxExtensionController {
           width: options?.width ?? 320,
           height: options?.height ?? 240,
           kind: grant.kind,
-          layerId,
+          layerId: uiLayerId(),
         });
       },
       resizeUI: (width, height) => {
-        if (!this.ownsOpenUi(grant.id, layerId)) {
+        if (!this.ownsOpenUi(grant.id, uiLayerId())) {
           return;
         }
         this.setUi({ ...this.uiState!, width, height });
       },
       closeUI: () => {
-        if (this.ownsOpenUi(grant.id, layerId)) {
+        if (this.ownsOpenUi(grant.id, uiLayerId())) {
           this.setUi(null);
         }
       },
       postToUI: (pluginMessage) => {
-        if (!this.ownsOpenUi(grant.id, layerId)) {
+        if (!this.ownsOpenUi(grant.id, uiLayerId())) {
           throw new Error('No open UI for this extension');
         }
         this.emitUiOutbound(pluginMessage);
@@ -578,16 +608,18 @@ export class SandboxExtensionController {
         this.clientStorage.set(storageKey, value);
       },
       getSyncedState: () => {
-        const id = this.activeWidgetLayerId ?? layerId;
+        const id = this.activeWidgetLayerId;
         if (!id) {
           return null;
         }
         return this.options.getWidgetValues?.(id) ?? null;
       },
       setSyncedState: (value) => {
-        const id = this.activeWidgetLayerId ?? layerId;
+        const id = this.activeWidgetLayerId;
         if (!id) {
-          throw new Error('Widget values require a widget layer');
+          throw new Error(
+            'Widget values require an active widget layer context'
+          );
         }
         const encoded = JSON.stringify(value ?? null);
         if (encoded.length > MAX_WIDGET_VALUES_JSON_CHARS) {
@@ -596,9 +628,11 @@ export class SandboxExtensionController {
         this.options.setWidgetValues?.(id, value);
       },
       resizeWidget: (width, height) => {
-        const id = this.activeWidgetLayerId ?? layerId;
+        const id = this.activeWidgetLayerId;
         if (!id) {
-          throw new Error('resizeWidget requires a widget layer');
+          throw new Error(
+            'resizeWidget requires an active widget layer context'
+          );
         }
         this.options.resizeWidgetLayer?.(id, width, height);
       },

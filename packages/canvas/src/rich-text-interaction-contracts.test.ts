@@ -30,7 +30,6 @@ const session = (
 ): RichTextResizeSession => ({
   anchor,
   origin,
-  snapshot: origin,
   startFontSize: 24,
 });
 

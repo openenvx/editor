@@ -86,5 +86,5 @@ Providers register `PageRulesContribution` keyed by `page.layout`. `SceneStore` 
 
 ## Related
 
-- Author API: [apps/docs/extension-guide.md](../../apps/docs/extension-guide.md)
+- Author API (internal plugins): [apps/docs/extension-guide.md](../../apps/docs/extension-guide.md) · hub: [apps/docs/README.md](../../apps/docs/README.md)
 - Property **pane** builders and workbench merge: [workbench-and-headless.md](workbench-and-headless.md)

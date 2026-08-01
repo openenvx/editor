@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { createCommandPaletteBuilder } from '../builders/command-palette-builder';
 import { createManifestContributions } from './create-manifest-contributions';
 import { n } from './test-node';
 
@@ -34,5 +35,26 @@ describe('createManifestContributions', () => {
       return;
     }
     expect(result.contributions).toHaveLength(1);
+  });
+
+  it('denies all chrome commands when allowedCommands is empty', () => {
+    const result = createManifestContributions(
+      {
+        palette: n(
+          'Palette',
+          null,
+          n('PaletteItem', { commandId: 'any.command', label: 'Any' })
+        ),
+      },
+      { allowedCommands: [] }
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.contributions).toHaveLength(1);
+    const builder = createCommandPaletteBuilder();
+    result.contributions[0]!.contribute(builder, {} as never);
+    expect(builder.build().overrides).toEqual([]);
   });
 });

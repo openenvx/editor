@@ -199,20 +199,14 @@ export async function createQuickJsEngine(input: {
       setClientStorage(key, value) {
         return this.call('setClientStorage', { key, value });
       },
-      onClick(handler) {
-        // Legacy no-op — per-element handlers via __openenvxWidgetHandlers.
-        void handler;
+      onClick(_handler) {
+        // Per-element handlers via __openenvxWidgetHandlersByLayer.
       },
       getSyncedState() { return this.call('getSyncedState'); },
       setSyncedState(value) { return this.call('setSyncedState', { value }); },
       resizeWidget(width, height) {
         return this.call('resizeWidget', { width, height });
       },
-    };
-    globalThis.__openenvxInvokeHandler = function (handlerId, payload) {
-      var bag = globalThis.__openenvxWidgetHandlers;
-      if (!bag || typeof bag[handlerId] !== 'function') return;
-      return bag[handlerId](payload);
     };
   `;
   try {

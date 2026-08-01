@@ -29,8 +29,7 @@ export default defineCanvasComponent({
 ```
 
 - **`renderToElementTree(element)`** — pure synchronous expand to element JSON (tests / Node backends). Hosts map further via `applyWidgetFace` / `applyHtmlWidgetFace`.
-- **`renderToLayers`** — deprecated alias of `renderToElementTree`.
-- **Mounted path** — Preact fake host inside QuickJS for live widgets.
+- **Mounted path** — Preact fake host (optional `mounted: true`) when hooks are needed; default path is sync expand.
 - **Subpaths:** `/canvas`, `/html`, `/panel` (panel chrome uses the same Preact + handler-ID model).
 - **`defineExtension`** — static `openenvx.extension.json` contributions (widgets, blocks, commands, views, chrome).
 - **Vite plugin** — `@xmazu/openenvxee-elements/vite` `openenvxWidgets()`:
@@ -43,4 +42,4 @@ export default defineCanvasComponent({
   await sandbox.pushWidgetSource('wm.seating', source);
   ```
 
-See [docs/architecture/widget-bridge.md](../../docs/architecture/widget-bridge.md) and the wedding demos in `apps/canvas-demo` / `apps/html-demo`.
+See [docs/architecture/widget-bridge.md](../../docs/architecture/widget-bridge.md), the authoring hub [apps/docs/README.md](../../apps/docs/README.md), and the step-by-step [sandbox extension guide](../../apps/docs/sandbox-extension-guide.md). Demos: wedding widgets in `apps/canvas-demo` / `apps/html-demo`.

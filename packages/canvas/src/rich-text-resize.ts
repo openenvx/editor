@@ -29,8 +29,6 @@ export interface RichTextResizeSession {
   anchor: RichTextResizeAnchor;
   /** Immutable drag-start transform — opposite corner/edge is pinned here. */
   origin: Transform;
-  /** @deprecated kept for call-site compat; corners ignore this (use origin only). */
-  snapshot: Transform;
   /** Immutable font size at drag start. */
   startFontSize: number;
 }

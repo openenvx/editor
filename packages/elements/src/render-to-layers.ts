@@ -77,13 +77,3 @@ export function renderToElementTree(
     }
   }
 }
-
-/**
- * @deprecated Use {@link renderToElementTree}. Kept as a short alias for demos.
- */
-export function renderToLayers(
-  element: ComponentChild,
-  options: RenderOptions = {}
-): WidgetNode | null {
-  return renderToElementTree(element, options);
-}

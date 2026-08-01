@@ -17,8 +17,13 @@ Package boundaries and contribution flow for the monorepo.
 | [HTML](docs/architecture/html.md) | Block editor, slots, `HtmlBlocksPlugin` |
 | [Studio & products](docs/architecture/studio-and-products.md) | Fat bundles, what host apps import |
 | [Extensions](docs/architecture/extensions.md) | Internal vs embed vs sandbox (summary + links) |
+| [Packages & public API](docs/architecture/packages-and-api.md) | Package map, export surface, pre-1.0 stability |
 
-Author how-to: [apps/docs/extension-guide.md](apps/docs/extension-guide.md).
+Author how-to:
+
+- Hub (internal vs sandbox vs embed): [apps/docs/README.md](apps/docs/README.md)
+- Internal OOP plugins: [apps/docs/extension-guide.md](apps/docs/extension-guide.md)
+- Sandbox widgets / plugins + embed: [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md)
 
 ## Client tiers (monorepo)
 
@@ -109,6 +114,7 @@ Plugin API surface = classes extending contribution base classes, not plain conf
 
 ## Related
 
+- [Packages & public API](docs/architecture/packages-and-api.md) — exports, who imports what, stability
 - [FEATURES.md](FEATURES.md) — product capability matrix
 - [PUBLISHING.md](PUBLISHING.md) — what ships to the registry
 - [AGENTS.md](AGENTS.md) — agent workflow and placement rules

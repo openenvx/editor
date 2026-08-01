@@ -62,8 +62,11 @@ Surfaces never expose `InstantiationService`. Isolates / parent pages never rece
 
 | Path | Doc |
 | --- | --- |
+| Pick internal vs sandbox vs embed | [apps/docs/README.md](../../apps/docs/README.md) |
 | Internal OOP plugins | [apps/docs/extension-guide.md](../../apps/docs/extension-guide.md) |
+| Sandbox widgets / plugins + embed panels | [apps/docs/sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md) |
 | Trust, protocol messages, caps, marketplace | [Plugin-boundaries.md](../../Plugin-boundaries.md) |
+| Widget face pipeline | [widget-bridge.md](widget-bridge.md) |
 | Cloud product API notes | openenvx-cloud `docs/embed/plugin-api.md` (sibling repo) |
 
 ## What not to expose to third parties

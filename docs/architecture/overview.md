@@ -68,3 +68,4 @@ Trusted code mutates the scene through **commands** on the shared command servic
 3. [Canvas](canvas.md) / [HTML](html.md) — domain engines
 4. [Studio & products](studio-and-products.md) — what apps import
 5. [Extensions](extensions.md) — trust boundaries summary
+6. [Packages & public API](packages-and-api.md) — exports and stability
