@@ -4,6 +4,8 @@ export default {
   'canvas.command.copy': 'Copy',
   'canvas.command.duplicate': 'Duplicate',
   'canvas.command.paste': 'Paste',
+  'canvas.command.group': 'Create group',
+  'canvas.command.ungroup': 'Ungroup',
   'canvas.command.image': 'Image',
   'canvas.command.uploadAsset': 'Upload asset',
   'canvas.command.delete': 'Delete',

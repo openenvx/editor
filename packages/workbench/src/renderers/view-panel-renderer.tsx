@@ -206,7 +206,7 @@ function TreeItemLabel({
   item: ViewTreeItem;
   isSelected: boolean;
   isRenaming: boolean;
-  onSelect: () => void;
+  onSelect: (options?: { additive?: boolean }) => void;
   onStartRename: () => void;
   onCommitRename: (value: string) => void;
   onCancelRename: () => void;
@@ -225,12 +225,13 @@ function TreeItemLabel({
   return (
     <button
       className={styles.treeItemLabel}
-      onClick={() => {
-        if (isSelected && item.renameCommandId) {
+      onClick={(event) => {
+        const additive = event.shiftKey || event.metaKey || event.ctrlKey;
+        if (!additive && isSelected && item.renameCommandId) {
           onStartRename();
           return;
         }
-        onSelect();
+        onSelect(additive ? { additive: true } : undefined);
       }}
       title={item.tooltip ?? undefined}
       type="button"
@@ -260,7 +261,7 @@ function StaticTreeRow({
   isHovered: boolean;
   isCollapsed: boolean;
   isRenaming: boolean;
-  onSelect: () => void;
+  onSelect: (options?: { additive?: boolean }) => void;
   onToggleCollapsed: () => void;
   onToggleLock?: () => void;
   onToggleVisibility?: () => void;
@@ -273,7 +274,10 @@ function StaticTreeRow({
     <div
       className={treeItemClassName(item, { isHovered, isSelected })}
       onContextMenu={() => {
-        onSelect();
+        // Keep multi-select for context actions (e.g. Create group).
+        if (!isSelected) {
+          onSelect();
+        }
       }}
       onMouseEnter={onHover}
       style={{ paddingLeft: `${treePaddingLeft(item.depth)}px` }}
@@ -405,7 +409,7 @@ function ViewPanelBody({
       isCollapsed: boolean;
       isSelected: boolean;
       onToggleCollapsed: () => void;
-      onSelect: () => void;
+      onSelect: (options?: { additive?: boolean }) => void;
     }) => (
       <>
         {item.hasChildren ? (
@@ -470,7 +474,9 @@ function ViewPanelBody({
         onMove={(source, target, position) => {
           api.moveViewItem(view.id, source, target, position);
         }}
-        onSelect={(source) => api.selectViewItem(view.id, source)}
+        onSelect={(source, options) =>
+          api.selectViewItem(view.id, source, options)
+        }
         onToggleCollapsed={toggleCollapsed}
         renderRowContent={renderRowContent}
         selectedIds={selectedIds}
@@ -501,7 +507,9 @@ function ViewPanelBody({
             onCancelRename={cancelRename}
             onCommitRename={(value) => commitRename(item, value)}
             onHover={() => handleHoverItem(item.id)}
-            onSelect={() => api.selectViewItem(view.id, item.source)}
+            onSelect={(options) =>
+              api.selectViewItem(view.id, item.source, options)
+            }
             onStartRename={() => setRenamingId(item.id)}
             onToggleCollapsed={() => toggleCollapsed(item.id)}
             onToggleLock={() => {

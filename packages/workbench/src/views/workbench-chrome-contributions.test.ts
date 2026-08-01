@@ -249,4 +249,46 @@ describe('LayersTreeProvider', () => {
     expect(provider.getChildren(parent)).toEqual([child]);
     expect(provider.getChildren(child)).toEqual([]);
   });
+
+  it('additive select toggles layers into and out of selection', () => {
+    const provider = new LayersTreeProvider();
+    const selection = {
+      activePageId: 'p1',
+      primaryLayerId: null as string | null,
+      selectedLayerIds: [] as string[],
+    };
+    const ctx = {
+      scene: {
+        selectLayers(ids: string[], primary: string | null) {
+          selection.selectedLayerIds = ids;
+          selection.primaryLayerId = primary;
+        },
+      },
+      selection,
+    } as unknown as CommandContext;
+
+    const a: Layer = {
+      data: { fill: '#000' },
+      id: 'a',
+      transform: createDefaultTransform(),
+      type: 'canvas.rect',
+    };
+    const b: Layer = {
+      data: { fill: '#fff' },
+      id: 'b',
+      transform: createDefaultTransform(),
+      type: 'canvas.rect',
+    };
+
+    provider.onSelect?.(a, ctx);
+    expect(selection.selectedLayerIds).toEqual(['a']);
+
+    provider.onSelect?.(b, ctx, { additive: true });
+    expect(selection.selectedLayerIds).toEqual(['a', 'b']);
+    expect(selection.primaryLayerId).toBe('a');
+
+    provider.onSelect?.(a, ctx, { additive: true });
+    expect(selection.selectedLayerIds).toEqual(['b']);
+    expect(selection.primaryLayerId).toBe('b');
+  });
 });

@@ -6,6 +6,11 @@ import type { RefObject } from 'react';
 
 import type { DragSession } from '../canvas-stage-types';
 import type { FlattenedStageLayer } from '../flatten-layer-surface';
+import { absoluteSnapToNodePosition } from '../snap/absolute-snap-to-node-position';
+import {
+  collectAncestorLayerIds,
+  collectDescendantLayerIds,
+} from '../snap/drag-snap-excludes';
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
 import type {
   CanvasGridSnapConfig,
@@ -57,11 +62,23 @@ export function useCanvasDragSnap({
       const session = dragSessionRef.current;
       const artboard = { height: artboardHeight, width: artboardWidth };
       const marginInset = getMarginInset();
+      const knownIds = new Set(
+        layersRef.current.map((entry) => entry.layer.id)
+      );
+      // Nested (in group/widget): Canva-style — no document guides/snap.
+      if (collectAncestorLayerIds(node, knownIds).length > 0) {
+        setInteractionOverlays();
+        return;
+      }
+
       const excludeIds = new Set(
         session && selectedLayerIdsRef.current.includes(layerId)
           ? selectedLayerIdsRef.current
           : [layerId]
       );
+      for (const id of collectDescendantLayerIds(layersRef.current, layerId)) {
+        excludeIds.add(id);
+      }
       const others = getOtherLayers(excludeIds);
       const draggedLayer = layersRef.current.find(
         (entry) => entry.layer.id === layerId
@@ -156,7 +173,14 @@ export function useCanvasDragSnap({
         zoom,
       });
       if (adjusted) {
-        node.position({ x: adjusted.x, y: adjusted.y });
+        node.position(
+          absoluteSnapToNodePosition(
+            adjusted.x,
+            adjusted.y,
+            relativeTransform,
+            absoluteTransform
+          )
+        );
         setInteractionOverlays(adjusted.overlays);
       }
     },

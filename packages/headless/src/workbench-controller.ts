@@ -297,7 +297,8 @@ export class WorkbenchController {
       setSecondarySidebarVisible: (visible) =>
         this.setSecondarySidebarVisible(visible),
       toggleSecondarySidebar: () => this.toggleSecondarySidebar(),
-      selectViewItem: (viewId, item) => this.selectViewItem(viewId, item),
+      selectViewItem: (viewId, item, options) =>
+        this.selectViewItem(viewId, item, options),
       serializeScene: () => this.serializeScene(),
       undo: () => this.undo(),
       updateProperty: (layerId, key, value) =>
@@ -725,13 +726,17 @@ export class WorkbenchController {
     }
   }
 
-  selectViewItem(viewId: string, item: unknown): void {
+  selectViewItem(
+    viewId: string,
+    item: unknown,
+    options?: { additive?: boolean }
+  ): void {
     const provider = this.providerRegistries.viewProviderRegistry.get(viewId);
     if (!provider) {
       return;
     }
     const ctx = this.runtime.createCommandContext();
-    provider.onSelect?.(item, ctx);
+    provider.onSelect?.(item, ctx, options);
   }
 
   moveViewItem(

@@ -142,7 +142,11 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   subscribe: (listener: (state: WorkbenchState) => void) => () => void;
   registerServiceInstance: <T>(id: ServiceId<T>, instance: T) => void;
   updateProperty: (layerId: string, key: string, value: unknown) => void;
-  selectViewItem: (viewId: string, item: unknown) => void;
+  selectViewItem: (
+    viewId: string,
+    item: unknown,
+    options?: { additive?: boolean }
+  ) => void;
   moveViewItem: (
     viewId: string,
     source: unknown,

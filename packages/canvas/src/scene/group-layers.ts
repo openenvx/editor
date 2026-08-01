@@ -54,6 +54,26 @@ export function computeUnionBounds(layers: Layer[]): LayerBounds {
   };
 }
 
+/**
+ * Local-space group outline: tight AABB of children (farthest point on each
+ * side). Pure — does not mutate children or the group origin. Empty group
+ * falls back to the stored box.
+ */
+export function computeGroupOutlineBounds(
+  groupTransform: Pick<Transform, 'width' | 'height'>,
+  children: Layer[]
+): LayerBounds {
+  if (children.length === 0) {
+    return {
+      x: 0,
+      y: 0,
+      width: Math.max(groupTransform.width, 1),
+      height: Math.max(groupTransform.height, 1),
+    };
+  }
+  return computeUnionBounds(children);
+}
+
 export function toRelativeTransform(
   layer: Layer,
   groupOrigin: { x: number; y: number }

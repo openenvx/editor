@@ -27,6 +27,11 @@ export interface TreeItem {
   editLabel?: string;
 }
 
+export interface TreeSelectOptions {
+  /** Shift / ⌘ / Ctrl — toggle into or out of the current selection. */
+  additive?: boolean;
+}
+
 export abstract class TreeDataProvider<TNode> {
   abstract getRootChildren(ctx: CommandContext): TNode[] | Promise<TNode[]>;
 
@@ -37,7 +42,11 @@ export abstract class TreeDataProvider<TNode> {
 
   abstract getTreeItem(node: TNode, ctx: CommandContext): TreeItem;
 
-  onSelect?(node: TNode, ctx: CommandContext): void;
+  onSelect?(
+    node: TNode,
+    ctx: CommandContext,
+    options?: TreeSelectOptions
+  ): void;
 
   canMove?(
     source: TNode,

@@ -42,6 +42,7 @@ export {
   TreeDataProvider,
   type SidebarBehavior,
   type TreeItem,
+  type TreeSelectOptions,
   type ViewContainerLocation,
 } from './contributions/view-contribution';
 export { WORKBENCH_INSPECTOR_CONTAINER_ID } from './workbench/inspector-container';

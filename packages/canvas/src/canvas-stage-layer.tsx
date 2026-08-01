@@ -16,6 +16,7 @@ import type {
   CanvasLayerInteractionRegistration,
   CanvasLayerRendererRegistration,
 } from './registry/canvas-registry-types';
+import { computeGroupOutlineBounds } from './scene/group-layers';
 import type { CanvasStageRuntime } from './stage/canvas-stage-runtime';
 import {
   selectLayerSlice,
@@ -23,8 +24,86 @@ import {
 } from './stage/canvas-stage-selectors';
 import { DEFAULT_TRANSFORM } from './stage/default-transform';
 
-/** Pixels before a mousedown on container content becomes a container drag. */
-const CONTAINER_DRAG_THRESHOLD_PX = 3;
+/** Pixels before mousedown becomes a drag (container forward or unselected leaf). */
+const POINTER_DRAG_THRESHOLD_PX = 3;
+
+function hasSelectedContainerAncestor(
+  start: Konva.Node,
+  selectedLayerIdSet: Set<string>,
+  layers: readonly { layer: { id: string; type: string } }[]
+): boolean {
+  let current: Konva.Node | null = start.getParent();
+  while (current) {
+    const id = current.name?.() ?? '';
+    if (id && selectedLayerIdSet.has(id)) {
+      const entry = layers.find((item) => item.layer.id === id);
+      if (entry && isCanvasContainerLayerType(entry.layer.type)) {
+        return true;
+      }
+    }
+    current = current.getParent();
+  }
+  return false;
+}
+
+/** Walk Konva target → named layer id registered on the stage. */
+function findHitLayerId(
+  target: Konva.Node | null | undefined,
+  layerIds: ReadonlySet<string>
+): string | null {
+  let current: Konva.Node | null | undefined = target;
+  while (current) {
+    const id = current.name?.() ?? '';
+    if (id && layerIds.has(id)) {
+      return id;
+    }
+    current = current.getParent();
+  }
+  return null;
+}
+
+function attachPointerDragThreshold(input: {
+  node: Konva.Group;
+  onThreshold: () => void;
+  cleanupRef: { current: (() => void) | null };
+}): void {
+  const { node, onThreshold, cleanupRef } = input;
+  const stage = node.getStage();
+  const start = stage?.getPointerPosition();
+  if (!stage || !start) {
+    return;
+  }
+
+  const thresholdSq = POINTER_DRAG_THRESHOLD_PX * POINTER_DRAG_THRESHOLD_PX;
+
+  const onMove = () => {
+    const pos = stage.getPointerPosition();
+    if (!pos) {
+      return;
+    }
+    const dx = pos.x - start.x;
+    const dy = pos.y - start.y;
+    if (dx * dx + dy * dy < thresholdSq) {
+      return;
+    }
+    cleanup();
+    onThreshold();
+  };
+
+  const cleanup = () => {
+    stage.off('mousemove', onMove);
+    stage.off('touchmove', onMove);
+    stage.off('mouseup', cleanup);
+    stage.off('touchend', cleanup);
+    cleanupRef.current = null;
+  };
+
+  cleanupRef.current = cleanup;
+  stage.on('mousemove', onMove);
+  stage.on('touchmove', onMove);
+  stage.on('mouseup', cleanup);
+  stage.on('touchend', cleanup);
+}
 
 function tryActivateLayerInteraction(input: {
   interaction: CanvasLayerInteractionRegistration | undefined;
@@ -107,10 +186,20 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
 
   const isGroupLayer = layer.type === CANVAS_GROUP_LAYER_TYPE;
   const isContainerLayer = isCanvasContainerLayerType(layer.type);
-  const containerDragCleanupRef = useRef<(() => void) | null>(null);
+  const pointerDragCleanupRef = useRef<(() => void) | null>(null);
+  const groupOutline = isGroupLayer
+    ? computeGroupOutlineBounds(
+        transform,
+        (children ?? []).map((child) => child.layer)
+      )
+    : null;
 
   const handleClick = useCallback(
     (event: Konva.KonvaEventObject<MouseEvent>) => {
+      // Right/middle click must not collapse multi-select before contextmenu.
+      if (event.evt.button !== 0) {
+        return;
+      }
       event.cancelBubble = true;
       // Always notify the widget bridge — host no-ops when the target is not
       // under an openenvx.widget (or is the widget itself with no handler).
@@ -179,70 +268,104 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
   );
 
   /**
-   * Only the selected node is `draggable`. When a group/widget is selected,
-   * mousedown lands on children (not the container), so Konva never starts the
-   * parent drag — forward it after a small move threshold so a plain click can
-   * still select the child.
+   * Selected nodes are `draggable`. Unselected writable layers start a drag after
+   * a small move threshold (select first). When a group/widget is selected,
+   * mousedown on children forwards to the container after the same threshold so
+   * a plain click can still select the child.
    */
   const handleMouseDown = useCallback(
     (event: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-      containerDragCleanupRef.current?.();
-      containerDragCleanupRef.current = null;
+      pointerDragCleanupRef.current?.();
+      pointerDragCleanupRef.current = null;
 
-      if (!(isContainerLayer && isSelected && draggable)) {
+      // Ignore right/middle — selection + context menu own those gestures.
+      if ('button' in event.evt && event.evt.button !== 0) {
         return;
       }
 
-      const container = event.currentTarget as Konva.Group;
-      const stage = container.getStage();
-      const start = stage?.getPointerPosition();
-      if (!stage || !start) {
+      const node = event.currentTarget as Konva.Group;
+
+      if (isContainerLayer && isSelected && draggable) {
+        attachPointerDragThreshold({
+          cleanupRef: pointerDragCleanupRef,
+          node,
+          onThreshold: () => {
+            if (!node.isDragging()) {
+              node.startDrag();
+            }
+          },
+        });
         return;
       }
 
-      const thresholdSq =
-        CONTAINER_DRAG_THRESHOLD_PX * CONTAINER_DRAG_THRESHOLD_PX;
+      // Selected leaf: stop bubble so an unselected ancestor group cannot steal
+      // the drag and move the whole container.
+      if (isSelected) {
+        event.cancelBubble = true;
+        return;
+      }
 
-      const onMove = () => {
-        const pos = stage.getPointerPosition();
-        if (!pos) {
-          return;
-        }
-        const dx = pos.x - start.x;
-        const dy = pos.y - start.y;
-        if (dx * dx + dy * dy < thresholdSq) {
-          return;
-        }
-        cleanup();
-        if (!container.isDragging()) {
-          container.startDrag();
-        }
-      };
+      if (
+        !layerWritable ||
+        !layerSelectable ||
+        hasSelectedContainerAncestor(
+          node,
+          selectedLayerIdSet,
+          runtime.layersRef.current
+        )
+      ) {
+        return;
+      }
 
-      const cleanup = () => {
-        stage.off('mousemove', onMove);
-        stage.off('touchmove', onMove);
-        stage.off('mouseup', cleanup);
-        stage.off('touchend', cleanup);
-        containerDragCleanupRef.current = null;
-      };
+      // Bubbled from a descendant layer — that child owns the gesture.
+      const knownIds = new Set(
+        runtime.layersRef.current.map((item) => item.layer.id)
+      );
+      const hitId = findHitLayerId(event.target, knownIds);
+      if (hitId && hitId !== layer.id) {
+        return;
+      }
 
-      containerDragCleanupRef.current = cleanup;
-      stage.on('mousemove', onMove);
-      stage.on('touchmove', onMove);
-      stage.on('mouseup', cleanup);
-      stage.on('touchend', cleanup);
+      event.cancelBubble = true;
+      attachPointerDragThreshold({
+        cleanupRef: pointerDragCleanupRef,
+        node,
+        onThreshold: () => {
+          // Enable drag before React re-applies props from selection.
+          node.draggable(true);
+          runtime.selectLayer(layer.id);
+          if (!node.isDragging()) {
+            node.startDrag();
+          }
+        },
+      });
     },
-    [draggable, isContainerLayer, isSelected]
+    [
+      draggable,
+      isContainerLayer,
+      isSelected,
+      layer.id,
+      layerSelectable,
+      layerWritable,
+      runtime,
+      selectedLayerIdSet,
+    ]
   );
 
-  const handleContextMenu = useCallback(() => {
-    if (!layerSelectable) {
-      return;
-    }
-    runtime.selectLayer(layer.id);
-  }, [layer.id, layerSelectable, runtime]);
-
+  const handleContextMenu = useCallback(
+    (event: Konva.KonvaEventObject<PointerEvent>) => {
+      event.cancelBubble = true;
+      if (!layerSelectable) {
+        return;
+      }
+      // Keep multi-select so context actions like Create group stay available.
+      if (selectedLayerIdSet.has(layer.id)) {
+        return;
+      }
+      runtime.selectLayer(layer.id);
+    },
+    [layer.id, layerSelectable, runtime, selectedLayerIdSet]
+  );
   const handleDblClick = useCallback(() => {
     if (!layerSelectable || !layerWritable) {
       return;
@@ -341,11 +464,13 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
         <Rect
           dash={isGroupLayer ? [6, 4] : undefined}
           fill="transparent"
-          height={transform.height}
+          height={groupOutline?.height ?? transform.height}
           listening={true}
           stroke={isGroupLayer ? '#6366f1' : 'transparent'}
           strokeWidth={1}
-          width={transform.width}
+          width={groupOutline?.width ?? transform.width}
+          x={groupOutline?.x ?? 0}
+          y={groupOutline?.y ?? 0}
         />
       ) : (
         <CanvasLayerContent

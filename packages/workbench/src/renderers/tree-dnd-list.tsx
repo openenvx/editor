@@ -38,7 +38,7 @@ interface TreeDndListProps {
   collapsed: Set<string>;
   selectedIds: Set<string>;
   hoveredIds: Set<string>;
-  onSelect: (source: unknown) => void;
+  onSelect: (source: unknown, options?: { additive?: boolean }) => void;
   onHoverItem: (itemId: string) => void;
   onToggleCollapsed: (id: string) => void;
   onMove: (
@@ -51,7 +51,7 @@ interface TreeDndListProps {
     isCollapsed: boolean;
     isSelected: boolean;
     onToggleCollapsed: () => void;
-    onSelect: () => void;
+    onSelect: (options?: { additive?: boolean }) => void;
   }) => React.ReactNode;
 }
 
@@ -77,7 +77,7 @@ const DraggableTreeRow = memo(
     isDragging: boolean;
     isDragActive: boolean;
     isCollapsed: boolean;
-    onSelect: () => void;
+    onSelect: (options?: { additive?: boolean }) => void;
     onHover: () => void;
     onToggleCollapsed: () => void;
     rowRef: (element: HTMLDivElement | null) => void;
@@ -97,7 +97,10 @@ const DraggableTreeRow = memo(
           isSelected,
         })}
         onContextMenu={() => {
-          onSelect();
+          // Keep multi-select for context actions (e.g. Create group).
+          if (!isSelected) {
+            onSelect();
+          }
         }}
         onMouseEnter={onHover}
         ref={(element) => {
@@ -366,7 +369,7 @@ export const TreeDndList = memo(
                 item={item}
                 key={`${viewId}-${item.id}`}
                 onHover={() => onHoverItem(item.id)}
-                onSelect={() => onSelect(item.source)}
+                onSelect={(options) => onSelect(item.source, options)}
                 onToggleCollapsed={() => onToggleCollapsed(item.id)}
                 renderRowContent={renderRowContent}
                 rowRef={(element) => setRowRef(item.id, element)}
