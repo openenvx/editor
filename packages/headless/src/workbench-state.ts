@@ -19,6 +19,7 @@ import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
 
 import type { CommandPaletteDescriptor } from './builders/command-palette-builder';
 import type { MenuItemDescriptor } from './builders/menu-builder';
+import type { SidebarHeaderDescriptor } from './builders/sidebar-header-builder';
 import type { StatusBarItemDescriptor } from './builders/status-bar-builder';
 import type { ToolbarItemDescriptor } from './builders/toolbar-builder';
 import type { OverlayDescriptor } from './contributions/overlay-contribution';
@@ -112,6 +113,8 @@ export interface WorkbenchState {
   contextMenu: MenuItemDescriptor[];
   commandPalette: CommandPaletteDescriptor;
   overlays: OverlayDescriptor[];
+  /** Custom headers keyed by view container id. */
+  sidebarHeaders: Record<string, SidebarHeaderDescriptor>;
   statusBar: StatusBarItemDescriptor[];
   statusBarItemRenderers: StatusBarItemRendererRegistration[];
   toolbarItems: ToolbarItemDescriptor[];

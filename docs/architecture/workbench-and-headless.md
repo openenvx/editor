@@ -19,8 +19,8 @@ Headless is framework UI-agnostic descriptors. Workbench is the first-party Reac
 - `bootstrapWorkbenchServices()` — headless DI services on the runtime
 - `WorkbenchPlugin` + `ctx.registerWorkbench()` — UI contribution registration
 - Provider registries: `registerTreeDataProvider`, `registerFieldRenderer`, `registerStatusBarItemRenderer`, `registerEditorPane`
-- Contribution points: Toolbar, CommandPalette, ViewContainer, View, ContextMenu, StatusBar, Overlay, PropertyPane
-- Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `PropertyPaneBuilder`
+- Contribution points: Toolbar, CommandPalette, ViewContainer, View, ContextMenu, StatusBar, SidebarHeader, Overlay, PropertyPane
+- Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `SidebarHeaderBuilder`, `PropertyPaneBuilder`
 - `WorkbenchLayout` (independent `activityBar` / `primarySidebar` / `secondarySidebar`), `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
 - Optional `WorkbenchLayoutStore` for persisted visibility + container locations
 - `WorkbenchProvider`, `useWorkbenchContext`

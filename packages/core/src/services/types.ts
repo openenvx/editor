@@ -12,13 +12,18 @@ export interface AssetService {
 export interface FontDescriptor {
   id: string;
   family: string;
+  /** Optional remote face URL (custom / registerFont). */
   src?: string;
 }
 
 export interface FontService {
   list(): FontDescriptor[];
+  /** Short list for the picker before search (provider-defined). */
+  listFeatured(): FontDescriptor[];
   resolve(family: string): FontDescriptor | null;
   register(font: FontDescriptor): void;
+  /** Ensure faces for `family` are available to `document.fonts` (no-op for system fonts). */
+  ensureLoaded(family: string): Promise<void>;
 }
 
 export interface PersistenceService {

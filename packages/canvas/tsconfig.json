@@ -2,6 +2,7 @@
   "extends": "@openenvx/typescript-config/base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
+    "resolveJsonModule": true,
     "strictNullChecks": true
   },
   "include": ["src"],

@@ -9,6 +9,8 @@ import type {
 import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { z } from 'zod';
 
+import { getImagePastePreview } from '../clipboard/image-paste-preview';
+
 export const canvasImageSchema = z
   .object({
     alt: z.string().optional(),
@@ -20,6 +22,8 @@ export const canvasImageSchema = z
         y: z.number(),
       })
       .optional(),
+    /** Ephemeral paste/upload flag; strip on durable asset swap. */
+    uploading: z.boolean().optional(),
   })
   .passthrough();
 
@@ -49,7 +53,9 @@ export class CanvasImageLayer extends LayerDefinition<CanvasImageModel> {
   }
 
   serialize(layer: Layer): CanvasImageModel {
-    return layer.data as CanvasImageModel;
+    const data = layer.data as CanvasImageModel;
+    const { uploading: _uploading, ...rest } = data;
+    return rest;
   }
 
   deserialize(data: unknown): CanvasImageModel {
@@ -91,12 +97,14 @@ export class CanvasImageLayer extends LayerDefinition<CanvasImageModel> {
   }
 
   renderPreview(ctx: LayerPreviewContext<CanvasImageModel>) {
-    const { assetRef, alt, ...rest } = ctx.model;
+    const { assetRef, alt, uploading, ...rest } = ctx.model;
+    const preview = getImagePastePreview(ctx.layerId);
     return {
       ...rest,
       alt: alt ?? 'Image',
       kind: 'image' as const,
-      src: assetRef,
+      src: preview || assetRef,
+      ...(uploading ? { uploading: true } : {}),
     };
   }
 }

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  createSidebarHeaderBuilder,
+} from './sidebar-header-builder';
+import {
   createStatusBarBuilder,
   isStatusBarDropdownItem,
 } from './status-bar-builder';
@@ -56,5 +59,35 @@ describe('ToolbarBuilder', () => {
     expect(items[1]?.kind).toBe('separator');
     expect(isToolbarDropdownItem(items[2]!)).toBe(true);
     expect(items[2]?.when).toBe('workbench.floatingToolbar');
+  });
+});
+
+describe('SidebarHeaderBuilder', () => {
+  it('builds title menu and ordered actions', () => {
+    const header = createSidebarHeaderBuilder()
+      .titleBinding('editorTitle')
+      .titleMenu((menu) => {
+        menu.item('workbench.save').label('Save');
+      })
+      .action('hide', {
+        commandId: 'workbench.togglePrimarySidebar',
+        icon: 'panelLeft',
+        label: 'Hide panels',
+        priority: 20,
+      })
+      .action('save', {
+        commandId: 'workbench.save',
+        icon: 'cloudCheck',
+        label: 'Save',
+        priority: 10,
+      })
+      .showMoveMenu(false)
+      .build('workbench.sidebar', -10);
+
+    expect(header.containerId).toBe('workbench.sidebar');
+    expect(header.titleBinding).toBe('editorTitle');
+    expect(header.showMoveMenu).toBe(false);
+    expect(header.menuItems).toHaveLength(1);
+    expect(header.actions.map((a) => a.id)).toEqual(['save', 'hide']);
   });
 });

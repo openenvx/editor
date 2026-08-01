@@ -73,7 +73,7 @@ Reject:
 | **Elevation** | `border: 1px solid` only | `box-shadow: 0 0 0 1px …` inset rings (shadcn card pattern) | Replace hard borders on inputs/cards with rings |
 | **Accent** | Blue focus + blue selection + blue tab potential | Blue **canvas-only**; focus = white/neutral ring | Split `--wb-ring` from `--wb-selection` |
 | **Typography** | 11–12px, no scale | 12px body, 11px caption, mono for X/Y/W/H | Formal type scale tokens |
-| **File menu** | Activity bar dropdown | Theme, Save, Open, Export via descriptor menu | `ActivitySidebar` + `DropdownMenuRenderer` |
+| **File menu** | Primary sidebar header dropdown | Theme, Save, Open, Export via descriptor menu | `SidebarHeaderContribution` + `DropdownMenuRenderer` |
 | **Inspector** | Basic label + input rows | Layout / Layer / Styles / Transforms sections | `createPropertyPane` + property renderer |
 | **Canvas** | No dimension badge | Blue `W × H px` label on selection | `canvas-stage.tsx` Konva Label |
 | **Demo scene** | Generic shapes | 1080×1920 Yellowstone image + text + rotated group | `createCanvasDemoScene()` |

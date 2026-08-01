@@ -4,6 +4,7 @@ import {
   InMemoryAssetService,
   localize,
   AssetServiceId,
+  FontServiceId,
   Plugin,
   SimpleServiceContribution,
   SingletonServiceContribution,
@@ -15,7 +16,6 @@ import { AbsolutePageRules } from '../absolute-page-rules';
 import {
   CanvasClipboardServiceId,
   CanvasCommandRequestServiceId,
-  CanvasFontServiceId,
   CanvasGridSettingsServiceId,
   CanvasPageResizeServiceId,
   CanvasRulerGuidesSettingsServiceId,
@@ -382,10 +382,7 @@ export class CanvasBasicsPlugin extends Plugin {
       new SimpleServiceContribution(CanvasPageResizeServiceId, () => ({
         resizeSceneToPreset: resizeSceneToPagePreset,
       })),
-      new SimpleServiceContribution(
-        CanvasFontServiceId,
-        () => canvasFontService
-      )
+      new SimpleServiceContribution(FontServiceId, () => canvasFontService)
     );
   }
 

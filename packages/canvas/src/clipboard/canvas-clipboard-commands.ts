@@ -1,8 +1,10 @@
 import {
+  AssetServiceId,
   getActivePage,
   canInsertLayers,
   findLayerById,
   localize,
+  updateLayerInTree,
 } from '@openenvx/core';
 import type { CommandContext, Layer } from '@openenvx/core';
 import { createDefaultTransform } from '@xmazu/openenvxee-schema';
@@ -10,7 +12,10 @@ import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { CanvasClipboardServiceId } from '../canvas-service-tokens';
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';
 import { CanvasTextLayer } from '../layers/canvas-text-layer';
-import type { CanvasClipboardService } from './canvas-clipboard-service';
+import type {
+  CanvasClipboardService,
+  ExternalImagePasteResult,
+} from './canvas-clipboard-service';
 import {
   cloneLayers,
   createLayerId,
@@ -89,12 +94,16 @@ function getPasteAnchor(service: CanvasClipboardService): {
   return service.getPasteAnchor();
 }
 
-async function layersFromExternalPayload(
+type ExternalPasteBuild =
+  | { kind: 'layers'; layers: Layer[] }
+  | { kind: 'image'; paste: ExternalImagePasteResult };
+
+function layersFromExternalPayload(
   service: CanvasClipboardService,
   ctx: CommandContext,
   anchor: { x: number; y: number },
   payload: ExternalClipboardPayload
-): Promise<Layer[] | null> {
+): ExternalPasteBuild | null {
   const page = ctx.scene.getActivePage();
 
   if (payload.kind === 'text') {
@@ -117,15 +126,98 @@ async function layersFromExternalPayload(
       },
       { maxWidth: MAX_PASTED_TEXT_WIDTH, mode: 'box' }
     );
-    return [fitted];
+    return { kind: 'layers', layers: [fitted] };
   }
 
-  const layer = await service.createImageLayerFromExternalPaste(page, anchor, {
-    blob: payload.blob,
-    naturalHeight: payload.naturalHeight,
-    naturalWidth: payload.naturalWidth,
+  const assets = ctx.services.get(AssetServiceId);
+  if (!assets) {
+    return null;
+  }
+  const paste = service.createImageLayerFromExternalPaste(
+    page,
+    anchor,
+    {
+      blob: payload.blob,
+      naturalHeight: payload.naturalHeight,
+      naturalWidth: payload.naturalWidth,
+    },
+    assets
+  );
+  return paste ? { kind: 'image', paste } : null;
+}
+
+function patchImageLayerData(
+  ctx: CommandContext,
+  layerId: string,
+  patch: (data: Record<string, unknown>) => Record<string, unknown>
+): boolean {
+  if (!findLayerById(ctx.scene.getScene(), layerId)) {
+    return false;
+  }
+  // setScene: don't push a second undo step for preview → CDN / flag updates
+  const scene = ctx.scene.getScene();
+  ctx.scene.setScene({
+    ...scene,
+    pages: scene.pages.map((page) => ({
+      ...page,
+      layers: updateLayerInTree(page.layers, layerId, (layer) => {
+        const data =
+          typeof layer.data === 'object' && layer.data !== null
+            ? { ...(layer.data as Record<string, unknown>) }
+            : {};
+        return { ...layer, data: patch(data) };
+      }),
+    })),
   });
-  return layer ? [layer] : null;
+  return true;
+}
+
+function applyDurableImagePaste(
+  ctx: CommandContext,
+  layerId: string,
+  assetRef: string
+): boolean {
+  return patchImageLayerData(ctx, layerId, (data) => {
+    data.assetRef = assetRef;
+    delete data.uploading;
+    return data;
+  });
+}
+
+async function finalizeImagePaste(
+  ctx: CommandContext,
+  paste: ExternalImagePasteResult
+): Promise<void> {
+  const layerId = paste.layer.id;
+  try {
+    const assetRef = await paste.finalizeUpload();
+    if (applyDurableImagePaste(ctx, layerId, assetRef)) {
+      paste.revokePreview();
+      return;
+    }
+    // Undone (or deleted) during upload: keep session preview briefly for redo,
+    // then swap to the durable ref when the layer returns.
+    const unsubscribe = ctx.scene.subscribe(() => {
+      if (!applyDurableImagePaste(ctx, layerId, assetRef)) {
+        return;
+      }
+      unsubscribe();
+      paste.revokePreview();
+    });
+    // Drop the object URL if redo never comes; CDN patch still applies later.
+    setTimeout(() => {
+      paste.revokePreview();
+    }, 30_000);
+  } catch {
+    const cleared = patchImageLayerData(ctx, layerId, (data) => {
+      delete data.uploading;
+      return data;
+    });
+    // Layer gone and upload failed — drop the unreclaimed object URL.
+    if (!cleared) {
+      paste.revokePreview();
+    }
+  }
 }
 
 async function pasteInternalLayers(
@@ -174,21 +266,33 @@ export async function executePasteExternalLayers(
     return false;
   }
 
-  const layers = await layersFromExternalPayload(
+  const built = layersFromExternalPayload(
     service,
     ctx,
     getPasteAnchor(service),
     payload
   );
-  if (!layers) {
+  if (!built) {
     return false;
   }
 
-  insertCanvasLayers(ctx, layers, {
-    label: localize(ctx.services, 'canvas.history.pasteFromClipboard', {
-      defaultValue: 'Paste from clipboard',
-    }),
-  });
+  const layers = built.kind === 'layers' ? built.layers : [built.paste.layer];
+  try {
+    insertCanvasLayers(ctx, layers, {
+      label: localize(ctx.services, 'canvas.history.pasteFromClipboard', {
+        defaultValue: 'Paste from clipboard',
+      }),
+    });
+  } catch (error) {
+    if (built.kind === 'image') {
+      built.paste.revokePreview();
+    }
+    throw error;
+  }
+
+  if (built.kind === 'image') {
+    void finalizeImagePaste(ctx, built.paste);
+  }
   return true;
 }
 

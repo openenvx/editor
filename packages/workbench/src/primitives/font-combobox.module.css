@@ -49,9 +49,23 @@
 }
 
 .list {
+  height: min(360px, 50vh);
   max-height: min(360px, 50vh);
   overflow: auto;
   padding: var(--wb-space-1) 0 0;
+}
+
+.virtualViewport {
+  position: relative;
+  width: 100%;
+}
+
+.virtualRow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .itemCheck {

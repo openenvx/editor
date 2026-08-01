@@ -21,16 +21,19 @@ import type {
 import {
   CommandPaletteContribution,
   ShellUiServiceId,
-  ViewContainerContribution,
+  SidebarHeaderContribution,
   createMenuBuilder,
   isCommandMenuItem,
   type CommandPaletteBuilder,
   type MenuBuilder,
+  type SidebarHeaderBuilder,
   type WorkbenchPluginContext,
 } from '@openenvx/headless';
 import {
   BUILT_IN_THEMES,
   SUPPORTED_LOCALES,
+  WORKBENCH_SIDEBAR_CONTAINER_ID,
+  WORKBENCH_TOGGLE_PRIMARY_SIDEBAR_COMMAND_ID,
   registerDefaultWorkbenchBundle,
   workbenchEnBundle,
   workbenchPlBundle,
@@ -41,7 +44,6 @@ import {
   canvasDemoExportCommandId,
 } from '../contributions/canvas-demo-export';
 
-export const WORKBENCH_FILE_CONTAINER_ID = 'workbench.file';
 export const WORKBENCH_SAVE_COMMAND_ID = 'workbench.save';
 export const WORKBENCH_SAVE_AS_COMMAND_ID = 'workbench.saveAs';
 export const WORKBENCH_OPEN_COMMAND_ID = 'workbench.open';
@@ -162,73 +164,96 @@ class ToggleCommandPaletteCommand extends Command {
   }
 }
 
-class FileMenuContainer extends ViewContainerContribution {
-  readonly id = WORKBENCH_FILE_CONTAINER_ID;
-  readonly title = 'File';
-  readonly icon = 'file';
-  readonly sidebarBehavior = 'dropdown' as const;
-  readonly sidebarGroup = 0;
-  readonly sidebarOrder = 0;
+function contributeFileMenu(
+  builder: MenuBuilder,
+  ctx: ContributionBuildContext
+): void {
+  builder
+    .radioGroup(
+      'theme',
+      WORKBENCH_THEME_MENU_CHOICE_PROVIDER_ID,
+      ctx.t('workbench.file.theme', 'Theme')
+    )
+    .radioGroup(
+      'language',
+      WORKBENCH_LOCALE_MENU_CHOICE_PROVIDER_ID,
+      ctx.t('workbench.file.language', 'Language')
+    )
+    .separator('file-separator');
+  builder
+    .item(WORKBENCH_SAVE_COMMAND_ID)
+    .label(ctx.t('workbench.file.save', 'Save'))
+    .shortcut('Mod+S');
+  builder
+    .item(WORKBENCH_SAVE_AS_COMMAND_ID)
+    .label(ctx.t('workbench.file.saveAs', 'Save As…'));
+  builder
+    .item(WORKBENCH_OPEN_COMMAND_ID)
+    .label(ctx.t('workbench.file.open', 'Open…'));
 
-  contributeMenu(builder: MenuBuilder, ctx: ContributionBuildContext): void {
-    builder
-      .radioGroup(
-        'theme',
-        WORKBENCH_THEME_MENU_CHOICE_PROVIDER_ID,
-        ctx.t('workbench.file.theme', 'Theme')
-      )
-      .radioGroup(
-        'language',
-        WORKBENCH_LOCALE_MENU_CHOICE_PROVIDER_ID,
-        ctx.t('workbench.file.language', 'Language')
-      )
-      .separator('file-separator');
-    builder
-      .item(WORKBENCH_SAVE_COMMAND_ID)
-      .label(ctx.t('workbench.file.save', 'Save'))
-      .shortcut('Mod+S');
-    builder
-      .item(WORKBENCH_SAVE_AS_COMMAND_ID)
-      .label(ctx.t('workbench.file.saveAs', 'Save As…'));
-    builder
-      .item(WORKBENCH_OPEN_COMMAND_ID)
-      .label(ctx.t('workbench.file.open', 'Open…'));
-
-    const exportMenu = createMenuBuilder();
-    for (const format of CANVAS_DEMO_EXPORT_FORMATS) {
-      exportMenu
-        .item(canvasDemoExportCommandId(format))
-        .label(ctx.t(`workbench.export.${format}`, format.toUpperCase()));
-    }
+  const exportMenu = createMenuBuilder();
+  for (const format of CANVAS_DEMO_EXPORT_FORMATS) {
     exportMenu
-      .item('canvas.exportImage')
-      .label(ctx.t('workbench.export.image', 'Image'));
+      .item(canvasDemoExportCommandId(format))
+      .label(ctx.t(`workbench.export.${format}`, format.toUpperCase()));
+  }
+  exportMenu
+    .item('canvas.exportImage')
+    .label(ctx.t('workbench.export.image', 'Image'));
 
-    const exportItems = exportMenu
-      .build()
-      .filter(
-        (item) => !isCommandMenuItem(item) || ctx.canExecute(item.commandId)
-      );
+  const exportItems = exportMenu
+    .build()
+    .filter(
+      (item) => !isCommandMenuItem(item) || ctx.canExecute(item.commandId)
+    );
 
-    if (exportItems.length > 0) {
-      builder.submenu(
-        'workbench.export',
-        ctx.t('workbench.file.export', 'Export'),
-        (menu) => {
-          for (const item of exportItems) {
-            if (isCommandMenuItem(item)) {
-              const next = menu.item(item.commandId);
-              if (item.label) {
-                next.label(item.label);
-              }
-              if (item.shortcut) {
-                next.shortcut(item.shortcut);
-              }
+  if (exportItems.length > 0) {
+    builder.submenu(
+      'workbench.export',
+      ctx.t('workbench.file.export', 'Export'),
+      (menu) => {
+        for (const item of exportItems) {
+          if (isCommandMenuItem(item)) {
+            const next = menu.item(item.commandId);
+            if (item.label) {
+              next.label(item.label);
+            }
+            if (item.shortcut) {
+              next.shortcut(item.shortcut);
             }
           }
         }
-      );
-    }
+      }
+    );
+  }
+}
+
+/** Document title + file menu + save / hide — Pages/Layers panel only. */
+class PrimarySidebarHeader extends SidebarHeaderContribution {
+  readonly containerId = WORKBENCH_SIDEBAR_CONTAINER_ID;
+
+  contribute(
+    builder: SidebarHeaderBuilder,
+    ctx: ContributionBuildContext
+  ): void {
+    builder
+      .titleBinding('editorTitle')
+      .titleMenu((menu) => {
+        contributeFileMenu(menu, ctx);
+      })
+      .action('save', {
+        commandId: WORKBENCH_SAVE_COMMAND_ID,
+        icon: 'cloudCheck',
+        label: ctx.t('workbench.file.save', 'Save'),
+        priority: 10,
+      })
+      .action('hidePanels', {
+        commandId: WORKBENCH_TOGGLE_PRIMARY_SIDEBAR_COMMAND_ID,
+        icon: 'panelLeft',
+        label: ctx.t('workbench.header.hidePanels', 'Hide panels'),
+        priority: 20,
+      })
+      .showMoveMenu(false);
   }
 }
 
@@ -286,7 +311,7 @@ export class CanvasDemoChromePlugin extends Plugin {
       new ToggleCommandPaletteShortcut()
     );
     (ctx as WorkbenchPluginContext).registerWorkbench(
-      new FileMenuContainer(),
+      new PrimarySidebarHeader(),
       new WorkbenchCommandPaletteItems()
     );
   }

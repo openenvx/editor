@@ -27,7 +27,7 @@
     "@cloudflare/workers-types": "^4.20250710.0",
     "@openenvx/core": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
-    "typescript": "6.0.3",
+    "typescript": "catalog:dev",
     "vitest": "4.1.10",
     "wrangler": "^4.24.0"
   }

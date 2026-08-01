@@ -1,4 +1,5 @@
 import {
+  FontServiceId,
   createPropertyBuilder,
   escapeHtml,
   LayerDefinition,
@@ -16,9 +17,11 @@ import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
 import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { z } from 'zod';
 
-import { CanvasFontServiceId } from '../canvas-service-tokens';
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';
-import { createSeedFontCatalog } from '../fonts/canvas-font-catalog';
+import {
+  createSeedFontCatalog,
+  toFontDescriptor,
+} from '../fonts/canvas-font-catalog';
 import {
   DEFAULT_RICH_TEXT_FILL,
   DEFAULT_RICH_TEXT_FONT_FAMILY,
@@ -70,20 +73,25 @@ function migrateLegacyTextData(data: unknown): CanvasTextModel | null {
   return null;
 }
 
-function buildFontOptions(
-  ctx: CommandContext
+function toFontOptions(
+  fonts: { id: string; family: string }[]
 ): { label: string; value: string }[] {
-  if (ctx.services.has(CanvasFontServiceId)) {
-    return ctx.services
-      .get<FontService>(CanvasFontServiceId)
-      .list()
-      .map((font) => ({ label: font.id, value: font.family }));
+  return fonts.map((font) => ({ label: font.id, value: font.family }));
+}
+
+function buildFontOptions(ctx: CommandContext): {
+  options: { label: string; value: string }[];
+} {
+  if (ctx.services.has(FontServiceId)) {
+    const service = ctx.services.get<FontService>(FontServiceId);
+    return {
+      options: toFontOptions(service.list()),
+    };
   }
 
-  return createSeedFontCatalog().map((font) => ({
-    label: font.id,
-    value: font.family,
-  }));
+  return {
+    options: toFontOptions(createSeedFontCatalog().map(toFontDescriptor)),
+  };
 }
 
 export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
@@ -127,12 +135,13 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
     const scrubPx = { scrub: true, precision: 0 };
     const scrubLineHeight = { scrub: true, precision: 1 };
     const scrubCurve = { scrub: true, precision: 0, unit: '°' };
+    const fontOptions = buildFontOptions(ctx);
     return (
       createPropertyBuilder()
         .section('text', 'Text')
         // .richText('html', 'Content')
         .number('fontSize', 'Font size')
-        .font('fontFamily', buildFontOptions(ctx), 'Font')
+        .font('fontFamily', fontOptions.options, 'Font')
         .color('fill', 'Fill')
         .align('align', 'Align')
         .number('lineHeight', 'Line spacing', { numeric: scrubLineHeight })

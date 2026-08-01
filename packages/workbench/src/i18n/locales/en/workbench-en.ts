@@ -29,6 +29,8 @@ export default {
   'view.moveToPrimary': 'Move to Primary Sidebar',
   'view.moveToSecondary': 'Move to Secondary Sidebar',
   'view.reorderHint': 'Drag to reorder',
+  'header.hidePanels': 'Hide panels',
+  'header.save': 'Save',
   'commandPalette.title': 'Command palette',
   'commandPalette.search': 'Search',
   'commandPalette.filters': 'Command palette filters',

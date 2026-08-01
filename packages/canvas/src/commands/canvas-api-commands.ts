@@ -3,6 +3,7 @@ import {
   canResizePage,
   canTransformLayer,
   findLayerById,
+  FontServiceId,
   getActivePage,
   localize,
   updateLayerInTree,
@@ -16,7 +17,6 @@ import type { Transform } from '@xmazu/openenvxee-schema';
 
 import {
   CanvasCommandRequestServiceId,
-  CanvasFontServiceId,
   CanvasPageResizeServiceId,
 } from '../canvas-service-tokens';
 import { bytesToDataUrl } from '../export/bytes-to-data-url';
@@ -355,7 +355,7 @@ export class RegisterCanvasFontCommand extends Command {
   readonly id = 'canvas.registerFont';
 
   canExecute(ctx: CommandContext, args?: unknown): boolean {
-    if (!ctx.services.has(CanvasFontServiceId)) {
+    if (!ctx.services.has(FontServiceId)) {
       return false;
     }
     const font = args as FontDescriptor | undefined;
@@ -367,7 +367,7 @@ export class RegisterCanvasFontCommand extends Command {
     if (!font?.id || !font.family) {
       return;
     }
-    ctx.services.get<FontService>(CanvasFontServiceId).register(font);
+    ctx.services.get<FontService>(FontServiceId).register(font);
   }
 }
 

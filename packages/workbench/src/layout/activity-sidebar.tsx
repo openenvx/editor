@@ -202,6 +202,11 @@ export function ActivitySidebar({
   );
 
   const activePanel = panelContainers.find((c) => c.id === activeContainerId);
+  const primaryHeader = useWorkbenchContextSelector((state) =>
+    activeContainerId
+      ? (state.sidebarHeaders?.[activeContainerId] ?? undefined)
+      : undefined
+  );
 
   if (!(showActivityBar || showPrimarySidebar)) {
     return null;
@@ -305,6 +310,7 @@ export function ActivitySidebar({
         <div className={styles.sidePanel}>
           <ViewContainerHeader
             containerId={activePanel.id}
+            header={primaryHeader ?? undefined}
             location="primary"
             title={activePanel.title}
           />

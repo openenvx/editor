@@ -1,4 +1,6 @@
 import {
+  CloudCheck,
+  PanelLeft,
   AlignCenter,
   AlignLeft,
   AlignRight,
@@ -51,6 +53,7 @@ export const LUCIDE_GLYPHS: Record<string, LucideIcon> = {
   arrows: ArrowLeftRight,
   boxes: Boxes,
   circle: Circle,
+  cloudCheck: CloudCheck,
   cornerBottomLeft: CornerDownLeft,
   cornerBottomRight: CornerDownRight,
   cornerTopLeft: CornerUpLeft,
@@ -67,6 +70,7 @@ export const LUCIDE_GLYPHS: Record<string, LucideIcon> = {
   layers: Layers,
   lock: Lock,
   lockOpen: LockOpen,
+  panelLeft: PanelLeft,
   rect: Square,
   redo: Redo2,
   rotateLeft: RotateCcw,

@@ -1,6 +1,2 @@
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/700.css';
-@import '@fontsource/parisienne/400.css';
-@import '@fontsource/cormorant-garamond/400.css';
-@import '@fontsource/cormorant-garamond/600.css';
-@import '@fontsource/cormorant-garamond/700.css';
+/* Google Fonts load via CSS2 at editor mount / ensureLoaded (see canvas-font-service).
+ * Hosts must allow https://fonts.googleapis.com (and fonts.gstatic.com) in CSP. */

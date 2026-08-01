@@ -29,6 +29,8 @@ export default {
   'view.moveToPrimary': 'Przenieś do lewego panelu',
   'view.moveToSecondary': 'Przenieś do prawego panelu',
   'view.reorderHint': 'Przeciągnij, aby zmienić kolejność',
+  'header.hidePanels': 'Ukryj panele',
+  'header.save': 'Zapisz',
   'commandPalette.title': 'Paleta poleceń',
   'commandPalette.search': 'Szukaj',
   'commandPalette.filters': 'Filtry palety poleceń',

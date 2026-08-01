@@ -66,6 +66,12 @@ export {
   type StatusBarTextItemDescriptor,
 } from './contributions/status-bar-contribution';
 export {
+  SidebarHeaderContribution,
+  type SidebarHeaderActionDescriptor,
+  type SidebarHeaderDescriptor,
+  type SidebarHeaderTitleBinding,
+} from './contributions/sidebar-header-contribution';
+export {
   ToolbarContribution,
   type ToolbarCommandItemDescriptor,
   type ToolbarDropdownItemDescriptor,
@@ -113,6 +119,11 @@ export {
   isStatusBarDropdownItem,
   type StatusBarDropdownOptions,
 } from './builders/status-bar-builder';
+export {
+  SidebarHeaderBuilder,
+  createSidebarHeaderBuilder,
+  type SidebarHeaderActionOptions,
+} from './builders/sidebar-header-builder';
 export {
   ToolbarBuilder,
   createToolbarBuilder,

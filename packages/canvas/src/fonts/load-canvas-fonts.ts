@@ -1,3 +1,5 @@
+import { canvasFontService } from './canvas-font-service';
+
 const FONT_LOAD_SPECS = ['16px', 'bold 16px', 'italic 16px'] as const;
 
 export async function loadCanvasFonts(families: string[]): Promise<void> {
@@ -9,6 +11,12 @@ export async function loadCanvasFonts(families: string[]): Promise<void> {
   if (uniqueFamilies.length === 0) {
     return;
   }
+
+  await Promise.all(
+    uniqueFamilies.map((family) =>
+      canvasFontService.ensureLoaded(family).catch(() => {})
+    )
+  );
 
   await Promise.all(
     uniqueFamilies.flatMap((family) =>

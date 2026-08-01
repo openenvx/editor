@@ -1,10 +1,14 @@
-import { AssetServiceId, inject } from '@openenvx/core';
+import type { AssetService } from '@openenvx/core';
 import type { Layer, Page } from '@xmazu/openenvxee-schema';
 import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 
 import { computeArtboardOffset } from '../artboard-offset';
 import { CanvasImageLayer } from '../layers/canvas-image-layer';
 import { createLayerId } from './clone-layers-for-paste';
+import {
+  registerImagePastePreview,
+  revokeImagePastePreview,
+} from './image-paste-preview';
 import type { CapturedClipboardPayload } from './read-external-clipboard';
 
 const MAX_IMAGE_DIMENSION = 800;
@@ -29,9 +33,15 @@ export interface ArtboardPointerContext {
   panY: number;
 }
 
-export class CanvasClipboardService {
-  private readonly assets = inject(AssetServiceId);
+export interface ExternalImagePasteResult {
+  layer: Layer;
+  /** Upload preview → durable ref. Does not revoke the object URL. */
+  finalizeUpload: () => Promise<string>;
+  /** Drop the session preview object URL for this layer. */
+  revokePreview: () => void;
+}
 
+export class CanvasClipboardService {
   private internal: InternalClipboardPayload | null = null;
   private lastPointer: ScreenPointer | null = null;
   private focused = false;
@@ -175,12 +185,18 @@ export class CanvasClipboardService {
     };
   }
 
-  async createImageLayerFromExternalPaste(
+  /**
+   * Build an image layer immediately (`uploading` + session blob preview).
+   * Scene JSON keeps an empty `assetRef` until upload finishes — no `blob:` in history.
+   * Pass `assets` from `ctx.services.get(AssetServiceId)` so host overrides apply.
+   */
+  createImageLayerFromExternalPaste(
     page: Page,
     anchor: { x: number; y: number },
-    payload: { blob: Blob; naturalWidth: number; naturalHeight: number }
-  ): Promise<Layer | null> {
-    if (!this.assets.upload) {
+    payload: { blob: Blob; naturalWidth: number; naturalHeight: number },
+    assets: AssetService
+  ): ExternalImagePasteResult | null {
+    if (!assets.upload) {
       return null;
     }
 
@@ -194,7 +210,7 @@ export class CanvasClipboardService {
     const file = new File([payload.blob], `pasted-image.${extension}`, {
       type: payload.blob.type || 'image/png',
     });
-    const assetRef = await this.assets.upload(file);
+    const previewUrl = URL.createObjectURL(payload.blob);
     const { width, height } = scaleImageDimensions(
       payload.naturalWidth,
       payload.naturalHeight
@@ -204,7 +220,11 @@ export class CanvasClipboardService {
       createLayerId('image'),
       page
     );
-    layer.data = { alt: 'Pasted image', assetRef };
+    layer.data = {
+      alt: 'Pasted image',
+      assetRef: '',
+      uploading: true,
+    };
     layer.transform = {
       ...createDefaultTransform(),
       x: anchor.x,
@@ -212,7 +232,15 @@ export class CanvasClipboardService {
       width,
       height,
     };
-    return layer;
+    registerImagePastePreview(layer.id, previewUrl);
+
+    return {
+      layer,
+      finalizeUpload: () => assets.upload!(file),
+      revokePreview: () => {
+        revokeImagePastePreview(layer.id);
+      },
+    };
   }
 }
 

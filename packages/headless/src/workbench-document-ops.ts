@@ -2,6 +2,7 @@ import {
   AssetServiceId,
   PersistenceServiceId,
   SceneValidationError,
+  walkLayers,
 } from '@openenvx/core';
 import type {
   AssetService,
@@ -22,6 +23,44 @@ export interface DocumentOpsDeps {
   sceneStore: SceneStore;
   editorService: EditorService;
   getService: <T>(token: ServiceId<T>) => T | undefined;
+}
+
+function layerIsUploading(data: unknown): boolean {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    (data as { uploading?: unknown }).uploading === true
+  );
+}
+
+export function sceneHasUploadingLayers(scene: Scene): boolean {
+  for (const page of scene.pages) {
+    let found = false;
+    walkLayers(page.layers, (layer) => {
+      if (layerIsUploading(layer.data)) {
+        found = true;
+      }
+    });
+    if (found) {
+      return true;
+    }
+  }
+  return false;
+}
+
+async function waitForUploadingLayers(
+  sceneStore: SceneStore,
+  timeoutMs = 60_000
+): Promise<void> {
+  const started = Date.now();
+  while (sceneHasUploadingLayers(sceneStore.getScene())) {
+    if (Date.now() - started > timeoutMs) {
+      throw new Error('Timed out waiting for image uploads to finish');
+    }
+    await new Promise((resolve) => {
+      setTimeout(resolve, 50);
+    });
+  }
 }
 
 function hydrateAssets(
@@ -64,6 +103,7 @@ export async function saveDocument(
   if (!editor) {
     return;
   }
+  await waitForUploadingLayers(deps.sceneStore);
   const persistence = deps.getService(PersistenceServiceId);
   const assets = deps.getService(AssetServiceId);
   const effectiveSaveFn: (input: EditorInput) => Promise<void> =

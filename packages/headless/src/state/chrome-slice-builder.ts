@@ -6,13 +6,58 @@ import {
 } from '../builders/command-palette-builder';
 import {
   createMenuBuilder,
+  filterMenuByCanExecute,
   filterMenuByWhen,
   mergeMenuContributions,
 } from '../builders/menu-builder';
+import { createSidebarHeaderBuilder } from '../builders/sidebar-header-builder';
+import type { SidebarHeaderDescriptor } from '../builders/sidebar-header-builder';
 import { createStatusBarBuilder } from '../builders/status-bar-builder';
 import { createToolbarBuilder } from '../builders/toolbar-builder';
 import type { ChromeSlice } from '../workbench-state-cache';
 import type { WorkbenchSliceContext } from './workbench-slice-context';
+
+function buildSidebarHeaders(
+  contributions: {
+    containerId: string;
+    priority?: number;
+    contribute: (
+      builder: ReturnType<typeof createSidebarHeaderBuilder>,
+      ctx: ReturnType<typeof createContributionBuildContext>
+    ) => void;
+  }[],
+  buildCtx: ReturnType<typeof createContributionBuildContext>,
+  evaluateWhen: (when: string | undefined) => boolean
+): Record<string, SidebarHeaderDescriptor> {
+  const winners = new Map<string, SidebarHeaderDescriptor>();
+  const ordered = [...contributions].toSorted(
+    (a, b) => (a.priority ?? 0) - (b.priority ?? 0)
+  );
+
+  for (const contribution of ordered) {
+    if (winners.has(contribution.containerId)) {
+      continue;
+    }
+    const builder = createSidebarHeaderBuilder();
+    contribution.contribute(builder, buildCtx);
+    const descriptor = builder.build(
+      contribution.containerId,
+      contribution.priority ?? 0
+    );
+    descriptor.actions = descriptor.actions.filter((action) =>
+      evaluateWhen(action.when)
+    );
+    if (descriptor.menuItems) {
+      descriptor.menuItems = filterMenuByCanExecute(
+        filterMenuByWhen(descriptor.menuItems, evaluateWhen),
+        buildCtx.canExecute
+      );
+    }
+    winners.set(contribution.containerId, descriptor);
+  }
+
+  return Object.fromEntries(winners);
+}
 
 export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
   const coreRegistries = ctx.coreRegistries;
@@ -78,11 +123,18 @@ export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
     .filter((item) => evaluateWhen(item.when))
     .toSorted((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
 
+  const sidebarHeaders = buildSidebarHeaders(
+    workbenchRegistries.sidebarHeaders,
+    buildCtx,
+    evaluateWhen
+  );
+
   return {
     commandPalette,
     contextKeys: contextKeyService.snapshot(),
     contextMenu,
     overlays,
+    sidebarHeaders,
     statusBar,
     statusBarItemRenderers,
     toolbarItems,

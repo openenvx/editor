@@ -64,6 +64,9 @@ export const SecondarySidebarRenderer = memo(
       (state) => state.activeContainerByLocation
     );
     const layout = useWorkbenchContextSelector((state) => state.layout);
+    const sidebarHeaders = useWorkbenchContextSelector(
+      (state) => state.sidebarHeaders
+    );
 
     const secondaryContainers = useMemo(
       () =>
@@ -102,6 +105,7 @@ export const SecondarySidebarRenderer = memo(
         <div className={styles.root}>
           <ViewContainerHeader
             containerId={container.id}
+            header={sidebarHeaders?.[container.id] ?? undefined}
             location="secondary"
             title={container.title}
           />

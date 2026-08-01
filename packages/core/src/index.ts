@@ -243,6 +243,7 @@ export {
   AssetServiceId,
   ContextKeyServiceId,
   EditorServiceId,
+  FontServiceId,
   LayerRegistryServiceId,
   PersistenceServiceId,
   SceneStoreServiceId,

@@ -5,6 +5,10 @@ import { Image as KonvaImage, Rect } from 'react-konva';
 
 import type { CanvasLayerRendererHostProps } from '../contributions/canvas-layer-renderer-contribution';
 import { computeImageFitLayout } from '../image-fit';
+import {
+  ImageUploadingOverlay,
+  imageUploadingOpacity,
+} from './image-uploading-chrome';
 import { useLoadedImage } from './use-loaded-image';
 
 export { useLoadedImage } from './use-loaded-image';
@@ -36,6 +40,7 @@ export const ImageCanvasRenderer = memo(
   ({ view, width, height, hidden = false }: CanvasLayerRendererHostProps) => {
     const descriptor = view as ImageView;
     const image = useLoadedImage(descriptor.src);
+    const uploading = descriptor.uploading === true;
 
     if (hidden) {
       return <Rect fill="transparent" height={height} width={width} />;
@@ -44,7 +49,7 @@ export const ImageCanvasRenderer = memo(
     if (!image) {
       return (
         <Rect
-          fill="#f3f4f6"
+          fill={uploading ? '#e5e7eb' : '#f3f4f6'}
           height={height}
           stroke="#d1d5db"
           strokeWidth={1}
@@ -61,14 +66,20 @@ export const ImageCanvasRenderer = memo(
     );
 
     return (
-      <KonvaImage
-        crop={layout.crop}
-        height={layout.draw.height}
-        image={image}
-        width={layout.draw.width}
-        x={layout.draw.x}
-        y={layout.draw.y}
-      />
+      <>
+        <KonvaImage
+          crop={layout.crop}
+          height={layout.draw.height}
+          image={image}
+          opacity={imageUploadingOpacity(uploading)}
+          width={layout.draw.width}
+          x={layout.draw.x}
+          y={layout.draw.y}
+        />
+        {uploading ? (
+          <ImageUploadingOverlay height={height} width={width} />
+        ) : null}
+      </>
     );
   }
 );

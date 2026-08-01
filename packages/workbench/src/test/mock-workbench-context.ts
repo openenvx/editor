@@ -39,6 +39,7 @@ export function createMockWorkbenchApi(
       primaryLayerId: null,
       selectedLayerIds: [],
     },
+    sidebarHeaders: {},
     statusBar: [],
     statusBarItemRenderers: [],
     toolbarItems: [],

@@ -305,8 +305,10 @@ export class WorkbenchController {
 
   async start(): Promise<void> {
     await this.manager.activateCorePlugins();
+    // Defer notify until all plugins are active so service overrides (e.g. cloud
+    // AssetService) win before any singleton is constructed via canExecute.
     for (const plugin of this.options.plugins) {
-      await this.activatePlugin(plugin);
+      await this.activatePlugin(plugin, { silent: true });
     }
     const sceneStore = this.runtime.getScene();
     // Lookup is already live via PluginManager; re-apply after plugins register rules.
@@ -336,17 +338,25 @@ export class WorkbenchController {
    * Activate a workbench plugin after boot. Contributions are tracked and
    * removed on {@link deactivatePlugin}.
    */
-  async activatePlugin(plugin: Plugin): Promise<void> {
+  async activatePlugin(
+    plugin: Plugin,
+    options?: { silent?: boolean }
+  ): Promise<void> {
     if (this.pluginDisposables.has(plugin.id)) {
       await this.deactivatePlugin(plugin.id);
     }
     const disposables: WorkbenchContributionDisposable[] = [];
+    const silent = options?.silent === true;
     const ctx = createWorkbenchPluginContext(
       this.manager.createPluginContext(),
       this.workbenchRegistries,
       this.providerRegistries,
       {
-        onContributionsChanged: () => this.invalidateContributions(),
+        onContributionsChanged: () => {
+          if (!silent) {
+            this.invalidateContributions();
+          }
+        },
         trackDisposable: (disposable) => {
           disposables.push(disposable);
         },
@@ -354,7 +364,9 @@ export class WorkbenchController {
     );
     await this.manager.activateWithContext(plugin, ctx);
     this.pluginDisposables.set(plugin.id, disposables);
-    this.invalidateContributions();
+    if (!silent) {
+      this.invalidateContributions();
+    }
   }
 
   /** Deactivate a plugin and dispose its workbench + provider registrations. */
@@ -802,6 +814,7 @@ export class WorkbenchController {
       revision: this.revision,
       scene: scene.scene,
       selection: scene.selection,
+      sidebarHeaders: chrome.sidebarHeaders,
       statusBar: chrome.statusBar,
       statusBarItemRenderers: chrome.statusBarItemRenderers,
       toolbarItems: chrome.toolbarItems,

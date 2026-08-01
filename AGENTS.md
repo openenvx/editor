@@ -164,7 +164,7 @@ bun run dev:playground
 bun run fix           # auto-fix lint/format (ultracite)
 bun run check         # lint (ultracite) + knip
 bun run check-types   # tsc --noEmit across packages (excl. apps)
-bun run precommit     # check + build/check-types/test packages dirty vs HEAD (excl. apps)
+bun run precommit     # ultracite + knip + check-types for packages dirty vs HEAD (excl. apps)
 bun run changeset     # create a release changeset
 ```
 
@@ -177,7 +177,7 @@ Only `packages/schema` (`@xmazu/openenvxee-schema`), `packages/preview` (`@xmazu
 After all code changes for the task are done, **always** run these from the repo root and fix every failure before stopping:
 
 1. `bun run fix` — apply Ultracite auto-fixes
-2. `bun run precommit` — `check` + Turbo build/check-types/test for packages changed vs `HEAD` (and their dependents), excluding `apps/*`. Full-repo gate is `bun run build && bun run test` (what CI runs).
+2. `bun run precommit` — `check` (ultracite + knip) + Turbo `check-types` for packages changed vs `HEAD` (and their dependents), excluding `apps/*`. Full-repo gate is `bun run build && bun run test` (what CI runs).
 
 If either command fails, fix the reported errors, then re-run both until they pass. Do not leave lint, format, knip, build, or test failures unresolved.
 

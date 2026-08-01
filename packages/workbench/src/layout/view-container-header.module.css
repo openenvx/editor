@@ -2,40 +2,77 @@
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--wb-space-2);
-  padding: var(--wb-space-2) var(--wb-space-3);
+  gap: var(--wb-space-1);
+  height: 44px;
+  padding: 0 var(--wb-space-2) 0 var(--wb-space-3);
   border-bottom: var(--wb-hairline);
 }
 
+.titleArea {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+}
+
+.titleButton {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: var(--wb-space-1);
+  height: 28px;
+  padding: 0 var(--wb-space-2);
+  border: none;
+  border-radius: var(--wb-radius-sm);
+  background: transparent;
+  color: var(--wb-foreground);
+  font: inherit;
+  cursor: pointer;
+}
+
+.titleButton:hover {
+  background: var(--wb-hover-overlay);
+}
+
+.titleButton:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-focus);
+}
+
 .title {
+  flex: 1;
   overflow: hidden;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
+  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.menuTrigger {
+.titleChevron {
+  flex-shrink: 0;
+  color: var(--wb-muted-foreground);
+}
+
+.actions {
   display: flex;
   flex-shrink: 0;
-}
-
-.menuButton {
-  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: none;
-  border-radius: var(--wb-radius-control);
-  background: transparent;
-  color: var(--wb-muted-foreground);
-  cursor: pointer;
+  gap: 2px;
 }
 
-.menuButton:hover {
+.actionButton {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--wb-radius-sm);
+  background: transparent;
+  box-shadow: none;
+  color: var(--wb-muted-foreground);
+}
+
+.actionButton:hover:not(:disabled) {
   background: var(--wb-hover-overlay);
+  box-shadow: none;
   color: var(--wb-foreground);
 }

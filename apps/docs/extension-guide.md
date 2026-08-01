@@ -160,6 +160,40 @@ Duplicate kinds overwrite earlier registrations so enterprise plugins activating
 
 `WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). Enterprise `@xmazu/openenvxee-canvas-pro` adds canvas-only chrome (`CanvasProPlugin`, `CanvasTemplatePlugin`).
 
+**Custom sidebar header** (per activity-bar panel — document title / file menu / icon actions):
+
+```ts
+class LayersSidebarHeader extends SidebarHeaderContribution {
+  // Only when this view container is the active primary panel
+  readonly containerId = 'workbench.sidebar';
+
+  contribute(builder: SidebarHeaderBuilder, ctx: ContributionBuildContext) {
+    builder
+      .titleBinding('editorTitle') // or .title('My Project')
+      .titleMenu((menu) => {
+        menu.item('workbench.save').label(ctx.t('…', 'Save'));
+      })
+      .action('save', {
+        commandId: 'workbench.save',
+        icon: 'cloudCheck',
+        label: 'Save',
+      })
+      .action('hidePanels', {
+        commandId: 'workbench.togglePrimarySidebar',
+        icon: 'panelLeft',
+        label: 'Hide panels',
+      })
+      .showMoveMenu(false);
+  }
+}
+
+activateWorkbench(ctx) {
+  ctx.registerWorkbench(new LayersSidebarHeader());
+}
+```
+
+Lowest `priority` wins per `containerId`. Other activity-bar panels keep the default header. Title menus reuse `DropdownMenuRenderer`.
+
 **Form / settings sidebars** (VS Code `views` + properties): declare only — no React panel:
 
 ```ts

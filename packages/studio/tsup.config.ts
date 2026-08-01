@@ -78,7 +78,6 @@ export default defineConfig({
     /^@radix-ui\//,
     /^@dnd-kit\//,
     /^@tiptap\//,
-    /^@fontsource\//,
   ],
   esbuildPlugins: [externalCssRelativeToDist()],
 });

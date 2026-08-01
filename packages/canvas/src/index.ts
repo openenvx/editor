@@ -119,13 +119,21 @@ export {
 } from './interactions/widget-click-handler';
 export { useLoadedImage } from './renderers/image-canvas-renderer';
 export {
-  CANVAS_FONT_CATALOG,
+  ImageUploadingOverlay,
+  imageUploadingOpacity,
+} from './renderers/image-uploading-chrome';
+export {
   CANVAS_FONT_FAMILIES,
+  GOOGLE_FONT_CATALOG,
+  PRELOADED_GOOGLE_FONT_IDS,
   SYSTEM_FONT_CATALOG,
+  createFeaturedFontCatalog,
   createSeedFontCatalog,
+  toFontDescriptor,
 } from './fonts/canvas-font-catalog';
 export {
   canvasFontService,
+  preloadCanvasFeaturedFonts,
   resetCanvasFontServiceForTests,
 } from './fonts/canvas-font-service';
 export { loadCanvasFonts } from './fonts/load-canvas-fonts';
@@ -291,7 +299,6 @@ export { useCanvasStageInteraction } from './hooks/use-canvas-stage-interaction'
 export {
   CanvasClipboardServiceId,
   CanvasCommandRequestServiceId,
-  CanvasFontServiceId,
   CanvasGridSettingsServiceId,
   CanvasPageResizeServiceId,
   CanvasRegistriesServiceId,

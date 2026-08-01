@@ -1,5 +1,7 @@
 import {
   computeImageFitLayout,
+  ImageUploadingOverlay,
+  imageUploadingOpacity,
   useLoadedImage,
   type CanvasLayerRendererHostProps,
 } from '@openenvx/canvas';
@@ -56,6 +58,7 @@ export const ProImageCanvasRenderer = memo(
     const descriptor = view as ImageView;
     const image = useLoadedImage(descriptor.src);
     const crop = resolveNormalizedCrop(readImageCrop(descriptor));
+    const uploading = descriptor.uploading === true;
 
     if (hidden) {
       return <Rect fill="transparent" height={height} width={width} />;
@@ -64,7 +67,7 @@ export const ProImageCanvasRenderer = memo(
     if (!image) {
       return (
         <Rect
-          fill="#f3f4f6"
+          fill={uploading ? '#e5e7eb' : '#f3f4f6'}
           height={height}
           stroke="#d1d5db"
           strokeWidth={1}
@@ -81,12 +84,18 @@ export const ProImageCanvasRenderer = memo(
         image.naturalHeight
       );
       return (
-        <KonvaImage
-          crop={konvaCrop}
-          height={height}
-          image={image}
-          width={width}
-        />
+        <>
+          <KonvaImage
+            crop={konvaCrop}
+            height={height}
+            image={image}
+            opacity={imageUploadingOpacity(uploading)}
+            width={width}
+          />
+          {uploading ? (
+            <ImageUploadingOverlay height={height} width={width} />
+          ) : null}
+        </>
       );
     }
 
@@ -98,14 +107,20 @@ export const ProImageCanvasRenderer = memo(
     );
 
     return (
-      <KonvaImage
-        crop={layout.crop}
-        height={layout.draw.height}
-        image={image}
-        width={layout.draw.width}
-        x={layout.draw.x}
-        y={layout.draw.y}
-      />
+      <>
+        <KonvaImage
+          crop={layout.crop}
+          height={layout.draw.height}
+          image={image}
+          opacity={imageUploadingOpacity(uploading)}
+          width={layout.draw.width}
+          x={layout.draw.x}
+          y={layout.draw.y}
+        />
+        {uploading ? (
+          <ImageUploadingOverlay height={height} width={width} />
+        ) : null}
+      </>
     );
   }
 );
