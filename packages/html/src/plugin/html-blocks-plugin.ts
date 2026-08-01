@@ -1,4 +1,4 @@
-import { SimpleServiceContribution } from '@openenvx/core';
+import { OpenEnvxWidgetLayer, SimpleServiceContribution } from '@openenvx/core';
 import { WorkbenchPlugin } from '@openenvx/headless';
 import type { WorkbenchPluginContext } from '@openenvx/headless';
 
@@ -42,6 +42,7 @@ export class HtmlBlocksPlugin extends WorkbenchPlugin {
         () => defaultBlockRegistry
       ),
       ...builtinBlocks.map((block) => createHtmlLayerDefinition(block)),
+      new OpenEnvxWidgetLayer(),
       new InsertHtmlBlockCommand(),
       new MoveHtmlBlockCommand(),
       new MoveHtmlBlockUpCommand(),

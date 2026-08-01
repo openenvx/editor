@@ -675,10 +675,16 @@ export class WorkbenchController {
         ? findWidgetAncestor(currentScene, layerId)
         : null;
 
+    const plain =
+      widgetAncestor && bindKey
+        ? typeof value === 'string'
+          ? htmlToPlainText(value)
+          : value
+        : null;
+
     sceneStore.apply({
-      apply: (scene) => ({
-        ...scene,
-        pages: scene.pages.map((page) => ({
+      apply: (scene) => {
+        let pages = scene.pages.map((page) => ({
           ...page,
           layers: updateLayerInTree(page.layers, layerId, (layer) => {
             const data =
@@ -692,20 +698,13 @@ export class WorkbenchController {
             }
             return { ...layer, data };
           }),
-        })),
-      }),
-      label: `Update ${key}`,
-    });
-
-    // Bound face part: write committed content back into the widget's values so
-    // the isolate re-renders (Figma/Unlayer bind path).
-    if (widgetAncestor && bindKey) {
-      const plain = typeof value === 'string' ? htmlToPlainText(value) : value;
-      const widgetId = widgetAncestor.id;
-      sceneStore.apply({
-        apply: (scene) => ({
-          ...scene,
-          pages: scene.pages.map((page) => ({
+        }));
+        // Bound face part: write committed content into widget values so the
+        // isolate re-renders (Figma/Unlayer bind path). Same apply as the face
+        // write so undo is one step and history stays consistent.
+        if (widgetAncestor && bindKey && plain !== null) {
+          const widgetId = widgetAncestor.id;
+          pages = pages.map((page) => ({
             ...page,
             layers: updateLayerInTree(page.layers, widgetId, (layer) => {
               const data =
@@ -716,14 +715,18 @@ export class WorkbenchController {
                 data.values && typeof data.values === 'object'
                   ? { ...(data.values as Record<string, unknown>) }
                   : {};
-              values[bindKey] = plain;
+              setNestedValue(values, bindKey, plain);
               return { ...layer, data: { ...data, values } };
             }),
-          })),
-        }),
-        label: `Bind ${bindKey}`,
-      });
-    }
+          }));
+        }
+        return { ...scene, pages };
+      },
+      label:
+        widgetAncestor && bindKey
+          ? `Update ${key} (bind ${bindKey})`
+          : `Update ${key}`,
+    });
   }
 
   selectViewItem(

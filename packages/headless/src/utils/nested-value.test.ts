@@ -17,4 +17,14 @@ describe('nested-value', () => {
     expect(Array.isArray(actions)).toBe(true);
     expect(getNestedValue(data, 'slots.actions.0.data.label')).toBe('CTA');
   });
+
+  it('clone-on-writes so shared nested containers stay intact', () => {
+    const section = { title: 'Zupa', dishes: [{ name: 'Rosół' }] };
+    const shared = { sections: [section] };
+    const draft = { sections: [section] };
+    setNestedValue(draft, 'sections.0.title', 'Zupa weselna');
+    expect(shared.sections[0]!.title).toBe('Zupa');
+    expect(draft.sections[0]!.title).toBe('Zupa weselna');
+    expect(draft.sections[0]).not.toBe(section);
+  });
 });

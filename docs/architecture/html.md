@@ -18,6 +18,7 @@ Puck-style block editor for pages with `page.layout === 'html'`. Same core/headl
 - `HtmlBlocksPlugin` — `LayerDefinition`s, commands, editor pane, primary activity-sidebar **Blocks** panel (`html.blocks`)
 - Built-in composites: `html.hero` (slots: headline / body / actions), `html.button`
 - Sandbox extension `contributes.blocks` (via `extensionBlockStore`) appear in the same Blocks palette; insert drops an `openenvx.widget` under `html.root` and the isolate maps the face into `data.children`
+- HTML sandbox widget faces persist `data.handlers` (click handler ids), support `bind` write-back into nested `data.values` paths, and map face parts with `writeMode: 'content'` / `showInLayers: false` (atomic widget row in Layers; inline TipTap on bound text). Inspector fields come from `data.manifest` via shared `OpenEnvxWidgetLayer` (`@openenvx/core`; also registered by canvas).
 
 ## Slots vs children
 

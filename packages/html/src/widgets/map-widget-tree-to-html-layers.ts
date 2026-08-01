@@ -11,6 +11,8 @@ export interface MapWidgetHtmlTreeOptions {
   idPrefix: string;
   /** Starting counter for unique child ids. */
   startIndex?: number;
+  /** Collect click handler ids keyed by face layer id. */
+  handlersOut?: Record<string, Record<string, string>>;
 }
 
 const BLOCK_ESCAPE = new Set<string>(WIDGET_BLOCK_ESCAPE_TYPES);
@@ -36,7 +38,30 @@ function textContent(children: RenderChild[]): string {
 }
 
 function faceMeta(): Pick<Layer, 'writeMode' | 'showInLayers'> {
-  return { writeMode: 'free', showInLayers: true };
+  return { writeMode: 'content', showInLayers: false };
+}
+
+function recordHandlers(
+  layerId: string,
+  props: Record<string, unknown>,
+  handlersOut?: Record<string, Record<string, string>>
+): void {
+  if (!handlersOut) {
+    return;
+  }
+  const handlers: Record<string, string> = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (
+      key.startsWith('on') &&
+      typeof value === 'string' &&
+      /^h\d+$/.test(value)
+    ) {
+      handlers[key.slice(2).toLowerCase()] = value;
+    }
+  }
+  if (Object.keys(handlers).length > 0) {
+    handlersOut[layerId] = handlers;
+  }
 }
 
 function plainData(data: unknown): Record<string, unknown> {
@@ -74,6 +99,15 @@ export function mapWidgetTreeToHtmlLayers(
     return id;
   };
 
+  const faceLayer = (
+    props: Record<string, unknown>,
+    layer: Omit<Layer, 'id' | 'writeMode' | 'showInLayers'>
+  ): Layer => {
+    const id = nextId();
+    recordHandlers(id, props, options.handlersOut);
+    return { id, ...faceMeta(), ...layer };
+  };
+
   const mapChildren = (children: RenderChild[]): Layer[] =>
     children.flatMap((child) => {
       if (typeof child === 'string' || typeof child === 'number') {
@@ -93,10 +127,8 @@ export function mapWidgetTreeToHtmlLayers(
     switch (node.type) {
       case 'Section': {
         return [
-          {
-            id: nextId(),
+          faceLayer(node.props, {
             type: 'html.flex',
-            ...faceMeta(),
             data: {
               direction: 'column',
               gap: 0,
@@ -108,15 +140,13 @@ export function mapWidgetTreeToHtmlLayers(
                   : undefined,
               children: mapChildren(node.children),
             },
-          },
+          }),
         ];
       }
       case 'Row': {
         return [
-          {
-            id: nextId(),
+          faceLayer(node.props, {
             type: 'html.flex',
-            ...faceMeta(),
             data: {
               direction: 'row',
               gap: typeof node.props.gap === 'number' ? node.props.gap : 24,
@@ -129,22 +159,20 @@ export function mapWidgetTreeToHtmlLayers(
               wrap: 'true',
               children: mapChildren(node.children),
             },
-          },
+          }),
         ];
       }
       case 'Column': {
         return [
-          {
-            id: nextId(),
+          faceLayer(node.props, {
             type: 'html.flex',
-            ...faceMeta(),
             data: {
               direction: 'column',
               gap: typeof node.props.gap === 'number' ? node.props.gap : 16,
               width: node.props.width,
               children: mapChildren(node.children),
             },
-          },
+          }),
         ];
       }
       case 'Heading': {
@@ -155,11 +183,8 @@ export function mapWidgetTreeToHtmlLayers(
         );
         const bound = typeof node.props.bind === 'string';
         return [
-          {
-            id: nextId(),
+          faceLayer(node.props, {
             type: 'html.heading',
-            writeMode: 'free',
-            showInLayers: true,
             ...(bound ? { allowedDataKeys: ['html'] } : {}),
             data: {
               html,
@@ -170,7 +195,7 @@ export function mapWidgetTreeToHtmlLayers(
                   : '#111827',
               ...(bound ? { bind: node.props.bind } : {}),
             },
-          },
+          }),
         ];
       }
       case 'Paragraph': {
@@ -181,11 +206,8 @@ export function mapWidgetTreeToHtmlLayers(
         );
         const bound = typeof node.props.bind === 'string';
         return [
-          {
-            id: nextId(),
+          faceLayer(node.props, {
             type: 'html.text',
-            writeMode: 'free',
-            showInLayers: true,
             ...(bound ? { allowedDataKeys: ['html'] } : {}),
             data: {
               html,
@@ -195,15 +217,13 @@ export function mapWidgetTreeToHtmlLayers(
                   : '#374151',
               ...(bound ? { bind: node.props.bind } : {}),
             },
-          },
+          }),
         ];
       }
       case 'Button': {
         return [
-          {
-            id: nextId(),
+          faceLayer(node.props, {
             type: 'html.button',
-            ...faceMeta(),
             data: {
               label: textContent(node.children) || 'Button',
               href: typeof node.props.href === 'string' ? node.props.href : '#',
@@ -212,28 +232,24 @@ export function mapWidgetTreeToHtmlLayers(
                   ? node.props.color
                   : '#ffffff',
             },
-          },
+          }),
         ];
       }
       case 'Image': {
         return [
-          {
-            id: nextId(),
+          faceLayer(node.props, {
             type: 'html.image',
-            ...faceMeta(),
             data: {
               src: String(node.props.src ?? ''),
               alt: typeof node.props.alt === 'string' ? node.props.alt : '',
             },
-          },
+          }),
         ];
       }
       case 'Divider': {
         return [
-          {
-            id: nextId(),
+          faceLayer(node.props, {
             type: 'html.raw',
-            ...faceMeta(),
             data: {
               markup: `<hr style="border:none;border-top:1px solid ${
                 typeof node.props.color === 'string'
@@ -241,19 +257,17 @@ export function mapWidgetTreeToHtmlLayers(
                   : '#e5e7eb'
               };margin:1rem 0"/>`,
             },
-          },
+          }),
         ];
       }
       case 'Html': {
         return [
-          {
-            id: nextId(),
+          faceLayer(node.props, {
             type: 'html.raw',
-            ...faceMeta(),
             data: {
               markup: String(node.props.markup ?? ''),
             },
-          },
+          }),
         ];
       }
       case 'Block': {
@@ -266,12 +280,10 @@ export function mapWidgetTreeToHtmlLayers(
           return [];
         }
         return [
-          {
-            id: nextId(),
+          faceLayer(node.props, {
             type,
-            ...faceMeta(),
             data: plainData(node.props.data),
-          },
+          }),
         ];
       }
       default: {
@@ -291,14 +303,20 @@ export function applyHtmlWidgetFace(
   tree: RenderNode
 ): Layer {
   validateWidgetTree(tree, 'html');
-  const mapped = mapWidgetTreeToHtmlLayers(tree, { idPrefix: widgetLayer.id });
+  const handlers: Record<string, Record<string, string>> = {};
+  const mapped = mapWidgetTreeToHtmlLayers(tree, {
+    idPrefix: widgetLayer.id,
+    handlersOut: handlers,
+  });
   const data = widgetLayer.data as Record<string, unknown>;
   return {
     ...widgetLayer,
     data: {
       ...data,
       children: mapped,
-      handlers: undefined,
+      ...(Object.keys(handlers).length > 0
+        ? { handlers }
+        : { handlers: undefined }),
     },
   };
 }

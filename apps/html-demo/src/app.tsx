@@ -1,16 +1,17 @@
 import {
   DEFAULT_HTML_STUDIO_PLUGINS,
   WorkbenchShell,
-  createHtmlDemoScene,
   createHtmlSandboxExtensionHost,
   DEFAULT_WORKBENCH_LAYOUT,
   mountSandboxExtensions,
   type WorkbenchApi,
 } from '@openenvx/html-studio';
 import countdownSource from 'openenvx-widget:./extensions/countdown.widget.tsx';
+import menuSource from 'openenvx-widget:./extensions/menu.widget.tsx';
 import rsvpSource from 'openenvx-widget:./extensions/rsvp.widget.tsx';
 import { useMemo } from 'react';
 
+import { createMenuDemoScene } from './create-menu-demo-scene';
 import weddingManifest, {
   guestsViewTree,
 } from './extensions/wedding.extension';
@@ -40,6 +41,16 @@ if (import.meta.hot) {
       const sandbox = import.meta.hot?.data.sandbox as SandboxHot | undefined;
       if (source && sandbox) {
         void sandbox.pushWidgetSource('wm.rsvp', source);
+      }
+    }
+  );
+  import.meta.hot.accept(
+    'openenvx-widget:./extensions/menu.widget.tsx',
+    (mod) => {
+      const source = (mod as { default?: string } | undefined)?.default;
+      const sandbox = import.meta.hot?.data.sandbox as SandboxHot | undefined;
+      if (source && sandbox) {
+        void sandbox.pushWidgetSource('wm.menu', source);
       }
     }
   );
@@ -80,6 +91,14 @@ export function App() {
           allowedCommands: ['wm.rsvp.insert'],
           title: 'RSVP',
         },
+        {
+          id: 'wm.menu',
+          kind: 'widget',
+          source: menuSource,
+          capabilities: ['widget:render', 'widget:values'],
+          allowedCommands: ['wm.menu.insert'],
+          title: 'Wedding menu',
+        },
       ],
     });
 
@@ -90,6 +109,7 @@ export function App() {
       }
       void sandbox.pushWidgetSource('wm.countdown', countdownSource);
       void sandbox.pushWidgetSource('wm.rsvp', rsvpSource);
+      void sandbox.pushWidgetSource('wm.menu', menuSource);
       if (guestsViewTree) {
         sandbox.applySurfaceRender('wm.wedding.guests', guestsViewTree);
       }
@@ -106,9 +126,9 @@ export function App() {
     <div className="html-demo-app">
       <WorkbenchShell
         className="html-workbench"
-        editorTitle="Website"
-        editorUri="openworkbench://html-demo"
-        initialScene={createHtmlDemoScene()}
+        editorTitle="Menu"
+        editorUri="openworkbench://html-demo/menu"
+        initialScene={createMenuDemoScene()}
         layout={DEFAULT_WORKBENCH_LAYOUT}
         mountExternalHosts={mountExternalHosts}
         plugins={DEFAULT_HTML_STUDIO_PLUGINS}

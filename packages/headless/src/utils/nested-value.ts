@@ -25,6 +25,18 @@ export function getNestedValue(
   return current;
 }
 
+function cloneContainer(value: object): Record<string, unknown> | unknown[] {
+  if (Array.isArray(value)) {
+    return [...value];
+  }
+  return { ...(value as Record<string, unknown>) };
+}
+
+/**
+ * Writes `value` at a dotted path. Clone-on-writes each container along the
+ * path so shallow-copied roots (scene history structural sharing) are not
+ * mutated in place.
+ */
 export function setNestedValue(
   data: Record<string, unknown>,
   path: string,
@@ -46,8 +58,10 @@ export function setNestedValue(
       let next = current[index];
       if (typeof next !== 'object' || next === null) {
         next = isNumericPathSegment(nextPart) ? [] : {};
-        current[index] = next;
+      } else {
+        next = cloneContainer(next);
       }
+      current[index] = next;
       current = next;
       continue;
     }
@@ -55,8 +69,10 @@ export function setNestedValue(
     let next = record[part];
     if (typeof next !== 'object' || next === null) {
       next = isNumericPathSegment(nextPart) ? [] : {};
-      record[part] = next;
+    } else {
+      next = cloneContainer(next);
     }
+    record[part] = next;
     current = next;
   }
   const leaf = parts.at(-1)!;

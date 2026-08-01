@@ -208,6 +208,7 @@
       "dependencies": {
         "@openenvx/preview": "workspace:*",
         "@openenvx/schema": "workspace:*",
+        "zod": "4.4.3",
       },
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",

@@ -14,6 +14,7 @@ export function Section(
   props: PropsWithChildren<{
     padding?: number;
     background?: string;
+    onClick?: (payload?: unknown) => void;
   }>
 ): JSX.Element {
   return intrinsic('Section', props as Record<string, unknown>, props.children);
@@ -24,6 +25,7 @@ export function Row(
     gap?: number;
     padding?: number;
     background?: string;
+    onClick?: (payload?: unknown) => void;
   }>
 ): JSX.Element {
   return intrinsic('Row', props as Record<string, unknown>, props.children);
@@ -68,6 +70,7 @@ export function Button(
     href?: string;
     backgroundColor?: string;
     color?: string;
+    onClick?: (payload?: unknown) => void;
   }>
 ): JSX.Element {
   return intrinsic('Button', props as Record<string, unknown>, props.children);

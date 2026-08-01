@@ -47,9 +47,24 @@ describe(mapWidgetTreeToHtmlLayers, () => {
     expect(firstRow.type).toBe('html.flex');
     const heading = firstRow.data.children[0];
     expect(heading?.type).toBe('html.heading');
-    expect(heading?.writeMode).toBe('free');
+    expect(heading?.writeMode).toBe('content');
     expect(heading?.data.html).toBe('Hello');
     expect(heading?.data.bind).toBe('title');
+  });
+
+  it('records onClick handler ids on mapped face layers', () => {
+    const handlers: Record<string, Record<string, string>> = {};
+    mapWidgetTreeToHtmlLayers(
+      {
+        type: 'Button',
+        props: { onClick: 'h1' },
+        children: ['Add'],
+      },
+      { idPrefix: 'w1', handlersOut: handlers }
+    );
+    const layerId = Object.keys(handlers)[0];
+    expect(layerId).toBeDefined();
+    expect(handlers[layerId]?.click).toBe('h1');
   });
 
   it('drops Block escape hatches that smuggle nested children', () => {

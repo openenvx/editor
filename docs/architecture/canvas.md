@@ -49,7 +49,7 @@ See `apps/canvas-demo` / `apps/demo-playground` and [studio-and-products.md](stu
 
 ## Widgets
 
-`openenvx.widget` layers are canvas layer types. Click binding and isolate lifecycle are owned by the **sandbox** path (`createSandboxExtensionHost` in studio wires canvas click handler + layer type so workbench never imports canvas). Trust model: [extensions.md](extensions.md).
+`openenvx.widget` is a shared scene layer type (`OpenEnvxWidgetLayer` in `@openenvx/core`), registered by both canvas and HTML plugins (first registration wins). Click binding and isolate lifecycle are owned by the **sandbox** path (`createSandboxExtensionHost` in studio wires canvas click handler + layer type so workbench never imports canvas). Trust model: [extensions.md](extensions.md).
 
 ## What does **not** belong in canvas
 

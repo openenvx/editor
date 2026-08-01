@@ -24,9 +24,13 @@ export class Registries {
 export class LayerRegistry {
   private readonly definitions = new Map<string, LayerDefinition>();
 
+  /**
+   * First registration wins. Canvas + HTML plugins both register the shared
+   * `openenvx.widget` definition; dual-engine hosts must not throw.
+   */
   register(definition: LayerDefinition): void {
     if (this.definitions.has(definition.type)) {
-      throw new Error(`Layer type already registered: ${definition.type}`);
+      return;
     }
     this.definitions.set(definition.type, definition);
   }

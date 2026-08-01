@@ -67,10 +67,10 @@ Rules:
 - Prefer `openenvx.widget.useSyncedState` inside isolate code; `setProps` batches patches onto the same host values.
 - Face render must stay pure w.r.t. document writes other than values — `executeCommand` / `showUI` throw while `widget.rendering`.
 - `onClick` / other `on*` handlers become handler IDs on the host; never pass live functions across the boundary.
-- Use `bind="propName"` on face elements when inline edit should write back into `values`.
+- Use `bind="propName"` or dotted paths (e.g. `bind="sections.0.title"`) on face elements when inline edit should write back into `values`.
 
-HTML example: [`apps/html-demo/src/extensions/countdown.widget.tsx`](../html-demo/src/extensions/countdown.widget.tsx).  
-Canvas example: [`apps/canvas-demo/src/extensions/seating.widget.tsx`](../canvas-demo/src/extensions/seating.widget.tsx).
+HTML examples: [`countdown.widget.tsx`](../html-demo/src/extensions/countdown.widget.tsx) (bind), [`menu.widget.tsx`](../html-demo/src/extensions/menu.widget.tsx) (bind + `onClick` + `setProps` for a full in-face editor).  
+Canvas example: [`seating.widget.tsx`](../canvas-demo/src/extensions/seating.widget.tsx).
 
 ### 2. Declare the extension manifest
 

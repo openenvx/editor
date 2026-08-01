@@ -1,5 +1,9 @@
 import type { Layer } from '@openenvx/core';
-import { applyHtmlWidgetFace, HtmlBlocksPlugin } from '@openenvx/html';
+import {
+  applyHtmlWidgetFace,
+  HtmlBlocksPlugin,
+  setOpenEnvxHtmlWidgetClickHandler,
+} from '@openenvx/html';
 import {
   SandboxExtensionHost,
   type SandboxExtensionHostOptions,
@@ -46,11 +50,15 @@ export {
 
 /** Sandbox host wired for HTML widget faces. */
 export function createHtmlSandboxExtensionHost(
-  options: Omit<SandboxExtensionHostOptions, 'applyWidgetFace'>
+  options: Omit<
+    SandboxExtensionHostOptions,
+    'applyWidgetFace' | 'bindWidgetClick'
+  >
 ): SandboxExtensionHost {
   return new SandboxExtensionHost({
     ...options,
     applyWidgetFace: (layer, tree) => applyHtmlWidgetFace(layer as Layer, tree),
+    bindWidgetClick: setOpenEnvxHtmlWidgetClickHandler,
   });
 }
 

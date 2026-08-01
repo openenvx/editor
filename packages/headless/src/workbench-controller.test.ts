@@ -244,6 +244,134 @@ describe(WorkbenchController, () => {
     expect((layer.data as { text: string }).text).toBe("after");
   });
 
+  it("writes bound face html into nested widget values paths", async () => {
+    const scene = normalizeScene({
+      activePageId: "p1",
+      pages: [
+        {
+          id: "p1",
+          name: "Page",
+          layout: "html",
+          layers: [
+            {
+              id: "root",
+              type: "html.root",
+              data: {
+                children: [
+                  {
+                    id: "widget-1",
+                    type: "openenvx.widget",
+                    data: {
+                      extensionId: "wm.menu",
+                      values: {
+                        sections: [{ title: "Zupa", dishes: [{ name: "Rosół" }] }],
+                      },
+                      children: [
+                        {
+                          id: "face-title",
+                          type: "html.heading",
+                          writeMode: "content",
+                          data: {
+                            html: "Zupa",
+                            bind: "sections.0.title",
+                          },
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      selection: {
+        activePageId: "p1",
+        primaryLayerId: "face-title",
+        selectedLayerIds: ["face-title"],
+      },
+    });
+    const controller = new WorkbenchController({
+      initialScene: scene,
+      plugins: [new LayerPlugin()],
+    });
+    await controller.start();
+    controller.updateProperty("face-title", "html", "<p>Zupa weselna</p>");
+    const root = controller.getState().scene.pages[0]!.layers[0]!;
+    const widget = (root.data as { children: { data: Record<string, unknown> }[] })
+      .children[0]!;
+    const values = widget.data.values as {
+      sections: { title: string }[];
+    };
+    expect(values.sections[0]!.title).toBe("Zupa weselna");
+  });
+
+  it("undo restores nested widget bind values after face html edit", async () => {
+    const scene = normalizeScene({
+      activePageId: "p1",
+      pages: [
+        {
+          id: "p1",
+          name: "Page",
+          layout: "html",
+          layers: [
+            {
+              id: "root",
+              type: "html.root",
+              data: {
+                children: [
+                  {
+                    id: "widget-1",
+                    type: "openenvx.widget",
+                    data: {
+                      extensionId: "wm.menu",
+                      values: {
+                        sections: [{ title: "Zupa", dishes: [{ name: "Rosół" }] }],
+                      },
+                      children: [
+                        {
+                          id: "face-title",
+                          type: "html.heading",
+                          writeMode: "content",
+                          data: {
+                            html: "Zupa",
+                            bind: "sections.0.title",
+                          },
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      selection: {
+        activePageId: "p1",
+        primaryLayerId: "face-title",
+        selectedLayerIds: ["face-title"],
+      },
+    });
+    const controller = new WorkbenchController({
+      initialScene: scene,
+      plugins: [new LayerPlugin()],
+    });
+    await controller.start();
+    controller.updateProperty("face-title", "html", "<p>Zupa weselna</p>");
+    expect(controller.undo()).toBe(true);
+    const root = controller.getState().scene.pages[0]!.layers[0]!;
+    const widget = (root.data as { children: { data: Record<string, unknown> }[] })
+      .children[0]!;
+    const values = widget.data.values as {
+      sections: { title: string }[];
+    };
+    expect(values.sections[0]!.title).toBe("Zupa");
+    expect((widget.data.children as { data: { html: string } }[])[0]!.data.html).toBe(
+      "Zupa"
+    );
+  });
+
   it("does not delete the selected layer while typing in an input", async () => {
     const scene = normalizeScene({
       activePageId: "p1",

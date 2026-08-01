@@ -34,6 +34,10 @@ export {
 } from './contributions/html-blocks-sidebar';
 export { BlockPalettePanel } from './editor/block-palette-panel';
 export { HtmlEditorPane } from './editor/html-editor-pane';
+export {
+  emitOpenEnvxHtmlWidgetClick,
+  setOpenEnvxHtmlWidgetClickHandler,
+} from './editor/html-widget-click-handler';
 export { HtmlBlocksPlugin } from './plugin/html-blocks-plugin';
 export {
   cloneBlockWithNewIds,

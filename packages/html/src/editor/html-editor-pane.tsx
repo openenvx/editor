@@ -111,17 +111,10 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
 
   const handleCommitEdit = useCallback(
     (hostId: string, dataPath: string, html: string) => {
-      if (dataPath.includes('.')) {
-        api.updateProperty(hostId, dataPath, html);
-      } else {
-        void executeCommand('html.updateBlockData', {
-          id: hostId,
-          patch: { [dataPath]: html },
-        });
-      }
+      api.updateProperty(hostId, dataPath, html);
       setEditingTarget(null);
     },
-    [api, executeCommand]
+    [api]
   );
 
   const handleDuplicate = useCallback(

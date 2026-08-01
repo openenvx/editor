@@ -169,6 +169,13 @@ export {
   type PaddingValue,
   type ShadowValue,
 } from './builders/property-builder';
+export { appendWidgetManifestField } from './builders/widget-manifest-fields';
+export {
+  OpenEnvxWidgetLayer,
+  WIDGET_LAYER_TYPE,
+  openenvxWidgetSchema,
+  type OpenEnvxWidgetModel,
+} from './layers/openenvx-widget-layer';
 export { type LayerPreviewContext } from './contributions/layer-preview-context';
 
 export { I18nContribution } from './i18n/i18n-contribution';

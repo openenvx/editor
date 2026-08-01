@@ -3,6 +3,7 @@ import { Block, Pane, Text } from '@openenvx/elements/panel';
 import { defineExtension, renderPanelTree } from '@openenvx/widget-sdk';
 
 import { countdownWidget } from './countdown.widget';
+import { menuWidget } from './menu.widget';
 import { rsvpWidget } from './rsvp.widget';
 
 const guestsPane = renderPanelTree(
@@ -24,10 +25,11 @@ export default defineExtension({
   activation: ['onStartup', 'onView:wm.wedding.guests'],
   permissions: ['widget:render', 'widget:values'],
   contributes: {
-    blocks: [countdownWidget, rsvpWidget],
+    blocks: [countdownWidget, rsvpWidget, menuWidget],
     commands: [
       { id: 'wm.countdown.insert', title: 'Insert countdown' },
       { id: 'wm.rsvp.insert', title: 'Insert RSVP' },
+      { id: 'wm.menu.insert', title: 'Insert wedding menu' },
     ],
     viewContainers: [{ id: 'wm.wedding', title: 'Wedding', icon: 'heart' }],
     views: [

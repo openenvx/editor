@@ -11,6 +11,7 @@ import {
   canReorderLayer,
   isLayerLocked,
   isLayerVisible,
+  WIDGET_LAYER_TYPE,
 } from '@openenvx/core';
 import type { Layer, Scene } from '@openenvx/schema';
 import {
@@ -39,6 +40,7 @@ import {
 } from './block-editor-context';
 import { BlockSelectionMenu } from './block-selection-menu';
 import { HtmlRichTextEditor } from './html-rich-text-editor';
+import { emitOpenEnvxHtmlWidgetClick } from './html-widget-click-handler';
 
 import styles from './html-editor-pane.module.css';
 
@@ -120,6 +122,7 @@ function BlockChrome({
   insertLineVertical,
   canDuplicate,
   canRemove,
+  insideWidget = false,
   setNodeRef,
   sortableProps,
   children,
@@ -136,18 +139,27 @@ function BlockChrome({
   insertLineVertical?: boolean;
   canDuplicate: boolean;
   canRemove: boolean;
+  /** True when this block is under an `openenvx.widget` ancestor (or is one). */
+  insideWidget?: boolean;
   setNodeRef?: (node: HTMLElement | null) => void;
   sortableProps?: Record<string, unknown>;
   children: ReactNode;
 }) {
   const { onSelect, onDuplicate, onRemove } = useBlockEditor();
 
+  const activate = useCallback(() => {
+    if (insideWidget) {
+      emitOpenEnvxHtmlWidgetClick(layer.id);
+    }
+    onSelect(layer.id);
+  }, [insideWidget, layer.id, onSelect]);
+
   const handleClick = useCallback(
     (event: MouseEvent) => {
       event.stopPropagation();
-      onSelect(layer.id);
+      activate();
     },
-    [layer.id, onSelect]
+    [activate]
   );
 
   const handleContextMenu = useCallback(
@@ -165,9 +177,9 @@ function BlockChrome({
       }
       event.preventDefault();
       event.stopPropagation();
-      onSelect(layer.id);
+      activate();
     },
-    [layer.id, onSelect]
+    [activate]
   );
 
   const handleDuplicate = useCallback(() => {
@@ -229,12 +241,14 @@ function SortableChildren({
   parentData,
   layers,
   registry,
+  insideWidget,
 }: {
   parentId: string;
   parentType: string;
   parentData: Record<string, unknown>;
   layers: readonly Layer[];
   registry: BlockRegistry;
+  insideWidget: boolean;
 }) {
   const { sortDraft } = useBlockEditor();
   const visibleEntries = visibleEntriesForParent(layers);
@@ -247,6 +261,7 @@ function SortableChildren({
     activeId,
     lineIndex
   );
+  const childInsideWidget = insideWidget || parentType === WIDGET_LAYER_TYPE;
 
   return (
     <SortableContext items={itemIds} strategy={staticSortingStrategy}>
@@ -257,6 +272,7 @@ function SortableChildren({
           insertLineAfter={afterId === child.id}
           insertLineBefore={beforeId === child.id}
           insertLineVertical={verticalLine}
+          insideWidget={childInsideWidget}
           layer={child}
           parentId={parentId}
           registry={registry}
@@ -269,9 +285,11 @@ function SortableChildren({
 function ContainerChildren({
   layer,
   registry,
+  insideWidget,
 }: {
   layer: Layer;
   registry: BlockRegistry;
+  insideWidget: boolean;
 }) {
   const { sortDraft } = useBlockEditor();
   const children = getBlockChildren(layer);
@@ -283,11 +301,13 @@ function ContainerChildren({
   const empty = visibleCount === 0 && !showInsertLine;
   const parentData = layerDataRecord(layer);
   const verticalLine = insertLineIsVertical(layer.type, parentData);
+  const childInsideWidget = insideWidget || layer.type === WIDGET_LAYER_TYPE;
 
   return (
     <DropZone disabled={isLayerLocked(layer)} empty={empty} parentId={layer.id}>
       {visibleCount > 0 ? (
         <SortableChildren
+          insideWidget={childInsideWidget}
           layers={children}
           parentData={parentData}
           parentId={layer.id}
@@ -425,10 +445,12 @@ function BlockContent({
   layer,
   registry,
   editing,
+  insideWidget,
 }: {
   layer: Layer;
   registry: BlockRegistry;
   editing: boolean;
+  insideWidget: boolean;
 }) {
   const { onSelect, onStartEdit, onCommitEdit } = useBlockEditor();
   const config = registry.get(layer.type);
@@ -504,7 +526,11 @@ function BlockContent({
   return config.render({
     data,
     children: acceptsChildren ? (
-      <ContainerChildren layer={layer} registry={registry} />
+      <ContainerChildren
+        insideWidget={insideWidget}
+        layer={layer}
+        registry={registry}
+      />
     ) : undefined,
     slots: slotNodes,
   });
@@ -523,6 +549,7 @@ function SortableBlockNode({
   parentId,
   index,
   registry,
+  insideWidget,
   insertLineBefore = false,
   insertLineAfter = false,
   insertLineVertical = false,
@@ -531,6 +558,7 @@ function SortableBlockNode({
   parentId: string;
   index: number;
   registry: BlockRegistry;
+  insideWidget: boolean;
   insertLineBefore?: boolean;
   insertLineAfter?: boolean;
   insertLineVertical?: boolean;
@@ -547,6 +575,7 @@ function SortableBlockNode({
     sortDraft?.containerPreview === true &&
     sortDraft.parentId === layer.id &&
     config?.acceptsChildren === true;
+  const nodeInsideWidget = insideWidget || layer.type === WIDGET_LAYER_TYPE;
 
   const dragData: BlockDragData = {
     type: 'block',
@@ -579,6 +608,7 @@ function SortableBlockNode({
       insertLineAfter={insertLineAfter}
       insertLineBefore={insertLineBefore}
       insertLineVertical={insertLineVertical}
+      insideWidget={nodeInsideWidget}
       isDraggingGhost={isDraggingGhost}
       label={config.label}
       layer={layer}
@@ -586,7 +616,12 @@ function SortableBlockNode({
       setNodeRef={setNodeRef}
       sortableProps={dragDisabled ? undefined : { ...listeners, ...attributes }}
     >
-      <BlockContent editing={editing} layer={layer} registry={registry} />
+      <BlockContent
+        editing={editing}
+        insideWidget={nodeInsideWidget}
+        layer={layer}
+        registry={registry}
+      />
     </BlockChrome>
   );
 }
@@ -603,7 +638,14 @@ function RootBlockNode({
     return null;
   }
 
-  return <BlockContent editing={false} layer={layer} registry={registry} />;
+  return (
+    <BlockContent
+      editing={false}
+      insideWidget={false}
+      layer={layer}
+      registry={registry}
+    />
+  );
 }
 
 export const BlockTreeRenderer = memo(
