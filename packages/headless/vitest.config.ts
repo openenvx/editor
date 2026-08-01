@@ -7,11 +7,12 @@ const root = import.meta.dirname;
 export default defineConfig({
   resolve: {
     alias: {
-      '@xmazu/openenvxee-plugin-protocol': path.resolve(
+      '@xmazu/openenvxee-protocol': path.resolve(
         root,
-        '../plugin-protocol/src/index.ts'
+        '../protocol/src/index.ts'
       ),
     },
+    conditions: ['development', 'import', 'module', 'browser', 'default'],
   },
   test: {
     environment: 'jsdom',

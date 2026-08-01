@@ -248,6 +248,7 @@ export function CanvasStage({
                   fontLoadRevision={fontLoadRevision}
                   key={entry.layer.id}
                   runtime={runtime}
+                  selectedLayerIdSet={selectedLayerIdSet}
                   selectedPrimary={selectedPrimary}
                 />
               ))}

@@ -168,7 +168,8 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   toggleSecondarySidebar: () => void;
   getService: <T>(token: ServiceId<T>) => T | undefined;
   /**
-   * Register workbench contributions at runtime (e.g. external panel:manifest).
+   * Register workbench contributions at runtime (e.g. from a validated
+   * ExtensionManifest via createExtensionContributions).
    * Dispose to remove them and refresh chrome/scene slices.
    */
   registerWorkbenchContributions: (

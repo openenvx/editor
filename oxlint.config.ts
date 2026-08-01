@@ -62,5 +62,6 @@ export default defineConfig({
     'react/hook-use-state': 'off',
     'react/react-compiler': 'off',
     'jsdoc/require-param-description': 'off',
+    'jsdoc/check-tag-names': 'off',
   },
 });

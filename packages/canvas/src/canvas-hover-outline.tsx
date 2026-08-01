@@ -1,7 +1,7 @@
 import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { Rect } from 'react-konva';
 
-import type { CanvasStageLayer } from './canvas-stage-types';
+import type { FlattenedStageLayer } from './flatten-layer-surface';
 
 const CANVAS_HOVER_OUTLINE_STROKE_WIDTH = 1;
 
@@ -9,10 +9,16 @@ export function CanvasHoverOutline({
   entry,
   stroke,
 }: {
-  entry: CanvasStageLayer;
+  entry: FlattenedStageLayer;
   stroke: string;
 }) {
-  const transform = entry.layer.transform ?? createDefaultTransform();
+  // Hover outline is painted at artboard root — must use composed (absolute)
+  // transform, not the layer-local one (nested face children would otherwise
+  // draw offset by their parent widget/group origin).
+  const transform =
+    entry.absoluteTransform ??
+    entry.layer.transform ??
+    createDefaultTransform();
 
   return (
     <Rect

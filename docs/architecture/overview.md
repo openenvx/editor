@@ -59,7 +59,7 @@ Scene-generic chrome (Pages, Layers, dirty status, Inspector container) lives in
 
 ## Commands are the mutation hub
 
-Trusted code mutates the scene through **commands** on the shared command service — not ad-hoc store writes from random UI. External paths (embed `panel:command`, sandbox `executeCommand`) hit the same hub behind allowlists.
+Trusted code mutates the scene through **commands** on the shared command service — not ad-hoc store writes from random UI. External paths (embed / sandbox `command` messages, sandbox `executeCommand`) hit the same hub behind allowlists.
 
 ## Next chapters
 

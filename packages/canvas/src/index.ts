@@ -178,6 +178,17 @@ export {
   type OpenEnvxWidgetModel,
 } from './layers/openenvx-widget-layer';
 export {
+  mapWidgetTreeToLayers,
+  type MapWidgetTreeOptions,
+} from './widgets/map-widget-tree-to-layers';
+export {
+  resolveAutoLayout,
+  readLayoutIntent,
+  type LayoutIntent,
+} from './widgets/resolve-auto-layout';
+export { applyWidgetFace } from './widgets/apply-widget-face';
+export { DetachWidgetCommand } from './commands/widget-detach-command';
+export {
   CanvasImageLayer,
   canvasImageSchema,
   type CanvasImageModel,

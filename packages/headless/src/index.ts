@@ -189,26 +189,37 @@ export { VersionHistoryProviderId } from './version-history/version-history-serv
 export { getNestedValue, setNestedValue } from './utils/nested-value';
 export { isTypingTarget } from './utils/is-typing-target';
 
-export { mapPluginTreeToPropertyPane } from './plugin-protocol/map-plugin-tree-to-property-pane';
+export { mapPluginTreeToPropertyPane } from './panel-tree/map-plugin-tree-to-property-pane';
 export {
   mapPluginTreeToMenu,
   contributePluginTreeToMenu,
-} from './plugin-protocol/map-plugin-tree-to-menu';
+} from './panel-tree/map-plugin-tree-to-menu';
 export {
   mapPluginTreeToToolbar,
   contributePluginTreeToToolbar,
-} from './plugin-protocol/map-plugin-tree-to-toolbar';
+} from './panel-tree/map-plugin-tree-to-toolbar';
 export {
   mapPluginTreeToStatusBar,
   contributePluginTreeToStatusBar,
-} from './plugin-protocol/map-plugin-tree-to-status-bar';
+} from './panel-tree/map-plugin-tree-to-status-bar';
 export {
   mapPluginTreeToPalette,
   contributePluginTreeToPalette,
-} from './plugin-protocol/map-plugin-tree-to-palette';
+} from './panel-tree/map-plugin-tree-to-palette';
 export {
   createManifestContributions,
   type CreateManifestContributionsResult,
   type CreateManifestContributionsOptions,
-} from './plugin-protocol/create-manifest-contributions';
+} from './panel-tree/create-manifest-contributions';
+export {
+  createExtensionContributions,
+  intersectExtensionPermissions,
+  type CreateExtensionContributionsResult,
+  type CreateExtensionContributionsOptions,
+} from './panel-tree/create-extension-contributions';
+export { extensionSurfaceStore } from './panel-tree/extension-surface-store';
+export {
+  extensionBlockStore,
+  type ExtensionBlockPaletteEntry,
+} from './panel-tree/extension-block-store';
 export type { WorkbenchContributionDisposable } from './registries/workbench-registries';

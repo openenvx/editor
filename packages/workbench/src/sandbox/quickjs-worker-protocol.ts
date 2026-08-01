@@ -1,11 +1,11 @@
 import type {
   SandboxBridgeRequest,
   SandboxBridgeResponse,
-} from '@xmazu/openenvxee-plugin-protocol';
+} from '@xmazu/openenvxee-protocol';
 
 export type WorkerToHost =
   | { type: 'ready' }
-  | { type: 'evalDone'; requestId: string }
+  | { type: 'evalDone'; requestId: string; result?: unknown }
   | { type: 'evalError'; requestId: string; error: string }
   | {
       type: 'hostCall';

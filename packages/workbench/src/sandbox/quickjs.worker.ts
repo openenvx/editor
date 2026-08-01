@@ -3,7 +3,7 @@
 import type {
   SandboxBridgeRequest,
   SandboxBridgeResponse,
-} from '@xmazu/openenvxee-plugin-protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import {
   createQuickJsEngine,
@@ -88,8 +88,8 @@ self.onmessage = (event: MessageEvent<HostToWorker>) => {
     enqueueIsolateWork(async () => {
       try {
         const qjs = await ensureEngine();
-        await qjs.evalModule(message.source);
-        post({ type: 'evalDone', requestId: message.requestId });
+        const result = await qjs.evalModule(message.source);
+        post({ type: 'evalDone', requestId: message.requestId, result });
       } catch (error) {
         const text = error instanceof Error ? error.message : String(error);
         post({

@@ -1,7 +1,7 @@
 import type {
   HostToParentMessage,
   ParentToHostMessage,
-} from '@xmazu/openenvxee-plugin-protocol';
+} from '@xmazu/openenvxee-protocol';
 
 /** Pluggable message pipe between the Studio panel host and the tree emitter. */
 export interface PluginPanelTransport {

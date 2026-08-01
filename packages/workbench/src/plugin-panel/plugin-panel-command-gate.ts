@@ -1,4 +1,4 @@
-import type { PluginPanelDeclaration } from '@xmazu/openenvxee-plugin-protocol';
+import type { PluginPanelDeclaration } from '@xmazu/openenvxee-protocol';
 
 export function canRunPluginPanelCommand(
   declaration: Pick<PluginPanelDeclaration, 'allowedCommands'>,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { SandboxHostSurface } from '@openenvx/headless';
-import type { SandboxExtensionGrant } from '@xmazu/openenvxee-plugin-protocol';
+import type { SandboxExtensionGrant } from '@xmazu/openenvxee-protocol';
 
 import { sha256Hex } from './fetch-artifact';
 import {
@@ -27,10 +27,12 @@ function mockHost(): SandboxHostSurface {
         assets: {},
       }) as ReturnType<SandboxHostSurface['getScene']>,
     apply: () => {},
+    selectLayers: () => {},
     onDidChangeScene: () => () => {},
     onDidChangeSelection: () => () => {},
     executeCommand: async () => ({ executed: true }),
     registerCommand: () => ({ dispose: () => {} }),
+    registerWorkbenchContributions: () => ({ dispose: () => {} }),
   };
 }
 

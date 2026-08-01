@@ -57,11 +57,9 @@
         "!src/**/*.test.ts"
       ]
     },
-    "packages/plugin-protocol": {
+    "packages/protocol": {
       "entry": [
-        "src/index.ts!",
-        "src/jsx-runtime.ts!",
-        "src/jsx-dev-runtime.ts!"
+        "src/index.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
@@ -193,6 +191,9 @@
       ],
       "project": [
         "src/**/*.{ts,tsx}"
+      ],
+      "ignoreDependencies": [
+        "openenvx-widget"
       ]
     },
     "apps/html-demo": {
@@ -203,6 +204,9 @@
       ],
       "project": [
         "src/**/*.{ts,tsx}"
+      ],
+      "ignoreDependencies": [
+        "openenvx-widget"
       ]
     }
   }

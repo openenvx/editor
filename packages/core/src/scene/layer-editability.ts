@@ -55,7 +55,9 @@ export function canSelectLayer(layer: Layer): boolean {
     return true;
   }
   if (!isLayerShownInLayers(layer)) {
-    return false;
+    // Bound widget face parts stay out of the Layers tree but must remain
+    // selectable so inline content editing (`writeMode: 'content'`) works.
+    return getLayerWriteMode(layer) === 'content';
   }
   return getLayerWriteMode(layer) !== 'locked';
 }

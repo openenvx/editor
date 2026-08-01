@@ -428,6 +428,14 @@ describe('template policy enforcement', () => {
     ).toBe(false);
   });
 
+  it('allows select for content-mode face parts hidden from Layers', () => {
+    expect(
+      canSelectLayer(
+        createLayer({ showInLayers: false, writeMode: 'content' })
+      )
+    ).toBe(true);
+  });
+
   it('allows select when showInLayers is false and not enforced', () => {
     setTemplatePolicyEnforced(false);
     expect(

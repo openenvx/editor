@@ -17,6 +17,7 @@ Puck-style block editor for pages with `page.layout === 'html'`. Same core/headl
 - Commands: `html.insertBlock`, `html.moveBlock`, `html.updateBlockData`, `html.removeBlock`
 - `HtmlBlocksPlugin` — `LayerDefinition`s, commands, editor pane, primary activity-sidebar **Blocks** panel (`html.blocks`)
 - Built-in composites: `html.hero` (slots: headline / body / actions), `html.button`
+- Sandbox extension `contributes.blocks` (via `extensionBlockStore`) appear in the same Blocks palette; insert drops an `openenvx.widget` under `html.root` and the isolate maps the face into `data.children`
 
 ## Slots vs children
 

@@ -105,6 +105,8 @@ export class ExternalHostMount {
       getScene: (): Scene => deps.getSceneStore().getScene(),
       apply: (transaction: SceneTransaction) =>
         deps.getSceneStore().apply(transaction),
+      selectLayers: (layerIds, primaryLayerId) =>
+        deps.getSceneStore().selectLayers(layerIds, primaryLayerId ?? null),
       onDidChangeScene: (listener) =>
         deps.getSceneStore().onDidChangeScene(() => listener()).dispose,
       onDidChangeSelection: (listener) =>
@@ -122,6 +124,13 @@ export class ExternalHostMount {
             deps.onCommandsChanged();
           },
         };
+        trackDisposable(disposable);
+        return disposable;
+      },
+      registerWorkbenchContributions: (...contributions) => {
+        const disposable = deps.registerWorkbenchContributions(
+          ...contributions
+        );
         trackDisposable(disposable);
         return disposable;
       },

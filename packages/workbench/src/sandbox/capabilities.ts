@@ -3,11 +3,12 @@ import {
   type SandboxCapability,
   type SandboxExtensionGrant,
   type SandboxHostMethod,
-} from '@xmazu/openenvxee-plugin-protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import {
   assertArtifactUrl,
   MAX_SHOW_UI_HTML_CHARS,
+  MAX_SOURCE_CHARS,
   MAX_UI_MESSAGE_JSON_CHARS,
 } from './sandbox-caps';
 
@@ -22,17 +23,17 @@ const METHOD_CAPABILITY: Partial<Record<SandboxHostMethod, SandboxCapability>> =
     postToUI: 'ui:show',
     getClientStorage: 'storage:client',
     setClientStorage: 'storage:client',
-    getSyncedState: 'widget:syncedState',
-    setSyncedState: 'widget:syncedState',
-    resizeWidget: 'widget:syncedState',
+    getSyncedState: 'widget:values',
+    setSyncedState: 'widget:values',
+    resizeWidget: 'widget:values',
   };
 
 /**
  * Figma-shaped kind gates (docs):
  * - showUI iframe is available to plugins AND widgets (optional for widgets;
  *   primary widget UI is the on-canvas object).
- * - clientStorage is plugin-oriented; widgets use syncedState on the node.
- * - syncedState / resizeWidget require a widget layer.
+ * - clientStorage is plugin-oriented; widgets use `data.values` on the node.
+ * - getSyncedState / setSyncedState / resizeWidget require a widget layer.
  */
 const PLUGIN_ONLY_METHODS = new Set<SandboxHostMethod>([
   'getClientStorage',
@@ -67,10 +68,24 @@ export function freezeGrant(
   if (grant.kind !== 'plugin' && grant.kind !== 'widget') {
     throw new Error(`Unknown sandbox grant kind: ${String(grant.kind)}`);
   }
-  assertArtifactUrl(grant.artifactUrl);
-  const contentHash = grant.contentHash.trim().toLowerCase();
-  if (!/^[a-f0-9]{64}$/.test(contentHash)) {
-    throw new Error('Invalid contentHash');
+  const hasSource =
+    typeof grant.source === 'string' && grant.source.trim().length > 0;
+  const hasArtifact =
+    typeof grant.artifactUrl === 'string' &&
+    grant.artifactUrl.trim().length > 0;
+
+  if (!hasSource && !hasArtifact) {
+    throw new Error('Sandbox grant requires source or artifactUrl');
+  }
+  if (hasSource && grant.source!.length > MAX_SOURCE_CHARS) {
+    throw new Error('Sandbox source too large');
+  }
+  if (hasArtifact) {
+    assertArtifactUrl(grant.artifactUrl!);
+    const contentHash = (grant.contentHash ?? '').trim().toLowerCase();
+    if (!/^[a-f0-9]{64}$/.test(contentHash)) {
+      throw new Error('Invalid contentHash');
+    }
   }
   if (
     grant.uiHtml !== undefined &&
@@ -78,14 +93,26 @@ export function freezeGrant(
   ) {
     throw new Error('showUI HTML too large');
   }
+
+  // Pushed widgets get render (+ values) by default when none declared.
+  let capabilities = normalizeCapabilities(grant.capabilities);
+  if (grant.kind === 'widget' && hasSource && capabilities.length === 0) {
+    capabilities = ['widget:render', 'widget:values'];
+  }
+
   const frozen: SandboxExtensionGrant = {
     id: grant.id,
     kind: grant.kind,
-    artifactUrl: grant.artifactUrl,
-    contentHash,
-    capabilities: normalizeCapabilities(grant.capabilities),
+    capabilities,
     allowedCommands: [...grant.allowedCommands],
   };
+  if (hasSource) {
+    frozen.source = grant.source;
+  }
+  if (hasArtifact) {
+    frozen.artifactUrl = grant.artifactUrl;
+    frozen.contentHash = (grant.contentHash ?? '').trim().toLowerCase();
+  }
   if (grant.title !== undefined) {
     frozen.title = grant.title;
   }

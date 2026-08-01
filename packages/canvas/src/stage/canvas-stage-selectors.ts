@@ -76,11 +76,18 @@ function selectLayerDraggable(
   layerId: string,
   isEditing: boolean,
   writable: boolean,
-  layerVisible: boolean
+  layerVisible: boolean,
+  isSelected: boolean
 ): boolean {
   const transformSessionLayerId = selectTransformSessionLayerId(snapshot);
   const isImperativeTransformTarget = transformSessionLayerId === layerId;
-  return layerVisible && !isEditing && writable && !isImperativeTransformTarget;
+  return (
+    layerVisible &&
+    !isEditing &&
+    writable &&
+    isSelected &&
+    !isImperativeTransformTarget
+  );
 }
 
 export function selectLayerSlice(
@@ -90,7 +97,8 @@ export function selectLayerSlice(
   interaction: CanvasLayerInteractionRegistration | undefined,
   editingLayerId: string | null,
   writable: boolean,
-  layerVisible: boolean
+  layerVisible: boolean,
+  isSelected = true
 ): CanvasLayerRenderSlice {
   const isEditing = editingLayerId === layerId;
   return {
@@ -99,7 +107,8 @@ export function selectLayerSlice(
       layerId,
       isEditing,
       writable,
-      layerVisible
+      layerVisible,
+      isSelected
     ),
     hideContent: selectLayerHideContent(
       snapshot,

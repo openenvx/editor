@@ -1,7 +1,7 @@
 import {
   PLUGIN_PARENT_SOURCE,
   type ParentToHostMessage,
-} from '@xmazu/openenvxee-plugin-protocol';
+} from '@xmazu/openenvxee-protocol';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createPostMessagePluginPanelTransport } from './create-post-message-plugin-panel-transport';
@@ -18,9 +18,9 @@ describe('createPostMessagePluginPanelTransport', () => {
     const message: ParentToHostMessage = {
       source: PLUGIN_PARENT_SOURCE,
       v: 1,
-      type: 'panel:tree',
+      type: 'render',
       payload: {
-        panelId: 'p1',
+        surfaceId: 'p1',
         root: { type: 'Text', props: {}, children: ['hi'] },
       },
     };

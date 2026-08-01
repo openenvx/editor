@@ -7,7 +7,7 @@ import {
   ViewContainerContribution,
   ViewContribution,
 } from '@openenvx/headless';
-import type { PluginPanelDeclaration } from '@xmazu/openenvxee-plugin-protocol';
+import type { PluginPanelDeclaration } from '@xmazu/openenvxee-protocol';
 import type { ComponentType, ReactNode } from 'react';
 
 import { PluginPanel } from './plugin-panel';

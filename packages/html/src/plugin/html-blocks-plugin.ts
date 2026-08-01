@@ -7,6 +7,7 @@ import {
   defaultBlockRegistry,
 } from '../block-registry';
 import { builtinBlocks } from '../blocks/builtin-blocks';
+import { openenvxWidgetBlock } from '../blocks/openenvx-widget-block';
 import {
   DuplicateHtmlBlockCommand,
   InsertHtmlBlockCommand,
@@ -33,6 +34,7 @@ export class HtmlBlocksPlugin extends WorkbenchPlugin {
     for (const block of builtinBlocks) {
       defaultBlockRegistry.register(block);
     }
+    defaultBlockRegistry.register(openenvxWidgetBlock);
 
     ctx.register(
       new SimpleServiceContribution(

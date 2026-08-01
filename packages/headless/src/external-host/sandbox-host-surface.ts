@@ -5,6 +5,9 @@ import type {
   Selection,
 } from '@openenvx/core';
 
+import type { WorkbenchContributionDisposable } from '../registries/workbench-registries';
+import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
+
 /**
  * Host surface for sandbox extensions (first-party adapter only).
  * Omits InstantiationService / PluginContext; still grants scene + commands.
@@ -14,6 +17,7 @@ export interface SandboxHostSurface {
   getSelection(): Selection;
   getScene(): Scene;
   apply(transaction: SceneTransaction): void;
+  selectLayers(layerIds: string[], primaryLayerId?: string | null): void;
   onDidChangeScene(listener: () => void): () => void;
   onDidChangeSelection(listener: () => void): () => void;
   executeCommand(
@@ -21,4 +25,7 @@ export interface SandboxHostSurface {
     args?: unknown
   ): Promise<{ executed: boolean }>;
   registerCommand(command: Command): { dispose(): void };
+  registerWorkbenchContributions(
+    ...contributions: WorkbenchContribution[]
+  ): WorkbenchContributionDisposable;
 }

@@ -5,14 +5,98 @@ import {
   walkLayers,
 } from '@openenvx/core';
 import type { SandboxHostSurface, WorkbenchApi } from '@openenvx/headless';
-import type { SandboxExtensionGrant } from '@xmazu/openenvxee-plugin-protocol';
+import {
+  createExtensionContributions,
+  extensionSurfaceStore,
+} from '@openenvx/headless';
+import type {
+  ExtensionManifest,
+  RenderNode,
+  SandboxExtensionGrant,
+} from '@xmazu/openenvxee-protocol';
+import type { Layer, Scene } from '@xmazu/openenvxee-schema';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
+import { registerWidgetInsertCommands } from './register-widget-insert-commands';
 import { SandboxExtensionController } from './sandbox-extension-controller';
 import { SandboxUiPanel } from './sandbox-ui-panel';
+import { createWidgetSceneAdapters } from './widget-scene-adapters';
 
 const DEFAULT_WIDGET_LAYER_TYPE = 'openenvx.widget';
+
+/** Host-injected face applicator (studio / html-studio). */
+export type ApplyWidgetFaceFn = (
+  widgetLayer: Layer,
+  tree: RenderNode,
+  kind?: 'canvas' | 'html'
+) => Layer;
+
+function findWidgetClickInLayers(
+  layers: Scene['pages'][number]['layers'],
+  targetLayerId: string,
+  widgetLayerType: string
+): {
+  widgetId: string;
+  extensionId: string;
+  handlerId: string;
+} | null {
+  let result: {
+    widgetId: string;
+    extensionId: string;
+    handlerId: string;
+  } | null = null;
+
+  walkLayers(layers, (layer, path) => {
+    if (result || layer.id !== targetLayerId) {
+      return;
+    }
+    const ancestors = [...path, layer];
+    for (let i = ancestors.length - 1; i >= 0; i -= 1) {
+      const candidate = ancestors[i];
+      if (candidate?.type !== widgetLayerType) {
+        continue;
+      }
+      const data = candidate.data as {
+        extensionId?: string;
+        handlers?: Record<string, Record<string, string>>;
+      };
+      const extensionId = data.extensionId ?? null;
+      const handlerId =
+        data.handlers?.[targetLayerId]?.click ??
+        data.handlers?.[candidate.id]?.click ??
+        null;
+      if (extensionId && handlerId) {
+        result = { widgetId: candidate.id, extensionId, handlerId };
+      }
+      break;
+    }
+  });
+
+  return result;
+}
+
+function resolveWidgetClickTarget(
+  scene: Scene,
+  targetLayerId: string,
+  widgetLayerType: string
+): {
+  widgetId: string;
+  extensionId: string;
+  handlerId: string;
+} | null {
+  for (const page of scene.pages) {
+    const found = findWidgetClickInLayers(
+      page.layers,
+      targetLayerId,
+      widgetLayerType
+    );
+    if (found) {
+      return found;
+    }
+  }
+  return null;
+}
 
 export interface SandboxExtensionHostOptions {
   grants: SandboxExtensionGrant[];
@@ -37,6 +121,13 @@ export interface SandboxExtensionHostOptions {
    * Studio injects canvas `setOpenEnvxWidgetClickHandler` so workbench stays canvas-free.
    */
   bindWidgetClick?: (handler: (layerId: string) => void) => () => void;
+  /**
+   * Apply a rendered element tree onto a widget layer (children, handlers, size).
+   * Studio injects canvas / html applicators so workbench stays engine-free.
+   */
+  applyWidgetFace?: ApplyWidgetFaceFn;
+  /** Static extension manifests activated on mount (chrome, views, commands). */
+  manifests?: ExtensionManifest[];
 }
 
 /**
@@ -55,12 +146,16 @@ export class SandboxExtensionHost {
   private readonly bindWidgetClick?: (
     handler: (layerId: string) => void
   ) => () => void;
+  private readonly applyWidgetFace?: ApplyWidgetFaceFn;
+  private readonly manifests: ExtensionManifest[];
   private mounted = false;
   private controller: SandboxExtensionController | null = null;
   private readonly surfaceDisposables: { dispose(): void }[] = [];
   private widgetWatchDispose: (() => void) | null = null;
   private selectionWatchDispose: (() => void) | null = null;
   private widgetClickDispose: (() => void) | null = null;
+  private readonly lastWidgetValues = new Map<string, string>();
+  private readonly faceEpoch = new Map<string, number>();
   private uiHost: HTMLDivElement | null = null;
   private uiRoot: Root | null = null;
 
@@ -72,6 +167,25 @@ export class SandboxExtensionHost {
     this.preferInProcess = options.preferInProcess;
     this.widgetLayerType = options.widgetLayerType ?? DEFAULT_WIDGET_LAYER_TYPE;
     this.bindWidgetClick = options.bindWidgetClick;
+    this.applyWidgetFace = options.applyWidgetFace;
+    this.manifests = options.manifests ?? [];
+  }
+
+  /** Apply a `render` body to a manifest-declared view / panel surface. */
+  applySurfaceRender(surfaceId: string, root: RenderNode | null): void {
+    extensionSurfaceStore.set(surfaceId, root);
+  }
+
+  /** Push widget source from the parent page (integrator bundle). */
+  async pushWidgetSource(extensionId: string, source: string): Promise<void> {
+    if (!this.controller) {
+      throw new Error('SandboxExtensionHost is not mounted');
+    }
+    await this.controller.pushWidgetSource(extensionId, source);
+  }
+
+  getController(): SandboxExtensionController | null {
+    return this.controller;
   }
 
   /** Attach to a narrow host surface. Call once per mount. */
@@ -81,82 +195,84 @@ export class SandboxExtensionHost {
     }
     this.mounted = true;
 
-    if (this.grants.length === 0) {
-      return;
-    }
-
     const widgetLayerType = this.widgetLayerType;
+    const applyFace = this.applyWidgetFace;
+    const lastValues = this.lastWidgetValues;
+    const faceEpoch = this.faceEpoch;
+    const sceneAdapters = createWidgetSceneAdapters({
+      host,
+      widgetLayerType,
+    });
     const controller = new SandboxExtensionController({
       grants: this.grants,
       permission: this.permission,
       host,
       workerUrl: this.workerUrl,
       preferInProcess: this.preferInProcess,
-      getWidgetSyncedState: (layerId) => {
-        const layer = findLayerById(host.getScene(), layerId);
-        if (!layer || layer.type !== widgetLayerType) {
-          return null;
-        }
-        const data = layer.data as { syncedState?: unknown };
-        return data.syncedState ?? null;
-      },
-      setWidgetSyncedState: (layerId, value) => {
-        const layer = findLayerById(host.getScene(), layerId);
-        if (!layer || layer.type !== widgetLayerType) {
-          return;
-        }
-        host.apply({
-          label: 'Update widget synced state',
-          apply: (scene) => ({
-            ...scene,
-            pages: scene.pages.map((page) => ({
-              ...page,
-              layers: updateLayerInTree(page.layers, layerId, (current) => ({
-                ...current,
-                data: {
-                  ...(current.data as Record<string, unknown>),
-                  syncedState: value,
-                },
-              })),
-            })),
-          }),
-        });
-      },
-      resizeWidgetLayer: (layerId, width, height) => {
-        const layer = findLayerById(host.getScene(), layerId);
-        if (!layer) {
-          return;
-        }
-        host.apply({
-          label: 'Resize widget',
-          apply: (scene) => ({
-            ...scene,
-            pages: scene.pages.map((page) => ({
-              ...page,
-              layers: updateLayerInTree(page.layers, layerId, (current) => {
-                const prev = current.transform ?? {
-                  x: 0,
-                  y: 0,
-                  width: 0,
-                  height: 0,
-                  rotation: 0,
-                  opacity: 1,
-                };
-                return {
-                  ...current,
-                  transform: {
-                    ...prev,
-                    width,
-                    height,
-                  },
-                };
-              }),
-            })),
-          }),
-        });
-      },
+      ...sceneAdapters,
     });
     this.controller = controller;
+
+    const refreshFace = async (layerId: string): Promise<void> => {
+      if (!applyFace) {
+        return;
+      }
+      const epoch = (faceEpoch.get(layerId) ?? 0) + 1;
+      faceEpoch.set(layerId, epoch);
+      const layer = findLayerById(host.getScene(), layerId);
+      if (!layer || layer.type !== widgetLayerType) {
+        return;
+      }
+      const data = layer.data as {
+        extensionId?: string;
+        values?: Record<string, unknown>;
+        manifest?: { id?: string; kinds?: ('canvas' | 'html')[] };
+      };
+      if (!data.extensionId) {
+        return;
+      }
+      const tree = await controller.renderWidgetFace(
+        data.extensionId,
+        layerId,
+        data.values ?? {},
+        data.manifest?.id
+      );
+      if (faceEpoch.get(layerId) !== epoch) {
+        return;
+      }
+      if (!tree || typeof tree !== 'object' || !('type' in tree)) {
+        return;
+      }
+      const kind = data.manifest?.kinds?.[0] === 'html' ? 'html' : 'canvas';
+      const next = applyFace(layer, tree as RenderNode, kind);
+      if (faceEpoch.get(layerId) !== epoch) {
+        return;
+      }
+      host.apply({
+        label: 'Render widget face',
+        apply: (scene) => ({
+          ...scene,
+          pages: scene.pages.map((page) => ({
+            ...page,
+            layers: updateLayerInTree(page.layers, layerId, (current) => ({
+              ...current,
+              ...(next.transform ? { transform: next.transform } : {}),
+              data: {
+                ...(current.data as Record<string, unknown>),
+                ...(next.data as Record<string, unknown>),
+              },
+            })),
+          })),
+        }),
+      });
+      const applied = findLayerById(host.getScene(), layerId);
+      if (applied) {
+        lastValues.set(
+          layerId,
+          JSON.stringify((applied.data as { values?: unknown }).values ?? {})
+        );
+      }
+    };
 
     const uiHost = document.createElement('div');
     uiHost.dataset.openenvxSandboxUi = '1';
@@ -184,6 +300,35 @@ export class SandboxExtensionHost {
       );
     }
 
+    for (const manifestInput of this.manifests) {
+      const grant = this.grants.find((entry) => entry.id === manifestInput.id);
+      if (!grant) {
+        console.error(
+          '[sandbox] no grant for extension manifest',
+          manifestInput.id
+        );
+        continue;
+      }
+      const result = createExtensionContributions(manifestInput, {
+        grant: {
+          capabilities: grant.capabilities,
+          allowedCommands: grant.allowedCommands,
+        },
+      });
+      if (!result.ok) {
+        console.error('[sandbox] invalid extension manifest', result.reason);
+        continue;
+      }
+      if (result.contributions.length > 0) {
+        this.surfaceDisposables.push(
+          host.registerWorkbenchContributions(...result.contributions)
+        );
+      }
+      this.surfaceDisposables.push(
+        ...registerWidgetInsertCommands(host, result.manifest, widgetLayerType)
+      );
+    }
+
     if (this.autoStartPlugins) {
       void (async () => {
         for (const grant of this.grants) {
@@ -204,9 +349,6 @@ export class SandboxExtensionHost {
 
     const syncWidgets = () => {
       const scene = host.getScene();
-      const widgetGrants = new Map(
-        this.grants.filter((g) => g.kind === 'widget').map((g) => [g.id, g])
-      );
       const desired: { extensionId: string; layerId: string }[] = [];
       for (const page of scene.pages) {
         walkLayers(page.layers, (layer) => {
@@ -214,16 +356,34 @@ export class SandboxExtensionHost {
             return;
           }
           const data = layer.data as { extensionId?: string };
-          const grant = data.extensionId
-            ? widgetGrants.get(data.extensionId)
-            : undefined;
-          if (!grant) {
+          if (!data.extensionId) {
+            return;
+          }
+          const grant =
+            controller.getGrant(data.extensionId) ??
+            this.grants.find((entry) => entry.id === data.extensionId);
+          if (!grant || grant.kind !== 'widget') {
             return;
           }
           desired.push({ extensionId: grant.id, layerId: layer.id });
-          void controller.start(grant, layer.id).catch((error) => {
-            console.error('[sandbox] failed to start widget', grant.id, error);
-          });
+          const valuesKey = JSON.stringify(
+            (layer.data as { values?: unknown }).values ?? {}
+          );
+          const shouldRefresh = lastValues.get(layer.id) !== valuesKey;
+          void controller
+            .start(grant, layer.id)
+            .then(() => {
+              if (shouldRefresh) {
+                return refreshFace(layer.id);
+              }
+            })
+            .catch((error) => {
+              console.error(
+                '[sandbox] failed to start widget',
+                grant.id,
+                error
+              );
+            });
         });
       }
       controller.reconcileWidgetIsolates(desired);
@@ -237,8 +397,23 @@ export class SandboxExtensionHost {
       controller.notifyUiContextChanged();
     });
     if (this.bindWidgetClick) {
-      this.widgetClickDispose = this.bindWidgetClick((layerId) => {
-        controller.dispatchWidgetClick(layerId);
+      this.widgetClickDispose = this.bindWidgetClick((targetLayerId) => {
+        const resolved = resolveWidgetClickTarget(
+          host.getScene(),
+          targetLayerId,
+          widgetLayerType
+        );
+        if (!resolved) {
+          return;
+        }
+        controller.invokeWidgetHandler(
+          resolved.extensionId,
+          resolved.widgetId,
+          resolved.handlerId,
+          {
+            targetLayerId,
+          }
+        );
       });
     }
   }

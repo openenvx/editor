@@ -242,6 +242,41 @@ function build(o: typeof z.object) {
         }),
         type: z.literal('canvas.instance'),
       }),
+      o({
+        ...layerBase,
+        data: o({
+          extensionId: z
+            .string()
+            .min(1)
+            .describe('Sandbox extension id (kind: widget).'),
+          values: z
+            .record(z.string(), z.unknown())
+            .default({})
+            .describe('Widget synced values / property bag.'),
+          manifest: o({
+            id: z.string().min(1),
+            label: z.string().min(1),
+            icon: z.string().optional(),
+            kinds: z.array(z.enum(['canvas', 'html'])).min(1),
+            fields: z.record(z.string(), z.unknown()),
+            defaults: z.record(z.string(), z.unknown()).optional(),
+          })
+            .optional()
+            .describe('Persisted manifest for Inspector without the source.'),
+          children: z
+            .array(layer)
+            .default([])
+            .describe('Last rendered face (hidden/locked child layers).'),
+          handlers: z
+            .record(z.string(), z.record(z.string(), z.string()))
+            .optional()
+            .describe(
+              'Face event map: child layer id → event name → handler id.'
+            ),
+          label: z.string().optional(),
+        }),
+        type: z.literal('openenvx.widget'),
+      }),
       // Plugin escape hatch — must be last; builtin type strings are excluded
       // so invalid builtin payloads cannot fall through to this branch.
       o({

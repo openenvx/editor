@@ -6,7 +6,7 @@ import {
   freezeGrant,
   normalizeCapabilities,
 } from './capabilities';
-import type { SandboxExtensionGrant } from '@xmazu/openenvxee-plugin-protocol';
+import type { SandboxExtensionGrant } from '@xmazu/openenvxee-protocol';
 
 const grant: SandboxExtensionGrant = {
   id: 'demo',
@@ -48,6 +48,33 @@ describe('sandbox capabilities', () => {
     ).toThrow(/protocol not allowed/);
   });
 
+  it('accepts pushed source without artifactUrl', () => {
+    const frozen = freezeGrant({
+      id: 'wm.guest-tables',
+      kind: 'widget',
+      source: 'globalThis.__openenvxWidgetRegistry = {};',
+      capabilities: [],
+      allowedCommands: [],
+    });
+    expect(frozen.source).toBeTruthy();
+    expect(frozen.capabilities).toEqual([
+      'widget:render',
+      'widget:values',
+    ]);
+    expect(frozen.artifactUrl).toBeUndefined();
+  });
+
+  it('rejects grants with neither source nor artifact', () => {
+    expect(() =>
+      freezeGrant({
+        id: 'empty',
+        kind: 'widget',
+        capabilities: [],
+        allowedCommands: [],
+      })
+    ).toThrow(/source or artifactUrl/);
+  });
+
   it('denies methods without capability', () => {
     expect(() =>
       assertMethodAllowed({
@@ -86,7 +113,7 @@ describe('sandbox capabilities', () => {
         grant: {
           ...grant,
           kind: 'widget',
-          capabilities: ['widget:syncedState'],
+          capabilities: ['widget:values'],
           allowedCommands: [],
         },
         method: 'resizeWidget',
@@ -122,7 +149,7 @@ describe('sandbox capabilities', () => {
         grant: {
           ...grant,
           kind: 'widget',
-          capabilities: ['ui:show', 'widget:syncedState'],
+          capabilities: ['ui:show', 'widget:values'],
           allowedCommands: [],
         },
         method: 'showUI',
@@ -154,7 +181,7 @@ describe('sandbox capabilities', () => {
         grant: {
           ...grant,
           kind: 'widget',
-          capabilities: ['storage:client', 'widget:syncedState'],
+          capabilities: ['storage:client', 'widget:values'],
           allowedCommands: [],
         },
         method: 'getClientStorage',
@@ -169,7 +196,7 @@ describe('sandbox capabilities', () => {
         grant: {
           ...grant,
           kind: 'widget',
-          capabilities: ['widget:syncedState'],
+          capabilities: ['widget:values'],
           allowedCommands: [],
         },
         method: 'setSyncedState',

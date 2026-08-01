@@ -50,9 +50,11 @@
         "@openenvx/canvas": "workspace:*",
         "@openenvx/core": "workspace:*",
         "@openenvx/headless": "workspace:*",
+        "@xmazu/openenvxee-elements": "workspace:*",
         "@xmazu/openenvxee-preview": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
         "@xmazu/openenvxee-studio": "workspace:*",
+        "preact": "^10.26.5",
         "react": "19.2.7",
         "react-dom": "19.2.7",
       },
@@ -60,6 +62,7 @@
         "@types/react": "^19.2.3",
         "@types/react-dom": "^19.2.3",
         "@vitejs/plugin-react": "6.0.3",
+        "esbuild": "^0.25.0",
         "typescript": "catalog:dev",
         "vite": "8.1.3",
         "vitest": "4.1.10",
@@ -95,8 +98,9 @@
       "name": "@openenvxee/html-demo",
       "version": "0.0.0",
       "dependencies": {
-        "@openenvx/html": "workspace:*",
+        "@xmazu/openenvxee-elements": "workspace:*",
         "@xmazu/openenvxee-html-studio": "workspace:*",
+        "preact": "^10.26.5",
         "react": "19.2.7",
         "react-dom": "19.2.7",
       },
@@ -104,6 +108,7 @@
         "@types/react": "^19.2.3",
         "@types/react-dom": "^19.2.3",
         "@vitejs/plugin-react": "6.0.3",
+        "esbuild": "^0.25.0",
         "typescript": "catalog:dev",
         "vite": "8.1.3",
         "vitest": "4.1.10",
@@ -146,6 +151,7 @@
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
         "@xmazu/openenvxee-preview": "workspace:*",
+        "@xmazu/openenvxee-protocol": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
         "konva": "^10.3.0",
         "lucide-react": "1.24.0",
@@ -208,13 +214,40 @@
         "vitest": "catalog:testing",
       },
     },
+    "packages/elements": {
+      "name": "@xmazu/openenvxee-elements",
+      "version": "0.1.0",
+      "bin": {
+        "openenvx-manifest": "./src/cli/openenvx-manifest.ts",
+      },
+      "dependencies": {
+        "@xmazu/openenvxee-protocol": "workspace:*",
+        "preact": "^10.26.5",
+      },
+      "devDependencies": {
+        "@openenvx/typescript-config": "workspace:*",
+        "esbuild": "^0.25.0",
+        "tsup": "catalog:dev",
+        "typescript": "catalog:dev",
+        "vite": "8.1.3",
+        "vitest": "catalog:testing",
+      },
+      "peerDependencies": {
+        "esbuild": "^0.25.0",
+        "vite": ">=5",
+      },
+      "optionalPeers": [
+        "esbuild",
+        "vite",
+      ],
+    },
     "packages/headless": {
       "name": "@openenvx/headless",
       "version": "0.1.11",
       "dependencies": {
         "@openenvx/core": "workspace:*",
-        "@xmazu/openenvxee-plugin-protocol": "workspace:*",
         "@xmazu/openenvxee-preview": "workspace:*",
+        "@xmazu/openenvxee-protocol": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
       },
       "devDependencies": {
@@ -244,6 +277,7 @@
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
         "@xmazu/openenvxee-preview": "workspace:*",
+        "@xmazu/openenvxee-protocol": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
         "lucide-react": "1.24.0",
       },
@@ -288,16 +322,6 @@
         "react-dom": ">=18",
       },
     },
-    "packages/plugin-protocol": {
-      "name": "@xmazu/openenvxee-plugin-protocol",
-      "version": "0.5.4",
-      "devDependencies": {
-        "@openenvx/typescript-config": "workspace:*",
-        "tsup": "catalog:dev",
-        "typescript": "catalog:dev",
-        "vitest": "catalog:testing",
-      },
-    },
     "packages/preview": {
       "name": "@xmazu/openenvxee-preview",
       "version": "0.5.4",
@@ -305,6 +329,16 @@
         "@xmazu/openenvxee-schema": "workspace:*",
         "uqr": "^0.1.3",
       },
+      "devDependencies": {
+        "@openenvx/typescript-config": "workspace:*",
+        "tsup": "catalog:dev",
+        "typescript": "catalog:dev",
+        "vitest": "catalog:testing",
+      },
+    },
+    "packages/protocol": {
+      "name": "@xmazu/openenvxee-protocol",
+      "version": "0.6.0",
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
         "tsup": "catalog:dev",
@@ -402,7 +436,7 @@
         "@radix-ui/react-tabs": "1.1.17",
         "@radix-ui/react-tooltip": "1.2.12",
         "@tanstack/react-virtual": "^3.13.12",
-        "@xmazu/openenvxee-plugin-protocol": "workspace:*",
+        "@xmazu/openenvxee-protocol": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
         "clsx": "2.1.1",
         "cmdk": "1.1.1",
@@ -1430,11 +1464,13 @@
 
     "@xmazu/openenvxee-canvas-pro": ["@xmazu/openenvxee-canvas-pro@workspace:packages/canvas-pro"],
 
+    "@xmazu/openenvxee-elements": ["@xmazu/openenvxee-elements@workspace:packages/elements"],
+
     "@xmazu/openenvxee-html-studio": ["@xmazu/openenvxee-html-studio@workspace:packages/html-studio"],
 
-    "@xmazu/openenvxee-plugin-protocol": ["@xmazu/openenvxee-plugin-protocol@workspace:packages/plugin-protocol"],
-
     "@xmazu/openenvxee-preview": ["@xmazu/openenvxee-preview@workspace:packages/preview"],
+
+    "@xmazu/openenvxee-protocol": ["@xmazu/openenvxee-protocol@workspace:packages/protocol"],
 
     "@xmazu/openenvxee-schema": ["@xmazu/openenvxee-schema@workspace:packages/schema"],
 
@@ -2363,6 +2399,8 @@
     "postcss-load-config": ["postcss-load-config@6.0.1", "", { "dependencies": { "lilconfig": "^3.1.1" }, "peerDependencies": { "jiti": ">=1.21.0", "postcss": ">=8.0.9", "tsx": "^4.8.1", "yaml": "^2.4.2" }, "optionalPeers": ["jiti", "postcss", "tsx", "yaml"] }, "sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g=="],
 
     "posthog-node": ["posthog-node@5.43.0", "", { "dependencies": { "@posthog/core": "^1.42.0" }, "peerDependencies": { "rxjs": "^7.0.0" }, "optionalPeers": ["rxjs"] }, "sha512-GqTn6gby4hugIs42Fva7a0lVD+Vk/+ySSdFsYG1B5fTKk5ZkKlz3y5oWsToAFd3Y+/ZEZUvXJDujLXHaLGGxMQ=="],
+
+    "preact": ["preact@10.29.8", "", { "peerDependencies": { "preact-render-to-string": ">=5" }, "optionalPeers": ["preact-render-to-string"] }, "sha512-ej2aVZ+vZ8WO7tvlQWRM9N63A0KzF9q4mWJfDUHgYaIofWY9hu74QdnQrjoPMmZi2/nZ5gN0bJCQF49xQqx09Q=="],
 
     "prelude-ls": ["prelude-ls@1.2.1", "", {}, "sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g=="],
 

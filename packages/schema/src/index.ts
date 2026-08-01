@@ -31,6 +31,8 @@ export {
   type LayerStyle,
   type LayerWriteMode,
   type LengthUnit,
+  type OpenEnvxWidgetData,
+  type OpenEnvxWidgetLayer,
   type Padding,
   type Page,
   type PageGuide,
@@ -47,6 +49,8 @@ export {
   type TemplatePolicy,
   type TextAutoFit,
   type Transform,
+  type WidgetFieldDef,
+  type WidgetManifestSnapshot,
 } from './types';
 
 export { LENGTH_UNITS, defaultDpiForUnit, fromPx, toPx } from './units';

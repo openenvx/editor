@@ -25,4 +25,21 @@ describe('layer-screen-bounds', () => {
       width: 400,
     });
   });
+
+  it('places nested face text using absolute artboard coords', () => {
+    const bounds = getLayerScreenBounds(
+      {
+        height: 26,
+        opacity: 1,
+        rotation: 0,
+        width: 120,
+        x: 56,
+        y: 56,
+      },
+      { panX: 0, panY: 0, zoom: 1 },
+      { x: 0, y: 0 }
+    );
+    expect(bounds.left).toBe(56);
+    expect(bounds.top).toBe(56);
+  });
 });

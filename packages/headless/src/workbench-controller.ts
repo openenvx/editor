@@ -10,9 +10,11 @@ import {
   SceneStore,
   setTemplatePolicyEnforced,
   updateLayerInTree,
+  walkLayers,
   WorkbenchEvents,
   type CommandExecutionResult,
   type EditorInput,
+  type Layer,
   type Plugin,
   type Scene,
   type ServiceId,
@@ -661,6 +663,17 @@ export class WorkbenchController {
     if (!targetLayer || !canEditLayerData(targetLayer, key)) {
       return;
     }
+
+    const bindKey =
+      typeof (targetLayer.data as { bind?: unknown } | undefined)?.bind ===
+      'string'
+        ? ((targetLayer.data as { bind: string }).bind as string)
+        : null;
+    const widgetAncestor =
+      bindKey && (key === 'html' || key === 'text' || key === 'markup')
+        ? findWidgetAncestor(currentScene, layerId)
+        : null;
+
     sceneStore.apply({
       apply: (scene) => ({
         ...scene,
@@ -682,6 +695,34 @@ export class WorkbenchController {
       }),
       label: `Update ${key}`,
     });
+
+    // Bound face part: write committed content back into the widget's values so
+    // the isolate re-renders (Figma/Unlayer bind path).
+    if (widgetAncestor && bindKey) {
+      const plain = typeof value === 'string' ? htmlToPlainText(value) : value;
+      const widgetId = widgetAncestor.id;
+      sceneStore.apply({
+        apply: (scene) => ({
+          ...scene,
+          pages: scene.pages.map((page) => ({
+            ...page,
+            layers: updateLayerInTree(page.layers, widgetId, (layer) => {
+              const data =
+                typeof layer.data === 'object' && layer.data !== null
+                  ? { ...(layer.data as Record<string, unknown>) }
+                  : {};
+              const values =
+                data.values && typeof data.values === 'object'
+                  ? { ...(data.values as Record<string, unknown>) }
+                  : {};
+              values[bindKey] = plain;
+              return { ...layer, data: { ...data, values } };
+            }),
+          })),
+        }),
+        label: `Bind ${bindKey}`,
+      });
+    }
   }
 
   selectViewItem(viewId: string, item: unknown): void {
@@ -823,4 +864,41 @@ export class WorkbenchController {
       viewPanels: scene.viewPanels,
     };
   }
+}
+
+const WIDGET_LAYER_TYPE = 'openenvx.widget';
+
+function htmlToPlainText(html: string): string {
+  return html
+    .replaceAll(/<br\s*\/?>/gi, '\n')
+    .replaceAll(/<\/p>/gi, '\n')
+    .replaceAll(/<[^>]+>/g, '')
+    .replaceAll('&nbsp;', ' ')
+    .replaceAll('&amp;', '&')
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll(/\n+$/g, '')
+    .trim();
+}
+
+function findWidgetAncestor(scene: Scene, layerId: string): Layer | null {
+  for (const page of scene.pages) {
+    let found: Layer | null = null;
+    walkLayers(page.layers, (layer, path) => {
+      if (layer.id !== layerId) {
+        return;
+      }
+      for (let i = path.length - 1; i >= 0; i -= 1) {
+        const ancestor = path[i];
+        if (ancestor?.type === WIDGET_LAYER_TYPE) {
+          found = ancestor;
+          return;
+        }
+      }
+    });
+    if (found) {
+      return found;
+    }
+  }
+  return null;
 }

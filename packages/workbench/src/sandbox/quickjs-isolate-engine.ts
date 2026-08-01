@@ -2,7 +2,7 @@ import {
   SANDBOX_BRIDGE_SOURCE,
   type SandboxBridgeRequest,
   type SandboxBridgeResponse,
-} from '@xmazu/openenvxee-plugin-protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import {
   SANDBOX_CPU_LIMIT_MS,
@@ -14,7 +14,7 @@ export type HostCallFn = (
 ) => Promise<SandboxBridgeResponse>;
 
 export interface QuickJsEngine {
-  evalModule: (source: string) => Promise<void>;
+  evalModule: (source: string) => Promise<unknown>;
   deliverUiMessage: (payload: unknown) => void;
   dispose: () => void;
 }
@@ -74,7 +74,7 @@ export async function createQuickJsEngine(input: {
     return String(dumped);
   };
 
-  const throwIfEvalFailed = (result: {
+  const assertEvalOk = (result: {
     error?: { dispose: () => void };
     value?: { dispose: () => void } | null;
   }): void => {
@@ -85,7 +85,36 @@ export async function createQuickJsEngine(input: {
       }
       throw new Error(`Sandbox eval failed: ${text}`);
     }
-    result.value?.dispose();
+    try {
+      result.value?.dispose();
+    } catch {
+      // Handle already freed.
+    }
+  };
+
+  const dumpEvalResult = (result: {
+    error?: { dispose: () => void };
+    value?: { dispose: () => void } | null;
+  }): unknown => {
+    if (result.error) {
+      const text = formatEvalError(result.error);
+      if (/interrupt/i.test(text)) {
+        throw new Error('Sandbox CPU limit exceeded');
+      }
+      throw new Error(`Sandbox eval failed: ${text}`);
+    }
+    if (!result.value) {
+      return undefined;
+    }
+    try {
+      return context.dump(result.value as never);
+    } finally {
+      try {
+        result.value.dispose();
+      } catch {
+        // Handle already freed by dump/runtime.
+      }
+    }
   };
 
   const hostHandle = context.newFunction('__openenvxHostCall', (reqHandle) => {
@@ -171,7 +200,8 @@ export async function createQuickJsEngine(input: {
         return this.call('setClientStorage', { key, value });
       },
       onClick(handler) {
-        globalThis.__openenvxOnClick = handler;
+        // Legacy no-op — per-element handlers via __openenvxWidgetHandlers.
+        void handler;
       },
       getSyncedState() { return this.call('getSyncedState'); },
       setSyncedState(value) { return this.call('setSyncedState', { value }); },
@@ -179,10 +209,15 @@ export async function createQuickJsEngine(input: {
         return this.call('resizeWidget', { width, height });
       },
     };
+    globalThis.__openenvxInvokeHandler = function (handlerId, payload) {
+      var bag = globalThis.__openenvxWidgetHandlers;
+      if (!bag || typeof bag[handlerId] !== 'function') return;
+      return bag[handlerId](payload);
+    };
   `;
   try {
     const bootResult = withCpuBudget(() => context.evalCode(bootstrap));
-    throwIfEvalFailed(bootResult);
+    assertEvalOk(bootResult);
   } catch (error) {
     context.dispose();
     runtime.dispose();
@@ -198,10 +233,11 @@ export async function createQuickJsEngine(input: {
   return {
     async evalModule(source: string) {
       const result = withCpuBudget(() => context.evalCode(source));
-      throwIfEvalFailed(result);
+      const dumped = dumpEvalResult(result);
       withCpuBudget(() => {
         context.runtime.executePendingJobs();
       });
+      return dumped;
     },
     deliverUiMessage(payload: unknown) {
       const encoded = JSON.stringify(payload ?? null);
@@ -215,7 +251,7 @@ export async function createQuickJsEngine(input: {
           })(${encoded})`
         )
       );
-      throwIfEvalFailed(result);
+      assertEvalOk(result);
       withCpuBudget(() => {
         context.runtime.executePendingJobs();
       });

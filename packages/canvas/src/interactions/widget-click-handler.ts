@@ -1,13 +1,13 @@
-type WidgetClickHandler = (layerId: string) => void;
+type WidgetPointerHandler = (targetLayerId: string) => void;
 
-let handler: WidgetClickHandler | null = null;
+let handler: WidgetPointerHandler | null = null;
 
 /**
- * Sandbox host binds this on activate so widget node clicks wake the isolate.
- * One handler at a time (last writer wins) — scoped to a single editor host.
+ * Sandbox host binds this so pointer hits on a widget or its face children
+ * resolve to handler ids in the isolate.
  */
 export function setOpenEnvxWidgetClickHandler(
-  next: WidgetClickHandler | null
+  next: WidgetPointerHandler | null
 ): () => void {
   handler = next;
   return () => {
@@ -17,6 +17,7 @@ export function setOpenEnvxWidgetClickHandler(
   };
 }
 
-export function emitOpenEnvxWidgetClick(layerId: string): void {
-  handler?.(layerId);
+/** Notify the host of a pointer hit on any stage layer (host filters ancestry). */
+export function emitOpenEnvxWidgetClick(targetLayerId: string): void {
+  handler?.(targetLayerId);
 }

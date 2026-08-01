@@ -67,6 +67,49 @@ describe('schema', () => {
     expect(validateScene(scene).valid).toBe(true);
   });
 
+  it('accepts openenvx.widget with values and children', () => {
+    const scene = normalizeScene({
+      pages: [
+        {
+          id: 'p1',
+          layout: 'absolute',
+          name: 'Page',
+          width: 800,
+          height: 600,
+          layers: [
+            {
+              id: 'w1',
+              type: 'openenvx.widget',
+              data: {
+                extensionId: 'wm.guest-tables',
+                values: { heading: 'Plan' },
+                manifest: {
+                  id: 'wm.guest-tables',
+                  label: 'Plan stolow',
+                  kinds: ['canvas'],
+                  fields: { heading: { kind: 'text', label: 'Naglowek' } },
+                },
+                children: [
+                  {
+                    id: 'w1-0',
+                    type: 'canvas.text',
+                    writeMode: 'locked',
+                    showInLayers: false,
+                    data: { html: 'Plan', fontSize: 24 },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(validateScene(scene).valid).toBe(true);
+    const layer = scene.pages[0]!.layers[0]!;
+    expect(layer.type).toBe('openenvx.widget');
+  });
+
   it('normalizes legacy embedded selection into snapshot', () => {
     const snapshot = normalizeSceneSnapshot({
       activePageId: 'p1',
@@ -273,7 +316,7 @@ describe('schema', () => {
   it('rejects empty pages array in validation', () => {
     const result = validateScene({
       pages: [],
-      schemaVersion: 2,
+      schemaVersion: 4,
     });
     expect(result.valid).toBe(false);
   });

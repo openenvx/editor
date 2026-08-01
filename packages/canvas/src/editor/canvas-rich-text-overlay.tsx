@@ -25,6 +25,8 @@ import styles from './canvas-editor.module.css';
 interface CanvasRichTextOverlayLayer {
   layer: Layer;
   view: LayerPreviewDescriptor;
+  /** Artboard-absolute transform when nested under a group/widget. */
+  absoluteTransform?: Layer['transform'];
 }
 
 export interface CanvasRichTextOverlayProps {
@@ -87,12 +89,13 @@ export const CanvasRichTextOverlay = memo(
         return null;
       }
 
-      const { layer, view } = editingLayer;
+      const { layer, view, absoluteTransform } = editingLayer;
       const richTextView = view as Extract<
         LayerPreviewDescriptor,
         { kind: 'richText' }
       >;
-      const transform = layer.transform ?? createDefaultTransform();
+      const transform =
+        absoluteTransform ?? layer.transform ?? createDefaultTransform();
       const fontSize = richTextView.fontSize ?? DEFAULT_RICH_TEXT_FONT_SIZE;
       const fontFamily =
         richTextView.fontFamily ?? DEFAULT_RICH_TEXT_FONT_FAMILY;
