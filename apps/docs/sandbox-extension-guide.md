@@ -15,7 +15,7 @@ Trust model: [Plugin-boundaries.md](../../Plugin-boundaries.md). Widget pipeline
 | Primary UI | On-canvas face (`data.children`) | Off-canvas `showUI` iframe | Declarative `render` trees from parent |
 | State | Host `data.values` (isolate expands only) | `clientStorage` / bridge (session) | Parent owns state; host gets `command` / `render` |
 | Lifetime | Lives with matching layers; one isolate per `extensionId` | Starts on run command; Stop closes isolate | Mounted while host session lasts |
-| Package | `@xmazu/openenvxee-widget-sdk` + `@xmazu/openenvxee-elements` | widget-sdk + optional HTML UI bundle | protocol (+ elements `/panel` + `renderPanelTree`) |
+| Package | `@openenvx/widget-sdk` + `@openenvx/elements` | widget-sdk + optional HTML UI bundle | protocol (+ elements `/panel` + `renderPanelTree`) |
 
 Figma-shaped: widgets = nodes; plugins = tools. Embed is a separate, weaker lane (no QuickJS).
 
@@ -36,12 +36,8 @@ Figma-shaped: widgets = nodes; plugins = tools. Embed is a separate, weaker lane
 
 ```tsx
 /** @jsxImportSource preact */
-import { Stack, Text } from '@xmazu/openenvxee-elements/canvas';
-import {
-  defineCanvasComponent,
-  string,
-  color,
-} from '@xmazu/openenvxee-widget-sdk';
+import { Stack, Text } from '@openenvx/elements/canvas';
+import { defineCanvasComponent, string, color } from '@openenvx/widget-sdk';
 
 export const seatingWidget = defineCanvasComponent({
   id: 'wm.seating',
@@ -62,8 +58,8 @@ export const seatingWidget = defineCanvasComponent({
 
 | Surface | API | Element vocabulary |
 | --- | --- | --- |
-| Canvas (`page.layout: 'absolute'`) | `defineCanvasComponent` | `@xmazu/openenvxee-elements/canvas` |
-| HTML (`page.layout: 'html'`) | `defineHtmlComponent` | `@xmazu/openenvxee-elements/html` |
+| Canvas (`page.layout: 'absolute'`) | `defineCanvasComponent` | `@openenvx/elements/canvas` |
+| HTML (`page.layout: 'html'`) | `defineHtmlComponent` | `@openenvx/elements/html` |
 
 Rules:
 
@@ -80,8 +76,8 @@ Canvas example: [`apps/canvas-demo/src/extensions/seating.widget.tsx`](../canvas
 
 ```tsx
 /** @jsxImportSource preact */
-import { Toolbar, ToolbarCommand } from '@xmazu/openenvxee-elements/panel';
-import { defineExtension, renderPanelTree } from '@xmazu/openenvxee-widget-sdk';
+import { Toolbar, ToolbarCommand } from '@openenvx/elements/panel';
+import { defineExtension, renderPanelTree } from '@openenvx/widget-sdk';
 import { seatingWidget } from './seating.widget';
 
 const toolbar = renderPanelTree(
@@ -108,21 +104,29 @@ Use `buildGrantFromManifest({ manifest, session: sessionPolicy, source })` so gr
 ### 3. Bundle + push source
 
 ```ts
-import { bundleWidgetSources } from '@xmazu/openenvxee-widget-sdk/vite';
+import { bundleWidgetSources } from '@openenvx/widget-sdk/vite';
 export default { plugins: [bundleWidgetSources()] };
 
 // app — host never runs this; only a string for the isolate
 import source from 'openenvx-widget:./seating.widget.tsx';
 await sandbox.pushWidgetSource('wm.seating', source);
+
+// Dev HMR: re-push without full reload when the widget file changes
+if (import.meta.hot) {
+  import.meta.hot.accept('openenvx-widget:./seating.widget.tsx', (mod) => {
+    const next = (mod as { default?: string } | undefined)?.default;
+    if (next) void sandbox.pushWidgetSource('wm.seating', next);
+  });
+}
 ```
 
-After eval, the module must call `openenvx.widget.register` (or `define*Component`, which does).
+After eval, the module must call `openenvx.widget.register` (or `define*Component`, which does). Isolate `console.log` / `warn` / `error` are forwarded to the host console tagged `[sandbox:<id>]` (rate-limited).
 
 ### 4. Types
 
 ```ts
-/// <reference types="@xmazu/openenvxee-widget-sdk/vite/client" />
-/// <reference types="@xmazu/openenvxee-widget-sdk/openenvx" />
+/// <reference types="@openenvx/widget-sdk/vite/client" />
+/// <reference types="@openenvx/widget-sdk/openenvx" />
 ```
 
 ---
@@ -137,7 +141,7 @@ User-run tools (`kind: 'plugin'`). Primary UI is `openenvx.showUI` → sandboxed
 
 Parent page sends validated `RenderNode` trees (optionally authored with elements `/panel` + `renderPanelTree`). No QuickJS. See [Plugin-boundaries.md](../../Plugin-boundaries.md).
 
-| Panel authoring helpers | `@xmazu/openenvxee-elements/panel` + `@xmazu/openenvxee-widget-sdk` `renderPanelTree` |
+| Panel authoring helpers | `@openenvx/elements/panel` + `@openenvx/widget-sdk` `renderPanelTree` |
 
 ---
 

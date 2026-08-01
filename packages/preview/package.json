@@ -1,5 +1,5 @@
 {
-  "name": "@xmazu/openenvxee-preview",
+  "name": "@openenvx/preview",
   "version": "0.5.4",
   "description": "Layer preview descriptor DSL / Render IR for OpenEnvx",
   "license": "MIT",
@@ -26,7 +26,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@xmazu/openenvxee-schema": "workspace:*",
+    "@openenvx/schema": "workspace:*",
     "uqr": "^0.1.3"
   },
   "devDependencies": {

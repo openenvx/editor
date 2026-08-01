@@ -6,13 +6,13 @@ import type {
   Page,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
+import { createLayerPreviewBuilder } from '@openenvx/preview';
 import {
   createDefaultTransform,
   type OpenEnvxWidgetData,
   type WidgetFieldDef,
   type WidgetManifestSnapshot,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 import { z } from 'zod';
 
 export const WIDGET_LAYER_TYPE = 'openenvx.widget';

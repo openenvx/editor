@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@openenvx/schema';
 import type Konva from 'konva';
 import { useEffect, useReducer } from 'react';
 import type { RefObject } from 'react';

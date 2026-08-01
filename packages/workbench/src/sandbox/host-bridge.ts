@@ -4,7 +4,7 @@ import {
   type SandboxBridgeResponse,
   type SandboxExtensionGrant,
   type SandboxHostMethod,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 import { assertJsonSerializable, assertMethodAllowed } from './capabilities';
 
@@ -29,6 +29,7 @@ export interface SandboxHostHandlers {
   getSyncedState: () => Promise<unknown> | unknown;
   setSyncedState: (value: unknown) => Promise<void> | void;
   resizeWidget: (width: number, height: number) => Promise<void> | void;
+  console: (level: string, args: unknown[]) => Promise<void> | void;
 }
 
 export function createSandboxHostBridge(input: {
@@ -154,6 +155,11 @@ async function dispatch(
         clampUiSize(params.width, 1),
         clampUiSize(params.height, 1)
       );
+    }
+    case 'console': {
+      const level = String(params.level ?? 'log');
+      const args = Array.isArray(params.args) ? params.args : [];
+      return handlers.console(level, args);
     }
     default: {
       const _exhaustive: never = method;

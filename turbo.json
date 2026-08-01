@@ -23,6 +23,11 @@
     },
     "check-types": {
       "outputs": []
+    },
+    "bench": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": []
     }
   }
 }

@@ -9,7 +9,7 @@ Hub: [Architecture.md](../../Architecture.md).
 ## Mental model
 
 ```text
-Scene JSON (@xmazu/openenvxee-schema)
+Scene JSON (@openenvx/schema)
         │
         ▼
 EditorRuntime + PluginManager (@openenvx/core)
@@ -20,10 +20,10 @@ EditorRuntime + PluginManager (@openenvx/core)
 WorkbenchController (@openenvx/headless)
         │
         ▼
-WorkbenchShell (@xmazu/openenvxee-workbench)
+WorkbenchShell (@openenvx/workbench)
         │
-        ├── canvas studio  (@xmazu/openenvxee-studio)
-        └── html studio    (@xmazu/openenvxee-html-studio)
+        ├── canvas studio  (@openenvx/studio)
+        └── html studio    (@openenvx/html-studio)
 ```
 
 | Layer | Job |
@@ -41,8 +41,8 @@ WorkbenchShell (@xmazu/openenvxee-workbench)
 | --- | --- |
 | Stage only, own state | `schema` + `canvas` (`CanvasStage`) |
 | Full editor, custom UI | `core` + `headless` + `canvas` or `html` |
-| Full Studio product | `@xmazu/openenvxee-studio` (`DEFAULT_STUDIO_PLUGINS`, `WorkbenchShell`) |
-| HTML block product | `@xmazu/openenvxee-html-studio` |
+| Full Studio product | `@openenvx/studio` (`DEFAULT_STUDIO_PLUGINS`, `WorkbenchShell`) |
+| HTML block product | `@openenvx/html-studio` |
 | Untrusted parent panels | `plugin-protocol` + embed host (never main-world JS) |
 | Untrusted scripts / widgets | Sandbox QuickJS Worker path (never main-world JS) |
 

@@ -1,4 +1,4 @@
-import type { Transform } from '@xmazu/openenvxee-schema';
+import type { Transform } from '@openenvx/schema';
 import { useCallback } from 'react';
 
 import { useCanvasHost } from '../canvas-host-context';

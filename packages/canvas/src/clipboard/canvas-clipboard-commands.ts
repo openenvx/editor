@@ -7,7 +7,7 @@ import {
   updateLayerInTree,
 } from '@openenvx/core';
 import type { CommandContext, Layer } from '@openenvx/core';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@openenvx/schema';
 
 import { CanvasClipboardServiceId } from '../canvas-service-tokens';
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';

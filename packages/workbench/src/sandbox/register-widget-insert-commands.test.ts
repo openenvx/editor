@@ -3,8 +3,8 @@ import {
   extensionBlockStore,
   type SandboxHostSurface,
 } from '@openenvx/headless';
-import type { ExtensionManifest } from '@xmazu/openenvxee-protocol';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import type { ExtensionManifest } from '@openenvx/protocol';
+import { createDefaultTransform } from '@openenvx/schema';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { registerWidgetInsertCommands } from './register-widget-insert-commands';

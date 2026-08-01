@@ -1,6 +1,6 @@
 # OpenWorkbench — Design Specification
 
-Designing the `@xmazu/openenvxee-workbench` React UI for canvas/flow editor authors on **web**.
+Designing the `@openenvx/workbench` React UI for canvas/flow editor authors on **web**.
 
 **Goal:** A composable, performant editor shell that feels as precise and polished as [shadcn/designer](https://ds.shadcn.com/) — without importing shadcn, Radix, or Tailwind.
 
@@ -170,8 +170,8 @@ Light inputs are **borderless at rest** (muted fill only). Focus shows a soft ou
 Users can switch between built-in themes from **File → Theme** in the activity sidebar. The shell keeps theme state internally and calls `onThemeChange` when the selection changes.
 
 ```tsx
-import { WorkbenchShell } from '@xmazu/openenvxee-workbench';
-import '@xmazu/openenvxee-workbench/theme.css';
+import { WorkbenchShell } from '@openenvx/workbench';
+import '@openenvx/workbench/theme.css';
 
 <WorkbenchShell
   onThemeChange={(theme) => localStorage.setItem('owb-theme', theme)}
@@ -619,8 +619,8 @@ Before merging visual changes, verify against [shadcn/designer editor](https://d
 Import theme in apps and pick a default theme:
 
 ```tsx
-import { WorkbenchShell } from '@xmazu/openenvxee-workbench';
-import '@xmazu/openenvxee-workbench/theme.css';
+import { WorkbenchShell } from '@openenvx/workbench';
+import '@openenvx/workbench/theme.css';
 
 <WorkbenchShell theme="light" plugins={plugins} />;
 ```

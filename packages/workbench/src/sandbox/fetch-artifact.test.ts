@@ -64,25 +64,48 @@ describe('fetchAndVerifyArtifact', () => {
     ).rejects.toThrow(/Artifact too large/);
   });
 
-  it('rejects oversized artifacts without content-length via streaming', async () => {
-    const source = 'x'.repeat(100);
+  it('rejects artifact fetch that exceeds timeout', async () => {
+    const source = 'export const x = 1;';
     const bytes = new TextEncoder().encode(source);
     const hash = await sha256Hex(bytes.buffer);
     await expect(
       fetchAndVerifyArtifact({
         url: 'https://example.com/plugin.js',
         contentHash: hash,
-        maxBytes: 16,
+        timeoutMs: 20,
+        fetchImpl: async (_url, init) => {
+          await new Promise<void>((resolve, reject) => {
+            const timer = setTimeout(resolve, 200);
+            init?.signal?.addEventListener('abort', () => {
+              clearTimeout(timer);
+              reject(new DOMException('Aborted', 'AbortError'));
+            });
+          });
+          return new Response(source, { status: 200 });
+        },
+      })
+    ).rejects.toThrow(/Artifact fetch timeout/);
+  });
+
+  it('rejects slow body reads that exceed timeout', async () => {
+    const source = 'export const x = 1;';
+    const bytes = new TextEncoder().encode(source);
+    const hash = await sha256Hex(bytes.buffer);
+    await expect(
+      fetchAndVerifyArtifact({
+        url: 'https://example.com/plugin.js',
+        contentHash: hash,
+        timeoutMs: 30,
         fetchImpl: async () => {
           const stream = new ReadableStream<Uint8Array>({
-            start(controller) {
-              controller.enqueue(bytes);
-              controller.close();
+            pull() {
+              // Hang until the abort signal cancels the reader.
+              return new Promise(() => {});
             },
           });
           return new Response(stream, { status: 200 });
         },
       })
-    ).rejects.toThrow(/Artifact too large/);
+    ).rejects.toThrow(/Artifact fetch timeout/);
   });
 });

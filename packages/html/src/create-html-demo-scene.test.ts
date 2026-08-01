@@ -1,4 +1,4 @@
-import { SCHEMA_VERSION } from '@xmazu/openenvxee-schema';
+import { SCHEMA_VERSION } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import { createHtmlDemoScene } from './create-html-demo-scene';

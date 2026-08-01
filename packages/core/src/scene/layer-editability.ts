@@ -2,7 +2,7 @@ import type {
   FrozenLayerSnapshot,
   LayerWriteMode,
   Scene,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 
 import { getLayerChildren, hasChildLayers, walkLayers } from './layer-tree';
 import type { Layer } from './types';

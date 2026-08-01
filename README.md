@@ -16,19 +16,19 @@ OpenEnvx is a monorepo for building opinionated visual editors - canvas, command
 
 Workspace libraries (private, not published — `exports` point at TypeScript `src/` for HMR and type resolution without rebuilding):
 
-- **`@xmazu/openenvxee-schema`** - Scene document model and page presets _(also published — see [PUBLISHING.md](PUBLISHING.md))_
-- **`@xmazu/openenvxee-preview`** - DOM preview rendering for layer types
+- **`@openenvx/schema`** - Scene document model and page presets _(also published — see [PUBLISHING.md](PUBLISHING.md))_
+- **`@openenvx/preview`** - DOM preview rendering for layer types
 - **`@openenvx/core`** - Scene model, plugins, commands, and contribution registries
 - **`@openenvx/headless`** - `WorkbenchController` and headless editor runtime
 - **`@openenvx/canvas`** - Canvas engine, layers, Konva stage, TipTap rich text, `CanvasBasicsPlugin`
-- **`@xmazu/openenvxee-workbench`** - React workbench UI shell (`WorkbenchShell`, fields, theme)
-- **`@xmazu/openenvxee-canvas-pro`** - Pro canvas chrome (toolbars, sidebars, smart guides)
+- **`@openenvx/workbench`** - React workbench UI shell (`WorkbenchShell`, fields, theme)
+- **`@openenvx/canvas-pro`** - Pro canvas chrome (toolbars, sidebars, smart guides)
 - **`@openenvx/agent`** - AI agent sidebar plugin
 
 Published packages (see [PUBLISHING.md](PUBLISHING.md)):
 
-- **`@xmazu/openenvxee-schema`** - Scene document model, Zod schemas, and template helpers
-- **`@xmazu/openenvxee-studio`** - Product fat bundle (workbench + canvas + canvas-pro + agent). Export is via openenvx-cloud `export-service` API, not an in-browser driver.
+- **`@openenvx/schema`** - Scene document model, Zod schemas, and template helpers
+- **`@openenvx/studio`** - Product fat bundle (workbench + canvas + canvas-pro + agent). Export is via openenvx-cloud `export-service` API, not an in-browser driver.
 
 ---
 

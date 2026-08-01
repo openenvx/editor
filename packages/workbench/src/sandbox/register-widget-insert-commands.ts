@@ -10,8 +10,8 @@ import {
 import type {
   ExtensionManifest,
   ExtensionWidgetContribution,
-} from '@xmazu/openenvxee-protocol';
-import { createDefaultTransform, type Layer } from '@xmazu/openenvxee-schema';
+} from '@openenvx/protocol';
+import { createDefaultTransform, type Layer } from '@openenvx/schema';
 
 function sizeFromDefaults(defaults: Record<string, unknown> | undefined): {
   width: number;

@@ -1,7 +1,7 @@
-import type { CanvasQrData } from '@xmazu/openenvxee-schema';
+import type { CanvasQrData } from '@openenvx/schema';
 import { renderSVG } from 'uqr';
 
-export type { QrErrorCorrection } from '@xmazu/openenvxee-schema';
+export type { QrErrorCorrection } from '@openenvx/schema';
 
 /** Encode options = QR layer data minus the payload string. */
 export type EncodeQrToSvgOptions = Omit<CanvasQrData, 'url'>;

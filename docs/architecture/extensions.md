@@ -25,14 +25,14 @@ Sandbox grants further split:
 | Lifetime | User-run command; Stop closes isolate | Lives with matching layers; **one isolate per `extensionId`** |
 | Delivery | `artifactUrl` + `contentHash`, or pushed `source` | Prefer pushed `source` via parent `widget:source` (integrator bundle) |
 
-Widgets declare a face with `defineCanvasComponent` / `defineHtmlComponent` from `@xmazu/openenvxee-widget-sdk` (tags from `@xmazu/openenvxee-elements`). The host asks the isolate to expand (`renderWidgetFace`), maps the tree to ordinary layers (AutoLayout resolved on the host for canvas; HTML uses flex blocks), and stores the result under `data.children`. **Persistent state is host `data.values`** — QuickJS does not own document truth. The Inspector is derived from the persisted `manifest`. Bound elements (`bind`) commit inline edits back into `values` and re-expand. `widget.detach` unlocks the face as a normal group. Export needs no isolate because the face is in the document. Backend templates can call `renderToElementTree()` outside the editor (then map with the host applicator).
+Widgets declare a face with `defineCanvasComponent` / `defineHtmlComponent` from `@openenvx/widget-sdk` (tags from `@openenvx/elements`). The host asks the isolate to expand (`renderWidgetFace`), maps the tree to ordinary layers (AutoLayout resolved on the host for canvas; HTML uses flex blocks), and stores the result under `data.children`. **Persistent state is host `data.values`** — QuickJS does not own document truth. The Inspector is derived from the persisted `manifest`. Bound elements (`bind`) commit inline edits back into `values` and re-expand. `widget.detach` unlocks the face as a normal group. Export needs no isolate because the face is in the document. Backend templates can call `renderToElementTree()` outside the editor (then map with the host applicator).
 
 ## Comparison
 
 |  | Internal | Embed panel | Sandbox |
 | --- | --- | --- | --- |
 | Runs where | Same JS bundle | Other document / origin | QuickJS Worker isolate |
-| Authors with | OOP `Plugin` + builders | `@xmazu/openenvxee-elements/panel` → `RenderNode` | JS/TS + `@xmazu/openenvxee-widget-sdk` / elements or `openenvx.*` |
+| Authors with | OOP `Plugin` + builders | `@openenvx/elements/panel` → `RenderNode` | JS/TS + `@openenvx/widget-sdk` / elements or `openenvx.*` |
 | Mutation | Direct register / workbench API | `command` allowlist | Allowlisted `executeCommand` + widget `values` |
 | UI | Builders → descriptors → renderers | Tree → validate → **same** mappers → renderers | Sandboxed iframe or widget face layers |
 
@@ -51,12 +51,12 @@ Surfaces never expose `InstantiationService`. Isolates / parent pages never rece
 
 | Concern | Package |
 | --- | --- |
-| Element vocabulary, messages, `validatePluginTree` / `validateExtensionManifest`, grant types | `@xmazu/openenvxee-protocol` |
-| Preact vocabulary | `@xmazu/openenvxee-elements` |
-| Widget authoring (`defineExtension`, expand) | `@xmazu/openenvxee-widget-sdk` |
+| Element vocabulary, messages, `validatePluginTree` / `validateExtensionManifest`, grant types | `@openenvx/protocol` |
+| Preact vocabulary | `@openenvx/elements` |
+| Widget authoring (`defineExtension`, expand) | `@openenvx/widget-sdk` |
 | Tree → builder mappers, `ExternalHostMount`, host surfaces | `@openenvx/headless` |
-| `EmbedPanelHost`, `SandboxExtensionHost`, transport, gate, runtime | `@xmazu/openenvxee-workbench` |
-| Widget click seam + default plugins | `@xmazu/openenvxee-studio` |
+| `EmbedPanelHost`, `SandboxExtensionHost`, transport, gate, runtime | `@openenvx/workbench` |
+| Widget click seam + default plugins | `@openenvx/studio` |
 | Internal OOP plugins | `core` / `headless` / product plugins |
 
 ## Author guides

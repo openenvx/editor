@@ -1,6 +1,6 @@
 # HTML block editor
 
-**Audience:** Internal engineers and coding agents. Package: `@openenvx/html` (+ product re-exports in `@xmazu/openenvxee-html-studio`).
+**Audience:** Internal engineers and coding agents. Package: `@openenvx/html` (+ product re-exports in `@openenvx/html-studio`).
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -30,7 +30,7 @@ Inspector fields for slot parts use paths like `slots.headline.0.data.html`.
 
 ## Product host
 
-`@xmazu/openenvxee-html-studio` re-exports core + headless + html + workbench shell surface and ships:
+`@openenvx/html-studio` re-exports core + headless + html + workbench shell surface and ships:
 
 ```ts
 export const DEFAULT_HTML_STUDIO_PLUGINS = [new HtmlBlocksPlugin()];

@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@openenvx/schema';
 import type Konva from "konva";
 import { describe, expect, it } from "vitest";
 

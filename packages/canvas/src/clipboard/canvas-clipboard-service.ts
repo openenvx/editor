@@ -1,6 +1,6 @@
 import type { AssetService } from '@openenvx/core';
-import type { Layer, Page } from '@xmazu/openenvxee-schema';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import type { Layer, Page } from '@openenvx/schema';
+import { createDefaultTransform } from '@openenvx/schema';
 
 import { computeArtboardOffset } from '../artboard-offset';
 import { CanvasImageLayer } from '../layers/canvas-image-layer';

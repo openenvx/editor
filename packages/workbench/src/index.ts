@@ -150,7 +150,7 @@ export {
   MAX_RENDER_TREE_JSON_CHARS,
   type PluginTreeValidationResult,
   type RenderTreeValidationResult,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 export {
   SandboxExtensionHost,
@@ -180,7 +180,10 @@ export {
 export { postSandboxUiMessage } from './sandbox/sandbox-ui-protocol';
 export {
   assertNotifyPolicy,
+  assertConsolePolicy,
+  assertRateLimit,
   MAX_CONCURRENT_ISOLATES,
+  MAX_CONSOLE_ARGS_JSON_CHARS,
   MAX_NOTIFY_MESSAGE_CHARS,
   MAX_NOTIFY_PER_SECOND,
   MAX_SHOW_UI_HTML_CHARS,

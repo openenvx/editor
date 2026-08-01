@@ -3,13 +3,14 @@
 import type {
   SandboxBridgeRequest,
   SandboxBridgeResponse,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 import {
   createQuickJsEngine,
   type QuickJsEngine,
 } from './quickjs-isolate-engine';
 import type { HostToWorker, WorkerToHost } from './quickjs-worker-protocol';
+import { MAX_PENDING_HOST_CALLS } from './sandbox-caps';
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -35,12 +36,16 @@ async function ensureEngine(): Promise<QuickJsEngine> {
     return engine;
   }
   engine = await createQuickJsEngine({
-    onHostCall: (request: SandboxBridgeRequest) =>
-      new Promise<SandboxBridgeResponse>((resolve, reject) => {
+    onHostCall: (request: SandboxBridgeRequest) => {
+      if (pendingHost.size >= MAX_PENDING_HOST_CALLS) {
+        return Promise.reject(new Error('Sandbox host call limit exceeded'));
+      }
+      return new Promise<SandboxBridgeResponse>((resolve, reject) => {
         const callId = Math.random().toString(36).slice(2);
         pendingHost.set(callId, { resolve, reject });
         post({ type: 'hostCall', callId, request });
-      }),
+      });
+    },
   });
   return engine;
 }

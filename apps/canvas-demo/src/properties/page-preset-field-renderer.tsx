@@ -2,7 +2,7 @@ import { resolvePagePreset, usePagePresetResize } from '@openenvx/canvas';
 import { getActivePage } from '@openenvx/core';
 import type { PropertyFieldDescriptor } from '@openenvx/core';
 import { useWorkbenchContextSelector } from '@openenvx/headless/react';
-import { ConfirmDialog, Select } from '@xmazu/openenvxee-studio';
+import { ConfirmDialog, Select } from '@openenvx/studio';
 import { memo, useState } from 'react';
 
 export interface PagePresetFieldRendererProps {

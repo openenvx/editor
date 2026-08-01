@@ -2,7 +2,7 @@ import type {
   RenderChild,
   RenderNode,
   RenderPropValue,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 import type { ComponentChild, VNode } from 'preact';
 
 import { serializePropValue, type HandlerRegistry } from './handlers';

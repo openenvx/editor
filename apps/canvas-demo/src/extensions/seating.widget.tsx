@@ -1,11 +1,11 @@
 /** @jsxImportSource preact */
-import { Grid, Stack, Text } from '@xmazu/openenvxee-elements/canvas';
+import { Grid, Stack, Text } from '@openenvx/elements/canvas';
 import {
   defineCanvasComponent,
   list,
   select,
   string,
-} from '@xmazu/openenvxee-widget-sdk';
+} from '@openenvx/widget-sdk';
 
 const STATUS = ['free', 'held', 'seated'] as const;
 const COLORS: Record<(typeof STATUS)[number], string> = {

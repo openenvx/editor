@@ -134,8 +134,8 @@
         "react-konva",
         "zod",
         "@openenvx/core",
-        "@xmazu/openenvxee-preview",
-        "@xmazu/openenvxee-schema"
+        "@openenvx/preview",
+        "@openenvx/schema"
       ]
     },
     "packages/canvas-pro": {

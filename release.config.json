@@ -1,19 +1,19 @@
 {
   "publish": [
     {
-      "name": "@xmazu/openenvxee-schema",
+      "name": "@openenvx/schema",
       "dir": "packages/schema"
     },
     {
-      "name": "@xmazu/openenvxee-preview",
+      "name": "@openenvx/preview",
       "dir": "packages/preview"
     },
     {
-      "name": "@xmazu/openenvxee-protocol",
+      "name": "@openenvx/protocol",
       "dir": "packages/protocol"
     },
     {
-      "name": "@xmazu/openenvxee-studio",
+      "name": "@openenvx/studio",
       "dir": "packages/studio"
     }
   ],
@@ -21,10 +21,10 @@
     {
       "repo": "../openenvx-cloud",
       "deps": [
-        "@xmazu/openenvxee-studio",
-        "@xmazu/openenvxee-protocol",
-        "@xmazu/openenvxee-schema",
-        "@xmazu/openenvxee-preview"
+        "@openenvx/studio",
+        "@openenvx/protocol",
+        "@openenvx/schema",
+        "@openenvx/preview"
       ]
     }
   ]

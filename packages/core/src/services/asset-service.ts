@@ -1,4 +1,4 @@
-import type { Scene, SceneAsset } from '@xmazu/openenvxee-schema';
+import type { Scene, SceneAsset } from '@openenvx/schema';
 
 import type { Disposable } from '../runtime/emitter';
 import { collectAssetRefs } from './collect-asset-refs';

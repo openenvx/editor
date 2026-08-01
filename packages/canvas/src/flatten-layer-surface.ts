@@ -1,5 +1,5 @@
 import type { Transform } from '@openenvx/core';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@openenvx/schema';
 
 import type { CanvasStageLayer } from './canvas-stage-types';
 import type { CanvasLayerSurfaceItem } from './layer-surface-item';

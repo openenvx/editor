@@ -4,7 +4,7 @@ import type {
   ExtensionContributes,
   ExtensionManifest,
   SandboxCapability,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 import type { RegisteredWidget } from './define-component';
 
@@ -38,14 +38,10 @@ export function defineExtension(
   options: DefineExtensionOptions
 ): ExtensionManifest {
   if (!options.id || typeof options.id !== 'string') {
-    throw new Error(
-      '@xmazu/openenvxee-widget-sdk: defineExtension requires id'
-    );
+    throw new Error('@openenvx/widget-sdk: defineExtension requires id');
   }
   if (!options.name || typeof options.name !== 'string') {
-    throw new Error(
-      '@xmazu/openenvxee-widget-sdk: defineExtension requires name'
-    );
+    throw new Error('@openenvx/widget-sdk: defineExtension requires name');
   }
 
   const toWidgetContrib = (entry: RegisteredWidget) => ({

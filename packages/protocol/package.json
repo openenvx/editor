@@ -1,5 +1,5 @@
 {
-  "name": "@xmazu/openenvxee-protocol",
+  "name": "@openenvx/protocol",
   "version": "0.6.0",
   "description": "OpenEnvx wire protocol — render-tree envelope, extension manifests, validators, sandbox grants",
   "license": "MIT",

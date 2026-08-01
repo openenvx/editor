@@ -9,11 +9,11 @@ This is **not** how to write sandbox widgets, sandbox plugins, or embed panels. 
 
 Under-the-hood map: [Architecture.md](../../Architecture.md) · [docs/architecture/](../../docs/architecture/overview.md). Trust model: [Plugin-boundaries.md](../../Plugin-boundaries.md).
 
-## Scene document (`@xmazu/openenvxee-schema`)
+## Scene document (`@openenvx/schema`)
 
-The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@xmazu/openenvxee-schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
+The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@openenvx/schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
 
-Backend services depend on `@xmazu/openenvxee-schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Cloud `export-service` (openenvx-cloud) imports overlapping leaf schemas (`paddingSchema`, `layerStyleShadowSchema`, …) into its Render IR request schema while keeping Render-IR-specific document shapes local.
+Backend services depend on `@openenvx/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Cloud `export-service` (openenvx-cloud) imports overlapping leaf schemas (`paddingSchema`, `layerStyleShadowSchema`, …) into its Render IR request schema while keeping Render-IR-specific document shapes local.
 
 ## OSS vs enterprise shell
 
@@ -163,7 +163,7 @@ activateWorkbench(ctx) {
 
 Duplicate kinds overwrite earlier registrations so enterprise plugins activating later can replace OSS defaults.
 
-`WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). Enterprise `@xmazu/openenvxee-canvas-pro` adds canvas-only chrome (`CanvasProPlugin`, `CanvasTemplatePlugin`).
+`WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). Enterprise `@openenvx/canvas-pro` adds canvas-only chrome (`CanvasProPlugin`, `CanvasTemplatePlugin`).
 
 **Custom sidebar header** (per activity-bar panel — document title / file menu / icon actions):
 

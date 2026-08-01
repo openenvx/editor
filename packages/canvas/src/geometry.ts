@@ -1,5 +1,5 @@
 import { clampTransformSize, MIN_LAYER_SIZE } from '@openenvx/core';
-import type { Transform } from '@xmazu/openenvxee-schema';
+import type { Transform } from '@openenvx/schema';
 import type Konva from 'konva';
 
 export { MIN_LAYER_SIZE, clampTransformSize } from '@openenvx/core';

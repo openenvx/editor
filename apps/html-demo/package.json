@@ -11,9 +11,9 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@xmazu/openenvxee-elements": "workspace:*",
-    "@xmazu/openenvxee-widget-sdk": "workspace:*",
-    "@xmazu/openenvxee-html-studio": "workspace:*",
+    "@openenvx/elements": "workspace:*",
+    "@openenvx/widget-sdk": "workspace:*",
+    "@openenvx/html-studio": "workspace:*",
     "preact": "^10.26.5",
     "react": "19.2.7",
     "react-dom": "19.2.7"

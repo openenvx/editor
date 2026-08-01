@@ -1,4 +1,4 @@
-import type { EditorState, Layer, Scene } from '@xmazu/openenvxee-schema';
+import type { EditorState, Layer, Scene } from '@openenvx/schema';
 
 import { walkLayers } from './layer-tree';
 
@@ -13,8 +13,14 @@ export type {
   SceneSnapshot as SchemaSceneSnapshot,
   Selection,
   Transform,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 
+/**
+ * Scene + editor snapshot.
+ *
+ * - `SceneStore.getSnapshot()` — deep clone (persistence / export).
+ * - `onDidChangeScene` / history — **shared** refs; treat as immutable.
+ */
 export interface SceneSnapshot {
   scene: Scene;
   editorState: EditorState;
@@ -23,6 +29,12 @@ export interface SceneSnapshot {
 
 export interface SceneTransaction {
   label: string;
+  /**
+   * Must be pure: return a new scene via path-copying. Do not mutate `scene`.
+   * Unchanged pages/layers should keep object identity for structural sharing.
+   * Returning the same root (or a new root that still shares every root field
+   * ref) is treated as a no-op.
+   */
   apply(scene: Scene): Scene;
   /**
    * When set, editor focus switches to this page in the same history step

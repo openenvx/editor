@@ -15,7 +15,7 @@ import {
   resolvePageBleedMm,
   resolvePageSafeMm,
   type Transform,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 
 export interface CanvasPropertyPathContextOptions extends PropertyPathContextOptions {
   updateLayerTransform: (

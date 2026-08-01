@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SANDBOX_BRIDGE_SOURCE } from '@xmazu/openenvxee-protocol';
+import { SANDBOX_BRIDGE_SOURCE } from '@openenvx/protocol';
 
 import { createQuickJsEngine } from './quickjs-isolate-engine';
 import { createQuickJsIsolate } from './quickjs-runtime';
@@ -82,7 +82,51 @@ describe('QuickJS isolate', () => {
     });
     await expect(
       engine.evalModule('while (true) {}')
-    ).rejects.toThrow(/Sandbox CPU limit exceeded/);
+    ).rejects.toThrow(/Sandbox CPU (limit|budget) exceeded/);
+    engine.dispose();
+  }, 10_000);
+
+  it('enforces cumulative CPU budget across async host calls', async () => {
+    const engine = await createQuickJsEngine({
+      cpuLimitMs: 200,
+      cpuBudgetPerWindowMs: 100,
+      evalTimeoutMs: 3000,
+      onHostCall: async (request) => ({
+        source: SANDBOX_BRIDGE_SOURCE,
+        v: 1,
+        id: request.id,
+        ok: true,
+        result: null,
+      }),
+    });
+    await expect(
+      engine.evalModule(`
+        (async function () {
+          for (var i = 0; i < 20; i++) {
+            await openenvx.getSelection();
+          }
+        })()
+      `)
+    ).rejects.toThrow(/Sandbox CPU budget exceeded/);
+    engine.dispose();
+  }, 10_000);
+
+  it('keeps the isolate usable after an ordinary eval failure', async () => {
+    const engine = await createQuickJsEngine({
+      onHostCall: async (request) => ({
+        source: SANDBOX_BRIDGE_SOURCE,
+        v: 1,
+        id: request.id,
+        ok: true,
+        result: null,
+      }),
+    });
+    await expect(engine.evalModule('throw new Error("boom")')).rejects.toThrow(
+      /Sandbox eval failed:.*boom/
+    );
+    await engine.evalModule(`globalThis.__recovered = 1;`);
+    const recovered = await engine.evalModule(`globalThis.__recovered`);
+    expect(recovered).toBe(1);
     engine.dispose();
   }, 10_000);
 

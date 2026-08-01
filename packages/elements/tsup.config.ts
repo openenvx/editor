@@ -7,6 +7,6 @@ export default createLibraryConfig({
     'preact/hooks',
     'preact/jsx-runtime',
     'preact/compat',
-    '@xmazu/openenvxee-protocol',
+    '@openenvx/protocol',
   ],
 });

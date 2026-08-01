@@ -12,11 +12,12 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest",
+    "bench": "vitest bench --run",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@xmazu/openenvxee-preview": "workspace:*",
-    "@xmazu/openenvxee-schema": "workspace:*"
+    "@openenvx/preview": "workspace:*",
+    "@openenvx/schema": "workspace:*"
   },
   "devDependencies": {
     "@openenvx/typescript-config": "workspace:*",

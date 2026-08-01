@@ -10,7 +10,7 @@ import type { CommandContext } from '@openenvx/core';
 import {
   createDefaultTransform,
   normalizeSceneSnapshot,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import { CanvasClipboardServiceId } from '../canvas-service-tokens';

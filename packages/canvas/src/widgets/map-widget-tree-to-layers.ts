@@ -1,10 +1,10 @@
-import type { RenderChild, RenderNode } from '@xmazu/openenvxee-protocol';
-import { WIDGET_LAYER_ESCAPE_TYPES } from '@xmazu/openenvxee-protocol';
+import type { RenderChild, RenderNode } from '@openenvx/protocol';
+import { WIDGET_LAYER_ESCAPE_TYPES } from '@openenvx/protocol';
 import {
   createDefaultTransform,
   type Layer,
   type Transform,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 
 import { readLayoutIntent, resolveAutoLayout } from './resolve-auto-layout';
 

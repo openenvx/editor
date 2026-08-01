@@ -13,7 +13,7 @@ import {
   EmbedPanelHost,
   mountEmbedPanel,
   mountSandboxExtensions,
-} from '@xmazu/openenvxee-studio';
+} from '@openenvx/studio';
 import saveTheDateSource from 'openenvx-widget:./extensions/save-the-date.widget.tsx';
 import seatingSource from 'openenvx-widget:./extensions/seating.widget.tsx';
 import { useMemo } from 'react';
@@ -24,11 +24,38 @@ import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
 import { CanvasDemoPlugin } from './plugins/canvas-demo-plugin';
 import { createDemoVersionHistoryProvider } from './providers/demo-version-history-provider';
 
-import '@xmazu/openenvxee-studio/fonts.css';
-import '@xmazu/openenvxee-studio/theme.css';
+import '@openenvx/studio/fonts.css';
+import '@openenvx/studio/theme.css';
 
 const EMBED_PANEL_ID = 'embed.demo';
 const LAYOUT_STORE_KEY = 'openenvx.canvas-demo.workbench-layout';
+
+interface SandboxHot {
+  pushWidgetSource: (id: string, source: string) => Promise<void>;
+}
+
+if (import.meta.hot) {
+  import.meta.hot.accept(
+    'openenvx-widget:./extensions/seating.widget.tsx',
+    (mod) => {
+      const source = (mod as { default?: string } | undefined)?.default;
+      const sandbox = import.meta.hot?.data.sandbox as SandboxHot | undefined;
+      if (source && sandbox) {
+        void sandbox.pushWidgetSource('wm.seating', source);
+      }
+    }
+  );
+  import.meta.hot.accept(
+    'openenvx-widget:./extensions/save-the-date.widget.tsx',
+    (mod) => {
+      const source = (mod as { default?: string } | undefined)?.default;
+      const sandbox = import.meta.hot?.data.sandbox as SandboxHot | undefined;
+      if (source && sandbox) {
+        void sandbox.pushWidgetSource('wm.save-the-date', source);
+      }
+    }
+  );
+}
 
 function isEmbedMode(): boolean {
   return new URLSearchParams(window.location.search).get('embed') === '1';
@@ -94,11 +121,19 @@ export function App() {
 
     return (api: WorkbenchApi) => {
       const disposeSandbox = mountSandboxExtensions(api, sandbox);
+      if (import.meta.hot) {
+        import.meta.hot.data.sandbox = sandbox;
+      }
       void sandbox.pushWidgetSource('wm.seating', seatingSource);
       void sandbox.pushWidgetSource('wm.save-the-date', saveTheDateSource);
 
       if (!isEmbedMode()) {
-        return disposeSandbox;
+        return () => {
+          if (import.meta.hot) {
+            import.meta.hot.data.sandbox = undefined;
+          }
+          disposeSandbox();
+        };
       }
 
       const panel = new EmbedPanelHost({
@@ -115,6 +150,9 @@ export function App() {
       });
       const disposeEmbed = mountEmbedPanel(api, panel);
       return () => {
+        if (import.meta.hot) {
+          import.meta.hot.data.sandbox = undefined;
+        }
         disposeEmbed();
         disposeSandbox();
       };

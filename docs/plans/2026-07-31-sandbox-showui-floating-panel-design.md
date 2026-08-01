@@ -9,7 +9,7 @@
 
 ## Decision
 
-Replace the modal with a **non-modal, title-bar-draggable floating panel** in `@xmazu/openenvxee-workbench` sandbox chrome.
+Replace the modal with a **non-modal, title-bar-draggable floating panel** in `@openenvx/workbench` sandbox chrome.
 
 | Behavior | Spec |
 | --- | --- |

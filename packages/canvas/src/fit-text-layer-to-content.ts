@@ -4,7 +4,7 @@ import {
   type Layer,
   type Modification,
   type Scene,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 
 import { isCurvedText } from './rich-text-arc';
 import {

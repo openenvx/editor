@@ -8,7 +8,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { validateExtensionManifest } from '@xmazu/openenvxee-protocol';
+import { validateExtensionManifest } from '@openenvx/protocol';
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);

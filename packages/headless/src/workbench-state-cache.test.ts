@@ -12,8 +12,8 @@ import type {
   PluginContext,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
-import { normalizeScene } from '@xmazu/openenvxee-schema';
+import { createLayerPreviewBuilder } from '@openenvx/preview';
+import { normalizeScene } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import { PropertyPaneContribution } from './contributions/property-pane-contribution';

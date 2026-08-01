@@ -1,7 +1,7 @@
 import type {
   SandboxBridgeRequest,
   SandboxBridgeResponse,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 export type WorkerToHost =
   | { type: 'ready' }

@@ -2,12 +2,17 @@ import {
   SANDBOX_BRIDGE_SOURCE,
   type SandboxBridgeRequest,
   type SandboxBridgeResponse,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
+import { sandboxBootstrapSource } from './sandbox-bootstrap-source';
 import {
-  SANDBOX_CPU_LIMIT_MS,
+  SANDBOX_EVAL_TIMEOUT_MS,
   SANDBOX_MEMORY_LIMIT_BYTES,
 } from './sandbox-caps';
+import {
+  createSandboxCpuBudget,
+  isSandboxCpuKillError,
+} from './sandbox-cpu-budget';
 
 export type HostCallFn = (
   request: SandboxBridgeRequest
@@ -24,32 +29,35 @@ export { SANDBOX_CPU_LIMIT_MS } from './sandbox-caps';
 /**
  * Runs one QuickJS isolate. Call only from a Worker (or test fallback).
  * Extension JS never touches the editor main world.
+ *
+ * CPU model:
+ * - Each sync burst gets up to `cpuLimitMs` wall-clock.
+ * - Cumulative CPU across host-call resumes is capped per sliding window.
+ * - `evalModule` drains async work until idle or `SANDBOX_EVAL_TIMEOUT_MS`.
  */
 export async function createQuickJsEngine(input: {
   onHostCall: HostCallFn;
-  /** Override CPU budget (tests). */
+  /** Override per-burst CPU budget (tests). */
   cpuLimitMs?: number;
+  /** Override cumulative window budget (tests). */
+  cpuBudgetPerWindowMs?: number;
+  /** Override eval wall-clock including async (tests). */
+  evalTimeoutMs?: number;
 }): Promise<QuickJsEngine> {
-  const cpuLimitMs = input.cpuLimitMs ?? SANDBOX_CPU_LIMIT_MS;
+  const evalTimeoutMs = input.evalTimeoutMs ?? SANDBOX_EVAL_TIMEOUT_MS;
+  const cpu = createSandboxCpuBudget({
+    cpuLimitMs: input.cpuLimitMs,
+    cpuBudgetPerWindowMs: input.cpuBudgetPerWindowMs,
+  });
   const quickjs = await import('quickjs-emscripten');
   const QuickJS = await quickjs.getQuickJS();
   const runtime = QuickJS.newRuntime();
   // Soft ceiling; upgrade path: per-extension memory budget from mint grant.
   runtime.setMemoryLimit(SANDBOX_MEMORY_LIMIT_BYTES);
-
-  let deadlineMs = Number.POSITIVE_INFINITY;
-  runtime.setInterruptHandler(() => Date.now() >= deadlineMs);
+  runtime.setInterruptHandler(() => cpu.shouldInterrupt());
 
   const context = runtime.newContext();
-
-  const withCpuBudget = <T>(fn: () => T): T => {
-    deadlineMs = Date.now() + cpuLimitMs;
-    try {
-      return fn();
-    } finally {
-      deadlineMs = Number.POSITIVE_INFINITY;
-    }
-  };
+  let inFlightHostCalls = 0;
 
   const formatEvalError = (errorHandle: { dispose: () => void }): string => {
     const dumped = context.dump(errorHandle as never);
@@ -74,16 +82,23 @@ export async function createQuickJsEngine(input: {
     return String(dumped);
   };
 
+  const throwIfInterrupted = (text: string): never => {
+    if (/interrupt/i.test(text) || cpu.isExceeded()) {
+      throw new Error(
+        cpu.isExceeded()
+          ? 'Sandbox CPU budget exceeded'
+          : 'Sandbox CPU limit exceeded'
+      );
+    }
+    throw new Error(`Sandbox eval failed: ${text}`);
+  };
+
   const assertEvalOk = (result: {
     error?: { dispose: () => void };
     value?: { dispose: () => void } | null;
   }): void => {
     if (result.error) {
-      const text = formatEvalError(result.error);
-      if (/interrupt/i.test(text)) {
-        throw new Error('Sandbox CPU limit exceeded');
-      }
-      throw new Error(`Sandbox eval failed: ${text}`);
+      throwIfInterrupted(formatEvalError(result.error));
     }
     try {
       result.value?.dispose();
@@ -97,11 +112,7 @@ export async function createQuickJsEngine(input: {
     value?: { dispose: () => void } | null;
   }): unknown => {
     if (result.error) {
-      const text = formatEvalError(result.error);
-      if (/interrupt/i.test(text)) {
-        throw new Error('Sandbox CPU limit exceeded');
-      }
-      throw new Error(`Sandbox eval failed: ${text}`);
+      throwIfInterrupted(formatEvalError(result.error));
     }
     if (!result.value) {
       return undefined;
@@ -120,8 +131,27 @@ export async function createQuickJsEngine(input: {
   const hostHandle = context.newFunction('__openenvxHostCall', (reqHandle) => {
     const raw = context.dump(reqHandle);
     const promise = context.newPromise();
+    if (cpu.isExceeded()) {
+      const value = context.newString(
+        JSON.stringify({
+          source: SANDBOX_BRIDGE_SOURCE,
+          v: 1,
+          id: 'error',
+          ok: false,
+          error: 'Sandbox CPU budget exceeded',
+        } satisfies SandboxBridgeResponse)
+      );
+      promise.resolve(value);
+      value.dispose();
+      return promise.handle;
+    }
+    inFlightHostCalls += 1;
     void (async () => {
       try {
+        if (cpu.isExceeded()) {
+          throw new Error('Sandbox CPU budget exceeded');
+        }
+        cpu.assert();
         const request = raw as SandboxBridgeRequest;
         if (
           !request ||
@@ -131,6 +161,9 @@ export async function createQuickJsEngine(input: {
           throw new Error('Invalid host call');
         }
         const response = await input.onHostCall(request);
+        if (cpu.isExceeded()) {
+          throw new Error('Sandbox CPU budget exceeded');
+        }
         const value = context.newString(JSON.stringify(response));
         promise.resolve(value);
         value.dispose();
@@ -148,9 +181,20 @@ export async function createQuickJsEngine(input: {
         promise.resolve(value);
         value.dispose();
       } finally {
-        withCpuBudget(() => {
-          context.runtime.executePendingJobs();
-        });
+        inFlightHostCalls = Math.max(0, inFlightHostCalls - 1);
+        // Charge host-call round-trips so async await loops cannot dodge the budget.
+        cpu.chargeHostCall();
+        try {
+          if (!cpu.isExceeded()) {
+            cpu.withBudget(() => {
+              context.runtime.executePendingJobs();
+            });
+          }
+        } catch (error) {
+          if (isSandboxCpuKillError(error)) {
+            cpu.markExceeded();
+          }
+        }
       }
     })();
     return promise.handle;
@@ -158,115 +202,10 @@ export async function createQuickJsEngine(input: {
   context.setProp(context.global, '__openenvxHostCall', hostHandle);
   hostHandle.dispose();
 
-  const bootstrap = `
-    globalThis.openenvx = {
-      ui: {
-        onmessage: null,
-        postMessage(pluginMessage) {
-          return globalThis.openenvx.call('postToUI', { pluginMessage });
-        },
-      },
-      async call(method, params) {
-        const id = Math.random().toString(36).slice(2);
-        const raw = await globalThis.__openenvxHostCall({
-          source: '${SANDBOX_BRIDGE_SOURCE}',
-          v: 1,
-          id,
-          method,
-          params: params ?? null,
-        });
-        const response = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        if (!response.ok) {
-          throw new Error(response.error || 'Host call failed');
-        }
-        return response.result;
-      },
-      _denyDuringFaceRender(method) {
-        if (this.widget && this.widget.rendering) {
-          throw new Error(method + ' is not allowed during widget face render');
-        }
-      },
-      getSelection() { return this.call('getSelection'); },
-      getPageId() { return this.call('getPageId'); },
-      executeCommand(commandId, args) {
-        this._denyDuringFaceRender('executeCommand');
-        return this.call('executeCommand', { commandId, args });
-      },
-      showUI(html, options) {
-        this._denyDuringFaceRender('showUI');
-        return this.call('showUI', { html, ...(options || {}) });
-      },
-      resizeUI(width, height) {
-        return this.call('resizeUI', { width, height });
-      },
-      closeUI() { return this.call('closeUI'); },
-      notify(message) {
-        this._denyDuringFaceRender('notify');
-        return this.call('notify', { message });
-      },
-      closePlugin() {
-        this._denyDuringFaceRender('closePlugin');
-        return this.call('closePlugin');
-      },
-      getClientStorage(key) { return this.call('getClientStorage', { key }); },
-      setClientStorage(key, value) {
-        this._denyDuringFaceRender('setClientStorage');
-        return this.call('setClientStorage', { key, value });
-      },
-      getSyncedState() { return this.call('getSyncedState'); },
-      setSyncedState(value) { return this.call('setSyncedState', { value }); },
-      resizeWidget(width, height) {
-        this._denyDuringFaceRender('resizeWidget');
-        return this.call('resizeWidget', { width, height });
-      },
-      widget: {
-        _registry: Object.create(null),
-        _handlersByLayer: Object.create(null),
-        _renderValues: null,
-        rendering: false,
-        applyProps: null,
-        _endRenderPass: null,
-        register(entry) {
-          if (!entry || typeof entry !== 'object') {
-            throw new Error('openenvx.widget.register expects an entry');
-          }
-          var id = entry.id || (entry.manifest && entry.manifest.id);
-          if (!id || typeof id !== 'string') {
-            throw new Error('openenvx.widget.register requires id');
-          }
-          this._registry[id] = entry;
-        },
-        useSyncedState(key, init) {
-          var values = this._renderValues;
-          var current =
-            values && typeof values === 'object' && Object.prototype.hasOwnProperty.call(values, key)
-              ? values[key]
-              : (typeof init === 'function' ? init() : init);
-          var set = function (next) {
-            var resolved = typeof next === 'function' ? next(current) : next;
-            current = resolved;
-            var patch = {};
-            patch[key] = resolved;
-            var apply = globalThis.openenvx.widget.applyProps;
-            if (typeof apply === 'function') {
-              return apply(patch);
-            }
-            return globalThis.openenvx.getSyncedState().then(function (live) {
-              var bag =
-                live && typeof live === 'object' && !Array.isArray(live)
-                  ? Object.assign({}, live)
-                  : {};
-              bag[key] = resolved;
-              return globalThis.openenvx.setSyncedState(bag);
-            });
-          };
-          return [current, set];
-        },
-      },
-    };
-  `;
   try {
-    const bootResult = withCpuBudget(() => context.evalCode(bootstrap));
+    const bootResult = cpu.withBudget(() =>
+      context.evalCode(sandboxBootstrapSource())
+    );
     assertEvalOk(bootResult);
   } catch (error) {
     context.dispose();
@@ -281,27 +220,87 @@ export async function createQuickJsEngine(input: {
   }
 
   const endHeldRenderPass = (): void => {
-    withCpuBudget(() => {
-      const result = context.evalCode(`(function () {
-        var w = globalThis.openenvx && globalThis.openenvx.widget;
-        if (w && typeof w._endRenderPass === 'function') {
-          w._endRenderPass();
+    try {
+      cpu.withBudget(() => {
+        const result = context.evalCode(`(function () {
+          var w = globalThis.openenvx && globalThis.openenvx.widget;
+          if (w && typeof w._endRenderPass === 'function') {
+            w._endRenderPass();
+          }
+        })()`);
+        assertEvalOk(result);
+      });
+    } catch {
+      // Best-effort clear; budget errors already thrown from evalModule.
+    }
+  };
+
+  const drainUntilIdle = async (wallDeadline: number): Promise<void> => {
+    // Pump host-call round-trips + QuickJS jobs until idle.
+    // Always yield to the host event loop so `onHostCall` async work can settle.
+    while (Date.now() < wallDeadline) {
+      cpu.assert();
+      cpu.withBudget(() => {
+        const jobs = context.runtime.executePendingJobs();
+        if (typeof jobs === 'number' && jobs < 0) {
+          throw new Error('Sandbox eval failed: pending jobs error');
         }
-      })()`);
-      assertEvalOk(result);
-    });
+      });
+      if (inFlightHostCalls === 0) {
+        // One more turn for promise reactions scheduled by resolve.
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 0);
+        });
+        cpu.assert();
+        cpu.withBudget(() => {
+          context.runtime.executePendingJobs();
+        });
+        if (inFlightHostCalls === 0) {
+          return;
+        }
+      }
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 0);
+      });
+    }
+    cpu.markExceeded();
+    throw new Error('Sandbox eval timeout');
   };
 
   return {
     async evalModule(source: string) {
+      const wallDeadline = Date.now() + evalTimeoutMs;
+      let result: {
+        error?: { dispose: () => void };
+        value?: { dispose: () => void } | null;
+      } | null = null;
       try {
-        const result = withCpuBudget(() => context.evalCode(source));
-        const dumped = dumpEvalResult(result);
-        // Drain microtasks while face-render hold is still active.
-        withCpuBudget(() => {
-          context.runtime.executePendingJobs();
-        });
-        return dumped;
+        cpu.assert();
+        result = cpu.withBudget(() => context.evalCode(source));
+        if (result.error) {
+          throwIfInterrupted(formatEvalError(result.error));
+        }
+        await drainUntilIdle(wallDeadline);
+        return dumpEvalResult(result);
+      } catch (error) {
+        if (isSandboxCpuKillError(error)) {
+          cpu.markExceeded();
+        }
+        if (result?.value) {
+          try {
+            result.value.dispose();
+          } catch {
+            // already freed
+          }
+        }
+        if (result?.error) {
+          try {
+            result.error.dispose();
+          } catch {
+            // already freed
+          }
+        }
+        throw error;
       } finally {
         endHeldRenderPass();
       }
@@ -309,7 +308,7 @@ export async function createQuickJsEngine(input: {
     deliverUiMessage(payload: unknown) {
       const encoded = JSON.stringify(payload ?? null);
       try {
-        const result = withCpuBudget(() =>
+        const result = cpu.withBudget(() =>
           context.evalCode(
             `(function (payload) {
             const ui = globalThis.openenvx && globalThis.openenvx.ui;
@@ -320,7 +319,7 @@ export async function createQuickJsEngine(input: {
           )
         );
         assertEvalOk(result);
-        withCpuBudget(() => {
+        cpu.withBudget(() => {
           context.runtime.executePendingJobs();
         });
       } finally {
@@ -328,7 +327,7 @@ export async function createQuickJsEngine(input: {
       }
     },
     dispose() {
-      deadlineMs = Number.POSITIVE_INFINITY;
+      inFlightHostCalls = 0;
       context.dispose();
       runtime.dispose();
     },

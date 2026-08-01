@@ -13,8 +13,8 @@ import type {
   Page,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createLayerPreviewBuilder } from '@openenvx/preview';
+import { createDefaultTransform } from '@openenvx/schema';
 import { z } from 'zod';
 
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';

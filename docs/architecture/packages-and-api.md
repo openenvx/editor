@@ -48,32 +48,32 @@ Hard rules:
 
 | Consumer | Prefer importing |
 | --- | --- |
-| Canvas product host (dashboard, embed) | `@xmazu/openenvxee-studio` |
-| HTML product host | `@xmazu/openenvxee-html-studio` |
+| Canvas product host (dashboard, embed) | `@openenvx/studio` |
+| HTML product host | `@openenvx/html-studio` |
 | Custom shell / playground | `@openenvx/core` + `@openenvx/headless` (+ canvas or html) |
 | In-repo **internal** plugin author | `core` + `headless` contributions; canvas APIs from `@openenvx/canvas` — [extension-guide.md](../../apps/docs/extension-guide.md) |
-| **Sandbox** widget / plugin author | `@xmazu/openenvxee-widget-sdk` + `@xmazu/openenvxee-elements` — [sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md) |
+| **Sandbox** widget / plugin author | `@openenvx/widget-sdk` + `@openenvx/elements` — [sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md) |
 | Embed parent author | protocol (+ elements `/panel` + widget-sdk `renderPanelTree`) — [sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md#embed-panels) |
-| Scene / export / LLM schemas | `@xmazu/openenvxee-schema` (+ preview / protocol as needed) |
+| Scene / export / LLM schemas | `@openenvx/schema` (+ preview / protocol as needed) |
 
 ## Package catalog
 
 | Package | Publish | Owns | Entry points |
 | --- | --- | --- | --- |
-| `@xmazu/openenvxee-schema` | yes | Scene Zod model, normalize/validate, template helpers | `.`, `./scene.schema.json` |
-| `@xmazu/openenvxee-preview` | yes | Layer preview descriptors, Render IR types | `.` |
-| `@xmazu/openenvxee-protocol` | yes | `RenderNode`, manifests, validators, sandbox grants/messages | `.` |
-| `@xmazu/openenvxee-elements` | yes | Preact element vocabulary (`/canvas` `/html` `/panel`) | `.`, `./canvas`, `./html`, `./panel`, jsx runtimes |
-| `@xmazu/openenvxee-widget-sdk` | yes | `defineExtension` / `define*Component`, props, `renderToElementTree`, Vite packaging, ambient `openenvx` | `.`, `./vite`, `./openenvx` |
+| `@openenvx/schema` | yes | Scene Zod model, normalize/validate, template helpers | `.`, `./scene.schema.json` |
+| `@openenvx/preview` | yes | Layer preview descriptors, Render IR types | `.` |
+| `@openenvx/protocol` | yes | `RenderNode`, manifests, validators, sandbox grants/messages | `.` |
+| `@openenvx/elements` | yes | Preact element vocabulary (`/canvas` `/html` `/panel`) | `.`, `./canvas`, `./html`, `./panel`, jsx runtimes |
+| `@openenvx/widget-sdk` | yes | `defineExtension` / `define*Component`, props, `renderToElementTree`, Vite packaging, ambient `openenvx` | `.`, `./vite`, `./openenvx` |
 | `@openenvx/core` | private | `EditorRuntime`, `PluginManager`, commands, layers, DI, scene store | `.` |
 | `@openenvx/headless` | private | `WorkbenchController`, UI contribution descriptors, property host, `ExternalHostMount` | `.`, `./react` |
 | `@openenvx/canvas` | private | Konva engine, layers, `CanvasBasicsPlugin`, `CanvasEditor` | `.` (+ export/registry subpaths) |
 | `@openenvx/html` | private | HTML blocks, `HtmlBlocksPlugin`, `HtmlEditorPane` | `.` |
-| `@xmazu/openenvxee-workbench` | private | `WorkbenchShell`, field renderers, sandbox/embed hosts | `.`, `./theme.css` |
-| `@xmazu/openenvxee-canvas-pro` | private | Canvas-only chrome (zoom, transform panes, floating toolbar) | `.` |
+| `@openenvx/workbench` | private | `WorkbenchShell`, field renderers, sandbox/embed hosts | `.`, `./theme.css` |
+| `@openenvx/canvas-pro` | private | Canvas-only chrome (zoom, transform panes, floating toolbar) | `.` |
 | `@openenvx/agent` | private | Agent chat sidebar plugin | `.`, `./schemas` |
-| `@xmazu/openenvxee-studio` | yes (restricted) | Fat canvas product: re-exports stack + `DEFAULT_STUDIO_PLUGINS` + sandbox factory | `.`, `./theme.css`, `./fonts.css` |
-| `@xmazu/openenvxee-html-studio` | private | Fat HTML product re-exports + `DEFAULT_HTML_STUDIO_PLUGINS` | `.`, `./theme.css` |
+| `@openenvx/studio` | yes (restricted) | Fat canvas product: re-exports stack + `DEFAULT_STUDIO_PLUGINS` + sandbox factory | `.`, `./theme.css`, `./fonts.css` |
+| `@openenvx/html-studio` | private | Fat HTML product re-exports + `DEFAULT_HTML_STUDIO_PLUGINS` | `.`, `./theme.css` |
 
 Private packages resolve from TypeScript `src/` in the workspace (HMR). Published packages ship `dist/` — see [PUBLISHING.md](../../PUBLISHING.md).
 
@@ -83,15 +83,15 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 ### Published foundation
 
-**`@xmazu/openenvxee-schema`** — `Scene` / `Page` / `Layer` types; `normalizeScene` / `validateScene` / `createEmptyScene*`; template (`applyModifications`, …); units; Zod schemas; `SCHEMA_VERSION`.
+**`@openenvx/schema`** — `Scene` / `Page` / `Layer` types; `normalizeScene` / `validateScene` / `createEmptyScene*`; template (`applyModifications`, …); units; Zod schemas; `SCHEMA_VERSION`.
 
-**`@xmazu/openenvxee-preview`** — `LayerPreviewBuilder`; Render IR document/node types; IR guards; `RENDER_IR_VERSION`.
+**`@openenvx/preview`** — `LayerPreviewBuilder`; Render IR document/node types; IR guards; `RENDER_IR_VERSION`.
 
-**`@xmazu/openenvxee-protocol`** — `RenderNode` / manifest types; `WidgetFaceRenderResult` / `WidgetRegistryEntry`; `validateRenderTree` / `validatePluginTree` / `validateWidgetTree` / `validateExtensionManifest`; sandbox grants + host/parent message unions.
+**`@openenvx/protocol`** — `RenderNode` / manifest types; `WidgetFaceRenderResult` / `WidgetRegistryEntry`; `validateRenderTree` / `validatePluginTree` / `validateWidgetTree` / `validateExtensionManifest`; sandbox grants + host/parent message unions.
 
-**`@xmazu/openenvxee-elements`** — Preact canvas/HTML/panel intrinsics only.
+**`@openenvx/elements`** — Preact canvas/HTML/panel intrinsics only.
 
-**`@xmazu/openenvxee-widget-sdk`** — `defineExtension`, `defineCanvasComponent` / `defineHtmlComponent`, `renderToElementTree`, `renderPanelTree`, `buildGrantFromManifest`; Vite `bundleWidgetSources` via `./vite`; isolate ambient via `./openenvx`.
+**`@openenvx/widget-sdk`** — `defineExtension`, `defineCanvasComponent` / `defineHtmlComponent`, `renderToElementTree`, `renderPanelTree`, `buildGrantFromManifest`; Vite `bundleWidgetSources` via `./vite`; isolate ambient via `./openenvx`.
 
 ### Editor backbone (private; re-exported by studio)
 
@@ -103,21 +103,21 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@openenvx/html`** — `HtmlBlocksPlugin`, `HtmlEditorPane`, block registry + tree helpers.
 
-**`@xmazu/openenvxee-canvas-pro`** — `CanvasProPlugin`, `DEFAULT_CANVAS_PRO_PLUGINS`, transform/print panes, align tools, crop/guides.
+**`@openenvx/canvas-pro`** — `CanvasProPlugin`, `DEFAULT_CANVAS_PRO_PLUGINS`, transform/print panes, align tools, crop/guides.
 
 **`@openenvx/agent`** — `AgentChatPlugin`, chat UI contributions; `./schemas` for proposal Zod types.
 
 ### Shell (private; selective re-export via studio)
 
-**`@xmazu/openenvxee-workbench`** — `WorkbenchShell`, default chrome/fields/inspector plugins, theme/i18n, `SandboxExtensionHost` / `EmbedPanelHost`, layout helpers.
+**`@openenvx/workbench`** — `WorkbenchShell`, default chrome/fields/inspector plugins, theme/i18n, `SandboxExtensionHost` / `EmbedPanelHost`, layout helpers.
 
 Studio re-exports a **fixed allowlist** of workbench symbols (shell + hosts + default plugins) — not the entire workbench barrel. See [`packages/studio/src/index.ts`](../../packages/studio/src/index.ts).
 
 ### Product fat bundles
 
-**`@xmazu/openenvxee-studio`** — `export *` from core, headless, canvas, canvas-pro, agent; selective workbench surface; `DEFAULT_STUDIO_PLUGINS`; `createSandboxExtensionHost()`.
+**`@openenvx/studio`** — `export *` from core, headless, canvas, canvas-pro, agent; selective workbench surface; `DEFAULT_STUDIO_PLUGINS`; `createSandboxExtensionHost()`.
 
-**`@xmazu/openenvxee-html-studio`** — same pattern for HTML (`export *` core/headless/html + selective workbench + `DEFAULT_HTML_STUDIO_PLUGINS`).
+**`@openenvx/html-studio`** — same pattern for HTML (`export *` core/headless/html + selective workbench + `DEFAULT_HTML_STUDIO_PLUGINS`).
 
 ## Not public (do not import from hosts)
 

@@ -1,4 +1,4 @@
-import { normalizeScene } from '@xmazu/openenvxee-schema';
+import { normalizeScene } from '@openenvx/schema';
 import { describe, expect, it } from "vitest";
 
 describe("schema units", () => {

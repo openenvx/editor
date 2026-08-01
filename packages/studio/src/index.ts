@@ -4,16 +4,16 @@ import {
   setOpenEnvxWidgetClickHandler,
   WIDGET_LAYER_TYPE,
 } from '@openenvx/canvas';
-import { CanvasProPlugin } from '@xmazu/openenvxee-canvas-pro';
+import { CanvasProPlugin } from '@openenvx/canvas-pro';
 import {
   SandboxExtensionHost,
   type SandboxExtensionHostOptions,
-} from '@xmazu/openenvxee-workbench';
+} from '@openenvx/workbench';
 
 export * from '@openenvx/core';
 export * from '@openenvx/headless';
 export * from '@openenvx/canvas';
-export * from '@xmazu/openenvxee-canvas-pro';
+export * from '@openenvx/canvas-pro';
 export * from '@openenvx/agent';
 
 /**
@@ -69,7 +69,7 @@ export {
   workbenchPlBundle,
   WorkbenchShell,
   type WorkbenchShellProps,
-} from '@xmazu/openenvxee-workbench';
+} from '@openenvx/workbench';
 
 /**
  * Studio factory: wires canvas widget click handler + layer type so extension JS

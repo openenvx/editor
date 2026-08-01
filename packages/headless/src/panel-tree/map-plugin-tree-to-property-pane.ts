@@ -9,7 +9,7 @@ import {
   PLUGIN_FIELD_ELEMENT_TO_KIND,
   type PluginNode,
   type PluginPropValue,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 import { encodePluginHandlerCommand } from '../properties/plugin-property-host-context';
 import {

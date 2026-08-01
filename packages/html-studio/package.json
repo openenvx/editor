@@ -1,5 +1,5 @@
 {
-  "name": "@xmazu/openenvxee-html-studio",
+  "name": "@openenvx/html-studio",
   "version": "0.1.0",
   "description": "OpenEnvx HTML Studio — workbench UI + HTML block editor",
   "license": "UNLICENSED",
@@ -19,7 +19,7 @@
     "@openenvx/core": "workspace:*",
     "@openenvx/headless": "workspace:*",
     "@openenvx/html": "workspace:*",
-    "@xmazu/openenvxee-workbench": "workspace:*"
+    "@openenvx/workbench": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18",

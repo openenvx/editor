@@ -1,4 +1,4 @@
-import type { LayerWriteMode } from '@xmazu/openenvxee-schema';
+import type { LayerWriteMode } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import { EditorService } from '../workbench/editor-service';

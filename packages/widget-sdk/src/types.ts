@@ -1,4 +1,4 @@
-import type { RenderChild, RenderNode } from '@xmazu/openenvxee-protocol';
+import type { RenderChild, RenderNode } from '@openenvx/protocol';
 
 /** Field kinds that map onto PropertyBuilder / PLUGIN_FIELD_KINDS. */
 export type WidgetFieldKind =

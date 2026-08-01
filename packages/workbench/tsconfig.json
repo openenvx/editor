@@ -10,9 +10,9 @@
       "@openenvx/core": ["../core/src/index.ts"],
       "@openenvx/headless": ["../headless/src/index.ts"],
       "@openenvx/headless/react": ["../headless/src/react/workbench-context.tsx"],
-      "@xmazu/openenvxee-schema": ["../schema/src/index.ts"],
-      "@xmazu/openenvxee-preview": ["../preview/src/index.ts"],
-      "@xmazu/openenvxee-protocol": ["../protocol/src/index.ts"]
+      "@openenvx/schema": ["../schema/src/index.ts"],
+      "@openenvx/preview": ["../preview/src/index.ts"],
+      "@openenvx/protocol": ["../protocol/src/index.ts"]
     }
   }
 }

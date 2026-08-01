@@ -1,5 +1,5 @@
 {
-  "name": "@xmazu/openenvxee-workbench",
+  "name": "@openenvx/workbench",
   "version": "0.1.4",
   "description": "React workbench UI — editor layout, primitives, and descriptor renderers",
   "license": "UNLICENSED",
@@ -29,8 +29,8 @@
     "@radix-ui/react-tabs": "1.1.17",
     "@radix-ui/react-tooltip": "1.2.12",
     "@tanstack/react-virtual": "^3.13.12",
-    "@xmazu/openenvxee-protocol": "workspace:*",
-    "@xmazu/openenvxee-schema": "workspace:*",
+    "@openenvx/protocol": "workspace:*",
+    "@openenvx/schema": "workspace:*",
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
     "i18next": "^26.3.4",

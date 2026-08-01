@@ -1,6 +1,6 @@
 # Workbench & headless
 
-**Audience:** Internal engineers and coding agents. Packages: `@openenvx/headless`, `@xmazu/openenvxee-workbench`.
+**Audience:** Internal engineers and coding agents. Packages: `@openenvx/headless`, `@openenvx/workbench`.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -9,7 +9,7 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 | Package | Responsibility |
 | --- | --- |
 | `@openenvx/headless` | Runtime: `WorkbenchController`, state, contributions, builders, property host context, `ExternalHostMount` |
-| `@xmazu/openenvxee-workbench` | React shell: `WorkbenchShell`, field/status renderers, default chrome plugins, sandbox/embed host adapters |
+| `@openenvx/workbench` | React shell: `WorkbenchShell`, field/status renderers, default chrome plugins, sandbox/embed host adapters |
 
 Headless is framework UI-agnostic descriptors. Workbench is the first-party React consumer.
 

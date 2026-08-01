@@ -2,6 +2,13 @@ import type { SceneSnapshot } from '../scene/types';
 
 const DEFAULT_HISTORY_DEPTH = 100;
 
+/**
+ * Undo/redo stack of scene snapshots.
+ *
+ * Entries hold **shared scene references** (structural sharing from path-copying
+ * transactions), not deep clones. Memory scales with changed nodes × depth,
+ * not full-document × depth. Do not mutate stored scenes.
+ */
 export class HistoryStack {
   private past: SceneSnapshot[] = [];
   private future: SceneSnapshot[] = [];

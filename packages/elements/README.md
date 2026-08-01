@@ -1,9 +1,9 @@
-# `@xmazu/openenvxee-elements`
+# `@openenvx/elements`
 
-Preact **element vocabulary** only — canvas, HTML, and panel intrinsics that emit string-tag VNodes. Authoring (`define*`, props schema, expand, Vite packaging) lives in [`@xmazu/openenvxee-widget-sdk`](../widget-sdk).
+Preact **element vocabulary** only — canvas, HTML, and panel intrinsics that emit string-tag VNodes. Authoring (`define*`, props schema, expand, Vite packaging) lives in [`@openenvx/widget-sdk`](../widget-sdk).
 
 ```tsx
-import { Stack, Text } from '@xmazu/openenvxee-elements/canvas';
+import { Stack, Text } from '@openenvx/elements/canvas';
 
 export function Face() {
   return (

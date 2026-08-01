@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { defineCanvasComponent, renderToElementTree, string } from './index';
-import { Stack, Text } from '@xmazu/openenvxee-elements/canvas';
+import { Stack, Text } from '@openenvx/elements/canvas';
 
 describe('renderToElementTree', () => {
   it('expands canvas vocabulary to RenderNode JSON', () => {

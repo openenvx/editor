@@ -1,6 +1,6 @@
 /** @jsxImportSource preact */
-import { Heading, Paragraph, Section } from '@xmazu/openenvxee-elements/html';
-import { defineHtmlComponent, string } from '@xmazu/openenvxee-widget-sdk';
+import { Heading, Paragraph, Section } from '@openenvx/elements/html';
+import { defineHtmlComponent, string } from '@openenvx/widget-sdk';
 
 /** Countdown HTML block — target date + label props. */
 export const countdownWidget = defineHtmlComponent({

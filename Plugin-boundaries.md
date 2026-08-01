@@ -22,7 +22,7 @@ Figma parity (plugins vs widgets, isolate + `showUI` iframe) lives on the **sand
 
 **Untrusted extension code must never execute inside the Studio / editor main world.**
 
-External embed panels interact only through `@xmazu/openenvxee-protocol`: serializable UI trees + a small `postMessage` (or equivalent) bus. The host validates data, maps it through the same fluent builders internals use, and renders with Studio’s own React.
+External embed panels interact only through `@openenvx/protocol`: serializable UI trees + a small `postMessage` (or equivalent) bus. The host validates data, maps it through the same fluent builders internals use, and renders with Studio’s own React.
 
 Sandbox extensions run in a QuickJS Worker isolate and talk through a capability-gated host bridge; optional UI is a sandboxed iframe (`allow-scripts` only).
 
@@ -53,7 +53,7 @@ This is the VS Code webview / Figma widget model: **UI description + message bus
 |  | Internal | External (embed panel) | External (sandbox) |
 | --- | --- | --- | --- |
 | Runs where | Same JS bundle as the editor | Other document / origin | QuickJS Worker isolate |
-| Authors with | OOP `Plugin` + fluent builders | `@xmazu/openenvxee-elements/panel` → `RenderNode` | JS/TS + widget-sdk / elements / `openenvx.*`; optional `showUI` |
+| Authors with | OOP `Plugin` + fluent builders | `@openenvx/elements/panel` → `RenderNode` | JS/TS + widget-sdk / elements / `openenvx.*`; optional `showUI` |
 | Trust | First-party | Must not execute arbitrary code in-editor | Must not execute in editor main world |
 | Mutation path | Direct `ctx.register` / workbench API | Only `command` through allowlist | Allowlisted `executeCommand` + widget `values` / face render |
 | UI path | Builders → descriptors → renderers | Tree → validate → **same** mappers/builders → renderers | Sandboxed iframe (`showUI`) or on-canvas widget face |
@@ -98,15 +98,15 @@ flowchart TB
 | Surface | Supported? | Notes |
 | --- | --- | --- |
 | React (or any framework) in `showUI` iframe | **Yes** | Authors bundle UI into HTML; host never loads it into Studio’s main React tree. Duplex: `openenvx.ui.postMessage` ↔ iframe `postPluginMessage` / `onPluginMessage`. |
-| React/Preact via `@xmazu/openenvxee-widget-sdk` + elements | **Yes** | Preact expand inside QuickJS; `renderToElementTree` emits `RenderNode`; host maps to layers. |
+| React/Preact via `@openenvx/widget-sdk` + elements | **Yes** | Preact expand inside QuickJS; `renderToElementTree` emits `RenderNode`; host maps to layers. |
 | ReactDOM as widget canvas face | **No** | Would put untrusted UI on the editor render path. |
 | Backend `renderToElementTree` round-trip | **Yes** | Same package emits element JSON; host applicators map to scene layers. |
 
-**V.1 author promise:** write your panel in React inside `showUI`; talk to the sandbox over `postMessage`. Widget faces are authored with `@xmazu/openenvxee-widget-sdk` + `@xmazu/openenvxee-elements` and stored as ordinary layers under `data.children`.
+**V.1 author promise:** write your panel in React inside `showUI`; talk to the sandbox over `postMessage`. Widget faces are authored with `@openenvx/widget-sdk` + `@openenvx/elements` and stored as ordinary layers under `data.children`.
 
 ## Protocol surface (public for untrusted embed / sandbox code)
 
-Treat `@xmazu/openenvxee-protocol` as the **only** public wire surface. One lane-neutral message set (postMessage for embed; in-process / Worker bridge for sandbox):
+Treat `@openenvx/protocol` as the **only** public wire surface. One lane-neutral message set (postMessage for embed; in-process / Worker bridge for sandbox):
 
 | Direction | Message | Role |
 | --- | --- | --- |
@@ -146,7 +146,7 @@ Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/p
 
 ## QuickJS sandbox (Phase V.1 / V.1.1)
 
-Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workbench `SandboxExtensionHost` + canvas widget click bind), mounted with `mountSandboxExtensions` / `WorkbenchShell` `mountExternalHosts`: **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` nodes carry **local** `data.values` plus a rendered face in `data.children` (collaborative CRDT deferred). Customer widgets push `source` over `widget:source`; first-party grants still use signed URLs + content hashes (minted by openenvx-cloud).
+Implemented via `@openenvx/studio` `createSandboxExtensionHost` (workbench `SandboxExtensionHost` + canvas widget click bind), mounted with `mountSandboxExtensions` / `WorkbenchShell` `mountExternalHosts`: **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` nodes carry **local** `data.values` plus a rendered face in `data.children` (collaborative CRDT deferred). Customer widgets push `source` over `widget:source`; first-party grants still use signed URLs + content hashes (minted by openenvx-cloud).
 
 **Plugin lifecycle:** production hosts default `autoStartPlugins: false` — sandbox plugins start via `openenvx.sandbox.run.<id>` (user-run). Demos may opt into auto-start. Closing the floating UI panel does not stop the isolate; **Stop** / `closePlugin` does.
 
@@ -159,14 +159,23 @@ Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workben
 | Cap | Value |
 | --- | --- |
 | Memory | 8 MiB QuickJS soft limit |
-| CPU interrupt | 5s wall-clock per sync eval / pending-jobs burst (`setInterruptHandler`) |
-| Worker eval timeout | 15s → terminate Worker |
-| Artifact size | 2 MiB; `https:` only (`http:` localhost/127.0.0.1 for tests) |
+| CPU interrupt | 5s wall-clock per sync burst (`setInterruptHandler`) |
+| Cumulative CPU | 8s inside a 10s sliding window across host-call resumes (async `await openenvx.*` loops cannot reset forever; each host call charges toward the budget) |
+| Worker eval timeout | 15s wall-clock covering sync **and** drained async work → terminate Worker |
+| In-flight host calls | 32 per isolate |
+| Artifact size | 2 MiB; `https:` only (`http:` localhost/127.0.0.1 for tests); **15s fetch timeout** |
 | Concurrent isolates | 8 |
 | `showUI` HTML | 512 KiB |
 | UI↔isolate message | JSON-serializable, 64 KiB; duplex `openenvx.ui.postMessage` ↔ iframe `postPluginMessage` / `onPluginMessage`; host pushes `ui:context` (theme always; selection only if grant has `document:read`) |
-| `notify` | 500 chars, 10/s per extension → workbench toast overlay |
+| `notify` / `console` | Rate-limited per extension (`notify` 10/s, `console` 20/s); methods are explicitly allowlisted (null capability = no grant bit required) |
+| `clientStorage` | 64 keys **per grant** (not global) |
 | Grant ingest | Constructor-only: URL/hash/`uiHtml` size + `normalizeCapabilities` + frozen `allowedCommands` |
+
+**Delivery honesty:** content-hash verification applies to the **`artifactUrl` + `contentHash`** path only. Integrator-pushed `source` / `pushWidgetSource` is trusted to the host that pushed it (no hash). Do not advertise “hash-pinned” for the widget push path.
+
+**Widget isolate granularity:** one QuickJS isolate per `extensionId` (shared by all instances of that widget). Face render + handler invoke are serialized per controller (`widgetOpTail`) so instances cannot interleave async work. Isolate-per-instance is deferred (memory under the concurrent-isolate cap).
+
+**Sandbox plugin lane (decision note):** widget face expand needs QuickJS for deterministic server-side `renderToElementTree`. Sandbox **plugins** already ship UI as `showUI` HTML — the same case where this doc prefers an iframe over a script isolate. Keeping QuickJS for plugins is intentional for a single bridge/`openenvx.*` authoring model in V.1; a future split (iframe-as-isolate for plugins, QuickJS only for widgets) would delete the async-CPU problem class for the plugin lane without changing the protocol messages.
 
 UI iframe messages use `postMessage(..., '*')` because the sandboxed frame has an opaque null origin — the host still checks `event.source === iframe.contentWindow`.
 
@@ -202,7 +211,7 @@ Rules if you sandbox JS:
 
 - No DOM, no `fetch` by default, no Studio imports
 - Only I/O is the host bridge (and optional sandboxed `showUI` iframe)
-- Cap CPU (5s interrupt + 15s Worker eval timeout), memory (8 MiB), artifact size, and tree size (tree caps already exist)
+- Cap CPU (5s sync interrupt + 8s/10s cumulative window across host calls + 15s Worker eval timeout including async drain), memory (8 MiB), artifact size/timeout, and tree size (tree caps already exist)
 - Run in a **Worker** only in production hosts (never `eval` / dynamic `import()` / in-process QuickJS on the editor UI thread). Unit tests may set `preferInProcess: true`.
 - Capabilities stay host-side (`allowedCommands`, grant capabilities)
 
@@ -218,11 +227,11 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 
 | Concern | Package |
 | --- | --- |
-| Element vocabulary, messages, `validatePluginTree` / `validateExtensionManifest`, sandbox grant types | `@xmazu/openenvxee-protocol` (published) |
-| Preact element vocabulary (`/canvas` `/html` `/panel`) | `@xmazu/openenvxee-elements` (published) |
-| Widget authoring (`defineExtension`, expand, Vite packaging) | `@xmazu/openenvxee-widget-sdk` (published) |
+| Element vocabulary, messages, `validatePluginTree` / `validateExtensionManifest`, sandbox grant types | `@openenvx/protocol` (published) |
+| Preact element vocabulary (`/canvas` `/html` `/panel`) | `@openenvx/elements` (published) |
+| Widget authoring (`defineExtension`, expand, Vite packaging) | `@openenvx/widget-sdk` (published) |
 | Tree → builder mappers, plugin host context, manifest → contributions, `ExternalHostMount`, `SandboxHostSurface` / `EmbedPanelHostSurface`, `mountSandboxHost` / `mountEmbedPanelHost` | `@openenvx/headless` |
-| `EmbedPanelHost`, `SandboxExtensionHost`, `PluginPanel`, postMessage transport, command gate, sandbox runtime | `@xmazu/openenvxee-workbench` |
+| `EmbedPanelHost`, `SandboxExtensionHost`, `PluginPanel`, postMessage transport, command gate, sandbox runtime | `@openenvx/workbench` |
 | Internal OOP plugins + builders | `@openenvx/core`, `@openenvx/headless`, product plugins (`canvas-pro`, …) |
 
 ## Related

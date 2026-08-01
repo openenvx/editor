@@ -10,7 +10,7 @@ import type {
   Page,
   Transform,
 } from '@openenvx/core';
-import type { LayerStyle } from '@xmazu/openenvxee-schema';
+import type { LayerStyle } from '@openenvx/schema';
 
 import { getDefaultPageDimensions } from '../page-presets';
 import { measureRichTextHeight } from '../rich-text-layout';

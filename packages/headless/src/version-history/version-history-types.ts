@@ -1,4 +1,4 @@
-import type { SceneSnapshot } from '@xmazu/openenvxee-schema';
+import type { SceneSnapshot } from '@openenvx/schema';
 
 /** Author metadata shown next to a version entry. */
 export interface VersionAuthor {

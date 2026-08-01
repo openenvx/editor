@@ -22,7 +22,7 @@ Full vertical slice: schema fields for bleed/safe, canvas print-guide overlays, 
 
 ## Architecture
 
-1. **`@xmazu/openenvxee-schema`** — `bleedMm` / `safeMm` on Page; resolvers + `computePagePrintBoxes`.
+1. **`@openenvx/schema`** — `bleedMm` / `safeMm` on Page; resolvers + `computePagePrintBoxes`.
 2. **`@openenvx/canvas`** — replace `PRINT_MARGIN_MM` with schema resolvers; dual overlay (safe + bleed edge).
 3. **`@openenvx/driver-image`** — `wrapTrimSvgWithCropMarks`; apply for client SVG export; IR page carries `bleedMm`.
 4. **`apps/export-service`** — after IR render, wrap for svg/pdf when bleed > 0; header `x-export-bleed-mm`.

@@ -1,5 +1,5 @@
 {
-  "name": "@xmazu/openenvxee-widget-sdk",
+  "name": "@openenvx/widget-sdk",
   "version": "0.1.0",
   "description": "OpenEnvx widget authoring SDK — defineExtension, props, Preact→RenderNode expand, Vite isolate bundling",
   "license": "MIT",
@@ -29,8 +29,8 @@
     "openenvx-manifest": "./src/cli/openenvx-manifest.ts"
   },
   "dependencies": {
-    "@xmazu/openenvxee-elements": "workspace:*",
-    "@xmazu/openenvxee-protocol": "workspace:*",
+    "@openenvx/elements": "workspace:*",
+    "@openenvx/protocol": "workspace:*",
     "preact": "^10.26.5"
   },
   "devDependencies": {

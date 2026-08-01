@@ -4,7 +4,7 @@ import {
   type ProposedChange,
 } from '@openenvx/agent/schemas';
 import { SceneStore } from '@openenvx/core';
-import { SCHEMA_VERSION } from '@xmazu/openenvxee-schema';
+import { SCHEMA_VERSION } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import { getProposalStore } from './request-context';

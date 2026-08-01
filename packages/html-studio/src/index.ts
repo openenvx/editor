@@ -3,7 +3,7 @@ import { applyHtmlWidgetFace, HtmlBlocksPlugin } from '@openenvx/html';
 import {
   SandboxExtensionHost,
   type SandboxExtensionHostOptions,
-} from '@xmazu/openenvxee-workbench';
+} from '@openenvx/workbench';
 
 export * from '@openenvx/core';
 export * from '@openenvx/headless';
@@ -42,7 +42,7 @@ export {
   SandboxExtensionHost,
   mountSandboxExtensions,
   type SandboxExtensionHostOptions,
-} from '@xmazu/openenvxee-workbench';
+} from '@openenvx/workbench';
 
 /** Sandbox host wired for HTML widget faces. */
 export function createHtmlSandboxExtensionHost(

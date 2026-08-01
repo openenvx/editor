@@ -3,7 +3,7 @@ import {
   type ImageEdgeAnchor,
   type HandleDescriptor,
 } from '@openenvx/canvas';
-import type { Transform } from '@xmazu/openenvxee-schema';
+import type { Transform } from '@openenvx/schema';
 
 const HANDLE_SIZE = 8;
 

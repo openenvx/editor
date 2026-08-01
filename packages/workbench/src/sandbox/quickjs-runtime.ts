@@ -1,7 +1,7 @@
 import type {
   SandboxBridgeRequest,
   SandboxBridgeResponse,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 import { createQuickJsEngine } from './quickjs-isolate-engine';
 import type { HostToWorker, WorkerToHost } from './quickjs-worker-protocol';

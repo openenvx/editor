@@ -1,6 +1,6 @@
 import { AssetServiceId, Command, type CommandContext } from '@openenvx/core';
 import { VersionHistoryProviderId } from '@openenvx/headless';
-import { parseValidSceneSnapshot } from '@xmazu/openenvxee-schema';
+import { parseValidSceneSnapshot } from '@openenvx/schema';
 
 export const VERSION_HISTORY_RESTORE_COMMAND_ID = 'versionHistory.restore';
 

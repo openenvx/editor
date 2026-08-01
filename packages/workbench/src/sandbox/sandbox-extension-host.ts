@@ -13,9 +13,9 @@ import type {
   ExtensionManifest,
   RenderNode,
   SandboxExtensionGrant,
-} from '@xmazu/openenvxee-protocol';
-import { validatePluginTree } from '@xmazu/openenvxee-protocol';
-import type { Layer, Scene } from '@xmazu/openenvxee-schema';
+} from '@openenvx/protocol';
+import { validatePluginTree } from '@openenvx/protocol';
+import type { Layer, Scene } from '@openenvx/schema';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
@@ -438,14 +438,18 @@ export class SandboxExtensionHost {
         if (!resolved) {
           return;
         }
-        controller.invokeWidgetHandler(
-          resolved.extensionId,
-          resolved.widgetId,
-          resolved.handlerId,
-          {
-            targetLayerId,
-          }
-        );
+        controller
+          .invokeWidgetHandler(
+            resolved.extensionId,
+            resolved.widgetId,
+            resolved.handlerId,
+            {
+              targetLayerId,
+            }
+          )
+          .catch((error) => {
+            console.error('[sandbox] widget click handler failed', error);
+          });
       });
     }
   }

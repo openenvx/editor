@@ -1,4 +1,4 @@
-/** Canvas element set — import from `@xmazu/openenvxee-elements/canvas`. */
+/** Canvas element set — import from `@openenvx/elements/canvas`. */
 export {
   Group,
   Stack,

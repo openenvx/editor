@@ -1,4 +1,4 @@
-import type { RenderNode } from '@xmazu/openenvxee-protocol';
+import type { RenderNode } from '@openenvx/protocol';
 import type { ComponentChild } from 'preact';
 
 import {

@@ -1,5 +1,5 @@
-import type { LayerWriteMode, TemplatePolicy } from '@xmazu/openenvxee-schema';
-import { LAYER_WRITE_MODES } from '@xmazu/openenvxee-schema';
+import type { LayerWriteMode, TemplatePolicy } from '@openenvx/schema';
+import { LAYER_WRITE_MODES } from '@openenvx/schema';
 
 import { Command } from '../contributions/command';
 import { ShortcutContribution } from '../contributions/shortcut-contribution';

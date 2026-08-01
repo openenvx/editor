@@ -21,7 +21,7 @@ import {
   type TreeItem,
   type TreeSelectOptions,
 } from '@openenvx/headless';
-import type { Page } from '@xmazu/openenvxee-schema';
+import type { Page } from '@openenvx/schema';
 
 export const WORKBENCH_SIDEBAR_CONTAINER_ID = 'workbench.sidebar';
 export const WORKBENCH_PAGES_VIEW_ID = 'workbench.pages';

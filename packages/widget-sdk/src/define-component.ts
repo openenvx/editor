@@ -1,7 +1,7 @@
 import type {
   WidgetFaceRenderResult,
   WidgetRegistryEntry,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 import { h, type ComponentChild } from 'preact';
 
 import type { HandlerRegistry, WidgetHandler } from './host/handlers';
@@ -87,9 +87,7 @@ function defineComponent<S extends PropsSchema>(
   kinds: WidgetKind[]
 ): RegisteredWidget {
   if (!options.id || typeof options.id !== 'string') {
-    throw new Error(
-      '@xmazu/openenvxee-widget-sdk: define*Component requires id'
-    );
+    throw new Error('@openenvx/widget-sdk: define*Component requires id');
   }
   const { fields, defaults } = compilePropsSchema(options.props);
 

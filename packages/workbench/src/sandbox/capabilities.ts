@@ -3,7 +3,7 @@ import {
   type SandboxCapability,
   type SandboxExtensionGrant,
   type SandboxHostMethod,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 import {
   assertArtifactUrl,
@@ -12,21 +12,24 @@ import {
   MAX_UI_MESSAGE_JSON_CHARS,
 } from './sandbox-caps';
 
-const METHOD_CAPABILITY: Partial<Record<SandboxHostMethod, SandboxCapability>> =
-  {
-    getSelection: 'document:read',
-    getPageId: 'document:read',
-    executeCommand: 'document:write',
-    showUI: 'ui:show',
-    resizeUI: 'ui:show',
-    closeUI: 'ui:show',
-    postToUI: 'ui:show',
-    getClientStorage: 'storage:client',
-    setClientStorage: 'storage:client',
-    getSyncedState: 'widget:values',
-    setSyncedState: 'widget:values',
-    resizeWidget: 'widget:values',
-  };
+const METHOD_CAPABILITY: Record<SandboxHostMethod, SandboxCapability | null> = {
+  getSelection: 'document:read',
+  getPageId: 'document:read',
+  executeCommand: 'document:write',
+  showUI: 'ui:show',
+  resizeUI: 'ui:show',
+  closeUI: 'ui:show',
+  postToUI: 'ui:show',
+  // null = allowed without a capability (still rate-limited / session-gated).
+  notify: null,
+  closePlugin: null,
+  console: null,
+  getClientStorage: 'storage:client',
+  setClientStorage: 'storage:client',
+  getSyncedState: 'widget:values',
+  setSyncedState: 'widget:values',
+  resizeWidget: 'widget:values',
+};
 
 /**
  * Figma-shaped kind gates (docs):
@@ -145,7 +148,10 @@ export function assertMethodAllowed(input: {
   }
 
   const required = METHOD_CAPABILITY[input.method];
-  if (required && !hasCapability(input.grant, required)) {
+  if (required === undefined) {
+    throw new Error(`Unknown method: ${input.method}`);
+  }
+  if (required !== null && !hasCapability(input.grant, required)) {
     throw new Error(`Capability denied: ${required}`);
   }
 

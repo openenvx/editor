@@ -7,7 +7,7 @@ import {
   createDefaultEditorState,
   createEmptySceneSnapshot,
   type SceneSnapshot,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 
 function snapshotFromScene(
   scene: ReturnType<typeof createCanvasDemoScene>

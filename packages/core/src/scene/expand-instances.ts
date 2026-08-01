@@ -1,7 +1,4 @@
-import type {
-  CanvasInstanceData,
-  SceneComponent,
-} from '@xmazu/openenvxee-schema';
+import type { CanvasInstanceData, SceneComponent } from '@openenvx/schema';
 
 import { getLayerChildren, hasChildLayers } from './layer-tree';
 import type { Layer, Scene } from './types';

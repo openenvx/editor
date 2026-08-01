@@ -6,7 +6,7 @@ import {
   isLayerVisible,
 } from '@openenvx/core';
 import type { Selection } from '@openenvx/core';
-import type { Layer, Scene } from '@xmazu/openenvxee-schema';
+import type { Layer, Scene } from '@openenvx/schema';
 import type { MutableRefObject } from 'react';
 
 import type { BlockRegistry } from '../block-registry';

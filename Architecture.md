@@ -42,7 +42,7 @@ Author how-to:
 | Tier | Packages | License / publish (intent) | Responsibility |
 | --- | --- | --- | --- |
 | Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives |
-| Embed / sandbox protocol | `protocol` (`@xmazu/openenvxee-protocol`) | Published (public) | `RenderNode`, manifests, validators, sandbox grants, message unions |
+| Embed / sandbox protocol | `protocol` (`@openenvx/protocol`) | Published (public) | `RenderNode`, manifests, validators, sandbox grants, message unions |
 | Product libs | `headless`, `canvas`, `html`, `driver-*`, `workbench`, `canvas-pro`, `agent`, `html-studio` | Private (workspace) | Workbench runtime, canvas engine, HTML editor, drivers, React shell, pro chrome, agent |
 | Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + canvas-pro + agent |
 
@@ -50,16 +50,16 @@ Author how-to:
 
 | Put it here | Examples |
 | --- | --- |
-| `@xmazu/openenvxee-schema` | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
+| `@openenvx/schema` | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
 | `@openenvx/headless` | `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context, external host mount surfaces |
 | `@openenvx/canvas` | Konva stage, layers, renderers, `CanvasBasicsPlugin`, `CanvasEditor` |
 | `@openenvx/html` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |
-| `@xmazu/openenvxee-workbench` | `WorkbenchShell`, field renderers, sandbox/embed hosts |
-| `@xmazu/openenvxee-canvas-pro` | Canvas-only chrome (zoom, transform panes, floating toolbar) |
-| `@xmazu/openenvxee-studio` | Product fat bundle + `DEFAULT_STUDIO_PLUGINS` + `createSandboxExtensionHost` |
-| `@xmazu/openenvxee-html-studio` | HTML product re-exports + `DEFAULT_HTML_STUDIO_PLUGINS` |
-| `@xmazu/openenvxee-protocol` | Embed panel vocabulary for untrusted parents |
+| `@openenvx/workbench` | `WorkbenchShell`, field renderers, sandbox/embed hosts |
+| `@openenvx/canvas-pro` | Canvas-only chrome (zoom, transform panes, floating toolbar) |
+| `@openenvx/studio` | Product fat bundle + `DEFAULT_STUDIO_PLUGINS` + `createSandboxExtensionHost` |
+| `@openenvx/html-studio` | HTML product re-exports + `DEFAULT_HTML_STUDIO_PLUGINS` |
+| `@openenvx/protocol` | Embed panel vocabulary for untrusted parents |
 
 ## Contribution flow (sketch)
 

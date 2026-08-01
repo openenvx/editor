@@ -1,13 +1,13 @@
-# `@xmazu/openenvxee-widget-sdk`
+# `@openenvx/widget-sdk`
 
 Widget **authoring** SDK: `defineCanvasComponent` / `defineHtmlComponent` / `defineExtension`, props schema, `renderToElementTree`, Vite isolate packaging.
 
-Preact element tags live in `@xmazu/openenvxee-elements`. Host bridge + `openenvx.*` injection live in workbench QuickJS sandbox.
+Preact element tags live in `@openenvx/elements`. Host bridge + `openenvx.*` injection live in workbench QuickJS sandbox.
 
 ```tsx
 /** @jsxImportSource preact */
-import { Stack, Text } from '@xmazu/openenvxee-elements/canvas';
-import { defineCanvasComponent, string } from '@xmazu/openenvxee-widget-sdk';
+import { Stack, Text } from '@openenvx/elements/canvas';
+import { defineCanvasComponent, string } from '@openenvx/widget-sdk';
 
 export const demo = defineCanvasComponent({
   id: 'wm.demo',
@@ -32,4 +32,4 @@ export const demo = defineCanvasComponent({
 | Map tree → layers / paint | Host (`applyWidgetFace` → Konva / HTML) |
 | `openenvx.*` bridge | Workbench injects into isolate only |
 
-Packaging: `@xmazu/openenvxee-widget-sdk/vite` → `bundleWidgetSources()`.
+Packaging: `@openenvx/widget-sdk/vite` → `bundleWidgetSources()`.

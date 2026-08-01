@@ -3,11 +3,11 @@ import type {
   PluginElementType,
   PluginNode,
   PluginPropValue,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 /**
  * Test helper: build a PluginNode without the deleted hyperscript runtime.
- * Production authors use `@xmazu/openenvxee-elements/panel` + Preact.
+ * Production authors use `@openenvx/elements/panel` + Preact.
  */
 export function n(
   type: PluginElementType,

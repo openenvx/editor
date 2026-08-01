@@ -4,14 +4,14 @@ import {
   normalizeScene,
   pruneEditorState,
   validateScene,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 import type {
   EditorState,
   Page,
   Scene,
   Selection,
   ValidationError,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 
 import type { PageRulesContribution } from '../contributions/page-rules-contribution';
 import { Emitter } from '../runtime/emitter';
@@ -37,6 +37,47 @@ function formatValidationErrors(
 export type PageRulesLookup = (
   layout: string
 ) => PageRulesContribution | undefined;
+
+/**
+ * Diff page identity against `previous` to find pages the transaction rewrote.
+ * Relies on path-copying transactions (unchanged pages keep === identity).
+ * Order-only rewrites (same page refs, new array order) return `'full'`.
+ */
+function touchedPageIds(previous: Scene, next: Scene): string[] | 'full' {
+  if (
+    previous.schemaVersion !== next.schemaVersion ||
+    previous.assets !== next.assets ||
+    previous.components !== next.components ||
+    previous.templatePolicy !== next.templatePolicy ||
+    previous.pages.length !== next.pages.length
+  ) {
+    return 'full';
+  }
+  const prevById = new Map(previous.pages.map((page) => [page.id, page]));
+  const nextIds = new Set<string>();
+  const touched: string[] = [];
+  for (let i = 0; i < next.pages.length; i += 1) {
+    const page = next.pages[i]!;
+    nextIds.add(page.id);
+    const old = prevById.get(page.id);
+    if (!old) {
+      return 'full';
+    }
+    // Same refs reordered → must not return touched:[] (would drop the move).
+    if (previous.pages[i]!.id !== page.id) {
+      return 'full';
+    }
+    if (old !== page) {
+      touched.push(page.id);
+    }
+  }
+  for (const page of previous.pages) {
+    if (!nextIds.has(page.id)) {
+      return 'full';
+    }
+  }
+  return touched;
+}
 
 export class SceneStore {
   private scene: Scene;
@@ -69,7 +110,7 @@ export class SceneStore {
    * Call once after plugins register PageRules contributions.
    */
   renormalize(): void {
-    this.scene = this.finalizeScene(this.scene);
+    this.scene = this.finalizeSceneFull(this.scene);
     this.syncEditorStateToScene();
     this.bumpRevision();
     this.notify();
@@ -91,11 +132,28 @@ export class SceneStore {
     return this.contentRevision;
   }
 
+  /**
+   * Deep-cloned snapshot for persistence / external export.
+   * Do not use for hot paths — prefer `onDidChangeScene` (shared immutable refs).
+   */
   getSnapshot(): SceneSnapshot {
     return {
       contentRevision: this.contentRevision,
       editorState: cloneEditorState(this.editorState),
       scene: cloneScene(this.scene),
+    };
+  }
+
+  /**
+   * Zero-clone snapshot for history + notify. Same `SceneSnapshot` shape as
+   * `getSnapshot()`, but scene/editorState are **shared** and must not be
+   * mutated (would corrupt live store + undo).
+   */
+  private captureSnapshot(): SceneSnapshot {
+    return {
+      contentRevision: this.contentRevision,
+      editorState: this.editorState,
+      scene: this.scene,
     };
   }
 
@@ -116,14 +174,15 @@ export class SceneStore {
   }
 
   setScene(scene: Scene): void {
-    this.scene = this.finalizeScene(scene);
+    // Full validation: load / trust-boundary replace.
+    this.scene = this.finalizeSceneFull(scene);
     this.syncEditorStateToScene();
     this.bumpContentRevision();
     this.notify();
   }
 
   restoreScene(scene: Scene, contentRevision: number): void {
-    this.scene = this.finalizeScene(scene);
+    this.scene = this.finalizeSceneFull(scene);
     this.syncEditorStateToScene();
     this.contentRevision = contentRevision;
     this.bumpRevision();
@@ -131,7 +190,7 @@ export class SceneStore {
   }
 
   restoreSnapshot(snapshot: SceneSnapshot): void {
-    this.scene = this.finalizeScene(snapshot.scene);
+    this.scene = this.finalizeSceneFull(snapshot.scene);
     this.editorState = normalizeEditorState(
       snapshot.editorState,
       this.scene.pages[0]!.id,
@@ -149,6 +208,7 @@ export class SceneStore {
       this.scene
     );
     this.bumpRevision();
+    // Selection-only: keep scene identity so React selectors / canvas pane skip re-render.
     this.notify();
   }
 
@@ -184,12 +244,27 @@ export class SceneStore {
   }
 
   apply(transaction: SceneTransaction): void {
-    const snapshot = this.getSnapshot();
-    // Finalize before history push so invalid transactions leave no side effects.
-    const nextScene = this.finalizeScene(
-      transaction.apply(cloneScene(this.scene))
-    );
-    this.history.push(snapshot);
+    const before = this.captureSnapshot();
+    // Transactions must be pure (path-copy; do not mutate `scene` in place).
+    // Skipping structuredClone lets unchanged pages/layers keep identity →
+    // incremental validation + cheap structural-sharing history.
+    const live = this.scene;
+    const drafted = transaction.apply(live);
+    if (
+      drafted === live ||
+      (drafted.pages === live.pages &&
+        drafted.assets === live.assets &&
+        drafted.components === live.components &&
+        drafted.templatePolicy === live.templatePolicy &&
+        drafted.schemaVersion === live.schemaVersion)
+    ) {
+      // True no-op (same root, or new root wrapping identical root refs).
+      // In-place mutators that return the live root corrupt the store without
+      // a history step — path-copy is required for real edits.
+      return;
+    }
+    const nextScene = this.finalizeScene(drafted, live);
+    this.history.push(before);
     this.scene = nextScene;
     if (transaction.activePageId) {
       this.editorState = normalizeEditorState(
@@ -209,7 +284,7 @@ export class SceneStore {
   }
 
   undo(): boolean {
-    const current = this.getSnapshot();
+    const current = this.captureSnapshot();
     const previous = this.history.undo(current);
     if (!previous) {
       return false;
@@ -223,7 +298,7 @@ export class SceneStore {
   }
 
   redo(): boolean {
-    const current = this.getSnapshot();
+    const current = this.captureSnapshot();
     const next = this.history.redo(current);
     if (!next) {
       return false;
@@ -248,7 +323,22 @@ export class SceneStore {
     return this.onDidChangeScene(listener).dispose;
   }
 
-  private finalizeScene(input: Scene): Scene {
+  /**
+   * Incremental when `previous` shares page identity with untouched pages;
+   * otherwise full normalize+validate (load / root-field / page add-remove).
+   */
+  private finalizeScene(input: Scene, previous: Scene): Scene {
+    const touched = touchedPageIds(previous, input);
+    if (touched === 'full' || touched.length === input.pages.length) {
+      return this.finalizeSceneFull(input);
+    }
+    if (touched.length === 0) {
+      return previous;
+    }
+    return this.finalizeSceneIncremental(input, new Set(touched));
+  }
+
+  private finalizeSceneFull(input: Scene): Scene {
     const structural = normalizeScene(input);
     const withRules = this.applyPageRules(structural);
     const withFrozen = applyFrozenLayerPolicy(withRules);
@@ -263,6 +353,44 @@ export class SceneStore {
       throw new SceneValidationError(formatValidationErrors(ruleErrors));
     }
     return withFrozen;
+  }
+
+  private finalizeSceneIncremental(input: Scene, touched: Set<string>): Scene {
+    const pages = input.pages.map((page) => {
+      if (!touched.has(page.id)) {
+        return page;
+      }
+      const normalized = normalizeScene({
+        schemaVersion: input.schemaVersion,
+        pages: [page],
+        ...(input.assets ? { assets: input.assets } : {}),
+        ...(input.components ? { components: input.components } : {}),
+        ...(input.templatePolicy
+          ? { templatePolicy: input.templatePolicy }
+          : {}),
+      });
+      return this.normalizeOnePage(normalized.pages[0]!);
+    });
+    const next: Scene = applyFrozenLayerPolicy({ ...input, pages });
+
+    for (const page of next.pages) {
+      if (!touched.has(page.id)) {
+        continue;
+      }
+      const result = validateScene({
+        schemaVersion: next.schemaVersion,
+        pages: [page],
+      });
+      if (!result.valid) {
+        throw new SceneValidationError(formatValidationErrors(result.errors));
+      }
+    }
+
+    const ruleErrors = this.collectPageRulesErrors(next, touched);
+    if (ruleErrors.length > 0) {
+      throw new SceneValidationError(formatValidationErrors(ruleErrors));
+    }
+    return next;
   }
 
   private applyPageRules(scene: Scene): Scene {
@@ -280,12 +408,18 @@ export class SceneStore {
     return rules ? rules.normalizePage(page) : page;
   }
 
-  private collectPageRulesErrors(scene: Scene): ValidationError[] {
+  private collectPageRulesErrors(
+    scene: Scene,
+    onlyPageIds?: Set<string>
+  ): ValidationError[] {
     if (!this.pageRulesLookup) {
       return [];
     }
     const errors: ValidationError[] = [];
     for (const page of scene.pages) {
+      if (onlyPageIds && !onlyPageIds.has(page.id)) {
+        continue;
+      }
       const rules = this.pageRulesLookup(page.layout);
       if (rules) {
         errors.push(...rules.validatePage(page));
@@ -319,7 +453,7 @@ export class SceneStore {
   }
 
   private notify(): void {
-    this.onDidChangeSceneEmitter.fire(this.getSnapshot());
+    this.onDidChangeSceneEmitter.fire(this.captureSnapshot());
   }
 }
 

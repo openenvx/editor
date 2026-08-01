@@ -51,7 +51,7 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
 | `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchPlugin`, workbench contributions (`ToolbarContribution`, `PropertyPaneContribution`, …), provider registries (`registerFieldRenderer`, …), `PropertyPaneBuilder`, `WorkbenchProvider`, `useWorkbenchContext` |
 | `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasBasicsPlugin`, `CanvasEditor`, `CanvasHostProvider` |
-| `@xmazu/openenvxee-protocol` | Wire contract: `RenderNode`, `ExtensionManifest`, validators, sandbox grants, unified messages |
+| `@openenvx/protocol` | Wire contract: `RenderNode`, `ExtensionManifest`, validators, sandbox grants, unified messages |
 
 ### Canvas rule (non-negotiable)
 
@@ -70,11 +70,11 @@ Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `workbenc
 
 Published packages:
 
-- **`@xmazu/openenvxee-schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](PUBLISHING.md).
-- **`@xmazu/openenvxee-elements`** — Preact element vocabulary (`/canvas`, `/html`, `/panel`). Published.
-- **`@xmazu/openenvxee-widget-sdk`** — widget authoring (`defineExtension`, `define*Component`, `renderToElementTree`, Vite packaging, ambient `openenvx`). Published; isolates share this with integrators.
-- **`@xmazu/openenvxee-protocol`** — wire contract (`RenderNode`, `ExtensionManifest`, validators, sandbox grants, message unions). Ships `dist/`; published `exports` are dist-only (see [PUBLISHING.md](PUBLISHING.md)).
-- **`@xmazu/openenvxee-studio`** — product fat bundle. Build inlines `@xmazu/openenvxee-workbench`, `@openenvx/canvas`, `@xmazu/openenvxee-canvas-pro`, `@openenvx/agent`, and their `@openenvx/*` deps into `dist/`. Re-exports `@openenvx/core` + `@openenvx/headless` so host apps can author plugins without private workspace packages. Workspace `exports` point at `src/` for HMR; `publishConfig.exports` are dist-only. PNG/JPG/PDF/SVG export is server-side via openenvx-cloud `apps/export-service`.
+- **`@openenvx/schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/elements`** — Preact element vocabulary (`/canvas`, `/html`, `/panel`). Published.
+- **`@openenvx/widget-sdk`** — widget authoring (`defineExtension`, `define*Component`, `renderToElementTree`, Vite packaging, ambient `openenvx`). Published; isolates share this with integrators.
+- **`@openenvx/protocol`** — wire contract (`RenderNode`, `ExtensionManifest`, validators, sandbox grants, message unions). Ships `dist/`; published `exports` are dist-only (see [PUBLISHING.md](PUBLISHING.md)).
+- **`@openenvx/studio`** — product fat bundle. Build inlines `@openenvx/workbench`, `@openenvx/canvas`, `@openenvx/canvas-pro`, `@openenvx/agent`, and their `@openenvx/*` deps into `dist/`. Re-exports `@openenvx/core` + `@openenvx/headless` so host apps can author plugins without private workspace packages. Workspace `exports` point at `src/` for HMR; `publishConfig.exports` are dist-only. PNG/JPG/PDF/SVG export is server-side via openenvx-cloud `apps/export-service`.
 
 ## Host sidebar panels (product hosts)
 
@@ -175,7 +175,7 @@ bun run changeset     # create a release changeset
 
 ## Publishing
 
-Only `packages/schema` (`@xmazu/openenvxee-schema`), `packages/preview` (`@xmazu/openenvxee-preview`), `packages/elements` (`@xmazu/openenvxee-elements`), `packages/widget-sdk` (`@xmazu/openenvxee-widget-sdk`), `packages/protocol` (`@xmazu/openenvxee-protocol`), and `packages/studio` (`@xmazu/openenvxee-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)). Export Worker lives in openenvx-cloud.
+Only `packages/schema` (`@openenvx/schema`), `packages/preview` (`@openenvx/preview`), `packages/elements` (`@openenvx/elements`), `packages/widget-sdk` (`@openenvx/widget-sdk`), `packages/protocol` (`@openenvx/protocol`), and `packages/studio` (`@openenvx/studio`) are published (see [PUBLISHING.md](PUBLISHING.md)). Export Worker lives in openenvx-cloud.
 
 ## Before you finish
 

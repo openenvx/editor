@@ -32,7 +32,7 @@ const bundle = await rollup({
     if (id.startsWith('\0css:') || id.endsWith('.css')) {
       return true;
     }
-    if (id.startsWith('@openenvx/') || id.startsWith('@xmazu/openenvxee-')) {
+    if (id.startsWith('@openenvx/')) {
       return false;
     }
     if (id.startsWith('.') || path.isAbsolute(id)) {

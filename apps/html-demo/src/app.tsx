@@ -6,7 +6,7 @@ import {
   DEFAULT_WORKBENCH_LAYOUT,
   mountSandboxExtensions,
   type WorkbenchApi,
-} from '@xmazu/openenvxee-html-studio';
+} from '@openenvx/html-studio';
 import countdownSource from 'openenvx-widget:./extensions/countdown.widget.tsx';
 import rsvpSource from 'openenvx-widget:./extensions/rsvp.widget.tsx';
 import { useMemo } from 'react';
@@ -15,7 +15,35 @@ import weddingManifest, {
   guestsViewTree,
 } from './extensions/wedding.extension';
 
-import '@xmazu/openenvxee-html-studio/theme.css';
+import '@openenvx/html-studio/theme.css';
+
+interface SandboxHot {
+  pushWidgetSource: (id: string, source: string) => Promise<void>;
+  applySurfaceRender?: (id: string, tree: unknown) => void;
+}
+
+if (import.meta.hot) {
+  import.meta.hot.accept(
+    'openenvx-widget:./extensions/countdown.widget.tsx',
+    (mod) => {
+      const source = (mod as { default?: string } | undefined)?.default;
+      const sandbox = import.meta.hot?.data.sandbox as SandboxHot | undefined;
+      if (source && sandbox) {
+        void sandbox.pushWidgetSource('wm.countdown', source);
+      }
+    }
+  );
+  import.meta.hot.accept(
+    'openenvx-widget:./extensions/rsvp.widget.tsx',
+    (mod) => {
+      const source = (mod as { default?: string } | undefined)?.default;
+      const sandbox = import.meta.hot?.data.sandbox as SandboxHot | undefined;
+      if (source && sandbox) {
+        void sandbox.pushWidgetSource('wm.rsvp', source);
+      }
+    }
+  );
+}
 
 function preferSandboxInProcess(): boolean {
   const enabled = new URLSearchParams(window.location.search).has(
@@ -57,12 +85,20 @@ export function App() {
 
     return (api: WorkbenchApi) => {
       const dispose = mountSandboxExtensions(api, sandbox);
+      if (import.meta.hot) {
+        import.meta.hot.data.sandbox = sandbox;
+      }
       void sandbox.pushWidgetSource('wm.countdown', countdownSource);
       void sandbox.pushWidgetSource('wm.rsvp', rsvpSource);
       if (guestsViewTree) {
         sandbox.applySurfaceRender('wm.wedding.guests', guestsViewTree);
       }
-      return dispose;
+      return () => {
+        if (import.meta.hot) {
+          import.meta.hot.data.sandbox = undefined;
+        }
+        dispose();
+      };
     };
   }, []);
 

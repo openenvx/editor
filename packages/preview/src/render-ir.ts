@@ -1,4 +1,4 @@
-import type { LengthUnit, Transform } from '@xmazu/openenvxee-schema';
+import type { LengthUnit, Transform } from '@openenvx/schema';
 
 import type { LayerPreviewDescriptor } from './layer-preview';
 

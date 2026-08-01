@@ -6,7 +6,7 @@ import {
   walkLayers,
 } from '@openenvx/core';
 import type { WorkbenchApi } from '@openenvx/headless';
-import { normalizeScene, type Scene } from '@xmazu/openenvxee-schema';
+import { normalizeScene, type Scene } from '@openenvx/schema';
 
 import type {
   CreateLayerChange,

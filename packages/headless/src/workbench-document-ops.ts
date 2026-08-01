@@ -12,12 +12,12 @@ import type {
   SceneStore,
   ServiceId,
 } from '@openenvx/core';
-import type { SceneAsset, SceneSnapshot } from '@xmazu/openenvxee-schema';
+import type { SceneAsset, SceneSnapshot } from '@openenvx/schema';
 import {
   normalizeScene,
   normalizeSceneSnapshot,
   validateScene,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/schema';
 
 export interface DocumentOpsDeps {
   sceneStore: SceneStore;

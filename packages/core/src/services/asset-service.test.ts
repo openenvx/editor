@@ -1,5 +1,5 @@
 import { InMemoryAssetService } from '@openenvx/core';
-import { createEmptyScene } from '@xmazu/openenvxee-schema';
+import { createEmptyScene } from '@openenvx/schema';
 import { describe, expect, it } from "vitest";
 
 function createPngBlob(): Blob {

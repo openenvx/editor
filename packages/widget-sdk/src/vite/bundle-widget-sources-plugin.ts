@@ -17,12 +17,20 @@ const RESOLVED_PREFIX = `\0${OPENENVX_WIDGET_PREFIX}`;
  * Not a runtime API — only delivery. After eval the module must call
  * `openenvx.widget.register` (or `define*Component`, which does).
  *
+ * Dev HMR: invalidates the virtual module and accepts via `import.meta.hot`
+ * so integrators can re-`pushWidgetSource` without a full page reload.
+ *
  * ```ts
  * // vite.config.ts
  * plugins: [bundleWidgetSources()]
  *
  * // app.tsx — host never runs this; only a string payload for the isolate
  * import source from 'openenvx-widget:./seating.widget.tsx'
+ * if (import.meta.hot) {
+ *   import.meta.hot.accept((mod) => {
+ *     void sandbox.pushWidgetSource('wm.seating', mod.default)
+ *   })
+ * }
  * await sandbox.pushWidgetSource('wm.seating', source)
  * ```
  */
@@ -93,7 +101,12 @@ export function bundleWidgetSources(
       }
       const entry = id.slice(RESOLVED_PREFIX.length);
       const source = await bundleWidget(entry);
-      return `export default ${JSON.stringify(source)};\n`;
+      // HMR accept so importers can re-push without full-reload.
+      return `export default ${JSON.stringify(source)};
+if (import.meta.hot) {
+  import.meta.hot.accept();
+}
+`;
     },
     handleHotUpdate({ file, server }) {
       const relevant = watched.has(file) || file.includes('.widget.');
@@ -109,8 +122,8 @@ export function bundleWidgetSources(
       for (const mod of mods) {
         server.moduleGraph.invalidateModule(mod);
       }
-      server.ws.send({ type: 'full-reload' });
-      return [];
+      // Prefer module HMR over full-reload so apps can re-pushWidgetSource.
+      return mods;
     },
   };
 }

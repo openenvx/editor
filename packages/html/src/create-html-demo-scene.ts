@@ -1,4 +1,4 @@
-import { SCHEMA_VERSION, type Scene } from '@xmazu/openenvxee-schema';
+import { SCHEMA_VERSION, type Scene } from '@openenvx/schema';
 
 export function createHtmlDemoScene(): Scene {
   return {

@@ -1,4 +1,4 @@
-import type { PluginElementType } from '@xmazu/openenvxee-protocol';
+import type { PluginElementType } from '@openenvx/protocol';
 import { h, type ComponentChildren, type JSX } from 'preact';
 
 type PropsWithChildren = Record<string, unknown> & {

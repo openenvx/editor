@@ -1,6 +1,6 @@
 # Studio & products
 
-**Audience:** Internal engineers and coding agents. Packages: `@xmazu/openenvxee-studio`, `@xmazu/openenvxee-html-studio`, and the apps that consume them.
+**Audience:** Internal engineers and coding agents. Packages: `@openenvx/studio`, `@openenvx/html-studio`, and the apps that consume them.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -14,7 +14,7 @@ Host product apps (dashboard Studio, embed host, demos) should not wire every pr
 
 Publishing intent: [PUBLISHING.md](../../PUBLISHING.md). Only `studio`, `schema`, and `plugin-protocol` publish today; `html-studio` stays workspace-private.
 
-## `@xmazu/openenvxee-studio` (canvas product)
+## `@openenvx/studio` (canvas product)
 
 Re-exports: `core`, `headless`, `canvas`, `canvas-pro`, `agent`, plus workbench host surface (`WorkbenchShell`, embed/sandbox mounts, themes, default chrome plugins).
 
@@ -37,7 +37,7 @@ Host apps typically:
 2. Mount `WorkbenchShell` with optional `mountExternalHosts` for embed/sandbox
 3. Alias studio to `src/` in monorepo Vite/tsconfig for HMR (`apps/canvas-demo`)
 
-## `@xmazu/openenvxee-html-studio` (HTML product)
+## `@openenvx/html-studio` (HTML product)
 
 Re-exports: `core`, `headless`, `html`, workbench shell surface (no sandbox/embed helpers in the thin index today).
 

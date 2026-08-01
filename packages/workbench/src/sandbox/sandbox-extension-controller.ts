@@ -3,7 +3,7 @@ import type {
   SandboxExtensionGrant,
   SandboxBridgeRequest,
   SandboxUiSelection,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 import {
   freezeGrant,
@@ -18,6 +18,9 @@ import {
 import { createQuickJsIsolate, type SandboxIsolate } from './quickjs-runtime';
 import {
   assertNotifyPolicy,
+  assertConsolePolicy,
+  MAX_CLIENT_STORAGE_KEYS_PER_GRANT,
+  MAX_CLIENT_STORAGE_VALUE_CHARS,
   MAX_CONCURRENT_ISOLATES,
   MAX_SHOW_UI_HTML_CHARS,
   MAX_WIDGET_VALUES_JSON_CHARS,
@@ -56,13 +59,18 @@ export type SandboxUiOutboundListener = (pluginMessage: unknown) => void;
 
 export type SandboxUiContextListener = () => void;
 
-const MAX_CLIENT_STORAGE_KEYS = 64;
-const MAX_CLIENT_STORAGE_VALUE_CHARS = 32_768;
-
-function isolateKey(extensionId: string, layerId?: string): string {
-  // Widgets share one isolate per extension (mounted roots per instance).
-  // Plugins still use extensionId only (layerId ignored).
-  void layerId;
+/**
+ * Isolate key for the runtime map.
+ *
+ * **Decision (V.1.1):** one QuickJS isolate per `extensionId` for widgets —
+ * not per layer instance. Instances share the registry/handlers bag; the host
+ * serializes face render + handler invoke via `widgetOpTail` /
+ * `withWidgetLayerContext` so async work from different layers cannot
+ * interleave. Isolate-per-instance would multiply Worker/Wasm memory under
+ * `MAX_CONCURRENT_ISOLATES` and is deferred until a product needs true
+ * parallel instance scripts.
+ */
+function isolateKey(extensionId: string): string {
   return extensionId;
 }
 
@@ -73,6 +81,7 @@ export class SandboxExtensionController {
   private readonly clientStorage = new Map<string, unknown>();
   private readonly grantById = new Map<string, SandboxExtensionGrant>();
   private readonly notifyTimestamps = new Map<string, number[]>();
+  private readonly consoleTimestamps = new Map<string, number[]>();
   private uiState: SandboxUiState | null = null;
   private readonly uiListeners = new Set<SandboxUiListener>();
   private readonly notifyListeners = new Set<SandboxNotifyListener>();
@@ -190,6 +199,7 @@ export class SandboxExtensionController {
     layerId: string | undefined,
     message: unknown
   ): void {
+    void layerId;
     if (this.disposed) {
       return;
     }
@@ -198,7 +208,7 @@ export class SandboxExtensionController {
     } catch {
       return;
     }
-    const key = isolateKey(extensionId, layerId);
+    const key = isolateKey(extensionId);
     const isolate =
       this.isolates.get(key) ?? this.isolates.get(extensionId) ?? null;
     if (!isolate) {
@@ -225,7 +235,7 @@ export class SandboxExtensionController {
     if (!frozen) {
       throw new Error(`Unknown sandbox grant: ${grant.id}`);
     }
-    const key = isolateKey(frozen.id, layerId);
+    const key = isolateKey(frozen.id);
     if (this.isolates.has(key) || this.starting.has(key)) {
       return;
     }
@@ -372,7 +382,7 @@ export class SandboxExtensionController {
   }
 
   stop(extensionId: string, layerId?: string): void {
-    const key = isolateKey(extensionId, layerId);
+    const key = isolateKey(extensionId);
     const isolate = this.isolates.get(key);
     isolate?.dispose();
     this.isolates.delete(key);
@@ -413,13 +423,14 @@ export class SandboxExtensionController {
    * Invoke a handler id inside the extension isolate for a widget layer.
    * Installs applyProps for the full handler lifetime (including async).
    * Handler pass is not a face-render pass — executeCommand / showUI allowed.
+   * Awaits async settlement so the Worker eval timeout covers handler work.
    */
-  invokeWidgetHandler(
+  async invokeWidgetHandler(
     extensionId: string,
     layerId: string,
     handlerId: string,
     payload?: unknown
-  ): void {
+  ): Promise<void> {
     if (this.disposed) {
       return;
     }
@@ -427,7 +438,7 @@ export class SandboxExtensionController {
     if (!isolate) {
       return;
     }
-    void this.withWidgetLayerContext(layerId, async () => {
+    await this.withWidgetLayerContext(layerId, async () => {
       try {
         await isolate.evalModule(
           `(async function () {
@@ -526,6 +537,41 @@ export class SandboxExtensionController {
     this.notifyTimestamps.set(extensionId, updated);
   }
 
+  private emitConsole(
+    extensionId: string,
+    level: string,
+    args: unknown[]
+  ): void {
+    const updated = assertConsolePolicy({
+      args,
+      recentTimestamps: this.consoleTimestamps.get(extensionId) ?? [],
+    });
+    this.consoleTimestamps.set(extensionId, updated);
+    const tag = `[sandbox:${extensionId}]`;
+    const fn =
+      level === 'error'
+        ? console.error
+        : level === 'warn'
+          ? console.warn
+          : level === 'info'
+            ? console.info
+            : level === 'debug'
+              ? console.debug
+              : console.log;
+    fn(tag, ...args);
+  }
+
+  private countClientStorageKeys(grantId: string): number {
+    const prefix = `${grantId}:`;
+    let count = 0;
+    for (const key of this.clientStorage.keys()) {
+      if (key.startsWith(prefix)) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
   /**
    * Run `fn` with `activeWidgetLayerId` set, serialized against other widget ops
    * on this controller (shared isolate must not interleave instance contexts).
@@ -615,7 +661,8 @@ export class SandboxExtensionController {
         const storageKey = `${grant.id}:${key}`;
         if (
           !this.clientStorage.has(storageKey) &&
-          this.clientStorage.size >= MAX_CLIENT_STORAGE_KEYS
+          this.countClientStorageKeys(grant.id) >=
+            MAX_CLIENT_STORAGE_KEYS_PER_GRANT
         ) {
           throw new Error('clientStorage key limit exceeded');
         }
@@ -653,6 +700,9 @@ export class SandboxExtensionController {
           );
         }
         this.options.resizeWidgetLayer?.(id, width, height);
+      },
+      console: (level, args) => {
+        this.emitConsole(grant.id, level, args);
       },
     };
   }

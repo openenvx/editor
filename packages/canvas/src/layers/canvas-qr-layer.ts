@@ -6,11 +6,8 @@ import type {
   Page,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import {
-  createLayerPreviewBuilder,
-  encodeQrToSvg,
-} from '@xmazu/openenvxee-preview';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createLayerPreviewBuilder, encodeQrToSvg } from '@openenvx/preview';
+import { createDefaultTransform } from '@openenvx/schema';
 import { z } from 'zod';
 
 export const canvasQrSchema = z.object({

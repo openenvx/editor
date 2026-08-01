@@ -1,4 +1,4 @@
-import { createEmptySceneSnapshot } from '@xmazu/openenvxee-schema';
+import { createEmptySceneSnapshot } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import { InMemoryPersistenceService } from './in-memory-persistence-service';

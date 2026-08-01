@@ -1,6 +1,6 @@
 /** @jsxImportSource preact */
-import { Toolbar, ToolbarCommand } from '@xmazu/openenvxee-elements/panel';
-import { defineExtension, renderPanelTree } from '@xmazu/openenvxee-widget-sdk';
+import { Toolbar, ToolbarCommand } from '@openenvx/elements/panel';
+import { defineExtension, renderPanelTree } from '@openenvx/widget-sdk';
 
 import { seatingWidget } from './seating.widget';
 

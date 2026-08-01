@@ -65,7 +65,8 @@ export type SandboxHostMethod =
   | 'setClientStorage'
   | 'getSyncedState'
   | 'setSyncedState'
-  | 'resizeWidget';
+  | 'resizeWidget'
+  | 'console';
 
 export interface SandboxBridgeRequest {
   source: typeof SANDBOX_BRIDGE_SOURCE;

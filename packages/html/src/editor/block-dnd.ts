@@ -4,7 +4,7 @@ import {
   type CollisionDetection,
 } from '@dnd-kit/core';
 import { isLayerVisible } from '@openenvx/core';
-import type { Layer } from '@xmazu/openenvxee-schema';
+import type { Layer } from '@openenvx/schema';
 
 export interface BlockSortDraft {
   activeId: string;

@@ -1,4 +1,4 @@
-import type { Scene } from '@xmazu/openenvxee-schema';
+import type { Scene } from '@openenvx/schema';
 import { createContext, useContext, type ReactNode } from 'react';
 
 import type { BlockSortDraft } from './block-dnd';

@@ -1,4 +1,4 @@
-import { normalizeSceneSnapshot } from '@xmazu/openenvxee-schema';
+import { normalizeSceneSnapshot } from '@openenvx/schema';
 import { describe, expect, it, vi } from 'vitest';
 
 import { PropertyPath } from './property-path';

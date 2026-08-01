@@ -1,6 +1,6 @@
 import type { Layer, Transform } from '@openenvx/core';
 import { getLayerChildren } from '@openenvx/core';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@openenvx/schema';
 
 import {
   CANVAS_GROUP_LAYER_TYPE,

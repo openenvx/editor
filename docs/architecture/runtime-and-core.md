@@ -1,6 +1,6 @@
 # Runtime & core
 
-**Audience:** Internal engineers and coding agents. Package: `@openenvx/core` (+ `@xmazu/openenvxee-schema` for the document).
+**Audience:** Internal engineers and coding agents. Package: `@openenvx/core` (+ `@openenvx/schema` for the document).
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -17,7 +17,7 @@ Plugin host primitives and the editor runtime. **No** canvas types, Konva, workb
 | `PropertyBuilder` | Layer property field/section descriptors (`LayerDefinition.properties()`) |
 | `Registry<K, V>` | Keyed runtime registrations (distinct from static contributions and DI services) |
 
-## Scene document (`@xmazu/openenvxee-schema`)
+## Scene document (`@openenvx/schema`)
 
 Canonical content Scene JSON is Zod v4 (`sceneSchemaLenient` / `sceneSchemaCanonical`). Defaults, `validateScene` / `normalizeScene`, and published `scene.schema.json` come from that schema.
 

@@ -115,6 +115,118 @@ describe(SceneStore, () => {
     expect(store.getSelection().primaryLayerId).toBe("a");
   });
 
+  it("keeps scene identity on selection-only changes", () => {
+    const store = new SceneStore();
+    const before = store.getScene();
+    let notifiedScene: unknown;
+    store.onDidChangeScene((snapshot) => {
+      notifiedScene = snapshot.scene;
+    });
+    store.selectLayers([], null);
+    expect(store.getScene()).toBe(before);
+    expect(notifiedScene).toBe(before);
+  });
+
+  it("shares page identity for untouched pages after apply", () => {
+    const store = new SceneStore({
+      schemaVersion: 4,
+      pages: [
+        {
+          id: "p1",
+          name: "One",
+          layout: "absolute",
+          width: 100,
+          height: 100,
+          layers: [
+            {
+              id: "a",
+              type: "canvas.rect",
+              data: { fill: "#000" },
+              transform: {
+                x: 0,
+                y: 0,
+                width: 10,
+                height: 10,
+                rotation: 0,
+                opacity: 1,
+              },
+            },
+          ],
+        },
+        {
+          id: "p2",
+          name: "Two",
+          layout: "absolute",
+          width: 100,
+          height: 100,
+          layers: [],
+        },
+      ],
+    });
+    const page2Before = store.getScene().pages[1];
+    store.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: scene.pages.map((page) =>
+          page.id === "p1"
+            ? {
+                ...page,
+                layers: page.layers.map((layer) =>
+                  layer.id === "a"
+                    ? {
+                        ...layer,
+                        transform: {
+                          ...layer.transform!,
+                          x: 5,
+                        },
+                      }
+                    : layer
+                ),
+              }
+            : page
+        ),
+      }),
+      label: "Move a",
+    });
+    expect(store.getScene().pages[1]).toBe(page2Before);
+  });
+
+  it("commits page reorder when page refs are unchanged", () => {
+    const store = new SceneStore({
+      schemaVersion: 4,
+      pages: [
+        {
+          id: "p1",
+          name: "One",
+          layout: "absolute",
+          width: 100,
+          height: 100,
+          layers: [],
+        },
+        {
+          id: "p2",
+          name: "Two",
+          layout: "absolute",
+          width: 100,
+          height: 100,
+          layers: [],
+        },
+      ],
+    });
+    store.apply({
+      apply: (scene) => ({
+        ...scene,
+        // Same page object refs, new array order (Pages panel path).
+        pages: [scene.pages[1]!, scene.pages[0]!],
+      }),
+      label: "Reorder pages",
+    });
+    expect(store.getScene().pages.map((page) => page.id)).toStrictEqual([
+      "p2",
+      "p1",
+    ]);
+  });
+
   it("prunes stale selection after apply removes layers", () => {
     const store = new SceneStore();
     const pageId = store.getScene().pages[0]!.id;

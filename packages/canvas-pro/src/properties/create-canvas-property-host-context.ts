@@ -2,7 +2,7 @@ import type {
   PropertyPathContextOptions,
   WorkbenchApi,
 } from '@openenvx/headless';
-import type { Transform } from '@xmazu/openenvxee-schema';
+import type { Transform } from '@openenvx/schema';
 
 import { createCanvasPropertyHostContext } from './canvas-property-path-context';
 import type { CanvasPropertyPathContextOptions } from './canvas-property-path-context';

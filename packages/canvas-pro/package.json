@@ -1,5 +1,5 @@
 {
-  "name": "@xmazu/openenvxee-canvas-pro",
+  "name": "@openenvx/canvas-pro",
   "version": "0.1.4",
   "description": "Pro canvas design tools for OpenEnvx — smart guides, alignment, distribution",
   "license": "UNLICENSED",
@@ -13,14 +13,15 @@
   "scripts": {
     "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/ dist/",
     "test": "vitest run",
+    "bench": "vitest bench --run",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@openenvx/canvas": "workspace:*",
     "@openenvx/core": "workspace:*",
     "@openenvx/headless": "workspace:*",
-    "@xmazu/openenvxee-preview": "workspace:*",
-    "@xmazu/openenvxee-schema": "workspace:*",
+    "@openenvx/preview": "workspace:*",
+    "@openenvx/schema": "workspace:*",
     "konva": "^10.3.0",
     "react-konva": "^19.2.1"
   },

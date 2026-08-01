@@ -4,7 +4,7 @@ import {
   type ExtensionManifest,
   type SandboxCapability,
   type SandboxExtensionGrant,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 import type { CommandPaletteBuilder } from '../builders/command-palette-builder';
 import { CommandPaletteContribution } from '../contributions/command-palette-contribution';

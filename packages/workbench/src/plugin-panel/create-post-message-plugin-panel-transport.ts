@@ -2,7 +2,7 @@ import {
   PLUGIN_PARENT_SOURCE,
   type HostToParentMessage,
   type ParentToHostMessage,
-} from '@xmazu/openenvxee-protocol';
+} from '@openenvx/protocol';
 
 import type { PluginPanelTransport } from './plugin-panel-transport';
 

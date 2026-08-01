@@ -1,6 +1,6 @@
 import { hasChildLayers } from '@openenvx/core';
 import { getNestedValue, setNestedValue } from '@openenvx/headless';
-import type { Layer } from '@xmazu/openenvxee-schema';
+import type { Layer } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
 import { BlockRegistryServiceId } from '../block-registry';

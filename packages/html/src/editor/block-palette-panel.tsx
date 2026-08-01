@@ -4,7 +4,7 @@ import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
-import type { Layer } from '@xmazu/openenvxee-schema';
+import type { Layer } from '@openenvx/schema';
 import { memo, useCallback, useSyncExternalStore } from 'react';
 
 import { defaultBlockRegistry } from '../block-registry';

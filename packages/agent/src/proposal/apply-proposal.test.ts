@@ -20,7 +20,7 @@ vi.mock('@openenvx/core', () => ({
   }),
 }));
 
-vi.mock('@xmazu/openenvxee-schema', () => ({
+vi.mock('@openenvx/schema', () => ({
   createDefaultTransform: () => ({
     x: 0,
     y: 0,

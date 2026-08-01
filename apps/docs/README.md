@@ -1,22 +1,26 @@
 # Extension authoring — pick a path
 
-OpenEnvx has **three different extension trees**. They are not interchangeable. Pick one before writing code.
+**Widgets are objects on the canvas. Plugins are tools you run.** Start there, then pick the trust lane.
 
-| Path | Trust | Runs where | Author with | Guide |
-| --- | --- | --- | --- | --- |
-| **Internal plugin** | First-party, trusted | Same JS bundle as Studio (`PluginManager`) | OOP `Plugin` / `WorkbenchPlugin`, builders | [Internal plugin guide](extension-guide.md) |
-| **Sandbox widget / plugin** | Untrusted | QuickJS Worker isolate (+ optional `showUI` iframe) | `@xmazu/openenvxee-widget-sdk` + `@xmazu/openenvxee-elements` | [Sandbox & embed guide](sandbox-extension-guide.md) |
-| **Embed panel** | Parent page | Other document / origin (`postMessage`) | Protocol `RenderNode` trees (+ optional elements `/panel`) | [Sandbox & embed guide](sandbox-extension-guide.md#embed-panels) |
+| You want… | Path | Guide |
+| --- | --- | --- |
+| An interactive object on the canvas / HTML page | **Sandbox widget** (`kind: 'widget'`) | [Sandbox guide](sandbox-extension-guide.md) |
+| A user-run tool (import, setup, panel) | **Sandbox plugin** (`kind: 'plugin'`) | [Sandbox guide](sandbox-extension-guide.md) |
+| First-party editor features in the same bundle | **Internal plugin** (`PluginManager`) | [Internal plugin guide](extension-guide.md) |
+| Chrome from a parent page over an iframe embed | **Embed panel** (no QuickJS) | [Sandbox guide — embed](sandbox-extension-guide.md#embed-panels) |
 
 ```text
-Internal  →  PluginManager + DI          (full editor APIs)
-Sandbox   →  QuickJS isolate + grants    (capability-gated bridge)
-Embed     →  postMessage + validators   (no isolate JS in editor)
+Widget  →  on-canvas face (data.values + data.children)
+Plugin  →  off-canvas tool (showUI iframe + bridge)
+Internal → full editor APIs (trusted OOP)
+Embed   →  parent postMessage trees (weakest lane)
 ```
 
-**Hard rule:** untrusted code never executes in the Studio main world. Do not load marketplace/customer JS via `PluginManager`. Do not write an internal `WorkbenchPlugin` when you meant a sandbox widget.
+**Hard rule:** untrusted code never executes in the Studio main world. Do not load marketplace/customer JS via `PluginManager`.
 
-Architecture / trust deep-dives:
+Author packages (published): `@openenvx/widget-sdk` + `@openenvx/elements`.
+
+Deep dives (trust taxonomy, protocol messages, caps):
 
 - [docs/architecture/extensions.md](../../docs/architecture/extensions.md)
 - [Plugin-boundaries.md](../../Plugin-boundaries.md)

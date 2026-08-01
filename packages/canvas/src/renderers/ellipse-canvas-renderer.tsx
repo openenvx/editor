@@ -1,4 +1,4 @@
-import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
+import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { memo } from 'react';
 import { Ellipse, Rect } from 'react-konva';
 

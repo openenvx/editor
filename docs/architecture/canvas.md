@@ -1,6 +1,6 @@
 # Canvas
 
-**Audience:** Internal engineers and coding agents. Package: `@openenvx/canvas` (+ chrome in `@xmazu/openenvxee-canvas-pro`).
+**Audience:** Internal engineers and coding agents. Package: `@openenvx/canvas` (+ chrome in `@openenvx/canvas-pro`).
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -32,7 +32,7 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 | Package | Responsibility |
 | --- | --- |
 | `@openenvx/canvas` | Engine: layers, commands, Konva, `CanvasEditor` |
-| `@xmazu/openenvxee-canvas-pro` | Canvas-only workbench chrome: zoom/selection status, transform property panes, insert-tool toolbar, grid/rulers, floating toolbar layout defaults |
+| `@openenvx/canvas-pro` | Canvas-only workbench chrome: zoom/selection status, transform property panes, insert-tool toolbar, grid/rulers, floating toolbar layout defaults |
 
 Scene-generic chrome (Pages/Layers, dirty status) is workbench default — not canvas-pro.
 
