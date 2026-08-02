@@ -1,0 +1,190 @@
+/* Blocks gallery — Design.md tool chrome: 12–13px type, inset rings, quiet dark. */
+
+.sheetHeader {
+  padding: 16px 16px 10px;
+}
+
+.searchSection {
+  flex: none;
+  padding: 0 16px 10px;
+}
+
+.searchWrap {
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 14px;
+  height: 14px;
+  color: var(--wb-muted-foreground, #a1a1aa);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.search {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--wb-control-height, 28px);
+  padding: 0 10px 0 30px;
+  border: none;
+  border-radius: var(--wb-radius-control, 8px);
+  background: var(--wb-muted, #27272a);
+  box-shadow: var(--wb-shadow-control, 0 0 0 1px rgb(255 255 255 / 6%));
+  color: var(--wb-foreground, #fafafa);
+  font-family: var(--wb-font, Geist, Inter, system-ui, sans-serif);
+  font-size: var(--wb-text-sm, 12px);
+  font-weight: 400;
+  outline: none;
+}
+
+.search::placeholder {
+  color: var(--wb-muted-foreground, #a1a1aa);
+}
+
+.search:hover {
+  box-shadow: var(--wb-shadow-control-hover, 0 0 0 1px rgb(255 255 255 / 10%));
+}
+
+.search:focus-visible {
+  box-shadow: var(--wb-shadow-control-focus);
+}
+
+.chipsSection {
+  flex: none;
+  padding: 0 16px 10px;
+  border-bottom: 1px solid var(--wb-divider-color, rgb(255 255 255 / 8%));
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip,
+.chipActive {
+  flex: none;
+  height: 24px;
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--wb-radius-control, 8px);
+  background: transparent;
+  box-shadow: var(--wb-shadow-control, 0 0 0 1px rgb(255 255 255 / 6%));
+  color: var(--wb-muted-foreground, #a1a1aa);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--wb-text-xs, 11px);
+  font-weight: 500;
+  line-height: 24px;
+  transition:
+    color 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+  white-space: nowrap;
+}
+
+.chip:hover {
+  color: var(--wb-foreground, #fafafa);
+  background: var(--wb-hover-overlay, rgb(255 255 255 / 4%));
+}
+
+.chipActive {
+  background: var(--wb-muted, #27272a);
+  box-shadow: var(--wb-segment-active-ring, 0 0 0 1px rgb(255 255 255 / 10%));
+  color: var(--wb-foreground, #fafafa);
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px 16px 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  border-radius: var(--wb-radius-control, 8px);
+  background: var(--wb-card, #18181b);
+  box-shadow: var(--wb-shadow-sm, 0 0 0 1px rgb(255 255 255 / 8%));
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.card:hover {
+  background: var(--wb-muted, #27272a);
+  box-shadow: var(--wb-shadow-control-hover, 0 0 0 1px rgb(255 255 255 / 10%));
+}
+
+.card:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-focus);
+}
+
+.thumb {
+  display: block;
+  width: 100%;
+  height: 96px;
+  overflow: hidden;
+  background: var(--wb-artboard, #ffffff);
+  box-shadow: inset 0 -1px 0 var(--wb-divider-color, rgb(255 255 255 / 8%));
+}
+
+.thumbScale {
+  display: block;
+  width: 600px;
+  pointer-events: none;
+  transform: scale(0.26);
+  transform-origin: top left;
+}
+
+.cardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px 10px;
+}
+
+.cardTitle {
+  color: var(--wb-foreground, #fafafa);
+  font-size: var(--wb-text-sm, 12px);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.cardDesc {
+  color: var(--wb-muted-foreground, #a1a1aa);
+  font-size: var(--wb-text-xs, 11px);
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.empty {
+  margin: 12px 0;
+  color: var(--wb-muted-foreground, #a1a1aa);
+  font-size: var(--wb-text-sm, 12px);
+}

@@ -246,25 +246,31 @@ export const imageBlock: BlockConfig = {
     src: { kind: 'image', label: 'Image' },
     alt: { kind: 'text', label: 'Alt' },
     width: { kind: 'number', label: 'Width (px)' },
+    height: { kind: 'number', label: 'Height (px)' },
   },
   defaultData: {
     src: 'https://placehold.co/600x200',
     alt: 'Placeholder',
     width: 600,
   },
-  render: ({ data }) => (
-    <Img
-      alt={String(data.alt ?? '')}
-      src={sanitizeUrl(String(data.src ?? ''), { allowDataImage: true })}
-      style={{
-        display: 'block',
-        maxWidth: '100%',
-        height: 'auto',
-        margin: '0 0 16px',
-      }}
-      width={Number(data.width ?? EMAIL_WIDTH) || EMAIL_WIDTH}
-    />
-  ),
+  render: ({ data }) => {
+    const height = Number(data.height);
+    const hasHeight = Number.isFinite(height) && height > 0;
+    return (
+      <Img
+        alt={String(data.alt ?? '')}
+        height={hasHeight ? height : undefined}
+        src={sanitizeUrl(String(data.src ?? ''), { allowDataImage: true })}
+        style={{
+          display: 'block',
+          maxWidth: '100%',
+          height: hasHeight ? height : 'auto',
+          margin: hasHeight ? 0 : '0 0 16px',
+        }}
+        width={Number(data.width ?? EMAIL_WIDTH) || EMAIL_WIDTH}
+      />
+    );
+  },
 };
 
 export const dividerBlock: BlockConfig = {

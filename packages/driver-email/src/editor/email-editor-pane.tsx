@@ -42,6 +42,7 @@ import {
   EmailBlockRegistryServiceId,
 } from '../block-registry';
 import type { BlockEditTarget } from './block-edit-target';
+import { EmailPatternBlocksSheet } from './pattern-blocks-sheet';
 import { useEmailStageMetrics } from './use-email-stage-metrics';
 
 import styles from './email-editor-pane.module.css';
@@ -307,6 +308,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
           </div>
         </div>
       </div>
+      <EmailPatternBlocksSheet />
     </DndContext>
   );
 });

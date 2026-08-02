@@ -9,19 +9,31 @@ import {
 } from '../block-registry';
 import { builtinEmailBlocks } from '../blocks/builtin-blocks';
 import {
-  EmailBlocksContainer,
-  EmailBlocksView,
-  EMAIL_BLOCKS_PANEL_COMPONENT_ID,
+  emailPatternBlocks,
+  emailPatternPartBlocks,
+} from '../blocks/pattern-blocks';
+import { OpenEmailBlocksSheetCommand } from '../commands/open-blocks-sheet-command';
+import {
+  EmailElementsContainer,
+  EmailElementsView,
+  EMAIL_ELEMENTS_PANEL_COMPONENT_ID,
 } from '../contributions/email-blocks-sidebar';
 import { EmailContextMenu } from '../contributions/email-context-menu';
+import { EmailPatternsContainer } from '../contributions/email-patterns-sidebar';
 import { EmailBlockPalettePanel } from '../editor/block-palette-panel';
 import { EmailEditorPane } from '../editor/email-editor-pane';
+
+const allEmailBlocks = [
+  ...builtinEmailBlocks,
+  ...emailPatternPartBlocks,
+  ...emailPatternBlocks,
+];
 
 export class EmailBlocksPlugin extends WorkbenchPlugin {
   readonly id = 'OpenEnvx.email-blocks';
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
-    for (const block of builtinEmailBlocks) {
+    for (const block of allEmailBlocks) {
       emailBlockRegistry.register(block);
     }
 
@@ -30,7 +42,8 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
         EmailBlockRegistryServiceId,
         () => emailBlockRegistry
       ),
-      ...builtinEmailBlocks.map((block) =>
+      new OpenEmailBlocksSheetCommand(),
+      ...allEmailBlocks.map((block) =>
         createHtmlLayerDefinition(block, {
           registryServiceId: EmailBlockRegistryServiceId,
         })
@@ -46,11 +59,12 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
 
     ctx.registerWorkbench(
       new EmailContextMenu(),
-      new EmailBlocksContainer(),
-      new EmailBlocksView()
+      new EmailPatternsContainer(),
+      new EmailElementsContainer(),
+      new EmailElementsView()
     );
     ctx.registerViewPanel(
-      EMAIL_BLOCKS_PANEL_COMPONENT_ID,
+      EMAIL_ELEMENTS_PANEL_COMPONENT_ID,
       EmailBlockPalettePanel
     );
     ctx.registerEditorPane('email', EmailEditorPane);

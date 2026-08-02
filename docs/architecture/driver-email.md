@@ -11,8 +11,9 @@ Block editor for pages with `page.layout === 'email'`. Same core/headless/workbe
 ## What driver-email owns
 
 - Email `BlockConfig` set wrapping React-Email primitives (`email.root`, `email.section`, `email.columns`, `email.heading`, `email.text`, `email.button`, `email.image`, `email.divider`, `email.spacer`)
+- Predefined pattern composites (`email.header` with slots; `email.link` as a slot part) in a left **Blocks** gallery sheet (search + group chips); not the Elements palette
 - Own `emailBlockRegistry` + `EmailBlockRegistryServiceId` (does not mix with the html palette)
-- `EmailBlocksPlugin` — layer definitions, `email.*` block commands, Blocks sidebar, `EmailEditorPane` for `page.layout === 'email'`
+- `EmailBlocksPlugin` — layer definitions, `email.*` block commands, **Blocks** activity command (opens sheet) + **Elements** (primitives) sidebar, `EmailEditorPane` for `page.layout === 'email'`
 - `renderEmailDocument(page, registry)` — walks the layer tree with the same `BlockConfig.render` functions and produces email-safe HTML via `@react-email/render`
 
 ## Editing vs export
