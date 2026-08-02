@@ -8,10 +8,7 @@ import {
   EmailBlockRegistryServiceId,
 } from '../block-registry';
 import { builtinEmailBlocks } from '../blocks/builtin-blocks';
-import {
-  emailPatternBlocks,
-  emailPatternPartBlocks,
-} from '../blocks/pattern-blocks';
+import { emailPatternBlocks, emailPatternPartBlocks } from '../blocks/patterns';
 import { OpenEmailBlocksSheetCommand } from '../commands/open-blocks-sheet-command';
 import {
   EmailElementsContainer,

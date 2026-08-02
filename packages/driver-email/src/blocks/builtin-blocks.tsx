@@ -36,7 +36,7 @@ export const rootBlock: BlockConfig = {
         background: String(data.background ?? '#f6f9fc'),
         width: '100%',
         minHeight: 480,
-        padding: '24px 0',
+        padding: '40px 16px',
       }}
     >
       <Container
@@ -45,6 +45,7 @@ export const rootBlock: BlockConfig = {
           margin: '0 auto',
           maxWidth: EMAIL_WIDTH,
           width: '100%',
+          borderRadius: 4,
         }}
       >
         {children}
@@ -145,11 +146,8 @@ export const headingBlock: BlockConfig = {
       margin: '0 0 12px',
     };
     if (children) {
-      return (
-        <Heading as={`h${level}`} style={style}>
-          {children}
-        </Heading>
-      );
+      // Edit mode: div keeps text-align without nesting TipTap inside <p>/<h*>.
+      return <div style={style}>{children}</div>;
     }
     return (
       <Heading
@@ -185,7 +183,7 @@ export const textBlock: BlockConfig = {
       fontSize: 14,
     };
     if (children) {
-      return <Text style={style}>{children}</Text>;
+      return <div style={style}>{children}</div>;
     }
     return (
       <Text
@@ -247,6 +245,7 @@ export const imageBlock: BlockConfig = {
     alt: { kind: 'text', label: 'Alt' },
     width: { kind: 'number', label: 'Width (px)' },
     height: { kind: 'number', label: 'Height (px)' },
+    borderRadius: { kind: 'number', label: 'Radius (px)' },
   },
   defaultData: {
     src: 'https://placehold.co/600x200',
@@ -256,6 +255,8 @@ export const imageBlock: BlockConfig = {
   render: ({ data }) => {
     const height = Number(data.height);
     const hasHeight = Number.isFinite(height) && height > 0;
+    const borderRadius = Number(data.borderRadius);
+    const hasRadius = Number.isFinite(borderRadius) && borderRadius > 0;
     return (
       <Img
         alt={String(data.alt ?? '')}
@@ -263,9 +264,12 @@ export const imageBlock: BlockConfig = {
         src={sanitizeUrl(String(data.src ?? ''), { allowDataImage: true })}
         style={{
           display: 'block',
+          width: '100%',
           maxWidth: '100%',
           height: hasHeight ? height : 'auto',
           margin: hasHeight ? 0 : '0 0 16px',
+          borderRadius: hasRadius ? borderRadius : undefined,
+          objectFit: hasHeight ? 'cover' : undefined,
         }}
         width={Number(data.width ?? EMAIL_WIDTH) || EMAIL_WIDTH}
       />

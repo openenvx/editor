@@ -47,6 +47,10 @@ import {
   applyHtmlDragOver,
   applyHtmlDragStart,
 } from './html-editor-drag';
+import {
+  alignDataPathFromHtmlPath,
+  type RichTextAlign,
+} from './rich-text-align';
 import { useHtmlDeviceStageMetrics } from './use-html-device-stage-metrics';
 
 import styles from './html-editor-pane.module.css';
@@ -115,8 +119,11 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   }, []);
 
   const handleCommitEdit = useCallback(
-    (hostId: string, dataPath: string, html: string) => {
+    (hostId: string, dataPath: string, html: string, align?: RichTextAlign) => {
       api.updateProperty(hostId, dataPath, html);
+      if (align !== undefined) {
+        api.updateProperty(hostId, alignDataPathFromHtmlPath(dataPath), align);
+      }
       setEditingTarget(null);
     },
     [api]
@@ -206,9 +213,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
 
   const handlePresetChange = useCallback((next: HtmlDevicePreset) => {
     setPreset(next);
-    // Stay at 100% when switching devices so the page stays readable.
-    setAutoZoom(false);
-    setManualZoom(1);
+    setAutoZoom(true);
   }, []);
 
   const handleZoomIn = useCallback(() => {

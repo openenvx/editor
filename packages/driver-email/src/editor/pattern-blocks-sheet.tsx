@@ -24,7 +24,7 @@ import {
   filterPatternCatalog,
   patternGroups,
   type EmailPatternEntry,
-} from '../blocks/pattern-catalog';
+} from '../blocks/patterns';
 import { EMAIL_BLOCKS_SHEET_OPEN_KEY } from '../contributions/email-patterns-sidebar';
 import { renderPatternThumbnail } from './block-thumbnail';
 

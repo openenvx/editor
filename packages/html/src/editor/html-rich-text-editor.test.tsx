@@ -93,4 +93,35 @@ describe('HtmlRichTextEditor', () => {
       expect(onCommit).toHaveBeenCalled();
     });
   });
+
+  it('seeds block align into TipTap and commits it back', async () => {
+    const onCommit = vi.fn();
+    render(
+      <HtmlRichTextEditor
+        align="center"
+        html="Our new article"
+        onCommit={onCommit}
+      />
+    );
+
+    const editable = await waitFor(() => {
+      const node = document.querySelector('[contenteditable="true"]');
+      expect(node).toBeTruthy();
+      return node as HTMLElement;
+    });
+
+    await waitFor(() => {
+      const centered = editable.querySelector('[style*="text-align"]');
+      expect(centered).toBeTruthy();
+      expect((centered as HTMLElement).style.textAlign).toBe('center');
+    });
+
+    fireEvent.blur(editable);
+
+    await waitFor(() => {
+      expect(onCommit).toHaveBeenCalled();
+      const [, align] = onCommit.mock.calls.at(-1)!;
+      expect(align).toBe('center');
+    });
+  });
 });

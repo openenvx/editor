@@ -78,6 +78,14 @@ describe('block-tree', () => {
       'html.text-new'
     );
 
+    const fromDefaults = createBlock('html.flex', 'box-1', {
+      children: [{ id: 'fixed-child', type: 'html.text', data: { html: 'x' } }],
+    });
+    const minted = (fromDefaults.data as { children: Layer[] }).children[0]!;
+    expect(fromDefaults.id).toBe('box-1');
+    expect(minted.id).not.toBe('fixed-child');
+    expect(minted.type).toBe('html.text');
+
     const bare = cloneBlockWithNewIds(
       { id: 'x', type: 'html.text', data: null },
       () => 'fresh'

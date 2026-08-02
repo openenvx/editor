@@ -13,6 +13,7 @@ import {
   isLayerVisible,
   WIDGET_LAYER_TYPE,
 } from '@openenvx/core';
+import { isTypingTarget } from '@openenvx/headless';
 import type { Layer, Scene } from '@openenvx/schema';
 import {
   Fragment,
@@ -40,6 +41,7 @@ import {
 import { BlockSelectionMenu } from './block-selection-menu';
 import { HtmlRichTextEditor } from './html-rich-text-editor';
 import { emitOpenEnvxHtmlWidgetClick } from './html-widget-click-handler';
+import { parseRichTextAlign, type RichTextAlign } from './rich-text-align';
 
 import styles from './html-editor-pane.module.css';
 
@@ -178,6 +180,9 @@ function BlockChrome({
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
+      if (editing || isTypingTarget(event.target)) {
+        return;
+      }
       if (event.key !== 'Enter' && event.key !== ' ') {
         return;
       }
@@ -185,7 +190,7 @@ function BlockChrome({
       event.stopPropagation();
       activate();
     },
-    [activate]
+    [activate, editing]
   );
 
   const handleDuplicate = useCallback(() => {
@@ -382,8 +387,8 @@ function SlotPartContent({
   );
 
   const handleCommit = useCallback(
-    (html: string) => {
-      onCommitEdit(hostId, dataPath, html);
+    (html: string, nextAlign?: RichTextAlign) => {
+      onCommitEdit(hostId, dataPath, html, nextAlign);
     },
     [dataPath, hostId, onCommitEdit]
   );
@@ -406,6 +411,7 @@ function SlotPartContent({
               data,
               children: (
                 <HtmlRichTextEditor
+                  align={parseRichTextAlign(data.align)}
                   html={String(data.html ?? '')}
                   onCommit={handleCommit}
                 />
@@ -497,8 +503,8 @@ function BlockContent({
   );
 
   const handleCommit = useCallback(
-    (html: string) => {
-      onCommitEdit(layer.id, 'html', html);
+    (html: string, nextAlign?: RichTextAlign) => {
+      onCommitEdit(layer.id, 'html', html, nextAlign);
     },
     [layer.id, onCommitEdit]
   );
@@ -514,6 +520,7 @@ function BlockContent({
           data,
           children: (
             <HtmlRichTextEditor
+              align={parseRichTextAlign(data.align)}
               html={String(data.html ?? '')}
               onCommit={handleCommit}
             />
@@ -685,7 +692,12 @@ export const BlockTreeRenderer = memo(
     sortDraft: BlockSortDraft | null;
     onSelect: (id: string) => void;
     onStartEdit: (hostId: string, dataPath: string) => void;
-    onCommitEdit: (hostId: string, dataPath: string, html: string) => void;
+    onCommitEdit: (
+      hostId: string,
+      dataPath: string,
+      html: string,
+      align?: RichTextAlign
+    ) => void;
     onDuplicate: (id: string) => void;
     onRemove: (id: string) => void;
   }) => (

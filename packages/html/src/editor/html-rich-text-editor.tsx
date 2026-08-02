@@ -5,6 +5,11 @@ import { BubbleMenu } from '@tiptap/react/menus';
 
 import { HtmlRichTextBubbleMenuToolbar } from './html-rich-text-bubble-menu';
 import { normalizeCommittedRichTextHtml } from './normalize-committed-rich-text-html';
+import {
+  parseRichTextAlign,
+  readEditorTextAlign,
+  type RichTextAlign,
+} from './rich-text-align';
 import { createRichTextEditorExtensions } from './rich-text-editor-extensions';
 
 import styles from './html-editor-pane.module.css';
@@ -23,15 +28,24 @@ export function shouldShowRichTextBubbleMenu({
   return state.doc.textBetween(from, to, '\n').length > 0;
 }
 
+function textAlignFromProseMirrorDom(dom: HTMLElement): RichTextAlign {
+  const block = dom.querySelector<HTMLElement>('p, h1, h2, h3, h4') ?? dom;
+  return parseRichTextAlign(block.style.textAlign) ?? 'left';
+}
+
 export interface HtmlRichTextEditorProps {
   html: string;
-  onCommit: (html: string) => void;
+  /** Block-level align (`data.align`) — seeded into TipTap and written back on commit. */
+  align?: RichTextAlign;
+  onCommit: (html: string, align?: RichTextAlign) => void;
 }
 
 export function HtmlRichTextEditor({
   html,
+  align,
   onCommit,
 }: HtmlRichTextEditorProps) {
+  const syncAlign = align !== undefined;
   const editor = useEditor({
     autofocus: false,
     content: html,
@@ -42,7 +56,10 @@ export function HtmlRichTextEditor({
         }
         event.preventDefault();
         event.stopPropagation();
-        onCommit(normalizeCommittedRichTextHtml(view.dom.innerHTML || html));
+        onCommit(
+          normalizeCommittedRichTextHtml(view.dom.innerHTML || html),
+          syncAlign ? textAlignFromProseMirrorDom(view.dom) : undefined
+        );
         return true;
       },
     },
@@ -56,14 +73,21 @@ export function HtmlRichTextEditor({
       ) {
         return;
       }
-      onCommit(normalizeCommittedRichTextHtml(activeEditor.getHTML()));
+      onCommit(
+        normalizeCommittedRichTextHtml(activeEditor.getHTML()),
+        syncAlign ? readEditorTextAlign(activeEditor) : undefined
+      );
     },
     onCreate: ({ editor: activeEditor }) => {
-      activeEditor
+      const chain = activeEditor
         .chain()
         .selectAll()
-        .focus(undefined, { scrollIntoView: false })
-        .run();
+        .focus(undefined, { scrollIntoView: false });
+      const seed = parseRichTextAlign(align);
+      if (seed) {
+        chain.setTextAlign(seed);
+      }
+      chain.run();
     },
   });
 
@@ -72,7 +96,10 @@ export function HtmlRichTextEditor({
   }
 
   return (
-    <div className={styles.editorHost}>
+    <div
+      className={styles.editorHost}
+      style={align ? { textAlign: align } : undefined}
+    >
       <BubbleMenu
         appendTo={() => document.body}
         editor={editor}

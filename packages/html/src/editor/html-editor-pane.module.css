@@ -270,7 +270,7 @@
 .editorHost :global(.ProseMirror) {
   cursor: text;
   display: block;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   outline: none;
   margin: 0;

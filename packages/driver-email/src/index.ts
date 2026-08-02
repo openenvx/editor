@@ -4,17 +4,17 @@ export {
 } from './block-registry';
 export { builtinEmailBlocks } from './blocks/builtin-blocks';
 export {
-  emailPatternCatalog,
-  filterPatternCatalog,
-  patternGroups,
-  type EmailPatternEntry,
-} from './blocks/pattern-catalog';
-export {
+  articleWithImageBlock,
+  defineEmailPattern,
   emailPatternBlocks,
+  emailPatternCatalog,
   emailPatternPartBlocks,
+  filterPatternCatalog,
   headerBlock,
   linkBlock,
-} from './blocks/pattern-blocks';
+  patternGroups,
+  type EmailPatternEntry,
+} from './blocks/patterns';
 export { OpenEmailBlocksSheetCommand } from './commands/open-blocks-sheet-command';
 export {
   EMAIL_ELEMENTS_CONTAINER_ID,

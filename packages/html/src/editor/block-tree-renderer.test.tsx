@@ -98,6 +98,27 @@ describe('BlockTreeRenderer', () => {
     ).toBeNull();
   });
 
+  it('lets Space reach TipTap while editing (does not preventDefault)', async () => {
+    renderTree({
+      selectedId: 'heading-1',
+      editingTarget: { hostId: 'heading-1', dataPath: 'html' },
+    });
+
+    const editable = await waitFor(() => {
+      const node = document.querySelector('[contenteditable="true"]');
+      expect(node).toBeTruthy();
+      return node as HTMLElement;
+    });
+
+    const event = new KeyboardEvent('keydown', {
+      key: ' ',
+      bubbles: true,
+      cancelable: true,
+    });
+    editable.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+  });
+
   it('starts slot edit on click of hero headline', () => {
     const onStartEdit = vi.fn();
     const onSelect = vi.fn();
