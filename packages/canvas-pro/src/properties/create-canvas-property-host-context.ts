@@ -1,3 +1,4 @@
+import { resolveTextBoxFitPropertyUpdate } from '@openenvx/canvas';
 import type {
   PropertyPathContextOptions,
   WorkbenchApi,
@@ -16,6 +17,25 @@ export function createCanvasPropertyHostContextWithApi(
   options: PropertyPathContextOptions,
   helpers: CanvasPropertyHostContextHelpers
 ): ReturnType<typeof createCanvasPropertyHostContext> {
+  const updateProperty = (layerId: string, key: string, value: unknown) => {
+    const fit = resolveTextBoxFitPropertyUpdate(
+      options.scene,
+      layerId,
+      key,
+      value
+    );
+    if (!fit) {
+      options.updateProperty(layerId, key, value);
+      return;
+    }
+
+    void helpers.executeCommand('canvas.updateLayerTransform', {
+      dataPatch: fit.dataPatch,
+      layerId,
+      transform: fit.transform,
+    });
+  };
+
   const canvasOptions: CanvasPropertyPathContextOptions = {
     ...options,
     updateLayerTransform: async (layerId: string, transform: Transform) =>
@@ -23,6 +43,7 @@ export function createCanvasPropertyHostContextWithApi(
         layerId,
         transform,
       }),
+    updateProperty,
   };
   return createCanvasPropertyHostContext(canvasOptions);
 }

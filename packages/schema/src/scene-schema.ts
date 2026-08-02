@@ -8,7 +8,12 @@
  */
 import { z } from 'zod';
 
-import { BUILTIN_LAYER_TYPES, SCHEMA_VERSION } from './types';
+import {
+  BUILTIN_LAYER_TYPES,
+  clampTextCurve,
+  MAX_TEXT_CURVE,
+  SCHEMA_VERSION,
+} from './types';
 
 function build(o: typeof z.object) {
   const cornerRadius = o({
@@ -167,10 +172,17 @@ function build(o: typeof z.object) {
       .describe(
         'When shrink, font size scales down so text stays inside the fixed box.'
       ),
-    curve: z
-      .number()
-      .optional()
-      .describe('Arc bend in degrees; 0 = straight, positive = smile.'),
+    curve: z.preprocess(
+      (value) => (typeof value === 'number' ? clampTextCurve(value) : value),
+      z
+        .number()
+        .min(-MAX_TEXT_CURVE)
+        .max(MAX_TEXT_CURVE)
+        .optional()
+        .describe(
+          `Curve amount (−${MAX_TEXT_CURVE}…${MAX_TEXT_CURVE}); 0 = straight, positive = arch (sides down), negative = bowl (center down). Out-of-range values clamp on normalize.`
+        )
+    ),
     fill: z.string().optional(),
     fontFamily: z.string().optional(),
     fontSize: z.number().optional(),

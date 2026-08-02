@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  buildArcPath,
+  buildCurvePath,
+  curveToPower,
+  estimateCurvedTextBounds,
   isCurvedText,
   stripHtmlToPlainText,
 } from './rich-text-arc';
@@ -15,20 +17,37 @@ describe('rich-text-arc', () => {
     expect(isCurvedText(-30)).toBe(true);
   });
 
-  it('buildArcPath returns a straight line for zero curve', () => {
-    expect(buildArcPath(200, 24, 0)).toBe('M 0,24 L 200,24');
+  it('curveToPower maps ±100 onto ±0.9999…1', () => {
+    expect(curveToPower(0)).toBe(0);
+    expect(curveToPower(100)).toBeCloseTo(0.9999, 4);
+    expect(curveToPower(-100)).toBeCloseTo(-0.9999, 4);
+    expect(curveToPower(50)).toBeCloseTo(0.5, 4);
+    expect(curveToPower(150)).toBeCloseTo(0.9999, 4);
   });
 
-  it('buildArcPath returns a downward smile arc for positive curve', () => {
-    const path = buildArcPath(200, 24, 60);
-    expect(path.startsWith('M 0,24 A ')).toBe(true);
-    expect(path.endsWith(' 0 0 1 200,24')).toBe(true);
+  it('buildCurvePath returns a midline for zero power', () => {
+    expect(buildCurvePath(200, 40, 0, 24)).toBe('M 0 20 L 200 20');
   });
 
-  it('buildArcPath returns an upward frown arc for negative curve', () => {
-    const path = buildArcPath(200, 24, -60);
-    expect(path.startsWith('M 0,')).toBe(true);
-    expect(path.includes(' 0 0 0 200,')).toBe(true);
+  it('buildCurvePath uses upper circle for positive power (arch)', () => {
+    const path = buildCurvePath(200, 80, 0.5, 24);
+    expect(path.startsWith('M 100 ')).toBe(true);
+    expect(path.includes(' 0 1 1 ')).toBe(true);
+    expect(path.includes(' 0 1 0 ')).toBe(false);
+  });
+
+  it('buildCurvePath uses lower circle for negative power (bowl)', () => {
+    const path = buildCurvePath(200, 80, -0.5, 24);
+    expect(path.startsWith('M 100 ')).toBe(true);
+    expect(path.includes(' 0 1 0 ')).toBe(true);
+  });
+
+  it('estimateCurvedTextBounds grows with |curve|', () => {
+    const straight = estimateCurvedTextBounds(200, 24, 0);
+    const curved = estimateCurvedTextBounds(200, 24, curveToPower(80));
+    expect(straight.height).toBe(24);
+    expect(curved.height).toBeGreaterThan(straight.height);
+    expect(curved.width).toBeGreaterThan(0);
   });
 
   it('stripHtmlToPlainText flattens markup', () => {

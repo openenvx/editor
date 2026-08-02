@@ -1,6 +1,8 @@
 export {
   BUILTIN_LAYER_TYPES,
+  clampTextCurve,
   LAYER_WRITE_MODES,
+  MAX_TEXT_CURVE,
   SCHEMA_VERSION,
   type BuiltinLayerType,
   type CanvasCircleData,

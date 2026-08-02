@@ -3,12 +3,13 @@ import Konva from 'konva';
 
 import { applyTransformToNode } from './geometry';
 import {
-  buildArcPath,
   isCurvedText,
+  layoutCurvedText,
   stripHtmlToPlainText,
 } from './rich-text-arc';
 import {
   layoutRichText,
+  measurePlainTextWidth,
   toKonvaFontStyle,
   toKonvaTextDecoration,
 } from './rich-text-layout';
@@ -92,15 +93,33 @@ export function applyRichTextToGroup(
   );
 
   if (isCurvedText(curve)) {
+    const plainText = stripHtmlToPlainText(view.html);
+    const pathText = plainText.length > 0 ? plainText : ' ';
+    const layout = layoutCurvedText({
+      curve,
+      fontFamily,
+      fontSize,
+      letterSpacing,
+      text: pathText,
+      textWidth: measurePlainTextWidth(
+        pathText,
+        fontSize,
+        fontFamily,
+        letterSpacing
+      ),
+    });
     node.add(
       new Konva.TextPath({
-        align,
-        data: buildArcPath(width, fontSize, curve),
+        align: 'center',
+        data: layout.path,
         fill,
         fontFamily,
         fontSize,
         letterSpacing,
-        text: stripHtmlToPlainText(view.html),
+        text: pathText,
+        textBaseline: 'middle',
+        x: -layout.offsetX,
+        y: -layout.offsetY,
       })
     );
     node.getLayer()?.batchDraw();

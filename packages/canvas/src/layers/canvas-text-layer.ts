@@ -14,7 +14,11 @@ import type {
   PropertySectionDescriptor,
 } from '@openenvx/core';
 import { createLayerPreviewBuilder } from '@openenvx/preview';
-import { createDefaultTransform } from '@openenvx/schema';
+import {
+  clampTextCurve,
+  createDefaultTransform,
+  MAX_TEXT_CURVE,
+} from '@openenvx/schema';
 import { z } from 'zod';
 
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';
@@ -33,7 +37,10 @@ import {
 export const canvasTextSchema = z.object({
   align: z.enum(['left', 'center', 'right']).optional(),
   autoFit: z.enum(['none', 'shrink']).optional(),
-  curve: z.number().optional(),
+  curve: z.preprocess(
+    (value) => (typeof value === 'number' ? clampTextCurve(value) : value),
+    z.number().min(-MAX_TEXT_CURVE).max(MAX_TEXT_CURVE).optional()
+  ),
   fill: z.string().optional(),
   fontFamily: z.string().optional(),
   fontSize: z.number().optional(),
@@ -134,7 +141,12 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
   properties(ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
     const scrubPx = { scrub: true, precision: 0 };
     const scrubLineHeight = { scrub: true, precision: 1 };
-    const scrubCurve = { scrub: true, precision: 0, unit: '°' };
+    const scrubCurve = {
+      scrub: true,
+      precision: 0,
+      min: -MAX_TEXT_CURVE,
+      max: MAX_TEXT_CURVE,
+    };
     const fontOptions = buildFontOptions(ctx);
     return (
       createPropertyBuilder()

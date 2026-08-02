@@ -153,10 +153,20 @@ export interface CanvasQrData {
 
 export type TextAutoFit = 'none' | 'shrink';
 
+/** Slider / schema range for `CanvasTextData.curve` (unitless power, not degrees). */
+export const MAX_TEXT_CURVE = 100;
+
+export function clampTextCurve(curve: number): number {
+  return Math.max(-MAX_TEXT_CURVE, Math.min(MAX_TEXT_CURVE, curve));
+}
+
 export interface CanvasTextData {
   html: string;
   align?: 'left' | 'center' | 'right';
-  /** Arc bend in degrees; 0 = straight, positive = smile, negative = frown. */
+  /**
+   * Curve amount (−100…100); 0 = straight, positive = arch (sides down),
+   * negative = bowl (center down). Out-of-range values are clamped on normalize.
+   */
   curve?: number;
   fill?: string;
   fontFamily?: string;

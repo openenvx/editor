@@ -1,6 +1,5 @@
 import {
   ContextKeyServiceId,
-  findLayerById,
   getActivePage,
   type Scene,
   type Selection,
@@ -15,22 +14,13 @@ import { memo, useCallback, useMemo } from 'react';
 import { CanvasHostProvider } from '../canvas-host-context';
 import type { CanvasHostApi } from '../canvas-host-context';
 import type { CanvasSelectLayerOptions } from '../canvas-stage-types';
-import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';
+import { resolveTextBoxFitPropertyUpdate } from '../fit-text-layer-to-content';
 import { useCanvasApi } from '../hooks/use-canvas-api';
 import { useCanvasRegistries } from '../hooks/use-canvas-registries';
 import { useCanvasStageInteraction } from '../hooks/use-canvas-stage-interaction';
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
 import { getDefaultPageDimensions } from '../page-presets';
 import { CanvasEditor, type CanvasEditorProps } from './canvas-editor';
-
-const TEXT_BOX_FIT_KEYS = new Set([
-  'align',
-  'fontFamily',
-  'fontSize',
-  'html',
-  'letterSpacing',
-  'lineHeight',
-]);
 
 export const AbsoluteEditorPane = memo(
   ({
@@ -139,29 +129,13 @@ const AbsoluteEditorPaneInner = memo(
 
     const handlePropertyChange = useCallback(
       (layerId: string, key: string, value: unknown) => {
-        if (!TEXT_BOX_FIT_KEYS.has(key)) {
+        const fit = resolveTextBoxFitPropertyUpdate(scene, layerId, key, value);
+        if (!fit) {
           api.updateProperty(layerId, key, value);
           return;
         }
-
-        const layer = findLayerById(scene, layerId);
-        if (!layer || layer.type !== 'canvas.text') {
-          api.updateProperty(layerId, key, value);
-          return;
-        }
-
-        const data =
-          typeof layer.data === 'object' && layer.data !== null
-            ? { ...(layer.data as Record<string, unknown>), [key]: value }
-            : { [key]: value };
-        const fitted = fitCanvasTextLayerToContent({ ...layer, data });
-        if (fitted === layer) {
-          api.updateProperty(layerId, key, value);
-          return;
-        }
-
-        void canvasApi.updateLayerTransform(layerId, fitted.transform!, {
-          dataPatch: { [key]: value },
+        void canvasApi.updateLayerTransform(layerId, fit.transform, {
+          dataPatch: fit.dataPatch,
         });
       },
       [api, canvasApi, scene]

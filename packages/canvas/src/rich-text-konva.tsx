@@ -3,12 +3,13 @@ import { Rect, Text, TextPath } from 'react-konva';
 
 import { DEFAULT_MIN_FONT_SIZE, fitFontSize } from './fit-font-size';
 import {
-  buildArcPath,
   isCurvedText,
+  layoutCurvedText,
   stripHtmlToPlainText,
 } from './rich-text-arc';
 import { layoutRichTextSpans } from './rich-text-konva-driver';
 import {
+  measurePlainTextWidth,
   measureRichTextHeight,
   toKonvaFontStyle,
   toKonvaTextDecoration,
@@ -92,10 +93,34 @@ export const RichTextKonva = memo(
       () => (curved ? stripHtmlToPlainText(html) : ''),
       [curved, html]
     );
-    const arcPath = useMemo(
-      () => (curved ? buildArcPath(width, resolvedFontSize, curve) : ''),
-      [curve, curved, resolvedFontSize, width]
-    );
+    const curvedPathText = plainText.length > 0 ? plainText : ' ';
+    const curvedLayout = useMemo(() => {
+      void fontLoadRevision;
+      if (!curved) {
+        return null;
+      }
+      return layoutCurvedText({
+        curve,
+        fontFamily,
+        fontSize: resolvedFontSize,
+        letterSpacing,
+        text: curvedPathText,
+        textWidth: measurePlainTextWidth(
+          curvedPathText,
+          resolvedFontSize,
+          fontFamily,
+          letterSpacing
+        ),
+      });
+    }, [
+      curve,
+      curved,
+      curvedPathText,
+      fontFamily,
+      fontLoadRevision,
+      letterSpacing,
+      resolvedFontSize,
+    ]);
     const allSpans = useMemo(() => {
       void fontLoadRevision;
       if (curved) {
@@ -134,15 +159,18 @@ export const RichTextKonva = memo(
           listening={false}
           width={width}
         />
-        {curved ? (
+        {curved && curvedLayout ? (
           <TextPath
-            align={align}
-            data={arcPath}
+            align="center"
+            data={curvedLayout.path}
             fill={fill}
             fontFamily={fontFamily}
             fontSize={resolvedFontSize}
             letterSpacing={letterSpacing}
-            text={plainText}
+            text={curvedPathText}
+            textBaseline="middle"
+            x={-curvedLayout.offsetX}
+            y={-curvedLayout.offsetY}
           />
         ) : (
           allSpans.map((span, index) => (

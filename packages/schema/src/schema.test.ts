@@ -261,6 +261,48 @@ describe('schema', () => {
     expect(result.valid).toBe(false);
   });
 
+  it('clamps out-of-range text curve on normalize', () => {
+    const scene = normalizeScene({
+      pages: [
+        {
+          id: 'p1',
+          layout: 'absolute',
+          name: 'Page',
+          layers: [
+            {
+              data: { curve: 250, html: '<p>Hi</p>' },
+              id: 't1',
+              transform: {
+                height: 40,
+                width: 120,
+                x: 0,
+                y: 0,
+              },
+              type: 'canvas.text',
+            },
+            {
+              data: { curve: -180, html: '<p>Lo</p>' },
+              id: 't2',
+              transform: {
+                height: 40,
+                width: 120,
+                x: 0,
+                y: 50,
+              },
+              type: 'canvas.text',
+            },
+          ],
+        },
+      ],
+    });
+    expect((scene.pages[0].layers[0].data as { curve: number }).curve).toBe(
+      100
+    );
+    expect((scene.pages[0].layers[1].data as { curve: number }).curve).toBe(
+      -100
+    );
+  });
+
   it('throws when normalizeScene cannot parse input', () => {
     expect(() =>
       normalizeScene({

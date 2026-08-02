@@ -102,8 +102,11 @@ export {
   applyModificationsWithTextFit,
   fitCanvasTextLayerToContent,
   fitSceneCanvasTextToContent,
+  resolveTextBoxFitPropertyUpdate,
+  TEXT_BOX_FIT_KEYS,
   type FitTextLayerMode,
   type FitTextLayerOptions,
+  type TextBoxFitTransformUpdate,
 } from './fit-text-layer-to-content';
 export {
   computeImageFitLayout,

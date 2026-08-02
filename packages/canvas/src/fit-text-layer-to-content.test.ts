@@ -7,7 +7,9 @@ import {
   fitSceneCanvasTextToContent,
 } from './fit-text-layer-to-content';
 import { CanvasTextLayer } from './layers/canvas-text-layer';
+import { layoutCurvedText } from './rich-text-arc';
 import {
+  measurePlainTextWidth,
   measureRichTextContentSize,
   measureRichTextHeight,
 } from './rich-text-layout';
@@ -123,6 +125,71 @@ describe('fitCanvasTextLayerToContent', () => {
     });
 
     expect(fitCanvasTextLayerToContent(layer)).toBe(layer);
+  });
+
+  it('curved text hugs measured TextPath bounds', () => {
+    const layer = textLayer({
+      height: 200,
+      html: '<p>Hi</p>',
+      width: 240,
+    });
+    layer.data = { ...layer.data, curve: 60 };
+    layer.transform = { ...layer.transform, x: 100 };
+
+    const fitted = fitCanvasTextLayerToContent(layer);
+    const centerBefore = layer.transform.x + layer.transform.width / 2;
+    const centerAfter =
+      fitted.transform!.x + fitted.transform!.width / 2;
+
+    expect(fitted.transform!.height).toBeGreaterThan(24);
+    expect(fitted.transform!.width).toBeGreaterThan(8);
+    expect(centerAfter).toBeCloseTo(centerBefore, 5);
+  });
+
+  it('scrubbing curve keeps the horizontal center fixed', () => {
+    let layer = textLayer({
+      height: 48,
+      html: '<p>$1,195,000</p>',
+      width: 300,
+    });
+    layer = {
+      ...layer,
+      transform: { ...layer.transform!, x: 50 },
+    };
+    const center0 = layer.transform!.x + layer.transform!.width / 2;
+
+    for (const curve of [20, 40, 60, 80, 100, 50, 0]) {
+      const data = { ...layer.data, curve };
+      layer = fitCanvasTextLayerToContent({ ...layer, data });
+      const center = layer.transform!.x + layer.transform!.width / 2;
+      if (curve === 0) {
+        // Straight height-mode keeps prior width; x may not recenter.
+        break;
+      }
+      expect(center).toBeCloseTo(center0, 5);
+    }
+  });
+
+  it('fit and layoutCurvedText agree on dimensions for the same advance', () => {
+    const layer = textLayer({
+      height: 48,
+      html: '<p>Hello World</p>',
+      width: 300,
+    });
+    layer.data = { ...layer.data, curve: 40 };
+    const fitted = fitCanvasTextLayerToContent(layer);
+    const plain = 'Hello World';
+    const textWidth = measurePlainTextWidth(plain, 24, FONT, 0);
+    const layout = layoutCurvedText({
+      curve: 40,
+      fontFamily: FONT,
+      fontSize: 24,
+      letterSpacing: 0,
+      text: plain,
+      textWidth,
+    });
+    expect(fitted.transform!.width).toBe(layout.width);
+    expect(fitted.transform!.height).toBe(layout.height);
   });
 
   it('applyModificationsWithTextFit remasures named text after injection', () => {

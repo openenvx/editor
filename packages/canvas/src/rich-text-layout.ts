@@ -191,6 +191,30 @@ function buildRichTextFont(
   return `${fontStyle} ${weight} ${fontSize}px ${family}`;
 }
 
+/** Single-line plain-text width (no HTML), including letter-spacing. */
+export function measurePlainTextWidth(
+  text: string,
+  fontSize: number,
+  fontFamily: string,
+  letterSpacing: number = DEFAULT_RICH_TEXT_LETTER_SPACING
+): number {
+  if (!text) {
+    return fontSize;
+  }
+  const measured = measureRichTextWidth(
+    text,
+    fontSize,
+    fontFamily,
+    DEFAULT_STYLE,
+    letterSpacing
+  );
+  if (measured > 0) {
+    return measured;
+  }
+  // Canvas measureText can return 0 before fonts settle (and in some test envs).
+  return text.length * fontSize * 0.6 + letterSpacing * text.length;
+}
+
 function measureRichTextWidth(
   text: string,
   fontSize: number,

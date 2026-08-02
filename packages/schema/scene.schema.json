@@ -1763,8 +1763,10 @@
                   ]
                 },
                 "curve": {
-                  "description": "Arc bend in degrees; 0 = straight, positive = smile.",
-                  "type": "number"
+                  "description": "Curve amount (−100…100); 0 = straight, positive = arch (sides down), negative = bowl (center down). Out-of-range values clamp on normalize.",
+                  "type": "number",
+                  "minimum": -100,
+                  "maximum": 100
                 },
                 "fill": {
                   "type": "string"
