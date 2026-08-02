@@ -245,7 +245,6 @@
         "@openenvx/headless": "workspace:*",
         "@openenvx/html": "workspace:*",
         "@openenvx/schema": "workspace:*",
-        "@openenvx/workbench": "workspace:*",
         "@react-email/components": "1.0.12",
         "@react-email/render": "2.1.0",
       },

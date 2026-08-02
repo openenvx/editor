@@ -110,7 +110,6 @@ export {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  InspectorSheet,
   type SheetSide,
 } from './primitives/sheet';
 export { Select } from './primitives/select';

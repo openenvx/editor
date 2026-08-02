@@ -27,12 +27,15 @@ export {
   EMAIL_BLOCKS_SHEET_OPEN_KEY,
   EMAIL_OPEN_BLOCKS_SHEET_COMMAND_ID,
   EMAIL_PATTERNS_CONTAINER_ID,
+  EMAIL_PATTERNS_PANEL_COMPONENT_ID,
+  EMAIL_PATTERNS_VIEW_ID,
   EmailPatternsContainer,
+  EmailPatternsView,
 } from './contributions/email-patterns-sidebar';
 export { EmailContextMenu } from './contributions/email-context-menu';
 export { createEmailDemoScene } from './create-email-demo-scene';
 export { EmailBlockPalettePanel } from './editor/block-palette-panel';
-export { EmailPatternBlocksSheet } from './editor/pattern-blocks-sheet';
+export { EmailPatternBlocksGallery } from './editor/pattern-blocks-gallery';
 export { EMAIL_FRAME_WIDTH, EmailEditorPane } from './editor/email-editor-pane';
 export { EmailBlocksPlugin } from './plugin/email-blocks-plugin';
 export { renderEmailDocument } from './render/render-email-document';

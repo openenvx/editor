@@ -72,6 +72,8 @@ export function buildViewContainer(
     id: container.id,
     location: locationService.getLocation(container.id),
     menuItems,
+    sheetDescription: container.sheetDescription,
+    sheetOpenKey: container.sheetOpenKey,
     sidebarBehavior,
     sidebarGroup: container.sidebarGroup ?? 0,
     sidebarOrder: container.sidebarOrder ?? 0,

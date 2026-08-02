@@ -74,6 +74,8 @@ export {
   removeById,
   updateBlockData,
 } from './tree/block-tree';
+export { flattenReactChildren } from './tree/flatten-react-children';
+export { resolveInsertParentId } from './tree/resolve-insert-parent-id';
 export {
   applyHtmlWidgetFace,
   mapWidgetTreeToHtmlLayers,

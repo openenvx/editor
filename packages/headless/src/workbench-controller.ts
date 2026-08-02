@@ -303,6 +303,8 @@ export class WorkbenchController {
       undo: () => this.undo(),
       updateProperty: (layerId, key, value) =>
         this.updateProperty(layerId, key, value),
+      updateProperties: (layerId, updates) =>
+        this.updateProperties(layerId, updates),
     };
   }
 
@@ -658,10 +660,26 @@ export class WorkbenchController {
   }
 
   updateProperty(layerId: string, key: string, value: unknown): void {
+    this.updateProperties(layerId, { [key]: value });
+  }
+
+  updateProperties(layerId: string, updates: Record<string, unknown>): void {
+    const entries = Object.entries(updates);
+    if (entries.length === 0) {
+      return;
+    }
+
     const sceneStore = this.runtime.getScene();
     const currentScene = sceneStore.getScene();
     const targetLayer = findLayerById(currentScene, layerId);
-    if (!targetLayer || !canEditLayerData(targetLayer, key)) {
+    if (!targetLayer) {
+      return;
+    }
+
+    const allowed = entries.filter(([key]) =>
+      canEditLayerData(targetLayer, key)
+    );
+    if (allowed.length === 0) {
       return;
     }
 
@@ -670,18 +688,20 @@ export class WorkbenchController {
       'string'
         ? ((targetLayer.data as { bind: string }).bind as string)
         : null;
+    const bindEntry = allowed.find(
+      ([key]) => key === 'html' || key === 'text' || key === 'markup'
+    );
     const widgetAncestor =
-      bindKey && (key === 'html' || key === 'text' || key === 'markup')
-        ? findWidgetAncestor(currentScene, layerId)
-        : null;
+      bindKey && bindEntry ? findWidgetAncestor(currentScene, layerId) : null;
 
     const plain =
-      widgetAncestor && bindKey
-        ? typeof value === 'string'
-          ? htmlToPlainText(value)
-          : value
+      widgetAncestor && bindKey && bindEntry
+        ? typeof bindEntry[1] === 'string'
+          ? htmlToPlainText(bindEntry[1])
+          : bindEntry[1]
         : null;
 
+    const labelKeys = allowed.map(([key]) => key).join(', ');
     sceneStore.apply({
       apply: (scene) => {
         let pages = scene.pages.map((page) => ({
@@ -691,10 +711,12 @@ export class WorkbenchController {
               typeof layer.data === 'object' && layer.data !== null
                 ? { ...(layer.data as Record<string, unknown>) }
                 : {};
-            if (key.includes('.')) {
-              setNestedValue(data, key, value);
-            } else {
-              data[key] = value;
+            for (const [key, value] of allowed) {
+              if (key.includes('.')) {
+                setNestedValue(data, key, value);
+              } else {
+                data[key] = value;
+              }
             }
             return { ...layer, data };
           }),
@@ -724,8 +746,8 @@ export class WorkbenchController {
       },
       label:
         widgetAncestor && bindKey
-          ? `Update ${key} (bind ${bindKey})`
-          : `Update ${key}`,
+          ? `Update ${labelKeys} (bind ${bindKey})`
+          : `Update ${labelKeys}`,
     });
   }
 

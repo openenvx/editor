@@ -65,6 +65,7 @@ export {
   isLayerShownInLayers,
   isLayerVisible,
   isLayerWritable,
+  isLayoutRootLayer,
   isTemplatePolicyEnforced,
   setTemplatePolicyEnforced,
   withFrozenLayerSnapshots,

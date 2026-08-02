@@ -695,13 +695,13 @@ class ToggleLayerLockShortcut extends ShortcutContribution {
 class DeleteLayerShortcut extends ShortcutContribution {
   readonly keybinding = 'Delete';
   readonly commandId = 'scene.deleteLayer';
-  when = 'scene.layerSelected && !canvas.editingText';
+  when = 'scene.layerSelected && !editor.editingText';
 }
 
 class BackspaceDeleteLayerShortcut extends ShortcutContribution {
   readonly keybinding = 'Backspace';
   readonly commandId = 'scene.deleteLayer';
-  when = 'scene.layerSelected && !canvas.editingText';
+  when = 'scene.layerSelected && !editor.editingText';
 }
 
 export class ScenePlugin extends Plugin {

@@ -1,12 +1,15 @@
+import { flattenReactChildren } from '@openenvx/html';
 import { Section } from '@react-email/components';
 
 import { defineEmailPattern } from './define-email-pattern';
-import { createDefaultChild, flattenChildren } from './slot-helpers';
+import { createDefaultChild } from './pattern-helpers';
 
 /**
  * Hero image + centered article intro and CTA.
  * Layout container — children are Elements visible in Layers.
  * Order: image, then centered eyebrow / title / body / button.
+ * ponytail: Index-as-role is fragile under reorder — upgrade to data.role /
+ * typed regions when patterns need safe cross-region moves.
  */
 export default defineEmailPattern({
   group: 'Articles',
@@ -60,7 +63,7 @@ export default defineEmailPattern({
     render: ({ data, children }) => {
       const paddingX = Number(data.paddingX ?? 32);
       const paddingY = Number(data.paddingY ?? 24);
-      const kids = flattenChildren(children);
+      const kids = flattenReactChildren(children);
       const [image, ...rest] = kids;
       return (
         <Section

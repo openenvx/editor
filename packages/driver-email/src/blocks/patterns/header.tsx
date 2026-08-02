@@ -1,12 +1,15 @@
+import { flattenReactChildren } from '@openenvx/html';
 import { Column, Row, Section } from '@react-email/components';
 
 import { defineEmailPattern } from './define-email-pattern';
 import { linkBlock } from './link';
-import { createDefaultChild, flattenChildren } from './slot-helpers';
+import { createDefaultChild } from './pattern-helpers';
 
 /**
  * Centered logo + horizontal nav.
  * Children in Layers: first = logo, remaining = nav links (order contract).
+ * ponytail: Index-as-role is fragile under reorder — upgrade to data.role /
+ * typed regions when patterns need safe cross-region moves.
  */
 export default defineEmailPattern({
   group: 'Headers',
@@ -63,7 +66,7 @@ export default defineEmailPattern({
       const paddingBottom = Number(data.paddingBottom ?? 40);
       const paddingX = Number(data.paddingX ?? 32);
       const marginY = Number(data.marginY ?? 40);
-      const kids = flattenChildren(children);
+      const kids = flattenReactChildren(children);
       const [logo, ...links] = kids;
 
       return (

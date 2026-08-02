@@ -6,6 +6,7 @@ import {
   isLayerShownInLayers,
   isLayerVisible,
   isLayerWritable,
+  isLayoutRootLayer,
   isTemplatePolicyEnforced,
   localize,
   moveLayerRelativeToTarget,
@@ -28,10 +29,7 @@ export const WORKBENCH_SIDEBAR_CONTAINER_ID = 'workbench.sidebar';
 export const WORKBENCH_PAGES_VIEW_ID = 'workbench.pages';
 export const WORKBENCH_LAYERS_VIEW_ID = 'workbench.layers';
 
-/** `html.root` / `email.root` — sole page frame; never a reorder sibling. */
-export function isLayoutRootLayer(layer: Layer): boolean {
-  return layer.type.endsWith('.root');
-}
+export { isLayoutRootLayer };
 
 export class PagesTreeProvider extends TreeDataProvider<Page> {
   getRootChildren(ctx: CommandContext): Page[] {

@@ -9,18 +9,16 @@ function layerData(layer: Layer): Record<string, unknown> {
     : {};
 }
 
-function renderPart(layer: Layer, registry: BlockRegistry): ReactNode | null {
-  if (!isLayerVisible(layer)) {
-    return null;
+function asLayers(value: unknown): Layer[] {
+  if (!Array.isArray(value)) {
+    return [];
   }
-  const config = registry.get(layer.type);
-  if (!config) {
-    return null;
-  }
-  return createElement(
-    Fragment,
-    { key: layer.id },
-    config.render({ data: layerData(layer) })
+  return value.filter(
+    (part): part is Layer =>
+      !!part &&
+      typeof part === 'object' &&
+      typeof (part as Layer).id === 'string' &&
+      typeof (part as Layer).type === 'string'
   );
 }
 
@@ -39,18 +37,39 @@ function renderDefaultSlots(
   const result: Record<string, ReactNode> = {};
   for (const slotKey of Object.keys(config.slots)) {
     const parts = (rawSlots as Record<string, unknown>)[slotKey];
-    if (!Array.isArray(parts)) {
-      continue;
-    }
-    result[slotKey] = parts.flatMap((part) => {
-      if (!part || typeof part !== 'object') {
-        return [];
-      }
-      const node = renderPart(part as Layer, registry);
+    result[slotKey] = asLayers(parts).flatMap((part) => {
+      const node = renderLayerThumbnail(part, registry);
       return node ? [node] : [];
     });
   }
   return result;
+}
+
+function renderLayerThumbnail(
+  layer: Layer,
+  registry: BlockRegistry
+): ReactNode | null {
+  if (!isLayerVisible(layer)) {
+    return null;
+  }
+  const config = registry.get(layer.type);
+  if (!config) {
+    return null;
+  }
+  const data = layerData(layer);
+  const childNodes = asLayers(data.children)
+    .map((child) => renderLayerThumbnail(child, registry))
+    .filter((node): node is ReactNode => node !== null && node !== undefined);
+  const slots = renderDefaultSlots(data, config, registry);
+  return createElement(
+    Fragment,
+    { key: layer.id },
+    config.render({
+      data,
+      children: childNodes.length > 0 ? childNodes : undefined,
+      slots,
+    })
+  );
 }
 
 /** Live thumbnail of a pattern's defaultData using the same BlockConfig.render. */
@@ -59,6 +78,13 @@ export function renderPatternThumbnail(
   registry: BlockRegistry
 ): ReactNode {
   const data = structuredClone(config.defaultData);
+  const childNodes = asLayers(data.children)
+    .map((child) => renderLayerThumbnail(child, registry))
+    .filter((node): node is ReactNode => node !== null && node !== undefined);
   const slots = renderDefaultSlots(data, config, registry);
-  return config.render({ data, slots });
+  return config.render({
+    data,
+    children: childNodes.length > 0 ? childNodes : undefined,
+    slots,
+  });
 }

@@ -1,5 +1,5 @@
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps } from 'react';
 
 import { useThemeScope } from '../context/theme-context';
 import { WorkbenchIcon } from '../icons/workbench-icon';
@@ -97,9 +97,8 @@ export function SheetFooter({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       {...props}
-      className={cn(styles.header, className)}
+      className={cn(styles.footer, className)}
       data-slot="sheet-footer"
-      style={{ marginTop: 'auto', ...props.style }}
     />
   );
 }
@@ -127,43 +126,5 @@ export function SheetDescription({
       className={cn(styles.description, className)}
       data-slot="sheet-description"
     />
-  );
-}
-
-/** Convenience wrapper matching @xmazu inspector-sheet open/onClose contract. */
-export function InspectorSheet({
-  open,
-  onClose,
-  title,
-  description,
-  side = 'right',
-  children,
-}: {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  description?: string;
-  side?: SheetSide;
-  children: ReactNode;
-}) {
-  return (
-    <Sheet
-      onOpenChange={(next) => {
-        if (!next) {
-          onClose();
-        }
-      }}
-      open={open}
-    >
-      <SheetContent showCloseButton side={side}>
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-          {description ? (
-            <SheetDescription>{description}</SheetDescription>
-          ) : null}
-        </SheetHeader>
-        {children}
-      </SheetContent>
-    </Sheet>
   );
 }

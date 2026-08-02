@@ -3,9 +3,7 @@ import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
-import type { BlockRegistry } from '@openenvx/html';
-import { findBlock, getPageRootId } from '@openenvx/html';
-import type { Layer } from '@openenvx/schema';
+import { getPageRootId, resolveInsertParentId } from '@openenvx/html';
 import { memo, useCallback } from 'react';
 
 import {
@@ -14,29 +12,6 @@ import {
 } from '../block-registry';
 
 import styles from './email-editor-pane.module.css';
-
-function resolveInsertParentId(
-  layers: Layer[],
-  selectedId: string | null,
-  rootId: string | null,
-  registry: BlockRegistry
-): string | null {
-  if (!rootId) {
-    return null;
-  }
-  if (!selectedId) {
-    return rootId;
-  }
-  const found = findBlock(layers, selectedId);
-  if (!found) {
-    return rootId;
-  }
-  const config = registry.get(found.block.type);
-  if (config?.acceptsChildren) {
-    return found.block.id;
-  }
-  return found.parentId ?? rootId;
-}
 
 export const EmailBlockPalettePanel = memo(() => {
   const { api, executeCommand } = useWorkbenchContext();

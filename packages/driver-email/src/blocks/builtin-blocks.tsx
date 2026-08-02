@@ -1,5 +1,6 @@
 import { sanitizeHtml, sanitizeUrl } from '@openenvx/core';
 import type { BlockConfig } from '@openenvx/html';
+import { flattenReactChildren } from '@openenvx/html';
 import {
   Button,
   Column,
@@ -11,7 +12,7 @@ import {
   Section,
   Text,
 } from '@react-email/components';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties } from 'react';
 
 const EMAIL_WIDTH = 600;
 
@@ -95,7 +96,7 @@ export const columnsBlock: BlockConfig = {
   acceptsChildren: true,
   insertLineAxis: 'vertical',
   render: ({ data, children }) => {
-    const childList = flattenChildren(children);
+    const childList = flattenReactChildren(children);
     const count = Math.max(1, childList.length);
     const width = `${Math.floor(100 / count)}%`;
     const gap = Number(data.gap ?? 16);
@@ -270,7 +271,6 @@ export const imageBlock: BlockConfig = {
         src={sanitizeUrl(String(data.src ?? ''), { allowDataImage: true })}
         style={{
           display: 'block',
-          width: '100%',
           maxWidth: '100%',
           height: hasHeight ? height : 'auto',
           margin: hasHeight ? 0 : '0 0 16px',
@@ -331,13 +331,3 @@ export const builtinEmailBlocks: BlockConfig[] = [
   dividerBlock,
   spacerBlock,
 ];
-
-function flattenChildren(children: ReactNode): ReactNode[] {
-  if (children === null || children === undefined || children === false) {
-    return [];
-  }
-  if (Array.isArray(children)) {
-    return children.flatMap((child) => flattenChildren(child));
-  }
-  return [children];
-}

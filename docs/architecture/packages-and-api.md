@@ -41,7 +41,7 @@ Hard rules:
 
 - **Canvas never imports workbench.** Studio wires canvas into sandbox via `createSandboxExtensionHost`.
 - **HTML never depends on canvas-pro.**
-- **Email driver** (`@openenvx/driver-email`) may depend on `@openenvx/html` for shared block machinery; it must not depend on canvas / canvas-pro.
+- **Email driver** (`@openenvx/driver-email`) may depend on `@openenvx/html` for shared block machinery; it must not depend on canvas / canvas-pro / workbench (command Sheets are hosted by the shell via `sheetOpenKey` + `registerViewPanel`).
 - **Hosts prefer studio / html-studio**, not a hand-wired private stack (unless custom shell — see `apps/demo-playground`).
 - **Untrusted code** never loads in the editor main world — protocol trees + sandbox Worker only.
 

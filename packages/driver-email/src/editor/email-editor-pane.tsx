@@ -8,7 +8,7 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { getActivePage } from '@openenvx/core';
+import { ContextKeyServiceId, getActivePage } from '@openenvx/core';
 import type { EditorPaneHostProps } from '@openenvx/headless';
 import {
   useWorkbenchContext,
@@ -48,7 +48,6 @@ import {
 } from '../block-registry';
 import type { BlockEditTarget } from './block-edit-target';
 import { resolveEmailFrameWidth } from './email-device-preview';
-import { EmailPatternBlocksSheet } from './pattern-blocks-sheet';
 
 import styles from './email-editor-pane.module.css';
 
@@ -124,16 +123,29 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     api.selectLayers([]);
   }, [api, editingTarget]);
 
-  const handleStartEdit = useCallback((hostId: string, dataPath: string) => {
-    setEditingTarget({ hostId, dataPath });
-  }, []);
+  const handleStartEdit = useCallback(
+    (hostId: string, dataPath: string) => {
+      api
+        .getService(ContextKeyServiceId)
+        ?.setContext('editor.editingText', true);
+      setEditingTarget({ hostId, dataPath });
+    },
+    [api]
+  );
 
   const handleCommitEdit = useCallback(
     (hostId: string, dataPath: string, html: string, align?: RichTextAlign) => {
-      api.updateProperty(hostId, dataPath, html);
       if (align !== undefined) {
-        api.updateProperty(hostId, alignDataPathFromHtmlPath(dataPath), align);
+        api.updateProperties(hostId, {
+          [dataPath]: html,
+          [alignDataPathFromHtmlPath(dataPath)]: align,
+        });
+      } else {
+        api.updateProperty(hostId, dataPath, html);
       }
+      api
+        .getService(ContextKeyServiceId)
+        ?.setContext('editor.editingText', false);
       setEditingTarget(null);
     },
     [api]
@@ -339,7 +351,6 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
           </div>
         </div>
       </div>
-      <EmailPatternBlocksSheet />
     </DndContext>
   );
 });

@@ -16,9 +16,14 @@ import {
   EMAIL_ELEMENTS_PANEL_COMPONENT_ID,
 } from '../contributions/email-blocks-sidebar';
 import { EmailContextMenu } from '../contributions/email-context-menu';
-import { EmailPatternsContainer } from '../contributions/email-patterns-sidebar';
+import {
+  EmailPatternsContainer,
+  EmailPatternsView,
+  EMAIL_PATTERNS_PANEL_COMPONENT_ID,
+} from '../contributions/email-patterns-sidebar';
 import { EmailBlockPalettePanel } from '../editor/block-palette-panel';
 import { EmailEditorPane } from '../editor/email-editor-pane';
+import { EmailPatternBlocksGallery } from '../editor/pattern-blocks-gallery';
 
 const allEmailBlocks = [
   ...builtinEmailBlocks,
@@ -57,12 +62,17 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
     ctx.registerWorkbench(
       new EmailContextMenu(),
       new EmailPatternsContainer(),
+      new EmailPatternsView(),
       new EmailElementsContainer(),
       new EmailElementsView()
     );
     ctx.registerViewPanel(
       EMAIL_ELEMENTS_PANEL_COMPONENT_ID,
       EmailBlockPalettePanel
+    );
+    ctx.registerViewPanel(
+      EMAIL_PATTERNS_PANEL_COMPONENT_ID,
+      EmailPatternBlocksGallery
     );
     ctx.registerEditorPane('email', EmailEditorPane);
   }

@@ -4,40 +4,16 @@ import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
-import type { Layer } from '@openenvx/schema';
 import { memo, useCallback, useSyncExternalStore } from 'react';
 
 import {
   BlockRegistryServiceId,
   defaultBlockRegistry,
-  type BlockRegistry,
 } from '../block-registry';
-import { findBlock, getPageRootId } from '../tree/block-tree';
+import { getPageRootId } from '../tree/block-tree';
+import { resolveInsertParentId } from '../tree/resolve-insert-parent-id';
 
 import styles from './html-editor-pane.module.css';
-
-function resolveInsertParentId(
-  layers: Layer[],
-  selectedId: string | null,
-  rootId: string | null,
-  registry: BlockRegistry
-): string | null {
-  if (!rootId) {
-    return null;
-  }
-  if (!selectedId) {
-    return rootId;
-  }
-  const found = findBlock(layers, selectedId);
-  if (!found) {
-    return rootId;
-  }
-  const config = registry.get(found.block.type);
-  if (config?.acceptsChildren) {
-    return found.block.id;
-  }
-  return found.parentId ?? rootId;
-}
 
 export const BlockPalettePanel = memo(() => {
   const { api, executeCommand } = useWorkbenchContext();

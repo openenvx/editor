@@ -72,6 +72,14 @@ export abstract class ViewContainerContribution extends WorkbenchContribution {
   sidebarOrder?: number;
   sidebarGroup?: number;
   commandId?: string;
+  /**
+   * When set with `sidebarBehavior: 'command'`, workbench hosts a Sheet whose
+   * open state is this context key. Mount gallery content via a view
+   * `componentId` + `registerViewPanel`.
+   */
+  sheetOpenKey?: string;
+  /** Optional description shown in the command Sheet header. */
+  sheetDescription?: string;
   /** Default workbench location. Defaults to `'primary'`. */
   defaultLocation?: ViewContainerLocation;
   /** When falsey after evaluate, the container is omitted from chrome. */

@@ -14,6 +14,7 @@ import {
   isLayerLocked,
   isLayerShownInLayers,
   isLayerWritable,
+  isLayoutRootLayer,
   isTemplatePolicyEnforced,
   setTemplatePolicyEnforced,
   withFrozenLayerSnapshots,
@@ -166,6 +167,9 @@ describe('templatePolicy', () => {
         scene
       )
     ).toBe(false);
+    expect(isLayoutRootLayer(createLayer({ type: 'html.root' }))).toBe(true);
+    expect(isLayoutRootLayer(createLayer({ type: 'email.root' }))).toBe(true);
+    expect(isLayoutRootLayer(createLayer({ type: 'canvas.text' }))).toBe(false);
   });
 
   it('blocks insert when allowInsertLayers is false', () => {
