@@ -43,4 +43,19 @@ describe('renderEmailDocument', () => {
     expect(whiteFrame).toBeGreaterThan(pageBg);
     expect(welcome).toBeGreaterThan(whiteFrame);
   });
+
+  it('applies editable content padding on the white frame', async () => {
+    const registry = new BlockRegistry();
+    for (const block of builtinEmailBlocks) {
+      registry.register(block);
+    }
+    const scene = createEmailDemoScene();
+    const page = scene.pages[0]!;
+    const root = page.layers.find((layer) => layer.type === 'email.root')!;
+    (root.data as { padding: number }).padding = 48;
+
+    const html = await renderEmailDocument(page, registry);
+
+    expect(html).toMatch(/padding:48px/i);
+  });
 });

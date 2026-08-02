@@ -100,6 +100,10 @@ export function canEditLayerData(layer: Layer, key?: string): boolean {
 }
 
 export function canDeleteLayer(layer: Layer, scene: Scene): boolean {
+  // Page/Email frame is structural — never remove from Layers or shortcuts.
+  if (layer.type.endsWith('.root')) {
+    return false;
+  }
   if (!canTransformLayer(layer)) {
     return false;
   }

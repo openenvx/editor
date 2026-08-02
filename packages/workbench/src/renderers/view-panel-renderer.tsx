@@ -28,6 +28,7 @@ import { TreeDndList } from './tree-dnd-list';
 import { treePaddingLeft } from './tree-dnd-utils';
 import { treeItemClassName } from './tree-item-class-name';
 
+import panelSectionStyles from '../primitives/panel-section.module.css';
 import styles from './view-panel.module.css';
 
 interface Props {
@@ -575,13 +576,8 @@ export const ViewPanelRenderer = memo(({ viewContainers }: Props) => {
         <div key={container.id}>
           {container.views
             .filter((view) => view.content.kind === 'tree')
-            .map((view) => (
-              <PanelSection
-                collapsible={view.collapsible}
-                defaultOpen={!view.initialCollapsed}
-                key={view.id}
-                title={view.name}
-              >
+            .map((view) => {
+              const body = (
                 <ViewPanelBody
                   activePageId={resolvedActivePageId}
                   collapsed={collapsed}
@@ -591,8 +587,25 @@ export const ViewPanelRenderer = memo(({ viewContainers }: Props) => {
                   setCollapsed={setCollapsed}
                   view={view}
                 />
-              </PanelSection>
-            ))}
+              );
+              if (view.collapsible === false) {
+                return (
+                  <div className={panelSectionStyles.flatBody} key={view.id}>
+                    {body}
+                  </div>
+                );
+              }
+              return (
+                <PanelSection
+                  collapsible={view.collapsible}
+                  defaultOpen={!view.initialCollapsed}
+                  key={view.id}
+                  title={view.name}
+                >
+                  {body}
+                </PanelSection>
+              );
+            })}
         </div>
       ))}
     </div>

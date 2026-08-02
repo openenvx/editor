@@ -21,37 +21,43 @@ export const rootBlock: BlockConfig = {
   fields: {
     background: { kind: 'color', label: 'Background' },
     preheader: { kind: 'text', label: 'Preheader' },
+    padding: { kind: 'number', label: 'Content padding (px)' },
   },
   defaultData: {
     background: '#f6f9fc',
     preheader: '',
+    padding: 32,
     children: [],
   },
   acceptsChildren: true,
   palette: false,
   treeIcon: 'file',
-  render: ({ data, children }) => (
-    <Section
-      style={{
-        background: String(data.background ?? '#f6f9fc'),
-        width: '100%',
-        minHeight: 480,
-        padding: '40px 16px',
-      }}
-    >
-      <Container
+  render: ({ data, children }) => {
+    const padding = Number(data.padding ?? 32);
+    return (
+      <Section
         style={{
-          background: '#ffffff',
-          margin: '0 auto',
-          maxWidth: EMAIL_WIDTH,
+          background: String(data.background ?? '#f6f9fc'),
           width: '100%',
-          borderRadius: 4,
+          minHeight: 480,
+          padding: '40px 16px',
         }}
       >
-        {children}
-      </Container>
-    </Section>
-  ),
+        <Container
+          style={{
+            background: '#ffffff',
+            margin: '0 auto',
+            maxWidth: EMAIL_WIDTH,
+            width: '100%',
+            borderRadius: 4,
+            padding: Number.isFinite(padding) ? padding : 32,
+          }}
+        >
+          {children}
+        </Container>
+      </Section>
+    );
+  },
 };
 
 export const sectionBlock: BlockConfig = {

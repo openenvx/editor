@@ -23,8 +23,6 @@ import {
 import {
   CopyLayersCommand,
   CopyLayersShortcut,
-  DeleteLayerShortcut,
-  BackspaceDeleteLayerShortcut,
   DuplicateLayersCommand,
   DuplicateLayersShortcut,
   PasteExternalLayersCommand,
@@ -370,8 +368,6 @@ export class CanvasBasicsPlugin extends Plugin {
       new CopyLayersShortcut(),
       new PasteLayersShortcut(),
       new DuplicateLayersShortcut(),
-      new DeleteLayerShortcut(),
-      new BackspaceDeleteLayerShortcut(),
       new CanvasZoomInCommand(),
       new CanvasZoomOutCommand(),
       new CanvasZoomTo100Command(),

@@ -15,6 +15,7 @@ export function createEmailDemoScene(): Scene {
             data: {
               background: '#f6f9fc',
               preheader: 'Thanks for signing up',
+              padding: 32,
               children: [
                 {
                   id: 'section-1',
