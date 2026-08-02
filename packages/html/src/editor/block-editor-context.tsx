@@ -2,6 +2,7 @@ import type { Scene } from '@openenvx/schema';
 import { createContext, useContext, type ReactNode } from 'react';
 
 import type { BlockSortDraft } from './block-dnd';
+import type { RichTextAlign } from './rich-text-align';
 
 /** Inline edit target — `dataPath` is `html` for plain blocks or a dotted slot path. */
 export interface BlockEditTarget {
@@ -12,11 +13,19 @@ export interface BlockEditTarget {
 export interface BlockEditorContextValue {
   scene: Scene;
   selectedId: string | null;
+  /** Canvas-style hover outline + Layers tree sync. */
+  hoveredLayerId: string | null;
   editingTarget: BlockEditTarget | null;
   sortDraft: BlockSortDraft | null;
   onSelect: (id: string) => void;
+  onHoverLayer: (id: string | null) => void;
   onStartEdit: (hostId: string, dataPath: string) => void;
-  onCommitEdit: (hostId: string, dataPath: string, html: string) => void;
+  onCommitEdit: (
+    hostId: string,
+    dataPath: string,
+    html: string,
+    align?: RichTextAlign
+  ) => void;
   onDuplicate: (id: string) => void;
   onRemove: (id: string) => void;
 }

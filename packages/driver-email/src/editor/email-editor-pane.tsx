@@ -8,7 +8,7 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { getActivePage } from '@openenvx/core';
+import { ContextKeyServiceId, getActivePage } from '@openenvx/core';
 import type { EditorPaneHostProps } from '@openenvx/headless';
 import {
   useWorkbenchContext,
@@ -22,11 +22,16 @@ import {
   BlockTreeRenderer,
   clampHtmlZoom,
   getPageRootId,
+  HtmlDeviceToolbar,
+  alignDataPathFromHtmlPath,
   resolveAutoZoom,
   resolveScaledFrameWidth,
   stepHtmlZoom,
+  useHtmlDeviceStageMetrics,
   type BlockRegistry,
   type BlockSortDraft,
+  type HtmlDevicePreset,
+  type RichTextAlign,
 } from '@openenvx/html';
 import {
   memo,
@@ -42,17 +47,22 @@ import {
   EmailBlockRegistryServiceId,
 } from '../block-registry';
 import type { BlockEditTarget } from './block-edit-target';
-import { useEmailStageMetrics } from './use-email-stage-metrics';
+import { resolveEmailFrameWidth } from './email-device-preview';
 
 import styles from './email-editor-pane.module.css';
 
-/** Standard email content width (px). */
-export const EMAIL_FRAME_WIDTH = 600;
+export { EMAIL_FRAME_WIDTH } from './email-device-preview';
+
+/** Slim desktop chrome — card fills most of the frame with a bit of body around it. */
+const DEFAULT_EMAIL_DEVICE_PRESET: HtmlDevicePreset = 'desktop';
 
 export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   const { api, executeCommand } = useWorkbenchContext();
   const scene = useWorkbenchContextSelector((state) => state.scene);
   const selection = useWorkbenchContextSelector((state) => state.selection);
+  const hoveredLayerId = useWorkbenchContextSelector(
+    (state) => state.interaction.hoveredLayerId
+  );
   const registry: BlockRegistry =
     api.getService(EmailBlockRegistryServiceId) ?? emailBlockRegistry;
   const [editingTarget, setEditingTarget] = useState<BlockEditTarget | null>(
@@ -60,11 +70,14 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   );
   const [sortDraft, setSortDraft] = useState<BlockSortDraft | null>(null);
   const sortDraftRef = useRef<BlockSortDraft | null>(null);
+  const [preset, setPreset] = useState<HtmlDevicePreset>(
+    DEFAULT_EMAIL_DEVICE_PRESET
+  );
   const [autoZoom, setAutoZoom] = useState(true);
   const [manualZoom, setManualZoom] = useState(1);
 
   const { artboardRef, artboardHeight, stageRef, stageWidth } =
-    useEmailStageMetrics();
+    useHtmlDeviceStageMetrics(preset);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -77,17 +90,28 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     []
   );
 
+  const frameWidth = useMemo(
+    () => resolveEmailFrameWidth(preset, stageWidth),
+    [preset, stageWidth]
+  );
   const autoZoomValue = useMemo(
-    () => resolveAutoZoom(EMAIL_FRAME_WIDTH, stageWidth),
-    [stageWidth]
+    () => resolveAutoZoom(frameWidth, stageWidth),
+    [frameWidth, stageWidth]
   );
   const zoom = autoZoom ? autoZoomValue : manualZoom;
-  const scaledWidth = resolveScaledFrameWidth(EMAIL_FRAME_WIDTH, zoom);
+  const scaledWidth = resolveScaledFrameWidth(frameWidth, zoom);
   const scaledHeight = artboardHeight > 0 ? artboardHeight * zoom : undefined;
 
   const handleSelect = useCallback(
     (id: string) => {
       api.selectLayers([id]);
+    },
+    [api]
+  );
+
+  const handleHoverLayer = useCallback(
+    (id: string | null) => {
+      api.setHoveredLayer(id);
     },
     [api]
   );
@@ -99,13 +123,29 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     api.selectLayers([]);
   }, [api, editingTarget]);
 
-  const handleStartEdit = useCallback((hostId: string, dataPath: string) => {
-    setEditingTarget({ hostId, dataPath });
-  }, []);
+  const handleStartEdit = useCallback(
+    (hostId: string, dataPath: string) => {
+      api
+        .getService(ContextKeyServiceId)
+        ?.setContext('editor.editingText', true);
+      setEditingTarget({ hostId, dataPath });
+    },
+    [api]
+  );
 
   const handleCommitEdit = useCallback(
-    (hostId: string, dataPath: string, html: string) => {
-      api.updateProperty(hostId, dataPath, html);
+    (hostId: string, dataPath: string, html: string, align?: RichTextAlign) => {
+      if (align !== undefined) {
+        api.updateProperties(hostId, {
+          [dataPath]: html,
+          [alignDataPathFromHtmlPath(dataPath)]: align,
+        });
+      } else {
+        api.updateProperty(hostId, dataPath, html);
+      }
+      api
+        .getService(ContextKeyServiceId)
+        ?.setContext('editor.editingText', false);
       setEditingTarget(null);
     },
     [api]
@@ -194,6 +234,11 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     [clearDrag, executeCommand, registry, scene, selection]
   );
 
+  const handlePresetChange = useCallback((next: HtmlDevicePreset) => {
+    setPreset(next);
+    setAutoZoom(true);
+  }, []);
+
   const handleZoomIn = useCallback(() => {
     setAutoZoom(false);
     setManualZoom((previous) =>
@@ -242,22 +287,17 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
           .join(' ')}
       >
         <div className={styles.toolbarHost}>
-          <div className={styles.emailZoomBar} role="toolbar">
-            <button onClick={handleZoomOut} type="button">
-              −
-            </button>
-            <button onClick={handleZoomAuto} type="button">
-              {autoZoom
-                ? `${Math.round(zoom * 100)}% Auto`
-                : `${Math.round(zoom * 100)}%`}
-            </button>
-            <button onClick={handleZoomIn} type="button">
-              +
-            </button>
-            <button onClick={() => handleZoomPercent(1)} type="button">
-              100%
-            </button>
-          </div>
+          <HtmlDeviceToolbar
+            autoZoom={autoZoom}
+            autoZoomValue={autoZoomValue}
+            preset={preset}
+            zoom={zoom}
+            onPresetChange={handlePresetChange}
+            onZoomAuto={handleZoomAuto}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onZoomPercent={handleZoomPercent}
+          />
         </div>
         <div
           aria-label="Email blocks"
@@ -267,9 +307,11 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
           tabIndex={0}
           onClick={clearSelection}
           onKeyDown={handleCanvasKeyDown}
+          onPointerLeave={() => api.setHoveredLayer(null)}
         >
           <div
             className={styles.artboardSlot}
+            data-device={preset}
             data-testid="email-artboard"
             style={{
               width: scaledWidth > 0 ? scaledWidth : undefined,
@@ -280,16 +322,18 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
               className={styles.artboard}
               ref={artboardRef}
               style={{
-                width: EMAIL_FRAME_WIDTH,
+                width: frameWidth > 0 ? frameWidth : undefined,
                 transform: `scale(${zoom})`,
               }}
             >
               {rootId ? (
                 <BlockTreeRenderer
                   editingTarget={editingTarget}
+                  hoveredLayerId={hoveredLayerId}
                   layers={page.layers}
                   onCommitEdit={handleCommitEdit}
                   onDuplicate={handleDuplicate}
+                  onHoverLayer={handleHoverLayer}
                   onRemove={handleRemove}
                   onSelect={handleSelect}
                   onStartEdit={handleStartEdit}

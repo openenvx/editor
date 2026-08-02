@@ -54,6 +54,11 @@ export {
 export { HtmlDeviceToolbar } from './editor/html-device-toolbar';
 export { useHtmlDeviceStageMetrics } from './editor/use-html-device-stage-metrics';
 export {
+  alignDataPathFromHtmlPath,
+  parseRichTextAlign,
+  type RichTextAlign,
+} from './editor/rich-text-align';
+export {
   emitOpenEnvxHtmlWidgetClick,
   setOpenEnvxHtmlWidgetClickHandler,
 } from './editor/html-widget-click-handler';
@@ -69,6 +74,8 @@ export {
   removeById,
   updateBlockData,
 } from './tree/block-tree';
+export { flattenReactChildren } from './tree/flatten-react-children';
+export { resolveInsertParentId } from './tree/resolve-insert-parent-id';
 export {
   applyHtmlWidgetFace,
   mapWidgetTreeToHtmlLayers,

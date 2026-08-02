@@ -209,13 +209,16 @@ describe('HtmlEditorPane', () => {
       await user.click(screen.getByRole('button', { name: 'Mobile' }));
       expect(artboard.dataset.device).toBe('mobile');
       expect(artboard.style.width).toBe('390px');
+      expect(zoomSelect.value).toBe('auto');
 
       await user.click(screen.getByRole('button', { name: 'Desktop' }));
       expect(artboard.dataset.device).toBe('desktop');
       expect(artboard.style.width).toBe('1280px');
+      expect(zoomSelect.value).toBe('auto');
 
       await user.click(screen.getByRole('button', { name: 'Fit width' }));
       expect(artboard.dataset.device).toBe('fluid');
+      expect(zoomSelect.value).toBe('auto');
 
       await user.click(screen.getByRole('button', { name: 'Desktop' }));
       await user.click(screen.getByRole('button', { name: 'Zoom in' }));

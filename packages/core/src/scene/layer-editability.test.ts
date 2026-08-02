@@ -14,6 +14,7 @@ import {
   isLayerLocked,
   isLayerShownInLayers,
   isLayerWritable,
+  isLayoutRootLayer,
   isTemplatePolicyEnforced,
   setTemplatePolicyEnforced,
   withFrozenLayerSnapshots,
@@ -153,6 +154,22 @@ describe('templatePolicy', () => {
     expect(canDeleteLayer(createLayer({ writeMode: 'free' }), scene)).toBe(
       false
     );
+  });
+
+  it('blocks delete of layout root layers', () => {
+    const scene = createScene();
+    expect(
+      canDeleteLayer(createLayer({ type: 'html.root', writeMode: 'free' }), scene)
+    ).toBe(false);
+    expect(
+      canDeleteLayer(
+        createLayer({ type: 'email.root', writeMode: 'free' }),
+        scene
+      )
+    ).toBe(false);
+    expect(isLayoutRootLayer(createLayer({ type: 'html.root' }))).toBe(true);
+    expect(isLayoutRootLayer(createLayer({ type: 'email.root' }))).toBe(true);
+    expect(isLayoutRootLayer(createLayer({ type: 'canvas.text' }))).toBe(false);
   });
 
   it('blocks insert when allowInsertLayers is false', () => {

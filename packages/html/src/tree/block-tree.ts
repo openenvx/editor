@@ -94,38 +94,15 @@ export function createBlock(
   id: string,
   defaultData: Record<string, unknown>
 ): Layer {
-  return {
-    id,
-    type,
-    data: mintSlotPartIds(structuredClone(defaultData)),
-  };
-}
-
-function mintSlotPartIds(
-  data: Record<string, unknown>
-): Record<string, unknown> {
-  const slots = data.slots;
-  if (!slots || typeof slots !== 'object' || slots === null) {
-    return data;
-  }
-  const nextSlots: Record<string, unknown> = {};
-  for (const [key, parts] of Object.entries(slots)) {
-    if (!Array.isArray(parts)) {
-      nextSlots[key] = parts;
-      continue;
-    }
-    nextSlots[key] = parts.map((part) => {
-      if (!part || typeof part !== 'object') {
-        return part;
-      }
-      const layer = part as Layer;
-      return {
-        ...structuredClone(layer),
-        id: createPartId(layer.type),
-      };
-    });
-  }
-  return { ...data, slots: nextSlots };
+  const cloned = cloneBlockWithNewIds(
+    {
+      id: 'tmp',
+      type,
+      data: structuredClone(defaultData),
+    },
+    createPartId
+  );
+  return { ...cloned, id };
 }
 
 function createPartId(type: string): string {

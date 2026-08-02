@@ -77,6 +77,21 @@ describe('ScenePlugin delete command', () => {
     expect(deleteCommand.canExecute(ctx)).toBe(true);
   });
 
+  it('cannot execute when a layout root is selected', () => {
+    const ctx = createContext(
+      [
+        {
+          id: 'root',
+          type: 'email.root',
+          data: { children: [] },
+          writeMode: 'free',
+        },
+      ],
+      ['root']
+    );
+    expect(deleteCommand.canExecute(ctx)).toBe(false);
+  });
+
   it('cannot execute when any selected layer is config-locked', () => {
     const ctx = createContext(
       [createLayer('a'), createLayer('b', 'locked')],

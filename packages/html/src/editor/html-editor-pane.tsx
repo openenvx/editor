@@ -8,7 +8,7 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { getActivePage } from '@openenvx/core';
+import { ContextKeyServiceId, getActivePage } from '@openenvx/core';
 import type { EditorPaneHostProps } from '@openenvx/headless';
 import {
   useWorkbenchContext,
@@ -47,6 +47,10 @@ import {
   applyHtmlDragOver,
   applyHtmlDragStart,
 } from './html-editor-drag';
+import {
+  alignDataPathFromHtmlPath,
+  type RichTextAlign,
+} from './rich-text-align';
 import { useHtmlDeviceStageMetrics } from './use-html-device-stage-metrics';
 
 import styles from './html-editor-pane.module.css';
@@ -55,6 +59,9 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   const { api, executeCommand } = useWorkbenchContext();
   const scene = useWorkbenchContextSelector((state) => state.scene);
   const selection = useWorkbenchContextSelector((state) => state.selection);
+  const hoveredLayerId = useWorkbenchContextSelector(
+    (state) => state.interaction.hoveredLayerId
+  );
   const registry: BlockRegistry =
     api.getService(BlockRegistryServiceId) ?? defaultBlockRegistry;
   const [editingTarget, setEditingTarget] = useState<BlockEditTarget | null>(
@@ -103,6 +110,13 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     [api]
   );
 
+  const handleHoverLayer = useCallback(
+    (id: string | null) => {
+      api.setHoveredLayer(id);
+    },
+    [api]
+  );
+
   const clearSelection = useCallback(() => {
     if (editingTarget) {
       return;
@@ -110,13 +124,29 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     api.selectLayers([]);
   }, [api, editingTarget]);
 
-  const handleStartEdit = useCallback((hostId: string, dataPath: string) => {
-    setEditingTarget({ hostId, dataPath });
-  }, []);
+  const handleStartEdit = useCallback(
+    (hostId: string, dataPath: string) => {
+      api
+        .getService(ContextKeyServiceId)
+        ?.setContext('editor.editingText', true);
+      setEditingTarget({ hostId, dataPath });
+    },
+    [api]
+  );
 
   const handleCommitEdit = useCallback(
-    (hostId: string, dataPath: string, html: string) => {
-      api.updateProperty(hostId, dataPath, html);
+    (hostId: string, dataPath: string, html: string, align?: RichTextAlign) => {
+      if (align !== undefined) {
+        api.updateProperties(hostId, {
+          [dataPath]: html,
+          [alignDataPathFromHtmlPath(dataPath)]: align,
+        });
+      } else {
+        api.updateProperty(hostId, dataPath, html);
+      }
+      api
+        .getService(ContextKeyServiceId)
+        ?.setContext('editor.editingText', false);
       setEditingTarget(null);
     },
     [api]
@@ -206,9 +236,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
 
   const handlePresetChange = useCallback((next: HtmlDevicePreset) => {
     setPreset(next);
-    // Stay at 100% when switching devices so the page stays readable.
-    setAutoZoom(false);
-    setManualZoom(1);
+    setAutoZoom(true);
   }, []);
 
   const handleZoomIn = useCallback(() => {
@@ -279,6 +307,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
           tabIndex={0}
           onClick={clearSelection}
           onKeyDown={handleCanvasKeyDown}
+          onPointerLeave={() => api.setHoveredLayer(null)}
         >
           <div
             className={styles.artboardSlot}
@@ -300,9 +329,11 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
               {rootId ? (
                 <BlockTreeRenderer
                   editingTarget={editingTarget}
+                  hoveredLayerId={hoveredLayerId}
                   layers={page.layers}
                   onCommitEdit={handleCommitEdit}
                   onDuplicate={handleDuplicate}
+                  onHoverLayer={handleHoverLayer}
                   onRemove={handleRemove}
                   onSelect={handleSelect}
                   onStartEdit={handleStartEdit}

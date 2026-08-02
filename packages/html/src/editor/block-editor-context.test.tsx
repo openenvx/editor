@@ -14,9 +14,11 @@ describe('BlockEditorProvider', () => {
     const value = {
       scene: { pages: [], schemaVersion: 1 },
       selectedId: 'a',
+      hoveredLayerId: null,
       editingTarget: null,
       sortDraft: null,
       onSelect: () => {},
+      onHoverLayer: () => {},
       onStartEdit: () => {},
       onCommitEdit: () => {},
       onDuplicate: () => {},

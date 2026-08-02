@@ -1,10 +1,12 @@
 import {
   getLayerChildren,
+  hasChildLayers,
   isLayerEditable,
   isLayerLocked,
   isLayerShownInLayers,
   isLayerVisible,
   isLayerWritable,
+  isLayoutRootLayer,
   isTemplatePolicyEnforced,
   localize,
   moveLayerRelativeToTarget,
@@ -26,6 +28,8 @@ import type { Page } from '@openenvx/schema';
 export const WORKBENCH_SIDEBAR_CONTAINER_ID = 'workbench.sidebar';
 export const WORKBENCH_PAGES_VIEW_ID = 'workbench.pages';
 export const WORKBENCH_LAYERS_VIEW_ID = 'workbench.layers';
+
+export { isLayoutRootLayer };
 
 export class PagesTreeProvider extends TreeDataProvider<Page> {
   getRootChildren(ctx: CommandContext): Page[] {
@@ -158,13 +162,26 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
   canMove(
     source: Layer,
     target: Layer,
-    _position: 'before' | 'after' | 'inside'
+    position: 'before' | 'after' | 'inside'
   ): boolean {
-    return (
-      source.id !== target.id &&
-      isLayerWritable(source) &&
-      isLayerWritable(target)
-    );
+    if (
+      source.id === target.id ||
+      !isLayerWritable(source) ||
+      !isLayerWritable(target)
+    ) {
+      return false;
+    }
+    // Page/Email frame stays the sole top-level row — never move it or hoist beside it.
+    if (isLayoutRootLayer(source)) {
+      return false;
+    }
+    if (
+      isLayoutRootLayer(target) &&
+      (position === 'before' || position === 'after')
+    ) {
+      return false;
+    }
+    return true;
   }
 
   handleMove(
@@ -174,7 +191,13 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
     ctx: CommandContext
   ): void {
     const page = ctx.scene.getActivePage();
-    const effectivePosition = position === 'inside' ? 'after' : position;
+    // Nest into real containers; flat canvas rows still treat "inside" as sibling after.
+    const effectivePosition =
+      position === 'inside' && hasChildLayers(target)
+        ? 'inside'
+        : position === 'inside'
+          ? 'after'
+          : position;
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
@@ -214,6 +237,8 @@ export class WorkbenchLayersView extends ViewContribution {
   readonly name = 'Layers';
   readonly viewOrder = 10;
   readonly viewHover = 'layer' as const;
+  /** Flat under the Layers container — Page/Email is the tree root, not a nested section. */
+  readonly collapsible = false;
 }
 
 export class WorkbenchSidebarContainer extends ViewContainerContribution {

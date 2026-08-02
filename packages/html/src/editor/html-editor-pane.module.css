@@ -46,30 +46,45 @@
 .palettePanel {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   padding: var(--wb-space-3, 12px);
 }
 
 .paletteItem {
+  box-sizing: border-box;
   display: block;
   width: 100%;
-  text-align: left;
-  padding: 8px 10px;
-  border: 1px solid var(--wb-border, #e2e8f0);
-  border-radius: var(--wb-radius-md, 6px);
-  background: var(--wb-bg-elevated, #f8fafc);
-  color: inherit;
+  height: var(--wb-control-height, 28px);
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--wb-radius-control, 8px);
+  background: var(--wb-chrome-button, #27272a);
+  box-shadow: var(--wb-shadow-control, 0 0 0 1px rgb(255 255 255 / 8%));
+  color: var(--wb-foreground, #fafafa);
   cursor: pointer;
-  font-size: var(--wb-text-base, 13px);
+  font-family: var(--wb-font, inherit);
+  font-size: var(--wb-text-sm, 12px);
+  font-weight: 500;
+  line-height: var(--wb-control-height, 28px);
+  text-align: left;
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
 .paletteItem:hover {
-  background: var(--wb-bg-hover, #f1f5f9);
+  background: var(--wb-muted, #27272a);
+  box-shadow: var(--wb-shadow-control-hover, 0 0 0 1px rgb(255 255 255 / 12%));
+}
+
+.paletteItem:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-control-focus);
 }
 
 .empty {
-  color: #94a3b8;
-  font-size: 13px;
+  color: var(--wb-muted-foreground, #a1a1aa);
+  font-size: var(--wb-text-sm, 12px);
 }
 
 .blockWrap {
@@ -156,15 +171,12 @@
   border-radius: 6px;
 }
 
-/* Deepest hovered block only — nested parents stay clean.
-   Hovering layout padding/gaps (no child under cursor) still outlines Flex/Grid.
-   During drag, hide hover outlines so insert lines / container preview lead. */
-.pane:not(.paneDragging) .blockWrap:not(:has(.blockWrap:hover)):hover {
+/* Canvas-style hover outline (driven by hoveredLayerId — content or Layers tree). */
+.blockWrapHovered {
   outline: 1px solid #3b82f6;
 }
 
-.blockWrapSelected,
-.blockWrapSelected:not(:has(.blockWrap:hover)):hover {
+.blockWrapSelected {
   outline: 2px solid #3b82f6;
 }
 
@@ -255,7 +267,7 @@
 .editorHost :global(.ProseMirror) {
   cursor: text;
   display: block;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   outline: none;
   margin: 0;

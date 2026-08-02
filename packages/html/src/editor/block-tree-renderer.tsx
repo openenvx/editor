@@ -13,6 +13,7 @@ import {
   isLayerVisible,
   WIDGET_LAYER_TYPE,
 } from '@openenvx/core';
+import { isTypingTarget } from '@openenvx/headless';
 import type { Layer, Scene } from '@openenvx/schema';
 import {
   Fragment,
@@ -40,6 +41,7 @@ import {
 import { BlockSelectionMenu } from './block-selection-menu';
 import { HtmlRichTextEditor } from './html-rich-text-editor';
 import { emitOpenEnvxHtmlWidgetClick } from './html-widget-click-handler';
+import { parseRichTextAlign, type RichTextAlign } from './rich-text-align';
 
 import styles from './html-editor-pane.module.css';
 
@@ -151,7 +153,16 @@ function BlockChrome({
   sortableProps?: Record<string, unknown>;
   children: ReactNode;
 }) {
-  const { onSelect, onDuplicate, onRemove } = useBlockEditor();
+  const {
+    onSelect,
+    onDuplicate,
+    onRemove,
+    hoveredLayerId,
+    onHoverLayer,
+    sortDraft,
+  } = useBlockEditor();
+  const hovered =
+    hoveredLayerId === layer.id && !selected && sortDraft === null;
 
   const activate = useCallback(() => {
     if (insideWidget) {
@@ -176,8 +187,30 @@ function BlockChrome({
     [layer.id, onSelect]
   );
 
+  const handlePointerEnter = useCallback(() => {
+    onHoverLayer(layer.id);
+  }, [layer.id, onHoverLayer]);
+
+  const handlePointerLeave = useCallback(
+    (event: MouseEvent) => {
+      const related = event.relatedTarget;
+      if (related instanceof Node && event.currentTarget.contains(related)) {
+        return;
+      }
+      const parent =
+        event.currentTarget.parentElement?.closest('[data-layer-id]');
+      onHoverLayer(
+        parent instanceof HTMLElement ? (parent.dataset.layerId ?? null) : null
+      );
+    },
+    [onHoverLayer]
+  );
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
+      if (editing || isTypingTarget(event.target)) {
+        return;
+      }
       if (event.key !== 'Enter' && event.key !== ' ') {
         return;
       }
@@ -185,7 +218,7 @@ function BlockChrome({
       event.stopPropagation();
       activate();
     },
-    [activate]
+    [activate, editing]
   );
 
   const handleDuplicate = useCallback(() => {
@@ -211,6 +244,7 @@ function BlockChrome({
       className={[
         styles.blockWrap,
         selected ? styles.blockWrapSelected : '',
+        hovered ? styles.blockWrapHovered : '',
         dragDisabled ? '' : styles.blockWrapDraggable,
         isDraggingGhost ? styles.blockWrapDraggingGhost : '',
         dropContainerPreview ? styles.blockWrapDropContainer : '',
@@ -219,12 +253,15 @@ function BlockChrome({
       ]
         .filter(Boolean)
         .join(' ')}
+      data-layer-id={layer.id}
       ref={setNodeRef}
       role="treeitem"
       tabIndex={selected ? 0 : -1}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       onKeyDown={handleKeyDown}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       {...sortableProps}
     >
       {selected && !editing && !isDraggingGhost ? (
@@ -382,8 +419,8 @@ function SlotPartContent({
   );
 
   const handleCommit = useCallback(
-    (html: string) => {
-      onCommitEdit(hostId, dataPath, html);
+    (html: string, nextAlign?: RichTextAlign) => {
+      onCommitEdit(hostId, dataPath, html, nextAlign);
     },
     [dataPath, hostId, onCommitEdit]
   );
@@ -406,6 +443,7 @@ function SlotPartContent({
               data,
               children: (
                 <HtmlRichTextEditor
+                  align={parseRichTextAlign(data.align)}
                   html={String(data.html ?? '')}
                   onCommit={handleCommit}
                 />
@@ -497,8 +535,8 @@ function BlockContent({
   );
 
   const handleCommit = useCallback(
-    (html: string) => {
-      onCommitEdit(layer.id, 'html', html);
+    (html: string, nextAlign?: RichTextAlign) => {
+      onCommitEdit(layer.id, 'html', html, nextAlign);
     },
     [layer.id, onCommitEdit]
   );
@@ -514,6 +552,7 @@ function BlockContent({
           data,
           children: (
             <HtmlRichTextEditor
+              align={parseRichTextAlign(data.align)}
               html={String(data.html ?? '')}
               onCommit={handleCommit}
             />
@@ -669,9 +708,11 @@ export const BlockTreeRenderer = memo(
     registry,
     scene,
     selectedId,
+    hoveredLayerId = null,
     editingTarget,
     sortDraft,
     onSelect,
+    onHoverLayer,
     onStartEdit,
     onCommitEdit,
     onDuplicate,
@@ -681,11 +722,18 @@ export const BlockTreeRenderer = memo(
     registry: BlockRegistry;
     scene: Scene;
     selectedId: string | null;
+    hoveredLayerId?: string | null;
     editingTarget: BlockEditTarget | null;
     sortDraft: BlockSortDraft | null;
     onSelect: (id: string) => void;
+    onHoverLayer?: (id: string | null) => void;
     onStartEdit: (hostId: string, dataPath: string) => void;
-    onCommitEdit: (hostId: string, dataPath: string, html: string) => void;
+    onCommitEdit: (
+      hostId: string,
+      dataPath: string,
+      html: string,
+      align?: RichTextAlign
+    ) => void;
     onDuplicate: (id: string) => void;
     onRemove: (id: string) => void;
   }) => (
@@ -693,9 +741,11 @@ export const BlockTreeRenderer = memo(
       value={{
         scene,
         selectedId,
+        hoveredLayerId,
         editingTarget,
         sortDraft,
         onSelect,
+        onHoverLayer: onHoverLayer ?? (() => {}),
         onStartEdit,
         onCommitEdit,
         onDuplicate,

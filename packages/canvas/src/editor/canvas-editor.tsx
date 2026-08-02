@@ -392,7 +392,7 @@ export const CanvasEditor = memo(
     );
 
     useEffect(() => {
-      host.setContextKey('canvas.editingText', editingLayerId !== null);
+      host.setContextKey('editor.editingText', editingLayerId !== null);
     }, [host, editingLayerId]);
 
     useEffect(() => {
@@ -405,7 +405,7 @@ export const CanvasEditor = memo(
       return () => {
         canvasClipboardService.setEditorActive(false);
         host.setContextKey('canvas.focused', false);
-        host.setContextKey('canvas.editingText', false);
+        host.setContextKey('editor.editingText', false);
       };
     }, [host, canvasClipboardService]);
 

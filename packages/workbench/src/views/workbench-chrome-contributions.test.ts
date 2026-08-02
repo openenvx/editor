@@ -250,6 +250,60 @@ describe('LayersTreeProvider', () => {
     expect(provider.getChildren(child)).toEqual([]);
   });
 
+  it('rejects moves that would place a layer beside or above the layout root', () => {
+    const provider = new LayersTreeProvider();
+    const root: Layer = {
+      id: 'root',
+      type: 'email.root',
+      data: { children: [] },
+    };
+    const block: Layer = {
+      id: 'section-1',
+      type: 'email.section',
+      data: { children: [] },
+    };
+
+    expect(provider.canMove?.(block, root, 'before')).toBe(false);
+    expect(provider.canMove?.(block, root, 'after')).toBe(false);
+    expect(provider.canMove?.(block, root, 'inside')).toBe(true);
+    expect(provider.canMove?.(root, block, 'after')).toBe(false);
+  });
+
+  it('nests into the layout root on inside drops instead of hoisting beside it', () => {
+    const provider = new LayersTreeProvider();
+    const root: Layer = {
+      id: 'root',
+      type: 'email.root',
+      data: {
+        children: [
+          { id: 'a', type: 'email.section', data: { children: [] } },
+          { id: 'b', type: 'email.section', data: { children: [] } },
+        ],
+      },
+    };
+    let pageLayers: Layer[] = [root];
+    const ctx = {
+      scene: {
+        getActivePage: () => ({ id: 'p1', layers: pageLayers }),
+        apply: (op: { apply: (scene: { pages: { id: string; layers: Layer[] }[] }) => { pages: { id: string; layers: Layer[] }[] } }) => {
+          const next = op.apply({ pages: [{ id: 'p1', layers: pageLayers }] });
+          pageLayers = next.pages[0]!.layers;
+        },
+      },
+      services: { has: () => false },
+    } as unknown as CommandContext;
+
+    const b = (root.data as { children: Layer[] }).children[1]!;
+    provider.handleMove?.(b, root, 'inside', ctx);
+
+    expect(pageLayers).toHaveLength(1);
+    expect(
+      (pageLayers[0]!.data as { children: Layer[] }).children.map(
+        (layer) => layer.id
+      )
+    ).toEqual(['a', 'b']);
+  });
+
   it('additive select toggles layers into and out of selection', () => {
     const provider = new LayersTreeProvider();
     const selection = {

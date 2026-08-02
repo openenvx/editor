@@ -19,6 +19,7 @@ export function App() {
         initialScene={createEmailDemoScene()}
         layout={DEFAULT_WORKBENCH_LAYOUT}
         plugins={DEFAULT_EMAIL_DEMO_PLUGINS}
+        theme="dark"
       />
       <style>{`
         html, body, #root { height: 100%; margin: 0; }

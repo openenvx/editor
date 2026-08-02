@@ -101,6 +101,17 @@ export {
   type ActivitySidebarProps,
 } from './layout/activity-sidebar';
 export { ConfirmDialog } from './primitives/confirm-dialog';
+export {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  type SheetSide,
+} from './primitives/sheet';
 export { Select } from './primitives/select';
 export {
   NumericInput,

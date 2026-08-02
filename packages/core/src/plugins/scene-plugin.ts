@@ -691,6 +691,19 @@ class ToggleLayerLockShortcut extends ShortcutContribution {
   when = 'scene.layerSelected';
 }
 
+/** Figma-like: Delete/Backspace removes selection (Layers or canvas/html/email). */
+class DeleteLayerShortcut extends ShortcutContribution {
+  readonly keybinding = 'Delete';
+  readonly commandId = 'scene.deleteLayer';
+  when = 'scene.layerSelected && !editor.editingText';
+}
+
+class BackspaceDeleteLayerShortcut extends ShortcutContribution {
+  readonly keybinding = 'Backspace';
+  readonly commandId = 'scene.deleteLayer';
+  when = 'scene.layerSelected && !editor.editingText';
+}
+
 export class ScenePlugin extends Plugin {
   readonly id = 'OpenEnvx.scene';
 
@@ -716,7 +729,9 @@ export class ScenePlugin extends Plugin {
       new RedoShortcut(),
       new MoveUpShortcut(),
       new MoveDownShortcut(),
-      new ToggleLayerLockShortcut()
+      new ToggleLayerLockShortcut(),
+      new DeleteLayerShortcut(),
+      new BackspaceDeleteLayerShortcut()
     );
   }
 }

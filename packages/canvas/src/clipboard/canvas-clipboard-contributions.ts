@@ -112,15 +112,3 @@ export class DuplicateLayersShortcut extends ShortcutContribution {
   readonly commandId = 'canvas.duplicate';
   when = 'page.layoutAbsolute && scene.layerSelected';
 }
-
-export class DeleteLayerShortcut extends ShortcutContribution {
-  readonly keybinding = 'Delete';
-  readonly commandId = 'scene.deleteLayer';
-  when = 'scene.layerSelected && !canvas.editingText';
-}
-
-export class BackspaceDeleteLayerShortcut extends ShortcutContribution {
-  readonly keybinding = 'Backspace';
-  readonly commandId = 'scene.deleteLayer';
-  when = 'scene.layerSelected && !canvas.editingText';
-}

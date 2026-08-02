@@ -37,6 +37,7 @@ import { ActivitySidebar } from '../layout/activity-sidebar';
 import { CanvasChrome } from '../layout/canvas-chrome';
 import { EditorLayout } from '../layout/editor-layout';
 import { CommandPaletteRenderer } from '../renderers/command-palette-renderer';
+import { CommandSheetHost } from '../renderers/command-sheet-host';
 import { ContextMenuRenderer } from '../renderers/context-menu-renderer';
 import { EditorPaneRenderer } from '../renderers/editor-pane-renderer';
 import { FloatingToolbarRenderer } from '../renderers/floating-toolbar-renderer';
@@ -113,6 +114,7 @@ const ChromeRegion = memo(
     return (
       <>
         {overlays ? <OverlayRenderer overlays={overlays} /> : null}
+        <CommandSheetHost />
         {paletteOpen && commandPalette && commandStates ? (
           <CommandPaletteRenderer
             commandPalette={commandPalette}

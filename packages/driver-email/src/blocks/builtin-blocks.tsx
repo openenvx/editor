@@ -1,5 +1,6 @@
 import { sanitizeHtml, sanitizeUrl } from '@openenvx/core';
 import type { BlockConfig } from '@openenvx/html';
+import { flattenReactChildren } from '@openenvx/html';
 import {
   Button,
   Column,
@@ -11,7 +12,7 @@ import {
   Section,
   Text,
 } from '@react-email/components';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties } from 'react';
 
 const EMAIL_WIDTH = 600;
 
@@ -21,36 +22,43 @@ export const rootBlock: BlockConfig = {
   fields: {
     background: { kind: 'color', label: 'Background' },
     preheader: { kind: 'text', label: 'Preheader' },
+    padding: { kind: 'number', label: 'Content padding (px)' },
   },
   defaultData: {
     background: '#f6f9fc',
     preheader: '',
+    padding: 32,
     children: [],
   },
   acceptsChildren: true,
   palette: false,
   treeIcon: 'file',
-  render: ({ data, children }) => (
-    <Section
-      style={{
-        background: String(data.background ?? '#f6f9fc'),
-        width: '100%',
-        minHeight: 480,
-        padding: '24px 0',
-      }}
-    >
-      <Container
+  render: ({ data, children }) => {
+    const padding = Number(data.padding ?? 32);
+    return (
+      <Section
         style={{
-          background: '#ffffff',
-          margin: '0 auto',
-          maxWidth: EMAIL_WIDTH,
+          background: String(data.background ?? '#f6f9fc'),
           width: '100%',
+          minHeight: 480,
+          padding: '40px 16px',
         }}
       >
-        {children}
-      </Container>
-    </Section>
-  ),
+        <Container
+          style={{
+            background: '#ffffff',
+            margin: '0 auto',
+            maxWidth: EMAIL_WIDTH,
+            width: '100%',
+            borderRadius: 4,
+            padding: Number.isFinite(padding) ? padding : 32,
+          }}
+        >
+          {children}
+        </Container>
+      </Section>
+    );
+  },
 };
 
 export const sectionBlock: BlockConfig = {
@@ -88,7 +96,7 @@ export const columnsBlock: BlockConfig = {
   acceptsChildren: true,
   insertLineAxis: 'vertical',
   render: ({ data, children }) => {
-    const childList = flattenChildren(children);
+    const childList = flattenReactChildren(children);
     const count = Math.max(1, childList.length);
     const width = `${Math.floor(100 / count)}%`;
     const gap = Number(data.gap ?? 16);
@@ -145,11 +153,8 @@ export const headingBlock: BlockConfig = {
       margin: '0 0 12px',
     };
     if (children) {
-      return (
-        <Heading as={`h${level}`} style={style}>
-          {children}
-        </Heading>
-      );
+      // Edit mode: div keeps text-align without nesting TipTap inside <p>/<h*>.
+      return <div style={style}>{children}</div>;
     }
     return (
       <Heading
@@ -185,7 +190,7 @@ export const textBlock: BlockConfig = {
       fontSize: 14,
     };
     if (children) {
-      return <Text style={style}>{children}</Text>;
+      return <div style={style}>{children}</div>;
     }
     return (
       <Text
@@ -246,25 +251,36 @@ export const imageBlock: BlockConfig = {
     src: { kind: 'image', label: 'Image' },
     alt: { kind: 'text', label: 'Alt' },
     width: { kind: 'number', label: 'Width (px)' },
+    height: { kind: 'number', label: 'Height (px)' },
+    borderRadius: { kind: 'number', label: 'Radius (px)' },
   },
   defaultData: {
     src: 'https://placehold.co/600x200',
     alt: 'Placeholder',
     width: 600,
   },
-  render: ({ data }) => (
-    <Img
-      alt={String(data.alt ?? '')}
-      src={sanitizeUrl(String(data.src ?? ''), { allowDataImage: true })}
-      style={{
-        display: 'block',
-        maxWidth: '100%',
-        height: 'auto',
-        margin: '0 0 16px',
-      }}
-      width={Number(data.width ?? EMAIL_WIDTH) || EMAIL_WIDTH}
-    />
-  ),
+  render: ({ data }) => {
+    const height = Number(data.height);
+    const hasHeight = Number.isFinite(height) && height > 0;
+    const borderRadius = Number(data.borderRadius);
+    const hasRadius = Number.isFinite(borderRadius) && borderRadius > 0;
+    return (
+      <Img
+        alt={String(data.alt ?? '')}
+        height={hasHeight ? height : undefined}
+        src={sanitizeUrl(String(data.src ?? ''), { allowDataImage: true })}
+        style={{
+          display: 'block',
+          maxWidth: '100%',
+          height: hasHeight ? height : 'auto',
+          margin: hasHeight ? 0 : '0 0 16px',
+          borderRadius: hasRadius ? borderRadius : undefined,
+          objectFit: hasHeight ? 'cover' : undefined,
+        }}
+        width={Number(data.width ?? EMAIL_WIDTH) || EMAIL_WIDTH}
+      />
+    );
+  },
 };
 
 export const dividerBlock: BlockConfig = {
@@ -315,13 +331,3 @@ export const builtinEmailBlocks: BlockConfig[] = [
   dividerBlock,
   spacerBlock,
 ];
-
-function flattenChildren(children: ReactNode): ReactNode[] {
-  if (children === null || children === undefined || children === false) {
-    return [];
-  }
-  if (Array.isArray(children)) {
-    return children.flatMap((child) => flattenChildren(child));
-  }
-  return [children];
-}
