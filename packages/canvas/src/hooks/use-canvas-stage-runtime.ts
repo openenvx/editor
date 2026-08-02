@@ -357,29 +357,13 @@ export function useCanvasStageRuntime(
     selectTransformSessionLayerId
   );
 
-  useEffect(() => {
-    runtime.bindLayerHandlers({
-      applyDragSnap,
-      clearOverlays,
-      completeLayerTransform,
-      handleLayerTransform,
-      syncLabelFromTransformer,
-    });
-  }, [
-    applyDragSnap,
-    clearOverlays,
-    completeLayerTransform,
-    handleLayerTransform,
-    runtime,
-    syncLabelFromTransformer,
-  ]);
-
   const {
     handleHandlePointerDown: startHandleDrag,
     handleHandlePointerMove,
     handleHandlePointerUp: endHandleDrag,
     handleLayouts,
     showHandles,
+    syncHandlesFromNode,
   } = useHandleDragSession({
     canvasLayerInteractions,
     clearOverlays,
@@ -408,6 +392,25 @@ export function useCanvasStageRuntime(
     transformerRef,
     vpZoom: vp.zoom,
   });
+
+  useEffect(() => {
+    runtime.bindLayerHandlers({
+      applyDragSnap,
+      clearOverlays,
+      completeLayerTransform,
+      handleLayerTransform,
+      syncHandlesFromNode,
+      syncLabelFromTransformer,
+    });
+  }, [
+    applyDragSnap,
+    clearOverlays,
+    completeLayerTransform,
+    handleLayerTransform,
+    runtime,
+    syncHandlesFromNode,
+    syncLabelFromTransformer,
+  ]);
 
   const handleHandlePointerDown = useCallback(
     (anchor: string) => {

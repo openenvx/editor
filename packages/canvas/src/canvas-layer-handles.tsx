@@ -1,6 +1,11 @@
+import type Konva from 'konva';
 import { Circle, Rect } from 'react-konva';
 
 import type { HandleDescriptor } from './registry/canvas-registry-types';
+import {
+  resolveResizeHandleCursor,
+  setStageContentCursor,
+} from './resize-handle-cursor';
 
 export interface CanvasLayerHandlesProps {
   handles: HandleDescriptor[];
@@ -20,9 +25,24 @@ export function CanvasLayerHandles({
   return (
     <>
       {handles.map((handle) => {
-        const onPointerDown = (event: { cancelBubble: boolean }) => {
+        const cursor = resolveResizeHandleCursor(
+          handle.anchor,
+          handle.rotation
+        );
+
+        const onPointerDown = (event: Konva.KonvaEventObject<Event>) => {
           event.cancelBubble = true;
+          // Set before handles unmount for the drag session so the cursor sticks.
+          setStageContentCursor(event.target, cursor);
           onHandlePointerDown(handle.anchor);
+        };
+
+        const onMouseEnter = (event: Konva.KonvaEventObject<MouseEvent>) => {
+          setStageContentCursor(event.target, cursor);
+        };
+
+        const onMouseLeave = (event: Konva.KonvaEventObject<MouseEvent>) => {
+          setStageContentCursor(event.target, '');
         };
 
         if (handle.shape === 'circle') {
@@ -33,6 +53,8 @@ export function CanvasLayerHandles({
               key={handle.anchor}
               listening={true}
               onMouseDown={onPointerDown}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
               onTouchStart={onPointerDown}
               radius={radius}
               rotation={handle.rotation}
@@ -51,6 +73,8 @@ export function CanvasLayerHandles({
             key={handle.anchor}
             listening={true}
             onMouseDown={onPointerDown}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
             onTouchStart={onPointerDown}
             rotation={handle.rotation}
             stroke={stroke}

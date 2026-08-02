@@ -52,6 +52,7 @@ export interface CanvasStageRuntimeLayerBindings {
     view: LayerPreviewDescriptor,
     interactionKind: string | undefined
   ) => void;
+  syncHandlesFromNode: (layerId: string) => void;
   syncLabelFromTransformer: () => void;
 }
 
@@ -248,6 +249,7 @@ export class CanvasStageRuntime implements ExternalStore<CanvasStageSnapshot> {
     this.layerBindings?.applyDragSnap(layerId, node, transform);
     if (selectedLayerIds.includes(layerId)) {
       this.layerBindings?.syncLabelFromTransformer();
+      this.layerBindings?.syncHandlesFromNode(layerId);
     }
   }
 

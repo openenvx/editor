@@ -3,7 +3,7 @@ import type { LayerPreviewDescriptor } from '@openenvx/preview';
 import { createDefaultTransform } from '@openenvx/schema';
 import type { Transform } from '@openenvx/schema';
 import type Konva from 'konva';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 
 import type { CanvasStageProps, SelectionBounds } from '../canvas-stage-types';
@@ -14,6 +14,8 @@ import type {
   CanvasLayerInteractionRegistration,
   HandleDescriptor,
 } from '../registry/canvas-registry-types';
+import { setStageContentCursor } from '../resize-handle-cursor';
+import { nodePositionToAbsolute } from '../snap/absolute-snap-to-node-position';
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
 import { resolveHandleDragTarget } from './resolve-handle-drag-target';
 import { useDragEndListeners } from './use-drag-end-listeners';
@@ -118,12 +120,30 @@ export function useHandleDragSession({
   const [activeHandleAnchorState, setActiveHandleAnchor] = useState<
     string | null
   >(null);
+  // Live node position while dragging — scene transform only commits on drag end.
+  const [liveHandlePosition, setLiveHandlePosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const handleDragRef = useRef<HandleDragRef | null>(null);
   const handleHandlePointerUpRef = useRef<() => void>(() => {});
   const detachEndDragListenersRef = useRef<() => void>(() => {});
+  const selectedPrimaryRef = useRef(selectedPrimary);
+  selectedPrimaryRef.current = selectedPrimary;
+  const selectedTransformRef = useRef(selectedTransform);
+  selectedTransformRef.current = selectedTransform;
+  const selectedRelativeTransformRef = useRef(
+    selectedLayer?.layer.transform ?? null
+  );
+  selectedRelativeTransformRef.current = selectedLayer?.layer.transform ?? null;
 
   const clearHandleDragState = useCallback(
     (options?: { clearLiveOverrides?: boolean }) => {
+      const layerId =
+        handleDragRef.current?.layerId ?? selectedPrimaryRef.current;
+      if (layerId) {
+        setStageContentCursor(nodeRefs.current?.get(layerId) ?? null, '');
+      }
       handleDragRef.current = null;
       setActiveHandleAnchor(null);
       setTransformSessionLayerId(null);
@@ -136,6 +156,7 @@ export function useHandleDragSession({
     },
     [
       clearOverlays,
+      nodeRefs,
       onHandleDragCleared,
       setLiveTransformOverrides,
       setTransformSessionLayerId,
@@ -229,6 +250,42 @@ export function useHandleDragSession({
     selectedInteraction?.providesHandles?.(selectedLayer.view)
   );
 
+  const syncHandlesFromNode = useCallback(
+    (layerId: string) => {
+      if (layerId !== selectedPrimaryRef.current) {
+        return;
+      }
+      const node = nodeRefs.current?.get(layerId);
+      const absolute = selectedTransformRef.current;
+      if (!node || !absolute) {
+        return;
+      }
+      const relative = selectedRelativeTransformRef.current ?? absolute;
+      setLiveHandlePosition(
+        nodePositionToAbsolute(node.x(), node.y(), relative, absolute)
+      );
+    },
+    [nodeRefs]
+  );
+
+  // Scene transform catches up after drag end — drop the live override.
+  useEffect(() => {
+    setLiveHandlePosition(null);
+  }, [selectedTransform]);
+
+  // Hover cursor can stick if handles unmount without mouseLeave (reselect/edit).
+  // Skip while a handle-anchor drag keeps the cursor intentionally sticky.
+  useEffect(() => {
+    if (showHandles || activeHandleAnchorState) {
+      return;
+    }
+    const layerId = selectedPrimaryRef.current;
+    setStageContentCursor(
+      layerId ? (nodeRefs.current?.get(layerId) ?? null) : null,
+      ''
+    );
+  }, [activeHandleAnchorState, nodeRefs, showHandles]);
+
   const handleLayouts = useMemo((): HandleDescriptor[] => {
     if (
       !showHandles ||
@@ -243,15 +300,23 @@ export function useHandleDragSession({
     if (!node) {
       return [];
     }
+    const sceneTransform = getLayerTransform(
+      selectedPrimary,
+      selectedTransform
+    );
+    const transform = liveHandlePosition
+      ? { ...sceneTransform, ...liveHandlePosition }
+      : sceneTransform;
     return selectedInteraction.layoutHandles({
       layerId: selectedPrimary,
       node,
-      transform: getLayerTransform(selectedPrimary, selectedTransform),
+      transform,
       view: selectedLayer.view,
       zoom: vpZoom,
     });
   }, [
     getLayerTransform,
+    liveHandlePosition,
     nodeRefs,
     selectedInteraction,
     selectedLayer,
@@ -382,5 +447,6 @@ export function useHandleDragSession({
     handleHandlePointerUp,
     handleLayouts,
     showHandles,
+    syncHandlesFromNode,
   };
 }

@@ -6,7 +6,10 @@ import type { RefObject } from 'react';
 
 import type { DragSession } from '../canvas-stage-types';
 import type { FlattenedStageLayer } from '../flatten-layer-surface';
-import { absoluteSnapToNodePosition } from '../snap/absolute-snap-to-node-position';
+import {
+  absoluteSnapToNodePosition,
+  nodePositionToAbsolute,
+} from '../snap/absolute-snap-to-node-position';
 import {
   collectAncestorLayerIds,
   collectDescendantLayerIds,
@@ -163,8 +166,12 @@ export function useCanvasDragSnap({
           bounds: {
             height: relativeTransform.height,
             width: relativeTransform.width,
-            x: absoluteTransform.x + (node.x() - relativeTransform.x),
-            y: absoluteTransform.y + (node.y() - relativeTransform.y),
+            ...nodePositionToAbsolute(
+              node.x(),
+              node.y(),
+              relativeTransform,
+              absoluteTransform
+            ),
           },
           layerType: movingLayerType,
         },
