@@ -129,6 +129,15 @@ export function createCanvasPropertyHostContext(
         if (!current) {
           return;
         }
+        if (key === 'rotation') {
+          if (typeof value === 'number') {
+            void executeCommand('canvas.setLayerRotation', {
+              layerId: selectedLayerId,
+              rotation: value,
+            });
+          }
+          return;
+        }
         const patch = { [key]: value } as Partial<Transform>;
         const transform = clampTransformSize({ ...current, ...patch });
         void updateLayerTransform(selectedLayerId, transform);

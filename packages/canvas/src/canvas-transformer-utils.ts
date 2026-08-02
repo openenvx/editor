@@ -1,7 +1,15 @@
 import type Konva from 'konva';
 import type { RefObject } from 'react';
 
+import { ROTATER_ANCHOR } from './geometry';
 import type { CanvasLayerInteractionRegistration } from './registry/canvas-registry-types';
+
+export function refreshTransformer(
+  transformer: Konva.Transformer | null
+): void {
+  transformer?.forceUpdate();
+  transformer?.getLayer()?.batchDraw();
+}
 
 export function getInteraction(
   interactions: CanvasLayerInteractionRegistration[],
@@ -62,7 +70,7 @@ export function applyTransformerAnchorVisibility(
   if (!transformer) {
     return;
   }
-  if (activeDragAnchor === 'rotater') {
+  if (activeDragAnchor === ROTATER_ANCHOR) {
     transformer.enabledAnchors([]);
     transformer.rotateEnabled(true);
   } else if (activeDragAnchor) {

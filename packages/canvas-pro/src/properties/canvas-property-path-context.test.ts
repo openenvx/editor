@@ -84,6 +84,34 @@ describe('createCanvasPropertyHostContext', () => {
     });
   });
 
+  it('writePath dispatches rotation to canvas.setLayerRotation', () => {
+    const scene = createSceneWithLayer();
+    scene.pages[0]!.layers[0]!.transform = {
+      ...createDefaultTransform(),
+      height: 100,
+      rotation: 0,
+      width: 200,
+      x: 100,
+      y: 100,
+    };
+    const executeCommand = vi.fn();
+    const ctx = createCanvasPropertyHostContext({
+      scene,
+      selectedLayerId: 'layer-1',
+      layerData: null,
+      updateProperty: vi.fn(),
+      executeCommand,
+      updateLayerTransform: vi.fn(),
+    });
+
+    ctx.writePath('selection.layer.transform.rotation', 90);
+
+    expect(executeCommand).toHaveBeenCalledWith('canvas.setLayerRotation', {
+      layerId: 'layer-1',
+      rotation: 90,
+    });
+  });
+
   it('writePath delegates command paths to executeCommand', () => {
     const scene = createSceneWithLayer();
     const executeCommand = vi.fn();

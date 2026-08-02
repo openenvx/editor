@@ -12,6 +12,8 @@ import {
   hitTestRotatedLayer,
   isValidNodeTransform,
   MIN_LAYER_SIZE,
+  reconcileRotationTransform,
+  rotateTransformAroundCenter,
   snapshotNodeState,
 } from "./geometry";
 
@@ -254,6 +256,48 @@ describe("geometry", () => {
     };
     expect(hitTestRotatedLayer({ x: 120, y: 120 }, transform)).toBeTruthy();
     expect(hitTestRotatedLayer({ x: 0, y: 0 }, transform)).toBeFalsy();
+  });
+
+  it("rotateTransformAroundCenter keeps visual center fixed", () => {
+    const transform = {
+      ...createDefaultTransform(),
+      height: 100,
+      rotation: 0,
+      width: 200,
+      x: 100,
+      y: 100,
+    };
+
+    const next = rotateTransformAroundCenter(transform, 90);
+
+    expect(next.rotation).toBe(90);
+    expect(next.x).toBeCloseTo(250);
+    expect(next.y).toBeCloseTo(50);
+
+    // Center before: (200, 150). After 90° around center, top-left→(250,50).
+    const back = rotateTransformAroundCenter(next, 0);
+    expect(back.x).toBeCloseTo(100);
+    expect(back.y).toBeCloseTo(100);
+    expect(back.rotation).toBe(0);
+  });
+
+  it("reconcileRotationTransform pivots when only rotation changes", () => {
+    const transform = {
+      ...createDefaultTransform(),
+      height: 100,
+      rotation: 0,
+      width: 200,
+      x: 100,
+      y: 100,
+    };
+
+    const next = reconcileRotationTransform(transform, {
+      ...transform,
+      rotation: 90,
+    });
+
+    expect(next.x).toBeCloseTo(250);
+    expect(next.y).toBeCloseTo(50);
   });
 });
 

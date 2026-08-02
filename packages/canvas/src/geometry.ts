@@ -2,7 +2,13 @@ import { clampTransformSize, MIN_LAYER_SIZE } from '@openenvx/core';
 import type { Transform } from '@openenvx/schema';
 import type Konva from 'konva';
 
+export const ROTATER_ANCHOR = 'rotater';
+
 export { MIN_LAYER_SIZE, clampTransformSize } from '@openenvx/core';
+
+function rotationDegreesToRadians(degrees: number): number {
+  return (degrees * Math.PI) / 180;
+}
 
 export interface TransformerBox {
   x: number;
@@ -145,7 +151,7 @@ export function createTransformDragContext(
   transformer: Konva.Transformer
 ): TransformDragContext | null {
   const anchor = transformer.getActiveAnchor();
-  if (!anchor || anchor === 'rotater') {
+  if (!anchor || anchor === ROTATER_ANCHOR) {
     return null;
   }
 
@@ -192,6 +198,50 @@ function toAbsoluteOffset(
     x: origin.x + local.x * cos - local.y * sin,
     y: origin.y + local.x * sin + local.y * cos,
   };
+}
+
+/**
+ * Rotate a top-left-origin transform around its center — same as Konva.Transformer.
+ */
+export function rotateTransformAroundCenter(
+  transform: Transform,
+  rotation: number
+): Transform {
+  if (transform.rotation === rotation) {
+    return transform;
+  }
+
+  const half = { x: transform.width / 2, y: transform.height / 2 };
+  const origin = { x: transform.x, y: transform.y };
+  const center = toAbsoluteOffset(
+    half,
+    origin,
+    rotationDegreesToRadians(transform.rotation)
+  );
+  const { x, y } = toAbsoluteOffset(
+    { x: -half.x, y: -half.y },
+    center,
+    rotationDegreesToRadians(rotation)
+  );
+
+  return { ...transform, rotation, x, y };
+}
+
+/** When only `rotation` changes, pivot around the layer center (programmatic updates). */
+export function reconcileRotationTransform(
+  current: Transform,
+  next: Transform
+): Transform {
+  if (
+    next.rotation === current.rotation ||
+    next.width !== current.width ||
+    next.height !== current.height ||
+    next.x !== current.x ||
+    next.y !== current.y
+  ) {
+    return next;
+  }
+  return rotateTransformAroundCenter(current, next.rotation);
 }
 
 export function pointerToParentLocal(

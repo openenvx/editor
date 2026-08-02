@@ -127,6 +127,12 @@ export function isRichTextCornerAnchor(
   );
 }
 
+export function isRichTextResizeAnchor(
+  anchor: string
+): anchor is RichTextResizeAnchor {
+  return isRichTextCornerAnchor(anchor) || isRichTextHorizontalAnchor(anchor);
+}
+
 export function horizontalResizeBoxFromPointer(
   session: RichTextResizeSession,
   pointerParent: { x: number; y: number },

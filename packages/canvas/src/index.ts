@@ -27,6 +27,8 @@ export {
   createTransformDragContextFromOrigin,
   normalizeNodeBeforeTransform,
   pointerToParentLocal,
+  rotateTransformAroundCenter,
+  reconcileRotationTransform,
   type TransformDragContext,
 } from './geometry';
 export { getLayerBounds, type AlignBounds } from './align';

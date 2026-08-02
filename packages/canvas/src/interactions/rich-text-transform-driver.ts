@@ -9,6 +9,7 @@ import { createDefaultTransform } from '@openenvx/schema';
 import type { Transform } from '@openenvx/schema';
 import type Konva from 'konva';
 
+import { refreshTransformer } from '../canvas-transformer-utils';
 import {
   createTransformDragContext,
   createTransformDragContextFromOrigin,
@@ -25,6 +26,7 @@ import {
   constrainRichTextHorizontalBox,
   isRichTextCornerAnchor,
   isRichTextHorizontalAnchor,
+  isRichTextResizeAnchor,
 } from '../rich-text-resize';
 import type {
   RichTextResizeAnchor,
@@ -60,7 +62,10 @@ export interface RichTextTransformRuntime {
   node: Konva.Group;
   transformer: Konva.Transformer | null;
   transform: Transform;
+  /** Active transformer handle at drag start (includes rotater). */
   anchor: string | null;
+  /** Resize handle when this drag is a corner/edge bake; null for rotation. */
+  resizeAnchor: RichTextResizeAnchor | null;
   sessionRef: { current: RichTextCornerSession | null };
   dragRef: { current: TransformDragContext | null };
   bakeInProgressRef: { current: boolean };
@@ -103,14 +108,14 @@ function measureRichTextHeightForView(
 
 function resizeSessionFrom(
   session: RichTextCornerSession,
-  anchor: string
+  anchor: RichTextResizeAnchor
 ): {
   anchor: RichTextResizeAnchor;
   origin: Transform;
   startFontSize: number;
 } {
   return {
-    anchor: anchor as RichTextResizeAnchor,
+    anchor,
     origin: session.origin,
     startFontSize: session.startFontSize,
   };
@@ -183,7 +188,10 @@ export function boundRichTextBox(
   },
   pointer: { x: number; y: number } | null
 ) {
-  const resizeSession = resizeSessionFrom(session, anchor);
+  const resizeSession = resizeSessionFrom(
+    session,
+    anchor as RichTextResizeAnchor
+  );
   const measure = (width: number, fontSize: number) =>
     measureRichTextHeightForView(session.view, width, fontSize);
 
@@ -210,7 +218,6 @@ export function runRichTextLiveBake(runtime: RichTextTransformRuntime): void {
   const {
     bakeInProgressRef,
     cornerBakeRafRef,
-    dragRef,
     layerId,
     nodeRefs,
     onUpdateSizeLabel,
@@ -224,6 +231,11 @@ export function runRichTextLiveBake(runtime: RichTextTransformRuntime): void {
     cornerBakeRafRef.current = null;
   }
 
+  // Konva.Transformer owns rotation; pointer-driven resize bake must not run.
+  if (!runtime.resizeAnchor) {
+    return;
+  }
+
   if (bakeInProgressRef.current) {
     return;
   }
@@ -231,12 +243,11 @@ export function runRichTextLiveBake(runtime: RichTextTransformRuntime): void {
   try {
     const session = sessionRef.current;
     const node = nodeRefs.get(layerId);
-    const anchor = dragRef.current?.anchor ?? 'bottom-right';
     if (!session || !node || session.layerId !== layerId) {
       return;
     }
 
-    const resizeSession = resizeSessionFrom(session, anchor);
+    const resizeSession = resizeSessionFrom(session, runtime.resizeAnchor);
     const measureHeight = (width: number, fontSize: number) =>
       measureRichTextHeightForView(view, width, fontSize);
 
@@ -245,6 +256,7 @@ export function runRichTextLiveBake(runtime: RichTextTransformRuntime): void {
     const pointer =
       stage && parent ? pointerToParentLocal(stage, parent) : null;
 
+    const anchor = runtime.resizeAnchor;
     let result: RichTextResizeResult;
     if (isRichTextHorizontalAnchor(anchor)) {
       const nodeState = {
@@ -292,8 +304,7 @@ export function runRichTextLiveBake(runtime: RichTextTransformRuntime): void {
       x: result.transform.x,
       y: result.transform.y,
     });
-    runtime.transformer?.forceUpdate();
-    runtime.transformer?.getLayer()?.batchDraw();
+    refreshTransformer(runtime.transformer);
   } finally {
     bakeInProgressRef.current = false;
   }
@@ -307,7 +318,12 @@ export function bakeRichTextTransformEnd(
   if (!session || session.layerId !== runtime.layerId) {
     return null;
   }
-  const anchor = runtime.dragRef.current?.anchor ?? 'bottom-right';
+  if (!runtime.resizeAnchor) {
+    node.destroyChildren();
+    node.getLayer()?.batchDraw();
+    return null;
+  }
+  const anchor = runtime.resizeAnchor;
   const stage = node.getStage();
   const parent = node.getParent();
   const pointer = stage && parent ? pointerToParentLocal(stage, parent) : null;
@@ -352,10 +368,12 @@ export function createRichTextTransformRuntime(
     | 'onUpdateSizeLabel'
   >
 ): RichTextTransformRuntime {
+  const resizeAnchor = anchor && isRichTextResizeAnchor(anchor) ? anchor : null;
   return {
     anchor,
     layerId,
     node,
+    resizeAnchor,
     transform: layerTransform ?? createDefaultTransform(),
     transformer,
     view,

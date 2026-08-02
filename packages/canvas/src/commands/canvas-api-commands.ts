@@ -22,6 +22,7 @@ import {
 import { bytesToDataUrl } from '../export/bytes-to-data-url';
 import { CanvasDocumentExportServiceId } from '../export/canvas-document-export-service';
 import type { CanvasDocumentExportService } from '../export/canvas-document-export-service';
+import { rotateTransformAroundCenter } from '../geometry';
 import { resolvePagePreset } from '../page-presets';
 import { applyPagePresetResize } from '../page-resize/apply-page-preset-resize';
 import type { PageResizeService } from '../page-resize/page-resize-types';
@@ -277,6 +278,31 @@ export class UpdateLayerTransformCommand extends Command {
   }
 }
 
+interface LayerRotationArgs {
+  layerId: string;
+  rotation: number;
+}
+
+export class SetLayerRotationCommand extends Command {
+  readonly id = 'canvas.setLayerRotation';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    const layerId = (args as LayerRotationArgs | undefined)?.layerId;
+    if (!layerId) {
+      return false;
+    }
+    return canTransformLayerById(ctx, layerId);
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const update = args as LayerRotationArgs | undefined;
+    if (!update || !Number.isFinite(update.rotation)) {
+      return;
+    }
+    setLayerRotation(ctx, update.layerId, update.rotation);
+  }
+}
+
 export class RotateLayerLeftCommand extends Command {
   readonly id = 'canvas.rotateLeft';
 
@@ -441,13 +467,26 @@ function applyLayerTransform(
   });
 }
 
+function setLayerRotation(
+  ctx: CommandContext,
+  layerId: string,
+  rotation: number
+): void {
+  const layer = findLayerById(ctx.scene.getScene(), layerId);
+  if (!layer?.transform) {
+    return;
+  }
+  applyLayerTransform(
+    ctx,
+    layerId,
+    rotateTransformAroundCenter(layer.transform, rotation)
+  );
+}
+
 function adjustLayerRotation(ctx: CommandContext, delta: number): void {
   const layer = ctx.scene.getPrimaryLayer();
   if (!layer?.transform) {
     return;
   }
-  applyLayerTransform(ctx, layer.id, {
-    ...layer.transform,
-    rotation: layer.transform.rotation + delta,
-  });
+  setLayerRotation(ctx, layer.id, layer.transform.rotation + delta);
 }

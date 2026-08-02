@@ -8,7 +8,11 @@ import type { CommandContext } from '@openenvx/core';
 import { createDefaultTransform, normalizeScene } from '@openenvx/schema';
 import { describe, expect, it } from 'vitest';
 
-import { UpdateLayerTransformCommand } from './canvas-api-commands';
+import {
+  RotateLayerRightCommand,
+  SetLayerRotationCommand,
+  UpdateLayerTransformCommand,
+} from './canvas-api-commands';
 
 function createContext(sceneStore: SceneStore): CommandContext {
   return {
@@ -204,5 +208,88 @@ describe('UpdateLayerTransformCommand group child isolation', () => {
     expect(group.transform).toMatchObject(groupTransform);
     expect(children[0]?.transform).toMatchObject({ x: -30, y: -20 });
     expect(children[1]?.transform).toMatchObject(siblingTransform);
+  });
+});
+
+describe('SetLayerRotationCommand', () => {
+  it('rotates around center and updates position', () => {
+    const scene = normalizeScene({
+      activePageId: 'p1',
+      pages: [
+        {
+          id: 'p1',
+          layout: 'absolute',
+          layers: [
+            {
+              data: { fill: '#000' },
+              id: 'rect-1',
+              transform: {
+                ...createDefaultTransform(),
+                height: 100,
+                width: 200,
+                x: 100,
+                y: 100,
+              },
+              type: 'canvas.rect',
+            },
+          ],
+          name: 'Page',
+        },
+      ],
+    });
+    const store = new SceneStore(scene, {
+      activePageId: 'p1',
+      primaryLayerId: 'rect-1',
+      selectedLayerIds: ['rect-1'],
+    });
+    new SetLayerRotationCommand().execute(createContext(store), {
+      layerId: 'rect-1',
+      rotation: 90,
+    });
+
+    const transform = store.getScene().pages[0]!.layers[0]!.transform!;
+    expect(transform.rotation).toBe(90);
+    expect(transform.x).toBeCloseTo(250);
+    expect(transform.y).toBeCloseTo(50);
+  });
+});
+
+describe('RotateLayerRightCommand', () => {
+  it('rotates around center and updates position', () => {
+    const scene = normalizeScene({
+      activePageId: 'p1',
+      pages: [
+        {
+          id: 'p1',
+          layout: 'absolute',
+          layers: [
+            {
+              data: { fill: '#000' },
+              id: 'rect-1',
+              transform: {
+                ...createDefaultTransform(),
+                height: 100,
+                width: 200,
+                x: 100,
+                y: 100,
+              },
+              type: 'canvas.rect',
+            },
+          ],
+          name: 'Page',
+        },
+      ],
+    });
+    const store = new SceneStore(scene, {
+      activePageId: 'p1',
+      primaryLayerId: 'rect-1',
+      selectedLayerIds: ['rect-1'],
+    });
+    new RotateLayerRightCommand().execute(createContext(store));
+
+    const transform = store.getScene().pages[0]!.layers[0]!.transform!;
+    expect(transform.rotation).toBe(90);
+    expect(transform.x).toBeCloseTo(250);
+    expect(transform.y).toBeCloseTo(50);
   });
 });

@@ -19,7 +19,12 @@ import {
 } from './canvas-stage-types';
 import type { CanvasStageProps } from './canvas-stage-types';
 import { useCanvasStageRuntime } from './hooks/use-canvas-stage-runtime';
+import { useTransformerRotateAnchorStyle } from './hooks/use-transformer-rotate-anchor-style';
 import { syncCanvasOverlays } from './stage/canvas-overlay-sync';
+import {
+  TRANSFORMER_ROTATE_ANCHOR_OFFSET,
+  TRANSFORMER_ROTATE_ANCHOR_SIZE,
+} from './transformer-rotate-anchor';
 import { useCanvasThemeColors } from './use-canvas-theme-colors';
 import {
   computeWheelZoom,
@@ -124,6 +129,10 @@ export function CanvasStage({
   } = shell;
 
   const themeColors = useCanvasThemeColors(stageContainerRef);
+  const rotateAnchorStyleFunc = useTransformerRotateAnchorStyle(
+    themeColors.selection,
+    transformerRef
+  );
 
   const hoveredEntry = useMemo(() => {
     if (
@@ -262,6 +271,7 @@ export function CanvasStage({
             !interactionPreviewLayerId ? (
               <Transformer
                 anchorDragBoundFunc={anchorDragBoundFunc}
+                anchorStyleFunc={rotateAnchorStyleFunc}
                 borderStroke={themeColors.selection}
                 boundBoxFunc={boundBoxFunc}
                 enabledAnchors={transformerEnabledAnchors}
@@ -273,6 +283,11 @@ export function CanvasStage({
                   handleTransformStart();
                 }}
                 ref={transformerRef}
+                rotateAnchorCursor="grab"
+                rotateAnchorOffset={
+                  TRANSFORMER_ROTATE_ANCHOR_SIZE +
+                  TRANSFORMER_ROTATE_ANCHOR_OFFSET
+                }
                 rotateEnabled={
                   !activeDragAnchor || activeDragAnchor === 'rotater'
                 }
