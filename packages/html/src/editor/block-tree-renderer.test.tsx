@@ -84,6 +84,20 @@ describe('BlockTreeRenderer', () => {
     expect(onRemove).toHaveBeenCalledWith('heading-1');
   });
 
+  it('hides selection menu while editing text', async () => {
+    renderTree({
+      selectedId: 'heading-1',
+      editingTarget: { hostId: 'heading-1', dataPath: 'html' },
+    });
+
+    await waitFor(() => {
+      expect(document.querySelector('[contenteditable="true"]')).toBeTruthy();
+    });
+    expect(
+      screen.queryByRole('toolbar', { name: 'Heading actions' })
+    ).toBeNull();
+  });
+
   it('starts slot edit on click of hero headline', () => {
     const onStartEdit = vi.fn();
     const onSelect = vi.fn();

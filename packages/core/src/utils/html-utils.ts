@@ -45,6 +45,30 @@ const ALLOWED_ATTRS = new Set(['class', 'href', 'rel', 'style', 'target']);
 const ALLOWED_STYLE_PROPS = new Set(['color', 'font-family']);
 
 const UNSAFE_HREF = /^\s*(javascript|data|vbscript):/i;
+const UNSAFE_PROTOCOL = /^\s*(javascript|vbscript):/i;
+const DATA_IMAGE = /^\s*data:image\//i;
+
+/** Strip unsafe URL protocols from href/src values (not rich-text HTML). */
+export function sanitizeUrl(
+  value: string,
+  options?: { fallback?: string; allowDataImage?: boolean }
+): string {
+  const trimmed = value.trim();
+  const fallback = options?.fallback ?? '';
+  if (!trimmed) {
+    return fallback;
+  }
+  if (UNSAFE_PROTOCOL.test(trimmed)) {
+    return fallback;
+  }
+  if (/^\s*data:/i.test(trimmed)) {
+    if (options?.allowDataImage && DATA_IMAGE.test(trimmed)) {
+      return trimmed;
+    }
+    return fallback;
+  }
+  return trimmed;
+}
 
 function sanitizeInlineStyle(value: string): string | null {
   const kept: string[] = [];

@@ -9,7 +9,7 @@ import {
 afterEach(cleanup);
 
 describe('shouldShowRichTextBubbleMenu', () => {
-  it('hides for empty, full, and shows for partial selection', () => {
+  it('hides for empty caret and shows for any non-empty selection', () => {
     const emptyState = {
       selection: { from: 1, to: 1, empty: true },
       doc: {
@@ -36,7 +36,7 @@ describe('shouldShowRichTextBubbleMenu', () => {
         editor: {} as never,
         state: fullState as never,
       })
-    ).toBe(false);
+    ).toBe(true);
 
     const partialState = {
       selection: { from: 0, to: 2, empty: false },
@@ -61,7 +61,9 @@ describe('HtmlRichTextEditor', () => {
     render(<HtmlRichTextEditor html="<p>Hello</p>" onCommit={onCommit} />);
 
     await waitFor(() => {
-      expect(document.querySelector('.ProseMirror, [contenteditable="true"]')).toBeTruthy();
+      expect(
+        document.querySelector('.ProseMirror, [contenteditable="true"]')
+      ).toBeTruthy();
     });
 
     const editable = document.querySelector(

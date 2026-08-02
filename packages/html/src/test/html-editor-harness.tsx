@@ -15,15 +15,7 @@ import { vi } from 'vitest';
 
 import { BlockRegistry, BlockRegistryServiceId } from '../block-registry';
 import { builtinBlocks } from '../blocks/builtin-blocks';
-import {
-  DuplicateHtmlBlockCommand,
-  InsertHtmlBlockCommand,
-  MoveHtmlBlockCommand,
-  MoveHtmlBlockDownCommand,
-  MoveHtmlBlockUpCommand,
-  RemoveHtmlBlockCommand,
-  UpdateHtmlBlockDataCommand,
-} from '../commands/html-block-commands';
+import { createBlockCommands } from '../commands/create-block-commands';
 import { createHtmlDemoScene } from '../create-html-demo-scene';
 import type { BlockSortDraft } from '../editor/block-dnd';
 import { HtmlBlocksPlugin } from '../plugin/html-blocks-plugin';
@@ -65,18 +57,14 @@ export function createHtmlCommandHarness() {
   const store = new SceneStore(createHtmlDemoScene());
   const runtime = new EditorRuntime(store, new EditorService());
   const manager = new PluginManager(runtime);
-  manager
-    .createPluginContext()
-    .register(
-      new SimpleServiceContribution(BlockRegistryServiceId, () => registry),
-      new InsertHtmlBlockCommand(),
-      new MoveHtmlBlockCommand(),
-      new MoveHtmlBlockUpCommand(),
-      new MoveHtmlBlockDownCommand(),
-      new DuplicateHtmlBlockCommand(),
-      new UpdateHtmlBlockDataCommand(),
-      new RemoveHtmlBlockCommand()
-    );
+  manager.createPluginContext().register(
+    new SimpleServiceContribution(BlockRegistryServiceId, () => registry),
+    ...createBlockCommands({
+      prefix: 'html',
+      rootType: 'html.root',
+      registryServiceId: BlockRegistryServiceId,
+    })
+  );
   return { manager, registry, runtime, store };
 }
 

@@ -1,0 +1,103 @@
+.pane {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--wb-canvas-field, #e4e4e9);
+  color: var(--wb-foreground, #18181b);
+  font-family: var(--wb-font-sans, Inter, system-ui, -apple-system, sans-serif);
+}
+
+.toolbarHost {
+  position: absolute;
+  top: var(--wb-space-3, 12px);
+  left: 50%;
+  z-index: 10;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toolbarHost > * {
+  pointer-events: auto;
+}
+
+.emailZoomBar {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 4px 6px;
+  border: 1px solid var(--wb-border, #e2e8f0);
+  border-radius: var(--wb-radius-md, 6px);
+  background: var(--wb-card, #ffffff);
+  box-shadow: var(--wb-shadow-sm, 0 1px 3px rgb(0 0 0 / 8%));
+}
+
+.emailZoomBar button {
+  min-width: 32px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.emailZoomBar button:hover {
+  background: var(--wb-bg-hover, #f1f5f9);
+}
+
+.paneDragging {
+  cursor: grabbing;
+}
+
+.stage {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 64px 48px 48px;
+}
+
+.artboardSlot {
+  margin: 0 auto;
+  overflow: hidden;
+  /* Width set inline to frameWidth * zoom so the scaled page stays proportional. */
+}
+
+.artboard {
+  transform-origin: top left;
+  min-height: 480px;
+  background: var(--wb-card, #ffffff);
+  box-shadow: var(--wb-shadow-sm, 0 1px 3px rgb(0 0 0 / 8%));
+}
+
+.palettePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--wb-space-3, 12px);
+}
+
+.paletteItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: 1px solid var(--wb-border, #e2e8f0);
+  border-radius: var(--wb-radius-md, 6px);
+  background: var(--wb-bg-elevated, #f8fafc);
+  color: inherit;
+  cursor: pointer;
+  font-size: var(--wb-text-base, 13px);
+}
+
+.paletteItem:hover {
+  background: var(--wb-bg-hover, #f1f5f9);
+}
+
+.empty {
+  color: #94a3b8;
+  font-size: 13px;
+}

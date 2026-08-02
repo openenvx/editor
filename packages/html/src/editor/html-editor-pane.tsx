@@ -23,7 +23,11 @@ import {
   type KeyboardEvent,
 } from 'react';
 
-import { defaultBlockRegistry } from '../block-registry';
+import {
+  BlockRegistryServiceId,
+  defaultBlockRegistry,
+  type BlockRegistry,
+} from '../block-registry';
 import { getPageRootId } from '../tree/block-tree';
 import { blockCollisionDetection, type BlockSortDraft } from './block-dnd';
 import type { BlockEditTarget } from './block-editor-context';
@@ -51,7 +55,8 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   const { api, executeCommand } = useWorkbenchContext();
   const scene = useWorkbenchContextSelector((state) => state.scene);
   const selection = useWorkbenchContextSelector((state) => state.selection);
-  const registry = defaultBlockRegistry;
+  const registry: BlockRegistry =
+    api.getService(BlockRegistryServiceId) ?? defaultBlockRegistry;
   const [editingTarget, setEditingTarget] = useState<BlockEditTarget | null>(
     null
   );

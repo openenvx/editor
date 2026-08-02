@@ -158,6 +158,17 @@
         "!src/**/*.test.tsx"
       ]
     },
+    "packages/driver-email": {
+      "entry": [
+        "src/index.ts!",
+        "src/plugin/email-blocks-plugin.ts!"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "!src/**/*.test.ts",
+        "!src/**/*.test.tsx"
+      ]
+    },
     "packages/html-studio": {
       "entry": [
         "src/index.ts!"
@@ -207,6 +218,16 @@
       ],
       "ignoreDependencies": [
         "openenvx-widget"
+      ]
+    },
+    "apps/email-demo": {
+      "entry": [
+        "src/main.tsx",
+        "src/app.tsx",
+        "index.html"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}"
       ]
     }
   }

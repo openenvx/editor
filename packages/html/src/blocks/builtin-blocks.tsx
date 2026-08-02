@@ -163,6 +163,7 @@ export const gridBlock: BlockConfig = {
     children: [],
   },
   acceptsChildren: true,
+  insertLineAxis: 'vertical',
   render: ({ data, children }) => {
     const columns = Math.min(
       12,
@@ -195,6 +196,7 @@ export const legacyContainerBlock: BlockConfig = {
   },
   defaultData: { padding: 16, background: 'transparent', children: [] },
   acceptsChildren: true,
+  palette: false,
   render: ({ data, children }) => (
     <div
       style={{

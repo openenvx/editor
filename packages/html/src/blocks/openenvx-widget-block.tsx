@@ -16,6 +16,7 @@ export const openenvxWidgetBlock: BlockConfig = {
     children: [],
   },
   acceptsChildren: true,
+  palette: false,
   render: ({ data, children }) => (
     <div
       data-openenvx-widget={String(data.extensionId ?? '')}

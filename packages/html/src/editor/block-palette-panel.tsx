@@ -7,7 +7,11 @@ import {
 import type { Layer } from '@openenvx/schema';
 import { memo, useCallback, useSyncExternalStore } from 'react';
 
-import { defaultBlockRegistry } from '../block-registry';
+import {
+  BlockRegistryServiceId,
+  defaultBlockRegistry,
+  type BlockRegistry,
+} from '../block-registry';
 import { findBlock, getPageRootId } from '../tree/block-tree';
 
 import styles from './html-editor-pane.module.css';
@@ -15,7 +19,8 @@ import styles from './html-editor-pane.module.css';
 function resolveInsertParentId(
   layers: Layer[],
   selectedId: string | null,
-  rootId: string | null
+  rootId: string | null,
+  registry: BlockRegistry
 ): string | null {
   if (!rootId) {
     return null;
@@ -27,7 +32,7 @@ function resolveInsertParentId(
   if (!found) {
     return rootId;
   }
-  const config = defaultBlockRegistry.get(found.block.type);
+  const config = registry.get(found.block.type);
   if (config?.acceptsChildren) {
     return found.block.id;
   }
@@ -35,9 +40,11 @@ function resolveInsertParentId(
 }
 
 export const BlockPalettePanel = memo(() => {
-  const { executeCommand } = useWorkbenchContext();
+  const { api, executeCommand } = useWorkbenchContext();
   const scene = useWorkbenchContextSelector((state) => state.scene);
   const selection = useWorkbenchContextSelector((state) => state.selection);
+  const registry =
+    api.getService(BlockRegistryServiceId) ?? defaultBlockRegistry;
   const extensionBlocks = useSyncExternalStore(
     extensionBlockStore.subscribe,
     extensionBlockStore.getSnapshot,
@@ -53,7 +60,12 @@ export const BlockPalettePanel = memo(() => {
       const selectedId =
         selection.primaryLayerId ?? selection.selectedLayerIds[0] ?? null;
       const rootId = getPageRootId(page);
-      const parentId = resolveInsertParentId(page.layers, selectedId, rootId);
+      const parentId = resolveInsertParentId(
+        page.layers,
+        selectedId,
+        rootId,
+        registry
+      );
       if (!parentId) {
         return;
       }
@@ -63,7 +75,7 @@ export const BlockPalettePanel = memo(() => {
         index: Number.POSITIVE_INFINITY,
       });
     },
-    [executeCommand, scene, selection]
+    [executeCommand, registry, scene, selection]
   );
 
   const handleExtensionInsert = useCallback(
@@ -75,7 +87,7 @@ export const BlockPalettePanel = memo(() => {
 
   return (
     <div className={styles.palettePanel}>
-      {defaultBlockRegistry.getPaletteBlocks().map((block) => (
+      {registry.getPaletteBlocks().map((block) => (
         <button
           className={styles.paletteItem}
           key={block.type}

@@ -16,6 +16,7 @@ function createDefaultSlotPart(
 export const heroBlock: BlockConfig = {
   type: 'html.hero',
   label: 'Hero',
+  treeIcon: 'image',
   fields: {
     variant: {
       kind: 'select',

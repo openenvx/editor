@@ -36,7 +36,8 @@
     "verify-pack:studio": "bun run build --filter=@openenvx/studio && cd packages/studio && bun pm pack && tgz=$(ls -t *.tgz | head -1) && echo \"==> packages/studio ($tgz)\" && tar -xOf \"$tgz\" package/package.json | node -e \"const d=JSON.parse(require('fs').readFileSync(0,'utf8')); const deps=d.dependencies??{}; const bad=Object.entries(deps).filter(([k,v])=>k.startsWith('@openenvx/')||String(v).startsWith('workspace:')||String(v).startsWith('catalog:')); if(bad.length){console.error('Bad runtime deps:',Object.fromEntries(bad)); process.exit(1)} else {console.log('studio runtime deps ok:', deps)}\" && rm -f *.tgz",
     "dev:playground": "turbo run dev --filter=demo-playground",
     "dev:canvas": "turbo run dev --filter=@openenvxee/canvas-demo",
-    "dev:html": "turbo run dev --filter=@openenvxee/html-demo"
+    "dev:html": "turbo run dev --filter=@openenvxee/html-demo",
+    "dev:email": "turbo run dev --filter=@openenvxee/email-demo"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",

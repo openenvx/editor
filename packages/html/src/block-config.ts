@@ -40,6 +40,18 @@ export interface BlockConfig {
   defaultData: Record<string, unknown>;
   /** When true, block renders a drop zone for nested children. */
   acceptsChildren?: boolean;
+  /**
+   * Palette visibility. `false` hides the block. When omitted, types ending in
+   * `.root` are hidden and everything else is shown.
+   */
+  palette?: boolean;
+  /** Layers-tree icon; falls back to a type-suffix heuristic when omitted. */
+  treeIcon?: string;
+  /**
+   * DnD insert-line axis for children. When omitted, `html.flex` uses
+   * `direction` and `html.grid` defaults to vertical.
+   */
+  insertLineAxis?: 'vertical' | 'horizontal';
   /** Named slots whose parts are real layers under `data.slots` (invisible to the Layers tree). */
   slots?: Record<string, SlotDef>;
   render: (props: BlockRenderProps) => ReactElement;

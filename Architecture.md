@@ -15,6 +15,7 @@ Package boundaries and contribution flow for the monorepo.
 | [Workbench & headless](docs/architecture/workbench-and-headless.md) | Controller, UI contributions, layout, property panes |
 | [Canvas](docs/architecture/canvas.md) | Engine vs chrome, `CanvasBasicsPlugin` vs canvas-pro |
 | [HTML](docs/architecture/html.md) | Block editor, slots, `HtmlBlocksPlugin` |
+| [Email driver](docs/architecture/driver-email.md) | React-Email block editor, `EmailBlocksPlugin`, `renderEmailDocument` |
 | [Studio & products](docs/architecture/studio-and-products.md) | Fat bundles, what host apps import |
 | [Extensions](docs/architecture/extensions.md) | Internal vs embed vs sandbox (summary + links) |
 | [Packages & public API](docs/architecture/packages-and-api.md) | Package map, export surface, pre-1.0 stability |
@@ -35,7 +36,7 @@ Author how-to:
 | **Published product** | `studio` (+ `schema`, `protocol`, `elements`, `widget-sdk`) | Fat bundle of workbench + canvas + canvas-pro + agent into `dist`; protocol + elements + widget-sdk also published standalone. |
 | **HTML studio** | `html`, `html-studio` | Puck-style block editor + thin studio re-exports (workspace-private). |
 
-**Hard rules:** All canvas code lives in `@openenvx/canvas` (not `core`). HTML block editing lives in `@openenvx/html`. Untrusted extension code never runs in the editor main world.
+**Hard rules:** All canvas code lives in `@openenvx/canvas` (not `core`). HTML block editing lives in `@openenvx/html`. Email block editing lives in `@openenvx/driver-email`. Untrusted extension code never runs in the editor main world.
 
 ## Package tiers
 
@@ -43,7 +44,7 @@ Author how-to:
 | --- | --- | --- | --- |
 | Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives |
 | Embed / sandbox protocol | `protocol` (`@openenvx/protocol`) | Published (public) | `RenderNode`, manifests, validators, sandbox grants, message unions |
-| Product libs | `headless`, `canvas`, `html`, `driver-*`, `workbench`, `canvas-pro`, `agent`, `html-studio` | Private (workspace) | Workbench runtime, canvas engine, HTML editor, drivers, React shell, pro chrome, agent |
+| Product libs | `headless`, `canvas`, `html`, `driver-email`, `workbench`, `canvas-pro`, `agent`, `html-studio` | Private (workspace) | Workbench runtime, canvas engine, HTML editor, email driver, React shell, pro chrome, agent |
 | Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + canvas-pro + agent |
 
 ## Placement cheat sheet
@@ -55,6 +56,7 @@ Author how-to:
 | `@openenvx/headless` | `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context, external host mount surfaces |
 | `@openenvx/canvas` | Konva stage, layers, renderers, `CanvasBasicsPlugin`, `CanvasEditor` |
 | `@openenvx/html` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |
+| `@openenvx/driver-email` | Email blocks, `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument` |
 | `@openenvx/workbench` | `WorkbenchShell`, field renderers, sandbox/embed hosts |
 | `@openenvx/canvas-pro` | Canvas-only chrome (zoom, transform panes, floating toolbar) |
 | `@openenvx/studio` | Product fat bundle + `DEFAULT_STUDIO_PLUGINS` + `createSandboxExtensionHost` |

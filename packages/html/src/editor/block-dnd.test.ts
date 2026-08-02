@@ -390,6 +390,13 @@ describe('insertLineIsVertical', () => {
   it('uses vertical lines for grid', () => {
     expect(insertLineIsVertical('html.grid', {})).toBe(true);
   });
+
+  it('honors BlockConfig insertLineAxis over type heuristics', () => {
+    expect(insertLineIsVertical('email.columns', {}, 'vertical')).toBe(true);
+    expect(insertLineIsVertical('html.flex', { direction: 'row' }, 'horizontal')).toBe(
+      false
+    );
+  });
 });
 
 describe('buildCrossParentDraft', () => {

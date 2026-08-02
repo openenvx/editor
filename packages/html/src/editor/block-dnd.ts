@@ -42,11 +42,18 @@ export function usesContainerNestPreview(
   return false;
 }
 
-/** Insert marker axis for flex/grid children (column flex → horizontal line). */
+/** Insert marker axis for flex/grid/columns children (column flex → horizontal line). */
 export function insertLineIsVertical(
   parentType: string,
-  parentData: Record<string, unknown>
+  parentData: Record<string, unknown>,
+  insertLineAxis?: 'vertical' | 'horizontal'
 ): boolean {
+  if (insertLineAxis === 'vertical') {
+    return true;
+  }
+  if (insertLineAxis === 'horizontal') {
+    return false;
+  }
   if (parentType === 'html.flex') {
     return parentData.direction !== 'column';
   }

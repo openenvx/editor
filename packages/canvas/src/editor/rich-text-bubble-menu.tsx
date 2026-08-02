@@ -1,10 +1,27 @@
 import type { Editor } from '@tiptap/react';
 import { Bold, Italic, Strikethrough, Underline } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { type ReactNode, useSyncExternalStore } from 'react';
 
 import { RICH_TEXT_FONT_FAMILY_OPTIONS } from './rich-text-editor-extensions';
 
 import styles from './canvas-editor.module.css';
+
+function readDocumentTheme(): string {
+  const scoped = document.querySelector('[data-owb-theme]');
+  return scoped instanceof HTMLElement
+    ? (scoped.dataset.owbTheme ?? 'light')
+    : 'light';
+}
+
+function subscribeDocumentTheme(onStoreChange: () => void): () => void {
+  const observer = new MutationObserver(onStoreChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-owb-theme'],
+    subtree: true,
+  });
+  return () => observer.disconnect();
+}
 
 function FormatButton({
   active,
@@ -33,6 +50,11 @@ function FormatButton({
 }
 
 export function RichTextBubbleMenuToolbar({ editor }: { editor: Editor }) {
+  const theme = useSyncExternalStore(
+    subscribeDocumentTheme,
+    readDocumentTheme,
+    () => 'light'
+  );
   const textStyle =
     typeof editor.getAttributes === 'function'
       ? editor.getAttributes('textStyle')
@@ -41,7 +63,11 @@ export function RichTextBubbleMenuToolbar({ editor }: { editor: Editor }) {
   const fontFamily = (textStyle.fontFamily as string | undefined) ?? '';
 
   return (
-    <div className={styles.bubbleMenu}>
+    <div
+      className={styles.bubbleMenu}
+      data-openenvx-rich-text-bubble=""
+      data-owb-theme={theme}
+    >
       <FormatButton
         active={editor.isActive('bold')}
         label="Bold"

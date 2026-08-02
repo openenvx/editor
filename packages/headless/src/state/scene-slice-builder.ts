@@ -30,6 +30,7 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
 
   const properties = buildLayerProperties(ctx, commandCtx);
   const viewContainers = workbenchRegistries.viewContainers
+    .filter((container) => evaluateWhen(container.when))
     .map((container) =>
       buildViewContainer(
         container,

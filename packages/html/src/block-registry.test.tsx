@@ -24,10 +24,10 @@ describe('BlockRegistry', () => {
     expect(registry.getAll()).toEqual([heading]);
   });
 
-  it('excludes root and container from palette blocks', () => {
+  it('excludes root and palette:false blocks from palette', () => {
     const registry = new BlockRegistry();
     registry.register(stubConfig('html.root'));
-    registry.register(stubConfig('html.container'));
+    registry.register({ ...stubConfig('html.container'), palette: false });
     registry.register(stubConfig('html.flex', 'Flex'));
     registry.register(stubConfig('html.text', 'Text'));
 

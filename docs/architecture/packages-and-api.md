@@ -14,7 +14,7 @@ This chapter answers: **what each package owns**, **what hosts/plugins should im
 | Mental model / layer stack | [overview.md](overview.md) |
 | Core runtime | [runtime-and-core.md](runtime-and-core.md) |
 | Headless vs workbench shell | [workbench-and-headless.md](workbench-and-headless.md) |
-| Canvas / HTML engines | [canvas.md](canvas.md) · [html.md](html.md) |
+| Canvas / HTML / email engines | [canvas.md](canvas.md) · [html.md](html.md) · [driver-email.md](driver-email.md) |
 | What product hosts import | [studio-and-products.md](studio-and-products.md) |
 | Trust (embed / sandbox) | [extensions.md](extensions.md) · [Plugin-boundaries.md](../../Plugin-boundaries.md) |
 | How to author an extension | [apps/docs/README.md](../../apps/docs/README.md) (pick path) |
@@ -30,7 +30,7 @@ schema / preview / protocol
         ▼
     headless ──────────────────────────────┐
         │                                  │
-        ├── canvas / html / agent          │
+        ├── canvas / html / driver-email / agent
         │       │                          │
         │       └── canvas-pro             │
         ▼                                  ▼
@@ -41,6 +41,7 @@ Hard rules:
 
 - **Canvas never imports workbench.** Studio wires canvas into sandbox via `createSandboxExtensionHost`.
 - **HTML never depends on canvas-pro.**
+- **Email driver** (`@openenvx/driver-email`) may depend on `@openenvx/html` for shared block machinery; it must not depend on canvas / canvas-pro.
 - **Hosts prefer studio / html-studio**, not a hand-wired private stack (unless custom shell — see `apps/demo-playground`).
 - **Untrusted code** never loads in the editor main world — protocol trees + sandbox Worker only.
 
@@ -69,6 +70,7 @@ Hard rules:
 | `@openenvx/headless` | private | `WorkbenchController`, UI contribution descriptors, property host, `ExternalHostMount` | `.`, `./react` |
 | `@openenvx/canvas` | private | Konva engine, layers, `CanvasBasicsPlugin`, `CanvasEditor` | `.` (+ export/registry subpaths) |
 | `@openenvx/html` | private | HTML blocks, `HtmlBlocksPlugin`, `HtmlEditorPane` | `.` |
+| `@openenvx/driver-email` | private | Email blocks (React-Email), `EmailBlocksPlugin`, `renderEmailDocument` | `.` |
 | `@openenvx/workbench` | private | `WorkbenchShell`, field renderers, sandbox/embed hosts | `.`, `./theme.css` |
 | `@openenvx/canvas-pro` | private | Canvas-only chrome (zoom, transform panes, floating toolbar) | `.` |
 | `@openenvx/agent` | private | Agent chat sidebar plugin | `.`, `./schemas` |
@@ -101,7 +103,9 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@openenvx/canvas`** — `CanvasBasicsPlugin`, `CanvasEditor` / `CanvasHostProvider` / `CanvasStage`, layer definitions, `registerCanvasContribution`, widget mapping helpers, export helpers.
 
-**`@openenvx/html`** — `HtmlBlocksPlugin`, `HtmlEditorPane`, block registry + tree helpers.
+**`@openenvx/html`** — `HtmlBlocksPlugin`, `HtmlEditorPane`, block registry + tree helpers, `createBlockCommands`.
+
+**`@openenvx/driver-email`** — `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument`, email block registry.
 
 **`@openenvx/canvas-pro`** — `CanvasProPlugin`, `DEFAULT_CANVAS_PRO_PLUGINS`, transform/print panes, align tools, crop/guides.
 

@@ -25,6 +25,7 @@
     "@openenvx/schema": "workspace:*",
     "@tiptap/extension-color": "^3.27.3",
     "@tiptap/extension-font-family": "^3.27.3",
+    "@tiptap/extension-text-align": "3.27.4",
     "@tiptap/extension-text-style": "^3.27.3",
     "@tiptap/pm": "^3.27.3",
     "@tiptap/react": "^3.27.3",

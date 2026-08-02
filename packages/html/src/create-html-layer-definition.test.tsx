@@ -100,7 +100,6 @@ describe('createHtmlLayerDefinition', () => {
       ['html.heading', 'text'],
       ['html.text', 'text'],
       ['html.image', 'image'],
-      ['html.hero', 'image'],
       ['html.button', 'box'],
       ['html.root', 'file'],
       ['html.flex', 'box'],
@@ -113,6 +112,12 @@ describe('createHtmlLayerDefinition', () => {
         icon
       );
     }
+    expect(
+      createHtmlLayerDefinition({
+        ...configWithFields('html.hero', {}),
+        treeIcon: 'image',
+      }).treeIcon
+    ).toBe('image');
 
     const textDef = createHtmlLayerDefinition(
       configWithFields('html.heading', {}, { html: 'Heading' })

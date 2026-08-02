@@ -170,8 +170,11 @@ export function cloneBlockWithNewIds(
   };
 }
 
-export function getPageRootId(page: Page): string | null {
-  const root = page.layers.find((layer) => layer.type === 'html.root');
+export function getPageRootId(
+  page: Page,
+  rootType = 'html.root'
+): string | null {
+  const root = page.layers.find((layer) => layer.type === rootType);
   return root?.id ?? null;
 }
 

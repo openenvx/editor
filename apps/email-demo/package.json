@@ -1,0 +1,28 @@
+{
+  "name": "@openenvxee/email-demo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run --passWithNoTests",
+    "preview": "vite preview",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openenvx/driver-email": "workspace:*",
+    "@openenvx/headless": "workspace:*",
+    "@openenvx/workbench": "workspace:*",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.3",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "typescript": "catalog:dev",
+    "vite": "8.1.3",
+    "vitest": "4.1.10"
+  }
+}

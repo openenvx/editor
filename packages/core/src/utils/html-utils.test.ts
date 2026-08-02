@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { escapeAttr, escapeHtml, sanitizeHtml } from './html-utils';
+import {
+  escapeAttr,
+  escapeHtml,
+  sanitizeHtml,
+  sanitizeUrl,
+} from './html-utils';
 
 describe('html-utils', () => {
   it('escapes html entities', () => {
@@ -34,5 +39,15 @@ describe('html-utils', () => {
     expect(sanitizeHtml(input)).toBe(
       '<p><span style="color: #f00; font-family: Georgia">Hi</span></p>'
     );
+  });
+
+  it('sanitizes bare urls', () => {
+    const unsafe = `${'javascript'}:alert(1)`;
+    expect(sanitizeUrl('https://example.com')).toBe('https://example.com');
+    expect(sanitizeUrl(unsafe, { fallback: '#' })).toBe('#');
+    expect(sanitizeUrl('data:text/html,x')).toBe('');
+    expect(
+      sanitizeUrl('data:image/png;base64,abc', { allowDataImage: true })
+    ).toBe('data:image/png;base64,abc');
   });
 });

@@ -180,20 +180,26 @@
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--wb-space-0-5, 2px);
   transform: translateY(-100%);
-  padding: 4px 6px;
-  border-radius: 8px 8px 0 0;
-  background: #1a1a1a;
-  color: #fafafa;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  padding: var(--wb-space-1, 4px) var(--wb-space-1, 4px) var(--wb-space-1, 4px)
+    var(--wb-space-2, 8px);
+  border-radius: var(--wb-radius-lg, 6px) var(--wb-radius-lg, 6px) 0 0;
+  background: var(--wb-popover, #ffffff);
+  color: var(--wb-foreground, #18181b);
+  box-shadow: var(
+    --wb-shadow-float,
+    0 8px 24px rgb(0 0 0 / 12%),
+    0 0 0 1px rgb(0 0 0 / 8%)
+  );
   cursor: default;
 }
 
 .selectionMenuLabel {
-  padding: 0 6px;
-  font-size: 12px;
+  padding: 0 var(--wb-space-1, 4px);
+  font-size: var(--wb-text-sm, 12px);
   font-weight: 500;
+  color: var(--wb-muted-foreground, #71717a);
   white-space: nowrap;
 }
 
@@ -201,17 +207,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: var(--wb-icon-button-size, 28px);
+  height: var(--wb-icon-button-size, 28px);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--wb-radius-control, 4px);
   background: transparent;
-  color: inherit;
+  color: var(--wb-muted-foreground, #71717a);
   cursor: pointer;
 }
 
 .selectionMenuButton:hover {
-  background: #242424;
+  background: var(--wb-hover-overlay, rgb(0 0 0 / 4%));
+  color: var(--wb-foreground, #18181b);
 }
 
 .dropZone {
@@ -273,30 +280,200 @@
   margin: 0;
 }
 
+/* Match FloatingToolbarRenderer / Design.md floating chrome. */
 .bubbleMenu {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px;
-  border-radius: 8px;
-  background: var(--wb-popover, #1a1a1a);
-  box-shadow: var(--wb-shadow-float, 0 4px 12px rgba(0, 0, 0, 0.35));
+  gap: var(--wb-space-0-5, 2px);
+  padding: var(--wb-space-1, 4px);
+  border: none;
+  border-radius: var(--wb-radius-lg, 6px);
+  background: var(--wb-popover, #ffffff);
+  color: var(--wb-foreground, #18181b);
+  font-family: var(--wb-font, Inter, system-ui, sans-serif);
+  box-shadow: var(
+    --wb-shadow-float,
+    0 8px 24px rgb(0 0 0 / 12%),
+    0 0 0 1px rgb(0 0 0 / 8%)
+  );
+}
+
+.bubbleMenuGroup {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wb-space-0-5, 2px);
+}
+
+.bubbleMenuDivider {
+  width: 1px;
+  height: 20px;
+  margin: 0 var(--wb-space-0-5, 2px);
+  background: var(--wb-divider-color, rgb(0 0 0 / 8%));
 }
 
 .formatButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: var(--wb-icon-button-size-lg, 32px);
+  height: var(--wb-icon-button-size-lg, 32px);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--wb-radius-control, 4px);
   background: transparent;
-  color: var(--wb-foreground, #fafafa);
+  color: var(--wb-muted-foreground, #71717a);
   cursor: pointer;
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
 }
 
-.formatButton:hover,
+.formatButton:hover {
+  background: var(--wb-hover-overlay, rgb(0 0 0 / 4%));
+  color: var(--wb-foreground, #18181b);
+}
+
 .formatButtonActive {
-  background: var(--wb-hover-overlay, #242424);
+  background: var(--wb-active-overlay, rgb(0 0 0 / 6%));
+  color: var(--wb-foreground, #18181b);
+}
+
+.formatButton:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-focus, 0 0 0 4px #e5e5e5);
+}
+
+.blockTypeButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wb-space-1, 4px);
+  height: var(--wb-icon-button-size-lg, 32px);
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--wb-radius-control, 4px);
+  background: transparent;
+  color: var(--wb-foreground, #18181b);
+  cursor: pointer;
+  font-size: var(--wb-text-sm, 12px);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.blockTypeButton:hover {
+  background: var(--wb-hover-overlay, rgb(0 0 0 / 4%));
+}
+
+.blockTypeButton:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-focus, 0 0 0 4px #e5e5e5);
+}
+
+.blockTypeMenu,
+.linkPopover {
+  position: absolute;
+  top: calc(100% + var(--wb-space-1, 4px));
+  left: 0;
+  z-index: 20;
+  border: none;
+  border-radius: var(--wb-radius-lg, 6px);
+  background: var(--wb-popover, #ffffff);
+  color: var(--wb-foreground, #18181b);
+  box-shadow: var(
+    --wb-shadow-float,
+    0 8px 24px rgb(0 0 0 / 12%),
+    0 0 0 1px rgb(0 0 0 / 8%)
+  );
+}
+
+.blockTypeMenu {
+  min-width: 180px;
+  padding: var(--wb-space-1, 4px);
+}
+
+.blockTypeMenuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-2, 8px);
+  width: 100%;
+  padding: var(--wb-space-2, 8px) 10px;
+  border: none;
+  border-radius: var(--wb-radius-control, 4px);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: var(--wb-text-sm, 12px);
+  text-align: left;
+}
+
+.blockTypeMenuItem:hover,
+.blockTypeMenuItemActive {
+  background: var(--wb-hover-overlay, rgb(0 0 0 / 4%));
+}
+
+.blockTypeMenuIcon {
+  display: inline-flex;
+  width: 16px;
+  justify-content: center;
+  color: var(--wb-muted-foreground, #71717a);
+}
+
+.blockTypeMenuCheck {
+  margin-left: auto;
+  color: var(--wb-muted-foreground, #71717a);
+}
+
+.colorSwatch {
+  position: relative;
+  overflow: hidden;
+}
+
+.colorSwatch input[type='color'] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.linkPopover {
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-1, 4px);
+  padding: var(--wb-space-2, 8px);
+}
+
+.linkInput {
+  width: 200px;
+  height: var(--wb-control-height, 28px);
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--wb-radius-control, 4px);
+  background: var(--wb-muted, #ececef);
+  color: var(--wb-foreground, #18181b);
+  font-size: var(--wb-text-sm, 12px);
+  box-shadow: var(--wb-shadow-control, none);
+}
+
+.linkInput:focus {
+  outline: none;
+  box-shadow: var(--wb-shadow-control-focus, 0 0 0 4px #e5e5e5);
+}
+
+.linkApply {
+  height: var(--wb-control-height, 28px);
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--wb-radius-control, 4px);
+  background: var(--wb-muted, #ececef);
+  color: var(--wb-foreground, #18181b);
+  cursor: pointer;
+  font-size: var(--wb-text-xs, 11px);
+  box-shadow: var(--wb-shadow-control, none);
+}
+
+.linkApply:hover {
+  background: var(--wb-hover-overlay, rgb(0 0 0 / 4%));
 }

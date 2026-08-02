@@ -74,6 +74,8 @@ export abstract class ViewContainerContribution extends WorkbenchContribution {
   commandId?: string;
   /** Default workbench location. Defaults to `'primary'`. */
   defaultLocation?: ViewContainerLocation;
+  /** When falsey after evaluate, the container is omitted from chrome. */
+  when?: string;
 
   contributeMenu?(builder: MenuBuilder, ctx: ContributionBuildContext): void;
 }

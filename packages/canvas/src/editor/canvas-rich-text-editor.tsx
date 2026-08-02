@@ -25,14 +25,7 @@ function shouldShowRichTextBubbleMenu({
   if (empty) {
     return false;
   }
-
-  const selected = state.doc.textBetween(from, to, '\n');
-  const full = state.doc.textBetween(0, state.doc.content.size, '\n');
-  if (selected.length > 0 && selected === full) {
-    return false;
-  }
-
-  return selected.length > 0;
+  return state.doc.textBetween(from, to, '\n').length > 0;
 }
 
 export interface CanvasRichTextEditorProps {
@@ -72,7 +65,14 @@ export function CanvasRichTextEditor({
       },
     },
     extensions: createRichTextEditorExtensions(),
-    onBlur: ({ editor: activeEditor }) => {
+    onBlur: ({ editor: activeEditor, event }) => {
+      const related = event.relatedTarget;
+      if (
+        related instanceof Element &&
+        related.closest('[data-openenvx-rich-text-bubble]')
+      ) {
+        return;
+      }
       onCommit(activeEditor.getHTML());
     },
     onCreate: ({ editor: activeEditor }) => {
@@ -103,8 +103,9 @@ export function CanvasRichTextEditor({
       }}
     >
       <BubbleMenu
+        appendTo={() => document.body}
         editor={editor}
-        options={{ placement: 'top' }}
+        options={{ placement: 'top', strategy: 'fixed' }}
         shouldShow={shouldShowRichTextBubbleMenu}
       >
         <RichTextBubbleMenuToolbar editor={editor} />

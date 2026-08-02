@@ -9,6 +9,7 @@ Deep under-the-hood docs for OpenEnvx. Start at the hub: [Architecture.md](../..
 | [workbench-and-headless.md](workbench-and-headless.md) | Controller, contributions, shell, property panes |
 | [canvas.md](canvas.md) | Canvas engine vs canvas-pro chrome |
 | [html.md](html.md) | HTML block editor and slots |
+| [driver-email.md](driver-email.md) | Email block editor (React-Email) |
 | [studio-and-products.md](studio-and-products.md) | Studio / html-studio fat bundles |
 | [extensions.md](extensions.md) | Internal vs embed vs sandbox (summary) |
 | [packages-and-api.md](packages-and-api.md) | Package map, public exports, stability rules |

@@ -7,6 +7,7 @@ import {
   type LayerPreviewContext,
   type Page,
   type PropertySectionDescriptor,
+  type ServiceId,
 } from '@openenvx/core';
 import { createLayerPreviewBuilder } from '@openenvx/preview';
 
@@ -14,33 +15,21 @@ import type { BlockConfig, FieldDef, SlotDef } from './block-config';
 import { BlockRegistryServiceId, type BlockRegistry } from './block-registry';
 import { createBlock } from './tree/block-tree';
 
-function treeIconFor(type: string): string {
-  switch (type) {
-    case 'html.heading':
-    case 'html.text': {
-      return 'text';
-    }
-    case 'html.image': {
-      return 'image';
-    }
-    case 'html.button': {
-      return 'box';
-    }
-    case 'html.hero': {
-      return 'image';
-    }
-    case 'html.root': {
-      return 'file';
-    }
-    case 'html.flex':
-    case 'html.grid':
-    case 'html.container': {
-      return 'box';
-    }
-    default: {
-      return 'box';
-    }
+function treeIconFor(config: { type: string; treeIcon?: string }): string {
+  if (config.treeIcon) {
+    return config.treeIcon;
   }
+  const { type } = config;
+  if (type.endsWith('.heading') || type.endsWith('.text')) {
+    return 'text';
+  }
+  if (type.endsWith('.image')) {
+    return 'image';
+  }
+  if (type.endsWith('.root')) {
+    return 'file';
+  }
+  return 'box';
 }
 
 type SectionBuilder = ReturnType<
@@ -128,11 +117,14 @@ function fieldDefToRepeaterField(
   return { key, kind: 'text', label: field.label };
 }
 
-function getRegistry(ctx: CommandContext): BlockRegistry | null {
-  if (!ctx.services?.has(BlockRegistryServiceId)) {
+function getRegistry(
+  ctx: CommandContext,
+  registryServiceId = BlockRegistryServiceId
+): BlockRegistry | null {
+  if (!ctx.services?.has(registryServiceId)) {
     return null;
   }
-  return ctx.services.get(BlockRegistryServiceId);
+  return ctx.services.get(registryServiceId);
 }
 
 function appendSlotSections(
@@ -185,13 +177,20 @@ function appendSlotSection(
   }
 }
 
+export interface CreateHtmlLayerDefinitionOptions {
+  registryServiceId?: ServiceId<BlockRegistry>;
+}
+
 /** Build a LayerDefinition from a Puck-style BlockConfig for inspector + layers tree. */
 export function createHtmlLayerDefinition(
-  config: BlockConfig
+  config: BlockConfig,
+  options?: CreateHtmlLayerDefinitionOptions
 ): LayerDefinition<Record<string, unknown>> {
+  const registryServiceId =
+    options?.registryServiceId ?? BlockRegistryServiceId;
   return new (class extends LayerDefinition<Record<string, unknown>> {
     readonly type = config.type;
-    readonly treeIcon = treeIconFor(config.type);
+    readonly treeIcon = treeIconFor(config);
     readonly treeDisplayName = config.label;
 
     createDefault(id: string, _page: Page): Layer {
@@ -221,8 +220,7 @@ export function createHtmlLayerDefinition(
           appendField(section, key, field);
         }
       }
-      // Slot sections need BlockRegistryServiceId (HtmlBlocksPlugin registers it).
-      const registry = getRegistry(ctx);
+      const registry = getRegistry(ctx, registryServiceId);
       if (registry && config.slots) {
         appendSlotSections(builder, config, registry);
       }

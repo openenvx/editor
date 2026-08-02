@@ -1,5 +1,10 @@
 export { SceneValidationError } from './scene/scene-validation-error';
-export { escapeAttr, escapeHtml, sanitizeHtml } from './utils/html-utils';
+export {
+  escapeAttr,
+  escapeHtml,
+  sanitizeHtml,
+  sanitizeUrl,
+} from './utils/html-utils';
 export { ContributionPoint } from './core/contribution-point';
 export { Contribution } from './core/contribution';
 export { Plugin } from './core/plugin';

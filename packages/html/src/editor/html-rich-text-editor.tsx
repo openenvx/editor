@@ -9,7 +9,7 @@ import { createRichTextEditorExtensions } from './rich-text-editor-extensions';
 
 import styles from './html-editor-pane.module.css';
 
-/** Exported for unit tests — bubble menu hides on caret/full-select. */
+/** Exported for unit tests — bubble menu hides only on empty caret. */
 export function shouldShowRichTextBubbleMenu({
   state,
 }: {
@@ -20,14 +20,7 @@ export function shouldShowRichTextBubbleMenu({
   if (empty) {
     return false;
   }
-
-  const selected = state.doc.textBetween(from, to, '\n');
-  const full = state.doc.textBetween(0, state.doc.content.size, '\n');
-  if (selected.length > 0 && selected === full) {
-    return false;
-  }
-
-  return selected.length > 0;
+  return state.doc.textBetween(from, to, '\n').length > 0;
 }
 
 export interface HtmlRichTextEditorProps {
@@ -54,7 +47,15 @@ export function HtmlRichTextEditor({
       },
     },
     extensions: createRichTextEditorExtensions(),
-    onBlur: ({ editor: activeEditor }) => {
+    onBlur: ({ editor: activeEditor, event }) => {
+      const related = event.relatedTarget;
+      if (
+        related instanceof Node &&
+        related instanceof Element &&
+        related.closest('[data-openenvx-rich-text-bubble]')
+      ) {
+        return;
+      }
       onCommit(normalizeCommittedRichTextHtml(activeEditor.getHTML()));
     },
     onCreate: ({ editor: activeEditor }) => {
@@ -73,8 +74,9 @@ export function HtmlRichTextEditor({
   return (
     <div className={styles.editorHost}>
       <BubbleMenu
+        appendTo={() => document.body}
         editor={editor}
-        options={{ placement: 'top' }}
+        options={{ placement: 'top', strategy: 'fixed' }}
         shouldShow={shouldShowRichTextBubbleMenu}
       >
         <HtmlRichTextBubbleMenuToolbar editor={editor} />

@@ -17,14 +17,17 @@ export class BlockRegistry {
     return [...this.configs.values()];
   }
 
-  /** Palette entries — skip synthetic root / host widget shell. */
+  /** Palette entries — respects `BlockConfig.palette` (roots default hidden). */
   getPaletteBlocks(): BlockConfig[] {
-    return this.getAll().filter(
-      (c) =>
-        c.type !== 'html.root' &&
-        c.type !== 'html.container' &&
-        c.type !== 'openenvx.widget'
-    );
+    return this.getAll().filter((config) => {
+      if (config.palette === false) {
+        return false;
+      }
+      if (config.palette === true) {
+        return true;
+      }
+      return !config.type.endsWith('.root');
+    });
   }
 }
 

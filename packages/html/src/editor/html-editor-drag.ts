@@ -282,6 +282,8 @@ export function applyHtmlDragEnd(args: {
   registry: BlockRegistry;
   clearDrag: () => void;
   executeCommand: (commandId: string, commandArgs?: unknown) => void;
+  /** Defaults to `html.moveBlock`. Drivers pass e.g. `email.moveBlock`. */
+  moveCommandId?: string;
 }): void {
   const {
     scene,
@@ -292,6 +294,7 @@ export function applyHtmlDragEnd(args: {
     registry,
     clearDrag,
     executeCommand,
+    moveCommandId = 'html.moveBlock',
   } = args;
   clearDrag();
 
@@ -349,7 +352,7 @@ export function applyHtmlDragEnd(args: {
     return;
   }
 
-  executeCommand('html.moveBlock', {
+  executeCommand(moveCommandId, {
     id: activeData.blockId,
     newParentId: resolved.parentId,
     index: resolved.index,

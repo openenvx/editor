@@ -8,15 +8,7 @@ import {
 } from '../block-registry';
 import { builtinBlocks } from '../blocks/builtin-blocks';
 import { openenvxWidgetBlock } from '../blocks/openenvx-widget-block';
-import {
-  DuplicateHtmlBlockCommand,
-  InsertHtmlBlockCommand,
-  MoveHtmlBlockCommand,
-  MoveHtmlBlockDownCommand,
-  MoveHtmlBlockUpCommand,
-  RemoveHtmlBlockCommand,
-  UpdateHtmlBlockDataCommand,
-} from '../commands/html-block-commands';
+import { createBlockCommands } from '../commands/create-block-commands';
 import {
   HtmlBlocksContainer,
   HtmlBlocksView,
@@ -43,13 +35,11 @@ export class HtmlBlocksPlugin extends WorkbenchPlugin {
       ),
       ...builtinBlocks.map((block) => createHtmlLayerDefinition(block)),
       new OpenEnvxWidgetLayer(),
-      new InsertHtmlBlockCommand(),
-      new MoveHtmlBlockCommand(),
-      new MoveHtmlBlockUpCommand(),
-      new MoveHtmlBlockDownCommand(),
-      new DuplicateHtmlBlockCommand(),
-      new UpdateHtmlBlockDataCommand(),
-      new RemoveHtmlBlockCommand()
+      ...createBlockCommands({
+        prefix: 'html',
+        rootType: 'html.root',
+        registryServiceId: BlockRegistryServiceId,
+      })
     );
 
     ctx.registerWorkbench(

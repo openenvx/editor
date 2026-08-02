@@ -24,7 +24,6 @@ import {
 } from 'react';
 
 import type { BlockRegistry } from '../block-registry';
-import { isHtmlTextBlockType } from '../blocks/builtin-blocks';
 import { getBlockChildren } from '../tree/block-tree';
 import {
   insertLineIsVertical,
@@ -45,6 +44,10 @@ import { emitOpenEnvxHtmlWidgetClick } from './html-widget-click-handler';
 import styles from './html-editor-pane.module.css';
 
 export type { BlockSortDraft };
+
+function isRichTextBlock(registry: BlockRegistry, type: string): boolean {
+  return registry.get(type)?.fields.html?.kind === 'richText';
+}
 
 function layerDataRecord(layer: Layer): Record<string, unknown> {
   return typeof layer.data === 'object' && layer.data !== null
@@ -114,6 +117,7 @@ function BlockChrome({
   layer,
   label,
   selected,
+  editing = false,
   dragDisabled,
   isDraggingGhost,
   dropContainerPreview,
@@ -130,6 +134,8 @@ function BlockChrome({
   layer: Layer;
   label: string;
   selected: boolean;
+  /** Hide block chrome while TipTap owns the selection bubble. */
+  editing?: boolean;
   dragDisabled: boolean;
   /** Dragging source stays put, grayed; only the insert line moves. */
   isDraggingGhost?: boolean;
@@ -221,7 +227,7 @@ function BlockChrome({
       onKeyDown={handleKeyDown}
       {...sortableProps}
     >
-      {selected && !isDraggingGhost ? (
+      {selected && !editing && !isDraggingGhost ? (
         <BlockSelectionMenu
           canDuplicate={canDuplicate}
           canRemove={canRemove}
@@ -255,7 +261,11 @@ function SortableChildren({
   const itemIds = visibleEntries.map(({ child }) => child.id);
   const lineIndex = sortInsertLineIndex(sortDraft, parentId);
   const activeId = sortDraft?.parentId === parentId ? sortDraft.activeId : null;
-  const verticalLine = insertLineIsVertical(parentType, parentData);
+  const verticalLine = insertLineIsVertical(
+    parentType,
+    parentData,
+    registry.get(parentType)?.insertLineAxis
+  );
   const { beforeId, afterId } = insertLineTargetIds(
     itemIds,
     activeId,
@@ -300,7 +310,11 @@ function ContainerChildren({
     !sortDraft.containerPreview;
   const empty = visibleCount === 0 && !showInsertLine;
   const parentData = layerDataRecord(layer);
-  const verticalLine = insertLineIsVertical(layer.type, parentData);
+  const verticalLine = insertLineIsVertical(
+    layer.type,
+    parentData,
+    registry.get(layer.type)?.insertLineAxis
+  );
   const childInsideWidget = insideWidget || layer.type === WIDGET_LAYER_TYPE;
 
   return (
@@ -335,7 +349,7 @@ function SlotPartContent({
   const { selectedId, editingTarget, onSelect, onStartEdit, onCommitEdit } =
     useBlockEditor();
   const config = registry.get(part.type);
-  const textBlock = isHtmlTextBlockType(part.type);
+  const textBlock = isRichTextBlock(registry, part.type);
   const editable = canEditLayerData(part);
   const data = layerDataRecord(part);
   const editing =
@@ -454,7 +468,7 @@ function BlockContent({
 }) {
   const { onSelect, onStartEdit, onCommitEdit } = useBlockEditor();
   const config = registry.get(layer.type);
-  const textBlock = isHtmlTextBlockType(layer.type);
+  const textBlock = isRichTextBlock(registry, layer.type);
   const editable = canEditLayerData(layer);
   const acceptsChildren = config?.acceptsChildren === true;
   const data = layerDataRecord(layer);
@@ -605,6 +619,7 @@ function SortableBlockNode({
       canRemove={canRemove}
       dragDisabled={dragDisabled}
       dropContainerPreview={dropContainerPreview}
+      editing={editing}
       insertLineAfter={insertLineAfter}
       insertLineBefore={insertLineBefore}
       insertLineVertical={insertLineVertical}

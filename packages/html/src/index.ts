@@ -14,16 +14,14 @@ export { buttonBlock } from './blocks/button-block';
 export { heroBlock } from './blocks/hero-block';
 export { openenvxWidgetBlock } from './blocks/openenvx-widget-block';
 export {
-  DuplicateHtmlBlockCommand,
-  InsertHtmlBlockCommand,
-  MoveHtmlBlockCommand,
-  MoveHtmlBlockDownCommand,
-  MoveHtmlBlockUpCommand,
-  RemoveHtmlBlockCommand,
-  UpdateHtmlBlockDataCommand,
-} from './commands/html-block-commands';
+  createBlockCommands,
+  type BlockCommandSetOptions,
+} from './commands/create-block-commands';
 export { createHtmlDemoScene } from './create-html-demo-scene';
-export { createHtmlLayerDefinition } from './create-html-layer-definition';
+export {
+  createHtmlLayerDefinition,
+  type CreateHtmlLayerDefinitionOptions,
+} from './create-html-layer-definition';
 export { HtmlContextMenu } from './contributions/html-context-menu';
 export {
   HTML_BLOCKS_CONTAINER_ID,
@@ -32,8 +30,29 @@ export {
   HtmlBlocksContainer,
   HtmlBlocksView,
 } from './contributions/html-blocks-sidebar';
+export {
+  blockCollisionDetection,
+  type BlockSortDraft,
+} from './editor/block-dnd';
 export { BlockPalettePanel } from './editor/block-palette-panel';
+export { BlockTreeRenderer } from './editor/block-tree-renderer';
+export {
+  applyHtmlDragEnd,
+  applyHtmlDragOver,
+  applyHtmlDragStart,
+} from './editor/html-editor-drag';
 export { HtmlEditorPane } from './editor/html-editor-pane';
+export {
+  clampHtmlZoom,
+  DEFAULT_HTML_DEVICE_PRESET,
+  resolveAutoZoom,
+  resolveFrameWidth,
+  resolveScaledFrameWidth,
+  stepHtmlZoom,
+  type HtmlDevicePreset,
+} from './editor/html-device-preview';
+export { HtmlDeviceToolbar } from './editor/html-device-toolbar';
+export { useHtmlDeviceStageMetrics } from './editor/use-html-device-stage-metrics';
 export {
   emitOpenEnvxHtmlWidgetClick,
   setOpenEnvxHtmlWidgetClickHandler,
