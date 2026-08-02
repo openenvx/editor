@@ -153,7 +153,16 @@ function BlockChrome({
   sortableProps?: Record<string, unknown>;
   children: ReactNode;
 }) {
-  const { onSelect, onDuplicate, onRemove } = useBlockEditor();
+  const {
+    onSelect,
+    onDuplicate,
+    onRemove,
+    hoveredLayerId,
+    onHoverLayer,
+    sortDraft,
+  } = useBlockEditor();
+  const hovered =
+    hoveredLayerId === layer.id && !selected && sortDraft === null;
 
   const activate = useCallback(() => {
     if (insideWidget) {
@@ -176,6 +185,25 @@ function BlockChrome({
       onSelect(layer.id);
     },
     [layer.id, onSelect]
+  );
+
+  const handlePointerEnter = useCallback(() => {
+    onHoverLayer(layer.id);
+  }, [layer.id, onHoverLayer]);
+
+  const handlePointerLeave = useCallback(
+    (event: MouseEvent) => {
+      const related = event.relatedTarget;
+      if (related instanceof Node && event.currentTarget.contains(related)) {
+        return;
+      }
+      const parent =
+        event.currentTarget.parentElement?.closest('[data-layer-id]');
+      onHoverLayer(
+        parent instanceof HTMLElement ? (parent.dataset.layerId ?? null) : null
+      );
+    },
+    [onHoverLayer]
   );
 
   const handleKeyDown = useCallback(
@@ -216,6 +244,7 @@ function BlockChrome({
       className={[
         styles.blockWrap,
         selected ? styles.blockWrapSelected : '',
+        hovered ? styles.blockWrapHovered : '',
         dragDisabled ? '' : styles.blockWrapDraggable,
         isDraggingGhost ? styles.blockWrapDraggingGhost : '',
         dropContainerPreview ? styles.blockWrapDropContainer : '',
@@ -224,12 +253,15 @@ function BlockChrome({
       ]
         .filter(Boolean)
         .join(' ')}
+      data-layer-id={layer.id}
       ref={setNodeRef}
       role="treeitem"
       tabIndex={selected ? 0 : -1}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       onKeyDown={handleKeyDown}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       {...sortableProps}
     >
       {selected && !editing && !isDraggingGhost ? (
@@ -676,9 +708,11 @@ export const BlockTreeRenderer = memo(
     registry,
     scene,
     selectedId,
+    hoveredLayerId = null,
     editingTarget,
     sortDraft,
     onSelect,
+    onHoverLayer,
     onStartEdit,
     onCommitEdit,
     onDuplicate,
@@ -688,9 +722,11 @@ export const BlockTreeRenderer = memo(
     registry: BlockRegistry;
     scene: Scene;
     selectedId: string | null;
+    hoveredLayerId?: string | null;
     editingTarget: BlockEditTarget | null;
     sortDraft: BlockSortDraft | null;
     onSelect: (id: string) => void;
+    onHoverLayer?: (id: string | null) => void;
     onStartEdit: (hostId: string, dataPath: string) => void;
     onCommitEdit: (
       hostId: string,
@@ -705,9 +741,11 @@ export const BlockTreeRenderer = memo(
       value={{
         scene,
         selectedId,
+        hoveredLayerId,
         editingTarget,
         sortDraft,
         onSelect,
+        onHoverLayer: onHoverLayer ?? (() => {}),
         onStartEdit,
         onCommitEdit,
         onDuplicate,

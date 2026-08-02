@@ -59,6 +59,9 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   const { api, executeCommand } = useWorkbenchContext();
   const scene = useWorkbenchContextSelector((state) => state.scene);
   const selection = useWorkbenchContextSelector((state) => state.selection);
+  const hoveredLayerId = useWorkbenchContextSelector(
+    (state) => state.interaction.hoveredLayerId
+  );
   const registry: BlockRegistry =
     api.getService(BlockRegistryServiceId) ?? defaultBlockRegistry;
   const [editingTarget, setEditingTarget] = useState<BlockEditTarget | null>(
@@ -103,6 +106,13 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   const handleSelect = useCallback(
     (id: string) => {
       api.selectLayers([id]);
+    },
+    [api]
+  );
+
+  const handleHoverLayer = useCallback(
+    (id: string | null) => {
+      api.setHoveredLayer(id);
     },
     [api]
   );
@@ -284,6 +294,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
           tabIndex={0}
           onClick={clearSelection}
           onKeyDown={handleCanvasKeyDown}
+          onPointerLeave={() => api.setHoveredLayer(null)}
         >
           <div
             className={styles.artboardSlot}
@@ -305,9 +316,11 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
               {rootId ? (
                 <BlockTreeRenderer
                   editingTarget={editingTarget}
+                  hoveredLayerId={hoveredLayerId}
                   layers={page.layers}
                   onCommitEdit={handleCommitEdit}
                   onDuplicate={handleDuplicate}
+                  onHoverLayer={handleHoverLayer}
                   onRemove={handleRemove}
                   onSelect={handleSelect}
                   onStartEdit={handleStartEdit}

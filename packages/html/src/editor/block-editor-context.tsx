@@ -13,9 +13,12 @@ export interface BlockEditTarget {
 export interface BlockEditorContextValue {
   scene: Scene;
   selectedId: string | null;
+  /** Canvas-style hover outline + Layers tree sync. */
+  hoveredLayerId: string | null;
   editingTarget: BlockEditTarget | null;
   sortDraft: BlockSortDraft | null;
   onSelect: (id: string) => void;
+  onHoverLayer: (id: string | null) => void;
   onStartEdit: (hostId: string, dataPath: string) => void;
   onCommitEdit: (
     hostId: string,

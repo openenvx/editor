@@ -171,15 +171,12 @@
   border-radius: 6px;
 }
 
-/* Deepest hovered block only — nested parents stay clean.
-   Hovering layout padding/gaps (no child under cursor) still outlines Flex/Grid.
-   During drag, hide hover outlines so insert lines / container preview lead. */
-.pane:not(.paneDragging) .blockWrap:not(:has(.blockWrap:hover)):hover {
+/* Canvas-style hover outline (driven by hoveredLayerId — content or Layers tree). */
+.blockWrapHovered {
   outline: 1px solid #3b82f6;
 }
 
-.blockWrapSelected,
-.blockWrapSelected:not(:has(.blockWrap:hover)):hover {
+.blockWrapSelected {
   outline: 2px solid #3b82f6;
 }
 

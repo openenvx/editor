@@ -247,6 +247,33 @@ describe('BlockTreeRenderer', () => {
     expect(onStartEdit).toHaveBeenCalledWith('heading-1', 'html');
   });
 
+  it('outlines the hovered block from hoveredLayerId', () => {
+    const scene = createHtmlDemoScene();
+    const registry = createBlockRegistry();
+    render(
+      <DndContext>
+        <BlockTreeRenderer
+          editingTarget={null}
+          hoveredLayerId="heading-1"
+          layers={scene.pages[0]!.layers}
+          registry={registry}
+          scene={scene}
+          selectedId={null}
+          sortDraft={null}
+          onCommitEdit={vi.fn()}
+          onDuplicate={vi.fn()}
+          onHoverLayer={vi.fn()}
+          onRemove={vi.fn()}
+          onSelect={vi.fn()}
+          onStartEdit={vi.fn()}
+        />
+      </DndContext>
+    );
+    const wrap = screen.getByText('Below the hero').closest('[data-layer-id]');
+    expect(wrap?.dataset.layerId).toBe('heading-1');
+    expect(wrap?.className).toContain('blockWrapHovered');
+  });
+
   it('renders insert-line preview from sortDraft', () => {
     const scene = createHtmlDemoScene();
     const registry = createBlockRegistry();
