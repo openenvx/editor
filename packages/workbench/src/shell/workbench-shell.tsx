@@ -5,11 +5,12 @@ import {
   ThemeServiceId,
 } from '@openenvx/core';
 import type { Plugin } from '@openenvx/core';
-import { ShellUiServiceId } from '@openenvx/headless';
+import { ShellUiServiceId, TOOLBAR_PLACEMENTS } from '@openenvx/headless';
 import type {
   PropertyHostContext,
   PropertyPathContextOptions,
   LayerSurfaceItem,
+  ToolbarPlacement,
   WorkbenchApi,
   WorkbenchControllerOptions,
 } from '@openenvx/headless';
@@ -34,16 +35,16 @@ import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { workbenchI18n } from '../i18n/workbench-i18n';
 import { WorkbenchI18nProvider } from '../i18n/workbench-i18n-provider';
 import { ActivitySidebar } from '../layout/activity-sidebar';
-import { CanvasChrome } from '../layout/canvas-chrome';
+import { EditorChrome } from '../layout/editor-chrome';
 import { EditorLayout } from '../layout/editor-layout';
 import { CommandPaletteRenderer } from '../renderers/command-palette-renderer';
 import { CommandSheetHost } from '../renderers/command-sheet-host';
 import { ContextMenuRenderer } from '../renderers/context-menu-renderer';
 import { EditorPaneRenderer } from '../renderers/editor-pane-renderer';
-import { FloatingToolbarRenderer } from '../renderers/floating-toolbar-renderer';
 import { OverlayRenderer } from '../renderers/overlay-renderer';
 import { SecondarySidebarRenderer } from '../renderers/secondary-sidebar-renderer';
 import { StatusBarRenderer } from '../renderers/status-bar-renderer';
+import { ToolbarRenderer } from '../renderers/toolbar-renderer';
 import {
   DEFAULT_INSPECTOR_PLUGIN_ID,
   DefaultInspectorContainerPlugin,
@@ -182,12 +183,21 @@ const EditorRegion = memo(
 
     return (
       <ContextMenuRenderer items={contextMenu}>
-        {layout.floatingToolbar ? (
-          <CanvasChrome
-            floatingToolbar={<FloatingToolbarRenderer items={toolbarItems} />}
+        {layout.editorToolbars ? (
+          <EditorChrome
+            toolbars={Object.fromEntries(
+              TOOLBAR_PLACEMENTS.map((placement: ToolbarPlacement) => [
+                placement,
+                <ToolbarRenderer
+                  items={toolbarItems}
+                  key={placement}
+                  placement={placement}
+                />,
+              ])
+            )}
           >
             {editorPane}
-          </CanvasChrome>
+          </EditorChrome>
         ) : (
           editorPane
         )}

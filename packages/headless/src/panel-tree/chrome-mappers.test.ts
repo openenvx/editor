@@ -51,6 +51,7 @@ describe('chrome mappers', () => {
 
   it('maps Toolbar trees onto ToolbarBuilder output', () => {
     const viaBuilder = createToolbarBuilder()
+      .placement('bottom-center')
       .command('undo', {
         commandId: 'scene.undo',
         icon: 'undo',
@@ -65,7 +66,8 @@ describe('chrome mappers', () => {
         labelBinding: 'editorZoomPercent',
         labelSuffix: '%',
         priority: 22,
-      });
+      })
+      .end();
 
     const viaTree = mapPluginTreeToToolbar(
       n(

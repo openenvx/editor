@@ -69,6 +69,7 @@ export function createBarebonesActivationScene(options?: {
     >
       <Section
         id="card-section"
+        name="Card"
         style={{
           backgroundColor: BG,
           paddingLeft: 24,
@@ -79,6 +80,7 @@ export function createBarebonesActivationScene(options?: {
       >
         <Section
           id="header-section"
+          name="Header"
           style={{
             backgroundColor: 'transparent',
             paddingLeft: 24,
@@ -96,23 +98,14 @@ export function createBarebonesActivationScene(options?: {
               verticalAlign="middle"
               style={{ paddingTop: 7, paddingBottom: 7 }}
             >
-              <Row id="header-logo-row">
-                <Column
-                  id="header-logo-inner-col"
-                  width="32px"
-                  align="left"
-                  verticalAlign="middle"
-                >
-                  <Img
-                    id="header-logo"
-                    src={LOGO_SRC}
-                    alt=""
-                    width={23}
-                    height={23}
-                    style={{ marginBottom: 0 }}
-                  />
-                </Column>
-              </Row>
+              <Img
+                id="header-logo"
+                src={LOGO_SRC}
+                alt=""
+                width={23}
+                height={23}
+                style={{ marginBottom: 0 }}
+              />
             </Column>
             <Column
               id="header-company-col"
@@ -139,6 +132,7 @@ export function createBarebonesActivationScene(options?: {
 
         <Section
           id="hero-section"
+          name="Hero"
           style={{
             backgroundColor: BG_2,
             paddingLeft: 40,
@@ -151,6 +145,7 @@ export function createBarebonesActivationScene(options?: {
         >
           <Section
             id="hero-logo-heading"
+            name="Hero intro"
             style={{
               backgroundColor: 'transparent',
               padding: 0,
@@ -201,6 +196,7 @@ export function createBarebonesActivationScene(options?: {
 
           <Section
             id="hero-button-wrap"
+            name="CTA"
             style={{
               backgroundColor: 'transparent',
               padding: 0,
@@ -243,6 +239,7 @@ export function createBarebonesActivationScene(options?: {
 
         <Section
           id="footer-section"
+          name="Footer"
           style={{
             backgroundColor: BG,
             padding: 0,
@@ -278,6 +275,7 @@ export function createBarebonesActivationScene(options?: {
 
               <Section
                 id="footer-social"
+                name="Social"
                 style={{
                   backgroundColor: 'transparent',
                   padding: 0,

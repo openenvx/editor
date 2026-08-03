@@ -37,8 +37,9 @@ describe('StatusBarBuilder', () => {
 });
 
 describe('ToolbarBuilder', () => {
-  it('builds command, separator, and dropdown items', () => {
+  it('builds command, separator, and dropdown items with placement', () => {
     const items = createToolbarBuilder()
+      .placement('bottom-center')
       .command('undo', {
         commandId: 'scene.undo',
         icon: 'undo',
@@ -49,16 +50,17 @@ describe('ToolbarBuilder', () => {
       .dropdown('zoom', {
         items: [{ commandId: 'canvas.zoomIn', labelKey: 'zoom.in' }],
         labelBinding: 'editorZoomPercent',
-        when: 'workbench.floatingToolbar',
         priority: 2,
       })
+      .end()
       .build();
 
     expect(items).toHaveLength(3);
     expect(items[0]?.kind).toBe('command');
+    expect(items[0]?.placement).toBe('bottom-center');
     expect(items[1]?.kind).toBe('separator');
     expect(isToolbarDropdownItem(items[2]!)).toBe(true);
-    expect(items[2]?.when).toBe('workbench.floatingToolbar');
+    expect(items[2]?.placement).toBe('bottom-center');
   });
 });
 

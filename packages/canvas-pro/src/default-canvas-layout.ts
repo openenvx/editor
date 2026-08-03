@@ -1,10 +1,8 @@
 import type { WorkbenchLayout } from '@openenvx/headless';
+import { DEFAULT_WORKBENCH_LAYOUT } from '@openenvx/headless';
 
+/** Canvas product layout — enables editor overlay toolbars (bottom-center). */
 export const DEFAULT_CANVAS_LAYOUT: WorkbenchLayout = {
-  activityBar: true,
-  editorArea: true,
-  floatingToolbar: true,
-  primarySidebar: true,
-  secondarySidebar: true,
-  statusBar: true,
+  ...DEFAULT_WORKBENCH_LAYOUT,
+  editorToolbars: true,
 };

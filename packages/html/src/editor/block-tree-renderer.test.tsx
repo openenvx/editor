@@ -78,6 +78,7 @@ describe('BlockTreeRenderer', () => {
     expect(
       screen.getByRole('toolbar', { name: 'Heading actions' })
     ).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Move' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }));
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
     expect(onDuplicate).toHaveBeenCalledWith('heading-1');

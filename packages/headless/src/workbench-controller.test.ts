@@ -91,6 +91,7 @@ class DemoPaletteContribution extends CommandPaletteContribution {
 class DemoToolbarContribution extends ToolbarContribution {
   contribute(builder: ToolbarBuilder, _ctx): void {
     builder
+      .placement('bottom-center')
       .command('toolbar-visible', {
         commandId: 'scene.undo',
         icon: 'undo',

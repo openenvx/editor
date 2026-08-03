@@ -160,4 +160,19 @@ describe('sceneFromEmailJsx', () => {
     expect(logoLayer?.data?.width).toBe(48);
     expect(logoLayer?.data?.height).toBe(48);
   });
+
+  it('maps name prop to layer.name for Layers labels', () => {
+    const scene = sceneFromEmailJsx(
+      <Email id="email-root">
+        <Section id="hero" name="Hero">
+          <Text id="body">Hi</Text>
+        </Section>
+      </Email>
+    );
+    const children = scene.pages[0]?.layers[0]?.data?.children as
+      | { id?: string; name?: string }[]
+      | undefined;
+    expect(children?.[0]?.id).toBe('hero');
+    expect(children?.[0]?.name).toBe('Hero');
+  });
 });

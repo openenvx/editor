@@ -1,21 +1,8 @@
-import {
-  getActivePage,
-  walkLayers,
-  type Page,
-  type Scene,
-} from '@openenvx/core';
+import { getActivePage, type Scene } from '@openenvx/core';
 import type { ViewDescriptor } from '@openenvx/headless';
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 
-function getLayerAncestorIds(page: Page, layerId: string): string[] {
-  let ancestorIds: string[] = [];
-  walkLayers(page.layers, (layer, path) => {
-    if (layer.id === layerId) {
-      ancestorIds = path.map((ancestor) => ancestor.id);
-    }
-  });
-  return ancestorIds;
-}
+import { getLayerAncestorIds } from './get-layer-ancestor-ids';
 
 export function resolveViewHoveredIds(
   view: ViewDescriptor,
@@ -32,7 +19,10 @@ export function resolveViewHoveredIds(
   return new Set([hoveredLayerId]);
 }
 
-export function useViewTreeHoverSync(
+/**
+ * While hovering a nested layer, expand ancestors so the hovered row is visible.
+ */
+export function useViewTreeHoverExpand(
   view: ViewDescriptor,
   hoveredLayerId: string | null,
   scene: Scene,

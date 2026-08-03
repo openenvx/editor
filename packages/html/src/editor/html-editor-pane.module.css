@@ -10,24 +10,12 @@
   font-family: var(--wb-font-sans, Inter, system-ui, -apple-system, sans-serif);
 }
 
-.toolbarHost {
-  position: absolute;
-  top: var(--wb-space-3, 12px);
-  left: 50%;
-  z-index: 10;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-.toolbarHost > * {
-  pointer-events: auto;
-}
-
 .stage {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: 64px 48px 48px;
+  /* Toolbar floats over the stage — keep light inset so artboard peeks under the pill. */
+  padding: 40px 40px 40px;
 }
 
 .artboardSlot {
@@ -124,12 +112,12 @@
  */
 .blockWrapContents.blockWrapSelected > *,
 .blockWrapContents.blockWrapHovered > * {
-  outline: 2px solid #3b82f6;
-  outline-offset: -2px;
+  outline: var(--block-chrome-outline-width) solid var(--wb-selection, #3b82f6);
+  outline-offset: calc(-1 * var(--block-chrome-outline-width));
 }
 
 .blockWrapContents.blockWrapHovered:not(.blockWrapSelected) > * {
-  outline-width: 1px;
+  outline-color: var(--wb-selection-muted, rgb(59 130 246 / 50%));
 }
 
 .blockWrapContents.blockWrapDraggable > * {
@@ -239,15 +227,13 @@
   border-radius: 6px;
 }
 
-/* Canvas-style hover outline (driven by hoveredLayerId — content or Layers tree). */
+/* Same stroke width for hover + selected; color distinguishes state. */
 .blockWrapHovered {
-  --block-chrome-outline-width: 1px;
-  outline: var(--block-chrome-outline-width) solid #3b82f6;
+  outline-color: var(--wb-selection-muted, rgb(59 130 246 / 50%));
 }
 
 .blockWrapSelected {
-  --block-chrome-outline-width: 2px;
-  outline: var(--block-chrome-outline-width) solid #3b82f6;
+  outline-color: var(--wb-selection, #3b82f6);
 }
 
 .blockEditableHit {
@@ -326,6 +312,15 @@
 .selectionMenuButton:hover {
   background: var(--wb-hover-overlay, rgb(0 0 0 / 4%));
   color: var(--wb-foreground, #18181b);
+}
+
+.selectionMenuDragHandle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.selectionMenuDragHandle:active {
+  cursor: grabbing;
 }
 
 .selectionMenuButton:focus-visible {

@@ -171,7 +171,7 @@ export class WorkbenchController {
 
   private syncLayoutContextKeys(): void {
     const keys = this.runtime.getContextKeys();
-    keys.setContext('workbench.floatingToolbar', this.layout.floatingToolbar);
+    keys.setContext('workbench.editorToolbars', this.layout.editorToolbars);
     keys.setContext('workbench.statusBar', this.layout.statusBar);
     keys.setContext('workbench.activityBar', this.layout.activityBar);
     keys.setContext('workbench.primarySidebar', this.layout.primarySidebar);

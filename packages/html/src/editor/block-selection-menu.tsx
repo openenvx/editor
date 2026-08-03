@@ -1,5 +1,5 @@
-import { Copy, Trash2 } from 'lucide-react';
-import { memo, type PointerEvent } from 'react';
+import { Copy, GripVertical, Trash2 } from 'lucide-react';
+import { memo, type HTMLAttributes, type PointerEvent } from 'react';
 
 import styles from './html-editor-pane.module.css';
 
@@ -10,18 +10,22 @@ function stopMenuEvent(event: PointerEvent) {
 export const BlockSelectionMenu = memo(
   ({
     label,
+    canDrag = false,
     canDuplicate,
     canRemove,
+    dragHandleProps,
     onDuplicate,
     onRemove,
   }: {
     label: string;
+    canDrag?: boolean;
     canDuplicate: boolean;
     canRemove: boolean;
+    dragHandleProps?: HTMLAttributes<HTMLButtonElement>;
     onDuplicate: () => void;
     onRemove: () => void;
   }) => {
-    const showActions = canDuplicate || canRemove;
+    const showActions = canDrag || canDuplicate || canRemove;
     return (
       <div
         aria-label={`${label} actions`}
@@ -29,8 +33,18 @@ export const BlockSelectionMenu = memo(
         role="toolbar"
         onPointerDown={stopMenuEvent}
       >
+        {canDrag ? (
+          <button
+            type="button"
+            {...dragHandleProps}
+            aria-label="Move"
+            className={`${styles.selectionMenuButton} ${styles.selectionMenuDragHandle}`}
+          >
+            <GripVertical size={14} strokeWidth={1.75} />
+          </button>
+        ) : null}
         <span className={styles.selectionMenuLabel}>{label}</span>
-        {showActions ? (
+        {showActions && (canDuplicate || canRemove) ? (
           <span aria-hidden className={styles.selectionMenuDivider} />
         ) : null}
         {canDuplicate ? (

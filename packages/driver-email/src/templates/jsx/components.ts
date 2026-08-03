@@ -22,6 +22,8 @@ export type EmailJsxComponent = ((props: EmailJsxProps) => null) & {
 
 export interface EmailJsxProps {
   id?: string;
+  /** Layers tree label override (falls back to block type label). */
+  name?: string;
   style?: CSSProperties;
   children?: ReactNode;
   /** email.root */

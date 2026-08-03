@@ -18,6 +18,7 @@ import { HtmlContextMenu } from '../contributions/html-context-menu';
 import { createHtmlLayerDefinition } from '../create-html-layer-definition';
 import { BlockPalettePanel } from '../editor/block-palette-panel';
 import { HtmlEditorPane } from '../editor/html-editor-pane';
+import { registerHtmlPreviewChrome } from '../preview/register-html-preview-chrome';
 
 export class HtmlBlocksPlugin extends WorkbenchPlugin {
   readonly id = 'OpenEnvx.html-blocks';
@@ -41,6 +42,7 @@ export class HtmlBlocksPlugin extends WorkbenchPlugin {
         registryServiceId: BlockRegistryServiceId,
       })
     );
+    registerHtmlPreviewChrome(ctx);
 
     ctx.registerWorkbench(
       new HtmlContextMenu(),

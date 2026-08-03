@@ -1,9 +1,10 @@
 import type { EditorViewportApi } from '@openenvx/core';
-import { EditorViewportServiceId } from '@openenvx/core';
+import { ContextKeyServiceId, EditorViewportServiceId } from '@openenvx/core';
 import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -26,12 +27,24 @@ const EditorViewportContext = createContext<EditorViewportContextValue | null>(
   null
 );
 
+function syncZoomPercent(
+  api: ReturnType<typeof useWorkbenchContext>['api'],
+  percent: number
+): void {
+  api.getService(EditorViewportServiceId)?.setZoomPercent(percent);
+  api.getService(ContextKeyServiceId)?.setContext('editorZoomPercent', percent);
+}
+
 export function EditorViewportProvider({ children }: { children: ReactNode }) {
   const { api } = useWorkbenchContext();
   const [zoomPercent, setZoomPercent] = useState(100);
   const [viewportApi, setViewportApi] = useState<EditorViewportApi | null>(
     null
   );
+
+  useEffect(() => {
+    syncZoomPercent(api, zoomPercent);
+  }, [api, zoomPercent]);
 
   const onViewportApiReady = useCallback(
     (instance: EditorViewportApi | null) => {
@@ -42,30 +55,22 @@ export function EditorViewportProvider({ children }: { children: ReactNode }) {
       }
       viewportService.setViewport(instance);
       if (instance) {
-        const percent = instance.getZoomPercent();
-        setZoomPercent(percent);
-        viewportService.setZoomPercent(percent);
+        setZoomPercent(instance.getZoomPercent());
       }
     },
     [api]
   );
 
-  const onZoomChange = useCallback(
-    (percent: number) => {
-      setZoomPercent(percent);
-      api.getService(EditorViewportServiceId)?.setZoomPercent(percent);
-    },
-    [api]
-  );
+  const onZoomChange = useCallback((percent: number) => {
+    setZoomPercent(percent);
+  }, []);
 
   const syncZoomFromViewport = useCallback(() => {
     if (!viewportApi) {
       return;
     }
-    const percent = viewportApi.getZoomPercent();
-    setZoomPercent(percent);
-    api.getService(EditorViewportServiceId)?.setZoomPercent(percent);
-  }, [api, viewportApi]);
+    setZoomPercent(viewportApi.getZoomPercent());
+  }, [viewportApi]);
 
   const value = useMemo(
     (): EditorViewportContextValue => ({

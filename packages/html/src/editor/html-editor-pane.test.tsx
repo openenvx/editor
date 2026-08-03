@@ -1,5 +1,4 @@
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { getNestedValue } from '@openenvx/headless';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -190,64 +189,52 @@ describe('HtmlEditorPane', () => {
     }
   });
 
-  it('switches device frame width from the preview toolbar', async () => {
-    const user = userEvent.setup();
+  it('switches device frame width via preview chrome commands', async () => {
     const { api, dispose } = await createHtmlWorkbench();
     try {
       renderWithWorkbench(api, <HtmlEditorPane />);
 
-      const zoomSelect = screen.getByRole('combobox', {
-        name: 'Zoom',
-      }) as HTMLSelectElement;
-      expect(zoomSelect.value).toBe('1');
-
-      expect(screen.getByRole('toolbar', { name: 'Device preview' })).toBeTruthy();
-
       const artboard = screen.getByTestId('html-artboard');
       expect(artboard.dataset.device).toBe('fluid');
 
-      await user.click(screen.getByRole('button', { name: 'Mobile' }));
-      expect(artboard.dataset.device).toBe('mobile');
-      expect(artboard.style.width).toBe('390px');
-      expect(zoomSelect.value).toBe('auto');
+      await api.executeCommand('html.setDevicePreset', { preset: 'mobile' });
+      await waitFor(() => {
+        expect(artboard.dataset.device).toBe('mobile');
+        expect(artboard.style.width).toBe('390px');
+      });
 
-      await user.click(screen.getByRole('button', { name: 'Desktop' }));
-      expect(artboard.dataset.device).toBe('desktop');
-      expect(artboard.style.width).toBe('1280px');
-      expect(zoomSelect.value).toBe('auto');
+      await api.executeCommand('html.setDevicePreset', { preset: 'desktop' });
+      await waitFor(() => {
+        expect(artboard.dataset.device).toBe('desktop');
+        expect(artboard.style.width).toBe('1280px');
+      });
 
-      await user.click(screen.getByRole('button', { name: 'Fit width' }));
-      expect(artboard.dataset.device).toBe('fluid');
-      expect(zoomSelect.value).toBe('auto');
+      await api.executeCommand('html.setDevicePreset', { preset: 'fluid' });
+      await waitFor(() => {
+        expect(artboard.dataset.device).toBe('fluid');
+      });
 
-      await user.click(screen.getByRole('button', { name: 'Desktop' }));
-      await user.click(screen.getByRole('button', { name: 'Zoom in' }));
-      expect(artboard.style.width).toBe(`${1280 * 1.1}px`);
+      await api.executeCommand('html.setDevicePreset', { preset: 'desktop' });
+      await api.executeCommand('html.zoomIn');
+      await waitFor(() => {
+        expect(artboard.style.width).toBe(`${1280 * 1.1}px`);
+      });
 
-      await user.click(screen.getByRole('button', { name: 'Zoom out' }));
-      expect(
-        (screen.getByRole('combobox', { name: 'Zoom' }) as HTMLSelectElement)
-          .value
-      ).toBe('1');
+      await api.executeCommand('html.zoomOut');
+      await waitFor(() => {
+        expect(artboard.style.width).toBe('1280px');
+      });
 
-      await user.selectOptions(
-        screen.getByRole('combobox', { name: 'Zoom' }),
-        '0.25'
-      );
-      expect(
-        (screen.getByRole('combobox', { name: 'Zoom' }) as HTMLSelectElement)
-          .value
-      ).toBe('0.25');
-      expect(artboard.style.width).toBe('320px');
+      await api.executeCommand('html.zoomPercent', { zoom: 0.25 });
+      await waitFor(() => {
+        expect(artboard.style.width).toBe('320px');
+      });
 
-      await user.selectOptions(
-        screen.getByRole('combobox', { name: 'Zoom' }),
-        'auto'
-      );
-      expect(
-        (screen.getByRole('combobox', { name: 'Zoom' }) as HTMLSelectElement)
-          .value
-      ).toBe('auto');
+      await api.executeCommand('html.zoomAuto');
+      await waitFor(() => {
+        // Auto fits desktop into the stage; width stays design width * auto zoom.
+        expect(Number.parseFloat(artboard.style.width)).toBeGreaterThan(0);
+      });
     } finally {
       dispose();
     }

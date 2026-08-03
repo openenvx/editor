@@ -14,7 +14,8 @@ Puck-style block editor for pages with `page.layout === 'html'`. Same core/headl
 - Composite blocks via named **`slots`** on `BlockConfig` — real part layers under `data.slots` (not `data.children`), so they stay invisible to the Layers tree and `walkLayers`
 - Nesting via `data.children`; composites via `data.slots`
 - `HtmlEditorPane` registered for `page.layout === 'html'` (preview surface; props via shared inspector; slot parts editable inline + via generated inspector fields)
-- Commands: `html.insertBlock`, `html.moveBlock`, `html.updateBlockData`, `html.removeBlock`
+- Device/zoom chrome via `HtmlToolbarContribution` → workbench `EditorChrome` (`top-center`); state in `HtmlPreviewChromeService` + `html.*` preview commands — no React toolbar in this package. Hosts should use `DEFAULT_HTML_LAYOUT` (`editorToolbars: true`) or set the flag themselves.
+- Commands: `html.insertBlock`, `html.moveBlock`, `html.updateBlockData`, `html.removeBlock`, plus `html.setDevicePreset` / `html.zoom*`
 - `HtmlBlocksPlugin` — `LayerDefinition`s, commands, editor pane, primary activity-sidebar **Blocks** panel (`html.blocks`)
 - Built-in composites: `html.hero` (slots: headline / body / actions), `html.button`
 - Sandbox extension `contributes.blocks` (via `extensionBlockStore`) appear in the same Blocks palette; insert drops an `openenvx.widget` under `html.root` and the isolate maps the face into `data.children`

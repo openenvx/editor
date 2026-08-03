@@ -213,6 +213,7 @@ function elementToLayer(element: ReactElement, nextId: () => string): Layer {
   return {
     id: props.id ?? nextId(),
     type,
+    ...(props.name?.trim() ? { name: props.name.trim() } : {}),
     data,
   } as Layer;
 }

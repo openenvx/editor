@@ -15,10 +15,13 @@ import {
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
+import { getSelectionExpandIds } from '../hooks/get-selection-expand-ids';
+import { useViewTreeCollapseSeed } from '../hooks/use-view-tree-collapse-seed';
 import {
   resolveViewHoveredIds,
-  useViewTreeHoverSync,
+  useViewTreeHoverExpand,
 } from '../hooks/use-view-tree-hover-sync';
+import { useViewTreeSelectionSync } from '../hooks/use-view-tree-selection-sync';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { WorkbenchIcon } from '../icons/workbench-icon';
@@ -30,6 +33,8 @@ import { treeItemClassName } from './tree-item-class-name';
 
 import panelSectionStyles from '../primitives/panel-section.module.css';
 import styles from './view-panel.module.css';
+
+const EMPTY_ID_SET = new Set<string>();
 
 interface Props {
   viewContainers: ViewContainerDescriptor[];
@@ -343,7 +348,16 @@ function ViewPanelBody({
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const items = view.content.kind === 'tree' ? view.content.items : [];
 
-  useViewTreeHoverSync(view, hoveredLayerId, scene, setCollapsed);
+  const selectionExpandIds = useMemo(() => {
+    if (view.viewSelection !== 'layer' || layerSelectedIds.size === 0) {
+      return EMPTY_ID_SET;
+    }
+    return getSelectionExpandIds(scene, layerSelectedIds);
+  }, [layerSelectedIds, scene, view.viewSelection]);
+
+  useViewTreeCollapseSeed(items, setCollapsed, selectionExpandIds);
+  useViewTreeSelectionSync(view, layerSelectedIds, scene, setCollapsed);
+  useViewTreeHoverExpand(view, hoveredLayerId, scene, setCollapsed);
 
   const selectedIds =
     view.viewSelection === 'page'

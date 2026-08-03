@@ -55,7 +55,12 @@ export { ContextMenuRenderer } from './renderers/context-menu-renderer';
 export { CommandPaletteRenderer } from './renderers/command-palette-renderer';
 export { OverlayRenderer } from './renderers/overlay-renderer';
 export { StatusBarRenderer } from './renderers/status-bar-renderer';
-export { CanvasChrome } from './layout/canvas-chrome';
+export { EditorChrome } from './layout/editor-chrome';
+export type {
+  EditorChromeProps,
+  EditorChromeToolbars,
+} from './layout/editor-chrome';
+export { ToolbarRenderer } from './renderers/toolbar-renderer';
 export { EditorLayout } from './layout/editor-layout';
 export { editorLayoutStyles } from './layout/editor-layout-styles';
 export {

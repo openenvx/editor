@@ -27,6 +27,8 @@ import {
   Layers,
   Lock,
   LockOpen,
+  Maximize2,
+  Monitor,
   QrCode,
   Redo2,
   RotateCcw,
@@ -34,12 +36,15 @@ import {
   Ruler,
   Settings,
   Shapes,
+  Smartphone,
   Sparkles,
   Square,
   Type,
   Undo2,
   Wrench,
   X,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -71,6 +76,8 @@ export const LUCIDE_GLYPHS: Record<string, LucideIcon> = {
   layers: Layers,
   lock: Lock,
   lockOpen: LockOpen,
+  maximize: Maximize2,
+  monitor: Monitor,
   panelLeft: PanelLeft,
   'qr-code': QrCode,
   rect: Square,
@@ -80,6 +87,7 @@ export const LUCIDE_GLYPHS: Record<string, LucideIcon> = {
   ruler: Ruler,
   settings: Settings,
   shapes: Shapes,
+  smartphone: Smartphone,
   sparkles: Sparkles,
   square: Square,
   text: Type,
@@ -88,4 +96,6 @@ export const LUCIDE_GLYPHS: Record<string, LucideIcon> = {
   undo: Undo2,
   wrench: Wrench,
   x: X,
+  'zoom-in': ZoomIn,
+  'zoom-out': ZoomOut,
 };

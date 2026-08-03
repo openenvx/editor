@@ -28,6 +28,27 @@ describe('BlockSelectionMenu', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
     expect(onDuplicate).toHaveBeenCalledOnce();
     expect(onRemove).toHaveBeenCalledOnce();
+    expect(screen.queryByRole('button', { name: 'Move' })).toBeNull();
+  });
+
+  it('renders move handle when canDrag and forwards handle props', () => {
+    const onPointerDown = vi.fn();
+    render(
+      <BlockSelectionMenu
+        canDrag
+        canDuplicate={false}
+        canRemove={false}
+        dragHandleProps={{ onPointerDown, 'data-testid': 'drag-handle' }}
+        label="Text"
+        onDuplicate={vi.fn()}
+        onRemove={vi.fn()}
+      />
+    );
+
+    const handle = screen.getByRole('button', { name: 'Move' });
+    expect(handle.dataset.testid).toBe('drag-handle');
+    fireEvent.pointerDown(handle);
+    expect(onPointerDown).toHaveBeenCalledOnce();
   });
 
   it('hides actions when not allowed', () => {
@@ -42,5 +63,6 @@ describe('BlockSelectionMenu', () => {
     );
     expect(screen.queryByRole('button', { name: 'Duplicate' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Move' })).toBeNull();
   });
 });

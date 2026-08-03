@@ -33,16 +33,6 @@ import { blockCollisionDetection, type BlockSortDraft } from './block-dnd';
 import type { BlockEditTarget } from './block-editor-context';
 import { BlockTreeRenderer } from './block-tree-renderer';
 import {
-  clampHtmlZoom,
-  DEFAULT_HTML_DEVICE_PRESET,
-  resolveAutoZoom,
-  resolveFrameWidth,
-  resolveScaledFrameWidth,
-  stepHtmlZoom,
-  type HtmlDevicePreset,
-} from './html-device-preview';
-import { HtmlDeviceToolbar } from './html-device-toolbar';
-import {
   applyHtmlDragEnd,
   applyHtmlDragOver,
   applyHtmlDragStart,
@@ -51,7 +41,7 @@ import {
   alignDataPathFromHtmlPath,
   type RichTextAlign,
 } from './rich-text-align';
-import { useHtmlDeviceStageMetrics } from './use-html-device-stage-metrics';
+import { useHtmlPreviewChrome } from './use-html-preview-chrome';
 
 import styles from './html-editor-pane.module.css';
 
@@ -69,14 +59,17 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   );
   const [sortDraft, setSortDraft] = useState<BlockSortDraft | null>(null);
   const sortDraftRef = useRef<BlockSortDraft | null>(null);
-  const [preset, setPreset] = useState<HtmlDevicePreset>(
-    DEFAULT_HTML_DEVICE_PRESET
-  );
-  const [autoZoom, setAutoZoom] = useState(false);
-  const [manualZoom, setManualZoom] = useState(1);
 
-  const { artboardRef, artboardHeight, stageRef, stageWidth } =
-    useHtmlDeviceStageMetrics(preset);
+  const {
+    artboardHeight: _artboardHeight,
+    artboardRef,
+    frameWidth,
+    preset,
+    scaledHeight,
+    scaledWidth,
+    stageRef,
+    zoom,
+  } = useHtmlPreviewChrome();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -90,18 +83,6 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     }),
     []
   );
-
-  const frameWidth = useMemo(
-    () => resolveFrameWidth(preset, stageWidth),
-    [preset, stageWidth]
-  );
-  const autoZoomValue = useMemo(
-    () => resolveAutoZoom(frameWidth, stageWidth),
-    [frameWidth, stageWidth]
-  );
-  const zoom = autoZoom ? autoZoomValue : manualZoom;
-  const scaledWidth = resolveScaledFrameWidth(frameWidth, zoom);
-  const scaledHeight = artboardHeight > 0 ? artboardHeight * zoom : undefined;
 
   const handleSelect = useCallback(
     (id: string) => {
@@ -234,34 +215,6 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     [clearDrag, executeCommand, registry, scene, selection]
   );
 
-  const handlePresetChange = useCallback((next: HtmlDevicePreset) => {
-    setPreset(next);
-    setAutoZoom(true);
-  }, []);
-
-  const handleZoomIn = useCallback(() => {
-    setAutoZoom(false);
-    setManualZoom((previous) =>
-      stepHtmlZoom(autoZoom ? autoZoomValue : previous, 1)
-    );
-  }, [autoZoom, autoZoomValue]);
-
-  const handleZoomOut = useCallback(() => {
-    setAutoZoom(false);
-    setManualZoom((previous) =>
-      stepHtmlZoom(autoZoom ? autoZoomValue : previous, -1)
-    );
-  }, [autoZoom, autoZoomValue]);
-
-  const handleZoomAuto = useCallback(() => {
-    setAutoZoom(true);
-  }, []);
-
-  const handleZoomPercent = useCallback((next: number) => {
-    setAutoZoom(false);
-    setManualZoom(clampHtmlZoom(next));
-  }, []);
-
   if (!(scene && selection)) {
     return null;
   }
@@ -286,19 +239,6 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
           .filter(Boolean)
           .join(' ')}
       >
-        <div className={styles.toolbarHost}>
-          <HtmlDeviceToolbar
-            autoZoom={autoZoom}
-            autoZoomValue={autoZoomValue}
-            preset={preset}
-            zoom={zoom}
-            onPresetChange={handlePresetChange}
-            onZoomAuto={handleZoomAuto}
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
-            onZoomPercent={handleZoomPercent}
-          />
-        </div>
         <div
           aria-label="HTML blocks"
           className={styles.stage}

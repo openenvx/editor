@@ -1,8 +1,8 @@
 import {
   createEmailDemoScene,
+  DEFAULT_HTML_LAYOUT,
   EmailBlocksPlugin,
 } from '@openenvx/driver-email';
-import { DEFAULT_WORKBENCH_LAYOUT } from '@openenvx/headless';
 import { WorkbenchShell } from '@openenvx/workbench';
 
 import '@openenvx/workbench/theme.css';
@@ -17,7 +17,7 @@ export function App() {
         editorTitle="Welcome email"
         editorUri="openworkbench://email-demo/welcome"
         initialScene={createEmailDemoScene()}
-        layout={DEFAULT_WORKBENCH_LAYOUT}
+        layout={DEFAULT_HTML_LAYOUT}
         plugins={DEFAULT_EMAIL_DEMO_PLUGINS}
         theme="dark"
       />

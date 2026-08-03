@@ -19,6 +19,7 @@ import {
   Fragment,
   memo,
   useCallback,
+  type HTMLAttributes,
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
@@ -134,6 +135,7 @@ function BlockChrome({
   chromeDisplay = 'block',
   setNodeRef,
   sortableProps,
+  dragHandleProps,
   children,
 }: {
   layer: Layer;
@@ -154,7 +156,10 @@ function BlockChrome({
   insideWidget?: boolean;
   chromeDisplay?: 'block' | 'inline' | 'contents';
   setNodeRef?: (node: HTMLElement | null) => void;
+  /** dnd-kit listeners/attributes on the block wrap (full-chrome drag). */
   sortableProps?: Record<string, unknown>;
+  /** Same listeners on the selection-menu grip (extra affordance). */
+  dragHandleProps?: HTMLAttributes<HTMLButtonElement>;
   children: ReactNode;
 }) {
   const {
@@ -308,8 +313,10 @@ function BlockChrome({
       // (e.g. email.column). Never use contents just to dodge layout chrome.
       chromeDisplay !== 'contents' ? (
         <BlockSelectionMenu
+          canDrag={!dragDisabled}
           canDuplicate={canDuplicate}
           canRemove={canRemove}
+          dragHandleProps={dragDisabled ? undefined : dragHandleProps}
           label={label}
           onDuplicate={handleDuplicate}
           onRemove={handleRemove}
@@ -720,6 +727,14 @@ function SortableBlockNode({
       selected={selected}
       setNodeRef={setNodeRef}
       sortableProps={dragDisabled ? undefined : { ...listeners, ...attributes }}
+      dragHandleProps={
+        dragDisabled
+          ? undefined
+          : ({
+              ...listeners,
+              ...attributes,
+            } as HTMLAttributes<HTMLButtonElement>)
+      }
     >
       <BlockContent
         editing={editing}

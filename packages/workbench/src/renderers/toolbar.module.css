@@ -1,0 +1,20 @@
+/* Floating pill — Design.md FloatingToolbarRenderer (popover + float shadow). */
+.toolbar {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--wb-space-0-5);
+  padding-block: var(--wb-space-2);
+  padding-inline: var(--wb-space-1);
+  border-radius: var(--wb-radius-lg);
+  background: var(--wb-popover);
+  box-shadow: var(--wb-shadow-float);
+}
+
+.divider {
+  align-self: center;
+  width: 1px;
+  height: 16px;
+  margin: 0 var(--wb-space-0-5);
+  background: var(--wb-divider-color);
+}

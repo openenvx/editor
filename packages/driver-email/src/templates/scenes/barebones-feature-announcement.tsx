@@ -65,6 +65,7 @@ function FeatureBlock({
   return (
     <Section
       id={id}
+      name={title}
       style={{
         backgroundColor: 'transparent',
         padding: 0,
@@ -156,6 +157,7 @@ function WayToWorkRow({
   return (
     <Section
       id={`${id}-wrap`}
+      name={title}
       style={{
         backgroundColor: 'transparent',
         padding: 0,
@@ -261,6 +263,7 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
     >
       <Section
         id="card-section"
+        name="Card"
         style={{
           backgroundColor: BG,
           paddingLeft: 24,
@@ -271,6 +274,7 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
       >
         <Section
           id="header-section"
+          name="Header"
           style={{
             backgroundColor: 'transparent',
             paddingLeft: 24,
@@ -288,23 +292,14 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
               verticalAlign="middle"
               style={{ paddingTop: 7, paddingBottom: 7 }}
             >
-              <Row id="header-logo-row">
-                <Column
-                  id="header-logo-inner-col"
-                  width="32px"
-                  align="left"
-                  verticalAlign="middle"
-                >
-                  <Img
-                    id="header-logo"
-                    src={LOGO_SRC}
-                    alt=""
-                    width={23}
-                    height={23}
-                    style={{ marginBottom: 0 }}
-                  />
-                </Column>
-              </Row>
+              <Img
+                id="header-logo"
+                src={LOGO_SRC}
+                alt=""
+                width={23}
+                height={23}
+                style={{ marginBottom: 0 }}
+              />
             </Column>
             <Column
               id="header-company-col"
@@ -331,6 +326,7 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
 
         <Section
           id="hero-section"
+          name="Hero"
           style={{
             backgroundColor: BG_2,
             paddingLeft: 24,
@@ -344,6 +340,7 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
         >
           <Section
             id="hero-intro"
+            name="Hero intro"
             style={{
               backgroundColor: 'transparent',
               padding: 0,
@@ -410,6 +407,7 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
 
         <Section
           id="ways-section"
+          name="New ways to work"
           style={{
             backgroundColor: BG_2,
             paddingLeft: 32,
@@ -452,6 +450,7 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
 
         <Section
           id="feature-3-section"
+          name="Feature highlight"
           style={{
             backgroundColor: BG_2,
             paddingLeft: 24,
@@ -473,6 +472,7 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
 
         <Section
           id="cta-section"
+          name="CTA"
           style={{
             backgroundColor: BG_2,
             paddingLeft: 24,
@@ -549,6 +549,7 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
 
         <Section
           id="footer-section"
+          name="Footer"
           style={{ backgroundColor: BG, padding: 0 }}
         >
           <Row id="footer-row">
@@ -580,6 +581,7 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
               </Text>
               <Section
                 id="footer-social"
+                name="Social"
                 style={{
                   backgroundColor: 'transparent',
                   padding: 0,

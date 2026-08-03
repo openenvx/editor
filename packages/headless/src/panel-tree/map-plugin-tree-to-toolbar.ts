@@ -2,8 +2,10 @@ import type { PluginNode } from '@openenvx/protocol';
 
 import {
   createToolbarBuilder,
+  TOOLBAR_PLACEMENTS,
   type ToolbarBuilder,
   type ToolbarItemDescriptor,
+  type ToolbarPlacement,
 } from '../builders/toolbar-builder';
 import {
   asNumber,
@@ -14,8 +16,19 @@ import {
   shellOptions,
 } from './plugin-tree-helpers';
 
+function parsePlacement(value: unknown): ToolbarPlacement {
+  if (
+    typeof value === 'string' &&
+    (TOOLBAR_PLACEMENTS as readonly string[]).includes(value)
+  ) {
+    return value as ToolbarPlacement;
+  }
+  return 'bottom-center';
+}
+
 /**
  * Drive {@link createToolbarBuilder} from a plugin-protocol `Toolbar` tree.
+ * Root may set `placement` (defaults to `bottom-center`).
  */
 export function mapPluginTreeToToolbar(
   root: PluginNode,
@@ -37,6 +50,8 @@ export function contributePluginTreeToToolbar(
     );
   }
 
+  const region = builder.placement(parsePlacement(root.props.placement));
+
   for (const child of pluginNodes(root.children)) {
     const options = shellOptions(child.props);
     const group = asNumber(child.props.group);
@@ -46,18 +61,22 @@ export function contributePluginTreeToToolbar(
       if (!isAllowedCommand(commandId, allowedCommands)) {
         continue;
       }
-      builder.command(asString(child.props.id), {
+      region.command(asString(child.props.id), {
         commandId,
         icon: asString(child.props.icon),
         labelKey: asString(child.props.labelKey),
         ...options,
         ...(group === undefined ? {} : { group }),
+        ...(typeof child.props.toggledWhen === 'string'
+          ? { toggledWhen: child.props.toggledWhen }
+          : {}),
+        ...(child.props.args !== undefined ? { args: child.props.args } : {}),
       });
       continue;
     }
 
     if (child.type === 'Separator') {
-      builder.separator(asString(child.props.id, 'separator'), {
+      region.separator(asString(child.props.id, 'separator'), {
         ...options,
         ...(group === undefined ? {} : { group }),
       });
@@ -65,7 +84,7 @@ export function contributePluginTreeToToolbar(
     }
 
     if (child.type === 'ToolbarDropdown') {
-      builder.dropdown(asString(child.props.id), {
+      region.dropdown(asString(child.props.id), {
         items: parseDropdownItems(pluginNodes(child.children), allowedCommands),
         ...(typeof child.props.label === 'string'
           ? { label: child.props.label }

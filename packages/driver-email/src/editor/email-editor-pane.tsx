@@ -20,14 +20,9 @@ import {
   applyHtmlDragStart,
   blockCollisionDetection,
   BlockTreeRenderer,
-  clampHtmlZoom,
   getPageRootId,
-  HtmlDeviceToolbar,
   alignDataPathFromHtmlPath,
-  resolveAutoZoom,
-  resolveScaledFrameWidth,
-  stepHtmlZoom,
-  useHtmlDeviceStageMetrics,
+  useHtmlPreviewChrome,
   type BlockRegistry,
   type BlockSortDraft,
   type HtmlDevicePreset,
@@ -40,6 +35,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
@@ -52,6 +48,10 @@ import { ensureEmailDocumentFont } from '../render/email-document-font';
 import { renderEmailDocument } from '../render/render-email-document';
 import type { BlockEditTarget } from './block-edit-target';
 import { resolveEmailFrameWidth } from './email-device-preview';
+import {
+  EmailEditorModeServiceId,
+  type EmailEditorMode,
+} from './email-editor-mode-service';
 import { EmailHtmlPreview } from './email-html-preview';
 
 import styles from './email-editor-pane.module.css';
@@ -61,46 +61,35 @@ export { EMAIL_FRAME_WIDTH } from './email-device-preview';
 /** Slim desktop chrome — content fills most of the frame with a bit of body around it. */
 const DEFAULT_EMAIL_DEVICE_PRESET: HtmlDevicePreset = 'desktop';
 
-type EmailPaneMode = 'edit' | 'preview';
+function useEmailEditorMode(): EmailEditorMode {
+  const { api } = useWorkbenchContext();
+  const service = api.getService(EmailEditorModeServiceId);
+  const keys = api.getService(ContextKeyServiceId);
+  const serviceRef = useRef(service);
+  const keysRef = useRef(keys);
+  serviceRef.current = service;
+  keysRef.current = keys;
 
-function EmailModeToggle({
-  isPreview,
-  onEdit,
-  onPreview,
-}: {
-  isPreview: boolean;
-  onEdit: () => void;
-  onPreview: () => void;
-}) {
-  return (
-    <div className={styles.modeToggle} role="group" aria-label="Editor mode">
-      <button
-        aria-pressed={!isPreview}
-        className={[
-          styles.modeButton,
-          !isPreview ? styles.modeButtonActive : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
-        title="Edit"
-        type="button"
-        onClick={onEdit}
-      >
-        Edit
-      </button>
-      <button
-        aria-pressed={isPreview}
-        className={[styles.modeButton, isPreview ? styles.modeButtonActive : '']
-          .filter(Boolean)
-          .join(' ')}
-        title="Preview"
-        type="button"
-        onClick={onPreview}
-      >
-        Preview
-      </button>
-    </div>
+  const subscribe = useCallback((onStoreChange: () => void) => {
+    const instance = serviceRef.current;
+    if (!instance) {
+      return () => {};
+    }
+    instance.bindContextKeys(keysRef.current ?? null);
+    instance.setActive(true);
+    const sub = instance.onDidChange(() => onStoreChange());
+    return () => {
+      sub.dispose();
+      instance.setActive(false);
+    };
+  }, []);
+
+  const getSnapshot = useCallback(
+    (): EmailEditorMode => serviceRef.current?.getMode() ?? 'edit',
+    []
   );
+
+  return useSyncExternalStore(subscribe, getSnapshot, () => 'edit');
 }
 
 export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
@@ -117,21 +106,26 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   );
   const [sortDraft, setSortDraft] = useState<BlockSortDraft | null>(null);
   const sortDraftRef = useRef<BlockSortDraft | null>(null);
-  const [preset, setPreset] = useState<HtmlDevicePreset>(
-    DEFAULT_EMAIL_DEVICE_PRESET
-  );
-  const [autoZoom, setAutoZoom] = useState(true);
-  const [manualZoom, setManualZoom] = useState(1);
-  const [mode, setMode] = useState<EmailPaneMode>('edit');
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
+  const mode = useEmailEditorMode();
 
   useEffect(() => {
     ensureEmailDocumentFont();
   }, []);
 
-  const { artboardRef, artboardHeight, stageRef, stageWidth } =
-    useHtmlDeviceStageMetrics(preset);
+  const {
+    artboardRef,
+    frameWidth,
+    preset,
+    scaledHeight,
+    scaledWidth,
+    stageRef,
+    zoom,
+  } = useHtmlPreviewChrome({
+    initialPreset: DEFAULT_EMAIL_DEVICE_PRESET,
+    resolveFrameWidth: resolveEmailFrameWidth,
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -143,18 +137,6 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     }),
     []
   );
-
-  const frameWidth = useMemo(
-    () => resolveEmailFrameWidth(preset, stageWidth),
-    [preset, stageWidth]
-  );
-  const autoZoomValue = useMemo(
-    () => resolveAutoZoom(frameWidth, stageWidth),
-    [frameWidth, stageWidth]
-  );
-  const zoom = autoZoom ? autoZoomValue : manualZoom;
-  const scaledWidth = resolveScaledFrameWidth(frameWidth, zoom);
-  const scaledHeight = artboardHeight > 0 ? artboardHeight * zoom : undefined;
 
   const handleSelect = useCallback(
     (id: string) => {
@@ -288,52 +270,25 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     [clearDrag, executeCommand, registry, scene, selection]
   );
 
-  const handlePresetChange = useCallback((next: HtmlDevicePreset) => {
-    setPreset(next);
-    setAutoZoom(true);
-  }, []);
+  const activePageId = selection?.activePageId ?? null;
+  const isPreview = mode === 'preview';
 
-  const handleZoomIn = useCallback(() => {
-    setAutoZoom(false);
-    setManualZoom((previous) =>
-      stepHtmlZoom(autoZoom ? autoZoomValue : previous, 1)
-    );
-  }, [autoZoom, autoZoomValue]);
+  useEffect(() => {
+    if (!isPreview) {
+      setPreviewHtml(null);
+      setPreviewError(null);
+    }
+  }, [isPreview]);
 
-  const handleZoomOut = useCallback(() => {
-    setAutoZoom(false);
-    setManualZoom((previous) =>
-      stepHtmlZoom(autoZoom ? autoZoomValue : previous, -1)
-    );
-  }, [autoZoom, autoZoomValue]);
-
-  const handleZoomAuto = useCallback(() => {
-    setAutoZoom(true);
-  }, []);
-
-  const handleZoomPercent = useCallback((next: number) => {
-    setAutoZoom(false);
-    setManualZoom(clampHtmlZoom(next));
-  }, []);
-
-  const enterEditMode = useCallback(() => {
-    setMode('edit');
-    setPreviewHtml(null);
-    setPreviewError(null);
-  }, []);
-
-  const enterPreviewMode = useCallback(() => {
-    if (editingTarget) {
+  useEffect(() => {
+    if (mode === 'preview' && editingTarget) {
       api
         .getService(ContextKeyServiceId)
         ?.setContext('editor.editingText', false);
       setEditingTarget(null);
+      clearDrag();
     }
-    clearDrag();
-    setMode('preview');
-  }, [api, clearDrag, editingTarget]);
-
-  const activePageId = selection?.activePageId ?? null;
+  }, [api, clearDrag, editingTarget, mode]);
 
   useEffect(() => {
     if (mode !== 'preview' || !scene || !activePageId) {
@@ -371,7 +326,6 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   const selectedId =
     selection.primaryLayerId ?? selection.selectedLayerIds[0] ?? null;
   const rootId = getPageRootId(page, 'email.root');
-  const isPreview = mode === 'preview';
 
   let artboardContent: ReactNode;
   if (!rootId) {
@@ -459,26 +413,6 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
         .filter(Boolean)
         .join(' ')}
     >
-      <div className={styles.toolbarHost}>
-        <HtmlDeviceToolbar
-          autoZoom={autoZoom}
-          autoZoomValue={autoZoomValue}
-          preset={preset}
-          trailing={
-            <EmailModeToggle
-              isPreview={isPreview}
-              onEdit={enterEditMode}
-              onPreview={enterPreviewMode}
-            />
-          }
-          zoom={zoom}
-          onPresetChange={handlePresetChange}
-          onZoomAuto={handleZoomAuto}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          onZoomPercent={handleZoomPercent}
-        />
-      </div>
       {stage}
     </div>
   );

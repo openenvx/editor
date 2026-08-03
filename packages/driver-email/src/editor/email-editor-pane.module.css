@@ -10,19 +10,6 @@
   font-family: var(--wb-font-sans, Inter, system-ui, -apple-system, sans-serif);
 }
 
-.toolbarHost {
-  position: absolute;
-  top: var(--wb-space-3, 12px);
-  left: 50%;
-  z-index: 10;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-.toolbarHost > * {
-  pointer-events: auto;
-}
-
 .paneDragging {
   cursor: grabbing;
 }
@@ -31,7 +18,8 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: 64px 48px 48px;
+  /* Toolbar floats over the stage — keep light inset so artboard peeks under the pill. */
+  padding: 40px 40px 40px;
 }
 
 .artboardSlot {
@@ -68,43 +56,6 @@
   min-height: 480px;
   border: 0;
   background: transparent;
-}
-
-.modeToggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.modeButton {
-  height: 28px;
-  padding: 0 10px;
-  border: none;
-  border-radius: var(--wb-radius-control, 10px);
-  background: transparent;
-  color: var(--wb-muted-foreground, #71717a);
-  cursor: pointer;
-  font-family: var(--wb-font, inherit);
-  font-size: var(--wb-text-xs, 12px);
-  font-weight: 500;
-}
-
-.modeButton:hover {
-  background: var(--wb-hover-overlay, rgb(0 0 0 / 4%));
-  color: var(--wb-foreground, #18181b);
-}
-
-.modeButton:focus-visible {
-  outline: none;
-  box-shadow: var(
-    --wb-shadow-focus,
-    0 0 0 2px #f6f6f8,
-    0 0 0 4px rgb(0 0 0 / 20%)
-  );
-}
-
-.modeButtonActive {
-  color: var(--wb-selection, #3b82f6);
 }
 
 .palettePanel {

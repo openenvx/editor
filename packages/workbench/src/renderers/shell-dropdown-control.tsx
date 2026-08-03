@@ -1,9 +1,13 @@
-import type { ShellDropdownMenuItemDescriptor } from '@openenvx/headless';
-import { ChevronUp } from 'lucide-react';
+import type {
+  ShellDropdownMenuItemDescriptor,
+  ToolbarPlacement,
+} from '@openenvx/headless';
+import { isToolbarTopPlacement } from '@openenvx/headless';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { memo, useMemo } from 'react';
 
-import { useEditorViewport } from '../context/editor-viewport-context';
 import { useWorkbenchContext } from '../context/workbench-context';
+import { useContextKeyValue } from '../hooks/use-context-key';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import {
   DropdownMenu,
@@ -18,18 +22,21 @@ export interface ShellDropdownControlProps {
   id: string;
   label?: string;
   labelKey?: string;
+  /** Context key whose string/number value is shown as the trigger label. */
   labelBinding?: string;
   labelSuffix?: string;
   items: ShellDropdownMenuItemDescriptor[];
   variant: 'toolbar' | 'statusBar';
+  /** Toolbar placement drives menu side; ignored for statusBar. */
+  placement?: ToolbarPlacement;
 }
 
-function resolveLabelBinding(
-  labelBinding: string,
-  zoomPercent: number
+function formatBoundLabel(
+  value: boolean | string | number | undefined,
+  suffix: string
 ): string | null {
-  if (labelBinding === 'editorZoomPercent') {
-    return String(zoomPercent);
+  if (typeof value === 'string' || typeof value === 'number') {
+    return `${value}${suffix}`;
   }
   return null;
 }
@@ -43,23 +50,24 @@ export const ShellDropdownControl = memo(
     labelSuffix = '',
     items,
     variant,
+    placement,
   }: ShellDropdownControlProps) => {
     const { executeCommand } = useWorkbenchContext();
     const { t } = useWorkbenchTranslation();
-    const { zoomPercent } = useEditorViewport();
+    const boundValue = useContextKeyValue(labelBinding ?? '');
 
     const displayLabel = useMemo(() => {
       if (labelBinding) {
-        const bound = resolveLabelBinding(labelBinding, zoomPercent);
+        const bound = formatBoundLabel(boundValue, labelSuffix);
         if (bound !== null) {
-          return `${bound}${labelSuffix}`;
+          return bound;
         }
       }
       if (labelKey) {
         return t(labelKey);
       }
       return label ?? '';
-    }, [label, labelBinding, labelKey, labelSuffix, t, zoomPercent]);
+    }, [boundValue, label, labelBinding, labelKey, labelSuffix, t]);
 
     const groups = useMemo(
       () => [
@@ -80,16 +88,20 @@ export const ShellDropdownControl = memo(
 
     const triggerClass =
       variant === 'toolbar' ? styles.trigger : styles.statusTrigger;
+    const openUp =
+      variant === 'statusBar' ||
+      (placement !== undefined && !isToolbarTopPlacement(placement));
+    const Chevron = openUp ? ChevronUp : ChevronDown;
 
     return (
       <DropdownMenu>
         <DropdownMenuTrigger>
           <button className={triggerClass} type="button">
             <span>{displayLabel}</span>
-            <ChevronUp aria-hidden className={styles.chevron} size={14} />
+            <Chevron aria-hidden className={styles.chevron} size={12} />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" side="top">
+        <DropdownMenuContent align="end" side={openUp ? 'top' : 'bottom'}>
           <DropdownMenuGroups groups={groups} />
         </DropdownMenuContent>
       </DropdownMenu>

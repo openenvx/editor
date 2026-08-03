@@ -319,7 +319,7 @@ Use `--wb-shadow-xs` on inputs at rest. Use `--wb-shadow-float` only on floating
 | --- | --- | --- |
 | ActivityBar | `ActivitySidebar` (icon rail) | 56px; icon + label per item; active icon uses `--wb-muted` fill |
 | Primary Side Bar | `ActivitySidebar` (panel body) | 240px; title header + scrollable `ViewPane` content |
-| CanvasField | `CanvasChrome` | `--wb-canvas-field` bg; artboard centered |
+| CanvasField | `EditorChrome` | `--wb-canvas-field` bg; artboard centered |
 | FloatingToolbar | `FloatingToolbarRenderer` | Bottom-center overlay; contribution-driven tools + widgets |
 | Secondary Side Bar | `ViewContainerViews` + `ViewPane` | 280px; default **Inspector** container (`workbench.inspector`) hosts canvas layer/node property views; same view chrome as primary |
 | StatusBar | `StatusBarRenderer` | 24px; zoom, dirty/saved, selection summary |

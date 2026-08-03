@@ -1,0 +1,62 @@
+.chrome {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: stretch;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--wb-canvas-field);
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Overlay only the pill — clicks pass through to the editor underneath. */
+.slot {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.slot > * {
+  pointer-events: auto;
+}
+
+.topLeft {
+  top: var(--wb-space-3);
+  left: var(--wb-space-3);
+}
+
+.topCenter {
+  top: var(--wb-space-3);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.topRight {
+  top: var(--wb-space-3);
+  right: var(--wb-space-3);
+}
+
+.bottomLeft {
+  bottom: var(--wb-space-3);
+  left: var(--wb-space-3);
+}
+
+.bottomCenter {
+  bottom: var(--wb-space-3);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.bottomRight {
+  bottom: var(--wb-space-3);
+  right: var(--wb-space-3);
+}

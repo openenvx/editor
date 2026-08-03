@@ -2,7 +2,7 @@ import {
   DEFAULT_HTML_STUDIO_PLUGINS,
   WorkbenchShell,
   createHtmlSandboxExtensionHost,
-  DEFAULT_WORKBENCH_LAYOUT,
+  DEFAULT_HTML_LAYOUT,
   mountSandboxExtensions,
   type WorkbenchApi,
 } from '@openenvx/html-studio';
@@ -129,7 +129,7 @@ export function App() {
         editorTitle="Menu"
         editorUri="openworkbench://html-demo/menu"
         initialScene={createMenuDemoScene()}
-        layout={DEFAULT_WORKBENCH_LAYOUT}
+        layout={DEFAULT_HTML_LAYOUT}
         mountExternalHosts={mountExternalHosts}
         plugins={DEFAULT_HTML_STUDIO_PLUGINS}
       />

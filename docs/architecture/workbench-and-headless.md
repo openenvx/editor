@@ -40,15 +40,17 @@ Headless is framework UI-agnostic descriptors. Workbench is the first-party Reac
 
 ## Layout defaults
 
-| Field | `DEFAULT_WORKBENCH_LAYOUT` | Canvas Pro `DEFAULT_CANVAS_LAYOUT` |
-| --- | --- | --- |
-| `activityBar` | `true` | `true` |
-| `primarySidebar` | `true` | `true` |
-| `secondarySidebar` | `true` | `true` |
-| `floatingToolbar` | `false` | `true` |
-| Other parts | all enabled | all enabled |
+| Field | `DEFAULT_WORKBENCH_LAYOUT` | Canvas Pro `DEFAULT_CANVAS_LAYOUT` | HTML `DEFAULT_HTML_LAYOUT` |
+| --- | --- | --- | --- |
+| `activityBar` | `true` | `true` | `true` |
+| `primarySidebar` | `true` | `true` | `true` |
+| `secondarySidebar` | `true` | `true` | `true` |
+| `editorToolbars` | `false` | `true` | `true` |
+| Other parts | all enabled | all enabled | all enabled |
 
-Visibility is mutable (`toggleActivityBar` / …). Containers move via `api.moveContainer`. Set `layout: { floatingToolbar: true }` when migrating toolbar items that use `when: 'workbench.floatingToolbar'`.
+Visibility is mutable (`toggleActivityBar` / …). Containers move via `api.moveContainer`. Set `layout: { editorToolbars: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_HTML_LAYOUT`) to show editor overlay toolbars. Items declare a `placement` (`top-left` | `top-center` | `top-right` | `bottom-left` | `bottom-center` | `bottom-right`) via `ToolbarBuilder.placement(...)`.
+
+**Host rule (toolbars):** Product engines (canvas / html / email) contribute toolbar descriptors only — no React toolbar components in those packages. Workbench `EditorChrome` + `ToolbarRenderer` render shared `IconButton` / `DropdownMenu` chrome.
 
 ## Property pane flow
 

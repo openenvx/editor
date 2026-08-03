@@ -29,7 +29,7 @@ describe('createBarebonesActivationScene', () => {
     expect(html).toContain('Confirm email');
     expect(html).toContain('data-id="__react-email-column"');
     expect(html).toMatch(/width:\s*50%/);
-    expect(html).toMatch(/width:\s*32px/);
+    expect(html).toMatch(/width="23"/);
     expect(html).toMatch(/vertical-align:\s*middle/);
     expect(html).toMatch(/border-radius:8px/i);
     expect(html).toMatch(/padding:16px 28px/i);

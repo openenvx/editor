@@ -62,6 +62,7 @@ export class CanvasStatusBarContribution extends StatusBarContribution {
 export class CanvasToolbarContribution extends ToolbarContribution {
   contribute(builder: ToolbarBuilder, _ctx: CommandContext): void {
     builder
+      .placement('bottom-center')
       .command('canvas-toolbar-undo', {
         commandId: 'scene.undo',
         icon: 'undo',
@@ -116,7 +117,6 @@ export class CanvasToolbarContribution extends ToolbarContribution {
         labelBinding: 'editorZoomPercent',
         labelSuffix: '%',
         priority: 22,
-        when: 'workbench.floatingToolbar',
       });
   }
 }

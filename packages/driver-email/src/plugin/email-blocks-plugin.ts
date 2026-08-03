@@ -1,7 +1,11 @@
 import { SimpleServiceContribution } from '@openenvx/core';
 import { WorkbenchPlugin } from '@openenvx/headless';
 import type { WorkbenchPluginContext } from '@openenvx/headless';
-import { createBlockCommands, createHtmlLayerDefinition } from '@openenvx/html';
+import {
+  createBlockCommands,
+  createHtmlLayerDefinition,
+  registerHtmlPreviewChrome,
+} from '@openenvx/html';
 
 import {
   emailBlockRegistry,
@@ -27,7 +31,13 @@ import {
   EmailTemplatesView,
   EMAIL_TEMPLATES_PANEL_COMPONENT_ID,
 } from '../contributions/email-templates-sidebar';
+import { EmailToolbarContribution } from '../contributions/email-toolbar-contribution';
 import { EmailBlockPalettePanel } from '../editor/block-palette-panel';
+import {
+  createEmailModeCommands,
+  EmailEditorModeServiceId,
+  EmailEditorModeServiceImpl,
+} from '../editor/email-editor-mode-service';
 import { EmailEditorPane } from '../editor/email-editor-pane';
 import { EmailPatternBlocksGallery } from '../editor/pattern-blocks-gallery';
 import { EmailTemplatesGallery } from '../editor/templates-gallery';
@@ -51,6 +61,10 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
         EmailBlockRegistryServiceId,
         () => emailBlockRegistry
       ),
+      new SimpleServiceContribution(
+        EmailEditorModeServiceId,
+        () => new EmailEditorModeServiceImpl()
+      ),
       new OpenEmailBlocksSheetCommand(),
       new OpenEmailTemplatesSheetCommand(),
       ...allEmailBlocks.map((block) =>
@@ -64,8 +78,10 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
         registryServiceId: EmailBlockRegistryServiceId,
         typePrefix: 'email.',
         pageLayout: 'email',
-      })
+      }),
+      ...createEmailModeCommands()
     );
+    registerHtmlPreviewChrome(ctx);
 
     ctx.registerWorkbench(
       new EmailContextMenu(),
@@ -74,7 +90,8 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
       new EmailPatternsContainer(),
       new EmailPatternsView(),
       new EmailElementsContainer(),
-      new EmailElementsView()
+      new EmailElementsView(),
+      new EmailToolbarContribution()
     );
     ctx.registerViewPanel(
       EMAIL_ELEMENTS_PANEL_COMPONENT_ID,

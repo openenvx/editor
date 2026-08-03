@@ -1,35 +1,48 @@
-import type { ToolbarItemDescriptor } from '@openenvx/headless';
+import { ContextKeyServiceId } from '@openenvx/core';
+import type {
+  ToolbarItemDescriptor,
+  ToolbarPlacement,
+} from '@openenvx/headless';
 import { isToolbarDropdownItem } from '@openenvx/headless';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
+import { useContextKeysRevision } from '../hooks/use-context-key';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { WorkbenchIcon } from '../icons/workbench-icon';
 import { IconButton } from '../primitives/icon-button';
 import { ShellDropdownControl } from './shell-dropdown-control';
 
-import styles from '../layout/floating-toolbar.module.css';
+import styles from './toolbar.module.css';
 
-interface FloatingToolbarRendererProps {
+export interface ToolbarRendererProps {
   items: ToolbarItemDescriptor[];
+  placement: ToolbarPlacement;
 }
 
-export const FloatingToolbarRenderer = memo(
-  ({ items }: FloatingToolbarRendererProps) => {
-    const { executeCommand } = useWorkbenchContext();
+export const ToolbarRenderer = memo(
+  ({ items, placement }: ToolbarRendererProps) => {
+    const { api, executeCommand } = useWorkbenchContext();
     const commandStates = useWorkbenchContextSelector(
       (state) => state.commandStates
     );
+    useContextKeysRevision();
     const { t } = useWorkbenchTranslation();
+    const contextKeys = api.getService(ContextKeyServiceId);
 
-    if (items.length === 0) {
+    const placementItems = useMemo(
+      () => items.filter((item) => item.placement === placement),
+      [items, placement]
+    );
+
+    if (placementItems.length === 0) {
       return null;
     }
 
     return (
       <div className={styles.toolbar}>
-        {items.map((item) => {
+        {placementItems.map((item) => {
           if (item.kind === 'separator') {
             return <span className={styles.divider} key={item.id} />;
           }
@@ -44,6 +57,7 @@ export const FloatingToolbarRenderer = memo(
                 labelBinding={item.labelBinding}
                 labelKey={item.labelKey}
                 labelSuffix={item.labelSuffix}
+                placement={placement}
                 variant="toolbar"
               />
             );
@@ -52,16 +66,21 @@ export const FloatingToolbarRenderer = memo(
           const canExecute =
             commandStates?.[item.commandId]?.canExecute ?? true;
           const label = t(item.labelKey);
+          const active = item.toggledWhen
+            ? (contextKeys?.evaluate(item.toggledWhen) ?? false)
+            : false;
 
           return (
             <IconButton
+              active={active}
               aria-label={label}
+              aria-pressed={item.toggledWhen ? active : undefined}
               disabled={!canExecute}
               key={item.id}
-              onClick={() => void executeCommand(item.commandId)}
               title={label}
+              onClick={() => void executeCommand(item.commandId, item.args)}
             >
-              <WorkbenchIcon id={item.icon} size={16} />
+              <WorkbenchIcon id={item.icon} size={14} />
             </IconButton>
           );
         })}

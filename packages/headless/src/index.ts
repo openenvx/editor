@@ -72,13 +72,7 @@ export {
   type SidebarHeaderDescriptor,
   type SidebarHeaderTitleBinding,
 } from './contributions/sidebar-header-contribution';
-export {
-  ToolbarContribution,
-  type ToolbarCommandItemDescriptor,
-  type ToolbarDropdownItemDescriptor,
-  type ToolbarItemDescriptor,
-  type ToolbarSeparatorItemDescriptor,
-} from './contributions/toolbar-contribution';
+export { ToolbarContribution } from './contributions/toolbar-contribution';
 
 export {
   MenuBuilder,
@@ -129,8 +123,15 @@ export {
   ToolbarBuilder,
   createToolbarBuilder,
   isToolbarDropdownItem,
+  isToolbarTopPlacement,
+  TOOLBAR_PLACEMENTS,
   type ToolbarCommandOptions,
   type ToolbarDropdownOptions,
+  type ToolbarItemDescriptor,
+  type ToolbarCommandItemDescriptor,
+  type ToolbarSeparatorItemDescriptor,
+  type ToolbarDropdownItemDescriptor,
+  type ToolbarPlacement,
 } from './builders/toolbar-builder';
 export {
   type ShellDropdownItemBase,

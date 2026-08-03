@@ -22,6 +22,7 @@ export {
   createHtmlLayerDefinition,
   type CreateHtmlLayerDefinitionOptions,
 } from './create-html-layer-definition';
+export { DEFAULT_HTML_LAYOUT } from './default-html-layout';
 export { HtmlContextMenu } from './contributions/html-context-menu';
 export {
   HTML_BLOCKS_CONTAINER_ID,
@@ -45,14 +46,25 @@ export { HtmlEditorPane } from './editor/html-editor-pane';
 export {
   clampHtmlZoom,
   DEFAULT_HTML_DEVICE_PRESET,
+  formatHtmlZoomLabel,
+  HTML_ZOOM_PRESETS,
   resolveAutoZoom,
   resolveFrameWidth,
   resolveScaledFrameWidth,
   stepHtmlZoom,
   type HtmlDevicePreset,
 } from './editor/html-device-preview';
-export { HtmlDeviceToolbar } from './editor/html-device-toolbar';
 export { useHtmlDeviceStageMetrics } from './editor/use-html-device-stage-metrics';
+export { useHtmlPreviewChrome } from './editor/use-html-preview-chrome';
+export { HtmlToolbarContribution } from './contributions/html-toolbar-contribution';
+export {
+  HtmlPreviewChromeServiceId,
+  HtmlPreviewChromeServiceImpl,
+  type HtmlPreviewChromeService,
+  type HtmlPreviewChromeState,
+} from './preview/html-preview-chrome-service';
+export { registerHtmlPreviewChrome } from './preview/register-html-preview-chrome';
+export { createHtmlPreviewCommands } from './commands/create-html-preview-commands';
 export {
   alignDataPathFromHtmlPath,
   parseRichTextAlign,
