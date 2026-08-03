@@ -27,8 +27,10 @@ import {
 import type { BlockRegistry } from '../block-registry';
 import { getBlockChildren } from '../tree/block-tree';
 import {
+  childrenUseInlineChrome,
   insertLineIsVertical,
   insertLineTargetIds,
+  resolveInsertLineAxis,
   sortInsertLineIndex,
   type BlockDragData,
   type BlockSortDraft,
@@ -129,6 +131,7 @@ function BlockChrome({
   canDuplicate,
   canRemove,
   insideWidget = false,
+  chromeDisplay = 'block',
   setNodeRef,
   sortableProps,
   children,
@@ -149,6 +152,7 @@ function BlockChrome({
   canRemove: boolean;
   /** True when this block is under an `openenvx.widget` ancestor (or is one). */
   insideWidget?: boolean;
+  chromeDisplay?: 'block' | 'inline';
   setNodeRef?: (node: HTMLElement | null) => void;
   sortableProps?: Record<string, unknown>;
   children: ReactNode;
@@ -174,6 +178,17 @@ function BlockChrome({
   const handleClick = useCallback(
     (event: MouseEvent) => {
       event.stopPropagation();
+      // React-Email Button/Link render <a href> — don't navigate / hash-scroll in the editor.
+      const target = event.target;
+      const el =
+        target instanceof Element
+          ? target
+          : target instanceof Node
+            ? target.parentElement
+            : null;
+      if (el?.closest('a[href]')) {
+        event.preventDefault();
+      }
       activate();
     },
     [activate]
@@ -243,6 +258,7 @@ function BlockChrome({
     <div
       className={[
         styles.blockWrap,
+        chromeDisplay === 'inline' ? styles.blockWrapInline : '',
         selected ? styles.blockWrapSelected : '',
         hovered ? styles.blockWrapHovered : '',
         dragDisabled ? '' : styles.blockWrapDraggable,
@@ -298,10 +314,14 @@ function SortableChildren({
   const itemIds = visibleEntries.map(({ child }) => child.id);
   const lineIndex = sortInsertLineIndex(sortDraft, parentId);
   const activeId = sortDraft?.parentId === parentId ? sortDraft.activeId : null;
+  const chromeDisplayFor = (type: string) => registry.get(type)?.chromeDisplay;
   const verticalLine = insertLineIsVertical(
     parentType,
     parentData,
-    registry.get(parentType)?.insertLineAxis
+    resolveInsertLineAxis(
+      registry.get(parentType)?.insertLineAxis,
+      childrenUseInlineChrome(layers, chromeDisplayFor)
+    )
   );
   const { beforeId, afterId } = insertLineTargetIds(
     itemIds,
@@ -347,10 +367,14 @@ function ContainerChildren({
     !sortDraft.containerPreview;
   const empty = visibleCount === 0 && !showInsertLine;
   const parentData = layerDataRecord(layer);
+  const chromeDisplayFor = (type: string) => registry.get(type)?.chromeDisplay;
   const verticalLine = insertLineIsVertical(
     layer.type,
     parentData,
-    registry.get(layer.type)?.insertLineAxis
+    resolveInsertLineAxis(
+      registry.get(layer.type)?.insertLineAxis,
+      childrenUseInlineChrome(children, chromeDisplayFor)
+    )
   );
   const childInsideWidget = insideWidget || layer.type === WIDGET_LAYER_TYPE;
 
@@ -656,6 +680,7 @@ function SortableBlockNode({
     <BlockChrome
       canDuplicate={canDuplicate}
       canRemove={canRemove}
+      chromeDisplay={config.chromeDisplay ?? 'block'}
       dragDisabled={dragDisabled}
       dropContainerPreview={dropContainerPreview}
       editing={editing}

@@ -633,6 +633,31 @@ describe(WorkbenchController, () => {
     ).toThrow(SceneValidationError);
   });
 
+  it("loadScene pushes history so undo restores the prior scene", async () => {
+    const { SCHEMA_VERSION } = await import('@openenvx/schema');
+    const controller = new WorkbenchController({
+      plugins: [new EmptyPlugin()],
+    });
+    await controller.start();
+    const beforeName = controller.getState().scene.pages[0]!.name;
+
+    controller.loadScene({
+      schemaVersion: SCHEMA_VERSION,
+      pages: [
+        {
+          id: "tpl",
+          name: "Template",
+          layout: "email",
+          layers: [],
+        },
+      ],
+    });
+    expect(controller.getState().scene.pages[0]!.name).toBe("Template");
+    expect(controller.api.scene.canUndo()).toBe(true);
+    expect(controller.api.scene.undo()).toBe(true);
+    expect(controller.getState().scene.pages[0]!.name).toBe(beforeName);
+  });
+
   it("setHoveredLayer updates state without rebuilding scene slice", async () => {
     const controller = new WorkbenchController({
       plugins: [new EmptyPlugin()],

@@ -4,12 +4,14 @@ import { describe, expect, it } from 'vitest';
 import {
   buildCrossParentDraft,
   cancelCrossParentDraftOnSourceParent,
+  childrenUseInlineChrome,
   insertLineIsVertical,
   insertLineTargetIds,
   isBlockDndData,
   mergeVisibleDraftIntoFullOrder,
   resolveBlockDragEnd,
   resolveBlockDrop,
+  resolveInsertLineAxis,
   resolveSameParentSortFromDraft,
   sameCrossParentDraft,
   shouldIgnoreOverWhileCrossParent,
@@ -396,6 +398,39 @@ describe('insertLineIsVertical', () => {
     expect(insertLineIsVertical('html.flex', { direction: 'row' }, 'horizontal')).toBe(
       false
     );
+  });
+});
+
+describe('resolveInsertLineAxis / childrenUseInlineChrome', () => {
+  it('prefers config axis over inline-chrome siblings', () => {
+    expect(resolveInsertLineAxis('horizontal', true)).toBe('horizontal');
+    expect(resolveInsertLineAxis('vertical', true)).toBe('vertical');
+  });
+
+  it('uses vertical axis when all visible children are inline chrome', () => {
+    expect(resolveInsertLineAxis(undefined, true)).toBe('vertical');
+    expect(resolveInsertLineAxis(undefined, false)).toBeUndefined();
+  });
+
+  it('detects inline-chrome children', () => {
+    expect(
+      childrenUseInlineChrome(
+        [
+          { id: 'a', type: 'email.imageLink', data: {} },
+          { id: 'b', type: 'email.imageLink', data: {} },
+        ],
+        (type) => (type === 'email.imageLink' ? 'inline' : 'block')
+      )
+    ).toBe(true);
+    expect(
+      childrenUseInlineChrome(
+        [
+          { id: 'a', type: 'email.imageLink', data: {} },
+          { id: 'b', type: 'email.text', data: {} },
+        ],
+        (type) => (type === 'email.imageLink' ? 'inline' : 'block')
+      )
+    ).toBe(false);
   });
 });
 

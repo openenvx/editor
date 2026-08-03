@@ -6,6 +6,32 @@ import {
 import { isLayerVisible } from '@openenvx/core';
 import type { Layer } from '@openenvx/schema';
 
+/** True when every visible child hugs content (e.g. email.imageLink row). */
+export function childrenUseInlineChrome(
+  layers: readonly Layer[],
+  chromeDisplayFor: (type: string) => 'block' | 'inline' | undefined
+): boolean {
+  const visible = layers.filter(isLayerVisible);
+  return (
+    visible.length > 0 &&
+    visible.every((layer) => chromeDisplayFor(layer.type) === 'inline')
+  );
+}
+
+/**
+ * Config axis wins; otherwise inline-chrome siblings get a horizontal row
+ * (vertical insert markers between left/right neighbors).
+ */
+export function resolveInsertLineAxis(
+  configAxis: 'vertical' | 'horizontal' | undefined,
+  inlineChromeChildren: boolean
+): 'vertical' | 'horizontal' | undefined {
+  if (configAxis) {
+    return configAxis;
+  }
+  return inlineChromeChildren ? 'vertical' : undefined;
+}
+
 export interface BlockSortDraft {
   activeId: string;
   /** Original parent when the drag started. */

@@ -174,9 +174,23 @@ export class SceneStore {
   }
 
   setScene(scene: Scene): void {
-    // Full validation: load / trust-boundary replace.
+    // Full validation: load / trust-boundary replace (no history — clipboard /
+    // hydrate paths that must not invent an undo step).
     this.scene = this.finalizeSceneFull(scene);
     this.syncEditorStateToScene();
+    this.bumpContentRevision();
+    this.notify();
+  }
+
+  /**
+   * User-facing full replace (e.g. load a template). Pushes the current
+   * snapshot onto undo so the previous document can be restored.
+   */
+  replaceScene(scene: Scene): void {
+    const before = this.captureSnapshot();
+    this.scene = this.finalizeSceneFull(scene);
+    this.syncEditorStateToScene();
+    this.history.push(before);
     this.bumpContentRevision();
     this.notify();
   }

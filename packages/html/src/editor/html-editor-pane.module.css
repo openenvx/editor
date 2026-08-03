@@ -94,6 +94,13 @@
   padding: 6px;
 }
 
+/* Hugs content so siblings can sit in a row (social image links, etc.). */
+.blockWrapInline {
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 100%;
+}
+
 .blockWrapDraggable {
   cursor: grab;
   touch-action: none;

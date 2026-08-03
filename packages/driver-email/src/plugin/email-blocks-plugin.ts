@@ -10,6 +10,7 @@ import {
 import { builtinEmailBlocks } from '../blocks/builtin-blocks';
 import { emailPatternBlocks, emailPatternPartBlocks } from '../blocks/patterns';
 import { OpenEmailBlocksSheetCommand } from '../commands/open-blocks-sheet-command';
+import { OpenEmailTemplatesSheetCommand } from '../commands/open-templates-sheet-command';
 import {
   EmailElementsContainer,
   EmailElementsView,
@@ -21,9 +22,15 @@ import {
   EmailPatternsView,
   EMAIL_PATTERNS_PANEL_COMPONENT_ID,
 } from '../contributions/email-patterns-sidebar';
+import {
+  EmailTemplatesContainer,
+  EmailTemplatesView,
+  EMAIL_TEMPLATES_PANEL_COMPONENT_ID,
+} from '../contributions/email-templates-sidebar';
 import { EmailBlockPalettePanel } from '../editor/block-palette-panel';
 import { EmailEditorPane } from '../editor/email-editor-pane';
 import { EmailPatternBlocksGallery } from '../editor/pattern-blocks-gallery';
+import { EmailTemplatesGallery } from '../editor/templates-gallery';
 
 const allEmailBlocks = [
   ...builtinEmailBlocks,
@@ -45,6 +52,7 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
         () => emailBlockRegistry
       ),
       new OpenEmailBlocksSheetCommand(),
+      new OpenEmailTemplatesSheetCommand(),
       ...allEmailBlocks.map((block) =>
         createHtmlLayerDefinition(block, {
           registryServiceId: EmailBlockRegistryServiceId,
@@ -61,6 +69,8 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
 
     ctx.registerWorkbench(
       new EmailContextMenu(),
+      new EmailTemplatesContainer(),
+      new EmailTemplatesView(),
       new EmailPatternsContainer(),
       new EmailPatternsView(),
       new EmailElementsContainer(),
@@ -73,6 +83,10 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
     ctx.registerViewPanel(
       EMAIL_PATTERNS_PANEL_COMPONENT_ID,
       EmailPatternBlocksGallery
+    );
+    ctx.registerViewPanel(
+      EMAIL_TEMPLATES_PANEL_COMPONENT_ID,
+      EmailTemplatesGallery
     );
     ctx.registerEditorPane('email', EmailEditorPane);
   }

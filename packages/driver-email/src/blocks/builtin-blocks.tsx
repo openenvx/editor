@@ -14,6 +14,8 @@ import {
 } from '@react-email/components';
 import type { CSSProperties } from 'react';
 
+import { imageLinkBlock } from './image-link';
+
 const EMAIL_WIDTH = 600;
 
 export const rootBlock: BlockConfig = {
@@ -67,10 +69,12 @@ export const sectionBlock: BlockConfig = {
   fields: {
     background: { kind: 'color', label: 'Background' },
     padding: { kind: 'number', label: 'Padding (px)' },
+    align: { kind: 'align', label: 'Align' },
   },
   defaultData: {
     background: 'transparent',
     padding: 24,
+    align: 'left',
     children: [],
   },
   acceptsChildren: true,
@@ -79,6 +83,7 @@ export const sectionBlock: BlockConfig = {
       style={{
         background: String(data.background ?? 'transparent'),
         padding: Number(data.padding ?? 24),
+        textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
       }}
     >
       {children}
@@ -253,17 +258,20 @@ export const imageBlock: BlockConfig = {
     width: { kind: 'number', label: 'Width (px)' },
     height: { kind: 'number', label: 'Height (px)' },
     borderRadius: { kind: 'number', label: 'Radius (px)' },
+    align: { kind: 'align', label: 'Align' },
   },
   defaultData: {
     src: 'https://placehold.co/600x200',
     alt: 'Placeholder',
     width: 600,
+    align: 'left',
   },
   render: ({ data }) => {
     const height = Number(data.height);
     const hasHeight = Number.isFinite(height) && height > 0;
     const borderRadius = Number(data.borderRadius);
     const hasRadius = Number.isFinite(borderRadius) && borderRadius > 0;
+    const align = String(data.align ?? 'left');
     return (
       <Img
         alt={String(data.alt ?? '')}
@@ -273,7 +281,10 @@ export const imageBlock: BlockConfig = {
           display: 'block',
           maxWidth: '100%',
           height: hasHeight ? height : 'auto',
-          margin: hasHeight ? 0 : '0 0 16px',
+          marginTop: 0,
+          marginBottom: hasHeight ? 0 : 16,
+          marginLeft: align === 'center' || align === 'right' ? 'auto' : 0,
+          marginRight: align === 'center' ? 'auto' : 0,
           borderRadius: hasRadius ? borderRadius : undefined,
           objectFit: hasHeight ? 'cover' : undefined,
         }}
@@ -328,6 +339,7 @@ export const builtinEmailBlocks: BlockConfig[] = [
   textBlock,
   buttonBlock,
   imageBlock,
+  imageLinkBlock,
   dividerBlock,
   spacerBlock,
 ];

@@ -201,5 +201,5 @@ export function loadScene(deps: DocumentOpsDeps, scene: Scene): void {
   }
   const normalized = normalizeScene(scene);
   hydrateAssets(deps, normalized.assets);
-  deps.sceneStore.setScene(normalized);
+  deps.sceneStore.replaceScene(normalized);
 }

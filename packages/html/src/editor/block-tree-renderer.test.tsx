@@ -332,4 +332,65 @@ describe('BlockTreeRenderer', () => {
     );
     expect(screen.getByText('Flex item')).toBeTruthy();
   });
+
+  it('uses inline chrome when BlockConfig.chromeDisplay is inline', () => {
+    const registry = createBlockRegistry();
+    registry.register({
+      type: 'html.inlineChip',
+      label: 'Chip',
+      chromeDisplay: 'inline',
+      fields: {},
+      defaultData: { html: 'chip' },
+      render: ({ data }) => <span>{String(data.html ?? '')}</span>,
+    });
+    const scene = {
+      schemaVersion: createHtmlDemoScene().schemaVersion,
+      pages: [
+        {
+          id: 'page-1',
+          name: 'Page',
+          layout: 'html' as const,
+          layers: [
+            {
+              id: 'root',
+              type: 'html.root',
+              data: {
+                children: [
+                  {
+                    id: 'chip-1',
+                    type: 'html.inlineChip',
+                    data: { html: 'chip-a' },
+                  },
+                  {
+                    id: 'chip-2',
+                    type: 'html.inlineChip',
+                    data: { html: 'chip-b' },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    };
+    render(
+      <DndContext>
+        <BlockTreeRenderer
+          editingTarget={null}
+          layers={scene.pages[0]!.layers}
+          registry={registry}
+          scene={scene}
+          selectedId={null}
+          sortDraft={null}
+          onCommitEdit={vi.fn()}
+          onDuplicate={vi.fn()}
+          onRemove={vi.fn()}
+          onSelect={vi.fn()}
+          onStartEdit={vi.fn()}
+        />
+      </DndContext>
+    );
+    const wrap = screen.getByText('chip-a').closest('[data-layer-id]');
+    expect(wrap?.className).toContain('blockWrapInline');
+  });
 });

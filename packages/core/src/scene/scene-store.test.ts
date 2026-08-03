@@ -90,6 +90,63 @@ describe(SceneStore, () => {
     expect(store.getScene().pages[0]!.layers).toHaveLength(0);
   });
 
+  it("replaceScene pushes history so undo restores the prior scene", () => {
+    const store = new SceneStore();
+    const pageId = store.getScene().pages[0]!.id;
+    store.apply({
+      apply: (scene) => ({
+        ...scene,
+        pages: scene.pages.map((p) =>
+          p.id === pageId
+            ? {
+                ...p,
+                layers: [{ id: "keep", type: "text", data: { text: "A" } }],
+              }
+            : p
+        ),
+      }),
+      label: "Seed",
+    });
+
+    store.replaceScene({
+      schemaVersion: 2,
+      pages: [
+        {
+          id: "email-page",
+          name: "Template",
+          layout: "email",
+          layers: [{ id: "root", type: "email.root", data: { children: [] } }],
+        },
+      ],
+    });
+
+    expect(store.getScene().pages[0]!.name).toBe("Template");
+    expect(store.canUndo()).toBe(true);
+    expect(store.undo()).toBeTruthy();
+    expect(store.getScene().pages[0]!.layers.map((l) => l.id)).toStrictEqual([
+      "keep",
+    ]);
+  });
+
+  it("setScene replaces without an extra history entry", () => {
+    const store = new SceneStore();
+    const beforeName = store.getScene().pages[0]!.name;
+    store.setScene({
+      schemaVersion: 2,
+      pages: [
+        {
+          id: "p2",
+          name: "Replaced",
+          layout: "flow",
+          layers: [],
+        },
+      ],
+    });
+    expect(store.getScene().pages[0]!.name).toBe("Replaced");
+    expect(store.canUndo()).toBe(false);
+    expect(beforeName).not.toBe("Replaced");
+  });
+
   it("supports multi-select", () => {
     const store = new SceneStore();
     const pageId = store.getScene().pages[0]!.id;

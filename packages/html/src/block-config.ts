@@ -52,6 +52,12 @@ export interface BlockConfig {
    * `direction` and `html.grid` defaults to vertical.
    */
   insertLineAxis?: 'vertical' | 'horizontal';
+  /**
+   * Editor selection chrome around this block. `inline` hugs content so
+   * siblings can sit in a row (e.g. ConfirmEmail social icon links).
+   * Default `block` (full-width stack).
+   */
+  chromeDisplay?: 'block' | 'inline';
   /** Named slots whose parts are real layers under `data.slots` (invisible to the Layers tree). */
   slots?: Record<string, SlotDef>;
   render: (props: BlockRenderProps) => ReactElement;
