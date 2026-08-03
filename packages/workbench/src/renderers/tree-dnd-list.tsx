@@ -5,7 +5,6 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import type { DragMoveEvent } from '@dnd-kit/core';
 import type { ViewTreeItem } from '@openenvx/headless';
 import { memo, useCallback, useRef, useState } from 'react';
 
@@ -26,10 +25,12 @@ import styles from './view-panel.module.css';
 
 export type TreeMovePosition = 'before' | 'after' | 'inside';
 
-interface DropLineState {
-  top: number;
-  left: number;
-  projection: DropProjection;
+interface DropIndicatorState {
+  /** Pixel top for the insert line; null when highlighting a container. */
+  lineTop: number | null;
+  lineLeft: number;
+  /** Container row highlighted for nest-into. */
+  nestTargetId: string | null;
 }
 
 interface TreeDndListProps {
@@ -63,6 +64,7 @@ const DraggableTreeRow = memo(
     isHovered,
     isDragging,
     isDragActive,
+    isDropNestTarget,
     isCollapsed,
     onSelect,
     onHover,
@@ -76,6 +78,7 @@ const DraggableTreeRow = memo(
     isHovered: boolean;
     isDragging: boolean;
     isDragActive: boolean;
+    isDropNestTarget: boolean;
     isCollapsed: boolean;
     onSelect: (options?: { additive?: boolean }) => void;
     onHover: () => void;
@@ -93,6 +96,7 @@ const DraggableTreeRow = memo(
         className={treeItemClassName(item, {
           isDragActive,
           isDragging,
+          isDropNestTarget,
           isHovered,
           isSelected,
         })}
@@ -139,11 +143,13 @@ export const TreeDndList = memo(
     const containerRef = useRef<HTMLDivElement>(null);
     const rowRefs = useRef(new Map<string, HTMLDivElement>());
     const pointerYRef = useRef(0);
-    const dragOffsetXRef = useRef(0);
+    const activeIdRef = useRef<string | null>(null);
+    const projectionRef = useRef<DropProjection | null>(null);
     const flatItems = buildFlatTree(items, collapsed);
 
     const [activeId, setActiveId] = useState<string | null>(null);
-    const [dropLine, setDropLine] = useState<DropLineState | null>(null);
+    const [dropIndicator, setDropIndicator] =
+      useState<DropIndicatorState | null>(null);
 
     const sensors = useSensors(
       useSensor(PointerSensor, {
@@ -170,10 +176,12 @@ export const TreeDndList = memo(
       return rects;
     }, []);
 
-    const updateDropLine = useCallback(
-      (clientY: number, offsetX: number) => {
-        if (!activeId || !containerRef.current) {
-          setDropLine(null);
+    const updateDropIndicator = useCallback(
+      (clientY: number) => {
+        const currentActiveId = activeIdRef.current;
+        if (!currentActiveId || !containerRef.current) {
+          projectionRef.current = null;
+          setDropIndicator(null);
           return;
         }
 
@@ -183,43 +191,63 @@ export const TreeDndList = memo(
           clientY
         );
         if (!pointerTarget) {
-          setDropLine(null);
+          projectionRef.current = null;
+          setDropIndicator(null);
           return;
         }
 
         const row = rowRefs.current.get(pointerTarget.overId);
         const containerRect = containerRef.current.getBoundingClientRect();
         if (!row) {
-          setDropLine(null);
+          projectionRef.current = null;
+          setDropIndicator(null);
           return;
         }
 
         const rowRect = row.getBoundingClientRect();
         const projection = getProjection(
           flatItems,
-          activeId,
+          currentActiveId,
           pointerTarget.overId,
-          offsetX,
           pointerTarget.zone
         );
         if (!projection) {
-          setDropLine(null);
+          projectionRef.current = null;
+          setDropIndicator(null);
           return;
         }
 
-        const activeItem = flatItems.find((item) => item.id === activeId);
+        const activeItem = flatItems.find(
+          (item) => item.id === currentActiveId
+        );
         if (!activeItem || isInvalidMove(flatItems, activeItem, projection)) {
-          setDropLine(null);
+          projectionRef.current = null;
+          setDropIndicator(null);
           return;
         }
 
-        setDropLine({
-          left: treePaddingLeft(projection.depth),
-          projection,
-          top: getDropLineTop(pointerTarget.zone, rowRect, containerRect.top),
+        projectionRef.current = projection;
+
+        if (projection.position === 'inside') {
+          setDropIndicator({
+            lineLeft: treePaddingLeft(projection.depth),
+            lineTop: null,
+            nestTargetId: projection.overId,
+          });
+          return;
+        }
+
+        setDropIndicator({
+          lineLeft: treePaddingLeft(projection.depth),
+          lineTop: getDropLineTop(
+            projection.zone === 'before' ? 'before' : 'after',
+            rowRect,
+            containerRect.top
+          ),
+          nestTargetId: null,
         });
       },
-      [activeId, flatItems, getRowRects]
+      [flatItems, getRowRects]
     );
 
     const pointerMoveHandlerRef = useRef<
@@ -229,11 +257,11 @@ export const TreeDndList = memo(
     const attachPointerMoveListener = useCallback(() => {
       const onPointerMove = (event: PointerEvent) => {
         pointerYRef.current = event.clientY;
-        updateDropLine(event.clientY, dragOffsetXRef.current);
+        updateDropIndicator(event.clientY);
       };
       pointerMoveHandlerRef.current = onPointerMove;
       document.addEventListener('pointermove', onPointerMove);
-    }, [updateDropLine]);
+    }, [updateDropIndicator]);
 
     const detachPointerMoveListener = useCallback(() => {
       const handler = pointerMoveHandlerRef.current;
@@ -246,62 +274,56 @@ export const TreeDndList = memo(
     const handleDragStart = useCallback(
       (event: { active: { id: string | number }; activatorEvent: Event }) => {
         const pointerEvent = event.activatorEvent as PointerEvent;
+        const id = String(event.active.id);
         pointerYRef.current = pointerEvent.clientY;
-        dragOffsetXRef.current = 0;
-        setActiveId(String(event.active.id));
-        updateDropLine(pointerEvent.clientY, 0);
+        activeIdRef.current = id;
+        setActiveId(id);
+        updateDropIndicator(pointerEvent.clientY);
         attachPointerMoveListener();
       },
-      [attachPointerMoveListener, updateDropLine]
-    );
-
-    const handleDragMove = useCallback(
-      (event: DragMoveEvent) => {
-        dragOffsetXRef.current = event.delta.x;
-        updateDropLine(pointerYRef.current, event.delta.x);
-      },
-      [updateDropLine]
+      [attachPointerMoveListener, updateDropIndicator]
     );
 
     const handleDragEnd = useCallback(() => {
       detachPointerMoveListener();
-      const currentActiveId = activeId;
-      const offsetX = dragOffsetXRef.current;
+      const currentActiveId = activeIdRef.current;
       const clientY = pointerYRef.current;
+      let commitProjection = projectionRef.current;
 
+      activeIdRef.current = null;
       setActiveId(null);
-      dragOffsetXRef.current = 0;
-      setDropLine(null);
+      projectionRef.current = null;
+      setDropIndicator(null);
 
       if (!currentActiveId) {
         return;
       }
 
-      const pointerTarget = findPointerTarget(
-        flatItems,
-        getRowRects(),
-        clientY
-      );
-      if (!pointerTarget) {
-        return;
+      if (!commitProjection) {
+        const pointerTarget = findPointerTarget(
+          flatItems,
+          getRowRects(),
+          clientY
+        );
+        if (!pointerTarget) {
+          return;
+        }
+        commitProjection = getProjection(
+          flatItems,
+          currentActiveId,
+          pointerTarget.overId,
+          pointerTarget.zone
+        );
       }
-
-      const projection = getProjection(
-        flatItems,
-        currentActiveId,
-        pointerTarget.overId,
-        offsetX,
-        pointerTarget.zone
-      );
-      if (!projection) {
+      if (!commitProjection) {
         return;
       }
 
       const activeItem = flatItems.find((item) => item.id === currentActiveId);
       if (
         !activeItem ||
-        isInvalidMove(flatItems, activeItem, projection) ||
-        isNoOpMove(flatItems, activeItem, projection)
+        isInvalidMove(flatItems, activeItem, commitProjection) ||
+        isNoOpMove(flatItems, activeItem, commitProjection)
       ) {
         return;
       }
@@ -310,7 +332,7 @@ export const TreeDndList = memo(
         flatItems,
         items,
         currentActiveId,
-        projection,
+        commitProjection,
         collapsed
       );
       if (!move) {
@@ -319,7 +341,6 @@ export const TreeDndList = memo(
 
       onMove(activeItem.source, move.target.source, move.position);
     }, [
-      activeId,
       collapsed,
       detachPointerMoveListener,
       flatItems,
@@ -330,9 +351,10 @@ export const TreeDndList = memo(
 
     const handleDragCancel = useCallback(() => {
       detachPointerMoveListener();
+      activeIdRef.current = null;
       setActiveId(null);
-      dragOffsetXRef.current = 0;
-      setDropLine(null);
+      projectionRef.current = null;
+      setDropIndicator(null);
     }, [detachPointerMoveListener]);
 
     const isDragActive = activeId !== null;
@@ -341,7 +363,6 @@ export const TreeDndList = memo(
       <DndContext
         onDragCancel={handleDragCancel}
         onDragEnd={handleDragEnd}
-        onDragMove={handleDragMove}
         onDragStart={handleDragStart}
         sensors={sensors}
       >
@@ -364,6 +385,7 @@ export const TreeDndList = memo(
                 isCollapsed={isCollapsed}
                 isDragActive={isDragActive}
                 isDragging={activeId === item.id}
+                isDropNestTarget={dropIndicator?.nestTargetId === item.id}
                 isHovered={isHovered}
                 isSelected={isSelected}
                 item={item}
@@ -377,13 +399,13 @@ export const TreeDndList = memo(
             );
           })}
 
-          {dropLine ? (
+          {dropIndicator && dropIndicator.lineTop !== null ? (
             <div
               aria-hidden
               className={styles.dropIndicatorLine}
               style={{
-                left: `${dropLine.left}px`,
-                top: `${dropLine.top}px`,
+                left: `${dropIndicator.lineLeft}px`,
+                top: `${dropIndicator.lineTop}px`,
               }}
             />
           ) : null}

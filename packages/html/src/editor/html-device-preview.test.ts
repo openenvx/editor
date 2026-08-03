@@ -12,7 +12,6 @@ import {
 describe('html-device-preview', () => {
   it('resolves fixed and fluid frame widths', () => {
     expect(resolveFrameWidth('mobile', 1200)).toBe(390);
-    expect(resolveFrameWidth('tablet', 1200)).toBe(768);
     expect(resolveFrameWidth('desktop', 1200)).toBe(1280);
     expect(resolveFrameWidth('fluid', 1200)).toBe(1200);
     expect(resolveFrameWidth('fluid', 0)).toBe(0);

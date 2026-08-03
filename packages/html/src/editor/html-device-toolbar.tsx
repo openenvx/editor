@@ -1,12 +1,10 @@
+import { Maximize2, Monitor, Smartphone, ZoomIn, ZoomOut } from 'lucide-react';
 import {
-  Maximize2,
-  Monitor,
-  Smartphone,
-  Tablet,
-  ZoomIn,
-  ZoomOut,
-} from 'lucide-react';
-import { memo, type ChangeEvent, type PointerEvent } from 'react';
+  memo,
+  type ChangeEvent,
+  type PointerEvent,
+  type ReactNode,
+} from 'react';
 
 import {
   formatHtmlZoomLabel,
@@ -28,7 +26,6 @@ const DEVICE_BUTTONS: {
   Icon: typeof Smartphone;
 }[] = [
   { preset: 'mobile', label: 'Mobile', Icon: Smartphone },
-  { preset: 'tablet', label: 'Tablet', Icon: Tablet },
   { preset: 'desktop', label: 'Desktop', Icon: Monitor },
 ];
 
@@ -48,6 +45,8 @@ export interface HtmlDeviceToolbarProps {
   onZoomOut: () => void;
   onZoomAuto: () => void;
   onZoomPercent: (zoom: number) => void;
+  /** Optional controls after zoom (e.g. email Edit / Preview). */
+  trailing?: ReactNode;
 }
 
 export const HtmlDeviceToolbar = memo(
@@ -61,6 +60,7 @@ export const HtmlDeviceToolbar = memo(
     onZoomOut,
     onZoomAuto,
     onZoomPercent,
+    trailing,
   }: HtmlDeviceToolbarProps) => {
     const canZoomOut = zoom > HTML_ZOOM_MIN + 0.001;
     const canZoomIn = zoom < HTML_ZOOM_MAX - 0.001;
@@ -166,6 +166,13 @@ export const HtmlDeviceToolbar = memo(
             <option value="custom">{formatHtmlZoomLabel(zoom, false)}</option>
           ) : null}
         </select>
+
+        {trailing ? (
+          <>
+            <span aria-hidden className={styles.divider} />
+            {trailing}
+          </>
+        ) : null}
       </div>
     );
   }

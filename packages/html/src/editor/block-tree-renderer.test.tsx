@@ -393,4 +393,89 @@ describe('BlockTreeRenderer', () => {
     const wrap = screen.getByText('chip-a').closest('[data-layer-id]');
     expect(wrap?.className).toContain('blockWrapInline');
   });
+
+  it('uses contents chrome when BlockConfig.chromeDisplay is contents', () => {
+    const registry = createBlockRegistry();
+    registry.register({
+      type: 'html.cell',
+      label: 'Cell',
+      chromeDisplay: 'contents',
+      fields: {},
+      defaultData: {},
+      render: ({ children }) => <td>{children}</td>,
+    });
+    registry.register({
+      type: 'html.rowLike',
+      label: 'Row',
+      acceptsChildren: true,
+      fields: {},
+      defaultData: { children: [] },
+      render: ({ children }) => (
+        <table>
+          <tbody>
+            <tr>{children}</tr>
+          </tbody>
+        </table>
+      ),
+    });
+    const scene = {
+      schemaVersion: createHtmlDemoScene().schemaVersion,
+      pages: [
+        {
+          id: 'page-1',
+          name: 'Page',
+          layout: 'html' as const,
+          layers: [
+            {
+              id: 'root',
+              type: 'html.root',
+              data: {
+                children: [
+                  {
+                    id: 'row-1',
+                    type: 'html.rowLike',
+                    data: {
+                      children: [
+                        {
+                          id: 'cell-1',
+                          type: 'html.cell',
+                          data: { children: [] },
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    };
+    const { container } = render(
+      <DndContext>
+        <BlockTreeRenderer
+          editingTarget={null}
+          layers={scene.pages[0]!.layers}
+          registry={registry}
+          scene={scene}
+          selectedId="cell-1"
+          sortDraft={null}
+          onCommitEdit={vi.fn()}
+          onDuplicate={vi.fn()}
+          onRemove={vi.fn()}
+          onSelect={vi.fn()}
+          onStartEdit={vi.fn()}
+        />
+      </DndContext>
+    );
+    const cellWrap = container.querySelector('[data-layer-id="cell-1"]');
+    expect(cellWrap?.className).toContain('blockWrapContents');
+    expect(cellWrap?.className).toContain('blockWrapSelected');
+    const cell = cellWrap?.querySelector(':scope > td');
+    expect(cell).toBeTruthy();
+    // Selection menu is omitted — contents has no box to anchor.
+    expect(
+      cellWrap?.querySelector('[aria-label="Cell actions"]')
+    ).toBeNull();
+  });
 });

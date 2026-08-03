@@ -1,11 +1,10 @@
-export type HtmlDevicePreset = 'mobile' | 'tablet' | 'desktop' | 'fluid';
+export type HtmlDevicePreset = 'mobile' | 'desktop' | 'fluid';
 
 export const HTML_DEVICE_WIDTHS: Record<
   Exclude<HtmlDevicePreset, 'fluid'>,
   number
 > = {
   mobile: 390,
-  tablet: 768,
   desktop: 1280,
 };
 

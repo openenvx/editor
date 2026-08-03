@@ -152,7 +152,7 @@ function BlockChrome({
   canRemove: boolean;
   /** True when this block is under an `openenvx.widget` ancestor (or is one). */
   insideWidget?: boolean;
-  chromeDisplay?: 'block' | 'inline';
+  chromeDisplay?: 'block' | 'inline' | 'contents';
   setNodeRef?: (node: HTMLElement | null) => void;
   sortableProps?: Record<string, unknown>;
   children: ReactNode;
@@ -244,6 +244,26 @@ function BlockChrome({
     onRemove(layer.id);
   }, [layer.id, onRemove]);
 
+  // display:contents has no box — dnd-kit must measure the first child (e.g. td).
+  const bindSortableRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (!setNodeRef) {
+        return;
+      }
+      if (!node) {
+        setNodeRef(null);
+        return;
+      }
+      if (chromeDisplay === 'contents') {
+        const child = node.firstElementChild;
+        setNodeRef(child instanceof HTMLElement ? child : node);
+        return;
+      }
+      setNodeRef(node);
+    },
+    [chromeDisplay, setNodeRef]
+  );
+
   const lineClass = insertLineVertical
     ? {
         before: styles.blockWrapInsertLineBeforeVertical,
@@ -259,6 +279,7 @@ function BlockChrome({
       className={[
         styles.blockWrap,
         chromeDisplay === 'inline' ? styles.blockWrapInline : '',
+        chromeDisplay === 'contents' ? styles.blockWrapContents : '',
         selected ? styles.blockWrapSelected : '',
         hovered ? styles.blockWrapHovered : '',
         dragDisabled ? '' : styles.blockWrapDraggable,
@@ -270,7 +291,7 @@ function BlockChrome({
         .filter(Boolean)
         .join(' ')}
       data-layer-id={layer.id}
-      ref={setNodeRef}
+      ref={bindSortableRef}
       role="treeitem"
       tabIndex={selected ? 0 : -1}
       onClick={handleClick}
@@ -280,7 +301,12 @@ function BlockChrome({
       onPointerLeave={handlePointerLeave}
       {...sortableProps}
     >
-      {selected && !editing && !isDraggingGhost ? (
+      {selected &&
+      !editing &&
+      !isDraggingGhost &&
+      // contents chrome has no box — menu only skipped for structural cases
+      // (e.g. email.column). Never use contents just to dodge layout chrome.
+      chromeDisplay !== 'contents' ? (
         <BlockSelectionMenu
           canDuplicate={canDuplicate}
           canRemove={canRemove}

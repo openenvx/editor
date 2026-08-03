@@ -3,8 +3,10 @@ import type { ViewTreeItem } from '@openenvx/headless';
 const TREE_INDENT_PX = 8;
 const TREE_BASE_PADDING_PX = 8;
 const DROP_LINE_HEIGHT_PX = 2;
+/** Edge strip for before/after on container rows; middle is nest-into. */
+const CONTAINER_EDGE_PX = 8;
 
-export type PointerZone = 'before' | 'after';
+export type PointerZone = 'before' | 'after' | 'inside';
 
 export interface FlatTreeItem extends ViewTreeItem {
   flatIndex: number;
@@ -75,7 +77,15 @@ export function buildFlatTree(
       parentId,
     });
 
-    if (item.hasChildren && !collapsed.has(item.id)) {
+    // Only push parents that actually show children — empty nestable rows
+    // stay nest targets without claiming the next sibling as their child.
+    const next = items[index + 1];
+    if (
+      item.hasChildren &&
+      !collapsed.has(item.id) &&
+      next &&
+      next.depth > item.depth
+    ) {
       parentStack.push(item.id);
     }
   }
@@ -107,67 +117,39 @@ export function findFirstChildInTree(
   return null;
 }
 
-function getDragDepth(offset: number, indentationWidth: number): number {
-  return Math.round(offset / indentationWidth);
-}
+function zoneForRow(
+  item: FlatTreeItem,
+  nextItem: FlatTreeItem | undefined,
+  rect: Pick<DOMRect, 'top' | 'bottom' | 'height'>,
+  clientY: number
+): PointerZone {
+  const y = clientY - rect.top;
+  const edge = Math.min(CONTAINER_EDGE_PX, Math.floor(rect.height / 3));
 
-function getMaxDepth(item: FlatTreeItem | undefined): number {
-  if (!item) {
-    return 0;
-  }
-  if (item.hasChildren) {
-    return item.depth + 1;
-  }
-  return item.depth;
-}
-
-function getMinDepth(item: FlatTreeItem | undefined): number {
-  return item?.depth ?? 0;
-}
-
-function findParentIdAtDepth(
-  items: FlatTreeItem[],
-  overIndex: number,
-  depth: number
-): string | null {
-  if (depth === 0) {
-    return null;
+  if (!item.hasChildren) {
+    return y < rect.height / 2 ? 'before' : 'after';
   }
 
-  for (let i = overIndex; i >= 0; i -= 1) {
-    const item = items[i]!;
-    if (item.depth === depth - 1) {
-      return item.id;
-    }
-    if (item.depth < depth - 1) {
-      break;
-    }
+  // Containers: top edge = sibling before; body = nest into.
+  if (y < edge) {
+    return 'before';
   }
 
-  return null;
-}
-
-function clampDepth(
-  projectedDepth: number,
-  maxDepth: number,
-  minDepth: number
-): number {
-  let depth = projectedDepth;
-  if (projectedDepth >= maxDepth) {
-    depth = maxDepth;
-  } else if (projectedDepth < minDepth) {
-    depth = minDepth;
+  // Bottom edge = sibling after only when the container has no visible kids
+  // (empty or collapsed) — otherwise bottom-of-header looks like "first child".
+  const showsChildren = Boolean(nextItem && nextItem.depth > item.depth);
+  if (!showsChildren && y >= rect.height - edge) {
+    return 'after';
   }
-  return depth;
+
+  return 'inside';
 }
 
 export function getProjection(
   items: FlatTreeItem[],
   activeId: string,
   overId: string,
-  dragOffset: number,
-  zone: PointerZone,
-  indentationWidth = TREE_INDENT_PX
+  zone: PointerZone
 ): DropProjection | null {
   const overIndex = items.findIndex((item) => item.id === overId);
   const activeIndex = items.findIndex((item) => item.id === activeId);
@@ -175,60 +157,33 @@ export function getProjection(
     return null;
   }
 
-  const activeItem = items[activeIndex]!;
   const overItem = items[overIndex]!;
-  const dragDepth = getDragDepth(dragOffset, indentationWidth);
-  const projectedDepth = activeItem.depth + dragDepth;
+
+  if (zone === 'inside') {
+    return {
+      depth: overItem.depth + 1,
+      overId,
+      parentId: overItem.id,
+      position: 'inside',
+      zone,
+    };
+  }
 
   if (zone === 'before') {
-    const previousItem = items[overIndex - 1];
-    const depth = clampDepth(
-      projectedDepth,
-      getMaxDepth(previousItem),
-      overItem.depth
-    );
-
     return {
-      depth,
+      depth: overItem.depth,
       overId,
-      parentId: findParentIdAtDepth(items, overIndex, depth),
+      parentId: overItem.parentId,
       position: 'before',
       zone,
     };
   }
 
-  const previousItem = overItem;
-  const nextItem = items[overIndex + 1];
-  let depth = clampDepth(
-    projectedDepth,
-    getMaxDepth(previousItem),
-    getMinDepth(nextItem)
-  );
-
-  let resolvedPosition: 'after' | 'inside' = 'after';
-
-  if (overItem.hasChildren) {
-    const outdentThreshold = -indentationWidth / 2;
-    if (dragOffset > outdentThreshold) {
-      resolvedPosition = 'inside';
-      depth = overItem.depth + 1;
-    } else {
-      depth = overItem.depth;
-    }
-  } else if (depth > overItem.depth) {
-    depth = overItem.depth;
-  }
-
-  const parentId =
-    resolvedPosition === 'inside'
-      ? overItem.id
-      : findParentIdAtDepth(items, overIndex, depth);
-
   return {
-    depth: resolvedPosition === 'inside' ? overItem.depth + 1 : depth,
+    depth: overItem.depth,
     overId,
-    parentId,
-    position: resolvedPosition,
+    parentId: overItem.parentId,
+    position: 'after',
     zone,
   };
 }
@@ -289,6 +244,7 @@ export function resolveMove(
     const firstChild = findFirstChildInTree(allItems, overItem.id);
     const groupCollapsed = collapsed.has(overItem.id);
 
+    // Collapsed folder: insert before first child (= first inside parent).
     if (firstChild && groupCollapsed) {
       const flatChild = items.find((item) => item.id === firstChild.id);
       return {
@@ -318,7 +274,7 @@ export function treePaddingLeft(depth: number): number {
 }
 
 export function getDropLineTop(
-  zone: PointerZone,
+  zone: Exclude<PointerZone, 'inside'>,
   rowRect: Pick<DOMRect, 'top' | 'bottom'>,
   containerTop: number
 ): number {
@@ -345,19 +301,22 @@ export function findPointerTarget(
 
   const lastItem = items.at(-1)!;
   const lastRect = rowRects.get(lastItem.id);
+  // Past the list = sibling after last row — never nest-into (even empty containers).
   if (lastRect && clientY >= lastRect.bottom) {
     return { overId: lastItem.id, zone: 'after' };
   }
 
-  for (const item of items) {
+  for (let index = 0; index < items.length; index += 1) {
+    const item = items[index]!;
     const rect = rowRects.get(item.id);
     if (!rect) {
       continue;
     }
     if (clientY >= rect.top && clientY < rect.bottom) {
-      const zone: PointerZone =
-        clientY < rect.top + rect.height / 2 ? 'before' : 'after';
-      return { overId: item.id, zone };
+      return {
+        overId: item.id,
+        zone: zoneForRow(item, items[index + 1], rect, clientY),
+      };
     }
   }
 

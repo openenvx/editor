@@ -1,24 +1,23 @@
 import type { HtmlDevicePreset } from '@openenvx/html';
 
 /**
- * Standard email content width (px). The artboard may be wider (device preview);
- * `email.root` keeps the white card at this max-width, centered.
+ * Email artboard design width (px). Device frames may be wider;
+ * `email.root` centers content with editable `maxWidth` (default 600).
  */
-export const EMAIL_FRAME_WIDTH = 600;
+export const EMAIL_FRAME_WIDTH = 640;
 
-/** Visible body chrome outside the white card (total, both sides). */
+/** Visible body chrome outside the content column (total, both sides). */
 const EMAIL_BODY_GUTTER = 80;
 
 /**
- * Email preview frames stay close to the design width so the card reads large.
- * Mobile is a phone viewport; tablet/desktop only add a slim body margin.
+ * Email preview frames stay close to the design width so content reads large.
+ * Mobile is a phone viewport; desktop only adds a slim body margin (→ 720).
  */
 export const EMAIL_DEVICE_WIDTHS: Record<
   Exclude<HtmlDevicePreset, 'fluid'>,
   number
 > = {
   mobile: 390,
-  tablet: EMAIL_FRAME_WIDTH + EMAIL_BODY_GUTTER,
   desktop: EMAIL_FRAME_WIDTH + EMAIL_BODY_GUTTER,
 };
 

@@ -20,34 +20,40 @@ export const BlockSelectionMenu = memo(
     canRemove: boolean;
     onDuplicate: () => void;
     onRemove: () => void;
-  }) => (
-    <div
-      aria-label={`${label} actions`}
-      className={styles.selectionMenu}
-      role="toolbar"
-      onPointerDown={stopMenuEvent}
-    >
-      <span className={styles.selectionMenuLabel}>{label}</span>
-      {canDuplicate ? (
-        <button
-          aria-label="Duplicate"
-          className={styles.selectionMenuButton}
-          type="button"
-          onClick={onDuplicate}
-        >
-          <Copy size={14} />
-        </button>
-      ) : null}
-      {canRemove ? (
-        <button
-          aria-label="Delete"
-          className={styles.selectionMenuButton}
-          type="button"
-          onClick={onRemove}
-        >
-          <Trash2 size={14} />
-        </button>
-      ) : null}
-    </div>
-  )
+  }) => {
+    const showActions = canDuplicate || canRemove;
+    return (
+      <div
+        aria-label={`${label} actions`}
+        className={styles.selectionMenu}
+        role="toolbar"
+        onPointerDown={stopMenuEvent}
+      >
+        <span className={styles.selectionMenuLabel}>{label}</span>
+        {showActions ? (
+          <span aria-hidden className={styles.selectionMenuDivider} />
+        ) : null}
+        {canDuplicate ? (
+          <button
+            aria-label="Duplicate"
+            className={styles.selectionMenuButton}
+            type="button"
+            onClick={onDuplicate}
+          >
+            <Copy size={14} strokeWidth={1.75} />
+          </button>
+        ) : null}
+        {canRemove ? (
+          <button
+            aria-label="Delete"
+            className={styles.selectionMenuButton}
+            type="button"
+            onClick={onRemove}
+          >
+            <Trash2 size={14} strokeWidth={1.75} />
+          </button>
+        ) : null}
+      </div>
+    );
+  }
 );

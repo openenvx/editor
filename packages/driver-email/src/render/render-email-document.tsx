@@ -1,7 +1,7 @@
 import { getLayerChildren, isLayerVisible } from '@openenvx/core';
 import type { BlockConfig, BlockRegistry } from '@openenvx/html';
 import type { Layer, Page } from '@openenvx/schema';
-import { Body, Head, Html, Preview } from '@react-email/components';
+import { Body, Font, Head, Html, Preview } from '@react-email/components';
 import { render } from '@react-email/render';
 import {
   createElement,
@@ -9,6 +9,14 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
+
+import {
+  EMAIL_FALLBACK_FONT_FAMILY,
+  EMAIL_FONT_FAMILY,
+  EMAIL_FONT_WEIGHTS,
+  EMAIL_WEB_FONT,
+  emailFontStack,
+} from './email-document-font';
 
 function layerData(layer: Layer): Record<string, unknown> {
   return typeof layer.data === 'object' && layer.data !== null
@@ -102,12 +110,31 @@ export async function renderEmailDocument(
   const data = layerData(root);
   const preheader = String(data.preheader ?? '');
   const children = renderBlockTree(getLayerChildren(root), registry);
+  const fontStack = emailFontStack();
 
   const document = (
     <Html>
-      <Head />
+      <Head>
+        {EMAIL_FONT_WEIGHTS.map((weight) => (
+          <Font
+            fallbackFontFamily={[...EMAIL_FALLBACK_FONT_FAMILY]}
+            fontFamily={EMAIL_FONT_FAMILY}
+            fontStyle="normal"
+            fontWeight={weight}
+            key={weight}
+            webFont={EMAIL_WEB_FONT}
+          />
+        ))}
+      </Head>
       {preheader ? <Preview>{preheader}</Preview> : null}
-      <Body style={{ margin: 0, padding: 0 }}>
+      <Body
+        style={{
+          margin: 0,
+          padding: 0,
+          fontFamily: fontStack,
+          fontSize: 16,
+        }}
+      >
         {rootConfig.render({ data, children })}
       </Body>
     </Html>

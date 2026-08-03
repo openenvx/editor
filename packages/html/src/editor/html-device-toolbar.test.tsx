@@ -28,4 +28,23 @@ describe('HtmlDeviceToolbar', () => {
     await user.selectOptions(screen.getByRole('combobox', { name: 'Zoom' }), '0.25');
     expect(onZoomPercent).toHaveBeenCalledWith(0.25);
   });
+
+  it('renders trailing content after zoom controls', () => {
+    render(
+      <HtmlDeviceToolbar
+        autoZoom
+        autoZoomValue={1}
+        preset="desktop"
+        trailing={<button type="button">Preview</button>}
+        zoom={1}
+        onPresetChange={vi.fn()}
+        onZoomAuto={vi.fn()}
+        onZoomIn={vi.fn()}
+        onZoomOut={vi.fn()}
+        onZoomPercent={vi.fn()}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: 'Preview' })).toBeTruthy();
+  });
 });

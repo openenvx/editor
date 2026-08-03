@@ -195,7 +195,8 @@ function buildTreeView(
       items.push({
         depth,
         editLabel: treeItem.editLabel,
-        hasChildren: childrenResult.length > 0,
+        // Provider `collapsible` marks nestable containers even when empty.
+        hasChildren: treeItem.collapsible ?? childrenResult.length > 0,
         icon: treeItem.icon,
         id: treeItem.id,
         label: treeItem.label,

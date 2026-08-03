@@ -269,6 +269,83 @@ describe('LayersTreeProvider', () => {
     expect(provider.canMove?.(root, block, 'after')).toBe(false);
   });
 
+  it('marks empty containers collapsible and accepts nest-into drops', () => {
+    const provider = new LayersTreeProvider();
+    const section: Layer = {
+      id: 'section',
+      type: 'email.section',
+      data: { children: [] },
+    };
+    const text: Layer = {
+      id: 'text',
+      type: 'email.text',
+      data: { text: 'Hi' },
+    };
+    const item = provider.getTreeItem(section, {
+      services: { has: () => false },
+    } as unknown as CommandContext);
+
+    expect(item.collapsible).toBe(true);
+    expect(
+      provider.getTreeItem(text, {
+        services: { has: () => false },
+      } as unknown as CommandContext).collapsible
+    ).toBe(false);
+    expect(provider.canMove?.(text, section, 'inside')).toBe(true);
+    expect(
+      provider.canMove?.(
+        text,
+        { id: 'other', type: 'email.text', data: { text: 'x' } },
+        'inside'
+      )
+    ).toBe(false);
+  });
+
+  it('nests into an empty section on inside drops', () => {
+    const provider = new LayersTreeProvider();
+    const section: Layer = {
+      id: 'section',
+      type: 'email.section',
+      data: { children: [] },
+    };
+    const text: Layer = {
+      id: 'text',
+      type: 'email.text',
+      data: { text: 'Hi' },
+    };
+    const root: Layer = {
+      id: 'root',
+      type: 'email.root',
+      data: { children: [section, text] },
+    };
+    let pageLayers: Layer[] = [root];
+    const ctx = {
+      scene: {
+        getActivePage: () => ({ id: 'p1', layers: pageLayers }),
+        apply: (op: {
+          apply: (scene: {
+            pages: { id: string; layers: Layer[] }[];
+          }) => { pages: { id: string; layers: Layer[] }[] };
+        }) => {
+          const next = op.apply({ pages: [{ id: 'p1', layers: pageLayers }] });
+          pageLayers = next.pages[0]!.layers;
+        },
+      },
+      services: { has: () => false },
+    } as unknown as CommandContext;
+
+    provider.handleMove?.(text, section, 'inside', ctx);
+
+    const nextRoot = pageLayers[0]!;
+    const nextSection = (nextRoot.data as { children: Layer[] }).children[0]!;
+    expect((nextRoot.data as { children: Layer[] }).children.map((l) => l.id)).toEqual([
+      'section',
+    ]);
+    expect(
+      (nextSection.data as { children: Layer[] }).children.map((l) => l.id)
+    ).toEqual(['text']);
+  });
+
   it('nests into the layout root on inside drops instead of hoisting beside it', () => {
     const provider = new LayersTreeProvider();
     const root: Layer = {

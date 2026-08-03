@@ -53,11 +53,13 @@ export interface BlockConfig {
    */
   insertLineAxis?: 'vertical' | 'horizontal';
   /**
-   * Editor selection chrome around this block. `inline` hugs content so
-   * siblings can sit in a row (e.g. ConfirmEmail social icon links).
-   * Default `block` (full-width stack).
+   * Editor selection chrome around this block.
+   * - `block` (default): full-width stack wrapper
+   * - `inline`: hug content for horizontal siblings (e.g. social icon links)
+   * - `contents`: no layout box — required for `email.column` (`<td>`) so the
+   *   wrapper is not inserted between `<tr>` and `<td>`
    */
-  chromeDisplay?: 'block' | 'inline';
+  chromeDisplay?: 'block' | 'inline' | 'contents';
   /** Named slots whose parts are real layers under `data.slots` (invisible to the Layers tree). */
   slots?: Record<string, SlotDef>;
   render: (props: BlockRenderProps) => ReactElement;

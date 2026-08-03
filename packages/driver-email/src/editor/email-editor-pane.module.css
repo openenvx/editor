@@ -42,12 +42,69 @@
 
 .artboard {
   /* Body color comes from email.root; keep the frame transparent so the
-     centered 600px white card reads against the page background. */
+     centered 600px white card reads against the page background.
+     Document stack + 16px root — not workbench chrome — so edit matches export.
+     line-height: normal (not 1.5) — forced 1.5 inherited into Section <td>s and
+     inflated gaps above inline social icons. */
   transform-origin: top left;
   min-height: 480px;
   background: transparent;
   box-shadow: var(--wb-shadow-sm, 0 1px 3px rgb(0 0 0 / 8%));
   border-radius: 2px;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: normal;
+  font-weight: 400;
+}
+
+/* Kill host UA heading metrics — blocks set explicit size/weight inline. */
+.artboard :is(h1, h2, h3) {
+  font-family: inherit;
+}
+
+.previewFrame {
+  display: block;
+  width: 100%;
+  min-height: 480px;
+  border: 0;
+  background: transparent;
+}
+
+.modeToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.modeButton {
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--wb-radius-control, 10px);
+  background: transparent;
+  color: var(--wb-muted-foreground, #71717a);
+  cursor: pointer;
+  font-family: var(--wb-font, inherit);
+  font-size: var(--wb-text-xs, 12px);
+  font-weight: 500;
+}
+
+.modeButton:hover {
+  background: var(--wb-hover-overlay, rgb(0 0 0 / 4%));
+  color: var(--wb-foreground, #18181b);
+}
+
+.modeButton:focus-visible {
+  outline: none;
+  box-shadow: var(
+    --wb-shadow-focus,
+    0 0 0 2px #f6f6f8,
+    0 0 0 4px rgb(0 0 0 / 20%)
+  );
+}
+
+.modeButtonActive {
+  color: var(--wb-selection, #3b82f6);
 }
 
 .palettePanel {

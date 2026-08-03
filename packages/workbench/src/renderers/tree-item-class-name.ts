@@ -9,6 +9,7 @@ export function treeItemClassName(
     isHovered: boolean;
     isDragging?: boolean;
     isDragActive?: boolean;
+    isDropNestTarget?: boolean;
   }
 ): string {
   const {
@@ -16,6 +17,7 @@ export function treeItemClassName(
     isHovered,
     isDragging = false,
     isDragActive = false,
+    isDropNestTarget = false,
   } = options;
   return [
     styles.treeItem,
@@ -23,6 +25,7 @@ export function treeItemClassName(
     isHovered ? styles.treeItemHovered : '',
     isDragging ? styles.treeItemDragging : '',
     isDragActive && !isDragging ? styles.treeItemPassive : '',
+    isDropNestTarget ? styles.treeItemDropNest : '',
     item.locked ? styles.treeItemLocked : '',
     item.visible === false ? styles.treeItemHidden : '',
   ]

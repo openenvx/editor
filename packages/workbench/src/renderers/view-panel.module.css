@@ -127,6 +127,14 @@
   background: var(--wb-sidebar-row-selected);
 }
 
+.treeItemDropNest,
+.treeListDragging .treeItemPassive.treeItemDropNest,
+.treeListDragging .treeItemPassive.treeItemDropNest:hover {
+  background: color-mix(in srgb, var(--wb-foreground) 12%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--wb-foreground) 35%, transparent);
+  outline-offset: -1px;
+}
+
 .dropIndicatorLine {
   position: absolute;
   right: var(--wb-space-2);

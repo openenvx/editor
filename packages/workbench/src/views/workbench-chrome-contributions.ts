@@ -120,6 +120,8 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
       ? node.type.slice(node.type.indexOf('.') + 1)
       : node.type;
     return {
+      // Nestable even when empty (email.section/row/column, html.flex, …).
+      collapsible: hasChildLayers(node),
       editLabel: node.name ?? '',
       icon: definition?.treeIcon,
       id: node.id,
@@ -179,6 +181,9 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
       isLayoutRootLayer(target) &&
       (position === 'before' || position === 'after')
     ) {
+      return false;
+    }
+    if (position === 'inside' && !hasChildLayers(target)) {
       return false;
     }
     return true;

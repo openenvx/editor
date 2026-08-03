@@ -14,6 +14,10 @@ export interface TreeItem {
   id: string;
   label: string;
   icon?: string;
+  /**
+   * When true, the row is a container in the tree (chevron + nest-into drops)
+   * even if it currently has no children.
+   */
   collapsible?: boolean;
   locked?: boolean;
   tooltip?: string;

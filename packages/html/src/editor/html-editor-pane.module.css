@@ -87,11 +87,15 @@
   font-size: var(--wb-text-sm, 12px);
 }
 
+/* Padding must stay 0 — chrome wrappers must not reflow block content vs export. */
 .blockWrap {
+  --block-chrome-outline-offset: 2px;
+  --block-chrome-outline-width: 1px;
   position: relative;
-  outline: 1px solid transparent;
+  outline: var(--block-chrome-outline-width) solid transparent;
+  outline-offset: var(--block-chrome-outline-offset);
   border-radius: 4px;
-  padding: 6px;
+  padding: 0;
 }
 
 /* Hugs content so siblings can sit in a row (social image links, etc.). */
@@ -99,6 +103,55 @@
   display: inline-block;
   vertical-align: middle;
   max-width: 100%;
+  /* Kill inherited artboard line-height strut above inline icons. */
+  line-height: 0;
+  font-size: 0;
+}
+
+/*
+ * No layout box — children participate in the parent formatting context.
+ * Required for email.column (`<td>`): a real wrapper between `<tr>` and `<td>`
+ * breaks the table. Selection menu is omitted for contents chrome only in that
+ * case (no box to anchor); do not use contents chrome to “fix spacing”.
+ */
+.blockWrapContents {
+  display: contents;
+}
+
+/*
+ * Contents chrome has no box — paint chrome on the first child instead
+ * (generic `> *`, not email-specific tags).
+ */
+.blockWrapContents.blockWrapSelected > *,
+.blockWrapContents.blockWrapHovered > * {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+.blockWrapContents.blockWrapHovered:not(.blockWrapSelected) > * {
+  outline-width: 1px;
+}
+
+.blockWrapContents.blockWrapDraggable > * {
+  cursor: grab;
+  touch-action: none;
+}
+
+.blockWrapContents.blockWrapDraggingGhost > * {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.blockWrapContents.blockWrapDropContainer > * {
+  outline: 2px dashed #3b82f6;
+  outline-offset: -2px;
+}
+
+.blockWrapContents.blockWrapInsertLineBefore > *,
+.blockWrapContents.blockWrapInsertLineAfter > *,
+.blockWrapContents.blockWrapInsertLineBeforeVertical > *,
+.blockWrapContents.blockWrapInsertLineAfterVertical > * {
+  position: relative;
 }
 
 .blockWrapDraggable {
@@ -116,7 +169,11 @@
 .blockWrapInsertLineBefore::before,
 .blockWrapInsertLineAfter::after,
 .blockWrapInsertLineBeforeVertical::before,
-.blockWrapInsertLineAfterVertical::after {
+.blockWrapInsertLineAfterVertical::after,
+.blockWrapContents.blockWrapInsertLineBefore > *::before,
+.blockWrapContents.blockWrapInsertLineAfter > *::after,
+.blockWrapContents.blockWrapInsertLineBeforeVertical > *::before,
+.blockWrapContents.blockWrapInsertLineAfterVertical > *::after {
   content: '';
   position: absolute;
   z-index: 4;
@@ -125,28 +182,32 @@
   border-radius: 1px;
 }
 
-.blockWrapInsertLineBefore::before {
+.blockWrapInsertLineBefore::before,
+.blockWrapContents.blockWrapInsertLineBefore > *::before {
   left: 0;
   right: 0;
   top: -2px;
   height: 2px;
 }
 
-.blockWrapInsertLineAfter::after {
+.blockWrapInsertLineAfter::after,
+.blockWrapContents.blockWrapInsertLineAfter > *::after {
   left: 0;
   right: 0;
   bottom: -2px;
   height: 2px;
 }
 
-.blockWrapInsertLineBeforeVertical::before {
+.blockWrapInsertLineBeforeVertical::before,
+.blockWrapContents.blockWrapInsertLineBeforeVertical > *::before {
   top: 0;
   bottom: 0;
   left: -2px;
   width: 2px;
 }
 
-.blockWrapInsertLineAfterVertical::after {
+.blockWrapInsertLineAfterVertical::after,
+.blockWrapContents.blockWrapInsertLineAfterVertical > *::after {
   top: 0;
   bottom: 0;
   right: -2px;
@@ -180,11 +241,13 @@
 
 /* Canvas-style hover outline (driven by hoveredLayerId — content or Layers tree). */
 .blockWrapHovered {
-  outline: 1px solid #3b82f6;
+  --block-chrome-outline-width: 1px;
+  outline: var(--block-chrome-outline-width) solid #3b82f6;
 }
 
 .blockWrapSelected {
-  outline: 2px solid #3b82f6;
+  --block-chrome-outline-width: 2px;
+  outline: var(--block-chrome-outline-width) solid #3b82f6;
 }
 
 .blockEditableHit {
@@ -194,45 +257,70 @@
 
 .selectionMenu {
   position: absolute;
-  top: 0;
-  right: 0;
+  /*
+   * Anchor to the outer top-right corner of the selection outline
+   * (offset + stroke), so the tab sits flush — no 2px air gap.
+   */
+  top: calc(
+    -1 *
+      (var(--block-chrome-outline-offset) + var(--block-chrome-outline-width))
+  );
+  right: calc(
+    -1 *
+      (var(--block-chrome-outline-offset) + var(--block-chrome-outline-width)) +
+      10px
+  );
   z-index: 5;
   display: flex;
   align-items: center;
   gap: var(--wb-space-0-5, 2px);
   transform: translateY(-100%);
-  padding: var(--wb-space-1, 4px) var(--wb-space-1, 4px) var(--wb-space-1, 4px)
-    var(--wb-space-2, 8px);
-  border-radius: var(--wb-radius-lg, 6px) var(--wb-radius-lg, 6px) 0 0;
+  padding: var(--wb-space-1, 4px);
+  border-radius: 12px 12px 0 0;
   background: var(--wb-popover, #ffffff);
   color: var(--wb-foreground, #18181b);
-  box-shadow: var(
-    --wb-shadow-float,
-    0 8px 24px rgb(0 0 0 / 12%),
-    0 0 0 1px rgb(0 0 0 / 8%)
-  );
+  /* No bottom ring — that would open a hairline between tab and selection stroke. */
+  box-shadow:
+    -1px 0 0 rgb(0 0 0 / 8%),
+    1px 0 0 rgb(0 0 0 / 8%),
+    0 -1px 0 rgb(0 0 0 / 8%),
+    0 -8px 20px rgb(0 0 0 / 10%);
   cursor: default;
+  pointer-events: auto;
 }
 
 .selectionMenuLabel {
-  padding: 0 var(--wb-space-1, 4px);
+  padding: 0 10px;
   font-size: var(--wb-text-sm, 12px);
   font-weight: 500;
+  line-height: var(--wb-icon-button-size-lg, 32px);
   color: var(--wb-muted-foreground, #71717a);
   white-space: nowrap;
+}
+
+.selectionMenuDivider {
+  width: 1px;
+  height: 20px;
+  margin: 0 var(--wb-space-0-5, 2px);
+  background: var(--wb-divider-color, #e4e4e7);
+  flex: none;
 }
 
 .selectionMenuButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--wb-icon-button-size, 28px);
-  height: var(--wb-icon-button-size, 28px);
+  width: var(--wb-icon-button-size-lg, 32px);
+  height: var(--wb-icon-button-size-lg, 32px);
+  padding: 0;
   border: none;
-  border-radius: var(--wb-radius-control, 4px);
+  border-radius: var(--wb-radius-control, 10px);
   background: transparent;
   color: var(--wb-muted-foreground, #71717a);
   cursor: pointer;
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
 }
 
 .selectionMenuButton:hover {
@@ -240,8 +328,16 @@
   color: var(--wb-foreground, #18181b);
 }
 
+.selectionMenuButton:focus-visible {
+  outline: none;
+  box-shadow: var(
+    --wb-shadow-focus,
+    0 0 0 2px #f6f6f8,
+    0 0 0 4px rgb(0 0 0 / 20%)
+  );
+}
+
 .dropZone {
-  min-height: 28px;
   border-radius: 4px;
   transition:
     background 120ms ease,
@@ -250,6 +346,7 @@
 
 .dropZone:not(.dropZoneEmpty) {
   display: contents;
+  min-height: 0;
 }
 
 .dropZoneActive {
@@ -261,6 +358,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 28px;
   color: #94a3b8;
   font-size: 12px;
   border: 1px dashed #cbd5e1;

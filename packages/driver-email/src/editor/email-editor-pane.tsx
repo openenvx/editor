@@ -36,25 +36,72 @@ import {
 import {
   memo,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
   type KeyboardEvent,
+  type ReactNode,
 } from 'react';
 
 import {
   emailBlockRegistry,
   EmailBlockRegistryServiceId,
 } from '../block-registry';
+import { ensureEmailDocumentFont } from '../render/email-document-font';
+import { renderEmailDocument } from '../render/render-email-document';
 import type { BlockEditTarget } from './block-edit-target';
 import { resolveEmailFrameWidth } from './email-device-preview';
+import { EmailHtmlPreview } from './email-html-preview';
 
 import styles from './email-editor-pane.module.css';
 
 export { EMAIL_FRAME_WIDTH } from './email-device-preview';
 
-/** Slim desktop chrome — card fills most of the frame with a bit of body around it. */
+/** Slim desktop chrome — content fills most of the frame with a bit of body around it. */
 const DEFAULT_EMAIL_DEVICE_PRESET: HtmlDevicePreset = 'desktop';
+
+type EmailPaneMode = 'edit' | 'preview';
+
+function EmailModeToggle({
+  isPreview,
+  onEdit,
+  onPreview,
+}: {
+  isPreview: boolean;
+  onEdit: () => void;
+  onPreview: () => void;
+}) {
+  return (
+    <div className={styles.modeToggle} role="group" aria-label="Editor mode">
+      <button
+        aria-pressed={!isPreview}
+        className={[
+          styles.modeButton,
+          !isPreview ? styles.modeButtonActive : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        title="Edit"
+        type="button"
+        onClick={onEdit}
+      >
+        Edit
+      </button>
+      <button
+        aria-pressed={isPreview}
+        className={[styles.modeButton, isPreview ? styles.modeButtonActive : '']
+          .filter(Boolean)
+          .join(' ')}
+        title="Preview"
+        type="button"
+        onClick={onPreview}
+      >
+        Preview
+      </button>
+    </div>
+  );
+}
 
 export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   const { api, executeCommand } = useWorkbenchContext();
@@ -75,6 +122,13 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   );
   const [autoZoom, setAutoZoom] = useState(true);
   const [manualZoom, setManualZoom] = useState(1);
+  const [mode, setMode] = useState<EmailPaneMode>('edit');
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+
+  useEffect(() => {
+    ensureEmailDocumentFont();
+  }, []);
 
   const { artboardRef, artboardHeight, stageRef, stageWidth } =
     useHtmlDeviceStageMetrics(preset);
@@ -262,6 +316,53 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     setManualZoom(clampHtmlZoom(next));
   }, []);
 
+  const enterEditMode = useCallback(() => {
+    setMode('edit');
+    setPreviewHtml(null);
+    setPreviewError(null);
+  }, []);
+
+  const enterPreviewMode = useCallback(() => {
+    if (editingTarget) {
+      api
+        .getService(ContextKeyServiceId)
+        ?.setContext('editor.editingText', false);
+      setEditingTarget(null);
+    }
+    clearDrag();
+    setMode('preview');
+  }, [api, clearDrag, editingTarget]);
+
+  const activePageId = selection?.activePageId ?? null;
+
+  useEffect(() => {
+    if (mode !== 'preview' || !scene || !activePageId) {
+      return;
+    }
+    let cancelled = false;
+    const page = getActivePage(scene, activePageId);
+    void renderEmailDocument(page, registry)
+      .then((html) => {
+        if (cancelled) {
+          return;
+        }
+        setPreviewHtml(html);
+        setPreviewError(null);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) {
+          return;
+        }
+        setPreviewHtml(null);
+        setPreviewError(
+          error instanceof Error ? error.message : 'Failed to render email'
+        );
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activePageId, mode, registry, scene]);
+
   if (!(scene && selection)) {
     return null;
   }
@@ -270,6 +371,121 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   const selectedId =
     selection.primaryLayerId ?? selection.selectedLayerIds[0] ?? null;
   const rootId = getPageRootId(page, 'email.root');
+  const isPreview = mode === 'preview';
+
+  let artboardContent: ReactNode;
+  if (!rootId) {
+    artboardContent = (
+      <p className={styles.empty}>No email.root block on this page.</p>
+    );
+  } else if (isPreview) {
+    if (previewError) {
+      artboardContent = <p className={styles.empty}>{previewError}</p>;
+    } else if (!previewHtml) {
+      artboardContent = <p className={styles.empty}>Rendering preview…</p>;
+    } else {
+      artboardContent = <EmailHtmlPreview html={previewHtml} />;
+    }
+  } else {
+    artboardContent = (
+      <BlockTreeRenderer
+        editingTarget={editingTarget}
+        hoveredLayerId={hoveredLayerId}
+        layers={page.layers}
+        onCommitEdit={handleCommitEdit}
+        onDuplicate={handleDuplicate}
+        onHoverLayer={handleHoverLayer}
+        onRemove={handleRemove}
+        onSelect={handleSelect}
+        onStartEdit={handleStartEdit}
+        registry={registry}
+        scene={scene}
+        selectedId={selectedId}
+        sortDraft={sortDraft}
+      />
+    );
+  }
+
+  const artboard = (
+    <div
+      className={styles.artboardSlot}
+      data-device={preset}
+      data-testid="email-artboard"
+      style={{
+        width: scaledWidth > 0 ? scaledWidth : undefined,
+        height: scaledHeight,
+      }}
+    >
+      <div
+        className={styles.artboard}
+        ref={artboardRef}
+        style={{
+          width: frameWidth > 0 ? frameWidth : undefined,
+          transform: `scale(${zoom})`,
+        }}
+      >
+        {artboardContent}
+      </div>
+    </div>
+  );
+
+  const stage = isPreview ? (
+    <div
+      aria-label="Email preview"
+      className={styles.stage}
+      ref={stageRef}
+      role="region"
+    >
+      {artboard}
+    </div>
+  ) : (
+    <div
+      aria-label="Email blocks"
+      className={styles.stage}
+      ref={stageRef}
+      role="tree"
+      tabIndex={0}
+      onClick={clearSelection}
+      onKeyDown={handleCanvasKeyDown}
+      onPointerLeave={() => api.setHoveredLayer(null)}
+    >
+      {artboard}
+    </div>
+  );
+
+  const pane = (
+    <div
+      className={[styles.pane, sortDraft ? styles.paneDragging : '']
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <div className={styles.toolbarHost}>
+        <HtmlDeviceToolbar
+          autoZoom={autoZoom}
+          autoZoomValue={autoZoomValue}
+          preset={preset}
+          trailing={
+            <EmailModeToggle
+              isPreview={isPreview}
+              onEdit={enterEditMode}
+              onPreview={enterPreviewMode}
+            />
+          }
+          zoom={zoom}
+          onPresetChange={handlePresetChange}
+          onZoomAuto={handleZoomAuto}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onZoomPercent={handleZoomPercent}
+        />
+      </div>
+      {stage}
+    </div>
+  );
+
+  if (isPreview) {
+    return pane;
+  }
 
   return (
     <DndContext
@@ -281,76 +497,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
       onDragOver={handleDragOver}
       onDragStart={handleDragStart}
     >
-      <div
-        className={[styles.pane, sortDraft ? styles.paneDragging : '']
-          .filter(Boolean)
-          .join(' ')}
-      >
-        <div className={styles.toolbarHost}>
-          <HtmlDeviceToolbar
-            autoZoom={autoZoom}
-            autoZoomValue={autoZoomValue}
-            preset={preset}
-            zoom={zoom}
-            onPresetChange={handlePresetChange}
-            onZoomAuto={handleZoomAuto}
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
-            onZoomPercent={handleZoomPercent}
-          />
-        </div>
-        <div
-          aria-label="Email blocks"
-          className={styles.stage}
-          ref={stageRef}
-          role="tree"
-          tabIndex={0}
-          onClick={clearSelection}
-          onKeyDown={handleCanvasKeyDown}
-          onPointerLeave={() => api.setHoveredLayer(null)}
-        >
-          <div
-            className={styles.artboardSlot}
-            data-device={preset}
-            data-testid="email-artboard"
-            style={{
-              width: scaledWidth > 0 ? scaledWidth : undefined,
-              height: scaledHeight,
-            }}
-          >
-            <div
-              className={styles.artboard}
-              ref={artboardRef}
-              style={{
-                width: frameWidth > 0 ? frameWidth : undefined,
-                transform: `scale(${zoom})`,
-              }}
-            >
-              {rootId ? (
-                <BlockTreeRenderer
-                  editingTarget={editingTarget}
-                  hoveredLayerId={hoveredLayerId}
-                  layers={page.layers}
-                  onCommitEdit={handleCommitEdit}
-                  onDuplicate={handleDuplicate}
-                  onHoverLayer={handleHoverLayer}
-                  onRemove={handleRemove}
-                  onSelect={handleSelect}
-                  onStartEdit={handleStartEdit}
-                  registry={registry}
-                  scene={scene}
-                  selectedId={selectedId}
-                  sortDraft={sortDraft}
-                />
-              ) : (
-                <p className={styles.empty}>
-                  No email.root block on this page.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      {pane}
     </DndContext>
   );
 });

@@ -44,7 +44,7 @@ describe('renderEmailDocument', () => {
     expect(welcome).toBeGreaterThan(whiteFrame);
   });
 
-  it('applies editable content padding on the white frame', async () => {
+  it('applies outer padding on the email root shell', async () => {
     const registry = new BlockRegistry();
     for (const block of builtinEmailBlocks) {
       registry.register(block);
@@ -52,10 +52,42 @@ describe('renderEmailDocument', () => {
     const scene = createEmailDemoScene();
     const page = scene.pages[0]!;
     const root = page.layers.find((layer) => layer.type === 'email.root')!;
-    (root.data as { padding: number }).padding = 48;
+    (root.data as { paddingY: number }).paddingY = 48;
 
     const html = await renderEmailDocument(page, registry);
 
-    expect(html).toMatch(/padding:48px/i);
+    expect(html).toMatch(/padding-top:48px/i);
+  });
+
+  it('embeds Inter via react-email Font with Arial fallback', async () => {
+    const registry = new BlockRegistry();
+    for (const block of builtinEmailBlocks) {
+      registry.register(block);
+    }
+    const scene = createEmailDemoScene();
+    const page = scene.pages[0]!;
+
+    const html = await renderEmailDocument(page, registry);
+
+    expect(html).toContain('@font-face');
+    expect(html).toContain("font-family: 'Inter'");
+    expect(html).toContain('Arial');
+    expect(html).toContain('fonts.gstatic.com');
+    expect(html).toContain('font-weight: 400');
+    expect(html).toContain('font-weight: 600');
+    expect(html).toContain('font-weight: 700');
+  });
+
+  it('pins heading size so edit and preview share metrics', async () => {
+    const registry = new BlockRegistry();
+    for (const block of builtinEmailBlocks) {
+      registry.register(block);
+    }
+    const scene = createEmailDemoScene();
+    const page = scene.pages[0]!;
+
+    const html = await renderEmailDocument(page, registry);
+
+    expect(html).toMatch(/font-size:28px/i);
   });
 });

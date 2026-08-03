@@ -1,6 +1,5 @@
 import { sanitizeHtml, sanitizeUrl } from '@openenvx/core';
 import type { BlockConfig } from '@openenvx/html';
-import { flattenReactChildren } from '@openenvx/html';
 import {
   Button,
   Column,
@@ -14,9 +13,26 @@ import {
 } from '@react-email/components';
 import type { CSSProperties } from 'react';
 
+import {
+  emailFontStack,
+  emailHeadingStyle,
+} from '../render/email-document-font';
 import { imageLinkBlock } from './image-link';
 
 const EMAIL_WIDTH = 600;
+
+function num(value: unknown, fallback: number): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function optionalNum(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  const n = Number(value);
+  return Number.isFinite(n) ? n : undefined;
+}
 
 export const rootBlock: BlockConfig = {
   type: 'email.root',
@@ -24,36 +40,47 @@ export const rootBlock: BlockConfig = {
   fields: {
     background: { kind: 'color', label: 'Background' },
     preheader: { kind: 'text', label: 'Preheader' },
-    padding: { kind: 'number', label: 'Content padding (px)' },
+    paddingX: { kind: 'number', label: 'Padding X (px)' },
+    paddingY: { kind: 'number', label: 'Padding Y (px)' },
+    maxWidth: { kind: 'number', label: 'Max width (px)' },
   },
   defaultData: {
     background: '#f6f9fc',
     preheader: '',
-    padding: 32,
+    paddingX: 16,
+    paddingY: 32,
+    maxWidth: EMAIL_WIDTH,
     children: [],
   },
   acceptsChildren: true,
   palette: false,
   treeIcon: 'file',
   render: ({ data, children }) => {
-    const padding = Number(data.padding ?? 32);
+    const paddingX = num(data.paddingX, 16);
+    const paddingY = num(data.paddingY, 32);
+    const maxWidth = num(data.maxWidth, EMAIL_WIDTH);
+    const fontFamily = emailFontStack();
     return (
       <Section
         style={{
           background: String(data.background ?? '#f6f9fc'),
           width: '100%',
           minHeight: 480,
-          padding: '40px 16px',
+          paddingTop: paddingY,
+          paddingBottom: paddingY,
+          paddingLeft: paddingX,
+          paddingRight: paddingX,
+          fontFamily,
+          fontSize: 16,
         }}
       >
         <Container
           style={{
-            background: '#ffffff',
             margin: '0 auto',
-            maxWidth: EMAIL_WIDTH,
+            maxWidth,
             width: '100%',
-            borderRadius: 4,
-            padding: Number.isFinite(padding) ? padding : 32,
+            fontFamily,
+            fontSize: 16,
           }}
         >
           {children}
@@ -68,61 +95,130 @@ export const sectionBlock: BlockConfig = {
   label: 'Section',
   fields: {
     background: { kind: 'color', label: 'Background' },
-    padding: { kind: 'number', label: 'Padding (px)' },
+    paddingX: { kind: 'number', label: 'Padding X (px)' },
+    paddingY: { kind: 'number', label: 'Padding Y (px)' },
+    marginBottom: { kind: 'number', label: 'Margin bottom (px)' },
+    borderRadius: { kind: 'number', label: 'Radius (px)' },
     align: { kind: 'align', label: 'Align' },
+    /** Classic email: `0` kills td line-height strut above inline icons. */
+    fontSize: { kind: 'number', label: 'Font size (px)' },
+    lineHeight: { kind: 'text', label: 'Line height' },
   },
   defaultData: {
     background: 'transparent',
-    padding: 24,
+    paddingX: 24,
+    paddingY: 24,
+    marginBottom: 0,
+    borderRadius: 0,
     align: 'left',
     children: [],
   },
   acceptsChildren: true,
-  render: ({ data, children }) => (
-    <Section
-      style={{
-        background: String(data.background ?? 'transparent'),
-        padding: Number(data.padding ?? 24),
-        textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
-      }}
-    >
-      {children}
-    </Section>
-  ),
+  render: ({ data, children }) => {
+    const paddingX = num(data.paddingX, 24);
+    const paddingY = num(data.paddingY, 24);
+    const marginBottom = num(data.marginBottom, 0);
+    const borderRadius = num(data.borderRadius, 0);
+    const fontSize = optionalNum(data.fontSize);
+    const lineHeightRaw = data.lineHeight;
+    const lineHeight =
+      lineHeightRaw === undefined ||
+      lineHeightRaw === null ||
+      lineHeightRaw === ''
+        ? undefined
+        : String(lineHeightRaw);
+    return (
+      <Section
+        style={{
+          background: String(data.background ?? 'transparent'),
+          paddingTop: paddingY,
+          paddingBottom: paddingY,
+          paddingLeft: paddingX,
+          paddingRight: paddingX,
+          marginBottom: marginBottom > 0 ? marginBottom : undefined,
+          borderRadius: borderRadius > 0 ? borderRadius : undefined,
+          textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
+          fontSize,
+          lineHeight,
+        }}
+      >
+        {children}
+      </Section>
+    );
+  },
 };
 
-export const columnsBlock: BlockConfig = {
-  type: 'email.columns',
-  label: 'Columns',
-  fields: {
-    gap: { kind: 'number', label: 'Gap (px)' },
-  },
-  defaultData: { gap: 16, children: [] },
+/** React-Email `<Row>` — table row; children should be `email.column`. */
+export const rowBlock: BlockConfig = {
+  type: 'email.row',
+  label: 'Row',
+  fields: {},
+  defaultData: { children: [] },
   acceptsChildren: true,
   insertLineAxis: 'vertical',
+  treeIcon: 'layout',
+  render: ({ children }) => <Row>{children}</Row>,
+};
+
+/** React-Email `<Column>` — table cell inside a Row. */
+export const columnBlock: BlockConfig = {
+  type: 'email.column',
+  label: 'Column',
+  /** Must not wrap `<td>` in a layout box (breaks `<tr>` → `<td>`). */
+  chromeDisplay: 'contents',
+  fields: {
+    width: { kind: 'text', label: 'Width' },
+    align: {
+      kind: 'select',
+      label: 'Align',
+      options: [
+        { label: 'Left', value: 'left' },
+        { label: 'Center', value: 'center' },
+        { label: 'Right', value: 'right' },
+      ],
+    },
+    verticalAlign: {
+      kind: 'select',
+      label: 'Vertical align',
+      options: [
+        { label: 'Top', value: 'top' },
+        { label: 'Middle', value: 'middle' },
+        { label: 'Bottom', value: 'bottom' },
+      ],
+    },
+    paddingX: { kind: 'number', label: 'Padding X (px)' },
+    paddingY: { kind: 'number', label: 'Padding Y (px)' },
+  },
+  defaultData: {
+    width: '50%',
+    align: 'left',
+    verticalAlign: 'top',
+    paddingX: 0,
+    paddingY: 0,
+    children: [],
+  },
+  acceptsChildren: true,
+  treeIcon: 'layout',
   render: ({ data, children }) => {
-    const childList = flattenReactChildren(children);
-    const count = Math.max(1, childList.length);
-    const width = `${Math.floor(100 / count)}%`;
-    const gap = Number(data.gap ?? 16);
+    const paddingX = num(data.paddingX, 0);
+    const paddingY = num(data.paddingY, 0);
+    const width = String(data.width ?? '').trim();
+    const verticalAlign = String(data.verticalAlign ?? 'top');
+    const align = String(data.align ?? 'left') as 'left' | 'center' | 'right';
     return (
-      <Section style={{ padding: gap / 2 }}>
-        <Row>
-          {childList.map((child, index) => (
-            <Column
-              key={index}
-              style={{
-                width,
-                paddingLeft: gap / 2,
-                paddingRight: gap / 2,
-                verticalAlign: 'top',
-              }}
-            >
-              {child}
-            </Column>
-          ))}
-        </Row>
-      </Section>
+      <Column
+        align={align}
+        style={{
+          width: width || undefined,
+          verticalAlign,
+          paddingLeft: paddingX,
+          paddingRight: paddingX,
+          paddingTop: paddingY,
+          paddingBottom: paddingY,
+        }}
+      >
+        {children}
+      </Column>
     );
   },
 };
@@ -143,19 +239,27 @@ export const headingBlock: BlockConfig = {
     },
     color: { kind: 'color', label: 'Color' },
     align: { kind: 'align', label: 'Align' },
+    marginBottom: { kind: 'number', label: 'Margin bottom (px)' },
   },
   defaultData: {
     html: 'Heading',
     level: '2',
     color: '#111827',
     align: 'left',
+    marginBottom: 12,
   },
   render: ({ data, children }) => {
     const level = Number(data.level ?? 2) as 1 | 2 | 3;
+    const heading = emailHeadingStyle(level);
+    const marginBottom = num(data.marginBottom, 12);
     const style: CSSProperties = {
       color: String(data.color ?? '#111827'),
       textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
-      margin: '0 0 12px',
+      margin: `0 0 ${marginBottom}px`,
+      fontFamily: emailFontStack(),
+      fontSize: heading.fontSize,
+      fontWeight: heading.fontWeight,
+      lineHeight: heading.lineHeight,
     };
     if (children) {
       // Edit mode: div keeps text-align without nesting TipTap inside <p>/<h*>.
@@ -180,19 +284,36 @@ export const textBlock: BlockConfig = {
     html: { kind: 'richText', label: 'Text' },
     color: { kind: 'color', label: 'Color' },
     align: { kind: 'align', label: 'Align' },
+    fontSize: { kind: 'number', label: 'Font size (px)' },
+    marginTop: { kind: 'number', label: 'Margin top (px)' },
+    marginBottom: { kind: 'number', label: 'Margin bottom (px)' },
+    maxWidth: { kind: 'number', label: 'Max width (px)' },
   },
   defaultData: {
     html: 'Paragraph text',
     color: '#374151',
     align: 'left',
+    fontSize: 14,
+    marginTop: 0,
+    marginBottom: 16,
   },
   render: ({ data, children }) => {
+    const fontSize = num(data.fontSize, 14);
+    const marginTop = num(data.marginTop, 0);
+    const marginBottom = num(data.marginBottom, 16);
+    const maxWidth = optionalNum(data.maxWidth);
     const style: CSSProperties = {
       color: String(data.color ?? '#374151'),
       textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
-      margin: '0 0 16px',
-      lineHeight: '24px',
-      fontSize: 14,
+      marginTop,
+      marginBottom,
+      marginLeft: maxWidth ? 'auto' : 0,
+      marginRight: maxWidth ? 'auto' : 0,
+      maxWidth: maxWidth ?? undefined,
+      lineHeight: '1.5',
+      fontSize,
+      fontFamily: emailFontStack(),
+      fontWeight: 400,
     };
     if (children) {
       return <div style={style}>{children}</div>;
@@ -217,6 +338,10 @@ export const buttonBlock: BlockConfig = {
     background: { kind: 'color', label: 'Background' },
     color: { kind: 'color', label: 'Text color' },
     align: { kind: 'align', label: 'Align' },
+    paddingX: { kind: 'number', label: 'Padding X (px)' },
+    paddingY: { kind: 'number', label: 'Padding Y (px)' },
+    borderRadius: { kind: 'number', label: 'Radius (px)' },
+    fontSize: { kind: 'number', label: 'Font size (px)' },
   },
   defaultData: {
     label: 'Get started',
@@ -224,29 +349,41 @@ export const buttonBlock: BlockConfig = {
     background: '#111827',
     color: '#ffffff',
     align: 'left',
+    paddingX: 20,
+    paddingY: 12,
+    borderRadius: 4,
+    fontSize: 14,
   },
-  render: ({ data }) => (
-    <Section
-      style={{
-        textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
-      }}
-    >
-      <Button
-        href={sanitizeUrl(String(data.href ?? '#'), { fallback: '#' })}
+  render: ({ data }) => {
+    const paddingX = num(data.paddingX, 20);
+    const paddingY = num(data.paddingY, 12);
+    const borderRadius = num(data.borderRadius, 4);
+    const fontSize = num(data.fontSize, 14);
+    return (
+      <Section
         style={{
-          background: String(data.background ?? '#111827'),
-          color: String(data.color ?? '#ffffff'),
-          padding: '12px 20px',
-          borderRadius: 4,
-          fontWeight: 600,
-          fontSize: 14,
-          textDecoration: 'none',
+          textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
         }}
       >
-        {String(data.label ?? 'Button')}
-      </Button>
-    </Section>
-  ),
+        <Button
+          href={sanitizeUrl(String(data.href ?? '#'), { fallback: '#' })}
+          style={{
+            background: String(data.background ?? '#111827'),
+            color: String(data.color ?? '#ffffff'),
+            padding: `${paddingY}px ${paddingX}px`,
+            borderRadius,
+            fontFamily: emailFontStack(),
+            fontWeight: 600,
+            fontSize,
+            lineHeight: '24px',
+            textDecoration: 'none',
+          }}
+        >
+          {String(data.label ?? 'Button')}
+        </Button>
+      </Section>
+    );
+  },
 };
 
 export const imageBlock: BlockConfig = {
@@ -258,6 +395,7 @@ export const imageBlock: BlockConfig = {
     width: { kind: 'number', label: 'Width (px)' },
     height: { kind: 'number', label: 'Height (px)' },
     borderRadius: { kind: 'number', label: 'Radius (px)' },
+    marginBottom: { kind: 'number', label: 'Margin bottom (px)' },
     align: { kind: 'align', label: 'Align' },
   },
   defaultData: {
@@ -271,6 +409,7 @@ export const imageBlock: BlockConfig = {
     const hasHeight = Number.isFinite(height) && height > 0;
     const borderRadius = Number(data.borderRadius);
     const hasRadius = Number.isFinite(borderRadius) && borderRadius > 0;
+    const marginBottom = optionalNum(data.marginBottom);
     const align = String(data.align ?? 'left');
     return (
       <Img
@@ -282,7 +421,7 @@ export const imageBlock: BlockConfig = {
           maxWidth: '100%',
           height: hasHeight ? height : 'auto',
           marginTop: 0,
-          marginBottom: hasHeight ? 0 : 16,
+          marginBottom: marginBottom ?? (hasHeight ? 0 : 16),
           marginLeft: align === 'center' || align === 'right' ? 'auto' : 0,
           marginRight: align === 'center' ? 'auto' : 0,
           borderRadius: hasRadius ? borderRadius : undefined,
@@ -334,7 +473,8 @@ export const spacerBlock: BlockConfig = {
 export const builtinEmailBlocks: BlockConfig[] = [
   rootBlock,
   sectionBlock,
-  columnsBlock,
+  rowBlock,
+  columnBlock,
   headingBlock,
   textBlock,
   buttonBlock,

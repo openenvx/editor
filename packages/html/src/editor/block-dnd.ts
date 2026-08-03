@@ -9,7 +9,9 @@ import type { Layer } from '@openenvx/schema';
 /** True when every visible child hugs content (e.g. email.imageLink row). */
 export function childrenUseInlineChrome(
   layers: readonly Layer[],
-  chromeDisplayFor: (type: string) => 'block' | 'inline' | undefined
+  chromeDisplayFor: (
+    type: string
+  ) => 'block' | 'inline' | 'contents' | undefined
 ): boolean {
   const visible = layers.filter(isLayerVisible);
   return (
