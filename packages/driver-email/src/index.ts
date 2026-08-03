@@ -52,10 +52,24 @@ export { EMAIL_FRAME_WIDTH, EmailEditorPane } from './editor/email-editor-pane';
 export { EmailBlocksPlugin } from './plugin/email-blocks-plugin';
 export { renderEmailDocument } from './render/render-email-document';
 export {
+  Button,
+  Column,
+  Email,
+  Heading,
+  ImageLink,
+  Img,
+  Link,
+  Row,
+  Section,
+  Text,
   createBarebonesActivationScene,
+  createBarebonesFeatureAnnouncementScene,
   emailTemplateCatalog,
   findTemplate,
   findTemplateCollection,
+  sceneFromEmailJsx,
+  type EmailJsxProps,
   type EmailTemplateCollection,
   type EmailTemplateEntry,
+  type SceneFromEmailJsxOptions,
 } from './templates';

@@ -11,6 +11,7 @@ Block editor for pages with `page.layout === 'email'`. Same core/headless/workbe
 ## What driver-email owns
 
 - Email `BlockConfig` set wrapping React-Email primitives (`email.root`, `email.section`, `email.row`, `email.column`, `email.heading`, `email.text`, `email.button`, `email.image`, `email.divider`, `email.spacer`)
+- **Templates** authored as JSX with inline `style={{ … }}` via `templates/jsx` (`Email`, `Section`, `Text`, …); `sceneFromEmailJsx()` compiles them into an editable Scene (inspector still sees `paddingX` / `marginBottom` / …). Catalog entries call `createScene()` which runs that compile on load.
 - Predefined patterns in `blocks/patterns/` via `defineEmailPattern` (one file = layout container + gallery meta; barrel `patterns/index.ts`). Patterns use **`data.children`** (Elements visible in Layers), like `email.section` — not `data.slots`. Examples: `email.header` (logo + `email.link` children), `email.articleWithImage` (image / text / heading / button). Gallery sheet: search + group chips; not the Elements palette
 - Own `emailBlockRegistry` + `EmailBlockRegistryServiceId` (does not mix with the html palette)
 - `EmailBlocksPlugin` — layer definitions, `email.*` block commands, **Blocks** activity command (opens sheet) + **Elements** (primitives) sidebar, `EmailEditorPane` for `page.layout === 'email'` (reuses html `HtmlDeviceToolbar` with Edit / Preview trailing control; artboard design width 640px — desktop frame 720px with slim body chrome, mobile 390px; `email.root` centers content at editable `maxWidth`, default 600)

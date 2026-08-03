@@ -22,6 +22,20 @@ import { imageLinkBlock } from './image-link';
 const EMAIL_WIDTH = 600;
 
 function num(value: unknown, fallback: number): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    const pxMatch = trimmed.match(/^(-?\d+(?:\.\d+)?)px$/i);
+    if (pxMatch) {
+      return Number(pxMatch[1]);
+    }
+    const asNumber = Number(trimmed);
+    if (Number.isFinite(asNumber)) {
+      return asNumber;
+    }
+  }
   const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
 }
@@ -427,7 +441,7 @@ export const imageBlock: BlockConfig = {
           borderRadius: hasRadius ? borderRadius : undefined,
           objectFit: hasHeight ? 'cover' : undefined,
         }}
-        width={Number(data.width ?? EMAIL_WIDTH) || EMAIL_WIDTH}
+        width={num(data.width, EMAIL_WIDTH)}
       />
     );
   },

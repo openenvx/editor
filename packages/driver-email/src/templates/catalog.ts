@@ -1,6 +1,7 @@
 import type { Scene } from '@openenvx/schema';
 
 import { createBarebonesActivationScene } from './scenes/barebones-activation';
+import { createBarebonesFeatureAnnouncementScene } from './scenes/barebones-feature-announcement';
 
 export interface EmailTemplateEntry {
   id: string;
@@ -27,6 +28,12 @@ export const emailTemplateCatalog: EmailTemplateCollection[] = [
         name: 'Activation',
         description: 'Confirm email address after signup.',
         createScene: createBarebonesActivationScene,
+      },
+      {
+        id: 'feature-announcement',
+        name: 'Feature announcement',
+        description: 'Release notes and what shipped this month.',
+        createScene: createBarebonesFeatureAnnouncementScene,
       },
     ],
   },

@@ -26,8 +26,8 @@ export const imageLinkBlock: BlockConfig = {
   },
   treeIcon: 'image',
   render: ({ data }) => {
-    const width = Number(data.width ?? 18);
-    const height = Number(data.height);
+    const width = parsePx(data.width, 18);
+    const height = parsePx(data.height, Number.NaN);
     const hasHeight = Number.isFinite(height) && height > 0;
     return (
       <Link
@@ -46,9 +46,27 @@ export const imageLinkBlock: BlockConfig = {
           height={hasHeight ? height : undefined}
           src={sanitizeUrl(String(data.src ?? ''), { allowDataImage: true })}
           style={{ display: 'block', border: 0 }}
-          width={Number.isFinite(width) && width > 0 ? width : 18}
+          width={width > 0 ? width : 18}
         />
       </Link>
     );
   },
 };
+
+function parsePx(value: unknown, fallback: number): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    const pxMatch = trimmed.match(/^(-?\d+(?:\.\d+)?)px$/i);
+    if (pxMatch) {
+      return Number(pxMatch[1]);
+    }
+    const asNumber = Number(trimmed);
+    if (Number.isFinite(asNumber)) {
+      return asNumber;
+    }
+  }
+  return fallback;
+}
