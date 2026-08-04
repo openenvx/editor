@@ -148,7 +148,10 @@ All packages are pre-1.0.0. Breaking API changes are expected and preferred over
 
 ### Implementation discipline
 
-- Minimize scope - smallest correct diff.
+- Follow **SOLID**, **KISS**, **YAGNI**, and clean-code principles on every change. Prefer the smallest design that solves the real problem; delete dead paths instead of layering workarounds.
+- Prefer known **design patterns** already used in this repo (contributions, registries, property paths, strategy/adapters at trust boundaries) over inventing new frameworks. Extract a shared helper once when two call sites share real logic — do not couple unrelated modules.
+- **Loose coupling:** a feature module must not reach into another feature’s internals. Cross features via public package exports, contribution APIs,events, or narrow adapters (e.g. DOM markers / pure geometry), never by importing shell/renderer code into content chrome or vice versa.
+- Minimize scope — smallest correct diff.
 - Match surrounding naming, types, and patterns.
 - Do not over-abstract or add tests that only assert the obvious.
 

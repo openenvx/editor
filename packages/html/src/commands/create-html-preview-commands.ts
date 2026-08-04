@@ -16,6 +16,7 @@ function getChrome(ctx: CommandContext): HtmlPreviewChromeService | null {
     return null;
   }
   const chrome = ctx.services.get(HtmlPreviewChromeServiceId);
+  // Hosts seed before mount via chrome.seedPreset — commands require an active pane.
   return chrome.isActive() ? chrome : null;
 }
 
@@ -43,7 +44,7 @@ export class HtmlZoomInCommand extends Command {
 
   canExecute(ctx: CommandContext): boolean {
     const chrome = getChrome(ctx);
-    return chrome !== null && chrome.getZoom() < HTML_ZOOM_MAX - 0.001;
+    return chrome !== null && chrome.getZoomFactor() < HTML_ZOOM_MAX - 0.001;
   }
 
   execute(ctx: CommandContext): void {
@@ -56,7 +57,7 @@ export class HtmlZoomOutCommand extends Command {
 
   canExecute(ctx: CommandContext): boolean {
     const chrome = getChrome(ctx);
-    return chrome !== null && chrome.getZoom() > HTML_ZOOM_MIN + 0.001;
+    return chrome !== null && chrome.getZoomFactor() > HTML_ZOOM_MIN + 0.001;
   }
 
   execute(ctx: CommandContext): void {

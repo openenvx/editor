@@ -4,8 +4,11 @@ import { act, renderHook } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { resolveViewHoveredIds, useViewTreeHoverExpand } from './use-view-tree-hover-sync';
 import { useViewTreeCollapseSeed } from './use-view-tree-collapse-seed';
+import {
+  resolveViewHoveredIds,
+  useViewTreeHoverExpand,
+} from './use-view-tree-hover-sync';
 import { useViewTreeSelectionSync } from './use-view-tree-selection-sync';
 
 const transform = {

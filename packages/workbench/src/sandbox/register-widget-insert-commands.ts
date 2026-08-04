@@ -11,7 +11,11 @@ import type {
   ExtensionManifest,
   ExtensionWidgetContribution,
 } from '@openenvx/protocol';
-import { createDefaultTransform, type Layer } from '@openenvx/schema';
+import {
+  createDefaultTransform,
+  type Layer,
+  type Page,
+} from '@openenvx/schema';
 
 function sizeFromDefaults(defaults: Record<string, unknown> | undefined): {
   width: number;
@@ -42,14 +46,27 @@ function insertCommandId(widget: ExtensionWidgetContribution): string {
   return `${widget.id}.insert`;
 }
 
-function findHtmlRootId(layers: Layer[]): string | null {
-  return layers.find((layer) => layer.type === 'html.root')?.id ?? null;
+/**
+ * Nest widgets under the page root for html-like layouts only.
+ * Never under `email.root` (widgets do not round-trip through email render).
+ */
+function findHtmlLikeRootId(page: Page): string | null {
+  if (page.layout !== 'html') {
+    return null;
+  }
+  return (
+    page.layers.find((layer) => layer.type === 'html.root')?.id ??
+    page.layers.find(
+      (layer) => layer.type.endsWith('.root') && layer.type !== 'email.root'
+    )?.id ??
+    null
+  );
 }
 
 /**
  * Register host Commands that drop widget layers for each widgets/blocks
  * contribution. Command id is `${widget.id}.insert`. Outer-world path — no
- * internal Plugin. HTML pages nest under `html.root`; canvas pages append to
+ * internal Plugin. HTML pages nest under the page `*.root`; canvas pages append to
  * page.layers. `contributes.blocks` also register in {@link extensionBlockStore}
  * for the HTML Blocks palette.
  */
@@ -111,7 +128,7 @@ export function registerWidgetInsertCommands(
               apply: (scene) => {
                 const selection = host.getSelection();
                 const page = getActivePage(scene, selection.activePageId);
-                const htmlRootId = findHtmlRootId(page.layers);
+                const htmlRootId = findHtmlLikeRootId(page);
                 return {
                   ...scene,
                   pages: scene.pages.map((entry) => {

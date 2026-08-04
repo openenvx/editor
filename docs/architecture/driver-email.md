@@ -40,4 +40,5 @@ Hosts load `new EmailBlocksPlugin()` (alongside workbench defaults). Demo: `apps
 ## Related
 
 - HTML block editor: [html.md](html.md)
+- Surface naming (stage / artboard / page root) + click selection: [html-editor-surfaces.md](html-editor-surfaces.md)
 - Workbench chrome: [workbench-and-headless.md](workbench-and-headless.md)

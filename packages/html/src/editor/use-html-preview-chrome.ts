@@ -13,7 +13,8 @@ import {
   type HtmlPreviewChromeState,
 } from '../preview/html-preview-chrome-service';
 import {
-  resolveAutoZoom,
+  resolveEffectiveZoom,
+  resolveFitZoom,
   resolveFrameWidth as defaultResolveFrameWidth,
   resolveScaledFrameWidth,
   type HtmlDevicePreset,
@@ -22,9 +23,12 @@ import { useHtmlDeviceStageMetrics } from './use-html-device-stage-metrics';
 
 export interface HtmlPreviewChromeView {
   preset: HtmlDevicePreset;
+  /** Absolute CSS scale (zoomFactor * fitZoom). */
   zoom: number;
-  autoZoom: boolean;
-  autoZoomValue: number;
+  /** User-facing factor; 1 = fit-width. */
+  zoomFactor: number;
+  /** fit-width scale (≤ 1). */
+  fitZoom: number;
   frameWidth: number;
   stageWidth: number;
   scaledWidth: number;
@@ -35,10 +39,9 @@ export interface HtmlPreviewChromeView {
 }
 
 const EMPTY_STATE: HtmlPreviewChromeState = {
-  autoZoom: false,
-  autoZoomValue: 1,
-  manualZoom: 1,
+  fitZoom: 1,
   preset: 'fluid',
+  zoomFactor: 1,
 };
 
 export function useHtmlPreviewChrome(options?: {
@@ -91,21 +94,20 @@ export function useHtmlPreviewChrome(options?: {
     useHtmlDeviceStageMetrics(state.preset);
 
   const frameWidth = resolveWidth(state.preset, stageWidth);
-  const autoZoomValue = resolveAutoZoom(frameWidth, stageWidth);
+  const fitZoom = resolveFitZoom(frameWidth, stageWidth);
 
   useLayoutEffect(() => {
-    chrome?.reportAutoZoomValue(autoZoomValue);
-  }, [autoZoomValue, chrome]);
+    chrome?.reportFitZoom(fitZoom);
+  }, [chrome, fitZoom]);
 
-  const zoom = state.autoZoom ? autoZoomValue : state.manualZoom;
+  const zoom = resolveEffectiveZoom(state.zoomFactor, fitZoom);
   const scaledWidth = resolveScaledFrameWidth(frameWidth, zoom);
   const scaledHeight = artboardHeight > 0 ? artboardHeight * zoom : undefined;
 
   return {
     artboardHeight,
     artboardRef,
-    autoZoom: state.autoZoom,
-    autoZoomValue,
+    fitZoom,
     frameWidth,
     preset: state.preset,
     scaledHeight,
@@ -113,5 +115,6 @@ export function useHtmlPreviewChrome(options?: {
     stageRef,
     stageWidth,
     zoom,
+    zoomFactor: state.zoomFactor,
   };
 }

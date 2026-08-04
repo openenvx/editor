@@ -28,7 +28,16 @@ import {
   useSyncExternalStore,
 } from 'react';
 
+import type { ResolvedRichTextToolbar } from './rich-text-toolbar';
+
 import styles from './html-editor-pane.module.css';
+
+const DEFAULT_TOOLBAR: ResolvedRichTextToolbar = {
+  blockType: true,
+  link: true,
+  code: true,
+  align: true,
+};
 
 /** Bubble portals to body — copy shell theme so `--wb-*` tokens resolve. */
 function readDocumentTheme(): string {
@@ -162,7 +171,13 @@ function applyLink(editor: Editor, href: string) {
     .run();
 }
 
-export function HtmlRichTextBubbleMenuToolbar({ editor }: { editor: Editor }) {
+export function HtmlRichTextBubbleMenuToolbar({
+  editor,
+  toolbar = DEFAULT_TOOLBAR,
+}: {
+  editor: Editor;
+  toolbar?: ResolvedRichTextToolbar;
+}) {
   const [blockMenuOpen, setBlockMenuOpen] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkValue, setLinkValue] = useState('');
@@ -223,6 +238,11 @@ export function HtmlRichTextBubbleMenuToolbar({ editor }: { editor: Editor }) {
     setLinkOpen(false);
   };
 
+  const showAlign = toolbar.align;
+  const showBlockType = toolbar.blockType;
+  const showLink = toolbar.link;
+  const showCode = toolbar.code;
+
   return (
     <div
       aria-label="Text formatting"
@@ -233,92 +253,98 @@ export function HtmlRichTextBubbleMenuToolbar({ editor }: { editor: Editor }) {
       role="toolbar"
       tabIndex={-1}
     >
-      <div className={styles.bubbleMenuGroup} ref={popoverRef}>
-        <button
-          aria-expanded={blockMenuOpen}
-          aria-haspopup="menu"
-          aria-label="Block type"
-          className={styles.blockTypeButton}
-          onClick={() => {
-            setLinkOpen(false);
-            setBlockMenuOpen((open) => !open);
-          }}
-          type="button"
-        >
-          <span>{currentBlock.label}</span>
-          <ChevronDown size={14} />
-        </button>
-        <FormatButton
-          active={state.link}
-          label="Link"
-          onPress={() => {
-            setBlockMenuOpen(false);
-            setLinkValue(state.linkHref || 'https://');
-            setLinkOpen((open) => !open);
-          }}
-        >
-          <LinkIcon size={14} />
-        </FormatButton>
-        {blockMenuOpen ? (
-          <div className={styles.blockTypeMenu} role="menu">
-            {BLOCK_OPTIONS.map((option) => {
-              const selected = option.format === state.blockFormat;
-              return (
+      {showBlockType || showLink ? (
+        <div className={styles.bubbleMenuGroup} ref={popoverRef}>
+          {showBlockType ? (
+            <button
+              aria-expanded={blockMenuOpen}
+              aria-haspopup="menu"
+              aria-label="Block type"
+              className={styles.blockTypeButton}
+              onClick={() => {
+                setLinkOpen(false);
+                setBlockMenuOpen((open) => !open);
+              }}
+              type="button"
+            >
+              <span>{currentBlock.label}</span>
+              <ChevronDown size={14} />
+            </button>
+          ) : null}
+          {showLink ? (
+            <FormatButton
+              active={state.link}
+              label="Link"
+              onPress={() => {
+                setBlockMenuOpen(false);
+                setLinkValue(state.linkHref || 'https://');
+                setLinkOpen((open) => !open);
+              }}
+            >
+              <LinkIcon size={14} />
+            </FormatButton>
+          ) : null}
+          {showBlockType && blockMenuOpen ? (
+            <div className={styles.blockTypeMenu} role="menu">
+              {BLOCK_OPTIONS.map((option) => {
+                const selected = option.format === state.blockFormat;
+                return (
+                  <button
+                    aria-checked={selected}
+                    className={`${styles.blockTypeMenuItem} ${selected ? styles.blockTypeMenuItemActive : ''}`}
+                    key={option.format}
+                    onClick={() => {
+                      applyBlockFormat(editor, option.format);
+                      setBlockMenuOpen(false);
+                    }}
+                    role="menuitemradio"
+                    type="button"
+                  >
+                    <span className={styles.blockTypeMenuIcon}>
+                      {option.icon}
+                    </span>
+                    <span>{option.label}</span>
+                    {selected ? (
+                      <span aria-hidden className={styles.blockTypeMenuCheck}>
+                        ✓
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+          {showLink && linkOpen ? (
+            <form className={styles.linkPopover} onSubmit={submitLink}>
+              <input
+                aria-label="Link URL"
+                autoFocus
+                className={styles.linkInput}
+                onChange={(event) => setLinkValue(event.target.value)}
+                placeholder="https://"
+                value={linkValue}
+              />
+              <button className={styles.linkApply} type="submit">
+                Apply
+              </button>
+              {state.link ? (
                 <button
-                  aria-checked={selected}
-                  className={`${styles.blockTypeMenuItem} ${selected ? styles.blockTypeMenuItemActive : ''}`}
-                  key={option.format}
+                  className={styles.linkApply}
                   onClick={() => {
-                    applyBlockFormat(editor, option.format);
-                    setBlockMenuOpen(false);
+                    applyLink(editor, '');
+                    setLinkOpen(false);
                   }}
-                  role="menuitemradio"
                   type="button"
                 >
-                  <span className={styles.blockTypeMenuIcon}>
-                    {option.icon}
-                  </span>
-                  <span>{option.label}</span>
-                  {selected ? (
-                    <span aria-hidden className={styles.blockTypeMenuCheck}>
-                      ✓
-                    </span>
-                  ) : null}
+                  Remove
                 </button>
-              );
-            })}
-          </div>
-        ) : null}
-        {linkOpen ? (
-          <form className={styles.linkPopover} onSubmit={submitLink}>
-            <input
-              aria-label="Link URL"
-              autoFocus
-              className={styles.linkInput}
-              onChange={(event) => setLinkValue(event.target.value)}
-              placeholder="https://"
-              value={linkValue}
-            />
-            <button className={styles.linkApply} type="submit">
-              Apply
-            </button>
-            {state.link ? (
-              <button
-                className={styles.linkApply}
-                onClick={() => {
-                  applyLink(editor, '');
-                  setLinkOpen(false);
-                }}
-                type="button"
-              >
-                Remove
-              </button>
-            ) : null}
-          </form>
-        ) : null}
-      </div>
+              ) : null}
+            </form>
+          ) : null}
+        </div>
+      ) : null}
 
-      <Divider />
+      {showBlockType || showLink ? <Divider /> : null}
 
       <div className={styles.bubbleMenuGroup}>
         <FormatButton
@@ -349,13 +375,15 @@ export function HtmlRichTextBubbleMenuToolbar({ editor }: { editor: Editor }) {
         >
           <Strikethrough size={14} />
         </FormatButton>
-        <FormatButton
-          active={state.code}
-          label="Inline code"
-          onPress={() => editor.chain().focus().toggleCode().run()}
-        >
-          <Code size={14} />
-        </FormatButton>
+        {showCode ? (
+          <FormatButton
+            active={state.code}
+            label="Inline code"
+            onPress={() => editor.chain().focus().toggleCode().run()}
+          >
+            <Code size={14} />
+          </FormatButton>
+        ) : null}
         <label
           className={`${styles.formatButton} ${styles.colorSwatch}`}
           title="Text color"
@@ -374,31 +402,36 @@ export function HtmlRichTextBubbleMenuToolbar({ editor }: { editor: Editor }) {
         </label>
       </div>
 
-      <Divider />
-
-      <div className={styles.bubbleMenuGroup}>
-        <FormatButton
-          active={state.alignLeft}
-          label="Align left"
-          onPress={() => editor.chain().focus().setTextAlign('left').run()}
-        >
-          <AlignLeft size={14} />
-        </FormatButton>
-        <FormatButton
-          active={state.alignCenter}
-          label="Align center"
-          onPress={() => editor.chain().focus().setTextAlign('center').run()}
-        >
-          <AlignCenter size={14} />
-        </FormatButton>
-        <FormatButton
-          active={state.alignRight}
-          label="Align right"
-          onPress={() => editor.chain().focus().setTextAlign('right').run()}
-        >
-          <AlignRight size={14} />
-        </FormatButton>
-      </div>
+      {showAlign ? (
+        <>
+          <Divider />
+          <div className={styles.bubbleMenuGroup}>
+            <FormatButton
+              active={state.alignLeft}
+              label="Align left"
+              onPress={() => editor.chain().focus().setTextAlign('left').run()}
+            >
+              <AlignLeft size={14} />
+            </FormatButton>
+            <FormatButton
+              active={state.alignCenter}
+              label="Align center"
+              onPress={() =>
+                editor.chain().focus().setTextAlign('center').run()
+              }
+            >
+              <AlignCenter size={14} />
+            </FormatButton>
+            <FormatButton
+              active={state.alignRight}
+              label="Align right"
+              onPress={() => editor.chain().focus().setTextAlign('right').run()}
+            >
+              <AlignRight size={14} />
+            </FormatButton>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

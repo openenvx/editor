@@ -1,3 +1,4 @@
+import type { Editor } from '@tiptap/react';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -8,50 +9,50 @@ import {
 
 afterEach(cleanup);
 
+function mockEditor(args: {
+  empty?: boolean;
+  text?: string;
+  from?: number;
+  to?: number;
+  coords?: { top: number; bottom: number; left: number; right: number };
+}): Editor {
+  const from = args.from ?? 0;
+  const to = args.to ?? 5;
+  const coords = args.coords ?? {
+    top: 100,
+    bottom: 120,
+    left: 40,
+    right: 120,
+  };
+  return {
+    state: {
+      selection: { from, to, empty: args.empty ?? false },
+      doc: {
+        textBetween: () => args.text ?? (args.empty ? '' : 'Hello'),
+      },
+    },
+    view: {
+      coordsAtPos: () => coords,
+    },
+  } as never;
+}
+
 describe('shouldShowRichTextBubbleMenu', () => {
-  it('hides for empty caret and shows for any non-empty selection', () => {
-    const emptyState = {
-      selection: { from: 1, to: 1, empty: true },
-      doc: {
-        content: { size: 10 },
-        textBetween: () => '',
-      },
-    };
+  it('hides for empty caret and shows for an on-screen selection', () => {
     expect(
-      shouldShowRichTextBubbleMenu({
-        editor: {} as never,
-        state: emptyState as never,
-      })
+      shouldShowRichTextBubbleMenu(mockEditor({ empty: true, text: '' }))
     ).toBe(false);
+    expect(shouldShowRichTextBubbleMenu(mockEditor({}))).toBe(true);
+  });
 
-    const fullState = {
-      selection: { from: 0, to: 5, empty: false },
-      doc: {
-        content: { size: 5 },
-        textBetween: () => 'Hello',
-      },
-    };
+  it('hides when the selection is mostly scrolled off-screen', () => {
     expect(
-      shouldShowRichTextBubbleMenu({
-        editor: {} as never,
-        state: fullState as never,
-      })
-    ).toBe(true);
-
-    const partialState = {
-      selection: { from: 0, to: 2, empty: false },
-      doc: {
-        content: { size: 5 },
-        textBetween: (from: number, to: number) =>
-          from === 0 && to === 2 ? 'He' : 'Hello',
-      },
-    };
-    expect(
-      shouldShowRichTextBubbleMenu({
-        editor: {} as never,
-        state: partialState as never,
-      })
-    ).toBe(true);
+      shouldShowRichTextBubbleMenu(
+        mockEditor({
+          coords: { top: -80, bottom: -20, left: 40, right: 120 },
+        })
+      )
+    ).toBe(false);
   });
 });
 

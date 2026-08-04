@@ -13,12 +13,12 @@ import {
   isLayerVisible,
   WIDGET_LAYER_TYPE,
 } from '@openenvx/core';
-import { isTypingTarget } from '@openenvx/headless';
 import type { Layer, Scene } from '@openenvx/schema';
 import {
-  Fragment,
   memo,
   useCallback,
+  useEffect,
+  useState,
   type HTMLAttributes,
   type KeyboardEvent,
   type MouseEvent,
@@ -27,6 +27,7 @@ import {
 
 import type { BlockRegistry } from '../block-registry';
 import { getBlockChildren } from '../tree/block-tree';
+import { BlockChrome } from './block-chrome';
 import {
   childrenUseInlineChrome,
   insertLineIsVertical,
@@ -40,11 +41,16 @@ import {
   BlockEditorProvider,
   useBlockEditor,
   type BlockEditTarget,
+  type BlockImageTarget,
 } from './block-editor-context';
-import { BlockSelectionMenu } from './block-selection-menu';
 import { HtmlRichTextEditor } from './html-rich-text-editor';
-import { emitOpenEnvxHtmlWidgetClick } from './html-widget-click-handler';
+import {
+  primaryImageFieldKey,
+  resolveImageFieldsInData,
+} from './primary-image-field';
 import { parseRichTextAlign, type RichTextAlign } from './rich-text-align';
+import { resolveRichTextToolbar } from './rich-text-toolbar';
+import { buildSlotNodes } from './slot-part-content';
 
 import styles from './html-editor-pane.module.css';
 
@@ -115,215 +121,6 @@ function visibleEntriesForParent(
 ): { child: Layer; childIndex: number }[] {
   return layers.flatMap((child, childIndex) =>
     isLayerVisible(child) ? [{ child, childIndex }] : []
-  );
-}
-
-function BlockChrome({
-  layer,
-  label,
-  selected,
-  editing = false,
-  dragDisabled,
-  isDraggingGhost,
-  dropContainerPreview,
-  insertLineBefore,
-  insertLineAfter,
-  insertLineVertical,
-  canDuplicate,
-  canRemove,
-  insideWidget = false,
-  chromeDisplay = 'block',
-  setNodeRef,
-  sortableProps,
-  dragHandleProps,
-  children,
-}: {
-  layer: Layer;
-  label: string;
-  selected: boolean;
-  /** Hide block chrome while TipTap owns the selection bubble. */
-  editing?: boolean;
-  dragDisabled: boolean;
-  /** Dragging source stays put, grayed; only the insert line moves. */
-  isDraggingGhost?: boolean;
-  dropContainerPreview?: boolean;
-  insertLineBefore?: boolean;
-  insertLineAfter?: boolean;
-  insertLineVertical?: boolean;
-  canDuplicate: boolean;
-  canRemove: boolean;
-  /** True when this block is under an `openenvx.widget` ancestor (or is one). */
-  insideWidget?: boolean;
-  chromeDisplay?: 'block' | 'inline' | 'contents';
-  setNodeRef?: (node: HTMLElement | null) => void;
-  /** dnd-kit listeners/attributes on the block wrap (full-chrome drag). */
-  sortableProps?: Record<string, unknown>;
-  /** Same listeners on the selection-menu grip (extra affordance). */
-  dragHandleProps?: HTMLAttributes<HTMLButtonElement>;
-  children: ReactNode;
-}) {
-  const {
-    onSelect,
-    onDuplicate,
-    onRemove,
-    hoveredLayerId,
-    onHoverLayer,
-    sortDraft,
-  } = useBlockEditor();
-  const hovered =
-    hoveredLayerId === layer.id && !selected && sortDraft === null;
-
-  const activate = useCallback(() => {
-    if (insideWidget) {
-      emitOpenEnvxHtmlWidgetClick(layer.id);
-    }
-    onSelect(layer.id);
-  }, [insideWidget, layer.id, onSelect]);
-
-  const handleClick = useCallback(
-    (event: MouseEvent) => {
-      event.stopPropagation();
-      // React-Email Button/Link render <a href> — don't navigate / hash-scroll in the editor.
-      const target = event.target;
-      const el =
-        target instanceof Element
-          ? target
-          : target instanceof Node
-            ? target.parentElement
-            : null;
-      if (el?.closest('a[href]')) {
-        event.preventDefault();
-      }
-      activate();
-    },
-    [activate]
-  );
-
-  const handleContextMenu = useCallback(
-    (event: MouseEvent) => {
-      event.stopPropagation();
-      onSelect(layer.id);
-    },
-    [layer.id, onSelect]
-  );
-
-  const handlePointerEnter = useCallback(() => {
-    onHoverLayer(layer.id);
-  }, [layer.id, onHoverLayer]);
-
-  const handlePointerLeave = useCallback(
-    (event: MouseEvent) => {
-      const related = event.relatedTarget;
-      if (related instanceof Node && event.currentTarget.contains(related)) {
-        return;
-      }
-      const parent =
-        event.currentTarget.parentElement?.closest('[data-layer-id]');
-      onHoverLayer(
-        parent instanceof HTMLElement ? (parent.dataset.layerId ?? null) : null
-      );
-    },
-    [onHoverLayer]
-  );
-
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (editing || isTypingTarget(event.target)) {
-        return;
-      }
-      if (event.key !== 'Enter' && event.key !== ' ') {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      activate();
-    },
-    [activate, editing]
-  );
-
-  const handleDuplicate = useCallback(() => {
-    onDuplicate(layer.id);
-  }, [layer.id, onDuplicate]);
-
-  const handleRemove = useCallback(() => {
-    onRemove(layer.id);
-  }, [layer.id, onRemove]);
-
-  // display:contents has no box — dnd-kit must measure the first child (e.g. td).
-  const bindSortableRef = useCallback(
-    (node: HTMLElement | null) => {
-      if (!setNodeRef) {
-        return;
-      }
-      if (!node) {
-        setNodeRef(null);
-        return;
-      }
-      if (chromeDisplay === 'contents') {
-        const child = node.firstElementChild;
-        setNodeRef(child instanceof HTMLElement ? child : node);
-        return;
-      }
-      setNodeRef(node);
-    },
-    [chromeDisplay, setNodeRef]
-  );
-
-  const lineClass = insertLineVertical
-    ? {
-        before: styles.blockWrapInsertLineBeforeVertical,
-        after: styles.blockWrapInsertLineAfterVertical,
-      }
-    : {
-        before: styles.blockWrapInsertLineBefore,
-        after: styles.blockWrapInsertLineAfter,
-      };
-
-  return (
-    <div
-      className={[
-        styles.blockWrap,
-        chromeDisplay === 'inline' ? styles.blockWrapInline : '',
-        chromeDisplay === 'contents' ? styles.blockWrapContents : '',
-        selected ? styles.blockWrapSelected : '',
-        hovered ? styles.blockWrapHovered : '',
-        dragDisabled ? '' : styles.blockWrapDraggable,
-        isDraggingGhost ? styles.blockWrapDraggingGhost : '',
-        dropContainerPreview ? styles.blockWrapDropContainer : '',
-        insertLineBefore ? lineClass.before : '',
-        insertLineAfter ? lineClass.after : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      data-layer-id={layer.id}
-      ref={bindSortableRef}
-      role="treeitem"
-      tabIndex={selected ? 0 : -1}
-      onClick={handleClick}
-      onContextMenu={handleContextMenu}
-      onKeyDown={handleKeyDown}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-      {...sortableProps}
-    >
-      {selected &&
-      !editing &&
-      !isDraggingGhost &&
-      // contents chrome has no box — menu only skipped for structural cases
-      // (e.g. email.column). Never use contents just to dodge layout chrome.
-      chromeDisplay !== 'contents' ? (
-        <BlockSelectionMenu
-          canDrag={!dragDisabled}
-          canDuplicate={canDuplicate}
-          canRemove={canRemove}
-          dragHandleProps={dragDisabled ? undefined : dragHandleProps}
-          label={label}
-          onDuplicate={handleDuplicate}
-          onRemove={handleRemove}
-        />
-      ) : null}
-      {children}
-    </div>
   );
 }
 
@@ -422,132 +219,10 @@ function ContainerChildren({
           parentType={layer.type}
           registry={registry}
         />
-      ) : showInsertLine ? (
-        <DropInsertLine vertical={verticalLine} />
       ) : null}
+      {showInsertLine ? <DropInsertLine vertical={verticalLine} /> : null}
     </DropZone>
   );
-}
-
-function SlotPartContent({
-  hostId,
-  dataPath,
-  part,
-  registry,
-}: {
-  hostId: string;
-  dataPath: string;
-  part: Layer;
-  registry: BlockRegistry;
-}) {
-  const { selectedId, editingTarget, onSelect, onStartEdit, onCommitEdit } =
-    useBlockEditor();
-  const config = registry.get(part.type);
-  const textBlock = isRichTextBlock(registry, part.type);
-  const editable = canEditLayerData(part);
-  const data = layerDataRecord(part);
-  const editing =
-    editingTarget?.hostId === hostId && editingTarget.dataPath === dataPath;
-
-  const handleClick = useCallback(
-    (event: MouseEvent) => {
-      event.stopPropagation();
-      onSelect(hostId);
-      if (textBlock && editable) {
-        onStartEdit(hostId, dataPath);
-      }
-    },
-    [dataPath, editable, hostId, onSelect, onStartEdit, textBlock]
-  );
-
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key !== 'Enter' && event.key !== ' ') {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      onSelect(hostId);
-      if (textBlock && editable) {
-        onStartEdit(hostId, dataPath);
-      }
-    },
-    [dataPath, editable, hostId, onSelect, onStartEdit, textBlock]
-  );
-
-  const handleCommit = useCallback(
-    (html: string, nextAlign?: RichTextAlign) => {
-      onCommitEdit(hostId, dataPath, html, nextAlign);
-    },
-    [dataPath, hostId, onCommitEdit]
-  );
-
-  if (!(config && isLayerVisible(part))) {
-    return null;
-  }
-
-  if (textBlock && editable) {
-    return (
-      <div
-        className={styles.blockEditableHit}
-        role="button"
-        tabIndex={selectedId === hostId ? 0 : -1}
-        onClick={editing ? undefined : handleClick}
-        onKeyDown={editing ? undefined : handleKeyDown}
-      >
-        {editing
-          ? config.render({
-              data,
-              children: (
-                <HtmlRichTextEditor
-                  align={parseRichTextAlign(data.align)}
-                  html={String(data.html ?? '')}
-                  onCommit={handleCommit}
-                />
-              ),
-            })
-          : config.render({ data })}
-      </div>
-    );
-  }
-
-  return (
-    <div role="presentation" onClick={handleClick} onKeyDown={handleKeyDown}>
-      {config.render({ data })}
-    </div>
-  );
-}
-
-function buildSlotNodes(
-  host: Layer,
-  registry: BlockRegistry
-): Record<string, ReactNode> | undefined {
-  const config = registry.get(host.type);
-  if (!config?.slots) {
-    return undefined;
-  }
-  const data = layerDataRecord(host);
-  const slotsRaw =
-    data.slots && typeof data.slots === 'object' && data.slots !== null
-      ? (data.slots as Record<string, unknown>)
-      : {};
-  const result: Record<string, ReactNode> = {};
-  for (const slotKey of Object.keys(config.slots)) {
-    const parts = Array.isArray(slotsRaw[slotKey])
-      ? (slotsRaw[slotKey] as Layer[])
-      : [];
-    result[slotKey] = parts.map((part, index) => (
-      <Fragment key={part.id}>
-        <SlotPartContent
-          dataPath={`slots.${slotKey}.${index}.data.html`}
-          hostId={host.id}
-          part={part}
-          registry={registry}
-        />
-      </Fragment>
-    ));
-  }
-  return result;
 }
 
 function BlockContent({
@@ -561,13 +236,19 @@ function BlockContent({
   editing: boolean;
   insideWidget: boolean;
 }) {
-  const { onSelect, onStartEdit, onCommitEdit } = useBlockEditor();
+  const { onSelect, onStartEdit, onCommitEdit, resolveAssetUrl, scene } =
+    useBlockEditor();
   const config = registry.get(layer.type);
   const textBlock = isRichTextBlock(registry, layer.type);
   const editable = canEditLayerData(layer);
   const acceptsChildren = config?.acceptsChildren === true;
-  const data = layerDataRecord(layer);
+  const data = resolveImageFieldsInData(
+    layerDataRecord(layer),
+    resolveAssetUrl,
+    config?.fields
+  );
   const slotNodes = buildSlotNodes(layer, registry);
+  const toolbar = resolveRichTextToolbar(layer, scene, registry);
 
   const handleEditableClick = useCallback(
     (event: MouseEvent) => {
@@ -609,9 +290,10 @@ function BlockContent({
           data,
           children: (
             <HtmlRichTextEditor
-              align={parseRichTextAlign(data.align)}
+              align={toolbar.align ? parseRichTextAlign(data.align) : undefined}
               html={String(data.html ?? '')}
               onCommit={handleCommit}
+              toolbar={toolbar}
             />
           ),
         })}
@@ -681,6 +363,7 @@ function SortableBlockNode({
   const dragDisabled = editing || !reorderable;
   const canDuplicate = canDuplicateLayer(layer, scene);
   const canRemove = canDeleteLayer(layer, scene);
+  const imageFieldKey = primaryImageFieldKey(config?.fields);
   const dropContainerPreview =
     sortDraft?.containerPreview === true &&
     sortDraft.parentId === layer.id &&
@@ -717,6 +400,7 @@ function SortableBlockNode({
       dragDisabled={dragDisabled}
       dropContainerPreview={dropContainerPreview}
       editing={editing}
+      imageFieldKey={imageFieldKey}
       insertLineAfter={insertLineAfter}
       insertLineBefore={insertLineBefore}
       insertLineVertical={insertLineVertical}
@@ -746,7 +430,11 @@ function SortableBlockNode({
   );
 }
 
-/** The page frame is not a selectable block — page props live in Layers + inspector. */
+/**
+ * Page root has no BlockChrome (no outline / selection pill).
+ * Select it by clicking the artboard; nested blocks still use BlockChrome.
+ * See docs/architecture/html-editor-surfaces.md.
+ */
 function RootBlockNode({
   layer,
   registry,
@@ -777,12 +465,15 @@ export const BlockTreeRenderer = memo(
     hoveredLayerId = null,
     editingTarget,
     sortDraft,
+    canReplaceImage = false,
     onSelect,
     onHoverLayer,
     onStartEdit,
     onCommitEdit,
     onDuplicate,
     onRemove,
+    onReplaceImage,
+    resolveAssetUrl,
   }: {
     layers: readonly Layer[];
     registry: BlockRegistry;
@@ -791,6 +482,7 @@ export const BlockTreeRenderer = memo(
     hoveredLayerId?: string | null;
     editingTarget: BlockEditTarget | null;
     sortDraft: BlockSortDraft | null;
+    canReplaceImage?: boolean;
     onSelect: (id: string) => void;
     onHoverLayer?: (id: string | null) => void;
     onStartEdit: (hostId: string, dataPath: string) => void;
@@ -802,25 +494,48 @@ export const BlockTreeRenderer = memo(
     ) => void;
     onDuplicate: (id: string) => void;
     onRemove: (id: string) => void;
-  }) => (
-    <BlockEditorProvider
-      value={{
-        scene,
-        selectedId,
-        hoveredLayerId,
-        editingTarget,
-        sortDraft,
-        onSelect,
-        onHoverLayer: onHoverLayer ?? (() => {}),
-        onStartEdit,
-        onCommitEdit,
-        onDuplicate,
-        onRemove,
-      }}
-    >
-      {layers.map((layer) => (
-        <RootBlockNode key={layer.id} layer={layer} registry={registry} />
-      ))}
-    </BlockEditorProvider>
-  )
+    onReplaceImage?: (
+      layerId: string,
+      fieldPath: string,
+      file: File
+    ) => void | Promise<void>;
+    resolveAssetUrl?: (ref: string) => string;
+  }) => {
+    const [imageOverride, setImageOverride] = useState<BlockImageTarget | null>(
+      null
+    );
+
+    useEffect(() => {
+      setImageOverride((prev) =>
+        prev && prev.layerId !== selectedId ? null : prev
+      );
+    }, [selectedId]);
+
+    return (
+      <BlockEditorProvider
+        value={{
+          scene,
+          selectedId,
+          hoveredLayerId,
+          editingTarget,
+          sortDraft,
+          canReplaceImage,
+          imageOverride,
+          setImageOverride,
+          onSelect,
+          onHoverLayer: onHoverLayer ?? (() => {}),
+          onStartEdit,
+          onCommitEdit,
+          onDuplicate,
+          onRemove,
+          onReplaceImage: onReplaceImage ?? (() => {}),
+          resolveAssetUrl: resolveAssetUrl ?? ((ref) => ref),
+        }}
+      >
+        {layers.map((layer) => (
+          <RootBlockNode key={layer.id} layer={layer} registry={registry} />
+        ))}
+      </BlockEditorProvider>
+    );
+  }
 );

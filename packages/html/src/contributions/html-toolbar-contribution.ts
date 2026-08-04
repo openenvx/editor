@@ -7,17 +7,12 @@ import {
 
 import { HTML_ZOOM_PRESETS } from '../editor/html-device-preview';
 
-const HTML_ZOOM_DROPDOWN_ITEMS: ShellDropdownMenuItemDescriptor[] = [
-  ...HTML_ZOOM_PRESETS.map((zoom) => ({
+const HTML_ZOOM_DROPDOWN_ITEMS: ShellDropdownMenuItemDescriptor[] =
+  HTML_ZOOM_PRESETS.map((zoom) => ({
     args: { zoom },
     commandId: 'html.zoomPercent',
     label: `${Math.round(zoom * 100)}%`,
-  })),
-  {
-    commandId: 'html.zoomAuto',
-    labelKey: 'toolbar.zoomAuto',
-  },
-];
+  }));
 
 export class HtmlToolbarContribution extends ToolbarContribution {
   contribute(builder: ToolbarBuilder, _ctx: CommandContext): void {
@@ -48,7 +43,7 @@ export class HtmlToolbarContribution extends ToolbarContribution {
         labelKey: 'toolbar.deviceFluid',
         priority: 2,
         toggledWhen: "html.devicePreset == 'fluid'",
-        when: 'html.previewActive',
+        when: 'html.previewActive && !html.hideFluidPreset',
       })
       .separator('html-toolbar-sep-1', {
         priority: 10,

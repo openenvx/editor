@@ -1,4 +1,4 @@
-import { Command } from '@openenvx/core';
+import { Command, isLayoutRootLayer } from '@openenvx/core';
 import type { CommandContext, ServiceId } from '@openenvx/core';
 
 import type { BlockRegistry } from '../block-registry';
@@ -17,7 +17,7 @@ import {
 export interface BlockCommandSetOptions {
   /** Command id prefix, e.g. `html` → `html.insertBlock`. */
   prefix: string;
-  /** Root layer type that cannot be removed/moved/duplicated. */
+  /** Preferred root layer type (also any `*.root` is protected). */
   rootType: string;
   registryServiceId: ServiceId<BlockRegistry>;
   /**
@@ -99,7 +99,7 @@ export function createBlockCommands(
     const found = findBlock(page.layers, id);
     return Boolean(
       found &&
-      found.block.type !== rootType &&
+      !isLayoutRootLayer(found.block) &&
       isDriverBlockType(found.block.type)
     );
   }
@@ -120,7 +120,7 @@ export function createBlockCommands(
     const found = findBlock(page.layers, id);
     if (
       !found ||
-      found.block.type === rootType ||
+      isLayoutRootLayer(found.block) ||
       !isDriverBlockType(found.block.type)
     ) {
       return false;
@@ -185,7 +185,7 @@ export function createBlockCommands(
           return;
         }
         const config = registry.get(type);
-        if (!config || type === rootType) {
+        if (!config || type.endsWith('.root') || type === rootType) {
           return;
         }
         const page = ctx.scene.getActivePage();
@@ -235,7 +235,7 @@ export function createBlockCommands(
         const found = findBlock(page.layers, id);
         if (
           !found ||
-          found.block.type === rootType ||
+          isLayoutRootLayer(found.block) ||
           !isDriverBlockType(found.block.type)
         ) {
           return;

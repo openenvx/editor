@@ -8,6 +8,34 @@ import { BlockTreeRenderer } from './block-tree-renderer';
 
 afterEach(cleanup);
 
+/** jsdom elements have 0×0 boxes — floating selection pill hides without this. */
+async function withMockedBlockRects(
+  run: () => void | Promise<void>
+): Promise<void> {
+  const proto = HTMLElement.prototype as HTMLElement & {
+    getBoundingClientRect: () => DOMRect;
+  };
+  const original = proto.getBoundingClientRect;
+  proto.getBoundingClientRect = function getBoundingClientRect() {
+    return {
+      top: 40,
+      left: 40,
+      bottom: 200,
+      right: 400,
+      width: 360,
+      height: 160,
+      x: 40,
+      y: 40,
+      toJSON: () => ({}),
+    } as DOMRect;
+  };
+  try {
+    await run();
+  } finally {
+    proto.getBoundingClientRect = original;
+  }
+}
+
 function renderTree(
   overrides: Partial<{
     selectedId: string | null;
@@ -66,23 +94,25 @@ describe('BlockTreeRenderer', () => {
     expect(onSelect).toHaveBeenCalledWith('hero-1');
   });
 
-  it('shows selection menu and wires duplicate/remove', () => {
-    const onDuplicate = vi.fn();
-    const onRemove = vi.fn();
-    renderTree({
-      selectedId: 'heading-1',
-      onDuplicate,
-      onRemove,
-    });
+  it('shows selection menu and wires duplicate/remove', async () => {
+    await withMockedBlockRects(() => {
+      const onDuplicate = vi.fn();
+      const onRemove = vi.fn();
+      renderTree({
+        selectedId: 'heading-1',
+        onDuplicate,
+        onRemove,
+      });
 
-    expect(
-      screen.getByRole('toolbar', { name: 'Heading actions' })
-    ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Move' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
-    expect(onDuplicate).toHaveBeenCalledWith('heading-1');
-    expect(onRemove).toHaveBeenCalledWith('heading-1');
+      expect(
+        screen.getByRole('toolbar', { name: 'Heading actions' })
+      ).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Move' })).toBeTruthy();
+      fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+      expect(onDuplicate).toHaveBeenCalledWith('heading-1');
+      expect(onRemove).toHaveBeenCalledWith('heading-1');
+    });
   });
 
   it('hides selection menu while editing text', async () => {
@@ -478,5 +508,106 @@ describe('BlockTreeRenderer', () => {
     expect(
       cellWrap?.querySelector('[aria-label="Cell actions"]')
     ).toBeNull();
+  });
+
+  it('selects host and marks image slot when clicking a slot image', async () => {
+    await withMockedBlockRects(() => {
+      const registry = createBlockRegistry();
+      registry.register({
+        type: 'test.card',
+        label: 'Card',
+        fields: {
+          backgroundImage: { kind: 'image', label: 'Background' },
+        },
+        defaultData: { backgroundImage: '', slots: {} },
+        slots: {
+          logo: { label: 'Logo', partType: 'html.image' },
+        },
+        render: ({ slots }) => <div data-testid="card">{slots?.logo}</div>,
+      });
+      const scene = {
+        schemaVersion: 1 as const,
+        pages: [
+          {
+            id: 'p1',
+            name: 'P',
+            layout: 'html' as const,
+            layers: [
+              {
+                id: 'root',
+                type: 'html.root',
+                data: {
+                  background: '#fff',
+                  children: [
+                    {
+                      id: 'card-1',
+                      type: 'test.card',
+                      data: {
+                        backgroundImage: '',
+                        slots: {
+                          logo: [
+                            {
+                              id: 'logo-1',
+                              type: 'html.image',
+                              data: {
+                                src: 'https://placehold.co/100',
+                                alt: 'Logo',
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+      };
+      const onSelect = vi.fn();
+      const onReplaceImage = vi.fn();
+      render(
+        <DndContext>
+          <BlockTreeRenderer
+            canReplaceImage
+            editingTarget={null}
+            layers={scene.pages[0]!.layers}
+            registry={registry}
+            scene={scene}
+            selectedId="card-1"
+            sortDraft={null}
+            onCommitEdit={vi.fn()}
+            onDuplicate={vi.fn()}
+            onRemove={vi.fn()}
+            onReplaceImage={onReplaceImage}
+            onSelect={onSelect}
+            onStartEdit={vi.fn()}
+          />
+        </DndContext>
+      );
+
+      const logoHit = screen.getByRole('button', {
+        name: 'Replace logo image',
+      });
+      fireEvent.pointerDown(logoHit);
+      fireEvent.click(logoHit);
+      expect(onSelect).toHaveBeenCalledWith('card-1');
+      expect(logoHit.className).toContain('slotImageHitSelected');
+      expect(
+        screen.getByRole('button', { name: 'Replace image' })
+      ).toBeTruthy();
+
+      const file = new File(['x'], 'logo.png', { type: 'image/png' });
+      const input = logoHit.querySelector(
+        'input[type="file"]'
+      ) as HTMLInputElement;
+      fireEvent.change(input, { target: { files: [file] } });
+      expect(onReplaceImage).toHaveBeenCalledWith(
+        'card-1',
+        'slots.logo.0.data.src',
+        file
+      );
+    });
   });
 });

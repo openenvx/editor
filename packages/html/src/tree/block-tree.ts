@@ -151,8 +151,13 @@ export function getPageRootId(
   page: Page,
   rootType = 'html.root'
 ): string | null {
-  const root = page.layers.find((layer) => layer.type === rootType);
-  return root?.id ?? null;
+  const preferred = page.layers.find((layer) => layer.type === rootType);
+  if (preferred) {
+    return preferred.id;
+  }
+  // Product roots (email.root, snapvelo.root, …) share the *.root convention.
+  const anyRoot = page.layers.find((layer) => layer.type.endsWith('.root'));
+  return anyRoot?.id ?? null;
 }
 
 export function siblingCount(layers: Layer[], parentId: string | null): number {

@@ -37,6 +37,7 @@
     "dev:playground": "turbo run dev --filter=demo-playground",
     "dev:canvas": "turbo run dev --filter=@openenvxee/canvas-demo",
     "dev:html": "turbo run dev --filter=@openenvxee/html-demo",
+    "dev:snapvelo": "turbo run dev --filter=@openenvxee/snapvelo-demo",
     "dev:email": "turbo run dev --filter=@openenvxee/email-demo"
   },
   "devDependencies": {

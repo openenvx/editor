@@ -2,6 +2,7 @@ export type {
   BlockConfig,
   BlockRenderProps,
   FieldDef,
+  RichTextToolbarOptions,
   SlotDef,
 } from './block-config';
 export {
@@ -44,11 +45,16 @@ export {
 } from './editor/html-editor-drag';
 export { HtmlEditorPane } from './editor/html-editor-pane';
 export {
+  resolveStageClickAction,
+  type StageClickAction,
+} from './editor/resolve-stage-click-selection';
+export {
   clampHtmlZoom,
   DEFAULT_HTML_DEVICE_PRESET,
   formatHtmlZoomLabel,
   HTML_ZOOM_PRESETS,
-  resolveAutoZoom,
+  resolveEffectiveZoom,
+  resolveFitZoom,
   resolveFrameWidth,
   resolveScaledFrameWidth,
   stepHtmlZoom,

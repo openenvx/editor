@@ -41,7 +41,7 @@ export const ToolbarRenderer = memo(
     }
 
     return (
-      <div className={styles.toolbar}>
+      <div className={styles.toolbar} data-owb-editor-toolbar={placement}>
         {placementItems.map((item) => {
           if (item.kind === 'separator') {
             return <span className={styles.divider} key={item.id} />;

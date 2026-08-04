@@ -470,6 +470,7 @@ export function WorkbenchShell({
   onThemeChangeRef.current = onThemeChange;
   onLocaleChangeRef.current = onLocaleChange;
 
+  // TODO: this should happen in plugin manager
   const resolvedPlugins = useMemo(() => {
     const hasFieldsPlugin = plugins.some(
       (plugin) => plugin.id === DEFAULT_FIELDS_PLUGIN_ID

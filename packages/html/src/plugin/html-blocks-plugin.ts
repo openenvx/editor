@@ -1,4 +1,10 @@
-import { OpenEnvxWidgetLayer, SimpleServiceContribution } from '@openenvx/core';
+import {
+  AssetServiceId,
+  InMemoryAssetService,
+  OpenEnvxWidgetLayer,
+  SimpleServiceContribution,
+  SingletonServiceContribution,
+} from '@openenvx/core';
 import { WorkbenchPlugin } from '@openenvx/headless';
 import type { WorkbenchPluginContext } from '@openenvx/headless';
 
@@ -30,6 +36,7 @@ export class HtmlBlocksPlugin extends WorkbenchPlugin {
     defaultBlockRegistry.register(openenvxWidgetBlock);
 
     ctx.register(
+      new SingletonServiceContribution(AssetServiceId, InMemoryAssetService),
       new SimpleServiceContribution(
         BlockRegistryServiceId,
         () => defaultBlockRegistry

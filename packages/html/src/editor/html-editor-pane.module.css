@@ -29,6 +29,9 @@
   min-height: 480px;
   background: var(--wb-card, #ffffff);
   box-shadow: var(--wb-shadow-sm, 0 1px 3px rgb(0 0 0 / 8%));
+  /* Selection pill is portaled to document.body — theme starts at (0,0). */
+  box-sizing: border-box;
+  padding: 0;
 }
 
 .palettePanel {
@@ -236,41 +239,39 @@
   outline-color: var(--wb-selection, #3b82f6);
 }
 
+.blockWrapImageDrop {
+  outline-color: var(--wb-selection, #3b82f6);
+  outline-style: dashed;
+  background: color-mix(in srgb, var(--wb-selection, #3b82f6) 8%, transparent);
+}
+
 .blockEditableHit {
   display: contents;
   cursor: text;
 }
 
 .selectionMenu {
-  position: absolute;
+  position: fixed;
   /*
-   * Anchor to the outer top-right corner of the selection outline
-   * (offset + stroke), so the tab sits flush — no 2px air gap.
+   * Anchored via inline top/left from the block rect (portaled to body so
+   * overflow:hidden ancestors — logo circles, rounded heroes — don't clip).
+   * Floating pill pinned near the block top; may sit over the block when top
+   * chrome / viewport inset forces it down.
    */
-  top: calc(
-    -1 *
-      (var(--block-chrome-outline-offset) + var(--block-chrome-outline-width))
-  );
-  right: calc(
-    -1 *
-      (var(--block-chrome-outline-offset) + var(--block-chrome-outline-width)) +
-      10px
-  );
-  z-index: 5;
+  z-index: 40;
   display: flex;
   align-items: center;
   gap: var(--wb-space-0-5, 2px);
-  transform: translateY(-100%);
+  transform: translate(-100%, -100%);
   padding: var(--wb-space-1, 4px);
-  border-radius: 12px 12px 0 0;
+  border-radius: 12px;
   background: var(--wb-popover, #ffffff);
   color: var(--wb-foreground, #18181b);
-  /* No bottom ring — that would open a hairline between tab and selection stroke. */
-  box-shadow:
-    -1px 0 0 rgb(0 0 0 / 8%),
-    1px 0 0 rgb(0 0 0 / 8%),
-    0 -1px 0 rgb(0 0 0 / 8%),
-    0 -8px 20px rgb(0 0 0 / 10%);
+  box-shadow: var(
+    --wb-shadow-float,
+    0 8px 24px rgb(0 0 0 / 12%),
+    0 0 0 1px rgb(0 0 0 / 8%)
+  );
   cursor: default;
   pointer-events: auto;
 }
@@ -330,6 +331,61 @@
     0 0 0 2px #f6f6f8,
     0 0 0 4px rgb(0 0 0 / 20%)
   );
+}
+
+.selectionMenuFileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.slotPartHit {
+  display: contents;
+}
+
+.slotImageHit {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  cursor: pointer;
+  outline: 1px solid transparent;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.slotImageHit:hover {
+  outline-color: color-mix(
+    in srgb,
+    var(--wb-selection, #3b82f6) 55%,
+    transparent
+  );
+}
+
+.slotImageHitSelected {
+  outline-color: var(--wb-selection, #3b82f6);
+}
+
+.slotImageHitDrop {
+  outline-color: var(--wb-selection, #3b82f6);
+  outline-style: dashed;
+  background: color-mix(in srgb, var(--wb-selection, #3b82f6) 10%, transparent);
+}
+
+.slotImageHit img {
+  /* Prevent native image-drag from eating click-to-select. */
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
 }
 
 .dropZone {
@@ -392,6 +448,14 @@
   margin: 0;
 }
 
+/* Positioning shell for the portaled rich-text bubble (chrome lives on .bubbleMenu). */
+.bubbleMenuPortal {
+  position: fixed;
+  z-index: 40;
+  transform: translate(-50%, -100%);
+  pointer-events: auto;
+}
+
 /* Match FloatingToolbarRenderer / Design.md floating chrome. */
 .bubbleMenu {
   display: flex;
@@ -399,7 +463,7 @@
   gap: var(--wb-space-0-5, 2px);
   padding: var(--wb-space-1, 4px);
   border: none;
-  border-radius: var(--wb-radius-lg, 6px);
+  border-radius: 12px;
   background: var(--wb-popover, #ffffff);
   color: var(--wb-foreground, #18181b);
   font-family: var(--wb-font, Inter, system-ui, sans-serif);

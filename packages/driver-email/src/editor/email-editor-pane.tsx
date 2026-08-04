@@ -22,6 +22,7 @@ import {
   BlockTreeRenderer,
   getPageRootId,
   alignDataPathFromHtmlPath,
+  resolveStageClickAction,
   useHtmlPreviewChrome,
   type BlockRegistry,
   type BlockSortDraft,
@@ -37,6 +38,7 @@ import {
   useState,
   useSyncExternalStore,
   type KeyboardEvent,
+  type MouseEvent,
   type ReactNode,
 } from 'react';
 
@@ -158,6 +160,31 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     }
     api.selectLayers([]);
   }, [api, editingTarget]);
+
+  /**
+   * Nested blocks stopPropagation. Clicks that reach the stage are either
+   * artboard/page-root chrome → select root, or stage padding → clear.
+   */
+  const handleStageClick = useCallback(
+    (event: MouseEvent) => {
+      if (editingTarget || !scene || !selection) {
+        return;
+      }
+      const page = getActivePage(scene, selection.activePageId);
+      const action = resolveStageClickAction({
+        target: event.target,
+        artboardTestId: 'email-artboard',
+        page,
+        rootType: 'email.root',
+      });
+      if (action.type === 'select') {
+        api.selectLayers([action.layerId]);
+        return;
+      }
+      api.selectLayers([]);
+    },
+    [api, editingTarget, scene, selection]
+  );
 
   const handleStartEdit = useCallback(
     (hostId: string, dataPath: string) => {
@@ -399,7 +426,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
       ref={stageRef}
       role="tree"
       tabIndex={0}
-      onClick={clearSelection}
+      onClick={handleStageClick}
       onKeyDown={handleCanvasKeyDown}
       onPointerLeave={() => api.setHoveredLayer(null)}
     >

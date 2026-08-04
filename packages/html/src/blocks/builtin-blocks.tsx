@@ -216,23 +216,35 @@ export const rootBlock: BlockConfig = {
   label: 'Page',
   fields: {
     background: { kind: 'text', label: 'Background' },
+    maxWidth: { kind: 'number', label: 'Max width (px, 0 = full)' },
+    padding: { kind: 'number', label: 'Padding (px)' },
   },
-  defaultData: { background: '#ffffff', children: [] },
+  defaultData: {
+    background: '#ffffff',
+    maxWidth: 720,
+    padding: 24,
+    children: [],
+  },
   acceptsChildren: true,
-  render: ({ data, children }) => (
-    <div
-      style={{
-        background: String(data.background ?? '#ffffff'),
-        minHeight: 480,
-        padding: 24,
-        width: '100%',
-        maxWidth: 720,
-        margin: '0 auto',
-      }}
-    >
-      {children}
-    </div>
-  ),
+  render: ({ data, children }) => {
+    const maxWidthRaw = Number(data.maxWidth ?? 720);
+    const padding = Number(data.padding ?? 24);
+    return (
+      <div
+        style={{
+          background: String(data.background ?? '#ffffff'),
+          minHeight: 480,
+          padding,
+          width: '100%',
+          maxWidth: maxWidthRaw > 0 ? maxWidthRaw : undefined,
+          margin: '0 auto',
+          boxSizing: 'border-box',
+        }}
+      >
+        {children}
+      </div>
+    );
+  },
 };
 
 export const rawHtmlBlock: BlockConfig = {

@@ -1,3 +1,4 @@
+import { AssetServiceId } from '@openenvx/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { builtinBlocks } from '../blocks/builtin-blocks';
@@ -44,5 +45,9 @@ describe('HtmlBlocksPlugin', () => {
       state.editorPanes.some((pane) => pane.editorPaneKind === 'html')
     ).toBe(true);
     expect(state.editorPaneKind).toBe('html');
+
+    const assets = api.getService(AssetServiceId);
+    expect(assets).toBeTruthy();
+    expect(typeof assets?.upload).toBe('function');
   });
 });

@@ -100,7 +100,6 @@
       "version": "0.0.0",
       "dependencies": {
         "@openenvx/driver-email": "workspace:*",
-        "@openenvx/headless": "workspace:*",
         "@openenvx/workbench": "workspace:*",
         "react": "19.2.7",
         "react-dom": "19.2.7",
@@ -130,6 +129,23 @@
         "@types/react-dom": "^19.2.3",
         "@vitejs/plugin-react": "6.0.3",
         "esbuild": "^0.25.0",
+        "typescript": "catalog:dev",
+        "vite": "8.1.3",
+        "vitest": "4.1.10",
+      },
+    },
+    "apps/snapvelo-demo": {
+      "name": "@openenvxee/snapvelo-demo",
+      "version": "0.0.0",
+      "dependencies": {
+        "@openenvx/html-studio": "workspace:*",
+        "react": "19.2.7",
+        "react-dom": "19.2.7",
+      },
+      "devDependencies": {
+        "@types/react": "^19.2.3",
+        "@types/react-dom": "^19.2.3",
+        "@vitejs/plugin-react": "6.0.3",
         "typescript": "catalog:dev",
         "vite": "8.1.3",
         "vitest": "4.1.10",
@@ -324,7 +340,6 @@
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
         "@testing-library/react": "16.3.2",
-        "@testing-library/user-event": "14.6.1",
         "@types/react": "^19.2.3",
         "@types/react-dom": "^19.2.3",
         "@vitejs/plugin-react": "6.0.3",
@@ -952,6 +967,8 @@
     "@openenvxee/email-demo": ["@openenvxee/email-demo@workspace:apps/email-demo"],
 
     "@openenvxee/html-demo": ["@openenvxee/html-demo@workspace:apps/html-demo"],
+
+    "@openenvxee/snapvelo-demo": ["@openenvxee/snapvelo-demo@workspace:apps/snapvelo-demo"],
 
     "@openrouter/ai-sdk-provider": ["@openrouter/ai-sdk-provider@1.5.4", "", { "dependencies": { "@openrouter/sdk": "^0.1.27" }, "peerDependencies": { "ai": "^5.0.0", "zod": "^3.24.1 || ^v4" } }, "sha512-xrSQPUIH8n9zuyYZR0XK7Ba0h2KsjJcMkxnwaYfmv13pKs3sDkjPzVPPhlhzqBGddHb5cFEwJ9VFuFeDcxCDSw=="],
 

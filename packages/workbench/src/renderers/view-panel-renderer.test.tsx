@@ -107,7 +107,7 @@ describe('ViewPanelRenderer', () => {
 });
 
 describe('WorkbenchLayersView', () => {
-  it('is not collapsible so Page/Email is the tree root under the container', () => {
+  it('is not collapsible so the document root is the tree root under the container', () => {
     expect(new WorkbenchLayersView().collapsible).toBe(false);
   });
 });

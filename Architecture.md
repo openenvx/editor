@@ -15,6 +15,7 @@ Package boundaries and contribution flow for the monorepo.
 | [Workbench & headless](docs/architecture/workbench-and-headless.md) | Controller, UI contributions, layout, property panes |
 | [Canvas](docs/architecture/canvas.md) | Engine vs chrome, `CanvasBasicsPlugin` vs canvas-pro |
 | [HTML](docs/architecture/html.md) | Block editor, slots, `HtmlBlocksPlugin` |
+| [HTML editor surfaces](docs/architecture/html-editor-surfaces.md) | Stage / artboard / page-root naming + click selection |
 | [Email driver](docs/architecture/driver-email.md) | React-Email block editor, `EmailBlocksPlugin`, `renderEmailDocument` |
 | [Studio & products](docs/architecture/studio-and-products.md) | Fat bundles, what host apps import |
 | [Extensions](docs/architecture/extensions.md) | Internal vs embed vs sandbox (summary + links) |

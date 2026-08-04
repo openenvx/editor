@@ -33,6 +33,18 @@ export interface BlockRenderProps {
   slots?: Record<string, ReactNode>;
 }
 
+/** TipTap bubble-menu sections. Omitted keys default to shown. */
+export interface RichTextToolbarOptions {
+  /** Paragraph / list / quote / code block picker. Default true. */
+  blockType?: boolean;
+  /** Link mark control. Default true. */
+  link?: boolean;
+  /** Inline code mark control. Default true. */
+  code?: boolean;
+  /** Left / center / right align. Default true. */
+  align?: boolean;
+}
+
 export interface BlockConfig {
   type: string;
   label: string;
@@ -60,6 +72,16 @@ export interface BlockConfig {
    *   wrapper is not inserted between `<tr>` and `<td>`
    */
   chromeDisplay?: 'block' | 'inline' | 'contents';
+  /**
+   * Bubble-menu controls when this block's own rich text is edited.
+   * Overrides `childRichTextToolbar` from ancestors.
+   */
+  richTextToolbar?: RichTextToolbarOptions;
+  /**
+   * Bubble-menu defaults for rich-text descendants (and slot text parts).
+   * Use when a composite fixes placement/structure (e.g. event hero).
+   */
+  childRichTextToolbar?: RichTextToolbarOptions;
   /** Named slots whose parts are real layers under `data.slots` (invisible to the Layers tree). */
   slots?: Record<string, SlotDef>;
   render: (props: BlockRenderProps) => ReactElement;

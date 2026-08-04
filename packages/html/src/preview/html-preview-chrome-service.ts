@@ -7,16 +7,20 @@ import {
   formatHtmlZoomLabel,
   HTML_ZOOM_MAX,
   HTML_ZOOM_MIN,
+  resolveEffectiveZoom,
   stepHtmlZoom,
   type HtmlDevicePreset,
 } from '../editor/html-device-preview';
 
 export interface HtmlPreviewChromeState {
   preset: HtmlDevicePreset;
-  autoZoom: boolean;
-  manualZoom: number;
-  /** Latest auto-fit zoom from the active pane (for labels / stepping). */
-  autoZoomValue: number;
+  /**
+   * User-facing zoom factor (0.25–1). 1 = 100% = artboard fits stage width
+   * (Puck-style). Absolute CSS scale is zoomFactor * fitZoom.
+   */
+  zoomFactor: number;
+  /** Latest fit-width scale from the active pane (stageWidth / frameWidth). */
+  fitZoom: number;
 }
 
 export interface HtmlPreviewChromeService {
@@ -26,16 +30,20 @@ export interface HtmlPreviewChromeService {
   setActive(active: boolean): void;
   isActive(): boolean;
   bindContextKeys(keys: ContextKeyService | null): void;
-  /** Pane reports current auto-fit zoom (does not toggle auto mode). */
-  reportAutoZoomValue(autoZoomValue: number): void;
+  /** Pane reports current fit-width zoom (does not change zoomFactor). */
+  reportFitZoom(fitZoom: number): void;
   /** Apply initial preset once per service lifetime (pane remounts are no-ops). */
   seedPreset(preset: HtmlDevicePreset): void;
   setPreset(preset: HtmlDevicePreset): void;
   zoomIn(): void;
   zoomOut(): void;
+  /** Reset to 100% fit-width. */
   zoomAuto(): void;
+  /** Set zoom factor (1 = fit-width). */
   zoomPercent(zoom: number): void;
+  /** Absolute CSS scale applied to the artboard. */
   getZoom(): number;
+  getZoomFactor(): number;
   getZoomLabel(): string;
 }
 
@@ -50,10 +58,9 @@ export class HtmlPreviewChromeServiceImpl implements HtmlPreviewChromeService {
   private seededPreset = false;
   private contextKeys: ContextKeyService | null = null;
   private state: HtmlPreviewChromeState = {
-    autoZoom: false,
-    autoZoomValue: 1,
-    manualZoom: 1,
+    fitZoom: 1,
     preset: DEFAULT_HTML_DEVICE_PRESET,
+    zoomFactor: 1,
   };
 
   getState(): HtmlPreviewChromeState {
@@ -81,11 +88,11 @@ export class HtmlPreviewChromeServiceImpl implements HtmlPreviewChromeService {
     this.syncContextKeys();
   }
 
-  reportAutoZoomValue(autoZoomValue: number): void {
-    if (this.state.autoZoomValue === autoZoomValue) {
+  reportFitZoom(fitZoom: number): void {
+    if (this.state.fitZoom === fitZoom) {
       return;
     }
-    this.state = { ...this.state, autoZoomValue };
+    this.state = { ...this.state, fitZoom };
     this.syncContextKeys();
     this.changeEmitter.fire();
   }
@@ -99,41 +106,38 @@ export class HtmlPreviewChromeServiceImpl implements HtmlPreviewChromeService {
   }
 
   setPreset(preset: HtmlDevicePreset): void {
-    if (this.state.preset === preset && this.state.autoZoom) {
+    if (this.state.preset === preset && this.state.zoomFactor === 1) {
       return;
     }
-    this.state = { ...this.state, autoZoom: true, preset };
+    // Switching device resets to 100% fit-width (never overflow sideways).
+    this.state = { ...this.state, preset, zoomFactor: 1 };
     this.syncContextKeys();
     this.changeEmitter.fire();
   }
 
   zoomIn(): void {
-    const current = this.getZoom();
     this.state = {
       ...this.state,
-      autoZoom: false,
-      manualZoom: stepHtmlZoom(current, 1),
+      zoomFactor: stepHtmlZoom(this.state.zoomFactor, 1),
     };
     this.syncContextKeys();
     this.changeEmitter.fire();
   }
 
   zoomOut(): void {
-    const current = this.getZoom();
     this.state = {
       ...this.state,
-      autoZoom: false,
-      manualZoom: stepHtmlZoom(current, -1),
+      zoomFactor: stepHtmlZoom(this.state.zoomFactor, -1),
     };
     this.syncContextKeys();
     this.changeEmitter.fire();
   }
 
   zoomAuto(): void {
-    if (this.state.autoZoom) {
+    if (this.state.zoomFactor === 1) {
       return;
     }
-    this.state = { ...this.state, autoZoom: true };
+    this.state = { ...this.state, zoomFactor: 1 };
     this.syncContextKeys();
     this.changeEmitter.fire();
   }
@@ -141,21 +145,22 @@ export class HtmlPreviewChromeServiceImpl implements HtmlPreviewChromeService {
   zoomPercent(zoom: number): void {
     this.state = {
       ...this.state,
-      autoZoom: false,
-      manualZoom: clampHtmlZoom(zoom),
+      zoomFactor: clampHtmlZoom(zoom),
     };
     this.syncContextKeys();
     this.changeEmitter.fire();
   }
 
+  getZoomFactor(): number {
+    return this.state.zoomFactor;
+  }
+
   getZoom(): number {
-    return this.state.autoZoom
-      ? this.state.autoZoomValue
-      : this.state.manualZoom;
+    return resolveEffectiveZoom(this.state.zoomFactor, this.state.fitZoom);
   }
 
   getZoomLabel(): string {
-    return formatHtmlZoomLabel(this.getZoom(), this.state.autoZoom);
+    return formatHtmlZoomLabel(this.state.zoomFactor);
   }
 
   private syncContextKeys(): void {
@@ -163,12 +168,12 @@ export class HtmlPreviewChromeServiceImpl implements HtmlPreviewChromeService {
     if (!keys) {
       return;
     }
-    const zoom = this.getZoom();
+    const factor = this.state.zoomFactor;
     keys.setContext('html.previewActive', this.active);
     keys.setContext('html.devicePreset', this.state.preset);
-    keys.setContext('html.autoZoom', this.state.autoZoom);
+    keys.setContext('html.autoZoom', factor >= HTML_ZOOM_MAX - 0.001);
     keys.setContext('html.zoomLabel', this.getZoomLabel());
-    keys.setContext('html.canZoomIn', zoom < HTML_ZOOM_MAX - 0.001);
-    keys.setContext('html.canZoomOut', zoom > HTML_ZOOM_MIN + 0.001);
+    keys.setContext('html.canZoomIn', factor < HTML_ZOOM_MAX - 0.001);
+    keys.setContext('html.canZoomOut', factor > HTML_ZOOM_MIN + 0.001);
   }
 }

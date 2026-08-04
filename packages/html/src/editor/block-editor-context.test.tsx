@@ -17,12 +17,17 @@ describe('BlockEditorProvider', () => {
       hoveredLayerId: null,
       editingTarget: null,
       sortDraft: null,
+      canReplaceImage: false,
+      imageOverride: null,
+      setImageOverride: () => {},
       onSelect: () => {},
       onHoverLayer: () => {},
       onStartEdit: () => {},
       onCommitEdit: () => {},
       onDuplicate: () => {},
       onRemove: () => {},
+      onReplaceImage: () => {},
+      resolveAssetUrl: (ref: string) => ref,
     } as unknown as BlockEditorContextValue;
 
     const { result } = renderHook(() => useBlockEditor(), {

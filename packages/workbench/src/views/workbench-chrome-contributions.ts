@@ -242,7 +242,7 @@ export class WorkbenchLayersView extends ViewContribution {
   readonly name = 'Layers';
   readonly viewOrder = 10;
   readonly viewHover = 'layer' as const;
-  /** Flat under the Layers container — Page/Email is the tree root, not a nested section. */
+  /** Flat under the Layers container — document `*.root` is the tree root. */
   readonly collapsible = false;
 }
 

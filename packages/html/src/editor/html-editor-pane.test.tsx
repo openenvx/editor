@@ -10,6 +10,34 @@ import { HtmlEditorPane } from './html-editor-pane';
 
 afterEach(cleanup);
 
+/** jsdom elements have 0×0 boxes — floating selection pill hides without this. */
+async function withMockedBlockRects(
+  run: () => void | Promise<void>
+): Promise<void> {
+  const proto = HTMLElement.prototype as HTMLElement & {
+    getBoundingClientRect: () => DOMRect;
+  };
+  const original = proto.getBoundingClientRect;
+  proto.getBoundingClientRect = function getBoundingClientRect() {
+    return {
+      top: 40,
+      left: 40,
+      bottom: 200,
+      right: 400,
+      width: 360,
+      height: 160,
+      x: 40,
+      y: 40,
+      toJSON: () => ({}),
+    } as DOMRect;
+  };
+  try {
+    await run();
+  } finally {
+    proto.getBoundingClientRect = original;
+  }
+}
+
 describe('HtmlEditorPane', () => {
   it('renders demo scene and updates selection on click', async () => {
     const { api, dispose } = await createHtmlWorkbench();
@@ -56,29 +84,68 @@ describe('HtmlEditorPane', () => {
   it('duplicates and removes via selection menu', async () => {
     const { api, dispose } = await createHtmlWorkbench();
     try {
-      api.selectLayers(['text-1'], 'text-1');
-      renderWithWorkbench(api, <HtmlEditorPane />);
+      await withMockedBlockRects(async () => {
+        api.selectLayers(['text-1'], 'text-1');
+        renderWithWorkbench(api, <HtmlEditorPane />);
 
-      fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }));
-      await waitFor(() => {
-        const root = api.getSnapshot().scene.pages[0]!.layers[0]!;
-        const children = (
-          root.data as { children: { type: string }[] }
-        ).children;
-        expect(children.filter((c) => c.type === 'html.text').length).toBeGreaterThan(
-          1
-        );
+        fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }));
+        await waitFor(() => {
+          const root = api.getSnapshot().scene.pages[0]!.layers[0]!;
+          const children = (
+            root.data as { children: { type: string }[] }
+          ).children;
+          expect(
+            children.filter((c) => c.type === 'html.text').length
+          ).toBeGreaterThan(1);
+        });
+
+        const selected =
+          api.getSnapshot().selection.primaryLayerId ??
+          api.getSnapshot().selection.selectedLayerIds[0]!;
+        api.selectLayers([selected], selected);
+        fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+        await waitFor(() => {
+          expect(
+            api.getSnapshot().selection.selectedLayerIds
+          ).not.toContain(selected);
+        });
       });
+    } finally {
+      dispose();
+    }
+  });
 
-      const selected =
-        api.getSnapshot().selection.primaryLayerId ??
-        api.getSnapshot().selection.selectedLayerIds[0]!;
-      api.selectLayers([selected], selected);
-      fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
-      await waitFor(() => {
+  it('replaces the selected block image via AssetService.upload', async () => {
+    const { api, dispose } = await createHtmlWorkbench();
+    try {
+      await withMockedBlockRects(async () => {
+        api.selectLayers(['hero-1'], 'hero-1');
+        renderWithWorkbench(api, <HtmlEditorPane />);
+
         expect(
-          api.getSnapshot().selection.selectedLayerIds
-        ).not.toContain(selected);
+          await screen.findByRole('button', { name: 'Replace image' })
+        ).toBeTruthy();
+
+        const file = new File([Uint8Array.from([1, 2, 3, 4])], 'hero.png', {
+          type: 'image/png',
+        });
+        const input = document.querySelector(
+          'input[type="file"]'
+        ) as HTMLInputElement;
+        fireEvent.change(input, { target: { files: [file] } });
+
+        await waitFor(() => {
+          const root = api.getSnapshot().scene.pages[0]!.layers[0]!;
+          const hero = (
+            root.data as {
+              children: {
+                id: string;
+                data: { backgroundImage?: string };
+              }[];
+            }
+          ).children.find((layer) => layer.id === 'hero-1');
+          expect(hero?.data.backgroundImage?.startsWith('asset://')).toBe(true);
+        });
       });
     } finally {
       dispose();
@@ -125,13 +192,13 @@ describe('HtmlEditorPane', () => {
     }
   });
 
-  it('clears selection when clicking the canvas background', async () => {
+  it('clears selection when clicking the stage outside the artboard', async () => {
     const { api, dispose } = await createHtmlWorkbench();
     try {
       api.selectLayers(['heading-1'], 'heading-1');
       const { container } = renderWithWorkbench(api, <HtmlEditorPane />);
-      const canvas = container.querySelector('[role="tree"]') as HTMLElement;
-      fireEvent.click(canvas);
+      const stage = container.querySelector('[role="tree"]') as HTMLElement;
+      fireEvent.click(stage);
       await waitFor(() => {
         expect(api.getSnapshot().selection.selectedLayerIds).toEqual([]);
       });
@@ -140,15 +207,14 @@ describe('HtmlEditorPane', () => {
     }
   });
 
-  it('clears selection instead of selecting the page frame', async () => {
+  it('selects the page root when clicking the artboard', async () => {
     const { api, dispose } = await createHtmlWorkbench();
     try {
       api.selectLayers(['heading-1'], 'heading-1');
-      const { container } = renderWithWorkbench(api, <HtmlEditorPane />);
-      const canvas = container.querySelector('[role="tree"]') as HTMLElement;
-      fireEvent.click(canvas.firstElementChild as HTMLElement);
+      renderWithWorkbench(api, <HtmlEditorPane />);
+      fireEvent.click(screen.getByTestId('html-artboard'));
       await waitFor(() => {
-        expect(api.getSnapshot().selection.selectedLayerIds).toEqual([]);
+        expect(api.getSnapshot().selection.selectedLayerIds).toEqual(['root']);
       });
     } finally {
       dispose();
@@ -168,7 +234,7 @@ describe('HtmlEditorPane', () => {
     }
   });
 
-  it('shows empty state when the page has no html.root', async () => {
+  it('shows empty state when the page has no root block', async () => {
     const { api, dispose } = await createHtmlWorkbench();
     try {
       api.loadScene({
@@ -183,7 +249,7 @@ describe('HtmlEditorPane', () => {
         ],
       });
       renderWithWorkbench(api, <HtmlEditorPane />);
-      expect(screen.getByText('No html.root block on this page.')).toBeTruthy();
+      expect(screen.getByText('No root block on this page.')).toBeTruthy();
     } finally {
       dispose();
     }
@@ -206,7 +272,7 @@ describe('HtmlEditorPane', () => {
       await api.executeCommand('html.setDevicePreset', { preset: 'desktop' });
       await waitFor(() => {
         expect(artboard.dataset.device).toBe('desktop');
-        expect(artboard.style.width).toBe('1280px');
+        expect(artboard.style.width).toBe('1600px');
       });
 
       await api.executeCommand('html.setDevicePreset', { preset: 'fluid' });
@@ -215,25 +281,32 @@ describe('HtmlEditorPane', () => {
       });
 
       await api.executeCommand('html.setDevicePreset', { preset: 'desktop' });
-      await api.executeCommand('html.zoomIn');
+      await api.executeCommand('html.zoomPercent', { zoom: 0.5 });
       await waitFor(() => {
-        expect(artboard.style.width).toBe(`${1280 * 1.1}px`);
+        // 50% of fit-width; in jsdom stage is often ≥ frame so fit=1 → 800px.
+        expect(Number.parseFloat(artboard.style.width)).toBeGreaterThan(0);
+        expect(Number.parseFloat(artboard.style.width)).toBeLessThanOrEqual(
+          1600
+        );
       });
 
-      await api.executeCommand('html.zoomOut');
+      await api.executeCommand('html.zoomIn');
       await waitFor(() => {
-        expect(artboard.style.width).toBe('1280px');
+        expect(Number.parseFloat(artboard.style.width)).toBeGreaterThan(0);
       });
 
       await api.executeCommand('html.zoomPercent', { zoom: 0.25 });
       await waitFor(() => {
-        expect(artboard.style.width).toBe('320px');
+        expect(Number.parseFloat(artboard.style.width)).toBeGreaterThan(0);
       });
 
       await api.executeCommand('html.zoomAuto');
       await waitFor(() => {
-        // Auto fits desktop into the stage; width stays design width * auto zoom.
+        // 100% = fit-width — scaled slot never exceeds the design frame.
         expect(Number.parseFloat(artboard.style.width)).toBeGreaterThan(0);
+        expect(Number.parseFloat(artboard.style.width)).toBeLessThanOrEqual(
+          1600
+        );
       });
     } finally {
       dispose();

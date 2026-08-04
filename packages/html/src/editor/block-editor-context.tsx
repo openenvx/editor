@@ -10,6 +10,15 @@ export interface BlockEditTarget {
   dataPath: string;
 }
 
+/**
+ * Slot (or non-primary) image field override for the selection-pill Replace
+ * action. When null, the selected host uses its primary image field.
+ */
+export interface BlockImageTarget {
+  layerId: string;
+  fieldPath: string;
+}
+
 export interface BlockEditorContextValue {
   scene: Scene;
   selectedId: string | null;
@@ -17,6 +26,14 @@ export interface BlockEditorContextValue {
   hoveredLayerId: string | null;
   editingTarget: BlockEditTarget | null;
   sortDraft: BlockSortDraft | null;
+  /** True when AssetService.upload is available. */
+  canReplaceImage: boolean;
+  /**
+   * Non-primary image path override (e.g. slot `src`). Cleared when selection
+   * moves to another layer; host chrome click also clears back to primary.
+   */
+  imageOverride: BlockImageTarget | null;
+  setImageOverride: (target: BlockImageTarget | null) => void;
   onSelect: (id: string) => void;
   onHoverLayer: (id: string | null) => void;
   onStartEdit: (hostId: string, dataPath: string) => void;
@@ -28,6 +45,13 @@ export interface BlockEditorContextValue {
   ) => void;
   onDuplicate: (id: string) => void;
   onRemove: (id: string) => void;
+  /** Upload file via AssetService and write ref to layer fieldPath. */
+  onReplaceImage: (
+    layerId: string,
+    fieldPath: string,
+    file: File
+  ) => void | Promise<void>;
+  resolveAssetUrl: (ref: string) => string;
 }
 
 const BlockEditorContext = createContext<BlockEditorContextValue | null>(null);

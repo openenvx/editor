@@ -102,6 +102,14 @@ describe('block-tree', () => {
       })
     ).toBe('root');
     expect(
+      getPageRootId({
+        id: 'p',
+        name: 'P',
+        layout: 'html',
+        layers: [block('event', 'snapvelo.root')],
+      })
+    ).toBe('event');
+    expect(
       getPageRootId({ id: 'p', name: 'P', layout: 'html', layers: [] })
     ).toBeNull();
 

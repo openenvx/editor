@@ -48,4 +48,5 @@ Demo: `apps/html-demo`. See [studio-and-products.md](studio-and-products.md).
 
 ## Related
 
+- Surface naming (stage / artboard / page root) + click selection: [html-editor-surfaces.md](html-editor-surfaces.md)
 - Workbench chrome shared with canvas studio: [workbench-and-headless.md](workbench-and-headless.md)

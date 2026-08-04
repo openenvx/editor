@@ -85,4 +85,24 @@ describe('HtmlRichTextBubbleMenuToolbar', () => {
     expect(screen.getByRole('button', { name: 'Align center' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Align right' })).toBeTruthy();
   });
+
+  it('hides structure controls when toolbar flags are off', () => {
+    render(
+      <HtmlRichTextBubbleMenuToolbar
+        editor={mockEditor()}
+        toolbar={{
+          blockType: false,
+          link: false,
+          code: false,
+          align: false,
+        }}
+      />
+    );
+
+    expect(screen.queryByRole('button', { name: 'Block type' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Link' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Inline code' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Align left' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Bold' })).toBeTruthy();
+  });
 });

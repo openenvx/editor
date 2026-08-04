@@ -8,7 +8,11 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { ContextKeyServiceId, getActivePage } from '@openenvx/core';
+import {
+  AssetServiceId,
+  ContextKeyServiceId,
+  getActivePage,
+} from '@openenvx/core';
 import type { EditorPaneHostProps } from '@openenvx/headless';
 import {
   useWorkbenchContext,
@@ -21,6 +25,7 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
+  type MouseEvent,
 } from 'react';
 
 import {
@@ -37,6 +42,7 @@ import {
   applyHtmlDragOver,
   applyHtmlDragStart,
 } from './html-editor-drag';
+import { resolveStageClickAction } from './resolve-stage-click-selection';
 import {
   alignDataPathFromHtmlPath,
   type RichTextAlign,
@@ -54,6 +60,8 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   );
   const registry: BlockRegistry =
     api.getService(BlockRegistryServiceId) ?? defaultBlockRegistry;
+  const assets = api.getService(AssetServiceId);
+  const canReplaceImage = typeof assets?.upload === 'function';
   const [editingTarget, setEditingTarget] = useState<BlockEditTarget | null>(
     null
   );
@@ -84,6 +92,28 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     []
   );
 
+  const resolveAssetUrl = useCallback(
+    (ref: string) => (assets ? assets.resolveUrl(ref) : ref),
+    [assets]
+  );
+
+  const handleReplaceImage = useCallback(
+    (layerId: string, fieldPath: string, file: File) => {
+      if (!assets?.upload) {
+        return;
+      }
+      void assets
+        .upload(file)
+        .then((ref) => {
+          api.updateProperty(layerId, fieldPath, ref);
+        })
+        .catch(() => {
+          // ponytail: v1 silent failure — toast when workbench status API is ready.
+        });
+    },
+    [api, assets]
+  );
+
   const handleSelect = useCallback(
     (id: string) => {
       api.selectLayers([id]);
@@ -104,6 +134,30 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     }
     api.selectLayers([]);
   }, [api, editingTarget]);
+
+  /**
+   * Nested blocks stopPropagation. Clicks that reach the stage are either
+   * artboard/page-root chrome → select root, or stage padding → clear.
+   */
+  const handleStageClick = useCallback(
+    (event: MouseEvent) => {
+      if (editingTarget || !scene || !selection) {
+        return;
+      }
+      const page = getActivePage(scene, selection.activePageId);
+      const action = resolveStageClickAction({
+        target: event.target,
+        artboardTestId: 'html-artboard',
+        page,
+      });
+      if (action.type === 'select') {
+        api.selectLayers([action.layerId]);
+        return;
+      }
+      api.selectLayers([]);
+    },
+    [api, editingTarget, scene, selection]
+  );
 
   const handleStartEdit = useCallback(
     (hostId: string, dataPath: string) => {
@@ -245,7 +299,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
           ref={stageRef}
           role="tree"
           tabIndex={0}
-          onClick={clearSelection}
+          onClick={handleStageClick}
           onKeyDown={handleCanvasKeyDown}
           onPointerLeave={() => api.setHoveredLayer(null)}
         >
@@ -268,6 +322,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
             >
               {rootId ? (
                 <BlockTreeRenderer
+                  canReplaceImage={canReplaceImage}
                   editingTarget={editingTarget}
                   hoveredLayerId={hoveredLayerId}
                   layers={page.layers}
@@ -275,15 +330,17 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
                   onDuplicate={handleDuplicate}
                   onHoverLayer={handleHoverLayer}
                   onRemove={handleRemove}
+                  onReplaceImage={handleReplaceImage}
                   onSelect={handleSelect}
                   onStartEdit={handleStartEdit}
                   registry={registry}
+                  resolveAssetUrl={resolveAssetUrl}
                   scene={scene}
                   selectedId={selectedId}
                   sortDraft={sortDraft}
                 />
               ) : (
-                <p className={styles.empty}>No html.root block on this page.</p>
+                <p className={styles.empty}>No root block on this page.</p>
               )}
             </div>
           </div>
