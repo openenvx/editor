@@ -7,7 +7,10 @@ const root = import.meta.dirname;
 export default defineConfig({
   resolve: {
     alias: {
-      '@openenvx/protocol': path.resolve(root, '../protocol/src/index.ts'),
+      '@xmazu/openenvxee-protocol': path.resolve(
+        root,
+        '../protocol/src/index.ts'
+      ),
     },
     conditions: ['development', 'import', 'module', 'browser', 'default'],
   },

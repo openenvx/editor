@@ -1,9 +1,11 @@
 import {
-  createHtmlLayerDefinition,
-  defaultBlockRegistry,
   WorkbenchPlugin,
   type WorkbenchPluginContext,
-} from '@openenvx/html-studio';
+} from '@openenvx/headless';
+import {
+  createHtmlLayerDefinition,
+  defaultBlockRegistry,
+} from '@openenvx/html';
 
 import {
   eventGalleryBlock,
@@ -31,7 +33,5 @@ export class SnapveloEventPagePlugin extends WorkbenchPlugin {
     ctx.register(
       ...snapveloBlocks.map((block) => createHtmlLayerDefinition(block))
     );
-    // Fluid/fit frame fights the fixed Chivent template width — hide it here.
-    // ctx.contextKeys.setContext('html.hideFluidPreset', true);
   }
 }

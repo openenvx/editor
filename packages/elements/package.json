@@ -7,16 +7,52 @@
   "files": [
     "dist"
   ],
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./canvas": "./src/canvas.ts",
-    "./html": "./src/html.ts",
-    "./panel": "./src/panel.ts",
-    "./jsx-runtime": "./src/jsx-runtime.ts",
-    "./jsx-dev-runtime": "./src/jsx-dev-runtime.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
+      "bun": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./canvas": {
+      "types": "./dist/canvas.d.ts",
+      "development": "./src/canvas.ts",
+      "bun": "./dist/canvas.js",
+      "import": "./dist/canvas.js",
+      "default": "./dist/canvas.js"
+    },
+    "./html": {
+      "types": "./dist/html.d.ts",
+      "development": "./src/html.ts",
+      "bun": "./dist/html.js",
+      "import": "./dist/html.js",
+      "default": "./dist/html.js"
+    },
+    "./panel": {
+      "types": "./dist/panel.d.ts",
+      "development": "./src/panel.ts",
+      "bun": "./dist/panel.js",
+      "import": "./dist/panel.js",
+      "default": "./dist/panel.js"
+    },
+    "./jsx-runtime": {
+      "types": "./dist/jsx-runtime.d.ts",
+      "development": "./src/jsx-runtime.ts",
+      "bun": "./dist/jsx-runtime.js",
+      "import": "./dist/jsx-runtime.js",
+      "default": "./dist/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./dist/jsx-dev-runtime.d.ts",
+      "development": "./src/jsx-dev-runtime.ts",
+      "bun": "./dist/jsx-dev-runtime.js",
+      "import": "./dist/jsx-dev-runtime.js",
+      "default": "./dist/jsx-dev-runtime.js"
+    }
   },
   "scripts": {
     "build": "tsup",
@@ -25,7 +61,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@openenvx/protocol": "workspace:*",
+    "@xmazu/openenvxee-protocol": "workspace:*",
     "preact": "^10.26.5"
   },
   "devDependencies": {
@@ -36,42 +72,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.openenvx.com",
-    "main": "./dist/index.js",
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "import": "./dist/index.js",
-        "default": "./dist/index.js"
-      },
-      "./canvas": {
-        "types": "./dist/canvas.d.ts",
-        "import": "./dist/canvas.js",
-        "default": "./dist/canvas.js"
-      },
-      "./html": {
-        "types": "./dist/html.d.ts",
-        "import": "./dist/html.js",
-        "default": "./dist/html.js"
-      },
-      "./panel": {
-        "types": "./dist/panel.d.ts",
-        "import": "./dist/panel.js",
-        "default": "./dist/panel.js"
-      },
-      "./jsx-runtime": {
-        "types": "./dist/jsx-runtime.d.ts",
-        "import": "./dist/jsx-runtime.js",
-        "default": "./dist/jsx-runtime.js"
-      },
-      "./jsx-dev-runtime": {
-        "types": "./dist/jsx-dev-runtime.d.ts",
-        "import": "./dist/jsx-dev-runtime.js",
-        "default": "./dist/jsx-dev-runtime.js"
-      }
-    }
+    "registry": "https://registry.openenvx.com"
   },
   "repository": {
     "type": "git",

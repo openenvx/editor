@@ -19,7 +19,7 @@
     "@ai-sdk/react": "^3.0.0",
     "@openenvx/core": "workspace:*",
     "@openenvx/headless": "workspace:*",
-    "@openenvx/schema": "workspace:*",
+    "@xmazu/openenvxee-schema": "workspace:*",
     "ai": "^6.0.0",
     "lucide-react": "1.23.0",
     "zod": "4.4.3"

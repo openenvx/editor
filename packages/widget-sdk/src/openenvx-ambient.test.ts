@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import type { SandboxHostMethod } from '@openenvx/protocol';
+import type { SandboxHostMethod } from '@xmazu/openenvxee-protocol';
 import { describe, expect, it } from 'vitest';
 
 const HOST_METHODS: SandboxHostMethod[] = [

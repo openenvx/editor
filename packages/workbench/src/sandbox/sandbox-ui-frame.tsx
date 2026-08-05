@@ -4,7 +4,7 @@ import {
   type SandboxHostUiMessage,
   type SandboxUiMessage,
   type SandboxUiSelection,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 import { useEffect, useRef } from 'react';
 
 import { postHostUiMessage } from './sandbox-ui-protocol';

@@ -1,7 +1,7 @@
 import { canSelectLayer, canTransformLayer } from '@openenvx/core';
 import { useStoreSelector } from '@openenvx/headless/react';
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
-import type { Transform } from '@openenvx/schema';
+import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
+import type { Transform } from '@xmazu/openenvxee-schema';
 import type Konva from 'konva';
 import { memo, useCallback, useRef } from 'react';
 import { Group, Rect } from 'react-konva';

@@ -1,5 +1,5 @@
 import { findLayerById, walkLayers } from '@openenvx/core';
-import type { Layer, Scene } from '@openenvx/schema';
+import type { Layer, Scene } from '@xmazu/openenvxee-schema';
 
 import type { RichTextToolbarOptions } from '../block-config';
 import type { BlockRegistry } from '../block-registry';

@@ -3,12 +3,16 @@ import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/headless/react';
-import type { Modification, Scene, TemplateField } from '@openenvx/schema';
+import type {
+  Modification,
+  Scene,
+  TemplateField,
+} from '@xmazu/openenvxee-schema';
 import {
   createEmptyScene,
   extractTemplateManifest,
   validateTemplateNames,
-} from '@openenvx/schema';
+} from '@xmazu/openenvxee-schema';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 import styles from './template-data-panel.module.css';

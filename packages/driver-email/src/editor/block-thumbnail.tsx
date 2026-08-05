@@ -1,6 +1,6 @@
 import { isLayerVisible } from '@openenvx/core';
 import type { BlockConfig, BlockRegistry } from '@openenvx/html';
-import type { Layer } from '@openenvx/schema';
+import type { Layer } from '@xmazu/openenvxee-schema';
 import { createElement, Fragment, type ReactNode } from 'react';
 
 function layerData(layer: Layer): Record<string, unknown> {

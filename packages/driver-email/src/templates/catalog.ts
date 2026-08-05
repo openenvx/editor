@@ -1,4 +1,4 @@
-import type { Scene } from '@openenvx/schema';
+import type { Scene } from '@xmazu/openenvxee-schema';
 
 import { createBarebonesActivationScene } from './scenes/barebones-activation';
 import { createBarebonesFeatureAnnouncementScene } from './scenes/barebones-feature-announcement';

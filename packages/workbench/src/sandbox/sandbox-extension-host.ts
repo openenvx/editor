@@ -13,9 +13,9 @@ import type {
   ExtensionManifest,
   RenderNode,
   SandboxExtensionGrant,
-} from '@openenvx/protocol';
-import { validatePluginTree } from '@openenvx/protocol';
-import type { Layer, Scene } from '@openenvx/schema';
+} from '@xmazu/openenvxee-protocol';
+import { validatePluginTree } from '@xmazu/openenvxee-protocol';
+import type { Layer, Scene } from '@xmazu/openenvxee-schema';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 

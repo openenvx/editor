@@ -1,5 +1,5 @@
 import { isTypingTarget } from '@openenvx/headless';
-import type { Layer } from '@openenvx/schema';
+import type { Layer } from '@xmazu/openenvxee-schema';
 import {
   useCallback,
   useState,

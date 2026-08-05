@@ -3,7 +3,7 @@ import type {
   PluginElementType,
   PluginNode,
   PluginPropValue,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 
 /**
  * Test helper: build a PluginNode without the deleted hyperscript runtime.

@@ -16,9 +16,9 @@
     "@openenvx/headless": "workspace:*",
     "@openenvx/elements": "workspace:*",
     "@openenvx/widget-sdk": "workspace:*",
-    "@openenvx/preview": "workspace:*",
-    "@openenvx/schema": "workspace:*",
-    "@openenvx/studio": "workspace:*",
+    "@xmazu/openenvxee-preview": "workspace:*",
+    "@xmazu/openenvxee-schema": "workspace:*",
+    "@xmazu/openenvxee-studio": "workspace:*",
     "preact": "^10.26.5",
     "react": "19.2.7",
     "react-dom": "19.2.7"

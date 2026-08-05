@@ -10,8 +10,8 @@ import {
   type PropertySectionDescriptor,
   createPropertyBuilder,
 } from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@openenvx/preview';
-import { normalizeSceneSnapshot } from '@openenvx/schema';
+import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
+import { normalizeSceneSnapshot } from '@xmazu/openenvxee-schema';
 import { describe, expect, it } from 'vitest';
 
 import {

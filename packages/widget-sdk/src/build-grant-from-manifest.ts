@@ -3,8 +3,8 @@ import type {
   SandboxCapability,
   SandboxExtensionGrant,
   SandboxExtensionKind,
-} from '@openenvx/protocol';
-import { isSandboxCapability } from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
+import { isSandboxCapability } from '@xmazu/openenvxee-protocol';
 
 /** Host session ceilings intersected with the manifest. */
 export interface SessionPolicy {

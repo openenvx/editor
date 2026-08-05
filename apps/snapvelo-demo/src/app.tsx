@@ -6,11 +6,12 @@ import {
   type WorkbenchApi,
   type WorkbenchLayout,
 } from '@openenvx/html-studio';
+import {
+  createSnapveloEventScene,
+  EVENT_PAGE_LAYER_ID,
+  SnapveloEventPagePlugin,
+} from '@openenvx/snapvelo';
 import { useMemo } from 'react';
-
-import { createSnapveloEventScene } from './create-snapvelo-event-scene';
-import { EVENT_PAGE_LAYER_ID } from './plugin/blocks';
-import { SnapveloEventPagePlugin } from './plugin/snapvelo-event-page-plugin';
 
 import '@openenvx/html-studio/theme.css';
 

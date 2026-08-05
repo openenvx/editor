@@ -1,4 +1,4 @@
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
+import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
 
 import type { PropertySectionDescriptor } from '../builders/property-builder';
 import { Contribution } from '../core/contribution';

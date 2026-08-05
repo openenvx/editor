@@ -2,7 +2,7 @@ import {
   moveLayerRelativeToTarget,
 } from '@openenvx/core';
 import type { CommandContext, Layer } from '@openenvx/core';
-import { createDefaultTransform, normalizeScene } from '@openenvx/schema';
+import { createDefaultTransform, normalizeScene } from '@xmazu/openenvxee-schema';
 import { describe, expect, it } from 'vitest';
 
 import {

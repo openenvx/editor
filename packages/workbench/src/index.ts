@@ -166,7 +166,7 @@ export {
   MAX_RENDER_TREE_JSON_CHARS,
   type PluginTreeValidationResult,
   type RenderTreeValidationResult,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 
 export {
   SandboxExtensionHost,

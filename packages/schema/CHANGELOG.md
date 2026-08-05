@@ -1,4 +1,4 @@
-# @openenvx/schema
+# @xmazu/openenvxee-schema
 
 ## 0.1.11
 

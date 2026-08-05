@@ -1,4 +1,4 @@
-import type { BlockConfig } from '@openenvx/html-studio';
+import type { BlockConfig } from '@openenvx/html';
 import type { CSSProperties, ReactElement } from 'react';
 
 export const EVENT_LOGO_TYPE = 'snapvelo.logo';

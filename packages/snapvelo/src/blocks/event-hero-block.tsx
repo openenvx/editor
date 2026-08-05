@@ -1,4 +1,4 @@
-import type { BlockConfig } from '@openenvx/html-studio';
+import type { BlockConfig } from '@openenvx/html';
 import type { ReactElement } from 'react';
 
 export const EVENT_HERO_TYPE = 'snapvelo.eventHero';

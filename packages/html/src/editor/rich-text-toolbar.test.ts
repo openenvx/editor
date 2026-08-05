@@ -1,4 +1,4 @@
-import type { Layer, Scene } from '@openenvx/schema';
+import type { Layer, Scene } from '@xmazu/openenvxee-schema';
 import { describe, expect, it } from 'vitest';
 
 import type { BlockConfig } from '../block-config';

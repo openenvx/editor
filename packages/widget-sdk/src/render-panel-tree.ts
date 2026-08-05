@@ -1,5 +1,5 @@
-import type { PluginNode } from '@openenvx/protocol';
-import { validatePluginTree } from '@openenvx/protocol';
+import type { PluginNode } from '@xmazu/openenvxee-protocol';
+import { validatePluginTree } from '@xmazu/openenvxee-protocol';
 import type { JSX } from 'preact';
 
 import {

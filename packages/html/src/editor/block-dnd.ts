@@ -4,7 +4,7 @@ import {
   type CollisionDetection,
 } from '@dnd-kit/core';
 import { isLayerVisible } from '@openenvx/core';
-import type { Layer } from '@openenvx/schema';
+import type { Layer } from '@xmazu/openenvxee-schema';
 
 /** True when every visible child hugs content (e.g. email.imageLink row). */
 export function childrenUseInlineChrome(

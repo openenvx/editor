@@ -1,4 +1,4 @@
-import type { PluginNode } from '@openenvx/protocol';
+import type { PluginNode } from '@xmazu/openenvxee-protocol';
 
 import {
   createToolbarBuilder,

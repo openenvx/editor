@@ -51,12 +51,12 @@ Surfaces never expose `InstantiationService`. Isolates / parent pages never rece
 
 | Concern | Package |
 | --- | --- |
-| Element vocabulary, messages, `validatePluginTree` / `validateExtensionManifest`, grant types | `@openenvx/protocol` |
+| Element vocabulary, messages, `validatePluginTree` / `validateExtensionManifest`, grant types | `@xmazu/openenvxee-protocol` |
 | Preact vocabulary | `@openenvx/elements` |
 | Widget authoring (`defineExtension`, expand) | `@openenvx/widget-sdk` |
 | Tree → builder mappers, `ExternalHostMount`, host surfaces | `@openenvx/headless` |
 | `EmbedPanelHost`, `SandboxExtensionHost`, transport, gate, runtime | `@openenvx/workbench` |
-| Widget click seam + default plugins | `@openenvx/studio` |
+| Widget click seam + default plugins | `@xmazu/openenvxee-studio` |
 | Internal OOP plugins | `core` / `headless` / product plugins |
 
 ## Author guides

@@ -8,8 +8,8 @@
 - Updated dependencies [9aa5b06]
   - @openenvx/headless@0.1.11
   - @openenvx/core@0.1.11
-  - @openenvx/preview@0.1.11
-  - @openenvx/schema@0.1.11
+  - @xmazu/openenvxee-preview@0.1.11
+  - @xmazu/openenvxee-schema@0.1.11
 
 ## 0.1.10
 
@@ -19,8 +19,8 @@
 - Updated dependencies [1a89b04]
   - @openenvx/headless@0.1.10
   - @openenvx/core@0.1.10
-  - @openenvx/preview@0.1.10
-  - @openenvx/schema@0.1.10
+  - @xmazu/openenvxee-preview@0.1.10
+  - @xmazu/openenvxee-schema@0.1.10
 
 ## 0.1.9
 
@@ -29,9 +29,9 @@
 - e7dbaa2: new contribution for canvas
 - Updated dependencies [e7dbaa2]
   - @openenvx/headless@0.1.9
-  - @openenvx/preview@0.1.9
+  - @xmazu/openenvxee-preview@0.1.9
   - @openenvx/core@0.1.9
-  - @openenvx/schema@0.1.9
+  - @xmazu/openenvxee-schema@0.1.9
 
 ## 0.1.8
 
@@ -40,9 +40,9 @@
 - 181b8fc: Enhance canvas functionality with new layer management capabilities
 - Updated dependencies [181b8fc]
   - @openenvx/headless@0.1.8
-  - @openenvx/schema@0.1.8
+  - @xmazu/openenvxee-schema@0.1.8
   - @openenvx/core@0.1.8
-  - @openenvx/preview@0.1.8
+  - @xmazu/openenvxee-preview@0.1.8
 
 ## 0.1.7
 
@@ -52,8 +52,8 @@
 - Updated dependencies [e5ec220]
   - @openenvx/headless@0.1.7
   - @openenvx/core@0.1.7
-  - @openenvx/preview@0.1.7
-  - @openenvx/schema@0.1.7
+  - @xmazu/openenvxee-preview@0.1.7
+  - @xmazu/openenvxee-schema@0.1.7
 
 ## 0.1.6
 
@@ -62,8 +62,8 @@
 - 1e1bdf4: fix - bring back react
 - Updated dependencies [1e1bdf4]
   - @openenvx/headless@0.1.6
-  - @openenvx/preview@0.1.6
-  - @openenvx/schema@0.1.6
+  - @xmazu/openenvxee-preview@0.1.6
+  - @xmazu/openenvxee-schema@0.1.6
   - @openenvx/core@0.1.6
 
 ## 0.1.3
@@ -74,8 +74,8 @@
 - Updated dependencies [60cfd11]
   - @openenvx/core@0.1.3
   - @openenvx/headless@0.1.3
-  - @openenvx/preview@0.1.3
-  - @openenvx/schema@0.1.3
+  - @xmazu/openenvxee-preview@0.1.3
+  - @xmazu/openenvxee-schema@0.1.3
 
 ## 0.1.2
 
@@ -85,8 +85,8 @@
 - Updated dependencies [1479c36]
   - @openenvx/core@0.1.2
   - @openenvx/headless@0.1.2
-  - @openenvx/preview@0.1.2
-  - @openenvx/schema@0.1.2
+  - @xmazu/openenvxee-preview@0.1.2
+  - @xmazu/openenvxee-schema@0.1.2
 
 ## 0.1.1
 
@@ -96,8 +96,8 @@
 - Updated dependencies [05c5915]
   - @openenvx/core@0.1.1
   - @openenvx/headless@0.1.1
-  - @openenvx/preview@0.1.1
-  - @openenvx/schema@0.1.1
+  - @xmazu/openenvxee-preview@0.1.1
+  - @xmazu/openenvxee-schema@0.1.1
 
 ## 0.1.0
 
@@ -110,5 +110,5 @@
 - Updated dependencies [62f8021]
   - @openenvx/core@0.1.0
   - @openenvx/headless@0.1.0
-  - @openenvx/preview@0.1.0
-  - @openenvx/schema@0.1.0
+  - @xmazu/openenvxee-preview@0.1.0
+  - @xmazu/openenvxee-schema@0.1.0

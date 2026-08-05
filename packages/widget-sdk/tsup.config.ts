@@ -13,7 +13,7 @@ export default createLibraryConfig({
     'preact/hooks',
     'preact/jsx-runtime',
     'preact/compat',
-    '@openenvx/protocol',
+    '@xmazu/openenvxee-protocol',
     '@openenvx/elements',
     'vite',
     'esbuild',

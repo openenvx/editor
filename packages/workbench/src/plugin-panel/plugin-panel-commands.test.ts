@@ -1,4 +1,4 @@
-import type { PluginPanelDeclaration } from '@openenvx/protocol';
+import type { PluginPanelDeclaration } from '@xmazu/openenvxee-protocol';
 import { describe, expect, it } from 'vitest';
 
 import { canRunPluginPanelCommand } from './plugin-panel-command-gate';

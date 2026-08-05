@@ -1,4 +1,4 @@
-import type { WidgetFieldDef } from '@openenvx/schema';
+import type { WidgetFieldDef } from '@xmazu/openenvxee-schema';
 
 import type { createPropertyBuilder } from './property-builder';
 

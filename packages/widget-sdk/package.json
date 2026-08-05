@@ -9,11 +9,17 @@
     "src/vite",
     "src/openenvx.d.ts"
   ],
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
+      "bun": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
     "./vite": "./src/vite/bundle-widget-sources-plugin.ts",
     "./vite/client": "./src/vite/client.d.ts",
     "./openenvx": "./src/openenvx.d.ts"
@@ -30,7 +36,7 @@
   },
   "dependencies": {
     "@openenvx/elements": "workspace:*",
-    "@openenvx/protocol": "workspace:*",
+    "@xmazu/openenvxee-protocol": "workspace:*",
     "preact": "^10.26.5"
   },
   "devDependencies": {
@@ -55,20 +61,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.openenvx.com",
-    "main": "./dist/index.js",
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "import": "./dist/index.js",
-        "default": "./dist/index.js"
-      },
-      "./vite": "./src/vite/bundle-widget-sources-plugin.ts",
-      "./vite/client": "./src/vite/client.d.ts",
-      "./openenvx": "./src/openenvx.d.ts"
-    }
+    "registry": "https://registry.openenvx.com"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-import type { Scene } from '@openenvx/schema';
+import type { Scene } from '@xmazu/openenvxee-schema';
 
 import {
   Button,

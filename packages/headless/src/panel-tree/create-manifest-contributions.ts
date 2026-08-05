@@ -3,7 +3,7 @@ import {
   validatePluginTree,
   type PluginNode,
   type PluginPanelManifest,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import type { CommandPaletteBuilder } from '../builders/command-palette-builder';
 import type { MenuBuilder } from '../builders/menu-builder';

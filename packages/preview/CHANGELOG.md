@@ -1,4 +1,4 @@
-# @openenvx/preview
+# @xmazu/openenvxee-preview
 
 ## 0.1.11
 
@@ -6,7 +6,7 @@
 
 - 9aa5b06: refactor: streamline Workbench provider registrations and remove deprecated contributions
 - Updated dependencies [9aa5b06]
-  - @openenvx/schema@0.1.11
+  - @xmazu/openenvxee-schema@0.1.11
 
 ## 0.1.10
 
@@ -14,7 +14,7 @@
 
 - 1a89b04: feat: add Workbench views and tree provider contributions
 - Updated dependencies [1a89b04]
-  - @openenvx/schema@0.1.10
+  - @xmazu/openenvxee-schema@0.1.10
 
 ## 0.1.9
 
@@ -22,7 +22,7 @@
 
 - e7dbaa2: new contribution for canvas
 - Updated dependencies [e7dbaa2]
-  - @openenvx/schema@0.1.9
+  - @xmazu/openenvxee-schema@0.1.9
 
 ## 0.1.8
 
@@ -30,7 +30,7 @@
 
 - 181b8fc: Enhance canvas functionality with new layer management capabilities
 - Updated dependencies [181b8fc]
-  - @openenvx/schema@0.1.8
+  - @xmazu/openenvxee-schema@0.1.8
 
 ## 0.1.7
 
@@ -38,7 +38,7 @@
 
 - e5ec220: new interactions store
 - Updated dependencies [e5ec220]
-  - @openenvx/schema@0.1.7
+  - @xmazu/openenvxee-schema@0.1.7
 
 ## 0.1.6
 
@@ -46,7 +46,7 @@
 
 - 1e1bdf4: fix - bring back react
 - Updated dependencies [1e1bdf4]
-  - @openenvx/schema@0.1.6
+  - @xmazu/openenvxee-schema@0.1.6
 
 ## 0.1.3
 
@@ -54,7 +54,7 @@
 
 - 60cfd11: fix: versioning
 - Updated dependencies [60cfd11]
-  - @openenvx/schema@0.1.3
+  - @xmazu/openenvxee-schema@0.1.3
 
 ## 0.1.2
 
@@ -62,7 +62,7 @@
 
 - 1479c36: fix: fix versioning
 - Updated dependencies [1479c36]
-  - @openenvx/schema@0.1.2
+  - @xmazu/openenvxee-schema@0.1.2
 
 ## 0.1.1
 
@@ -70,7 +70,7 @@
 
 - 05c5915: fix: correct versioning in the npm
 - Updated dependencies [05c5915]
-  - @openenvx/schema@0.1.1
+  - @xmazu/openenvxee-schema@0.1.1
 
 ## 0.1.0
 
@@ -81,4 +81,4 @@
 ### Patch Changes
 
 - Updated dependencies [62f8021]
-  - @openenvx/schema@0.1.0
+  - @xmazu/openenvxee-schema@0.1.0

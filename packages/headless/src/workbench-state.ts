@@ -15,7 +15,7 @@ import type {
   ServiceId,
   EditorService,
 } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
+import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
 
 import type { CommandPaletteDescriptor } from './builders/command-palette-builder';
 import type { MenuItemDescriptor } from './builders/menu-builder';

@@ -3,7 +3,7 @@ import type {
   SandboxExtensionGrant,
   SandboxBridgeRequest,
   SandboxUiSelection,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import {
   freezeGrant,

@@ -35,7 +35,7 @@ Author how-to:
 | **Editor backbone** | `core`, `headless`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
 | **Workbench UI** | `workbench` | React shell (`WorkbenchShell`); workspace-private. |
 | **Published product** | `studio` (+ `schema`, `protocol`, `elements`, `widget-sdk`) | Fat bundle of workbench + canvas + canvas-pro + agent into `dist`; protocol + elements + widget-sdk also published standalone. |
-| **HTML studio** | `html`, `html-studio` | Puck-style block editor + thin studio re-exports (workspace-private). |
+| **HTML studio** | `html`, `html-studio`, optional `snapvelo` / `driver-*` | Puck-style block editor + thin studio re-exports; product drivers compose on top (workspace-private). |
 
 **Hard rules:** All canvas code lives in `@openenvx/canvas` (not `core`). HTML block editing lives in `@openenvx/html`. Email block editing lives in `@openenvx/driver-email`. Untrusted extension code never runs in the editor main world.
 
@@ -44,25 +44,26 @@ Author how-to:
 | Tier | Packages | License / publish (intent) | Responsibility |
 | --- | --- | --- | --- |
 | Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives |
-| Embed / sandbox protocol | `protocol` (`@openenvx/protocol`) | Published (public) | `RenderNode`, manifests, validators, sandbox grants, message unions |
-| Product libs | `headless`, `canvas`, `html`, `driver-email`, `workbench`, `canvas-pro`, `agent`, `html-studio` | Private (workspace) | Workbench runtime, canvas engine, HTML editor, email driver, React shell, pro chrome, agent |
+| Embed / sandbox protocol | `protocol` (`@xmazu/openenvxee-protocol`) | Published (public) | `RenderNode`, manifests, validators, sandbox grants, message unions |
+| Product libs | `headless`, `canvas`, `html`, `driver-email`, `snapvelo`, `workbench`, `canvas-pro`, `agent`, `html-studio` | Private (workspace) | Workbench runtime, canvas engine, HTML editor, email/Snapvelo drivers, React shell, pro chrome, agent |
 | Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + canvas-pro + agent |
 
 ## Placement cheat sheet
 
 | Put it here | Examples |
 | --- | --- |
-| `@openenvx/schema` | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
+| `@xmazu/openenvxee-schema` | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
 | `@openenvx/headless` | `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context, external host mount surfaces |
 | `@openenvx/canvas` | Konva stage, layers, renderers, `CanvasBasicsPlugin`, `CanvasEditor` |
 | `@openenvx/html` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |
 | `@openenvx/driver-email` | Email blocks, `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument` |
+| `@openenvx/snapvelo` | Snapvelo event-page blocks/plugin (private product driver; compose with `html-studio`, not published studio) |
 | `@openenvx/workbench` | `WorkbenchShell`, field renderers, sandbox/embed hosts |
 | `@openenvx/canvas-pro` | Canvas-only chrome (zoom, transform panes, floating toolbar) |
-| `@openenvx/studio` | Product fat bundle + `DEFAULT_STUDIO_PLUGINS` + `createSandboxExtensionHost` |
+| `@xmazu/openenvxee-studio` | Product fat bundle + `DEFAULT_STUDIO_PLUGINS` + `createSandboxExtensionHost` |
 | `@openenvx/html-studio` | HTML product re-exports + `DEFAULT_HTML_STUDIO_PLUGINS` |
-| `@openenvx/protocol` | Embed panel vocabulary for untrusted parents |
+| `@xmazu/openenvxee-protocol` | Embed panel vocabulary for untrusted parents |
 
 ## Contribution flow (sketch)
 

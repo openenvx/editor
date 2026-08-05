@@ -1,5 +1,5 @@
-import type { Layer, Scene } from '@openenvx/schema';
-import { validateScene } from '@openenvx/schema';
+import type { Layer, Scene } from '@xmazu/openenvxee-schema';
+import { validateScene } from '@xmazu/openenvxee-schema';
 
 export interface LayerSummary {
   id: string;

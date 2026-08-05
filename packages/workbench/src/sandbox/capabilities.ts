@@ -3,7 +3,7 @@ import {
   type SandboxCapability,
   type SandboxExtensionGrant,
   type SandboxHostMethod,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import {
   assertArtifactUrl,

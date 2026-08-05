@@ -22,7 +22,7 @@ import {
 import {
   createEmptySceneSnapshot,
   normalizeSceneSnapshot,
-} from '@openenvx/schema';
+} from '@xmazu/openenvxee-schema';
 
 import { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
 import type { ViewContainerLocation } from './contributions/view-contribution';

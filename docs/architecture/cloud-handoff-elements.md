@@ -4,11 +4,11 @@ After publishing from editor-core, update openenvx-cloud:
 
 ## Packages to publish (editor-core)
 
-1. `@openenvx/schema` (SCHEMA_VERSION 4 — widget `handlers`)
-2. `@openenvx/protocol` (`RenderNode`, `ExtensionManifest`, unified messages, sandbox grants)
+1. `@xmazu/openenvxee-schema` (SCHEMA_VERSION 4 — widget `handlers`)
+2. `@xmazu/openenvxee-protocol` (`RenderNode`, `ExtensionManifest`, unified messages, sandbox grants)
 3. `@openenvx/elements` (Preact `/canvas` `/html` `/panel` vocabulary only)
 4. `@openenvx/widget-sdk` (`defineExtension`, `define*Component`, `renderToElementTree`, `renderPanelTree`, Vite packaging)
-5. `@openenvx/studio` (depends on the above)
+5. `@xmazu/openenvxee-studio` (depends on the above)
 
 Do **not** publish until the human asks.
 
@@ -21,8 +21,8 @@ export { Pane, Row, Block /* … */ } from '@openenvx/elements/panel';
 export { renderPanelTree } from '@openenvx/widget-sdk';
 ```
 
-Swap dependency `@openenvx/protocol` → `@openenvx/protocol` if still present.
+Swap dependency `@xmazu/openenvxee-protocol` → `@xmazu/openenvxee-protocol` if still present.
 
-Keep importing message/grant types from `@openenvx/protocol`.
+Keep importing message/grant types from `@xmazu/openenvxee-protocol`.
 
 `packages/studio-host` only needs the protocol message types — bump the pin, no authoring swap.

@@ -1,7 +1,7 @@
 import {
   PLUGIN_PARENT_SOURCE,
   type ParentToHostMessage,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createPostMessagePluginPanelTransport } from './create-post-message-plugin-panel-transport';

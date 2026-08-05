@@ -1,7 +1,7 @@
 import type {
   WidgetFaceRenderResult,
   WidgetRegistryEntry,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 import { h, type ComponentChild } from 'preact';
 
 import type { HandlerRegistry, WidgetHandler } from './host/handlers';

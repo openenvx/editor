@@ -134,8 +134,19 @@
         "react-konva",
         "zod",
         "@openenvx/core",
-        "@openenvx/preview",
-        "@openenvx/schema"
+        "@xmazu/openenvxee-preview",
+        "@xmazu/openenvxee-schema"
+      ]
+    },
+    "packages/snapvelo": {
+      "entry": [
+        "src/index.ts!",
+        "src/snapvelo-event-page-plugin.ts!"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "!src/**/*.test.ts",
+        "!src/**/*.test.tsx"
       ]
     },
     "packages/canvas-pro": {
@@ -218,6 +229,16 @@
       ],
       "ignoreDependencies": [
         "openenvx-widget"
+      ]
+    },
+    "apps/snapvelo-demo": {
+      "entry": [
+        "src/main.tsx",
+        "src/app.tsx",
+        "index.html"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}"
       ]
     },
     "apps/email-demo": {

@@ -13,7 +13,7 @@ import {
   type PluginPanelDeclaration,
   type PluginPanelSelection,
   validatePluginTree,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 

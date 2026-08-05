@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { createSnapveloEventScene } from './create-snapvelo-event-scene';
 import {
   EVENT_GALLERY_TYPE,
   EVENT_HERO_LAYER_ID,
@@ -12,7 +11,8 @@ import {
   eventHeroBlock,
   eventLogoBlock,
   eventPageBlock,
-} from './plugin/blocks';
+} from './blocks';
+import { createSnapveloEventScene } from './create-snapvelo-event-scene';
 
 describe('createSnapveloEventScene', () => {
   it('seeds a real layer tree (hero, logo, texts, gallery)', () => {
@@ -33,7 +33,9 @@ describe('createSnapveloEventScene', () => {
           id: string;
           type: string;
           writeMode?: string;
-          data: { children?: { id: string; type: string; writeMode?: string }[] };
+          data: {
+            children?: { id: string; type: string; writeMode?: string }[];
+          };
         }[];
       };
     };

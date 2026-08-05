@@ -13,7 +13,7 @@ import {
   EmbedPanelHost,
   mountEmbedPanel,
   mountSandboxExtensions,
-} from '@openenvx/studio';
+} from '@xmazu/openenvxee-studio';
 import saveTheDateSource from 'openenvx-widget:./extensions/save-the-date.widget.tsx';
 import seatingSource from 'openenvx-widget:./extensions/seating.widget.tsx';
 import { useMemo } from 'react';
@@ -24,8 +24,8 @@ import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
 import { CanvasDemoPlugin } from './plugins/canvas-demo-plugin';
 import { createDemoVersionHistoryProvider } from './providers/demo-version-history-provider';
 
-import '@openenvx/studio/fonts.css';
-import '@openenvx/studio/theme.css';
+import '@xmazu/openenvxee-studio/fonts.css';
+import '@xmazu/openenvxee-studio/theme.css';
 
 const EMBED_PANEL_ID = 'embed.demo';
 const LAYOUT_STORE_KEY = 'openenvx.canvas-demo.workbench-layout';

@@ -20,8 +20,8 @@
     "@openenvx/canvas": "workspace:*",
     "@openenvx/core": "workspace:*",
     "@openenvx/headless": "workspace:*",
-    "@openenvx/preview": "workspace:*",
-    "@openenvx/schema": "workspace:*",
+    "@xmazu/openenvxee-preview": "workspace:*",
+    "@xmazu/openenvxee-schema": "workspace:*",
     "konva": "^10.3.0",
     "react-konva": "^19.2.1"
   },

@@ -4,7 +4,7 @@ import {
   type SandboxBridgeResponse,
   type SandboxExtensionGrant,
   type SandboxHostMethod,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import { assertJsonSerializable, assertMethodAllowed } from './capabilities';
 

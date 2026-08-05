@@ -1,9 +1,9 @@
-import { createLayerPreviewBuilder } from '@openenvx/preview';
+import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
 import {
   createDefaultTransform,
   type OpenEnvxWidgetData,
   type WidgetManifestSnapshot,
-} from '@openenvx/schema';
+} from '@xmazu/openenvxee-schema';
 import { z } from 'zod';
 
 import {

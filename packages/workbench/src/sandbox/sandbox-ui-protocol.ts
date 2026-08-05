@@ -1,7 +1,7 @@
 import {
   SANDBOX_HOST_UI_SOURCE,
   type SandboxHostUiMessage,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 
 /** Host → opaque-origin showUI iframe (`targetOrigin` must be `'*'`). */
 export function postHostUiMessage(

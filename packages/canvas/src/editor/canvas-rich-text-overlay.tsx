@@ -1,7 +1,7 @@
 import { canEditLayerData } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
-import type { Layer } from '@openenvx/schema';
-import { createDefaultTransform } from '@openenvx/schema';
+import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
+import type { Layer } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { memo, useMemo } from 'react';
 
 import { computeArtboardOffset } from '../artboard-offset';

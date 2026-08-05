@@ -1,4 +1,4 @@
-import { createHtmlDemoScene, type Scene } from '@openenvx/html-studio';
+import { SCHEMA_VERSION, type Scene } from '@xmazu/openenvxee-schema';
 
 import {
   createGalleryImageSlots,
@@ -8,9 +8,7 @@ import {
   EVENT_LOGO_TYPE,
   EVENT_PAGE_LAYER_ID,
   EVENT_PAGE_TYPE,
-} from './plugin/blocks';
-
-const { schemaVersion: SCHEMA_VERSION } = createHtmlDemoScene();
+} from './blocks';
 
 const LOGO_SRC = '/demo/logo.jpg';
 

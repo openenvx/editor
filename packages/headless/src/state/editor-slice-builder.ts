@@ -3,7 +3,7 @@ import {
   resolveEditorPaneKind,
 } from '@openenvx/core';
 import type { Layer } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/preview';
+import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
 
 import { resolveLayerPreview } from '../utils/layer-preview-resolver';
 import type { EditorSlice } from '../workbench-state-cache';

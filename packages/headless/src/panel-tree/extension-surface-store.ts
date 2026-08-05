@@ -1,4 +1,4 @@
-import type { RenderNode } from '@openenvx/protocol';
+import type { RenderNode } from '@xmazu/openenvxee-protocol';
 
 type Listener = () => void;
 

@@ -11,8 +11,8 @@ import {
   type TreeItem,
   type WorkbenchPluginContext,
 } from '@openenvx/headless';
-import { createDefaultTransform, normalizeScene } from '@openenvx/schema';
-import type { Page } from '@openenvx/schema';
+import { createDefaultTransform, normalizeScene } from '@xmazu/openenvxee-schema';
+import type { Page } from '@xmazu/openenvxee-schema';
 import { describe, expect, it } from 'vitest';
 
 import {

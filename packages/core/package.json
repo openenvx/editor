@@ -16,8 +16,8 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@openenvx/preview": "workspace:*",
-    "@openenvx/schema": "workspace:*",
+    "@xmazu/openenvxee-preview": "workspace:*",
+    "@xmazu/openenvxee-schema": "workspace:*",
     "zod": "4.4.3"
   },
   "devDependencies": {

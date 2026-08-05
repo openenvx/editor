@@ -5,7 +5,7 @@ import {
   StatusBarContribution,
   type StatusBarBuilder,
 } from '@openenvx/headless';
-import type { Scene } from '@openenvx/schema';
+import type { Scene } from '@xmazu/openenvxee-schema';
 
 import { CanvasDemoExportServiceId } from '../services/canvas-demo-export-service';
 import type { CanvasDemoExportService } from '../services/canvas-demo-export-service';

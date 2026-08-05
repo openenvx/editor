@@ -1,6 +1,6 @@
 import { SceneStore } from '@openenvx/core';
 import type { WorkbenchApi } from '@openenvx/headless';
-import { SCHEMA_VERSION } from '@openenvx/schema';
+import { SCHEMA_VERSION } from '@xmazu/openenvxee-schema';
 import { describe, expect, it } from 'vitest';
 
 import { applyProposedChanges } from './apply-proposal';

@@ -1,5 +1,5 @@
-import type { RenderNode } from '@openenvx/protocol';
-import { createDefaultTransform, type Layer } from '@openenvx/schema';
+import type { RenderNode } from '@xmazu/openenvxee-protocol';
+import { createDefaultTransform, type Layer } from '@xmazu/openenvxee-schema';
 
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';
 

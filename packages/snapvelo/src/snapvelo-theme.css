@@ -10,6 +10,8 @@
  * outline — otherwise the blue rect is a stretched wrap around padded guts.
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,500&family=Great+Vibes&display=swap');
+
 [data-layer-id='event-page'] {
   width: 100%;
   min-height: 100%;

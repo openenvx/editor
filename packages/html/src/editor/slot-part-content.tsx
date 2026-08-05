@@ -1,5 +1,5 @@
 import { canEditLayerData, isLayerVisible } from '@openenvx/core';
-import type { Layer } from '@openenvx/schema';
+import type { Layer } from '@xmazu/openenvxee-schema';
 import {
   Fragment,
   useCallback,

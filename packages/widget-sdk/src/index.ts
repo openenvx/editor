@@ -47,7 +47,12 @@ export {
   type RenderOptions,
 } from './render-to-element-tree';
 
-export { renderPanelTree, type RenderPanelResult } from './render-panel-tree';
+export {
+  renderPanelTree,
+  type RenderPanelResult,
+  type HandlerRegistry,
+  type WidgetHandler,
+} from './render-panel-tree';
 
 export {
   buildGrantFromManifest,

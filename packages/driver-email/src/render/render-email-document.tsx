@@ -1,8 +1,8 @@
 import { getLayerChildren, isLayerVisible } from '@openenvx/core';
 import type { BlockConfig, BlockRegistry } from '@openenvx/html';
-import type { Layer, Page } from '@openenvx/schema';
 import { Body, Font, Head, Html, Preview } from '@react-email/components';
 import { render } from '@react-email/render';
+import type { Layer, Page } from '@xmazu/openenvxee-schema';
 import {
   createElement,
   Fragment,

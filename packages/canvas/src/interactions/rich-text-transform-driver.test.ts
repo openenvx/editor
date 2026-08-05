@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/schema';
+import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { describe, expect, it, vi } from 'vitest';
 
 import {

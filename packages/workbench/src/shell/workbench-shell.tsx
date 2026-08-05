@@ -14,7 +14,7 @@ import type {
   WorkbenchApi,
   WorkbenchControllerOptions,
 } from '@openenvx/headless';
-import type { Scene } from '@openenvx/schema';
+import type { Scene } from '@xmazu/openenvxee-schema';
 import type { MutableRefObject, ReactNode } from 'react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 

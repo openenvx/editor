@@ -5,7 +5,7 @@ import {
   type Modification,
   type Scene,
   type Transform,
-} from '@openenvx/schema';
+} from '@xmazu/openenvxee-schema';
 
 import {
   isCurvedText,

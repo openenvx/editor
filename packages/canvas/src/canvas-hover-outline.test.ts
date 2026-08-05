@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/schema';
+import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { describe, expect, it } from 'vitest';
 
 import { resolveHoverOutlineRect, readLiveHoverOutlineRect } from './canvas-hover-outline';

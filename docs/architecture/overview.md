@@ -9,7 +9,7 @@ Hub: [Architecture.md](../../Architecture.md).
 ## Mental model
 
 ```text
-Scene JSON (@openenvx/schema)
+Scene JSON (@xmazu/openenvxee-schema)
         │
         ▼
 EditorRuntime + PluginManager (@openenvx/core)
@@ -22,7 +22,7 @@ WorkbenchController (@openenvx/headless)
         ▼
 WorkbenchShell (@openenvx/workbench)
         │
-        ├── canvas studio  (@openenvx/studio)
+        ├── canvas studio  (@xmazu/openenvxee-studio)
         └── html studio    (@openenvx/html-studio)
 ```
 
@@ -41,7 +41,7 @@ WorkbenchShell (@openenvx/workbench)
 | --- | --- |
 | Stage only, own state | `schema` + `canvas` (`CanvasStage`) |
 | Full editor, custom UI | `core` + `headless` + `canvas` / `html` / `driver-email` |
-| Full Studio product | `@openenvx/studio` (`DEFAULT_STUDIO_PLUGINS`, `WorkbenchShell`) |
+| Full Studio product | `@xmazu/openenvxee-studio` (`DEFAULT_STUDIO_PLUGINS`, `WorkbenchShell`) |
 | HTML block product | `@openenvx/html-studio` |
 | Email block editor | `@openenvx/driver-email` + workbench (`apps/email-demo`) |
 | Untrusted parent panels | `plugin-protocol` + embed host (never main-world JS) |

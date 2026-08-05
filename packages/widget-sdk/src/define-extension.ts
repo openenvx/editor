@@ -4,7 +4,7 @@ import type {
   ExtensionContributes,
   ExtensionManifest,
   SandboxCapability,
-} from '@openenvx/protocol';
+} from '@xmazu/openenvxee-protocol';
 
 import type { RegisteredWidget } from './define-component';
 
