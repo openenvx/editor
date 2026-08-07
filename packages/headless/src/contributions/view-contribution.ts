@@ -105,6 +105,14 @@ export abstract class ViewContribution extends WorkbenchContribution {
   viewHover?: 'layer' | 'page' | 'none';
   collapsible?: boolean;
   initialCollapsed?: boolean;
+  /** Optional glyph id for the accordion section header (`WorkbenchIcon`). */
+  icon?: string;
+  /**
+   * Optional labelled group for consecutive views in the same container.
+   * When the group string changes between sorted views, the shell renders a
+   * heading before the next section.
+   */
+  group?: string;
   when?: string;
   /**
    * When set, the view renders a registered React panel instead of a tree.

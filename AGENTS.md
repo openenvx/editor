@@ -75,11 +75,14 @@ Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `workbenc
 
 Published packages:
 
-- **`@xmazu/openenvxee-schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry; monorepo and `bun link` consumers resolve `src/` via export conditions. See [PUBLISHING.md](PUBLISHING.md).
+- **`@xmazu/openenvxee-schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry. See [PUBLISHING.md](PUBLISHING.md).
 - **`@openenvx/elements`** — Preact element vocabulary (`/canvas`, `/html`, `/panel`). Published.
 - **`@openenvx/widget-sdk`** — widget authoring (`defineExtension`, `define*Component`, `renderToElementTree`, Vite packaging, ambient `openenvx`). Published; isolates share this with integrators.
-- **`@xmazu/openenvxee-protocol`** — wire contract (`RenderNode`, `ExtensionManifest`, validators, sandbox grants, message unions). Ships `dist/`; top-level `exports` use `development` → `src/`, `bun`/`import`/`default` → `dist/` (see [PUBLISHING.md](PUBLISHING.md)).
-- **`@xmazu/openenvxee-studio`** — product fat canvas bundle. Build inlines `@openenvx/workbench`, `@openenvx/canvas`, `@openenvx/canvas-pro`, `@openenvx/agent`, and their `@openenvx/*` deps into `dist/`. Re-exports `@openenvx/core` + `@openenvx/headless` so host apps can author plugins without private workspace packages. Top-level `exports`: `development` → `src/` (Vite HMR), `bun`/`import`/`default` → `dist/` (rebuild after edits for Bun). Does **not** inline html or Snapvelo — HTML hosts use `@openenvx/html-studio`; Snapvelo hosts compose that with `@openenvx/snapvelo`. PNG/JPG/PDF/SVG export is server-side via openenvx-cloud `apps/export-service`.
+- **`@xmazu/openenvxee-protocol`** — wire contract (`RenderNode`, `ExtensionManifest`, validators, sandbox grants, message unions). Ships `dist/`; `exports` → `dist/` (`bun`/`import`/`default`). See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/canvas-studio`** — private curated canvas host surface (`WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, sandbox/embed, theme CSS). Workspace TypeScript via `workspace:*` — monorepo hosts use this (not bundled).
+- **`@openenvx/html-studio`** — private curated HTML host surface (`DEFAULT_HTML_STUDIO_PLUGINS`, theme CSS). Monorepo hosts use this; external hosts use `@xmazu/openenvxee-html-studio`.
+- **`@xmazu/openenvxee-studio`** — published fat canvas bundle. Re-exports `@openenvx/canvas-studio` and inlines `@openenvx/workbench`, `@openenvx/canvas`, `@openenvx/canvas-pro`, and their `@openenvx/*` deps into `dist/`. Public surface matches canvas-studio’s allowlist — not a barrel re-export of core/headless/canvas. Plugin authoring uses private `@openenvx/core` + `@openenvx/headless` in-monorepo. Top-level `exports` → `dist/` only (no `development` → `src`). Publish to GitHub Packages (`npm.pkg.github.com`, restricted); `latest` has no sourcemaps, `debug` tag ships maps. Does **not** inline html — HTML hosts use `@xmazu/openenvxee-html-studio`. PNG/JPG/PDF/SVG export is server-side via openenvx-cloud `apps/export-service`.
+- **`@xmazu/openenvxee-html-studio`** — published HTML host package. Re-exports `@openenvx/html-studio` and inlines workspace packages into a per-module `dist/` ESM tree (Vite-tree-shakeable; third-party UI deps external). Subpaths: `.` (editor), `./runtime` (Worker-safe `renderBlockDocument`), `./theme.css`. Product hosts own their blocks/plugins (e.g. Snapvelo in snapvelo-app).
 
 ## Host sidebar panels (product hosts)
 
@@ -183,7 +186,7 @@ bun run changeset     # create a release changeset
 
 ## Publishing
 
-Only `packages/schema` (`@xmazu/openenvxee-schema`), `packages/preview` (`@xmazu/openenvxee-preview`), `packages/elements` (`@openenvx/elements`), `packages/widget-sdk` (`@openenvx/widget-sdk`), `packages/protocol` (`@xmazu/openenvxee-protocol`), and `packages/studio` (`@xmazu/openenvxee-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)). Export Worker lives in openenvx-cloud.
+Only `packages/schema` (`@xmazu/openenvxee-schema`), `packages/preview` (`@xmazu/openenvxee-preview`), `packages/elements` (`@openenvx/elements`), `packages/widget-sdk` (`@openenvx/widget-sdk`), `packages/protocol` (`@xmazu/openenvxee-protocol`), `packages/studio` (`@xmazu/openenvxee-studio`), and `packages/openenvxee-html-studio` (`@xmazu/openenvxee-html-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)). Export Worker lives in openenvx-cloud.
 
 ## Before you finish
 

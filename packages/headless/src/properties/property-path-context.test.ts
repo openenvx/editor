@@ -85,4 +85,18 @@ describe('createPropertyHostContext', () => {
       allowInsertLayers: false,
     });
   });
+
+  it('reads and writes layerById paths without selection', () => {
+    const updateProperty = vi.fn();
+    const ctx = createPropertyHostContext({
+      executeCommand: vi.fn(),
+      layerData: null,
+      scene,
+      selectedLayerId: null,
+      updateProperty,
+    });
+    expect(ctx.readPath(PropertyPath.layerById('a', 'text'))).toBe('hi');
+    ctx.writePath(PropertyPath.layerById('a', 'text'), 'bye');
+    expect(updateProperty).toHaveBeenCalledWith('a', 'text', 'bye');
+  });
 });

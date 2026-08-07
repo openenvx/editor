@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes } from 'react';
+import { forwardRef } from 'react';
 
 import { cn } from '../lib/cn';
 
@@ -9,13 +10,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'default' | 'sm' | 'icon';
 }
 
-export function Button({
-  className,
-  variant = 'default',
-  size = 'default',
-  ...props
-}: ButtonProps) {
-  return (
+/** Ref-forwarding so Radix `asChild` slots can target the underlying button. */
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = 'default', size = 'default', ...props }, ref) => (
     <button
       className={cn(
         styles.root,
@@ -26,8 +23,11 @@ export function Button({
         size === 'icon' && styles.icon,
         className
       )}
+      ref={ref}
       {...props}
       type="button"
     />
-  );
-}
+  )
+);
+
+Button.displayName = 'Button';

@@ -79,6 +79,13 @@ export interface ViewDescriptor {
   initialCollapsed: boolean;
   supportsReorder: boolean;
   content: ViewContent;
+  /** Optional glyph id for the accordion section header. */
+  icon?: string;
+  /**
+   * Optional labelled group. Consecutive views sharing a group sit under one
+   * heading in the shell.
+   */
+  group?: string;
   /** viewsWelcome analogue — used when content is welcome or for empty properties. */
   emptyMessage?: string;
 }

@@ -126,7 +126,12 @@ function createPropertyLayoutVisitor(
       // Full-width chrome (repeater / slotList): block label above, not 56px row.
       if (node.field.chrome === false) {
         return (
-          <PropertyFieldBlock label={node.label}>{control}</PropertyFieldBlock>
+          <PropertyFieldBlock
+            description={node.field.description}
+            label={node.label}
+          >
+            {control}
+          </PropertyFieldBlock>
         );
       }
 
@@ -139,6 +144,7 @@ function createPropertyLayoutVisitor(
 
       return (
         <PropertyFieldRow
+          description={node.field.description}
           htmlFor={getFieldId(context.layerId, node.field.key)}
           label={node.label}
           variant={rowVariant}

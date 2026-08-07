@@ -1,14 +1,8 @@
-import { getLayerChildren, isLayerVisible } from '@openenvx/core';
-import type { BlockConfig, BlockRegistry } from '@openenvx/html';
+import { getLayerChildren } from '@openenvx/core';
+import { renderBlockTree, type BlockRegistry } from '@openenvx/html';
 import { Body, Font, Head, Html, Preview } from '@react-email/components';
 import { render } from '@react-email/render';
-import type { Layer, Page } from '@xmazu/openenvxee-schema';
-import {
-  createElement,
-  Fragment,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import type { Page } from '@xmazu/openenvxee-schema';
 
 import {
   EMAIL_FALLBACK_FONT_FAMILY,
@@ -18,76 +12,10 @@ import {
   emailFontStack,
 } from './email-document-font';
 
-function layerData(layer: Layer): Record<string, unknown> {
+function layerData(layer: { data?: unknown }): Record<string, unknown> {
   return typeof layer.data === 'object' && layer.data !== null
     ? (layer.data as Record<string, unknown>)
     : {};
-}
-
-function renderBlockTree(
-  layers: readonly Layer[],
-  registry: BlockRegistry
-): ReactNode[] {
-  return layers.flatMap((layer) => {
-    if (!isLayerVisible(layer)) {
-      return [];
-    }
-    const config = registry.get(layer.type);
-    if (!config) {
-      return [];
-    }
-    return [renderBlock(layer, config, registry)];
-  });
-}
-
-function renderBlock(
-  layer: Layer,
-  config: BlockConfig,
-  registry: BlockRegistry
-): ReactElement {
-  const data = layerData(layer);
-  const children = config.acceptsChildren
-    ? renderBlockTree(getLayerChildren(layer), registry)
-    : undefined;
-  const slots = config.slots ? renderSlots(data, config, registry) : undefined;
-  return createElement(
-    Fragment,
-    { key: layer.id },
-    config.render({ data, children, slots })
-  );
-}
-
-function renderSlots(
-  data: Record<string, unknown>,
-  config: BlockConfig,
-  registry: BlockRegistry
-): Record<string, ReactNode> {
-  const rawSlots = data.slots;
-  const result: Record<string, ReactNode> = {};
-  if (!config.slots || !rawSlots || typeof rawSlots !== 'object') {
-    return result;
-  }
-  for (const slotKey of Object.keys(config.slots)) {
-    const parts = (rawSlots as Record<string, unknown>)[slotKey];
-    if (!Array.isArray(parts)) {
-      continue;
-    }
-    result[slotKey] = parts.flatMap((part) => {
-      if (!part || typeof part !== 'object') {
-        return [];
-      }
-      const layer = part as Layer;
-      if (!isLayerVisible(layer)) {
-        return [];
-      }
-      const partConfig = registry.get(layer.type);
-      if (!partConfig) {
-        return [];
-      }
-      return [renderBlock(layer, partConfig, registry)];
-    });
-  }
-  return result;
 }
 
 /**

@@ -9,6 +9,7 @@ export interface PropertyFieldRowProps {
   htmlFor?: string;
   children: ReactNode;
   className?: string;
+  description?: string;
   /**
    * `switch`: flex label + trailing toggle.
    * `inline`: flex label + growing control (select / settings).
@@ -22,6 +23,7 @@ export function PropertyFieldRow({
   htmlFor,
   children,
   className,
+  description,
   variant = 'default',
 }: PropertyFieldRowProps) {
   return (
@@ -40,7 +42,12 @@ export function PropertyFieldRow({
       ) : (
         <span className={styles.label}>{label}</span>
       )}
-      <div className={styles.control}>{children}</div>
+      <div className={styles.control}>
+        {children}
+        {description ? (
+          <p className={styles.description}>{description}</p>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -49,17 +56,20 @@ export interface PropertyFieldBlockProps {
   label: string;
   children: ReactNode;
   className?: string;
+  description?: string;
 }
 
 export function PropertyFieldBlock({
   label,
   children,
   className,
+  description,
 }: PropertyFieldBlockProps) {
   return (
     <div className={cn(styles.fieldBlock, className)}>
       <span className={styles.blockLabel}>{label}</span>
       {children}
+      {description ? <p className={styles.description}>{description}</p> : null}
     </div>
   );
 }

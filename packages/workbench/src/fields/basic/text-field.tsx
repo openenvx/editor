@@ -13,7 +13,9 @@ export const TextFieldRenderer: PropertyFieldComponent = ({
     <TextInput
       debounceMs={field.debounceMs}
       id={id}
+      maxLength={field.maxLength}
       onChange={(next) => onUpdate(field.key, next)}
+      placeholder={field.placeholder}
       value={String(value ?? '')}
     />
   );

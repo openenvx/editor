@@ -73,6 +73,13 @@
   min-width: 0;
 }
 
+.description {
+  margin: var(--wb-space-1) 0 0;
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+  line-height: 1.35;
+}
+
 .fieldBlock {
   margin-bottom: var(--wb-space-2);
 }

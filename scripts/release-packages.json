@@ -1,5 +1,5 @@
 {
-  "comment": "Packages published for openenvx-cloud. Schema is not a direct cloud dep yet.",
+  "comment": "Legacy fallback — prefer release.config.json at repo root.",
   "publish": [
     {
       "name": "@xmazu/openenvxee-protocol",
@@ -8,6 +8,10 @@
     {
       "name": "@xmazu/openenvxee-studio",
       "dir": "packages/studio"
+    },
+    {
+      "name": "@xmazu/openenvxee-html-studio",
+      "dir": "packages/openenvxee-html-studio"
     }
   ],
   "cloudRepo": "../openenvx-cloud",

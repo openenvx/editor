@@ -43,6 +43,12 @@ export interface FieldConfigOptions {
   chrome?: boolean;
   /** Debounce property commits (ms). Useful for expensive preview regenerations. */
   debounceMs?: number;
+  /** Helper text shown under the field control. */
+  description?: string;
+  /** Placeholder for text-like controls. */
+  placeholder?: string;
+  /** Max character length for text-like controls. */
+  maxLength?: number;
 }
 
 export interface CornerRadiusValue {
@@ -154,6 +160,9 @@ export interface FieldConfigTarget {
   icon?: string;
   chrome?: boolean;
   debounceMs?: number;
+  description?: string;
+  placeholder?: string;
+  maxLength?: number;
 }
 
 export const DEFAULT_ALIGN_OPTIONS: PropertyFieldOption[] = [
@@ -186,5 +195,14 @@ export function applyFieldConfig(
   }
   if (config.debounceMs !== undefined) {
     field.debounceMs = config.debounceMs;
+  }
+  if (config.description !== undefined) {
+    field.description = config.description;
+  }
+  if (config.placeholder !== undefined) {
+    field.placeholder = config.placeholder;
+  }
+  if (config.maxLength !== undefined) {
+    field.maxLength = config.maxLength;
   }
 }

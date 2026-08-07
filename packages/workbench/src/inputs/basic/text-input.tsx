@@ -8,13 +8,24 @@ export interface TextInputProps {
   onChange: (value: string) => void;
   /** Debounce property commits (ms). Blur and unmount flush immediately. */
   debounceMs?: number;
+  placeholder?: string;
+  maxLength?: number;
 }
 
-export function TextInput({ id, value, onChange, debounceMs }: TextInputProps) {
+export function TextInput({
+  id,
+  value,
+  onChange,
+  debounceMs,
+  placeholder,
+  maxLength,
+}: TextInputProps) {
   if (!debounceMs) {
     return (
       <Input
         id={id}
+        maxLength={maxLength}
+        placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         value={value}
       />
@@ -25,7 +36,9 @@ export function TextInput({ id, value, onChange, debounceMs }: TextInputProps) {
     <DebouncedTextInput
       debounceMs={debounceMs}
       id={id}
+      maxLength={maxLength}
       onChange={onChange}
+      placeholder={placeholder}
       value={value}
     />
   );
@@ -36,6 +49,8 @@ function DebouncedTextInput({
   value,
   onChange,
   debounceMs,
+  placeholder,
+  maxLength,
 }: TextInputProps & { debounceMs: number }) {
   const [draft, setDraft] = useState(value);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -96,6 +111,8 @@ function DebouncedTextInput({
   return (
     <Input
       id={id}
+      maxLength={maxLength}
+      placeholder={placeholder}
       onBlur={() => {
         if (draft !== value) {
           commit(draft);

@@ -32,10 +32,11 @@ function resolveWorkerUrl(override?: string | URL): URL {
       ? new URL(override, import.meta.url)
       : override;
   }
-  // Source / Vite HMR: co-located TypeScript worker.
-  // Studio dist bundle: sandbox-worker.js next to the consuming entry.
+  // Source / Vite HMR: import.meta.url ends in .ts → co-located TypeScript worker.
+  // Published dist (flat or preserveModules) ends in .js — even when the path still
+  // contains /src/ — so load sandbox-worker.js beside this module.
   const meta = import.meta.url;
-  if (meta.includes('/src/') || /\.tsx?([?#]|$)/.test(meta)) {
+  if (/\.tsx?([?#]|$)/.test(meta)) {
     return new URL('quickjs.worker.ts', meta);
   }
   return new URL('sandbox-worker.js', meta);

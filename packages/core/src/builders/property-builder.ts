@@ -52,6 +52,12 @@ export interface PropertyFieldDescriptor {
   chrome?: boolean;
   /** Debounce property commits (ms). Useful for expensive preview regenerations. */
   debounceMs?: number;
+  /** Helper text shown under the field control. */
+  description?: string;
+  /** Placeholder for text-like controls. */
+  placeholder?: string;
+  /** Max character length for text-like controls. */
+  maxLength?: number;
   options?: PropertyFieldOption[];
   repeaterFields?: RepeaterFieldConfig[];
   slotList?: SlotListFieldConfig;

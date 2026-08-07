@@ -21,6 +21,36 @@ import type {
 } from '../workbench-state';
 import type { ViewLocationService } from '../workbench/view-location-service';
 
+function viewChrome(
+  view: ViewContribution,
+  buildCtx: ReturnType<typeof createContributionBuildContext>
+): Pick<
+  ViewDescriptor,
+  | 'collapsible'
+  | 'containerId'
+  | 'group'
+  | 'icon'
+  | 'id'
+  | 'initialCollapsed'
+  | 'name'
+  | 'viewHover'
+  | 'viewOrder'
+  | 'viewSelection'
+> {
+  return {
+    collapsible: view.collapsible ?? false,
+    containerId: view.containerId,
+    ...(view.group ? { group: view.group } : {}),
+    ...(view.icon ? { icon: view.icon } : {}),
+    id: view.id,
+    initialCollapsed: view.initialCollapsed ?? false,
+    name: buildCtx.t(`view.${view.id}.name`, view.name),
+    viewHover: view.viewHover ?? 'none',
+    viewOrder: view.viewOrder ?? 0,
+    viewSelection: view.viewSelection ?? 'layer',
+  };
+}
+
 export function buildViewContainer(
   container: ViewContainerContribution,
   views: ViewContribution[],
@@ -88,21 +118,14 @@ function buildPropertiesView(
 ): ViewDescriptor {
   const pane = view.buildProperties?.(buildCtx);
   return {
-    collapsible: view.collapsible ?? false,
-    containerId: view.containerId,
+    ...viewChrome(view, buildCtx),
     content: {
       headerToggle: pane?.headerToggle,
       kind: 'properties',
       nodes: pane?.nodes ?? [],
     },
     emptyMessage: view.emptyMessage,
-    id: view.id,
-    initialCollapsed: view.initialCollapsed ?? false,
-    name: buildCtx.t(`view.${view.id}.name`, view.name),
     supportsReorder: false,
-    viewOrder: view.viewOrder ?? 0,
-    viewSelection: view.viewSelection ?? 'layer',
-    viewHover: view.viewHover ?? 'none',
   };
 }
 
@@ -111,20 +134,13 @@ function buildWelcomeView(
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): ViewDescriptor {
   return {
-    collapsible: view.collapsible ?? false,
-    containerId: view.containerId,
+    ...viewChrome(view, buildCtx),
     content: {
       kind: 'welcome',
       message: view.emptyMessage ?? '',
     },
     emptyMessage: view.emptyMessage,
-    id: view.id,
-    initialCollapsed: view.initialCollapsed ?? false,
-    name: buildCtx.t(`view.${view.id}.name`, view.name),
     supportsReorder: false,
-    viewOrder: view.viewOrder ?? 0,
-    viewSelection: view.viewSelection ?? 'layer',
-    viewHover: view.viewHover ?? 'none',
   };
 }
 
@@ -133,20 +149,13 @@ function buildComponentView(
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): ViewDescriptor {
   return {
-    collapsible: view.collapsible ?? false,
-    containerId: view.containerId,
+    ...viewChrome(view, buildCtx),
     content: {
       componentId: view.componentId ?? view.id,
       kind: 'component',
     },
     emptyMessage: view.emptyMessage,
-    id: view.id,
-    initialCollapsed: view.initialCollapsed ?? false,
-    name: buildCtx.t(`view.${view.id}.name`, view.name),
     supportsReorder: false,
-    viewOrder: view.viewOrder ?? 0,
-    viewSelection: view.viewSelection ?? 'layer',
-    viewHover: view.viewHover ?? 'none',
   };
 }
 
@@ -155,15 +164,10 @@ function buildEmptyView(
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): ViewDescriptor {
   return {
+    ...viewChrome(view, buildCtx),
     collapsible: view.collapsible ?? true,
-    containerId: view.containerId,
     content: { items: [], kind: 'tree' },
-    id: view.id,
-    initialCollapsed: view.initialCollapsed ?? false,
-    name: buildCtx.t(`view.${view.id}.name`, view.name),
     supportsReorder: false,
-    viewOrder: view.viewOrder ?? 0,
-    viewSelection: view.viewSelection ?? 'layer',
     viewHover: view.viewHover ?? 'layer',
   };
 }
@@ -220,15 +224,10 @@ function buildTreeView(
   }
 
   return {
+    ...viewChrome(view, buildCtx),
     collapsible: view.collapsible ?? true,
-    containerId: view.containerId,
     content: { items, kind: 'tree' },
-    id: view.id,
-    initialCollapsed: view.initialCollapsed ?? false,
-    name: buildCtx.t(`view.${view.id}.name`, view.name),
     supportsReorder: typeof provider.handleMove === 'function',
-    viewOrder: view.viewOrder ?? 0,
-    viewSelection: view.viewSelection ?? 'layer',
     viewHover: view.viewHover ?? 'layer',
   };
 }

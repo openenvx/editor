@@ -8,6 +8,7 @@ const packagesRoot = path.resolve(studioRoot, '..');
 
 const cssPackageRoots: { root: string; prefix: string }[] = [
   { root: path.join(studioRoot, 'src'), prefix: '' },
+  { root: path.join(packagesRoot, 'canvas-studio/src'), prefix: '' },
   { root: path.join(packagesRoot, 'workbench/src'), prefix: 'workbench/' },
   { root: path.join(packagesRoot, 'canvas/src'), prefix: 'canvas/' },
   { root: path.join(packagesRoot, 'agent/src'), prefix: 'agent/' },
@@ -41,6 +42,8 @@ function externalCssRelativeToDist(): Plugin {
   };
 }
 
+const withSourcemap = process.env.STUDIO_SOURCEMAP === '1';
+
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
@@ -54,7 +57,7 @@ export default defineConfig({
   dts: false,
   bundle: true,
   splitting: false,
-  sourcemap: true,
+  sourcemap: withSourcemap,
   clean: true,
   outDir: 'dist',
   tsconfig: 'tsconfig.build.json',
@@ -80,4 +83,9 @@ export default defineConfig({
     /^@tiptap\//,
   ],
   esbuildPlugins: [externalCssRelativeToDist()],
+  esbuildOptions(options) {
+    if (withSourcemap) {
+      options.sourcesContent = true;
+    }
+  },
 });

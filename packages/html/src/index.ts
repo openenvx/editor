@@ -82,6 +82,12 @@ export {
 } from './editor/html-widget-click-handler';
 export { HtmlBlocksPlugin } from './plugin/html-blocks-plugin';
 export {
+  renderBlockDocument,
+  renderBlockTree,
+  type BlockRenderOverride,
+  type RenderBlockDocumentOptions,
+} from './render/render-block-document';
+export {
   cloneBlockWithNewIds,
   createBlock,
   findBlock,

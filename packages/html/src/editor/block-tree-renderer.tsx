@@ -16,6 +16,7 @@ import {
 import type { Layer, Scene } from '@xmazu/openenvxee-schema';
 import {
   memo,
+  Suspense,
   useCallback,
   useEffect,
   useState,
@@ -43,7 +44,7 @@ import {
   type BlockEditTarget,
   type BlockImageTarget,
 } from './block-editor-context';
-import { HtmlRichTextEditor } from './html-rich-text-editor';
+import { HtmlRichTextEditorLazy } from './lazy-rich-text-editor';
 import {
   primaryImageFieldKey,
   resolveImageFieldsInData,
@@ -286,17 +287,21 @@ function BlockContent({
   if (editing && textBlock && editable) {
     return (
       <div className={styles.blockEditableHit}>
-        {config.render({
-          data,
-          children: (
-            <HtmlRichTextEditor
-              align={toolbar.align ? parseRichTextAlign(data.align) : undefined}
-              html={String(data.html ?? '')}
-              onCommit={handleCommit}
-              toolbar={toolbar}
-            />
-          ),
-        })}
+        <Suspense fallback={config.render({ data })}>
+          {config.render({
+            data,
+            children: (
+              <HtmlRichTextEditorLazy
+                align={
+                  toolbar.align ? parseRichTextAlign(data.align) : undefined
+                }
+                html={String(data.html ?? '')}
+                onCommit={handleCommit}
+                toolbar={toolbar}
+              />
+            ),
+          })}
+        </Suspense>
       </div>
     );
   }

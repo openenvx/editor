@@ -1,4 +1,13 @@
 import {
+  BUILT_IN_THEMES,
+  SUPPORTED_LOCALES,
+  WORKBENCH_SIDEBAR_CONTAINER_ID,
+  WORKBENCH_TOGGLE_PRIMARY_SIDEBAR_COMMAND_ID,
+  registerDefaultWorkbenchBundle,
+  workbenchEnBundle,
+  workbenchPlBundle,
+} from '@openenvx/canvas-studio';
+import {
   Command,
   DocumentHostServiceId,
   DocumentOperationsServiceId,
@@ -29,15 +38,6 @@ import {
   type SidebarHeaderBuilder,
   type WorkbenchPluginContext,
 } from '@openenvx/headless';
-import {
-  BUILT_IN_THEMES,
-  SUPPORTED_LOCALES,
-  WORKBENCH_SIDEBAR_CONTAINER_ID,
-  WORKBENCH_TOGGLE_PRIMARY_SIDEBAR_COMMAND_ID,
-  registerDefaultWorkbenchBundle,
-  workbenchEnBundle,
-  workbenchPlBundle,
-} from '@xmazu/openenvxee-studio';
 
 import {
   CANVAS_DEMO_EXPORT_FORMATS,

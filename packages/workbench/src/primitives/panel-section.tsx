@@ -2,6 +2,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
+import { WorkbenchIcon } from '../icons/workbench-icon';
 import { cn } from '../lib/cn';
 import { Switch } from './switch';
 
@@ -20,6 +21,8 @@ export interface PanelSectionProps {
   children: ReactNode;
   className?: string;
   headerSwitch?: PanelSectionHeaderSwitch;
+  /** Optional glyph id rendered ahead of the title. */
+  icon?: string;
 }
 
 export function PanelSection({
@@ -29,8 +32,13 @@ export function PanelSection({
   children,
   className,
   headerSwitch,
+  icon,
 }: PanelSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
+
+  const iconNode = icon ? (
+    <WorkbenchIcon className={styles.icon} id={icon} size={14} />
+  ) : null;
 
   const switchControl = headerSwitch ? (
     <Switch
@@ -46,7 +54,10 @@ export function PanelSection({
     return (
       <section className={cn(styles.root, className)}>
         <div className={styles.headerBar}>
-          <div className={styles.headerStatic}>{title}</div>
+          <div className={styles.headerStatic}>
+            {iconNode}
+            <span className={styles.title}>{title}</span>
+          </div>
           {switchControl}
         </div>
         <div className={styles.body}>{children}</div>
@@ -68,6 +79,7 @@ export function PanelSection({
           ) : (
             <ChevronRight aria-hidden className={styles.chevron} size={14} />
           )}
+          {iconNode}
           <span className={styles.title}>{title}</span>
         </button>
         {switchControl}

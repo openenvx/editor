@@ -613,6 +613,7 @@ export const ViewPanelRenderer = memo(({ viewContainers }: Props) => {
                 <PanelSection
                   collapsible={view.collapsible}
                   defaultOpen={!view.initialCollapsed}
+                  icon={view.icon}
                   key={view.id}
                   title={view.name}
                 >

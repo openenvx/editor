@@ -54,6 +54,10 @@ export function createPropertyHostContext(
         return scene.templatePolicy?.[key] ?? true;
       }
 
+      if (path.startsWith('scene.layer.')) {
+        return readLayerByIdPath(path, scene);
+      }
+
       if (path === 'selection.layer.writeMode') {
         return primaryLayer ? getLayerWriteMode(primaryLayer) : 'free';
       }
@@ -71,6 +75,11 @@ export function createPropertyHostContext(
         if (isTemplatePolicyKey(key) && typeof value === 'boolean') {
           void executeCommand('scene.setTemplatePolicy', { [key]: value });
         }
+        return;
+      }
+
+      if (path.startsWith('scene.layer.')) {
+        writeLayerByIdPath(path, value, updateProperty);
         return;
       }
 
@@ -93,6 +102,51 @@ export function createPropertyHostContext(
       });
     },
   };
+}
+
+/** `scene.layer.{id}.data.{key}` */
+function parseLayerByIdPath(
+  path: PropertyValuePath
+): { layerId: string; key: string } | null {
+  const match = /^scene\.layer\.([^.]+)\.data\.(.+)$/.exec(path);
+  if (!match) {
+    return null;
+  }
+  return { key: match[2]!, layerId: match[1]! };
+}
+
+function layerDataRecord(layer: { data?: unknown }): Record<string, unknown> {
+  return typeof layer.data === 'object' && layer.data !== null
+    ? (layer.data as Record<string, unknown>)
+    : {};
+}
+
+function readLayerByIdPath(path: PropertyValuePath, scene: Scene): unknown {
+  const parsed = parseLayerByIdPath(path);
+  if (!parsed) {
+    return undefined;
+  }
+  const layer = findLayerById(scene, parsed.layerId);
+  if (!layer) {
+    return undefined;
+  }
+  const data = layerDataRecord(layer);
+  if (parsed.key.includes('.')) {
+    return getNestedValue(data, parsed.key);
+  }
+  return data[parsed.key];
+}
+
+function writeLayerByIdPath(
+  path: PropertyValuePath,
+  value: unknown,
+  updateProperty: (layerId: string, key: string, value: unknown) => void
+): void {
+  const parsed = parseLayerByIdPath(path);
+  if (!parsed) {
+    return;
+  }
+  updateProperty(parsed.layerId, parsed.key, value);
 }
 
 function readPropertyPath(

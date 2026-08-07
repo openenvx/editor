@@ -5,6 +5,14 @@ export const PropertyPath = {
     return `selection.layer.data.${key}`;
   },
 
+  /**
+   * Read/write `data[key]` on a specific layer by id (not the selection).
+   * Useful for product design panels that edit a locked template tree.
+   */
+  layerById(layerId: string, key: string): PropertyValuePath {
+    return `scene.layer.${layerId}.data.${key}`;
+  },
+
   layerTransform(key: string): PropertyValuePath {
     return `selection.layer.transform.${key}`;
   },

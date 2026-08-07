@@ -133,20 +133,64 @@
         "react-i18next",
         "react-konva",
         "zod",
+        "@openenvx/canvas",
+        "@openenvx/canvas-pro",
         "@openenvx/core",
+        "@openenvx/headless",
+        "@openenvx/workbench",
         "@xmazu/openenvxee-preview",
         "@xmazu/openenvxee-schema"
       ]
     },
-    "packages/snapvelo": {
+    "packages/openenvxee-html-studio": {
       "entry": [
         "src/index.ts!",
-        "src/snapvelo-event-page-plugin.ts!"
+        "src/runtime.ts!",
+        "build.ts!",
+        "build-dts.ts!",
+        "copy-dist-assets.ts!",
+        "publish-debug.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts",
-        "!src/**/*.test.tsx"
+        "build.ts",
+        "build-dts.ts",
+        "copy-dist-assets.ts",
+        "publish-debug.ts"
+      ],
+      "ignoreDependencies": [
+        "@dnd-kit/core",
+        "@dnd-kit/sortable",
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-dropdown-menu",
+        "@radix-ui/react-popover",
+        "@radix-ui/react-select",
+        "@radix-ui/react-slot",
+        "@radix-ui/react-switch",
+        "@radix-ui/react-tabs",
+        "@radix-ui/react-tooltip",
+        "@tanstack/react-virtual",
+        "@tiptap/extension-color",
+        "@tiptap/extension-font-family",
+        "@tiptap/extension-text-align",
+        "@tiptap/extension-text-style",
+        "@tiptap/pm",
+        "@tiptap/react",
+        "@tiptap/starter-kit",
+        "clsx",
+        "cmdk",
+        "i18next",
+        "lucide-react",
+        "quickjs-emscripten",
+        "react-colorful",
+        "react-i18next",
+        "zod",
+        "@openenvx/core",
+        "@openenvx/headless",
+        "@openenvx/workbench",
+        "@xmazu/openenvxee-preview",
+        "@xmazu/openenvxee-protocol",
+        "@xmazu/openenvxee-schema"
       ]
     },
     "packages/canvas-pro": {
@@ -181,6 +225,14 @@
       ]
     },
     "packages/html-studio": {
+      "entry": [
+        "src/index.ts!"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}"
+      ]
+    },
+    "packages/canvas-studio": {
       "entry": [
         "src/index.ts!"
       ],
@@ -229,16 +281,6 @@
       ],
       "ignoreDependencies": [
         "openenvx-widget"
-      ]
-    },
-    "apps/snapvelo-demo": {
-      "entry": [
-        "src/main.tsx",
-        "src/app.tsx",
-        "index.html"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}"
       ]
     },
     "apps/email-demo": {

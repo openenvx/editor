@@ -1,6 +1,6 @@
 # Studio & products
 
-**Audience:** Internal engineers and coding agents. Packages: `@xmazu/openenvxee-studio`, `@openenvx/html-studio`, `@openenvx/snapvelo`, and the apps that consume them.
+**Audience:** Internal engineers and coding agents. Packages: `@openenvx/canvas-studio`, `@xmazu/openenvxee-studio`, `@openenvx/html-studio`, `@xmazu/openenvxee-html-studio`, and the apps that consume them.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -8,15 +8,19 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 
 Host product apps (dashboard Studio, embed host, demos) should not wire every private workspace package by hand. Studio packages:
 
-1. Re-export the public authoring surface (`core`, `headless`, domain engine, chrome)
+1. Expose a curated host surface to mount and run the editor
 2. Inline private deps into published `dist/` where applicable
 3. Ship a default plugin list + sandbox factory helpers
 
-Publishing intent: [PUBLISHING.md](../../PUBLISHING.md). Only `studio`, `schema`, `preview`, `protocol`, `elements`, and `widget-sdk` publish today; `html-studio` and product drivers like `snapvelo` stay workspace-private.
+Publishing intent: [PUBLISHING.md](../../PUBLISHING.md). Published today: `studio`, `openenvxee-html-studio`, `schema`, `preview`, `protocol`, `elements`, and `widget-sdk`. Private workspace packages (`canvas-studio`, `html-studio`, …) stay unpublished.
 
-## `@xmazu/openenvxee-studio` (canvas product)
+## `@openenvx/canvas-studio` (canvas product — monorepo)
 
-Re-exports: `core`, `headless`, `canvas`, `canvas-pro`, `agent`, plus workbench host surface (`WorkbenchShell`, embed/sandbox mounts, themes, default chrome plugins). Does **not** re-export html or Snapvelo.
+Private workspace package. Same curated host allowlist as the published studio, but resolves TypeScript `src/` via `workspace:*` (not bundled). Monorepo hosts (`apps/canvas-demo`) import this for HMR.
+
+## `@xmazu/openenvxee-studio` (canvas product — published)
+
+Fat GitHub Packages bundle. Re-exports `@openenvx/canvas-studio` and inlines workbench/canvas/canvas-pro into `dist/`. External product hosts install this.
 
 ```ts
 export const DEFAULT_STUDIO_PLUGINS = [
@@ -31,26 +35,30 @@ Pages/Layers + dirty status come from `WorkbenchShell` defaults — not from thi
 
 Host apps typically:
 
-1. Construct `WorkbenchController` / use shell props with `DEFAULT_STUDIO_PLUGINS`
+1. Use shell props with `DEFAULT_STUDIO_PLUGINS`
 2. Mount `WorkbenchShell` with optional `mountExternalHosts` for embed/sandbox
-3. Alias studio to `src/` in monorepo Vite/tsconfig for HMR (`apps/canvas-demo`)
+3. Import `@openenvx/canvas-studio` in monorepo Vite apps for HMR (published hosts use `@xmazu/openenvxee-studio`)
 
-## `@openenvx/html-studio` (HTML product)
+## `@openenvx/html-studio` (HTML product — monorepo)
 
-Re-exports: `core`, `headless`, `html`, workbench shell surface (no sandbox/embed helpers in the thin index today).
+Re-exports: `core`, `headless`, `html`, workbench shell surface + HTML sandbox helper.
 
 ```ts
 export const DEFAULT_HTML_STUDIO_PLUGINS = [new HtmlBlocksPlugin()];
 ```
 
-## `@openenvx/snapvelo` (private product driver)
+## `@xmazu/openenvxee-html-studio` (HTML product — published)
 
-Snapvelo event-page blocks + plugin + scene seed. Depends on `@openenvx/html`. Not a studio default and not published.
+GitHub Packages publish of `@openenvx/html-studio`. Inlines workspace packages (workbench/html/core/…) into a **per-module `dist/` ESM tree** (Vite-tree-shakeable); third-party deps stay external. Subpaths:
 
-Hosts compose:
+- `.` — editor host surface (`WorkbenchShell`, plugins, authoring API) → `dist/openenvxee-html-studio/src/index.js`
+- `./runtime` — Worker-safe block configs + `renderBlockDocument` (no TipTap / DnD / shell)
+- `./theme.css` — workbench tokens
+
+Product hosts (e.g. Snapvelo) own their blocks and sidebar plugins in the product repo and compose:
 
 ```ts
-const PLUGINS = [...DEFAULT_HTML_STUDIO_PLUGINS, new SnapveloEventPagePlugin()];
+const PLUGINS = [...DEFAULT_HTML_STUDIO_PLUGINS, new MyEventPagePlugin()];
 ```
 
 ## What hosts must not do
@@ -69,7 +77,6 @@ Per AGENTS.md product-host rules:
 | `apps/canvas-demo`     | Studio + canvas + external host demos |
 | `apps/demo-playground` | Composable / custom shell patterns    |
 | `apps/html-demo`       | HTML block studio                     |
-| `apps/snapvelo-demo`   | html-studio + Snapvelo event page     |
 | `apps/docs`            | Extension guide and contracts         |
 
 ## Related

@@ -1,6 +1,6 @@
 {
   "name": "@xmazu/openenvxee-protocol",
-  "version": "0.6.7",
+  "version": "0.7.7",
   "description": "OpenEnvx wire protocol — render-tree envelope, extension manifests, validators, sandbox grants",
   "license": "MIT",
   "type": "module",
@@ -13,7 +13,6 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "development": "./src/index.ts",
       "bun": "./dist/index.js",
       "import": "./dist/index.js",
       "default": "./dist/index.js"

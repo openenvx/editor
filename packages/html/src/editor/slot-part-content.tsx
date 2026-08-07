@@ -2,6 +2,7 @@ import { canEditLayerData, isLayerVisible } from '@openenvx/core';
 import type { Layer } from '@xmazu/openenvxee-schema';
 import {
   Fragment,
+  Suspense,
   useCallback,
   useRef,
   useState,
@@ -11,8 +12,8 @@ import {
 
 import type { BlockRegistry } from '../block-registry';
 import { useBlockEditor } from './block-editor-context';
-import { HtmlRichTextEditor } from './html-rich-text-editor';
 import { dataTransferHasFiles, firstImageFile } from './image-file-drop';
+import { HtmlRichTextEditorLazy } from './lazy-rich-text-editor';
 import {
   primaryImageFieldKey,
   resolveImageFieldsInData,
@@ -207,11 +208,12 @@ function SlotPartContent({
         }
         onPointerDown={stopParentDrag}
       >
-        {editing
-          ? config.render({
+        {editing ? (
+          <Suspense fallback={config.render({ data })}>
+            {config.render({
               data,
               children: (
-                <HtmlRichTextEditor
+                <HtmlRichTextEditorLazy
                   align={
                     toolbar.align ? parseRichTextAlign(data.align) : undefined
                   }
@@ -220,8 +222,11 @@ function SlotPartContent({
                   toolbar={toolbar}
                 />
               ),
-            })
-          : config.render({ data })}
+            })}
+          </Suspense>
+        ) : (
+          config.render({ data })
+        )}
       </div>
     );
   }

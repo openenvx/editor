@@ -1,10 +1,8 @@
-import type { Plugin } from '@openenvx/core';
-import type { WorkbenchApi } from '@openenvx/headless';
+import { createCanvasDemoScene } from '@openenvx/canvas';
 import {
   DEFAULT_STUDIO_PLUGINS,
   VersionHistoryPlugin,
   WorkbenchShell,
-  createCanvasDemoScene,
   createCanvasPropertyHostContextWithApi,
   createLocalStorageWorkbenchLayoutStore,
   createPostMessagePluginPanelTransport,
@@ -13,7 +11,9 @@ import {
   EmbedPanelHost,
   mountEmbedPanel,
   mountSandboxExtensions,
-} from '@xmazu/openenvxee-studio';
+} from '@openenvx/canvas-studio';
+import type { Plugin } from '@openenvx/core';
+import type { WorkbenchApi } from '@openenvx/headless';
 import saveTheDateSource from 'openenvx-widget:./extensions/save-the-date.widget.tsx';
 import seatingSource from 'openenvx-widget:./extensions/seating.widget.tsx';
 import { useMemo } from 'react';
@@ -24,8 +24,8 @@ import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
 import { CanvasDemoPlugin } from './plugins/canvas-demo-plugin';
 import { createDemoVersionHistoryProvider } from './providers/demo-version-history-provider';
 
-import '@xmazu/openenvxee-studio/fonts.css';
-import '@xmazu/openenvxee-studio/theme.css';
+import '@openenvx/canvas-studio/fonts.css';
+import '@openenvx/canvas-studio/theme.css';
 
 const EMBED_PANEL_ID = 'embed.demo';
 const LAYOUT_STORE_KEY = 'openenvx.canvas-demo.workbench-layout';

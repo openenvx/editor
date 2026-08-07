@@ -38,7 +38,13 @@ function CommandSheet({
 }) {
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetContent side="left">
+      <SheetContent
+        side="left"
+        // Radix points aria-describedby at SheetDescription; opt out when absent.
+        {...(container.sheetDescription
+          ? {}
+          : { 'aria-describedby': undefined })}
+      >
         <SheetHeader>
           <SheetTitle>{container.title}</SheetTitle>
           {container.sheetDescription ? (

@@ -85,6 +85,8 @@ class EmbedLayerView extends ViewContribution {
   readonly collapsible = false;
   readonly when = 'scene.layerSelected';
   readonly viewOrder = 0;
+  readonly icon = 'layers';
+  readonly group = 'Content';
 
   buildProperties(_ctx: ContributionBuildContext) {
     return createPropertyPane(this.id, this.name)
@@ -119,6 +121,8 @@ class EmbedPolicyView extends ViewContribution {
   readonly name = 'Policy';
   readonly collapsible = false;
   readonly viewOrder = 1;
+  readonly icon = 'settings';
+  readonly group = 'Look and feel';
 
   buildProperties(_ctx: ContributionBuildContext) {
     return createPropertyPane(this.id, this.name)
@@ -252,6 +256,30 @@ describe('ViewContribution.buildProperties', () => {
         kind: 'properties',
         message: undefined,
       },
+    ]);
+  });
+
+  it('carries icon and group onto view descriptors', async () => {
+    const snapshot = sceneWithSelection();
+    const controller = new WorkbenchController({
+      initialEditorState: snapshot.editorState,
+      initialScene: snapshot.scene,
+      plugins: [new LayerPlugin(), new ContextPlugin(), new EmbedWorkbenchPlugin()],
+    });
+    await controller.start();
+
+    const embed = controller
+      .getState()
+      .viewContainers.find((c) => c.id === 'test.embed');
+    expect(
+      embed?.views.map((v) => ({
+        group: v.group,
+        icon: v.icon,
+        id: v.id,
+      }))
+    ).toEqual([
+      { group: 'Content', icon: 'layers', id: 'test.embed.layer' },
+      { group: 'Look and feel', icon: 'settings', id: 'test.embed.policy' },
     ]);
   });
 });

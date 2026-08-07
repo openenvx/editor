@@ -197,6 +197,7 @@ function PropertiesViewSection({
           <PanelSection
             collapsible={false}
             headerSwitch={headerSwitch}
+            icon={view.icon}
             title={view.name}
           >
             {body}
@@ -213,6 +214,7 @@ function PropertiesViewSection({
       collapsible={view.collapsible}
       defaultOpen={!view.initialCollapsed}
       headerSwitch={headerSwitch}
+      icon={view.icon}
       key={view.id}
       title={view.name}
     >
@@ -277,39 +279,54 @@ export function ViewContainerViews({
       />
     ) : null;
 
-  const otherSections = otherViews.map((view) => {
+  const otherSections = otherViews.flatMap((view, index) => {
+    const previousGroup = otherViews[index - 1]?.group;
+    const groupHeading =
+      view.group && view.group !== previousGroup ? (
+        <p
+          className={panelSectionStyles.groupHeading}
+          key={`group:${view.group}:${view.id}`}
+        >
+          {view.group}
+        </p>
+      ) : null;
+
     if (view.content.kind === 'welcome') {
-      return (
-        <ViewPane empty emptyMessage={view.content.message} key={view.id} />
-      );
+      return [
+        groupHeading,
+        <ViewPane empty emptyMessage={view.content.message} key={view.id} />,
+      ];
     }
     if (view.content.kind === 'properties') {
-      return (
+      return [
+        groupHeading,
         <PropertiesViewSection
           createHostContext={createHostContext}
           key={view.id}
           view={view}
-        />
-      );
+        />,
+      ];
     }
     if (view.content.kind === 'component') {
       const showSection = view.collapsible !== false && view.name;
       const body = <ComponentViewBody view={view} viewPanels={viewPanels} />;
       if (!showSection) {
-        return <div key={view.id}>{body}</div>;
+        return [groupHeading, <div key={view.id}>{body}</div>];
       }
-      return (
+      return [
+        groupHeading,
         <PanelSection
           collapsible={view.collapsible}
           defaultOpen={!view.initialCollapsed}
+          icon={view.icon}
           key={view.id}
           title={view.name}
         >
           {body}
-        </PanelSection>
-      );
+        </PanelSection>,
+      ];
     }
-    return null;
+    return [groupHeading];
   });
 
   if (otherViews.length === 0) {

@@ -58,6 +58,21 @@
   color: var(--wb-muted-foreground);
 }
 
+.icon {
+  flex-shrink: 0;
+  color: var(--wb-muted-foreground);
+}
+
+.groupHeading {
+  margin: 0;
+  padding: var(--wb-space-4) var(--wb-space-4) var(--wb-space-1);
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .body {
   padding: 0 var(--wb-space-4) var(--wb-space-4);
 }

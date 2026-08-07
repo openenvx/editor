@@ -49,7 +49,7 @@ describe('openenvx ambient vs SandboxHostMethod', () => {
     const bootstrap = readFileSync(
       path.resolve(
         dir,
-        '../../workbench/src/sandbox/quickjs-isolate-engine.ts'
+        '../../workbench/src/sandbox/sandbox-bootstrap-source.ts'
       ),
       'utf-8'
     );
