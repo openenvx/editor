@@ -9,7 +9,8 @@
   overflow: hidden;
 }
 
-.root:focus-within {
+.root:focus-within,
+.root[data-scrubbing] {
   box-shadow: var(--wb-shadow-control-focus);
 }
 
@@ -38,12 +39,13 @@
   flex: 1;
   min-width: 0;
   height: 100%;
-  padding: 0 10px 0 0;
+  padding: 0 var(--wb-control-padding-x) 0 0;
   border: none;
   background: transparent;
   color: var(--wb-foreground);
   font-family: var(--wb-font-mono);
   font-size: var(--wb-text-mono);
+  font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
@@ -53,7 +55,7 @@
 
 .unit {
   flex-shrink: 0;
-  padding-right: 10px;
+  padding-right: var(--wb-control-padding-x);
   font-size: var(--wb-text-xs);
   color: var(--wb-muted-foreground);
 }
@@ -64,7 +66,8 @@
   box-shadow: none;
 }
 
-.compact:focus-within {
+.compact:focus-within,
+.compact[data-scrubbing] {
   box-shadow: none;
 }
 

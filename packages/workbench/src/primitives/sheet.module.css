@@ -51,11 +51,11 @@
 }
 
 .overlay[data-state='open'] {
-  animation: sheet-fade-in 150ms ease;
+  animation: sheet-fade-in var(--wb-duration-fast, 140ms) ease;
 }
 
 .overlay[data-state='closed'] {
-  animation: sheet-fade-out 150ms ease;
+  animation: sheet-fade-out var(--wb-duration-fast, 140ms) ease;
 }
 
 .content {
@@ -66,9 +66,16 @@
   gap: 0;
   padding: 0;
   background: var(--wb-background, #09090b);
-  color: var(--wb-foreground, #fafafa);
-  font-family: var(--wb-font, Geist, Inter, system-ui, sans-serif);
-  font-size: var(--wb-text-base, 13px);
+  color: var(--wb-foreground, rgba(255, 255, 255, 0.9));
+  font-family: var(
+    --wb-font,
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    sans-serif
+  );
+  font-size: var(--wb-text-base, 12px);
   box-shadow: var(--wb-shadow-float, 0 0 0 1px rgb(255 255 255 / 8%));
   outline: none;
 }
@@ -90,19 +97,19 @@
 }
 
 .content[data-side='left'][data-state='open'] {
-  animation: sheet-slide-in-left 150ms ease;
+  animation: sheet-slide-in-left var(--wb-duration-fast, 140ms) ease;
 }
 
 .content[data-side='left'][data-state='closed'] {
-  animation: sheet-slide-out-left 150ms ease;
+  animation: sheet-slide-out-left var(--wb-duration-fast, 140ms) ease;
 }
 
 .content[data-side='right'][data-state='open'] {
-  animation: sheet-slide-in-right 150ms ease;
+  animation: sheet-slide-in-right var(--wb-duration-fast, 140ms) ease;
 }
 
 .content[data-side='right'][data-state='closed'] {
-  animation: sheet-slide-out-right 150ms ease;
+  animation: sheet-slide-out-right var(--wb-duration-fast, 140ms) ease;
 }
 
 .header {
@@ -126,9 +133,9 @@
 
 .title {
   margin: 0;
-  color: var(--wb-foreground, #fafafa);
+  color: var(--wb-foreground, rgba(255, 255, 255, 0.9));
   font-family: inherit;
-  font-size: var(--wb-text-base, 13px);
+  font-size: var(--wb-text-base, 12px);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.3;

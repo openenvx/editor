@@ -1,12 +1,12 @@
 /* Theme-agnostic tokens — shared by every [data-owb-theme] scope. */
 [data-owb-theme] {
-  /* Typography */
-  --wb-text-xs: 11px;
-  --wb-text-sm: 12px;
-  --wb-text-base: 13px;
-  --wb-text-mono: 12px;
-  --wb-font: Geist, Inter, system-ui, -apple-system, sans-serif;
-  --wb-font-mono: Geist Mono, ui-monospace, 'SF Mono', Menlo, monospace;
+  /* Typography — 11px is the workhorse UI size (Figma/Paper density) */
+  --wb-text-xs: 10px;
+  --wb-text-sm: 11px;
+  --wb-text-base: 12px;
+  --wb-text-mono: 11px;
+  --wb-font: -apple-system, BlinkMacSystemFont, Inter, system-ui, sans-serif;
+  --wb-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
 
   /* Spacing */
   --wb-space-0-5: 2px;
@@ -17,138 +17,213 @@
   --wb-space-5: 20px;
   --wb-space-6: 24px;
 
-  /* Radius — OpenEnvX Cloud: panel 4 / thumb 2 / modal 6 */
-  --wb-radius-sm: 2px;
-  --wb-radius-md: 4px;
-  --wb-radius-control: 4px;
-  --wb-radius-lg: 6px;
+  /* Radius — tight on controls, generous only on floating surfaces */
+  --wb-radius-sm: 3px;
+  --wb-radius-control: 5px;
+  --wb-radius-md: 6px;
+  --wb-radius-lg: 10px;
   --wb-radius-full: 9999px;
 
   /* Control sizes */
-  --wb-control-height: 28px;
-  --wb-icon-button-size: 28px;
-  --wb-icon-button-size-lg: 32px;
+  --wb-control-height: 24px;
+  --wb-control-padding-x: 6px;
+  --wb-icon-button-size: 24px;
+  --wb-icon-button-size-lg: 28px;
+  --wb-menu-item-height: 24px;
 
   /* Layout */
   --wb-topbar-height: 40px;
   --wb-activity-bar-width: 56px;
   --wb-sidebar-width: 240px;
   --wb-secondary-sidebar-width: 280px;
-  --wb-layer-row-height: 28px;
-  --wb-tree-indent: 8px;
-  --wb-tree-base-padding: 8px;
+  --wb-layer-row-height: 24px;
+
+  /* Material — translucent chrome reads as an app window, not a web page */
+  --wb-surface-blur: saturate(180%) blur(20px);
+
+  /* Motion — state reveals only, never decoration */
+  --wb-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --wb-duration-fast: 140ms;
+  --wb-duration: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-owb-theme],
+  [data-owb-theme] *,
+  [data-owb-theme] *::before,
+  [data-owb-theme] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 [data-owb-theme='light'] {
-  /* Surfaces — soft zinc chrome; canvas field lifts the white artboard */
-  --wb-background: #f6f6f8;
-  --wb-canvas-field: #e4e4e9;
+  color-scheme: light;
+
+  /* Surfaces — grey panel chrome, white cards, canvas darker than chrome */
+  --wb-background: #f0f0f0;
+  --wb-canvas-field: #d9d9d9;
   --wb-card: #ffffff;
   --wb-popover: #ffffff;
   --wb-property-popover: #ffffff;
-  --wb-muted: #ececef;
-  --wb-border: #d4d4d8;
-  --wb-chrome-button: #ffffff;
+  --wb-menu: rgb(247 247 247 / 92%);
+  --wb-popup-header: #dddddd;
+  --wb-muted: #fbfbfb;
+  --wb-border: #dcdcdc;
+  --wb-chrome-button: #fbfbfb;
   --wb-sidebar-segment-active: #ffffff;
-  --wb-sidebar-row-selected: #dbeafe;
-  --wb-sidebar-row-hovered: rgb(59 130 246 / 18%);
+  /* Neutral tonal steps, not an accent tint: a full-bleed blue bar in a dense
+     tree reads as an alert. Selection is simply more opaque than hover. */
+  --wb-sidebar-row-selected: rgb(0 0 0 / 9%);
+  --wb-sidebar-row-hovered: rgb(0 0 0 / 4%);
 
-  /* Text */
-  --wb-foreground: #18181b;
-  --wb-muted-foreground: #71717a;
+  /* Text — classic rgba: --wb-foreground is read into Konva */
+  --wb-foreground: rgba(0, 0, 0, 0.9);
+  --wb-muted-foreground: rgba(0, 0, 0, 0.62);
 
   /* Actions */
-  --wb-primary: #18181b;
-  --wb-primary-foreground: #fafafa;
+  --wb-primary: #1e1e1e;
+  --wb-primary-foreground: #f2f2f2;
+  --wb-focus: oklch(74% 0.12 258);
+  --wb-menu-highlight: oklch(67% 0.17 258);
+  --wb-menu-highlight-foreground: #ffffff;
+  --wb-destructive: #d5232c;
+
+  /* Canvas-facing — Konva cannot parse modern `rgb(… / α)` or oklch */
   --wb-selection: #3b82f6;
-  --wb-selection-muted: rgb(59 130 246 / 50%);
+  --wb-selection-muted: rgba(59, 130, 246, 0.5);
   --wb-smart-guide: #ec4899;
   --wb-page-margin: #a855f7;
-  --wb-grid: rgb(0 0 0 / 10%);
-  --wb-destructive: #dc2626;
+  --wb-grid: rgba(0, 0, 0, 0.1);
   --wb-artboard: #ffffff;
-  --wb-artboard-border: #d4d4d8;
+  --wb-artboard-border: #d8d8d8;
+  --wb-artboard-shadow-color: rgba(0, 0, 0, 0.18);
+
+  /* Tooltip — high-contrast inverse pill */
+  --wb-tooltip: rgb(30 30 30 / 94%);
+  --wb-tooltip-foreground: rgb(255 255 255 / 92%);
+  --wb-tooltip-border: transparent;
+  --wb-tooltip-shadow: 0 2px 8px -2px rgb(0 0 0 / 30%);
 
   /* Overlays */
-  --wb-hover-overlay: rgb(0 0 0 / 4%);
-  --wb-active-overlay: rgb(0 0 0 / 6%);
+  --wb-hover-overlay: rgb(0 0 0 / 6%);
+  --wb-active-overlay: rgb(0 0 0 / 9%);
   --wb-divider-color: rgb(0 0 0 / 8%);
   --wb-border-subtle: rgb(0 0 0 / 10%);
-  --wb-backdrop-overlay: rgb(0 0 0 / 60%);
+  --wb-backdrop-overlay: rgb(0 0 0 / 35%);
 
-  /* Elevation */
-  --wb-shadow-xs: 0 0 0 1px rgb(0 0 0 / 6%);
-  --wb-shadow-sm: 0 0 0 1px rgb(0 0 0 / 8%);
-  --wb-segment-active-ring: 0 0 0 1px rgb(0 0 0 / 10%);
-  --wb-shadow-md: 0 1px 2px rgb(0 0 0 / 10%), 0 0 0 1px rgb(0 0 0 / 6%);
-  --wb-shadow-float: 0 8px 24px rgb(0 0 0 / 12%), 0 0 0 1px rgb(0 0 0 / 8%);
-  --wb-shadow-control: none;
-  --wb-shadow-control-hover: none;
-  --wb-shadow-control-focus: 0 0 0 4px #e5e5e5;
-  --wb-shadow-focus: 0 0 0 4px #e5e5e5;
-  --wb-shadow-artboard: 0 4px 32px rgb(0 0 0 / 16%);
-  --wb-artboard-shadow-color: rgba(0, 0, 0, 0.16);
+  /* Elevation — controls are lit from above, not flat web fills */
+  --wb-shadow-xs: 0 0 0 1px rgb(0 0 0 / 8%);
+  --wb-shadow-sm: 0 0 0 1px rgb(0 0 0 / 11%);
+  --wb-segment-active-ring:
+    0 0 0 1px rgb(0 0 0 / 10%), 0 1px 2px rgb(0 0 0 / 8%);
+  --wb-shadow-md: 0 0 0 1px rgb(0 0 0 / 8%), 0 1px 3px rgb(0 0 0 / 8%);
+  --wb-shadow-float:
+    0 0 0 1px rgb(0 0 0 / 10%), 0 1px 2px rgb(0 0 0 / 6%),
+    0 8px 24px -6px rgb(0 0 0 / 18%), 0 16px 48px -12px rgb(0 0 0 / 12%);
+  --wb-shadow-control:
+    0 0 0 1px rgb(0 0 0 / 13%), inset 0 1px rgb(255 255 255 / 80%),
+    0 1px 1.5px rgb(0 0 0 / 6%);
+  --wb-shadow-control-hover:
+    0 0 0 1px rgb(0 0 0 / 20%), inset 0 1px rgb(255 255 255 / 80%),
+    0 1px 2px rgb(0 0 0 / 8%);
+  /* Field focus rings sit *inside* the control so a focused field never grows
+     into its neighbours in a dense inspector. Buttons keep the outer ring. */
+  --wb-shadow-control-focus:
+    inset 0 0 0 2px var(--wb-focus), 0 0 0 1px rgb(0 0 0 / 13%);
+  --wb-shadow-focus:
+    0 0 0 1px var(--wb-focus), 0 0 0 3px rgb(130 170 240 / 35%);
+  --wb-shadow-artboard:
+    0 1px 3px rgb(0 0 0 / 10%), 0 12px 32px -8px rgb(0 0 0 / 18%);
 
   /* Hairline dividers */
-  --wb-hairline: 1px solid rgb(0 0 0 / 6%);
-  --wb-divider: 1px solid rgb(0 0 0 / 8%);
+  --wb-hairline: 1px solid rgb(0 0 0 / 7%);
+  --wb-divider: 1px solid #e2e2e2;
+
+  /* Scrollbars */
+  --wb-scrollbar-thumb: rgb(0 0 0 / 30%);
+  --wb-scrollbar-thumb-hover: rgb(0 0 0 / 45%);
 }
 
 [data-owb-theme='dark'] {
-  /* Surfaces — OpenEnvX Cloud: void canvas, graphite chrome, slate elevation */
-  --wb-background: #1a1a1a;
-  --wb-canvas-field: #0a0a0a;
-  --wb-card: #1a1a1a;
-  --wb-popover: #1a1a1a;
-  --wb-property-popover: #1a1a1a;
-  --wb-muted: #242424;
-  --wb-border: rgb(255 255 255 / 8%);
-  --wb-chrome-button: #242424;
-  --wb-sidebar-segment-active: #242424;
-  --wb-sidebar-row-selected: #242424;
-  --wb-sidebar-row-hovered: rgb(59 130 246 / 22%);
+  color-scheme: dark;
 
-  /* Text */
-  --wb-foreground: rgb(255 255 255 / 92%);
-  --wb-muted-foreground: rgb(255 255 255 / 55%);
+  /* Surfaces — graphite panel chrome over a near-black canvas */
+  --wb-background: #2a2a2a;
+  --wb-canvas-field: #1e1e1e;
+  --wb-card: #222222;
+  --wb-popover: #2a2a2a;
+  --wb-property-popover: #222222;
+  --wb-menu: rgb(42 42 42 / 92%);
+  --wb-popup-header: #222222;
+  --wb-muted: #373737;
+  --wb-border: #373737;
+  --wb-chrome-button: #373737;
+  --wb-sidebar-segment-active: #3c3c3c;
+  --wb-sidebar-row-selected: rgb(255 255 255 / 11%);
+  --wb-sidebar-row-hovered: rgb(255 255 255 / 5%);
+
+  /* Text — classic rgba: --wb-foreground is read into Konva */
+  --wb-foreground: rgba(255, 255, 255, 0.9);
+  --wb-muted-foreground: rgba(255, 255, 255, 0.62);
 
   /* Actions */
-  --wb-primary: #fafafa;
-  --wb-primary-foreground: #0a0a0a;
+  --wb-primary: #f2f2f2;
+  --wb-primary-foreground: #1e1e1e;
+  --wb-focus: oklch(60% 0.15 258);
+  --wb-menu-highlight: oklch(55% 0.145 258);
+  --wb-menu-highlight-foreground: #ffffff;
+  --wb-destructive: #f56a63;
+
+  /* Canvas-facing — Konva cannot parse modern `rgb(… / α)` or oklch */
   --wb-selection: #3b82f6;
-  --wb-selection-muted: rgb(59 130 246 / 50%);
+  --wb-selection-muted: rgba(59, 130, 246, 0.5);
   --wb-smart-guide: #ec4899;
   --wb-page-margin: #a855f7;
-  --wb-grid: rgb(0 0 0 / 10%);
-  --wb-destructive: #dc2626;
+  --wb-grid: rgba(0, 0, 0, 0.1);
   --wb-artboard: #ffffff;
   --wb-artboard-border: #e5e7eb;
+  --wb-artboard-shadow-color: rgba(0, 0, 0, 0.55);
+
+  /* Tooltip — lifted above the panel, hairline outlined */
+  --wb-tooltip: rgb(74 74 74 / 94%);
+  --wb-tooltip-foreground: rgb(255 255 255 / 92%);
+  --wb-tooltip-border: #555555;
+  --wb-tooltip-shadow: 0 2px 8px -2px rgb(0 0 0 / 55%);
 
   /* Overlays */
-  --wb-hover-overlay: rgb(255 255 255 / 4%);
-  --wb-active-overlay: rgb(255 255 255 / 6%);
-  --wb-divider-color: rgb(255 255 255 / 8%);
-  --wb-border-subtle: rgb(255 255 255 / 8%);
-  --wb-backdrop-overlay: rgb(10 10 10 / 72%);
+  --wb-hover-overlay: rgb(255 255 255 / 6%);
+  --wb-active-overlay: rgb(255 255 255 / 9%);
+  --wb-divider-color: rgb(255 255 255 / 9%);
+  --wb-border-subtle: rgb(255 255 255 / 10%);
+  --wb-backdrop-overlay: rgb(17 17 17 / 72%);
 
-  /* Elevation — hairline rings; depth from tonal steps, not drop shadows */
+  /* Elevation — solid hairline outlines, depth from tonal steps */
   --wb-shadow-xs: 0 0 0 1px rgb(255 255 255 / 8%);
-  --wb-shadow-sm: 0 0 0 1px rgb(255 255 255 / 8%);
-  --wb-segment-active-ring: 0 0 0 1px rgb(255 255 255 / 8%);
-  --wb-shadow-md: 0 0 0 1px rgb(255 255 255 / 8%);
-  --wb-shadow-float: 0 0 0 1px rgb(255 255 255 / 8%);
-  --wb-shadow-control: 0 0 0 1px rgb(255 255 255 / 8%);
-  --wb-shadow-control-hover: 0 0 0 1px rgb(255 255 255 / 12%);
+  --wb-shadow-sm: 0 0 0 1px rgb(255 255 255 / 12%);
+  --wb-segment-active-ring: 0 0 0 1px rgb(255 255 255 / 10%);
+  --wb-shadow-md: 0 0 0 1px rgb(255 255 255 / 8%), 0 1px 3px rgb(0 0 0 / 40%);
+  --wb-shadow-float:
+    0 0 0 1px #444444, 0 8px 24px -6px rgb(0 0 0 / 55%),
+    0 16px 48px -12px rgb(0 0 0 / 45%);
+  --wb-shadow-control:
+    0 0 0 1px rgb(255 255 255 / 9%), inset 0 1px rgb(255 255 255 / 6%);
+  --wb-shadow-control-hover:
+    0 0 0 1px rgb(255 255 255 / 16%), inset 0 1px rgb(255 255 255 / 7%);
   --wb-shadow-control-focus:
-    0 0 0 2px var(--wb-background), 0 0 0 4px rgb(255 255 255 / 28%);
-  --wb-shadow-focus:
-    0 0 0 2px var(--wb-background), 0 0 0 4px rgb(255 255 255 / 28%);
-  --wb-shadow-artboard: 0 4px 32px rgb(0 0 0 / 45%);
-  --wb-artboard-shadow-color: rgba(0, 0, 0, 0.45);
+    inset 0 0 0 2px var(--wb-focus), 0 0 0 1px rgb(255 255 255 / 9%);
+  --wb-shadow-focus: 0 0 0 1px var(--wb-focus), 0 0 0 3px rgb(68 121 223 / 35%);
+  --wb-shadow-artboard:
+    0 1px 3px rgb(0 0 0 / 50%), 0 12px 32px -8px rgb(0 0 0 / 55%);
 
   /* Hairline dividers */
   --wb-hairline: 1px solid rgb(255 255 255 / 8%);
-  --wb-divider: 1px solid rgb(255 255 255 / 8%);
+  --wb-divider: 1px solid #373737;
+
+  /* Scrollbars */
+  --wb-scrollbar-thumb: rgb(255 255 255 / 28%);
+  --wb-scrollbar-thumb-hover: rgb(255 255 255 / 42%);
 }
 
 [data-owb-theme],
@@ -156,9 +231,72 @@
   box-sizing: border-box;
 }
 
+[data-owb-theme] {
+  font-family: var(--wb-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scrollbar-color: var(--wb-scrollbar-thumb) transparent;
+  scrollbar-width: thin;
+}
+
+[data-owb-theme] ::selection {
+  background: var(--wb-selection-muted);
+}
+
+[data-owb-theme] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+[data-owb-theme] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-owb-theme] ::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: var(--wb-radius-full);
+  background: var(--wb-scrollbar-thumb);
+  background-clip: content-box;
+}
+
+[data-owb-theme] ::-webkit-scrollbar-thumb:hover {
+  background: var(--wb-scrollbar-thumb-hover);
+  background-clip: content-box;
+}
+
+[data-owb-theme] ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 [data-owb-theme] button,
 [data-owb-theme] input,
 [data-owb-theme] select,
 [data-owb-theme] textarea {
   font-family: inherit;
+}
+
+/* Digits must not reflow while a value is dragged or typed. */
+[data-owb-theme] input,
+[data-owb-theme] select {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Squircle corners where the engine has them. Scoped to controls: corner-shape
+   does not inherit, and applying it broadly would flatten intentional circles
+   (scrollbar thumbs, avatars, pills built on --wb-radius-full). The radius
+   scale steps up because a superellipse reads tighter than the same radius. */
+@supports (corner-shape: squircle) {
+  [data-owb-theme] {
+    --wb-radius-sm: 3.75px;
+    --wb-radius-control: 6px;
+    --wb-radius-md: 7.5px;
+    --wb-radius-lg: 12.5px;
+  }
+
+  [data-owb-theme] button,
+  [data-owb-theme] input,
+  [data-owb-theme] select,
+  [data-owb-theme] textarea {
+    corner-shape: superellipse(1.3);
+  }
 }

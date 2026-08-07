@@ -60,7 +60,7 @@
   align-items: center;
   gap: var(--wb-space-2);
   width: 100%;
-  min-height: 36px;
+  min-height: 32px;
   padding: var(--wb-space-1) var(--wb-space-2);
   border: none;
   border-radius: var(--wb-radius-sm);
@@ -75,7 +75,8 @@
 }
 
 .item[data-selected='true'] {
-  background: var(--wb-muted);
+  background: var(--wb-menu-highlight);
+  color: var(--wb-menu-highlight-foreground);
 }
 
 .item[data-disabled='true'] {
@@ -93,7 +94,7 @@
 
 .itemCheck {
   flex-shrink: 0;
-  color: var(--wb-muted-foreground);
+  color: inherit;
   opacity: 0;
 }
 

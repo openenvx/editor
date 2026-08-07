@@ -60,7 +60,7 @@
 
 .itemCheck {
   flex-shrink: 0;
-  color: var(--wb-muted-foreground);
+  color: inherit;
   opacity: 0;
 }
 

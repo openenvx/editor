@@ -1,14 +1,15 @@
+/* Default: small muted label above the control (Figma-style stack). */
 .fieldRow {
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  align-items: center;
-  gap: var(--wb-space-2);
-  margin-bottom: var(--wb-space-2);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  margin-bottom: var(--wb-space-3);
 }
 
 .fieldRowSwitch {
   display: flex;
-  grid-template-columns: unset;
+  flex-direction: row;
   align-items: center;
   min-height: 36px;
   margin-bottom: 0;
@@ -38,7 +39,7 @@
 /* Label + growing control (select / settings rows) */
 .fieldRowInline {
   display: flex;
-  grid-template-columns: unset;
+  flex-direction: row;
   align-items: center;
   gap: var(--wb-space-3);
   min-height: 36px;
@@ -66,6 +67,7 @@
 
 .label {
   font-size: var(--wb-text-xs);
+  font-weight: 500;
   color: var(--wb-muted-foreground);
 }
 
@@ -88,6 +90,7 @@
   display: block;
   margin-bottom: var(--wb-space-1);
   font-size: var(--wb-text-xs);
+  font-weight: 500;
   color: var(--wb-muted-foreground);
 }
 

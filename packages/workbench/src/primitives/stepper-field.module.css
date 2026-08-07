@@ -20,7 +20,7 @@
   gap: var(--wb-space-2);
   min-width: 0;
   height: var(--wb-control-height);
-  padding: 0 var(--wb-space-3);
+  padding: 0 var(--wb-control-padding-x);
   border-radius: var(--wb-radius-control);
   background: var(--wb-muted);
   box-shadow: var(--wb-shadow-control);

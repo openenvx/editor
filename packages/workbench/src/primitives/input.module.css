@@ -1,13 +1,16 @@
 .root {
   width: 100%;
   height: var(--wb-control-height);
-  padding: 0 10px;
+  padding: 0 var(--wb-control-padding-x);
   border: none;
   border-radius: var(--wb-radius-control);
   background: var(--wb-muted);
   color: var(--wb-foreground);
   font-size: var(--wb-text-sm);
   box-shadow: var(--wb-shadow-control);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .root:focus-visible {

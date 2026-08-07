@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { usePresence } from '../hooks/use-presence';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { cn } from '../lib/cn';
+import { formatShortcut } from '../lib/format-shortcut';
 import {
   Command,
   CommandEmpty,
@@ -18,15 +19,6 @@ import overlaySurface from '../primitives/overlay-surface.module.css';
 import styles from './command-palette.module.css';
 
 const UNCATEGORIZED_GROUP_ID = '__other__';
-
-function formatPaletteShortcut(shortcut: string): string {
-  return shortcut
-    .replaceAll('Mod+', '⌘')
-    .replaceAll('Shift+', '⇧')
-    .replaceAll('Alt+', '⌥')
-    .replaceAll('Delete', '⌫')
-    .replaceAll('Backspace', '⌫');
-}
 
 interface Props {
   open: boolean;
@@ -187,7 +179,7 @@ export function CommandPaletteRenderer({
                         <span className={styles.itemLabel}>{item.label}</span>
                         {item.shortcut ? (
                           <span className={styles.shortcut}>
-                            {formatPaletteShortcut(item.shortcut)}
+                            {formatShortcut(item.shortcut)}
                           </span>
                         ) : null}
                       </span>

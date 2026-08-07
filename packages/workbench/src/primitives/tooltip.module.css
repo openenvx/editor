@@ -3,20 +3,22 @@
   display: inline-flex;
   align-items: center;
   max-width: 240px;
-  min-height: var(--wb-control-height);
-  padding: var(--wb-space-1) var(--wb-space-2);
-  border-radius: var(--wb-radius-md);
-  background: var(--wb-popover);
-  box-shadow: var(--wb-shadow-float);
+  min-height: 22px;
+  padding: var(--wb-space-1) 6px;
+  border: 1px solid var(--wb-tooltip-border);
+  border-radius: var(--wb-radius-sm);
+  background: var(--wb-tooltip);
+  backdrop-filter: var(--wb-surface-blur);
+  box-shadow: var(--wb-tooltip-shadow);
   font-family: var(--wb-font);
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
   font-weight: 400;
   line-height: 1.4;
-  color: var(--wb-foreground);
+  color: var(--wb-tooltip-foreground);
   pointer-events: none;
   user-select: none;
 }
 
 .arrow {
-  fill: var(--wb-popover);
+  fill: var(--wb-tooltip);
 }

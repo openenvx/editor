@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -23,6 +23,8 @@ export interface PanelSectionProps {
   headerSwitch?: PanelSectionHeaderSwitch;
   /** Optional glyph id rendered ahead of the title. */
   icon?: string;
+  /** Lets full-bleed content (trees) drop the body's horizontal inset. */
+  bodyClassName?: string;
 }
 
 export function PanelSection({
@@ -33,6 +35,7 @@ export function PanelSection({
   className,
   headerSwitch,
   icon,
+  bodyClassName,
 }: PanelSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
 
@@ -60,7 +63,7 @@ export function PanelSection({
           </div>
           {switchControl}
         </div>
-        <div className={styles.body}>{children}</div>
+        <div className={cn(styles.body, bodyClassName)}>{children}</div>
       </section>
     );
   }
@@ -74,17 +77,15 @@ export function PanelSection({
           type="button"
           onClick={() => setOpen((value) => !value)}
         >
-          {open ? (
-            <ChevronDown aria-hidden className={styles.chevron} size={14} />
-          ) : (
-            <ChevronRight aria-hidden className={styles.chevron} size={14} />
-          )}
           {iconNode}
           <span className={styles.title}>{title}</span>
+          <ChevronDown aria-hidden className={styles.chevron} size={14} />
         </button>
         {switchControl}
       </div>
-      {open ? <div className={styles.body}>{children}</div> : null}
+      {open ? (
+        <div className={cn(styles.body, bodyClassName)}>{children}</div>
+      ) : null}
     </section>
   );
 }

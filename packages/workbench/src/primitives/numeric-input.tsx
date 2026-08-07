@@ -181,6 +181,7 @@ export function NumericInput({
         variant === 'compact' && styles.compact,
         className
       )}
+      data-scrubbing={isDragging || undefined}
     >
       {scrub ? (
         <button

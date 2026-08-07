@@ -5,6 +5,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { useThemeScope } from '../context/theme-context';
 import { cn } from '../lib/cn';
+import { formatShortcut } from '../lib/format-shortcut';
 
 import styles from './dropdown-menu.module.css';
 import overlaySurface from './overlay-surface.module.css';
@@ -128,7 +129,9 @@ export function DropdownMenuItem({
       onSelect={() => onSelect?.()}
     >
       <span className={styles.itemLabel}>{children}</span>
-      {shortcut ? <span className={styles.shortcut}>{shortcut}</span> : null}
+      {shortcut ? (
+        <span className={styles.shortcut}>{formatShortcut(shortcut)}</span>
+      ) : null}
     </DropdownMenuPrimitive.Item>
   );
 }
@@ -223,10 +226,12 @@ export function DropdownMenuRadioItem({
       className={cn(styles.item, className)}
       value={value}
     >
+      <span className={styles.itemIndicator}>
+        <DropdownMenuPrimitive.ItemIndicator>
+          <Check aria-hidden size={11} strokeWidth={2.5} />
+        </DropdownMenuPrimitive.ItemIndicator>
+      </span>
       <span className={styles.itemLabel}>{children}</span>
-      <DropdownMenuPrimitive.ItemIndicator className={styles.itemCheck}>
-        <Check aria-hidden size={14} />
-      </DropdownMenuPrimitive.ItemIndicator>
     </DropdownMenuPrimitive.RadioItem>
   );
 }

@@ -10,7 +10,7 @@
   gap: var(--wb-space-2);
   width: 100%;
   height: var(--wb-control-height);
-  padding: 0 var(--wb-space-3);
+  padding: 0 var(--wb-control-padding-x);
   border: none;
   border-radius: var(--wb-radius-control);
   background: var(--wb-muted);
@@ -36,11 +36,10 @@
 }
 
 .optionSelected {
-  background: var(--wb-muted);
+  background: var(--wb-active-overlay);
 }
 
 .viewport {
   display: flex;
   flex-direction: column;
-  gap: var(--wb-space-1);
 }

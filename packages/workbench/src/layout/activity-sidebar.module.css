@@ -1,3 +1,16 @@
+/* Keyframes co-located so Vite scopes name + definition together. */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .root {
   display: flex;
   height: 100%;
@@ -9,9 +22,9 @@
   flex-shrink: 0;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--wb-space-2);
+  gap: var(--wb-space-3);
   width: var(--wb-activity-bar-width);
-  padding: var(--wb-space-2) var(--wb-space-1);
+  padding: var(--wb-space-3) var(--wb-space-1);
   border-right: var(--wb-hairline);
   background: var(--wb-background);
 }
@@ -24,7 +37,7 @@
 .activitySeparator {
   flex-shrink: 0;
   height: 1px;
-  margin: var(--wb-space-1) var(--wb-space-2);
+  margin: 0 var(--wb-space-3);
   background: var(--wb-divider-color);
 }
 
@@ -32,14 +45,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: var(--wb-space-1);
   width: 100%;
-  padding: var(--wb-space-1) 0;
+  padding: 0;
   border: none;
   border-radius: var(--wb-radius-md);
   background: transparent;
   color: var(--wb-muted-foreground);
   cursor: pointer;
+  transition: color var(--wb-duration-fast) ease;
 }
 
 .activityItem:hover {
@@ -50,12 +64,21 @@
   background: var(--wb-hover-overlay);
 }
 
+.activityItem:active .activityIconWrap {
+  transform: scale(0.95);
+}
+
 .activityItemActive {
   color: var(--wb-foreground);
 }
 
-.activityItemActive .activityIconWrap {
-  background: var(--wb-muted);
+.activityItemActive .activityIconWrap,
+.activityItemActive:hover .activityIconWrap {
+  background: color-mix(in srgb, var(--wb-selection) 14%, transparent);
+  color: var(--wb-selection);
+}
+
+.activityItemActive .activityLabel {
   color: var(--wb-foreground);
 }
 
@@ -63,20 +86,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--wb-radius-control);
+  width: 38px;
+  height: 34px;
+  border-radius: var(--wb-radius-lg);
   color: inherit;
+  transition:
+    background var(--wb-duration-fast) ease,
+    color var(--wb-duration-fast) ease,
+    transform var(--wb-duration-fast) var(--wb-ease-out);
 }
 
 .activityLabel {
   max-width: 100%;
   overflow: hidden;
-  font-size: 10px;
+  font-size: var(--wb-text-xs);
+  font-weight: 500;
   line-height: 1.2;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--wb-muted-foreground);
+  transition: color var(--wb-duration-fast) ease;
+}
+
+.activityItem:hover .activityLabel {
+  color: var(--wb-foreground);
 }
 
 .sidePanel {
@@ -86,6 +120,7 @@
   width: var(--wb-sidebar-width);
   min-height: 0;
   background: var(--wb-background);
+  animation: slideInLeft var(--wb-duration) var(--wb-ease-out);
 }
 
 .sidePanelContent {

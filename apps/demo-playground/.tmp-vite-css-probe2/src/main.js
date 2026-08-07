@@ -1,0 +1,1 @@
+import './foo.module.css';

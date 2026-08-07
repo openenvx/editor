@@ -1,6 +1,6 @@
 import type { ViewTreeItem } from '@openenvx/headless';
 
-const TREE_INDENT_PX = 8;
+const TREE_INDENT_PX = 6;
 const TREE_BASE_PADDING_PX = 8;
 const DROP_LINE_HEIGHT_PX = 2;
 /** Edge strip for before/after on container rows; middle is nest-into. */

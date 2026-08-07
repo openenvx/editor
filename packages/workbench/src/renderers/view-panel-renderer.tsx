@@ -4,14 +4,7 @@ import type {
   ViewDescriptor,
   ViewTreeItem,
 } from '@openenvx/headless';
-import {
-  ChevronDown,
-  ChevronRight,
-  Eye,
-  EyeOff,
-  Lock,
-  LockOpen,
-} from 'lucide-react';
+import { ChevronDown, Eye, EyeOff, Lock, LockOpen } from 'lucide-react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
@@ -25,6 +18,7 @@ import { useViewTreeSelectionSync } from '../hooks/use-view-tree-selection-sync'
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { WorkbenchIcon } from '../icons/workbench-icon';
+import { cn } from '../lib/cn';
 import { PanelSection } from '../primitives/panel-section';
 import { Tooltip } from '../primitives/tooltip';
 import { TreeDndList } from './tree-dnd-list';
@@ -35,6 +29,20 @@ import panelSectionStyles from '../primitives/panel-section.module.css';
 import styles from './view-panel.module.css';
 
 const EMPTY_ID_SET = new Set<string>();
+
+function TreeToggleChevron({ isCollapsed }: { isCollapsed: boolean }) {
+  return (
+    <ChevronDown
+      aria-hidden
+      className={
+        isCollapsed
+          ? `${styles.treeChevron} ${styles.treeChevronCollapsed}`
+          : styles.treeChevron
+      }
+      size={14}
+    />
+  );
+}
 
 interface Props {
   viewContainers: ViewContainerDescriptor[];
@@ -298,7 +306,7 @@ function StaticTreeRow({
           }}
           type="button"
         >
-          {isCollapsed ? '▸' : '▾'}
+          <TreeToggleChevron isCollapsed={isCollapsed} />
         </button>
       ) : (
         <span className={styles.treeToggleSpacer} />
@@ -437,11 +445,7 @@ function ViewPanelBody({
             }}
             type="button"
           >
-            {isCollapsed ? (
-              <ChevronRight aria-hidden size={14} />
-            ) : (
-              <ChevronDown aria-hidden size={14} />
-            )}
+            <TreeToggleChevron isCollapsed={isCollapsed} />
           </button>
         ) : (
           <span className={styles.treeToggleSpacer} />
@@ -604,13 +608,17 @@ export const ViewPanelRenderer = memo(({ viewContainers }: Props) => {
               );
               if (view.collapsible === false) {
                 return (
-                  <div className={panelSectionStyles.flatBody} key={view.id}>
+                  <div
+                    className={cn(panelSectionStyles.flatBody, styles.treeBody)}
+                    key={view.id}
+                  >
                     {body}
                   </div>
                 );
               }
               return (
                 <PanelSection
+                  bodyClassName={styles.treeBody}
                   collapsible={view.collapsible}
                   defaultOpen={!view.initialCollapsed}
                   icon={view.icon}

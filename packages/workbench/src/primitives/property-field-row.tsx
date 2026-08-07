@@ -13,7 +13,7 @@ export interface PropertyFieldRowProps {
   /**
    * `switch`: flex label + trailing toggle.
    * `inline`: flex label + growing control (select / settings).
-   * Default: 56px label grid (X/Y/W/H).
+   * Default: small muted label stacked above the control.
    */
   variant?: 'default' | 'switch' | 'inline';
 }

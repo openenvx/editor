@@ -1,3 +1,16 @@
+/* Keyframes co-located so Vite scopes name + definition together. */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .root {
   display: flex;
   flex-direction: column;
@@ -47,6 +60,7 @@
   background: var(--wb-background);
   min-height: 0;
   overflow: auto;
+  animation: slideInRight var(--wb-duration) var(--wb-ease-out);
 }
 
 .statusBar {

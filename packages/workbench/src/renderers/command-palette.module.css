@@ -112,10 +112,6 @@
   border-radius: var(--wb-radius-sm);
 }
 
-.item[data-selected='true'] {
-  background: var(--wb-muted);
-}
-
 .itemRow {
   display: flex;
   align-items: center;
@@ -131,7 +127,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--wb-text-sm);
-  line-height: 1.2;
+  /* Clears descenders; the label clips overflow. */
+  line-height: 16px;
 }
 
 .shortcut {
