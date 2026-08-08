@@ -8,7 +8,7 @@ import {
 import type { CommandContext } from '@openenvx/core';
 import type { Transform } from '@xmazu/openenvxee-schema';
 
-import { alignTransforms, distributeHorizontally } from '../align/align';
+import { alignTransforms, distributeHorizontally } from '../layer-align/align';
 
 type AlignMode = 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom';
 

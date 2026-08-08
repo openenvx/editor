@@ -1,15 +1,7 @@
-import type {
-  CanvasDragAdjustInput,
-  CanvasOverlayBuildContext,
-  CanvasOverlayPrimitive,
-  CanvasResizeAdjustInput,
-  CanvasStageInteractionService,
-} from '@openenvx/canvas';
 import {
   applyGridSnapToDragPosition,
   applyGridSnapToResizeBox,
-} from '@openenvx/canvas';
-
+} from '../snap/grid-snap';
 import { computeDragSnap } from '../snap/smart-guides/drag-snap';
 import { computeResizeSnap } from '../snap/smart-guides/resize-snap';
 import {
@@ -18,6 +10,13 @@ import {
   toSnapBounds,
 } from '../snap/smart-guides/snap-bounds';
 import type { SnapBounds } from '../snap/smart-guides/types';
+import type { CanvasOverlayPrimitive } from './canvas-overlay-primitives';
+import type {
+  CanvasDragAdjustInput,
+  CanvasOverlayBuildContext,
+  CanvasResizeAdjustInput,
+  CanvasStageInteractionService,
+} from './canvas-stage-interaction';
 import { guidesToOverlayPrimitives } from './guides-to-overlay-primitives';
 
 function boundsToSnapBounds(

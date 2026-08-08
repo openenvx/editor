@@ -1,10 +1,10 @@
-import { resolveTextBoxFitPropertyUpdate } from '@openenvx/canvas';
 import type {
   PropertyPathContextOptions,
   WorkbenchApi,
 } from '@openenvx/headless';
 import type { Transform } from '@xmazu/openenvxee-schema';
 
+import { resolveTextBoxFitPropertyUpdate } from '../fit-text-layer-to-content';
 import { createCanvasPropertyHostContext } from './canvas-property-path-context';
 import type { CanvasPropertyPathContextOptions } from './canvas-property-path-context';
 

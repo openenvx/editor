@@ -1,21 +1,21 @@
-import {
-  computeImageFitLayout,
-  ImageUploadingOverlay,
-  imageUploadingOpacity,
-  useLoadedImage,
-  type CanvasLayerRendererHostProps,
-} from '@openenvx/canvas';
 import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
 import type { FocalPoint, ImageFit } from '@xmazu/openenvxee-schema';
 import { memo } from 'react';
 import { Image as KonvaImage, Rect } from 'react-konva';
 
+import type { CanvasLayerRendererHostProps } from '../contributions/canvas-layer-renderer-contribution';
 import {
   hasActiveCrop,
   readImageCrop,
   resolveNormalizedCrop,
   type NormalizedCrop,
 } from '../crop/normalized-crop';
+import { computeImageFitLayout } from '../image-fit';
+import { useLoadedImage } from './image-canvas-renderer';
+import {
+  ImageUploadingOverlay,
+  imageUploadingOpacity,
+} from './image-uploading-chrome';
 
 type ImageView = Extract<LayerPreviewDescriptor, { kind: 'image' }>;
 

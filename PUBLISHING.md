@@ -78,7 +78,7 @@ Backend round-trip: `renderToElementTree()` in Node for templates API, then host
 
 ## `@xmazu/openenvxee-studio`
 
-Fat canvas host bundle (inlines workbench, canvas, canvas-pro — **not** html/agent). Source of truth for the curated host API is private `@openenvx/canvas-studio`; this package re-exports and bundles it. See [`packages/canvas-studio/src/index.ts`](packages/canvas-studio/src/index.ts).
+Fat canvas host bundle (inlines workbench, canvas — **not** html/agent). Source of truth for the curated host API is private `@openenvx/canvas-studio`; this package re-exports and bundles it. See [`packages/canvas-studio/src/index.ts`](packages/canvas-studio/src/index.ts).
 
 Published tarball is `files: ["dist"]` only; exports → `dist/`.
 

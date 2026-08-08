@@ -1,6 +1,6 @@
-import type { ImageEdgeAnchor } from '@openenvx/canvas';
 import Konva from 'konva';
 
+import type { ImageEdgeAnchor } from '../image-resize';
 import type { ImageCropSession } from './image-crop-utils';
 
 const PREVIEW_GROUP_NAME = 'image-crop-preview';

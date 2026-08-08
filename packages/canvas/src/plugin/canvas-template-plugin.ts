@@ -9,7 +9,7 @@ import {
 } from '../contributions/canvas-template-contribution';
 
 export class CanvasTemplatePlugin extends WorkbenchPlugin {
-  readonly id = 'openenvx.canvas-pro.template';
+  readonly id = 'openenvx.canvas.template';
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
     ctx.registerWorkbench(

@@ -41,7 +41,7 @@
       "entry": [
         "src/index.ts!",
         "src/export-layers.ts!",
-        "src/plugin/canvas-basics-plugin.ts!"
+        "src/plugin/canvas-plugin.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
@@ -135,7 +135,6 @@
         "react-konva",
         "zod",
         "@openenvx/canvas",
-        "@openenvx/canvas-pro",
         "@openenvx/core",
         "@openenvx/headless",
         "@openenvx/workbench",
@@ -192,15 +191,6 @@
         "@xmazu/openenvxee-preview",
         "@xmazu/openenvxee-extensions",
         "@xmazu/openenvxee-schema"
-      ]
-    },
-    "packages/canvas-pro": {
-      "entry": [
-        "src/index.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts"
       ]
     },
     "packages/html": {

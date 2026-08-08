@@ -1,4 +1,3 @@
-import { applyModificationsWithTextFit } from '@openenvx/canvas';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
@@ -14,6 +13,8 @@ import {
   validateTemplateNames,
 } from '@xmazu/openenvxee-schema';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
+
+import { applyModificationsWithTextFit } from '../fit-text-layer-to-content';
 
 import styles from './template-data-panel.module.css';
 

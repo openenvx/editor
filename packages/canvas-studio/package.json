@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@openenvx/canvas": "workspace:*",
-    "@openenvx/canvas-pro": "workspace:*",
     "@openenvx/workbench": "workspace:*"
   },
   "peerDependencies": {

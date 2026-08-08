@@ -1,6 +1,6 @@
-import { getLayerBounds } from '@openenvx/canvas';
 import type { Transform } from '@xmazu/openenvxee-schema';
 
+import { getLayerBounds } from '../../align';
 import type { SnapBounds } from './types';
 
 export function toSnapBounds(

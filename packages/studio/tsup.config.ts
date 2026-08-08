@@ -12,7 +12,6 @@ const cssPackageRoots: { root: string; prefix: string }[] = [
   { root: path.join(packagesRoot, 'workbench/src'), prefix: 'workbench/' },
   { root: path.join(packagesRoot, 'canvas/src'), prefix: 'canvas/' },
   { root: path.join(packagesRoot, 'agent/src'), prefix: 'agent/' },
-  { root: path.join(packagesRoot, 'canvas-pro/src'), prefix: 'canvas-pro/' },
 ];
 
 /**

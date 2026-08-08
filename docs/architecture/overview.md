@@ -57,7 +57,7 @@ WorkbenchShell (@openenvx/workbench)
 | `'html'`      | `@openenvx/html`         | `HtmlEditorPane`               |
 | `'email'`     | `@openenvx/driver-email` | `EmailEditorPane`              |
 
-Scene-generic chrome (Pages, Layers, dirty status, Inspector container) lives in workbench defaults. Canvas-only chrome (zoom, transform panes, floating toolbar) lives in canvas-pro. HTML and email each own a Blocks activity sidebar.
+Scene-generic chrome (Pages, Layers, dirty status, Inspector container) lives in workbench defaults. Canvas-only chrome (zoom, transform panes, floating toolbar) is registered by `CanvasPlugin`. HTML and email each own a Blocks activity sidebar.
 
 ## Commands are the mutation hub
 

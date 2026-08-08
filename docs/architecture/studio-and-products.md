@@ -20,13 +20,10 @@ Private workspace package. Same curated host allowlist as the published studio, 
 
 ## `@xmazu/openenvxee-studio` (canvas product — published)
 
-Fat GitHub Packages bundle. Re-exports `@openenvx/canvas-studio` and inlines workbench/canvas/canvas-pro into `dist/`. External product hosts install this.
+Fat GitHub Packages bundle. Re-exports `@openenvx/canvas-studio` and inlines workbench/canvas into `dist/`. External product hosts install this.
 
 ```ts
-export const DEFAULT_STUDIO_PLUGINS = [
-  new CanvasBasicsPlugin(),
-  new CanvasProPlugin(),
-];
+export const DEFAULT_STUDIO_PLUGINS = [new CanvasPlugin()];
 ```
 
 Pages/Layers + dirty status come from `WorkbenchShell` defaults — not from this list.
@@ -68,7 +65,7 @@ Per AGENTS.md product-host rules:
 - Do **not** mount React panel views from the product host for form/settings — declare `ViewContribution` with `buildProperties` / `emptyMessage` / `when`
 - Do **not** import shell-internal `ViewPane` / `PropertyContentRenderer`
 - Use `registerViewPanel` only for non-form surfaces
-- Embed **policy/data API** stays in editor-core; embed **product panels** (e.g. Embed Options) live in the product host repo, not canvas-pro Inspector contributions
+- Embed **policy/data API** stays in editor-core; embed **product panels** (e.g. Embed Options) live in the product host repo, not canvas Inspector contributions
 
 ## Demo apps (monorepo)
 

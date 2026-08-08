@@ -194,36 +194,11 @@
         "react-dom": ">=18",
       },
     },
-    "packages/canvas-pro": {
-      "name": "@openenvx/canvas-pro",
-      "version": "0.1.4",
-      "dependencies": {
-        "@openenvx/canvas": "workspace:*",
-        "@openenvx/core": "workspace:*",
-        "@openenvx/headless": "workspace:*",
-        "@xmazu/openenvxee-preview": "workspace:*",
-        "@xmazu/openenvxee-schema": "workspace:*",
-        "konva": "^10.3.0",
-        "react-konva": "^19.2.1",
-      },
-      "devDependencies": {
-        "@openenvx/typescript-config": "workspace:*",
-        "@types/react": "^19.2.3",
-        "react": "19.2.7",
-        "tsup": "catalog:dev",
-        "typescript": "catalog:dev",
-        "vitest": "catalog:testing",
-      },
-      "peerDependencies": {
-        "react": ">=18",
-      },
-    },
     "packages/canvas-studio": {
       "name": "@openenvx/canvas-studio",
       "version": "0.1.0",
       "dependencies": {
         "@openenvx/canvas": "workspace:*",
-        "@openenvx/canvas-pro": "workspace:*",
         "@openenvx/workbench": "workspace:*",
       },
       "devDependencies": {
@@ -285,7 +260,7 @@
     },
     "packages/extensions": {
       "name": "@xmazu/openenvxee-extensions",
-      "version": "0.1.0",
+      "version": "0.7.17",
       "bin": {
         "openenvx-manifest": "./src/cli/openenvx-manifest.ts",
       },
@@ -392,7 +367,7 @@
     },
     "packages/openenvxee-html-studio": {
       "name": "@xmazu/openenvxee-html-studio",
-      "version": "0.7.15",
+      "version": "0.7.17",
       "dependencies": {
         "@dnd-kit/core": "6.3.1",
         "@dnd-kit/sortable": "8.0.0",
@@ -449,7 +424,7 @@
     },
     "packages/preview": {
       "name": "@xmazu/openenvxee-preview",
-      "version": "0.7.15",
+      "version": "0.7.17",
       "dependencies": {
         "@xmazu/openenvxee-schema": "workspace:*",
         "uqr": "^0.1.3",
@@ -463,7 +438,7 @@
     },
     "packages/schema": {
       "name": "@xmazu/openenvxee-schema",
-      "version": "0.7.15",
+      "version": "0.7.17",
       "dependencies": {
         "zod": "4.4.3",
       },
@@ -476,7 +451,7 @@
     },
     "packages/studio": {
       "name": "@xmazu/openenvxee-studio",
-      "version": "0.7.15",
+      "version": "0.7.17",
       "dependencies": {
         "@ai-sdk/react": "^3.0.0",
         "@dnd-kit/core": "6.3.1",
@@ -504,7 +479,6 @@
       },
       "devDependencies": {
         "@openenvx/canvas": "workspace:*",
-        "@openenvx/canvas-pro": "workspace:*",
         "@openenvx/canvas-studio": "workspace:*",
         "@openenvx/core": "workspace:*",
         "@openenvx/headless": "workspace:*",
@@ -961,8 +935,6 @@
     "@openenvx/agent-service": ["@openenvx/agent-service@workspace:apps/agent-service"],
 
     "@openenvx/canvas": ["@openenvx/canvas@workspace:packages/canvas"],
-
-    "@openenvx/canvas-pro": ["@openenvx/canvas-pro@workspace:packages/canvas-pro"],
 
     "@openenvx/canvas-studio": ["@openenvx/canvas-studio@workspace:packages/canvas-studio"],
 

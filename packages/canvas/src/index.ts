@@ -145,7 +145,7 @@ export { loadCanvasFonts } from './fonts/load-canvas-fonts';
 export { collectCanvasFontFamilies } from './collect-canvas-font-families';
 export { useCanvasFontPreload } from './use-canvas-font-preload';
 export {
-  CanvasBasicsPlugin,
+  CanvasPlugin,
   createCanvasDemoScene,
   InsertCanvasTextCommand,
   InsertCanvasImageCommand,
@@ -154,7 +154,52 @@ export {
   InsertCanvasRectCommand,
   InsertCanvasCircleCommand,
   UploadAssetCommand,
-} from './plugin/canvas-basics-plugin';
+} from './plugin/canvas-plugin';
+export { CanvasTemplatePlugin } from './plugin/canvas-template-plugin';
+export { alignTransforms, distributeHorizontally } from './layer-align/align';
+export {
+  AlignLayersBottomCommand,
+  AlignLayersCenterCommand,
+  AlignLayersCommand,
+  AlignLayersLeftCommand,
+  AlignLayersMiddleCommand,
+  AlignLayersRightCommand,
+  AlignLayersTopCommand,
+  DistributeLayersHorizontallyCommand,
+} from './commands/align-layers-commands';
+export { CanvasCommandPaletteItems } from './contributions/canvas-command-palette';
+export { CanvasContextMenu } from './contributions/canvas-context-menu';
+export {
+  CanvasTemplateContainer,
+  CanvasTemplateView,
+  TEMPLATE_DATA_CONTAINER_ID,
+  TEMPLATE_DATA_VIEW_ID,
+  TEMPLATE_DATA_PANEL_COMPONENT_ID,
+} from './contributions/canvas-template-contribution';
+export { TemplateDataPanel } from './components/template-data-panel';
+export {
+  CanvasStatusBarContribution,
+  CanvasToolbarContribution,
+} from './contributions/canvas-shell-contributions';
+export {
+  CanvasLayerTransformPropertyPane,
+  CanvasPagePrintGuidesPropertyPane,
+  CanvasTransformsPropertyPane,
+  canvasPropertyPaneContributions,
+} from './contributions/canvas-property-pane-contributions';
+export { DEFAULT_CANVAS_LAYOUT } from './default-canvas-layout';
+export { createCanvasPropertyHostContextWithApi } from './properties/create-canvas-property-host-context';
+export { SmartGuidesStageInteraction } from './stage/smart-guides-stage-interaction';
+export {
+  ImageCropInteraction,
+  canResetImageCrop,
+} from './interactions/image-crop-interaction';
+export { proImageCanvasContributions } from './contributions/pro-image-contributions';
+export {
+  hasActiveCrop,
+  readImageCrop,
+  type NormalizedCrop,
+} from './crop/normalized-crop';
 export {
   ExportImageCommand,
   RegisterCanvasFontCommand,

@@ -10,7 +10,7 @@ Designing the `@openenvx/workbench` React UI for canvas/flow editor authors on *
 **Material reference:** [Paper](https://paper.design) — translucent chrome, lit controls, oklch ramps  
 **Secondary reference:** Framer / Artboard Studio editor screens (Refero) — three-column canvas layout patterns
 
-**Status (v4):** Token system rebuilt on the Figma/Paper palette. Every workbench CSS module is token-driven, so the palette, density, radius, and material are changed from [`tokens.css`](src/theme/tokens.css) alone — `canvas`, `canvas-pro`, `html`, `driver-email`, and `agent` inherit it.
+**Status (v4):** Token system rebuilt on the Figma/Paper palette. Every workbench CSS module is token-driven, so the palette, density, radius, and material are changed from [`tokens.css`](src/theme/tokens.css) alone — `canvas`, `html`, `driver-email`, and `agent` inherit it.
 
 ---
 
@@ -63,7 +63,7 @@ Reject:
 
 All tokens live in [`src/theme/tokens.css`](src/theme/tokens.css). The file defines two built-in scopes — `[data-owb-theme="light"]` (default) and `[data-owb-theme="dark"]` — plus a shared `[data-owb-theme]` layer for theme-agnostic type, spacing, radius, metrics, and material.
 
-Every workbench CSS module should resolve colour, radius, and metrics from these variables when a token exists. Prefer tokens over literals; a few layout sizes (activity icon pill, tooltip min-height, label stack gap) stay as module literals when they are one-offs. Downstream packages (`canvas`, `canvas-pro`, `html`, `driver-email`, `agent`) read the same variables for shared chrome and canvas-facing colours.
+Every workbench CSS module should resolve colour, radius, and metrics from these variables when a token exists. Prefer tokens over literals; a few layout sizes (activity icon pill, tooltip min-height, label stack gap) stay as module literals when they are one-offs. Downstream packages (`canvas`, `html`, `driver-email`, `agent`) read the same variables for shared chrome and canvas-facing colours.
 
 ### Surfaces
 

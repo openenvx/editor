@@ -10,6 +10,7 @@ import {
   SingletonServiceContribution,
 } from '@openenvx/core';
 import type { CommandContext, Layer, PluginContext } from '@openenvx/core';
+import type { WorkbenchPluginContext } from '@openenvx/headless';
 import { normalizeScene } from '@xmazu/openenvxee-schema';
 
 import { AbsolutePageRules } from '../absolute-page-rules';
@@ -19,6 +20,7 @@ import {
   CanvasGridSettingsServiceId,
   CanvasPageResizeServiceId,
   CanvasRulerGuidesSettingsServiceId,
+  CanvasStageInteractionServiceId,
 } from '../canvas-service-tokens';
 import {
   CopyLayersCommand,
@@ -30,6 +32,15 @@ import {
   PasteLayersShortcut,
 } from '../clipboard/canvas-clipboard-contributions';
 import { CanvasClipboardService } from '../clipboard/canvas-clipboard-service';
+import {
+  AlignLayersBottomCommand,
+  AlignLayersCenterCommand,
+  AlignLayersLeftCommand,
+  AlignLayersMiddleCommand,
+  AlignLayersRightCommand,
+  AlignLayersTopCommand,
+  DistributeLayersHorizontallyCommand,
+} from '../commands/align-layers-commands';
 import {
   ExportImageCommand,
   RegisterCanvasFontCommand,
@@ -73,7 +84,18 @@ import {
   CanvasZoomTo100Command,
   CanvasZoomToFitCommand,
 } from '../commands/canvas-zoom-commands';
+import { ResetImageCropCommand } from '../commands/reset-image-crop-command';
 import { DetachWidgetCommand } from '../commands/widget-detach-command';
+import { CanvasCommandPaletteItems } from '../contributions/canvas-command-palette';
+import { CanvasContextMenu } from '../contributions/canvas-context-menu';
+import { canvasPropertyPaneContributions } from '../contributions/canvas-property-pane-contributions';
+import {
+  CanvasStatusBarContribution,
+  CanvasToolbarContribution,
+} from '../contributions/canvas-shell-contributions';
+import { proImageCanvasContributions } from '../contributions/pro-image-contributions';
+import { AbsoluteEditorPane } from '../editor/absolute-editor-pane';
+import { SvgNodesFieldRenderer } from '../fields/svg-nodes-field';
 import { canvasFontService } from '../fonts/canvas-font-service';
 import { CanvasGridSettings } from '../grid/canvas-grid-settings';
 import { CanvasI18nBundle } from '../i18n/canvas-i18n-bundle';
@@ -94,6 +116,7 @@ import {
   builtinLayerPreviewRendererContributions,
 } from '../renderers/builtin-contributions';
 import { CanvasRulerGuidesSettings } from '../rulers/canvas-ruler-guides-settings';
+import { SmartGuidesStageInteraction } from '../stage/smart-guides-stage-interaction';
 import {
   ensureCanvasRegistriesInstalled,
   registerCanvasContribution,
@@ -310,8 +333,8 @@ export class UploadAssetCommand extends Command {
   }
 }
 
-export class CanvasBasicsPlugin extends Plugin {
-  readonly id = 'OpenEnvx.canvas-basics';
+export class CanvasPlugin extends Plugin {
+  readonly id = 'openenvx.canvas';
 
   activate(ctx: PluginContext): void {
     ensureCanvasRegistriesInstalled(ctx);
@@ -401,6 +424,36 @@ export class CanvasBasicsPlugin extends Plugin {
         resizeSceneToPreset: resizeSceneToPagePreset,
       })),
       new SimpleServiceContribution(FontServiceId, () => canvasFontService)
+    );
+
+    const workbench = ctx as WorkbenchPluginContext;
+    workbench.registerEditorPane('absolute', AbsoluteEditorPane);
+    workbench.registerFieldRenderer('svgNodes', SvgNodesFieldRenderer);
+    workbench.registerWorkbench(
+      new CanvasContextMenu(),
+      new CanvasCommandPaletteItems(),
+      new CanvasStatusBarContribution(),
+      new CanvasToolbarContribution(),
+      ...canvasPropertyPaneContributions
+    );
+    ctx.register(
+      new SingletonServiceContribution(
+        CanvasStageInteractionServiceId,
+        SmartGuidesStageInteraction
+      )
+    );
+    registerCanvasContribution(ctx, [...proImageCanvasContributions], {
+      override: true,
+    });
+    ctx.register(
+      new AlignLayersLeftCommand(),
+      new AlignLayersCenterCommand(),
+      new AlignLayersRightCommand(),
+      new AlignLayersTopCommand(),
+      new AlignLayersMiddleCommand(),
+      new AlignLayersBottomCommand(),
+      new DistributeLayersHorizontallyCommand(),
+      new ResetImageCropCommand()
     );
   }
 

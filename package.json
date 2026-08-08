@@ -11,7 +11,7 @@
     "prepare": "husky",
     "build": "turbo run build",
     "test": "turbo run test -- --run",
-    "bench": "turbo run bench --filter=@openenvx/core --filter=@openenvx/canvas-pro",
+    "bench": "turbo run bench --filter=@openenvx/core --filter=@openenvx/canvas",
     "lint": "turbo run lint",
     "check": "ultracite check && knip",
     "check-types": "turbo run check-types --filter='!./apps/*'",

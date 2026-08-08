@@ -255,7 +255,7 @@ export class WorkbenchSidebarContainer extends ViewContainerContribution {
   readonly sidebarOrder = 10;
 }
 
-/** Generic dirty indicators — canvas zoom/selection stay in canvas-pro. */
+/** Generic dirty indicators — canvas zoom/selection stay in `@openenvx/canvas`. */
 export class WorkbenchStatusBarContribution extends StatusBarContribution {
   contribute(builder: StatusBarBuilder, _ctx: CommandContext): void {
     builder

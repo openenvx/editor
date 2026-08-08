@@ -1,7 +1,7 @@
 {
   "name": "@xmazu/openenvxee-studio",
-  "version": "0.7.15",
-  "description": "OpenEnvx Studio — curated host surface with workbench, canvas, and canvas-pro bundled for product apps",
+  "version": "0.7.17",
+  "description": "OpenEnvx Studio — curated host surface with workbench and canvas bundled for product apps",
   "license": "UNLICENSED",
   "type": "module",
   "files": [
@@ -62,7 +62,6 @@
   },
   "devDependencies": {
     "@openenvx/canvas": "workspace:*",
-    "@openenvx/canvas-pro": "workspace:*",
     "@openenvx/canvas-studio": "workspace:*",
     "@openenvx/core": "workspace:*",
     "@openenvx/headless": "workspace:*",

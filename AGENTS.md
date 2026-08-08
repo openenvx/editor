@@ -46,7 +46,7 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | [apps/docs/extension-guide.md](apps/docs/extension-guide.md) | Internal OOP plugin author API |
 | [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) | Sandbox widgets/plugins + embed panels |
 | [docs/architecture/property-fields.md](docs/architecture/property-fields.md) | Inspector `PropertyFieldDescriptor`, field kinds, `chrome` |
-| [packages/canvas/README.md](packages/canvas/README.md) | Canvas install and `CanvasBasicsPlugin` |
+| [packages/canvas/README.md](packages/canvas/README.md) | Canvas install and `CanvasPlugin` |
 | [packages/workbench/Design.md](packages/workbench/Design.md) | Workbench **visual design** tokens only (not API docs) |
 
 Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before placing new code. Read **Plugin-boundaries.md** when touching embed/sandbox/external plugins. Update **FEATURES.md** when adding or removing a user-facing editor capability. When unsure, load the global **openenvx** skill (`~/.cursor/skills/openenvx`).
@@ -63,7 +63,7 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 | --- | --- |
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
 | `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchPlugin`, workbench contributions (`ToolbarContribution`, `PropertyPaneContribution`, …), provider registries (`registerFieldRenderer`, …), `PropertyPaneBuilder`, `WorkbenchProvider`, `useWorkbenchContext` |
-| `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasBasicsPlugin`, `CanvasEditor`, `CanvasHostProvider` |
+| `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasPlugin`, `CanvasEditor`, `CanvasHostProvider` |
 | `@xmazu/openenvxee-extensions` | Sandbox author SDK: `./protocol`, element subpaths, `defineExtension`, Vite (`@xmazu/openenvxee-extensions/protocol` for hosts) |
 
 ### Canvas rule (non-negotiable)
@@ -75,11 +75,11 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 | Add a Konva renderer in `packages/canvas/src/renderers/` | Add canvas renderer types to `core` |
 | Register renderers via `registerCanvasContribution()` | Hardcode preview `kind` switches in app shell |
 | Use `CanvasEditor` + `CanvasHostProvider` in the app shell | Put workbench-aware editor pane wiring in `@openenvx/canvas` |
-| Use `CanvasBasicsPlugin` for built-in canvas engine features | Create app-only canvas plugins without registering contributions |
+| Use `CanvasPlugin` for built-in canvas features | Create app-only canvas plugins without registering contributions |
 
 ## Licensing / publishing intent
 
-Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `workbench`, `canvas-pro`, `agent`, …) are **private** and not published. Their `exports` point at **TypeScript `src/`** so Vite/Bun apps hot-reload and TypeScript resolves types from source without rebuilding.
+Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `workbench`, `agent`, …) are **private** and not published. Their `exports` point at **TypeScript `src/`** so Vite/Bun apps hot-reload and TypeScript resolves types from source without rebuilding.
 
 Published packages:
 
@@ -87,7 +87,7 @@ Published packages:
 - **`@xmazu/openenvxee-extensions`** — published sandbox author SDK (merged protocol + elements + widget-sdk): `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts import **`@xmazu/openenvxee-extensions/protocol`** only.
 - **`@openenvx/canvas-studio`** — private curated canvas host surface (`WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, sandbox/embed, theme CSS). Workspace TypeScript via `workspace:*` — monorepo hosts use this (not bundled).
 - **`@openenvx/html-studio`** — private curated HTML host surface (`DEFAULT_HTML_STUDIO_PLUGINS`, theme CSS). Monorepo hosts use this; external hosts use `@xmazu/openenvxee-html-studio`.
-- **`@xmazu/openenvxee-studio`** — published fat canvas bundle. Re-exports `@openenvx/canvas-studio` and inlines `@openenvx/workbench`, `@openenvx/canvas`, `@openenvx/canvas-pro`, and their `@openenvx/*` deps into `dist/`. Public surface matches canvas-studio’s allowlist — not a barrel re-export of core/headless/canvas. Plugin authoring uses private `@openenvx/core` + `@openenvx/headless` in-monorepo. Top-level `exports` → `dist/` only (no `development` → `src`). Publish to GitHub Packages (`npm.pkg.github.com`, restricted); `latest` has no sourcemaps, `debug` tag ships maps. Does **not** inline html — HTML hosts use `@xmazu/openenvxee-html-studio`. PNG/JPG/PDF/SVG export is server-side via openenvx-cloud `apps/export-service`.
+- **`@xmazu/openenvxee-studio`** — published fat canvas bundle. Re-exports `@openenvx/canvas-studio` and inlines `@openenvx/workbench`, `@openenvx/canvas`, and their `@openenvx/*` deps into `dist/`. Public surface matches canvas-studio’s allowlist — not a barrel re-export of core/headless/canvas. Plugin authoring uses private `@openenvx/core` + `@openenvx/headless` in-monorepo. Top-level `exports` → `dist/` only (no `development` → `src`). Publish to GitHub Packages (`npm.pkg.github.com`, restricted); `latest` has no sourcemaps, `debug` tag ships maps. Does **not** inline html — HTML hosts use `@xmazu/openenvxee-html-studio`. PNG/JPG/PDF/SVG export is server-side via openenvx-cloud `apps/export-service`.
 - **`@xmazu/openenvxee-html-studio`** — published HTML host package. Re-exports `@openenvx/html-studio` and inlines workspace packages into a per-module `dist/` ESM tree (Vite-tree-shakeable; third-party UI deps external). Subpaths: `.` (editor), `./runtime` (Worker-safe `renderBlockDocument`), `./theme.css`. Product hosts own their blocks/plugins (e.g. Snapvelo in snapvelo-app).
 
 ## Host sidebar panels (product hosts)
@@ -107,11 +107,11 @@ Product apps (dashboard Studio, embed host) register host sidebars the **VS Code
 **Hard rules:**
 
 - Form/settings panels: `WorkbenchPlugin` + `registerWorkbench(container, ...views)` with `buildProperties` / `emptyMessage` / `when`. Zero React panel components in the host.
-- Product hosts: use `ViewContribution.buildProperties()` only. `PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas-pro transform panes) merged into the default **Inspector** container — not for embed/dashboard hosts.
+- Product hosts: use `ViewContribution.buildProperties()` only. `PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas transform panes) merged into the default **Inspector** container — not for embed/dashboard hosts.
 - **Naming:** **Inspector** = the default secondary container (`workbench.inspector`) and the canvas layer/node property views it hosts. Generic form content is a `properties` view + `PropertyPane` / `PropertyPath` / `PropertyHostContext` (any container). Headless `createPropertyHostContext` resolves `layerProp` / `templatePolicy` paths; canvas hosts pass `createCanvasPropertyHostContext` for transform and page bleed/safe paths.
 - Do **not** import or compose `ViewPane` / `PropertyContentRenderer` from the host (they are shell-internal).
 - Before adding a new primitive: inventory published exports and call sites; prefer reuse; only then extend core.
-- Embed **policy/data API** (scene commands, schema fields, path context) stays in editor-core; embed **product panels** (e.g. Embed Options) live in the product host (`studio-host`), not in canvas-pro Inspector contributions.
+- Embed **policy/data API** (scene commands, schema fields, path context) stays in editor-core; embed **product panels** (e.g. Embed Options) live in the product host (`studio-host`), not in canvas Inspector contributions.
 
 ## Code conventions
 
@@ -168,7 +168,7 @@ All packages are pre-1.0.0. Breaking API changes are expected and preferred over
 
 | Task | Where |
 | --- | --- |
-| Add canvas layer type | `packages/canvas/src/layers/` + register in `CanvasBasicsPlugin` |
+| Add canvas layer type | `packages/canvas/src/layers/` + register in `CanvasPlugin` |
 | Add custom preview `kind` | Canvas contribution class + `registerCanvasContribution(ctx, …)` |
 | Add shell UI chrome | `apps/demo-playground/src/` or your own app |
 | Wire canvas editor to workbench | App shell: `CanvasHostProvider` + `AbsoluteEditorPane` (see `apps/demo-playground`) |

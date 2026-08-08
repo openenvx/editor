@@ -1,6 +1,5 @@
-import type { CanvasOverlayPrimitive } from '@openenvx/canvas';
-
 import type { GuideLine, SpacingGuide } from '../snap/smart-guides/types';
+import type { CanvasOverlayPrimitive } from './canvas-overlay-primitives';
 
 const GUIDE_STROKE_WIDTH = 2;
 const SPACING_STROKE_WIDTH = 2;

@@ -23,9 +23,9 @@ Backend services depend on `@xmazu/openenvxee-schema` too instead of re-declarin
 | `@openenvx/headless` | Workbench runtime: `WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()` |
 | `@openenvx/core` | Editor host: `EditorRuntime`, `PluginManager`, `registerContribution()` |
 | Your app / `demo-playground` | Wire canvas to workbench via `CanvasHostProvider` + app-owned toolbar/sidebars |
-| `@openenvx/canvas-pro` (enterprise) | Pre-built canvas workbench chrome: toolbar, palette, layers sidebar, editor pane registration |
+| `@openenvx/canvas` | Full canvas editor: `CanvasPlugin` (engine + workbench chrome), toolbar, palette, editor pane registration |
 
-`CanvasBasicsPlugin` registers engine contributions only. For a full editor UX, either wire chrome in your app shell (see `apps/demo-playground`) or use enterprise `@openenvx/canvas-pro`.
+Load `CanvasPlugin` for the full canvas editor. For a minimal custom shell, compose workbench contributions yourself (see `apps/demo-playground`).
 
 ### Custom editor host (without `WorkbenchController`)
 
@@ -163,7 +163,7 @@ activateWorkbench(ctx) {
 
 Duplicate kinds overwrite earlier registrations so enterprise plugins activating later can replace OSS defaults.
 
-`WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). Enterprise `@openenvx/canvas-pro` adds canvas-only chrome (`CanvasProPlugin`, `CanvasTemplatePlugin`).
+`WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). `CanvasPlugin` registers canvas-only chrome. Optional `CanvasTemplatePlugin` adds the template data panel.
 
 **Custom sidebar header** (per activity-bar panel — document title / file menu / icon actions):
 

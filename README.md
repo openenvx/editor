@@ -20,15 +20,14 @@ Workspace libraries (private, not published — `exports` point at TypeScript `s
 - **`@xmazu/openenvxee-preview`** - DOM preview rendering for layer types
 - **`@openenvx/core`** - Scene model, plugins, commands, and contribution registries
 - **`@openenvx/headless`** - `WorkbenchController` and headless editor runtime
-- **`@openenvx/canvas`** - Canvas engine, layers, Konva stage, TipTap rich text, `CanvasBasicsPlugin`
+- **`@openenvx/canvas`** - Canvas engine, layers, Konva stage, TipTap rich text, `CanvasPlugin` (toolbar, smart guides, inspector)
 - **`@openenvx/workbench`** - React workbench UI shell (`WorkbenchShell`, fields, theme)
-- **`@openenvx/canvas-pro`** - Pro canvas chrome (toolbars, sidebars, smart guides)
 - **`@openenvx/agent`** - AI agent sidebar plugin
 
 Published packages (see [PUBLISHING.md](PUBLISHING.md)):
 
 - **`@xmazu/openenvxee-schema`** - Scene document model, Zod schemas, and template helpers
-- **`@xmazu/openenvxee-studio`** - Product fat bundle (workbench + canvas + canvas-pro + agent). Export is via openenvx-cloud `export-service` API, not an in-browser driver.
+- **`@xmazu/openenvxee-studio`** - Product fat bundle (workbench + canvas + agent). Export is via openenvx-cloud `export-service` API, not an in-browser driver.
 
 ---
 

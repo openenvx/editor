@@ -1,7 +1,6 @@
-import { CanvasLayerRendererContribution } from '@openenvx/canvas';
-
 import { ImageCropInteraction } from '../interactions/image-crop-interaction';
 import { ProImageCanvasRenderer } from '../renderers/pro-image-canvas-renderer';
+import { CanvasLayerRendererContribution } from './canvas-layer-renderer-contribution';
 
 class ProImageCanvasRendererContribution extends CanvasLayerRendererContribution {
   readonly kind = 'image';

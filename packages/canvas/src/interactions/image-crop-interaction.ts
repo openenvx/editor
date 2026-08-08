@@ -1,16 +1,16 @@
-import {
-  ImageCanvasInteraction,
-  isImageEdgeAnchor,
-  type CanvasHandleDragContext,
-  type CanvasHandleLayoutContext,
-  type CanvasLayerActivateContext,
-  type CanvasTransformResult,
-} from '@openenvx/canvas';
 import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
 import type Konva from 'konva';
 
+import type {
+  CanvasHandleDragContext,
+  CanvasHandleLayoutContext,
+  CanvasLayerActivateContext,
+  CanvasTransformResult,
+} from '../contributions/canvas-layer-interaction-contribution';
 import { layoutCropHandles } from '../crop/image-crop-handle-geometry';
 import { hasActiveCrop, readImageCrop } from '../crop/normalized-crop';
+import { isImageEdgeAnchor } from '../image-resize';
+import { ImageCanvasInteraction } from './image-canvas-interaction';
 import {
   clearImageCropPreview,
   loadPreviewImage,

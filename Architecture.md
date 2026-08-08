@@ -14,7 +14,7 @@ Package boundaries and contribution flow for the monorepo.
 | [Runtime & core](docs/architecture/runtime-and-core.md) | `EditorRuntime`, `PluginManager`, scene, commands, DI |
 | [Workbench & headless](docs/architecture/workbench-and-headless.md) | Controller, UI contributions, layout, property panes |
 | [Property fields](docs/architecture/property-fields.md) | Inspector field descriptors, kinds, `chrome` |
-| [Canvas](docs/architecture/canvas.md) | Engine vs chrome, `CanvasBasicsPlugin` vs canvas-pro |
+| [Canvas](docs/architecture/canvas.md) | Canvas engine, `CanvasPlugin`, workbench chrome |
 | [HTML](docs/architecture/html.md) | Block editor, slots, `HtmlBlocksPlugin` |
 | [HTML editor surfaces](docs/architecture/html-editor-surfaces.md) | Stage / artboard / page-root naming + click selection |
 | [Email driver](docs/architecture/driver-email.md) | React-Email block editor, `EmailBlocksPlugin`, `renderEmailDocument` |
@@ -47,8 +47,8 @@ Author how-to (under `docs/architecture/`):
 | --- | --- | --- | --- |
 | Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives |
 | Embed / sandbox protocol | `extensions` (`@xmazu/openenvxee-extensions`, `./protocol` subpath) | Published (public) | `RenderNode`, manifests, validators, sandbox grants |
-| Product libs | `headless`, `canvas`, `html`, `driver-email`, `workbench`, `canvas-pro`, `agent`, `canvas-studio`, `html-studio` | Private (workspace) | Workbench runtime, canvas engine, HTML editor, email driver, React shell, pro chrome, agent, studio host surfaces |
-| Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + canvas-pro + agent |
+| Product libs | `headless`, `canvas`, `html`, `driver-email`, `workbench`, `agent`, `canvas-studio`, `html-studio` | Private (workspace) | Workbench runtime, canvas editor, HTML editor, email driver, React shell, agent, studio host surfaces |
+| Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + agent |
 
 ## Placement cheat sheet
 
@@ -57,11 +57,10 @@ Author how-to (under `docs/architecture/`):
 | `@xmazu/openenvxee-schema` | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
 | `@openenvx/headless` | `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context, external host mount surfaces |
-| `@openenvx/canvas` | Konva stage, layers, renderers, `CanvasBasicsPlugin`, `CanvasEditor` |
+| `@openenvx/canvas` | Konva stage, layers, renderers, `CanvasPlugin`, `CanvasEditor` |
 | `@openenvx/html` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |
 | `@openenvx/driver-email` | Email blocks, `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument` |
 | `@openenvx/workbench` | `WorkbenchShell`, field renderers, sandbox/embed hosts |
-| `@openenvx/canvas-pro` | Canvas-only chrome (zoom, transform panes, floating toolbar) |
 | `@openenvx/canvas-studio` | Curated canvas host API (workspace TS) + `DEFAULT_STUDIO_PLUGINS` + `createSandboxExtensionHost` |
 | `@xmazu/openenvxee-studio` | Published fat bundle of canvas-studio |
 | `@openenvx/html-studio` | HTML product re-exports + `DEFAULT_HTML_STUDIO_PLUGINS` |
@@ -74,8 +73,7 @@ Author how-to (under `docs/architecture/`):
 flowchart TB
   subgraph plugins [Plugins]
     Chrome[DefaultWorkbenchChromePlugin]
-    CanvasBasics[CanvasBasicsPlugin]
-    CanvasPro[CanvasProPlugin]
+    CanvasPlugin[CanvasPlugin]
     HtmlBlocks[HtmlBlocksPlugin]
     Custom[CustomPlugin]
   end
@@ -94,9 +92,9 @@ flowchart TB
     Shell[WorkbenchShell]
   end
   Chrome -->|pages layers status| WbRegs
-  CanvasBasics -->|commands layers| PluginHost
-  CanvasBasics -->|registerCanvasContribution| Registries
-  CanvasPro -->|canvas-only chrome| WbRegs
+  CanvasPlugin -->|commands layers chrome| PluginHost
+  CanvasPlugin -->|registerCanvasContribution| Registries
+  CanvasPlugin -->|canvas chrome| WbRegs
   HtmlBlocks -->|layers editorPane| PluginHost
   HtmlBlocks -->|registerEditorPane html| WbRegs
   Shell --> Controller
@@ -104,9 +102,8 @@ flowchart TB
 ```
 
 1. `WorkbenchShell` injects default chrome (Pages/Layers + dirty status) plus Inspector / field plugins.
-2. Engine plugins (`CanvasBasicsPlugin`, `HtmlBlocksPlugin`, …) register via core + domain registries.
-3. Product chrome (`CanvasProPlugin`, …) registers workbench UI only for that editor surface.
-4. `WorkbenchController` assembles core + workbench registries into `WorkbenchState`.
+2. Domain plugins (`CanvasPlugin`, `HtmlBlocksPlugin`, …) register via core + domain registries and workbench contributions.
+3. `WorkbenchController` assembles core + workbench registries into `WorkbenchState`.
 
 External hosts (sandbox / embed) mount **off** `PluginManager` via `ExternalHostMount` — see [Extensions](docs/architecture/extensions.md) and [Plugin-boundaries.md](Plugin-boundaries.md).
 

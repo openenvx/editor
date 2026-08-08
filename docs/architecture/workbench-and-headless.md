@@ -84,7 +84,7 @@ Field descriptors, kinds, and `chrome`: [property-fields.md](property-fields.md)
 
 **Naming:** **Inspector** = default secondary container (`workbench.inspector`) hosting canvas/HTML layer property views. Generic form content is a `properties` view + `PropertyPane` / `PropertyPath` in any container.
 
-`PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas-pro transform panes) merged into the Inspector — not for embed/dashboard product hosts. Product hosts use `ViewContribution.buildProperties()`.
+`PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas transform panes) merged into the Inspector — not for embed/dashboard product hosts. Product hosts use `ViewContribution.buildProperties()`.
 
 ## External host mount (DI isolation)
 

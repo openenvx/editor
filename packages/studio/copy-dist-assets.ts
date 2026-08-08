@@ -24,10 +24,6 @@ await rsyncCss(
   path.join(packagesRoot, 'agent/src'),
   path.join(distRoot, 'agent')
 );
-await rsyncCss(
-  path.join(packagesRoot, 'canvas-pro/src'),
-  path.join(distRoot, 'canvas-pro')
-);
 
 const themeDest = path.join(distRoot, 'theme');
 await mkdir(themeDest, { recursive: true });

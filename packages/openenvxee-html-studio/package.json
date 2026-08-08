@@ -1,6 +1,6 @@
 {
   "name": "@xmazu/openenvxee-html-studio",
-  "version": "0.7.15",
+  "version": "0.7.17",
   "description": "OpenEnvx HTML Studio — curated host surface with workbench and HTML block editor bundled for product apps",
   "license": "UNLICENSED",
   "type": "module",

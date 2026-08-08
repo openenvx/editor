@@ -1,16 +1,13 @@
-import {
-  type CanvasTransformBox,
-  isImageEdgeAnchor,
-  type ImageEdgeAnchor,
-} from '@openenvx/canvas';
 import { MIN_LAYER_SIZE } from '@openenvx/core';
 import type { Transform } from '@xmazu/openenvxee-schema';
 
+import type { CanvasTransformBox } from '../contributions/canvas-layer-interaction-contribution';
 import {
   clampNormalizedCrop,
   resolveNormalizedCrop,
   type NormalizedCrop,
 } from '../crop/normalized-crop';
+import { isImageEdgeAnchor, type ImageEdgeAnchor } from '../image-resize';
 
 export interface FullImageLayout {
   height: number;

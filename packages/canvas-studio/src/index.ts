@@ -1,14 +1,11 @@
 import {
   applyWidgetFace,
-  CanvasBasicsPlugin,
+  CanvasPlugin,
+  createCanvasPropertyHostContextWithApi,
+  DEFAULT_CANVAS_LAYOUT,
   setOpenEnvxWidgetClickHandler,
   WIDGET_LAYER_TYPE,
 } from '@openenvx/canvas';
-import {
-  CanvasProPlugin,
-  createCanvasPropertyHostContextWithApi,
-  DEFAULT_CANVAS_LAYOUT,
-} from '@openenvx/canvas-pro';
 import {
   SandboxExtensionHost,
   type SandboxExtensionHostOptions,
@@ -90,12 +87,8 @@ export function createSandboxExtensionHost(
 }
 
 /**
- * Default plugin set for a full OpenEnvx Studio host app
- * (canvas basics + canvas-pro chrome).
+ * Default plugin set for a full OpenEnvx Studio host app.
  * Pages/Layers sidebar + dirty status come from WorkbenchShell defaults.
  * Document export is via cloud export-service API (not in-browser driver).
  */
-export const DEFAULT_STUDIO_PLUGINS = [
-  new CanvasBasicsPlugin(),
-  new CanvasProPlugin(),
-];
+export const DEFAULT_STUDIO_PLUGINS = [new CanvasPlugin()];

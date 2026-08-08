@@ -1,6 +1,6 @@
 # Canvas
 
-**Audience:** Internal engineers and coding agents. Package: `@openenvx/canvas` (+ chrome in `@openenvx/canvas-pro`).
+**Audience:** Internal engineers and coding agents. Package: `@openenvx/canvas`.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -16,25 +16,19 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 - Canvas renderer / preview / interaction contributions and `Canvas*ServiceId` tokens
 - `CanvasRegistriesReader`, `PageResizeService`
 - `useCanvasRegistries()`, `useCanvasApi()` — require `CanvasHostProvider`
-- `CanvasBasicsPlugin` — layers, renderers, interactions, commands only (**no** workbench chrome)
+- `CanvasPlugin` — engine + canvas-only workbench chrome (toolbar, inspector panes, smart guides, align/crop, editor pane)
+- Optional `CanvasTemplatePlugin` — template data panel
 - `registerCanvasContribution()` for third-party renderers, interactions, layer preview renderers
 - `CanvasStageInteractionService` — optional stage drag/resize adjustment + overlay primitives
 - Page size presets and `AbsolutePageRules` (`layout: 'absolute'`)
 
-### Enterprise / override hooks
+### Override hooks
 
-- Per-kind override of OSS renderers / interactions / preview / SVG export (server) via `{ override: true }`
+- Per-kind override of renderers / interactions / preview / SVG export (server) via `{ override: true }`
 - Generic layer handles on `CanvasLayerInteractionContribution` (`providesHandles`, `layoutHandles`, `onHandleDrag*`)
 - Optional `dataPatch` on `canvas.updateLayerTransform` (merges into `layer.data`)
 
-## CanvasBasics vs canvas-pro
-
-| Package | Responsibility |
-| --- | --- |
-| `@openenvx/canvas` | Engine: layers, commands, Konva, `CanvasEditor` |
-| `@openenvx/canvas-pro` | Canvas-only workbench chrome: zoom/selection status, transform property panes, insert-tool toolbar, grid/rulers, floating toolbar layout defaults |
-
-Scene-generic chrome (Pages/Layers, dirty status) is workbench default — not canvas-pro.
+Scene-generic chrome (Pages/Layers, dirty status) is workbench default — registered by `DefaultWorkbenchChromePlugin`, not `CanvasPlugin`.
 
 ## Wiring in a workbench app
 
@@ -42,8 +36,8 @@ App shell (or studio) provides:
 
 1. `WorkbenchProvider` / `WorkbenchShell`
 2. `CanvasHostProvider` around the editor region
-3. Editor pane that mounts `CanvasEditor` for `page.layout === 'absolute'`
-4. Plugins: at least `CanvasBasicsPlugin`; product hosts also load `CanvasProPlugin` (+ drivers, agent, …)
+3. Editor pane that mounts `CanvasEditor` for `page.layout === 'absolute'` (registered by `CanvasPlugin`)
+4. Plugins: `CanvasPlugin` (or `DEFAULT_STUDIO_PLUGINS` from canvas-studio); optional `CanvasTemplatePlugin`, agent, product plugins
 
 See `apps/canvas-demo` / `apps/demo-playground` and [studio-and-products.md](studio-and-products.md).
 
@@ -60,6 +54,4 @@ See `apps/canvas-demo` / `apps/demo-playground` and [studio-and-products.md](stu
 
 ## Related
 
-- Package README: [packages/canvas/README.md](../../packages/canvas/README.md)
 - Author extension (internal): [apps/docs/extension-guide.md](../../apps/docs/extension-guide.md) · hub: [apps/docs/README.md](../../apps/docs/README.md)
-- Pro chrome README: [packages/canvas-pro/README.md](../../packages/canvas-pro/README.md)

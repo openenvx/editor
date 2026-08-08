@@ -6,7 +6,7 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 
 ## Role
 
-Puck-style block editor for pages with `page.layout === 'html'`. Same core/headless/workbench stack as canvas; **no** canvas / canvas-pro dependency.
+Puck-style block editor for pages with `page.layout === 'html'`. Same core/headless/workbench stack as canvas; **no** `@openenvx/canvas` dependency.
 
 ## What html owns
 

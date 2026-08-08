@@ -30,8 +30,6 @@ schema / preview / extensions (protocol subpath)
     headless ──────────────────────────────┐
         │                                  │
         ├── canvas / html / driver-email / agent
-        │       │                          │
-        │       └── canvas-pro             │
         ▼                                  ▼
    workbench (React shell) ◄── studio / html-studio (fat re-exports)
 ```
@@ -39,8 +37,8 @@ schema / preview / extensions (protocol subpath)
 Hard rules:
 
 - **Canvas never imports workbench.** Studio wires canvas into sandbox via `createSandboxExtensionHost`.
-- **HTML never depends on canvas-pro.**
-- **Email driver** (`@openenvx/driver-email`) may depend on `@openenvx/html` for shared block machinery; it must not depend on canvas / canvas-pro / workbench (command Sheets are hosted by the shell via `sheetOpenKey` + `registerViewPanel`).
+- **HTML never depends on `@openenvx/canvas`.**
+- **Email driver** (`@openenvx/driver-email`) may depend on `@openenvx/html` for shared block machinery; it must not depend on canvas / workbench (command Sheets are hosted by the shell via `sheetOpenKey` + `registerViewPanel`).
 - **Hosts prefer studio / html-studio**, not a hand-wired private stack (unless custom shell — see `apps/demo-playground`).
 - **Untrusted code** never loads in the editor main world — protocol trees + sandbox Worker only.
 
@@ -64,11 +62,10 @@ Hard rules:
 | `@xmazu/openenvxee-extensions` | yes | Author SDK: `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite | `.`, `./protocol`, `./canvas`, `./html`, `./panel`, `./vite`, `./openenvx`, jsx runtimes |
 | `@openenvx/core` | private | `EditorRuntime`, `PluginManager`, commands, layers, DI, scene store | `.` |
 | `@openenvx/headless` | private | `WorkbenchController`, UI contribution descriptors, property host, `ExternalHostMount` | `.`, `./react` |
-| `@openenvx/canvas` | private | Konva engine, layers, `CanvasBasicsPlugin`, `CanvasEditor` | `.` (+ export/registry subpaths) |
+| `@openenvx/canvas` | private | Konva engine, layers, `CanvasPlugin`, `CanvasEditor`, canvas workbench chrome | `.` (+ export/registry subpaths) |
 | `@openenvx/html` | private | HTML blocks, `HtmlBlocksPlugin`, `HtmlEditorPane`, `renderBlockDocument` | `.`, `./runtime` |
 | `@openenvx/driver-email` | private | Email blocks (React-Email), `EmailBlocksPlugin`, `renderEmailDocument` | `.` |
 | `@openenvx/workbench` | private | `WorkbenchShell`, field renderers, sandbox host | `.`, `./theme.css` |
-| `@openenvx/canvas-pro` | private | Canvas-only chrome (zoom, transform panes, floating toolbar) | `.` |
 | `@openenvx/agent` | private | Agent chat sidebar plugin | `.`, `./schemas` |
 | `@openenvx/canvas-studio` | private | Curated canvas host API (workspace TS, not bundled) | `.`, `./theme.css`, `./fonts.css` |
 | `@xmazu/openenvxee-studio` | yes (restricted, GH Packages) | Fat publish of canvas-studio + inlined canvas stack | `.`, `./theme.css`, `./fonts.css` |
@@ -95,13 +92,11 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@openenvx/headless`** — `WorkbenchController`, `WorkbenchPlugin`, contribution classes (Toolbar, View, PropertyPane, …), builders, `createPropertyPane` / `createPropertyHostContext`, layout + `ExternalHostMount`. React bridge: `@openenvx/headless/react` (`WorkbenchProvider`, hooks).
 
-**`@openenvx/canvas`** — `CanvasBasicsPlugin`, `CanvasEditor` / `CanvasHostProvider` / `CanvasStage`, layer definitions, `registerCanvasContribution`, widget mapping helpers, export helpers.
+**`@openenvx/canvas`** — `CanvasPlugin`, `CanvasTemplatePlugin`, `CanvasEditor` / `CanvasHostProvider` / `CanvasStage`, layer definitions, `registerCanvasContribution`, transform/print panes, align tools, crop/guides, widget mapping helpers, export helpers.
 
 **`@openenvx/html`** — `HtmlBlocksPlugin`, `HtmlEditorPane`, block registry + tree helpers, `createBlockCommands`.
 
 **`@openenvx/driver-email`** — `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument`, email block registry.
-
-**`@openenvx/canvas-pro`** — `CanvasProPlugin`, `DEFAULT_CANVAS_PRO_PLUGINS`, transform/print panes, align tools, crop/guides.
 
 **`@openenvx/agent`** — `AgentChatPlugin`, chat UI contributions; `./schemas` for proposal Zod types.
 
@@ -115,7 +110,7 @@ Studio re-exports a **fixed allowlist** of workbench symbols (shell + hosts + de
 
 **`@openenvx/canvas-studio`** — curated host allowlist (`WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, layout/property helpers, sandbox/embed, theme CSS). Workspace TypeScript via `workspace:*` — monorepo hosts use this.
 
-**`@xmazu/openenvxee-studio`** — published fat bundle of the same surface (re-exports `@openenvx/canvas-studio`, inlines workbench/canvas/canvas-pro into `dist/`).
+**`@xmazu/openenvxee-studio`** — published fat bundle of the same surface (re-exports `@openenvx/canvas-studio`, inlines workbench/canvas into `dist/`).
 
 **`@openenvx/html-studio`** — private HTML fat package (`export *` core/headless/html + selective workbench + `DEFAULT_HTML_STUDIO_PLUGINS`).
 

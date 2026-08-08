@@ -1,4 +1,4 @@
-import { CanvasBasicsPlugin, createCanvasDemoScene } from '@openenvx/canvas';
+import { CanvasPlugin, createCanvasDemoScene } from '@openenvx/canvas';
 import { WorkbenchController } from '@openenvx/headless';
 import { useEffect, useState } from 'react';
 
@@ -10,7 +10,7 @@ export function usePlaygroundController() {
   useEffect(() => {
     const nextController = new WorkbenchController({
       initialScene: createCanvasDemoScene(),
-      plugins: [new CanvasBasicsPlugin()],
+      plugins: [new CanvasPlugin()],
     });
 
     let cancelled = false;

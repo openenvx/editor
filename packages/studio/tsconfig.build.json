@@ -23,8 +23,7 @@
       "@openenvx/canvas": ["../canvas/src/index.ts"],
       "@openenvx/canvas-studio": ["../canvas-studio/src/index.ts"],
       "@openenvx/agent": ["../agent/src/index.ts"],
-      "@openenvx/workbench": ["../workbench/src/index.ts"],
-      "@openenvx/canvas-pro": ["../canvas-pro/src/index.ts"]
+      "@openenvx/workbench": ["../workbench/src/index.ts"]
     }
   }
 }

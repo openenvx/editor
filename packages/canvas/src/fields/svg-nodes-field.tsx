@@ -1,10 +1,11 @@
+import type { PropertyFieldDescriptor } from '@openenvx/core';
+import { useState, type ReactNode } from 'react';
+
 import {
   editableAttrsForTag,
   parseSvgElements,
   setSvgElementAttrs,
-} from '@openenvx/canvas';
-import type { PropertyFieldDescriptor } from '@openenvx/core';
-import { useState, type ReactNode } from 'react';
+} from '../svg/svg-node-list';
 
 import styles from './svg-nodes-field.module.css';
 

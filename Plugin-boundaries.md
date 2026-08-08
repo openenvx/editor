@@ -232,7 +232,7 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 | Widget authoring (`defineExtension`, expand, Vite packaging) | `@xmazu/openenvxee-extensions` (published) |
 | Tree → builder mappers, plugin host context, manifest → contributions, `ExternalHostMount`, `SandboxHostSurface` / `EmbedPanelHostSurface`, `mountSandboxHost` / `mountEmbedPanelHost` | `@openenvx/headless` |
 | `EmbedPanelHost`, `SandboxExtensionHost`, `PluginPanel`, postMessage transport, command gate, sandbox runtime | `@openenvx/workbench` |
-| Internal OOP plugins + builders | `@openenvx/core`, `@openenvx/headless`, product plugins (`canvas-pro`, …) |
+| Internal OOP plugins + builders | `@openenvx/core`, `@openenvx/headless`, product plugins (`CanvasPlugin`, …) |
 
 ## Related
 
