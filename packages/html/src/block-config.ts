@@ -1,4 +1,30 @@
-import type { ReactElement, ReactNode } from 'react';
+import type {
+  CSSProperties,
+  DragEvent,
+  KeyboardEvent,
+  MouseEvent,
+  PointerEvent,
+  ReactElement,
+  ReactNode,
+} from 'react';
+
+/** Props applied to the block DOM root when `chromeDisplay` is `contents`. */
+export type BlockChromeHostProps = {
+  ref?: (node: HTMLElement | null) => void;
+  className?: string;
+  style?: CSSProperties;
+  role?: string;
+  tabIndex?: number;
+  'data-layer-id'?: string;
+  onClick?: (event: MouseEvent<HTMLElement>) => void;
+  onContextMenu?: (event: MouseEvent<HTMLElement>) => void;
+  onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
+  onPointerEnter?: (event: PointerEvent<HTMLElement>) => void;
+  onPointerLeave?: (event: PointerEvent<HTMLElement>) => void;
+  onDragOver?: (event: DragEvent<HTMLElement>) => void;
+  onDragLeave?: (event: DragEvent<HTMLElement>) => void;
+  onDrop?: (event: DragEvent<HTMLElement>) => void;
+} & Record<string, unknown>;
 
 export type FieldDef =
   | { kind: 'text'; label: string }
@@ -11,6 +37,11 @@ export type FieldDef =
   | { kind: 'toggle'; label: string }
   | {
       kind: 'select';
+      label: string;
+      options: { label: string; value: string }[];
+    }
+  | {
+      kind: 'segmented';
       label: string;
       options: { label: string; value: string }[];
     };
@@ -31,6 +62,14 @@ export interface BlockRenderProps {
   children?: ReactNode;
   /** Named slot content for composite blocks (keyed by SlotDef name). */
   slots?: Record<string, ReactNode>;
+  /**
+   * Droppable target for nested children when `childContainerHost` is
+   * `table-row` (ref/class on `<tr>`, not a wrapper `<div>`).
+   */
+  containerRef?: (node: HTMLElement | null) => void;
+  containerClassName?: string;
+  /** Selection/dnd chrome for `chromeDisplay: 'contents'` blocks (e.g. email column `<td>`). */
+  hostProps?: BlockChromeHostProps;
 }
 
 /** TipTap bubble-menu sections. Omitted keys default to shown. */
@@ -68,10 +107,17 @@ export interface BlockConfig {
    * Editor selection chrome around this block.
    * - `block` (default): full-width stack wrapper
    * - `inline`: hug content for horizontal siblings (e.g. social icon links)
-   * - `contents`: no layout box — required for `email.column` (`<td>`) so the
-   *   wrapper is not inserted between `<tr>` and `<td>`
+   * - `contents`: mount selection/DnD on the block's DOM root (no wrapper div).
+   *   Required for `email.column` (`<td>`) so a chrome box is not inserted
+   *   between `<tr>` and `<td>`. Editor CSS uses `position: relative` on the
+   *   host element — not CSS `display: contents` (invalid for table cells).
    */
   chromeDisplay?: 'block' | 'inline' | 'contents';
+  /**
+   * Where the child-list drop target mounts. `table-row` puts the droppable
+   * ref on the row's `<tr>` so columns stay valid `<td>` children.
+   */
+  childContainerHost?: 'default' | 'table-row';
   /**
    * Bubble-menu controls when this block's own rich text is edited.
    * Overrides `childRichTextToolbar` from ancestors.

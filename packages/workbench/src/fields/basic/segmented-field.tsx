@@ -1,21 +1,17 @@
-import { Select } from '../../primitives/select';
-import { getFieldId } from '../../renderers/property-field-types';
+import { SegmentedControl } from '../../primitives/segmented-control';
 import type { PropertyFieldComponent } from '../../renderers/property-field-types';
 
-export const SelectFieldRenderer: PropertyFieldComponent = ({
+export const SegmentedFieldRenderer: PropertyFieldComponent = ({
   field,
   value,
-  layerId,
   onUpdate,
 }) => {
-  const id = getFieldId(layerId, field.key);
   const options = (field.options ?? []).map((opt) => ({
     label: opt.label,
     value: opt.value,
   }));
   return (
-    <Select
-      id={id}
+    <SegmentedControl
       onChange={(next) => onUpdate(field.key, next)}
       options={options}
       value={String(value ?? field.options?.[0]?.value ?? '')}

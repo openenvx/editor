@@ -67,9 +67,13 @@ export {
   HtmlPreviewChromeServiceId,
   HtmlPreviewChromeServiceImpl,
   type HtmlPreviewChromeService,
+  type HtmlPreviewChromeServiceOptions,
   type HtmlPreviewChromeState,
 } from './preview/html-preview-chrome-service';
-export { registerHtmlPreviewChrome } from './preview/register-html-preview-chrome';
+export {
+  registerHtmlPreviewChrome,
+  type RegisterHtmlPreviewChromeOptions,
+} from './preview/register-html-preview-chrome';
 export { createHtmlPreviewCommands } from './commands/create-html-preview-commands';
 export {
   alignDataPathFromHtmlPath,

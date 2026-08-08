@@ -14,6 +14,8 @@ const HTML_ZOOM_DROPDOWN_ITEMS: ShellDropdownMenuItemDescriptor[] =
     label: `${Math.round(zoom * 100)}%`,
   }));
 
+const HTML_ZOOM_TOOLBAR_WHEN = 'html.previewActive && !html.hideZoomControls';
+
 export class HtmlToolbarContribution extends ToolbarContribution {
   contribute(builder: ToolbarBuilder, _ctx: CommandContext): void {
     builder
@@ -47,31 +49,31 @@ export class HtmlToolbarContribution extends ToolbarContribution {
       })
       .separator('html-toolbar-sep-1', {
         priority: 10,
-        when: 'html.previewActive',
+        when: HTML_ZOOM_TOOLBAR_WHEN,
       })
       .command('html-toolbar-zoom-out', {
         commandId: 'html.zoomOut',
         icon: 'zoom-out',
         labelKey: 'zoom.out',
         priority: 11,
-        when: 'html.previewActive',
+        when: HTML_ZOOM_TOOLBAR_WHEN,
       })
       .command('html-toolbar-zoom-in', {
         commandId: 'html.zoomIn',
         icon: 'zoom-in',
         labelKey: 'zoom.in',
         priority: 12,
-        when: 'html.previewActive',
+        when: HTML_ZOOM_TOOLBAR_WHEN,
       })
       .separator('html-toolbar-sep-2', {
         priority: 20,
-        when: 'html.previewActive',
+        when: HTML_ZOOM_TOOLBAR_WHEN,
       })
       .dropdown('html-toolbar-zoom', {
         items: HTML_ZOOM_DROPDOWN_ITEMS,
         labelBinding: 'html.zoomLabel',
         priority: 21,
-        when: 'html.previewActive',
+        when: HTML_ZOOM_TOOLBAR_WHEN,
       });
   }
 }

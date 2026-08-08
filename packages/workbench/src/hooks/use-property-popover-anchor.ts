@@ -5,6 +5,16 @@ export interface PropertyPopoverAnchorRect {
   top: number;
   left: number;
   height: number;
+  side: 'left' | 'right';
+}
+
+function propertyPopoverOpensLeft(panelRect: DOMRect): boolean {
+  const viewportMid =
+    (typeof document !== 'undefined'
+      ? document.documentElement.clientWidth
+      : 0) / 2;
+  const panelCenter = panelRect.left + panelRect.width / 2;
+  return panelCenter > viewportMid;
 }
 
 export function measurePropertyPopoverAnchor(
@@ -18,10 +28,16 @@ export function measurePropertyPopoverAnchor(
   }
   const panelRect = panel.getBoundingClientRect();
   const triggerRect = trigger.getBoundingClientRect();
+  const opensLeft = propertyPopoverOpensLeft(panelRect);
+  const clampedTop = Math.min(
+    Math.max(triggerRect.top, panelRect.top),
+    Math.max(panelRect.bottom - triggerRect.height, panelRect.top)
+  );
   return {
-    left: panelRect.left,
-    top: triggerRect.top,
     height: triggerRect.height,
+    left: opensLeft ? panelRect.left : panelRect.right,
+    side: opensLeft ? 'left' : 'right',
+    top: clampedTop,
   };
 }
 

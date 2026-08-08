@@ -10,7 +10,7 @@ export const headingBlock: BlockConfig = {
   fields: {
     html: { kind: 'richText', label: 'Text' },
     level: {
-      kind: 'select',
+      kind: 'segmented',
       label: 'Level',
       options: [
         { label: 'H1', value: '1' },
@@ -94,7 +94,7 @@ export const flexBlock: BlockConfig = {
   label: 'Flex',
   fields: {
     direction: {
-      kind: 'select',
+      kind: 'segmented',
       label: 'Direction',
       options: [
         { label: 'Row', value: 'row' },
@@ -102,7 +102,7 @@ export const flexBlock: BlockConfig = {
       ],
     },
     justify: {
-      kind: 'select',
+      kind: 'segmented',
       label: 'Justify Content',
       options: [
         { label: 'Start', value: 'flex-start' },
@@ -112,7 +112,7 @@ export const flexBlock: BlockConfig = {
     },
     gap: { kind: 'number', label: 'Gap' },
     wrap: {
-      kind: 'select',
+      kind: 'segmented',
       label: 'Wrap',
       options: [
         { label: 'true', value: 'true' },

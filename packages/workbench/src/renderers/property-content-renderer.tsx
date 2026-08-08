@@ -138,7 +138,7 @@ function createPropertyLayoutVisitor(
       const rowVariant =
         node.field.kind === 'toggle' || node.field.kind === 'checkbox'
           ? 'switch'
-          : node.field.kind === 'select'
+          : node.field.kind === 'select' || node.field.kind === 'segmented'
             ? 'inline'
             : 'default';
 

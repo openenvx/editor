@@ -1,6 +1,6 @@
 {
   "name": "@xmazu/openenvxee-protocol",
-  "version": "0.7.7",
+  "version": "0.7.15",
   "description": "OpenEnvx wire protocol — render-tree envelope, extension manifests, validators, sandbox grants",
   "license": "MIT",
   "type": "module",

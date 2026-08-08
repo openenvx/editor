@@ -30,6 +30,7 @@ export const Color = definePanel('Color');
 export const Font = definePanel('Font');
 export const Toggle = definePanel('Toggle');
 export const Select = definePanel('Select');
+export const Segmented = definePanel('Segmented');
 export const Align = definePanel('Align');
 export const Border = definePanel('Border');
 export const CornerRadius = definePanel('CornerRadius');

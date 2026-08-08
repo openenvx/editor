@@ -59,7 +59,12 @@ function validateFieldKindProps(
   ) {
     return `${type}: bind must be under plugin.${externalPanelId}.*`;
   }
-  if (kind === 'select' || kind === 'font' || kind === 'align') {
+  if (
+    kind === 'select' ||
+    kind === 'segmented' ||
+    kind === 'font' ||
+    kind === 'align'
+  ) {
     if (props.options !== undefined && !Array.isArray(props.options)) {
       return `${type}: options must be an array`;
     }

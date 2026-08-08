@@ -50,6 +50,10 @@ export interface HtmlPreviewChromeService {
 export const HtmlPreviewChromeServiceId =
   createServiceId<HtmlPreviewChromeService>('htmlPreviewChrome');
 
+export interface HtmlPreviewChromeServiceOptions {
+  initialPreset?: HtmlDevicePreset;
+}
+
 export class HtmlPreviewChromeServiceImpl implements HtmlPreviewChromeService {
   private readonly changeEmitter = new Emitter<void>();
   readonly onDidChange: Event<void> = this.changeEmitter.event;
@@ -57,11 +61,19 @@ export class HtmlPreviewChromeServiceImpl implements HtmlPreviewChromeService {
   private active = false;
   private seededPreset = false;
   private contextKeys: ContextKeyService | null = null;
-  private state: HtmlPreviewChromeState = {
-    fitZoom: 1,
-    preset: DEFAULT_HTML_DEVICE_PRESET,
-    zoomFactor: 1,
-  };
+  private state: HtmlPreviewChromeState;
+
+  constructor(options?: HtmlPreviewChromeServiceOptions) {
+    const preset = options?.initialPreset ?? DEFAULT_HTML_DEVICE_PRESET;
+    this.state = {
+      fitZoom: 1,
+      preset,
+      zoomFactor: 1,
+    };
+    if (options?.initialPreset) {
+      this.seededPreset = true;
+    }
+  }
 
   getState(): HtmlPreviewChromeState {
     return this.state;

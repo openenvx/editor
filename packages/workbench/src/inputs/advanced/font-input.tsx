@@ -1,5 +1,5 @@
 import { FontCombobox } from '../../primitives/font-combobox';
-import type { SelectOption } from '../basic/select-input';
+import type { SelectOption } from '../../primitives/select';
 
 export interface FontInputProps {
   id: string;

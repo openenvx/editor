@@ -100,48 +100,43 @@
 }
 
 /*
- * No layout box — children participate in the parent formatting context.
- * Required for email.column (`<td>`): a real wrapper between `<tr>` and `<td>`
- * breaks the table. Selection menu is omitted for contents chrome only in that
- * case (no box to anchor); do not use contents chrome to “fix spacing”.
+ * Contents chrome mounts on the block root (e.g. email `<td>`) — no wrapper
+ * element (invalid `<div>` inside `<tr>`). Selection menu is omitted for
+ * contents chrome only in that case (no box to anchor).
  */
 .blockWrapContents {
-  display: contents;
+  position: relative;
 }
 
-/*
- * Contents chrome has no box — paint chrome on the first child instead
- * (generic `> *`, not email-specific tags).
- */
-.blockWrapContents.blockWrapSelected > *,
-.blockWrapContents.blockWrapHovered > * {
+.blockWrapContents.blockWrapSelected,
+.blockWrapContents.blockWrapHovered {
   outline: var(--block-chrome-outline-width) solid var(--wb-selection, #3b82f6);
   outline-offset: calc(-1 * var(--block-chrome-outline-width));
 }
 
-.blockWrapContents.blockWrapHovered:not(.blockWrapSelected) > * {
+.blockWrapContents.blockWrapHovered:not(.blockWrapSelected) {
   outline-color: var(--wb-selection-muted, rgb(59 130 246 / 50%));
 }
 
-.blockWrapContents.blockWrapDraggable > * {
+.blockWrapContents.blockWrapDraggable {
   cursor: grab;
   touch-action: none;
 }
 
-.blockWrapContents.blockWrapDraggingGhost > * {
+.blockWrapContents.blockWrapDraggingGhost {
   opacity: 0.4;
   pointer-events: none;
 }
 
-.blockWrapContents.blockWrapDropContainer > * {
+.blockWrapContents.blockWrapDropContainer {
   outline: 2px dashed #3b82f6;
   outline-offset: -2px;
 }
 
-.blockWrapContents.blockWrapInsertLineBefore > *,
-.blockWrapContents.blockWrapInsertLineAfter > *,
-.blockWrapContents.blockWrapInsertLineBeforeVertical > *,
-.blockWrapContents.blockWrapInsertLineAfterVertical > * {
+.blockWrapContents.blockWrapInsertLineBefore,
+.blockWrapContents.blockWrapInsertLineAfter,
+.blockWrapContents.blockWrapInsertLineBeforeVertical,
+.blockWrapContents.blockWrapInsertLineAfterVertical {
   position: relative;
 }
 
@@ -161,10 +156,10 @@
 .blockWrapInsertLineAfter::after,
 .blockWrapInsertLineBeforeVertical::before,
 .blockWrapInsertLineAfterVertical::after,
-.blockWrapContents.blockWrapInsertLineBefore > *::before,
-.blockWrapContents.blockWrapInsertLineAfter > *::after,
-.blockWrapContents.blockWrapInsertLineBeforeVertical > *::before,
-.blockWrapContents.blockWrapInsertLineAfterVertical > *::after {
+.blockWrapContents.blockWrapInsertLineBefore::before,
+.blockWrapContents.blockWrapInsertLineAfter::after,
+.blockWrapContents.blockWrapInsertLineBeforeVertical::before,
+.blockWrapContents.blockWrapInsertLineAfterVertical::after {
   content: '';
   position: absolute;
   z-index: 4;
@@ -174,7 +169,7 @@
 }
 
 .blockWrapInsertLineBefore::before,
-.blockWrapContents.blockWrapInsertLineBefore > *::before {
+.blockWrapContents.blockWrapInsertLineBefore::before {
   left: 0;
   right: 0;
   top: -2px;
@@ -182,7 +177,7 @@
 }
 
 .blockWrapInsertLineAfter::after,
-.blockWrapContents.blockWrapInsertLineAfter > *::after {
+.blockWrapContents.blockWrapInsertLineAfter::after {
   left: 0;
   right: 0;
   bottom: -2px;
@@ -190,7 +185,7 @@
 }
 
 .blockWrapInsertLineBeforeVertical::before,
-.blockWrapContents.blockWrapInsertLineBeforeVertical > *::before {
+.blockWrapContents.blockWrapInsertLineBeforeVertical::before {
   top: 0;
   bottom: 0;
   left: -2px;
@@ -198,7 +193,7 @@
 }
 
 .blockWrapInsertLineAfterVertical::after,
-.blockWrapContents.blockWrapInsertLineAfterVertical > *::after {
+.blockWrapContents.blockWrapInsertLineAfterVertical::after {
   top: 0;
   bottom: 0;
   right: -2px;

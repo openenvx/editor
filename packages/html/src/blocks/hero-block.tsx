@@ -19,7 +19,7 @@ export const heroBlock: BlockConfig = {
   treeIcon: 'image',
   fields: {
     variant: {
-      kind: 'select',
+      kind: 'segmented',
       label: 'Variant',
       options: [
         { label: 'Centered', value: 'centered' },

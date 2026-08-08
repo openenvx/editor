@@ -13,6 +13,7 @@ Package boundaries and contribution flow for the monorepo.
 | [Overview](docs/architecture/overview.md) | Mental model, client tiers, how pieces connect |
 | [Runtime & core](docs/architecture/runtime-and-core.md) | `EditorRuntime`, `PluginManager`, scene, commands, DI |
 | [Workbench & headless](docs/architecture/workbench-and-headless.md) | Controller, UI contributions, layout, property panes |
+| [Property fields](docs/architecture/property-fields.md) | Inspector field descriptors, kinds, `chrome` |
 | [Canvas](docs/architecture/canvas.md) | Engine vs chrome, `CanvasBasicsPlugin` vs canvas-pro |
 | [HTML](docs/architecture/html.md) | Block editor, slots, `HtmlBlocksPlugin` |
 | [HTML editor surfaces](docs/architecture/html-editor-surfaces.md) | Stage / artboard / page-root naming + click selection |

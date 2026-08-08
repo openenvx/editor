@@ -403,7 +403,7 @@ Non-modal floating host chrome for sandbox `showUI` (Figma-shaped plugin window)
 
 ### PropertyPopover
 
-Popup shell for per-side/per-corner/per-shadow controls:
+Popup shell for per-side/per-corner/per-shadow controls. Popovers anchor on the property panel edge facing the editor (right-docked Inspector: open left; left-docked primary sidebar: open right).
 
 - Width: 256px, clamped to viewport
 - Radius: `--wb-radius-md`
@@ -435,30 +435,9 @@ Map to shadcn/designer `DesignerPane` + `Action*` pattern conceptually. Each pan
 
 ### Field kinds (author once, reuse everywhere)
 
-Property form controls are **descriptor → registered renderer**, not ad-hoc JSX in plugins. Author properties with `PropertyBuilder` (canvas) or HTML `FieldDef` → `createHtmlLayerDefinition` (maps onto the same builders). Prefer these kinds over inventing new inputs:
+Property form controls are **descriptor → registered renderer**, not ad-hoc JSX in plugins. **API reference** (kinds, `chrome`, `PropertyFieldDescriptor`, paths): [docs/architecture/property-fields.md](../../docs/architecture/property-fields.md). This file covers **visual** treatment only (density, radii, slot-list row surfaces).
 
-| Kind | Control | Use for |
-| --- | --- | --- |
-| `text` | Compact text input | Short strings, URLs without media chrome |
-| `number` | Scrub / NumericInput | Dimensions, gaps, sizes |
-| `select` | Select | Discrete enums (H1–H4, fit mode) |
-| `toggle` | Switch (pill) | Optional visibility, flags |
-| `checkbox` | Checkbox (square) | Multi-select flags, list row booleans |
-| `color` | Color swatch + popover | Fill, overlay, text color |
-| `image` | Image input (+ optional upload) | Backgrounds, media refs — **not** a plain text URL field |
-| `richText` | TipTap-backed rich text | Body / heading content |
-| `align` | Icon segmented control | left / center / right |
-| `font` | Font combobox | Canvas typography |
-| `repeater` | Full-width list of plain object rows | Simple multi-value data |
-| `slotList` | Full-width list of **part layers** | Composite HTML slots (CTAs); sub-fields are the part type’s own kinds |
-| `border` / `cornerRadius` / `padding` / `shadow` | Scrub + popup | Canvas style chrome |
-
-Rules:
-
-- **Do not** hand-roll property rows with outline “Add/Remove” buttons and stacked labels — use `PropertyFieldRow` / `PropertyFieldBlock` + registered kinds.
-- Fields with `chrome: false` (`repeater`, `slotList`) render as a **block** (label above, full width), not a cramped 56px label row.
 - Slot list rows: muted surface + inset ring (`--wb-muted` / `--wb-shadow-control`), header + ghost `IconButton` (trash / plus) — same grammar as layer-tree trailing actions.
-- HTML `BlockConfig.fields` should pick the kind from this table; composites generate slot inspector sections from each part type’s fields (re-keyed under `slots.<name>…`).
 
 ### Layout pane
 

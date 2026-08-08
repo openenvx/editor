@@ -1,6 +1,6 @@
 {
   "name": "@xmazu/openenvxee-studio",
-  "version": "0.7.7",
+  "version": "0.7.15",
   "description": "OpenEnvx Studio — curated host surface with workbench, canvas, and canvas-pro bundled for product apps",
   "license": "UNLICENSED",
   "type": "module",

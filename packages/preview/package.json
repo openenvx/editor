@@ -1,6 +1,6 @@
 {
   "name": "@xmazu/openenvxee-preview",
-  "version": "0.7.7",
+  "version": "0.7.15",
   "description": "Layer preview descriptor DSL / Render IR for OpenEnvx",
   "license": "MIT",
   "type": "module",

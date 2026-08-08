@@ -5,7 +5,11 @@ import {
   ThemeServiceId,
 } from '@openenvx/core';
 import type { Plugin } from '@openenvx/core';
-import { ShellUiServiceId, TOOLBAR_PLACEMENTS } from '@openenvx/headless';
+import {
+  ShellUiServiceId,
+  shouldMountSecondarySidebar,
+  TOOLBAR_PLACEMENTS,
+} from '@openenvx/headless';
 import type {
   PropertyHostContext,
   PropertyPathContextOptions,
@@ -268,6 +272,14 @@ const LayoutRegion = memo(
     'showEditorArea' | 'renderEditorPane' | 'createPropertyHostContext'
   >) => {
     const layout = useWorkbenchContextSelector((state) => state.layout);
+    const viewContainers = useWorkbenchContextSelector(
+      (state) => state.viewContainers
+    );
+    const showSecondarySidebar = useMemo(
+      () => shouldMountSecondarySidebar(layout, viewContainers),
+      [layout, viewContainers]
+    );
+
     if (!layout) {
       return null;
     }
@@ -281,9 +293,11 @@ const LayoutRegion = memo(
           />
         }
         secondarySidebar={
-          <SecondarySidebarRenderer
-            createPropertyHostContext={createPropertyHostContext}
-          />
+          showSecondarySidebar ? (
+            <SecondarySidebarRenderer
+              createPropertyHostContext={createPropertyHostContext}
+            />
+          ) : undefined
         }
         primarySidebar={
           <SidebarRegion

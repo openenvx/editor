@@ -159,7 +159,7 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
         .number('lineHeight', 'Line spacing', { numeric: scrubLineHeight })
         .number('letterSpacing', 'Letter spacing', { numeric: scrubPx })
         .number('curve', 'Curve', { numeric: scrubCurve })
-        .select(
+        .segmented(
           'autoFit',
           [
             { label: 'None', value: 'none' },

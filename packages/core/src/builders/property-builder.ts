@@ -15,6 +15,7 @@ export type PropertyFieldKind =
   | 'toggle'
   | 'checkbox'
   | 'select'
+  | 'segmented'
   | 'font'
   | 'color'
   | 'richText'
@@ -44,11 +45,25 @@ export interface SlotListFieldConfig {
 
 export type { PropertyFieldOption } from './field-config';
 
+/**
+ * Declarative inspector/sidebar field consumed by workbench field renderers.
+ *
+ * Author via `PropertyBuilder`, `createPropertyPane().row()`, or HTML `FieldDef` mapping.
+ * @see docs/architecture/property-fields.md
+ */
 export interface PropertyFieldDescriptor {
+  /** Stable key; default binding is `layer.data[key]` unless the pane row supplies a `PropertyPath`. */
   key: string;
+  /** Registered renderer id (`text`, `select`, `color`, …). */
   kind: PropertyFieldKind;
+  /** Label shown in the property row or block header. */
   label: string;
   icon?: string;
+  /**
+   * Inspector row layout and inner `FieldChrome` wrapper — not editor toolbar chrome.
+   * `false`: `PropertyFieldBlock` (label above, full width); skips `FieldChrome` for actions/popups.
+   * Omitted/`true`: `PropertyFieldRow` (layout depends on `kind`, e.g. `select` is inline).
+   */
   chrome?: boolean;
   /** Debounce property commits (ms). Useful for expensive preview regenerations. */
   debounceMs?: number;
@@ -58,15 +73,20 @@ export interface PropertyFieldDescriptor {
   placeholder?: string;
   /** Max character length for text-like controls. */
   maxLength?: number;
+  /** Choices for `select` / `segmented` / `align`. */
   options?: PropertyFieldOption[];
+  /** Sub-fields for each row when `kind: 'repeater'`. */
   repeaterFields?: RepeaterFieldConfig[];
+  /** Template + fields when `kind: 'slotList'` (HTML composite slots). */
   slotList?: SlotListFieldConfig;
+  /** Command id invoked by the `image` field upload affordance. */
   uploadCommandId?: string;
   numeric?: NumericFieldConfig;
   popup?: PopupFieldConfig;
   actions?: FieldAction[];
 }
 
+/** Group of fields in a layer `properties()` section (canvas/HTML layer definitions). */
 export interface PropertySectionDescriptor {
   id: string;
   label?: string;
@@ -75,7 +95,24 @@ export interface PropertySectionDescriptor {
 
 interface FieldHost {
   pushField(field: PropertyFieldDescriptor): void;
-  getLastField(): PropertyFieldDescriptor | null;
+}
+
+function pushOptionsField(
+  host: FieldHost,
+  kind: 'select' | 'segmented',
+  key: string,
+  options: { value: string; label: string }[],
+  label: string | undefined,
+  applyConfig: (config?: FieldConfigOptions) => void,
+  config?: FieldConfigOptions
+): void {
+  host.pushField({
+    key,
+    kind,
+    label: label ?? key,
+    options,
+  });
+  applyConfig(config);
 }
 
 export class PropertyBuilder implements FieldHost {
@@ -118,13 +155,33 @@ export class PropertyBuilder implements FieldHost {
     label?: string,
     config?: FieldConfigOptions
   ): this {
-    this.pushField({
+    pushOptionsField(
+      this,
+      'select',
       key,
-      kind: 'select',
-      label: label ?? key,
       options,
-    });
-    this.applyConfigToLast(config);
+      label,
+      (c) => this.applyConfigToLast(c),
+      config
+    );
+    return this;
+  }
+
+  segmented(
+    key: string,
+    options: { value: string; label: string }[],
+    label?: string,
+    config?: FieldConfigOptions
+  ): this {
+    pushOptionsField(
+      this,
+      'segmented',
+      key,
+      options,
+      label,
+      (c) => this.applyConfigToLast(c),
+      config
+    );
     return this;
   }
 
@@ -317,6 +374,14 @@ class PropertySectionBuilder {
     private readonly section: PropertySectionDescriptor
   ) {}
 
+  private optionsFieldHost(): FieldHost {
+    return {
+      pushField: (field) => {
+        this.pushField(field);
+      },
+    };
+  }
+
   text(key: string, label?: string, config?: FieldConfigOptions): this {
     this.pushField({ key, kind: 'text', label: label ?? key });
     this.applyConfigToLast(config);
@@ -347,13 +412,33 @@ class PropertySectionBuilder {
     label?: string,
     config?: FieldConfigOptions
   ): this {
-    this.pushField({
+    pushOptionsField(
+      this.optionsFieldHost(),
+      'select',
       key,
-      kind: 'select',
-      label: label ?? key,
       options,
-    });
-    this.applyConfigToLast(config);
+      label,
+      (c) => this.applyConfigToLast(c),
+      config
+    );
+    return this;
+  }
+
+  segmented(
+    key: string,
+    options: { value: string; label: string }[],
+    label?: string,
+    config?: FieldConfigOptions
+  ): this {
+    pushOptionsField(
+      this.optionsFieldHost(),
+      'segmented',
+      key,
+      options,
+      label,
+      (c) => this.applyConfigToLast(c),
+      config
+    );
     return this;
   }
 

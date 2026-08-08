@@ -50,6 +50,10 @@ function appendField(
       section.select(key, field.options, field.label);
       break;
     }
+    case 'segmented': {
+      section.segmented(key, field.options, field.label);
+      break;
+    }
     case 'color': {
       section.color(key, field.label);
       break;
@@ -89,6 +93,14 @@ function fieldDefToRepeaterField(
     return {
       key,
       kind: 'select',
+      label: field.label,
+      options: field.options,
+    };
+  }
+  if (field.kind === 'segmented') {
+    return {
+      key,
+      kind: 'segmented',
       label: field.label,
       options: field.options,
     };

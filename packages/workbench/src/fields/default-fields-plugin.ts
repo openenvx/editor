@@ -18,6 +18,7 @@ import {
 } from './advanced/spatial-field';
 import { CheckboxFieldRenderer } from './basic/checkbox-field';
 import { NumberFieldRenderer } from './basic/number-field';
+import { SegmentedFieldRenderer } from './basic/segmented-field';
 import { SelectFieldRenderer } from './basic/select-field';
 import { TextFieldRenderer } from './basic/text-field';
 import { ToggleFieldRenderer } from './basic/toggle-field';
@@ -35,6 +36,7 @@ const DEFAULT_FIELD_RENDERERS: { kind: string; Component: unknown }[] = [
   { kind: 'repeater', Component: RepeaterFieldRenderer },
   { kind: 'richText', Component: RichTextFieldRenderer },
   { kind: 'select', Component: SelectFieldRenderer },
+  { kind: 'segmented', Component: SegmentedFieldRenderer },
   { kind: 'shadow', Component: ShadowFieldRenderer },
   { kind: 'slotList', Component: SlotListFieldRenderer },
   { kind: 'text', Component: TextFieldRenderer },

@@ -29,6 +29,7 @@ import {
 import type { BlockRegistry } from '../block-registry';
 import { getBlockChildren } from '../tree/block-tree';
 import { BlockChrome } from './block-chrome';
+import { useBlockChromeHostProps } from './block-chrome-host-context';
 import {
   childrenUseInlineChrome,
   insertLineIsVertical,
@@ -44,6 +45,7 @@ import {
   type BlockEditTarget,
   type BlockImageTarget,
 } from './block-editor-context';
+import { childListInsertChrome, dropZoneClassName } from './child-list-chrome';
 import { HtmlRichTextEditorLazy } from './lazy-rich-text-editor';
 import {
   primaryImageFieldKey,
@@ -52,6 +54,7 @@ import {
 import { parseRichTextAlign, type RichTextAlign } from './rich-text-align';
 import { resolveRichTextToolbar } from './rich-text-toolbar';
 import { buildSlotNodes } from './slot-part-content';
+import { useTableRowChildListDropTarget } from './table-row-drop-target';
 
 import styles from './html-editor-pane.module.css';
 
@@ -84,16 +87,7 @@ function DropZone({
     disabled,
   });
   return (
-    <div
-      className={[
-        styles.dropZone,
-        isOver ? styles.dropZoneActive : '',
-        empty ? styles.dropZoneEmpty : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      ref={setNodeRef}
-    >
+    <div className={dropZoneClassName(isOver, empty)} ref={setNodeRef}>
       {empty ? 'Select Blocks in the sidebar to add content' : children}
     </div>
   );
@@ -191,12 +185,11 @@ function ContainerChildren({
 }) {
   const { sortDraft } = useBlockEditor();
   const children = getBlockChildren(layer);
-  const visibleCount = children.filter(isLayerVisible).length;
-  const showInsertLine =
-    sortDraft?.parentId === layer.id &&
-    typeof sortDraft.placeholderIndex === 'number' &&
-    !sortDraft.containerPreview;
-  const empty = visibleCount === 0 && !showInsertLine;
+  const { empty, showInsertLine, visibleCount } = childListInsertChrome(
+    layer.id,
+    children,
+    sortDraft
+  );
   const parentData = layerDataRecord(layer);
   const chromeDisplayFor = (type: string) => registry.get(type)?.chromeDisplay;
   const verticalLine = insertLineIsVertical(
@@ -208,9 +201,11 @@ function ContainerChildren({
     )
   );
   const childInsideWidget = insideWidget || layer.type === WIDGET_LAYER_TYPE;
+  const childContainerHost =
+    registry.get(layer.type)?.childContainerHost ?? 'default';
 
-  return (
-    <DropZone disabled={isLayerLocked(layer)} empty={empty} parentId={layer.id}>
+  const childNodes = (
+    <>
       {visibleCount > 0 ? (
         <SortableChildren
           insideWidget={childInsideWidget}
@@ -222,23 +217,39 @@ function ContainerChildren({
         />
       ) : null}
       {showInsertLine ? <DropInsertLine vertical={verticalLine} /> : null}
+    </>
+  );
+
+  if (childContainerHost === 'table-row') {
+    return childNodes;
+  }
+
+  return (
+    <DropZone disabled={isLayerLocked(layer)} empty={empty} parentId={layer.id}>
+      {childNodes}
     </DropZone>
   );
 }
 
-function BlockContent({
+function BlockContentInner({
   layer,
   registry,
   editing,
   insideWidget,
+  tableRowDrop,
 }: {
   layer: Layer;
   registry: BlockRegistry;
   editing: boolean;
   insideWidget: boolean;
+  tableRowDrop?: {
+    className: string;
+    setNodeRef: (node: HTMLElement | null) => void;
+  };
 }) {
   const { onSelect, onStartEdit, onCommitEdit, resolveAssetUrl, scene } =
     useBlockEditor();
+  const chromeHost = useBlockChromeHostProps();
   const config = registry.get(layer.type);
   const textBlock = isRichTextBlock(registry, layer.type);
   const editable = canEditLayerData(layer);
@@ -330,7 +341,74 @@ function BlockContent({
       />
     ) : undefined,
     slots: slotNodes,
+    containerRef: tableRowDrop?.setNodeRef,
+    containerClassName: tableRowDrop?.className,
+    hostProps: chromeHost ?? undefined,
   });
+}
+
+function TableRowContainerBlockContent({
+  layer,
+  registry,
+  editing,
+  insideWidget,
+}: {
+  layer: Layer;
+  registry: BlockRegistry;
+  editing: boolean;
+  insideWidget: boolean;
+}) {
+  const { sortDraft } = useBlockEditor();
+  const blockChildren = getBlockChildren(layer);
+  const { empty } = childListInsertChrome(layer.id, blockChildren, sortDraft);
+  const tableRowDrop = useTableRowChildListDropTarget(layer.id, layer, empty);
+  return (
+    <BlockContentInner
+      editing={editing}
+      insideWidget={insideWidget}
+      layer={layer}
+      registry={registry}
+      tableRowDrop={tableRowDrop}
+    />
+  );
+}
+
+function BlockContent({
+  layer,
+  registry,
+  editing,
+  insideWidget,
+}: {
+  layer: Layer;
+  registry: BlockRegistry;
+  editing: boolean;
+  insideWidget: boolean;
+}) {
+  const config = registry.get(layer.type);
+  const acceptsChildren = config?.acceptsChildren === true;
+  const childContainerHost = config?.childContainerHost ?? 'default';
+  const tableRowChildHost =
+    acceptsChildren && childContainerHost === 'table-row';
+
+  if (tableRowChildHost) {
+    return (
+      <TableRowContainerBlockContent
+        editing={editing}
+        insideWidget={insideWidget}
+        layer={layer}
+        registry={registry}
+      />
+    );
+  }
+
+  return (
+    <BlockContentInner
+      editing={editing}
+      insideWidget={insideWidget}
+      layer={layer}
+      registry={registry}
+    />
+  );
 }
 
 function isEditingLayer(

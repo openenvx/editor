@@ -45,9 +45,17 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | [apps/docs/README.md](apps/docs/README.md) | Extension authoring hub — internal vs sandbox vs embed |
 | [apps/docs/extension-guide.md](apps/docs/extension-guide.md) | Internal OOP plugin author API |
 | [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) | Sandbox widgets/plugins + embed panels |
+| [docs/architecture/property-fields.md](docs/architecture/property-fields.md) | Inspector `PropertyFieldDescriptor`, field kinds, `chrome` |
 | [packages/canvas/README.md](packages/canvas/README.md) | Canvas install and `CanvasBasicsPlugin` |
+| [packages/workbench/Design.md](packages/workbench/Design.md) | Workbench **visual design** tokens only (not API docs) |
 
 Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before placing new code. Read **Plugin-boundaries.md** when touching embed/sandbox/external plugins. Update **FEATURES.md** when adding or removing a user-facing editor capability. When unsure, load the global **openenvx** skill (`~/.cursor/skills/openenvx`).
+
+### Documentation vs design reference
+
+- **`docs/architecture/*.md`** and package READMEs — **authoritative API and behavior** for agents and integrators. Add or update a chapter when you introduce or change a public descriptor, contribution, or host contract.
+- **[packages/workbench/Design.md](packages/workbench/Design.md)** — **editor shell look-and-feel** (colors, density, component visuals). Do **not** put API tables, prop reference, or integration guides there; link to `docs/architecture/` instead.
+- **JSDoc** — Public types in `@openenvx/core`, `@openenvx/headless`, and other libraries should document non-obvious fields on interfaces (especially contribution and descriptor props). Keep JSDoc in sync when you change the type; mirror substantive behavior in architecture docs when authors need narrative context.
 
 ## Package placement (hard rules)
 
@@ -204,4 +212,5 @@ Also verify:
 - [ ] No `I`-prefixed interface or type alias names
 - [ ] No backward-compat shims for removed APIs
 - [ ] Architecture or extension docs updated if you changed package boundaries or plugin APIs
+- [ ] Public descriptor/contribution types have JSDoc when props are non-obvious; API behavior belongs in `docs/architecture/`, not `packages/workbench/Design.md`
 - [ ] [FEATURES.md](FEATURES.md) updated if you added, removed, or materially changed a user-facing editor capability

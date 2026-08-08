@@ -85,6 +85,14 @@ export interface HtmlRichTextEditorProps {
   onCommit: (html: string, align?: RichTextAlign) => void;
 }
 
+function readEditorDom(editor: Editor): HTMLElement | null {
+  try {
+    return editor.view.dom;
+  } catch {
+    return null;
+  }
+}
+
 export function HtmlRichTextEditor({
   html,
   align,
@@ -161,6 +169,12 @@ export function HtmlRichTextEditor({
       setPlacement(placeRichTextBubble(editor, menuRef.current));
     };
 
+    const editorDom = readEditorDom(editor);
+    if (!editorDom) {
+      setPlacement(null);
+      return;
+    }
+
     updatePosition();
 
     const onScrollOrResize = () => {
@@ -172,7 +186,7 @@ export function HtmlRichTextEditor({
       typeof ResizeObserver !== 'undefined'
         ? new ResizeObserver(onScrollOrResize)
         : null;
-    ro?.observe(editor.view.dom);
+    ro?.observe(editorDom);
     const menu = menuRef.current;
     if (menu) {
       ro?.observe(menu);

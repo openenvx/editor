@@ -7,7 +7,6 @@ import {
   Heading,
   Hr,
   Img,
-  Row,
   Section,
   Text,
 } from '@react-email/components';
@@ -169,9 +168,30 @@ export const rowBlock: BlockConfig = {
   fields: {},
   defaultData: { children: [] },
   acceptsChildren: true,
+  childContainerHost: 'table-row',
   insertLineAxis: 'vertical',
   treeIcon: 'layout',
-  render: ({ children }) => <Row>{children}</Row>,
+  render: ({ children, containerRef, containerClassName }) => (
+    <table
+      align="center"
+      border={0}
+      cellPadding={0}
+      cellSpacing={0}
+      role="presentation"
+      width="100%"
+      style={{ width: '100%' }}
+    >
+      <tbody style={{ width: '100%' }}>
+        <tr
+          ref={containerRef}
+          className={containerClassName}
+          style={{ width: '100%' }}
+        >
+          {children}
+        </tr>
+      </tbody>
+    </table>
+  ),
 };
 
 /** React-Email `<Column>` — table cell inside a Row. */
@@ -183,7 +203,7 @@ export const columnBlock: BlockConfig = {
   fields: {
     width: { kind: 'text', label: 'Width' },
     align: {
-      kind: 'select',
+      kind: 'segmented',
       label: 'Align',
       options: [
         { label: 'Left', value: 'left' },
@@ -192,7 +212,7 @@ export const columnBlock: BlockConfig = {
       ],
     },
     verticalAlign: {
-      kind: 'select',
+      kind: 'segmented',
       label: 'Vertical align',
       options: [
         { label: 'Top', value: 'top' },
@@ -213,14 +233,23 @@ export const columnBlock: BlockConfig = {
   },
   acceptsChildren: true,
   treeIcon: 'layout',
-  render: ({ data, children }) => {
+  render: ({ data, children, hostProps }) => {
     const paddingX = num(data.paddingX, 0);
     const paddingY = num(data.paddingY, 0);
     const width = String(data.width ?? '').trim();
     const verticalAlign = String(data.verticalAlign ?? 'top');
     const align = String(data.align ?? 'left') as 'left' | 'center' | 'right';
+    const {
+      ref: hostRef,
+      className: hostClassName,
+      style: hostStyle,
+      ...hostEvents
+    } = hostProps ?? {};
     return (
       <Column
+        {...hostEvents}
+        className={hostClassName}
+        ref={hostRef}
         align={align}
         style={{
           width: width || undefined,
@@ -229,6 +258,7 @@ export const columnBlock: BlockConfig = {
           paddingRight: paddingX,
           paddingTop: paddingY,
           paddingBottom: paddingY,
+          ...hostStyle,
         }}
       >
         {children}
@@ -243,7 +273,7 @@ export const headingBlock: BlockConfig = {
   fields: {
     html: { kind: 'richText', label: 'Text' },
     level: {
-      kind: 'select',
+      kind: 'segmented',
       label: 'Level',
       options: [
         { label: 'H1', value: '1' },

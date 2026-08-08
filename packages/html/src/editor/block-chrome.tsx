@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { BlockChromeHostProvider } from './block-chrome-host-context';
 import { useBlockEditor } from './block-editor-context';
 import { BlockSelectionMenu } from './block-selection-menu';
 import { emitOpenEnvxHtmlWidgetClick } from './html-widget-click-handler';
@@ -220,7 +221,14 @@ export function BlockChrome({
     [handleReplaceFile, replaceEnabled]
   );
 
-  // display:contents has no box — dnd-kit must measure the first child (e.g. td).
+  // Contents chrome attaches to the block root (`<td>`) — no wrapper element.
+  const bindHostRef = useCallback(
+    (node: HTMLElement | null) => {
+      setNodeRef?.(node);
+    },
+    [setNodeRef]
+  );
+
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const bindSortableRef = useCallback(
     (node: HTMLElement | null) => {
@@ -228,18 +236,9 @@ export function BlockChrome({
       if (!setNodeRef) {
         return;
       }
-      if (!node) {
-        setNodeRef(null);
-        return;
-      }
-      if (chromeDisplay === 'contents') {
-        const child = node.firstElementChild;
-        setNodeRef(child instanceof HTMLElement ? child : node);
-        return;
-      }
       setNodeRef(node);
     },
-    [chromeDisplay, setNodeRef]
+    [setNodeRef]
   );
 
   const lineClass = insertLineVertical
@@ -252,43 +251,54 @@ export function BlockChrome({
         after: styles.blockWrapInsertLineAfter,
       };
 
+  const wrapClassName = [
+    styles.blockWrap,
+    chromeDisplay === 'inline' ? styles.blockWrapInline : '',
+    chromeDisplay === 'contents' ? styles.blockWrapContents : '',
+    selected ? styles.blockWrapSelected : '',
+    hovered ? styles.blockWrapHovered : '',
+    dragDisabled ? '' : styles.blockWrapDraggable,
+    isDraggingGhost ? styles.blockWrapDraggingGhost : '',
+    dropContainerPreview ? styles.blockWrapDropContainer : '',
+    imageDropActive ? styles.blockWrapImageDrop : '',
+    insertLineBefore ? lineClass.before : '',
+    insertLineAfter ? lineClass.after : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const wrapProps = {
+    className: wrapClassName,
+    'data-layer-id': layer.id,
+    role: 'treeitem' as const,
+    tabIndex: selected ? 0 : -1,
+    onClick: handleClick,
+    onContextMenu: handleContextMenu,
+    onDragLeave: replaceEnabled ? handleDragLeave : undefined,
+    onDragOver: replaceEnabled ? handleDragOver : undefined,
+    onDrop: replaceEnabled ? handleDrop : undefined,
+    onKeyDown: handleKeyDown,
+    onPointerEnter: handlePointerEnter,
+    onPointerLeave: handlePointerLeave,
+    ...sortableProps,
+  };
+
+  if (chromeDisplay === 'contents') {
+    return (
+      <BlockChromeHostProvider
+        value={{
+          ...wrapProps,
+          ref: bindHostRef,
+        }}
+      >
+        {children}
+      </BlockChromeHostProvider>
+    );
+  }
+
   return (
-    <div
-      className={[
-        styles.blockWrap,
-        chromeDisplay === 'inline' ? styles.blockWrapInline : '',
-        chromeDisplay === 'contents' ? styles.blockWrapContents : '',
-        selected ? styles.blockWrapSelected : '',
-        hovered ? styles.blockWrapHovered : '',
-        dragDisabled ? '' : styles.blockWrapDraggable,
-        isDraggingGhost ? styles.blockWrapDraggingGhost : '',
-        dropContainerPreview ? styles.blockWrapDropContainer : '',
-        imageDropActive ? styles.blockWrapImageDrop : '',
-        insertLineBefore ? lineClass.before : '',
-        insertLineAfter ? lineClass.after : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      data-layer-id={layer.id}
-      ref={bindSortableRef}
-      role="treeitem"
-      tabIndex={selected ? 0 : -1}
-      onClick={handleClick}
-      onContextMenu={handleContextMenu}
-      onDragLeave={replaceEnabled ? handleDragLeave : undefined}
-      onDragOver={replaceEnabled ? handleDragOver : undefined}
-      onDrop={replaceEnabled ? handleDrop : undefined}
-      onKeyDown={handleKeyDown}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-      {...sortableProps}
-    >
-      {selected &&
-      !editing &&
-      !isDraggingGhost &&
-      // contents chrome has no box — menu only skipped for structural cases
-      // (e.g. email.column). Never use contents just to dodge layout chrome.
-      chromeDisplay !== 'contents' ? (
+    <div {...wrapProps} ref={bindSortableRef}>
+      {selected && !editing && !isDraggingGhost ? (
         <BlockSelectionMenu
           anchor={menuAnchor}
           canDrag={!dragDisabled}

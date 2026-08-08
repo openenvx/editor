@@ -1,9 +1,12 @@
+/** Numeric scrub/input options for `kind: 'number'` and popup sub-fields. */
 export interface NumericFieldConfig {
+  /** Enable drag-to-scrub on the numeric control. */
   scrub?: boolean;
   min?: number;
   max?: number;
   step?: number;
   precision?: number;
+  /** Suffix shown after the value (e.g. `px`, `°`). */
   unit?: string;
 }
 
@@ -18,6 +21,7 @@ interface PopupSubFieldDescriptor {
   actions?: FieldAction[];
 }
 
+/** Nested fields shown inside a field-level popup (e.g. per-corner radius). */
 export interface PopupFieldConfig {
   icon: string;
   title?: string;
@@ -29,17 +33,27 @@ export type FieldActionClick =
   | { type: 'toggle'; key: string }
   | { type: 'command'; commandId: string };
 
+/** Trailing icon action on a property field (clear, link, run command). */
 export interface FieldAction {
   icon: string;
   label: string;
   onClick: FieldActionClick;
 }
 
+/**
+ * Optional config passed to `PropertyBuilder.*` methods (third/fourth argument).
+ * Applied to the field descriptor via {@link applyFieldConfig}.
+ */
 export interface FieldConfigOptions {
   numeric?: NumericFieldConfig;
   popup?: PopupFieldConfig;
   actions?: FieldAction[];
   icon?: string;
+  /**
+   * Inspector row layout and inner `FieldChrome` wrapper — not editor toolbar chrome.
+   * `false`: full-width block (label above) and no action/popup wrapper.
+   * @see docs/architecture/property-fields.md
+   */
   chrome?: boolean;
   /** Debounce property commits (ms). Useful for expensive preview regenerations. */
   debounceMs?: number;
@@ -147,6 +161,7 @@ export function normalizePadding(
   return { ...DEFAULT_PADDING, ...value };
 }
 
+/** One option in a `select` or `align` field. */
 export interface PropertyFieldOption {
   value: string;
   label: string;

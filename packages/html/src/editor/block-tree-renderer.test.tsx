@@ -433,7 +433,7 @@ describe('BlockTreeRenderer', () => {
       chromeDisplay: 'contents',
       fields: {},
       defaultData: {},
-      render: ({ children }) => <td>{children}</td>,
+      render: ({ children, hostProps }) => <td {...hostProps}>{children}</td>,
     });
     registry.register({
       type: 'html.rowLike',
@@ -500,10 +500,9 @@ describe('BlockTreeRenderer', () => {
       </DndContext>
     );
     const cellWrap = container.querySelector('[data-layer-id="cell-1"]');
+    expect(cellWrap?.tagName).toBe('TD');
     expect(cellWrap?.className).toContain('blockWrapContents');
     expect(cellWrap?.className).toContain('blockWrapSelected');
-    const cell = cellWrap?.querySelector(':scope > td');
-    expect(cell).toBeTruthy();
     // Selection menu is omitted — contents has no box to anchor.
     expect(
       cellWrap?.querySelector('[aria-label="Cell actions"]')

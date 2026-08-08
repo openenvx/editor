@@ -159,6 +159,10 @@ export {
   DEFAULT_WORKBENCH_LAYOUT,
   type WorkbenchLayout,
 } from './workbench/workbench-layout';
+export {
+  secondaryPanelContainers,
+  shouldMountSecondarySidebar,
+} from './workbench/secondary-sidebar-layout';
 export type {
   WorkbenchLayoutSnapshot,
   WorkbenchLayoutStore,

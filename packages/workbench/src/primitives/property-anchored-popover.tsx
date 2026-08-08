@@ -62,7 +62,16 @@ export function PropertyAnchoredPopover({
         />
       ) : null}
       {displayAnchor ? (
-        <PopoverContent placement={placement} title={title} variant="property">
+        <PopoverContent
+          avoidCollisions={false}
+          placement={{
+            ...placement,
+            align: 'start',
+            side: displayAnchor.side,
+          }}
+          title={title}
+          variant="property"
+        >
           {children}
         </PopoverContent>
       ) : null}

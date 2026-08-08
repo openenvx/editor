@@ -49,9 +49,17 @@ describe('createHtmlLayerDefinition', () => {
       configWithFields('html.flex', {
         gap: { kind: 'number', label: 'Gap' },
         direction: {
-          kind: 'select',
+          kind: 'segmented',
           label: 'Direction',
           options: [{ label: 'Row', value: 'row' }],
+        },
+        layout: {
+          kind: 'segmented',
+          label: 'Layout',
+          options: [
+            { label: 'A', value: 'a' },
+            { label: 'B', value: 'b' },
+          ],
         },
         html: { kind: 'richText', label: 'HTML' },
         name: { kind: 'text', label: 'Name' },
@@ -69,6 +77,7 @@ describe('createHtmlLayerDefinition', () => {
     expect(sections[0]!.fields.map((f) => f.key)).toEqual([
       'gap',
       'direction',
+      'layout',
       'html',
       'name',
       'tint',
@@ -78,7 +87,8 @@ describe('createHtmlLayerDefinition', () => {
     ]);
     expect(sections[0]!.fields.map((f) => f.kind)).toEqual([
       'number',
-      'select',
+      'segmented',
+      'segmented',
       'richText',
       'text',
       'color',

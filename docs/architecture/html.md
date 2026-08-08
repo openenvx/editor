@@ -15,6 +15,7 @@ Puck-style block editor for pages with `page.layout === 'html'`. Same core/headl
 - Nesting via `data.children`; composites via `data.slots`
 - `HtmlEditorPane` registered for `page.layout === 'html'` (preview surface; props via shared inspector; slot parts editable inline + via generated inspector fields)
 - Device/zoom chrome via `HtmlToolbarContribution` → workbench `EditorChrome` (`top-center`); state in `HtmlPreviewChromeService` + `html.*` preview commands — no React toolbar in this package. Hosts should use `DEFAULT_HTML_LAYOUT` (`editorToolbars: true`) or set the flag themselves.
+- Hosts trim chrome via context keys `html.hideFluidPreset` and `html.hideZoomControls`, or pass options to `registerHtmlPreviewChrome(ctx, { initialPreset?, hideFluidPreset?, hideZoomControls? })` (e.g. product studios that only need mobile + desktop at fit-width). Options from every plugin activation are **merged** before the first registration; context keys apply on every call even when preview commands are already registered.
 - Commands: `html.insertBlock`, `html.moveBlock`, `html.updateBlockData`, `html.removeBlock`, plus `html.setDevicePreset` / `html.zoom*`
 - `HtmlBlocksPlugin` — `LayerDefinition`s, commands, editor pane, primary activity-sidebar **Blocks** panel (`html.blocks`)
 - Built-in composites: `html.hero` (slots: headline / body / actions), `html.button`
@@ -29,6 +30,16 @@ Puck-style block editor for pages with `page.layout === 'html'`. Same core/headl
 | Composite parts | `data.slots.<name>[]` | No — atomic parent in the tree |
 
 Inspector fields for slot parts use paths like `slots.headline.0.data.html`.
+
+## Block chrome (`chromeDisplay`, `childContainerHost`)
+
+| `chromeDisplay` | Editor behavior |
+| --- | --- |
+| `block` (default) | Full-width wrapper around the block for selection outline and DnD |
+| `inline` | Hug content for horizontal siblings (e.g. icon links) |
+| `contents` | No wrapper div — chrome props (`hostProps`) mount on the block's rendered root (e.g. email `email.column` → `<td>`). CSS is `position: relative` on that host, **not** CSS `display: contents` (invalid inside tables). |
+
+`childContainerHost: 'table-row'` (email `email.row`) mounts the child-list drop target on the row's `<tr>` so columns remain valid `<td>` children.
 
 ## Product host
 

@@ -80,6 +80,8 @@ flowchart LR
 3. Controller merges plugin panes + synthesized layer panes into inspector views (`content.kind: 'properties'`).
 4. Shell renders via `ViewPane` + `PropertyContentRenderer` (shell-internal — hosts must not import these).
 
+Field descriptors, kinds, and `chrome`: [property-fields.md](property-fields.md).
+
 **Naming:** **Inspector** = default secondary container (`workbench.inspector`) hosting canvas/HTML layer property views. Generic form content is a `properties` view + `PropertyPane` / `PropertyPath` in any container.
 
 `PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas-pro transform panes) merged into the Inspector — not for embed/dashboard product hosts. Product hosts use `ViewContribution.buildProperties()`.
@@ -111,5 +113,6 @@ Most product apps skip this and use `WorkbenchShell` from studio / html-studio.
 
 ## Related
 
-- Visual shell design notes: [packages/workbench/Design.md](../../packages/workbench/Design.md)
+- Visual shell design notes (tokens only): [packages/workbench/Design.md](../../packages/workbench/Design.md)
+- Property field API: [property-fields.md](property-fields.md)
 - Extension trust: [Plugin-boundaries.md](../../Plugin-boundaries.md)

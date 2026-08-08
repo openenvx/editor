@@ -5,6 +5,15 @@ import { HTML_ZOOM_MAX, HTML_ZOOM_MIN } from '../editor/html-device-preview';
 import { HtmlPreviewChromeServiceImpl } from './html-preview-chrome-service';
 
 describe('HtmlPreviewChromeService', () => {
+  it('starts on initialPreset when passed to constructor', () => {
+    const chrome = new HtmlPreviewChromeServiceImpl({
+      initialPreset: 'desktop',
+    });
+    expect(chrome.getState().preset).toBe('desktop');
+    chrome.seedPreset('mobile');
+    expect(chrome.getState().preset).toBe('desktop');
+  });
+
   it('seedPreset applies once and ignores remount reseeds', () => {
     const chrome = new HtmlPreviewChromeServiceImpl();
     chrome.seedPreset('desktop');

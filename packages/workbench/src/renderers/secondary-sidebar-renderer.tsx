@@ -4,6 +4,10 @@ import {
   horizontalListSortingStrategy,
   useSortable,
 } from '@dnd-kit/sortable';
+import {
+  secondaryPanelContainers,
+  shouldMountSecondarySidebar,
+} from '@openenvx/headless';
 import { memo, useMemo } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
@@ -69,12 +73,7 @@ export const SecondarySidebarRenderer = memo(
     );
 
     const secondaryContainers = useMemo(
-      () =>
-        (viewContainers ?? []).filter(
-          (container) =>
-            container.location === 'secondary' &&
-            container.sidebarBehavior === 'panel'
-        ),
+      () => secondaryPanelContainers(viewContainers),
       [viewContainers]
     );
     const sortableIds = useMemo(
@@ -87,7 +86,7 @@ export const SecondarySidebarRenderer = memo(
       api.setContainerOrder('secondary', orderedIds);
     });
 
-    if (!layout?.secondarySidebar || secondaryContainers.length === 0) {
+    if (!shouldMountSecondarySidebar(layout, viewContainers)) {
       return null;
     }
 

@@ -153,14 +153,13 @@ export function PopoverContent({
     : placement;
   const resolvedSide = side ?? resolvedPlacement?.side ?? 'bottom';
   const resolvedAlign = align ?? resolvedPlacement?.align ?? 'end';
-  const resolvedAvoidCollisions = isPropertyPopover ? false : avoidCollisions;
 
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
         {...themeScope}
         align={resolvedAlign}
-        avoidCollisions={resolvedAvoidCollisions}
+        avoidCollisions={avoidCollisions}
         className={cn(
           styles.panel,
           overlaySurface.surface,
