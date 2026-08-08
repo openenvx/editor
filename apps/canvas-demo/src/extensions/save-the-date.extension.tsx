@@ -1,6 +1,6 @@
+import { defineExtension, renderPanelTree } from '@xmazu/openenvxee-extensions';
 /** @jsxImportSource preact */
-import { Toolbar, ToolbarCommand } from '@openenvx/elements/panel';
-import { defineExtension, renderPanelTree } from '@openenvx/widget-sdk';
+import { Toolbar, ToolbarCommand } from '@xmazu/openenvxee-extensions/panel';
 
 import { saveTheDateWidget } from './save-the-date.widget';
 

@@ -10,7 +10,7 @@ import {
 import type {
   ExtensionManifest,
   ExtensionWidgetContribution,
-} from '@xmazu/openenvxee-protocol';
+} from '@xmazu/openenvxee-extensions/protocol';
 import {
   createDefaultTransform,
   type Layer,

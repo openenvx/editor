@@ -1,9 +1,12 @@
 import { sanitizeHtml } from '@openenvx/core';
-import type { RenderChild, RenderNode } from '@xmazu/openenvxee-protocol';
+import type {
+  RenderChild,
+  RenderNode,
+} from '@xmazu/openenvxee-extensions/protocol';
 import {
   validateWidgetTree,
   WIDGET_BLOCK_ESCAPE_TYPES,
-} from '@xmazu/openenvxee-protocol';
+} from '@xmazu/openenvxee-extensions/protocol';
 import type { Layer } from '@xmazu/openenvxee-schema';
 
 export interface MapWidgetHtmlTreeOptions {

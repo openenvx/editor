@@ -34,7 +34,7 @@ const WORKSPACE_ENTRIES: Record<string, string> = {
   '@openenvx/workbench': 'workbench/src/index.ts',
   '@xmazu/openenvxee-schema': 'schema/src/index.ts',
   '@xmazu/openenvxee-preview': 'preview/src/index.ts',
-  '@xmazu/openenvxee-protocol': 'protocol/src/index.ts',
+  '@xmazu/openenvxee-extensions/protocol': 'extensions/src/protocol/index.ts',
 };
 
 function isExternalId(id: string): boolean {

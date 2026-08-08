@@ -57,9 +57,10 @@
         "!src/**/*.test.ts"
       ]
     },
-    "packages/protocol": {
+    "packages/extensions": {
       "entry": [
-        "src/index.ts!"
+        "src/index.ts!",
+        "src/protocol/index.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
@@ -189,7 +190,7 @@
         "@openenvx/headless",
         "@openenvx/workbench",
         "@xmazu/openenvxee-preview",
-        "@xmazu/openenvxee-protocol",
+        "@xmazu/openenvxee-extensions",
         "@xmazu/openenvxee-schema"
       ]
     },

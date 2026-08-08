@@ -2,7 +2,6 @@ export { WorkbenchController } from './workbench-controller';
 export { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
 export type { WorkbenchServiceDeps } from './bootstrap-workbench-services';
 export type { SandboxHostSurface } from './external-host/sandbox-host-surface';
-export type { EmbedPanelHostSurface } from './external-host/embed-panel-host-surface';
 export {
   type WorkbenchApi,
   type WorkbenchControllerOptions,

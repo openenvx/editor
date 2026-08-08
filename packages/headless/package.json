@@ -19,7 +19,7 @@
     "@openenvx/core": "workspace:*",
     "@xmazu/openenvxee-preview": "workspace:*",
     "@xmazu/openenvxee-schema": "workspace:*",
-    "@xmazu/openenvxee-protocol": "workspace:*"
+    "@xmazu/openenvxee-extensions": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18"

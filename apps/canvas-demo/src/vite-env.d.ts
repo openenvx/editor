@@ -1,3 +1,3 @@
 /// <reference types="vite/client" />
-/// <reference types="@openenvx/widget-sdk/vite/client" />
-/// <reference types="@openenvx/widget-sdk/openenvx" />
+/// <reference types="@xmazu/openenvxee-extensions/vite/client" />
+/// <reference types="@xmazu/openenvxee-extensions/openenvx" />

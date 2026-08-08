@@ -13,8 +13,8 @@ import type {
   ExtensionManifest,
   RenderNode,
   SandboxExtensionGrant,
-} from '@xmazu/openenvxee-protocol';
-import { validatePluginTree } from '@xmazu/openenvxee-protocol';
+} from '@xmazu/openenvxee-extensions/protocol';
+import { validatePluginTree } from '@xmazu/openenvxee-extensions/protocol';
 import type { Layer, Scene } from '@xmazu/openenvxee-schema';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';

@@ -64,7 +64,7 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
 | `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchPlugin`, workbench contributions (`ToolbarContribution`, `PropertyPaneContribution`, …), provider registries (`registerFieldRenderer`, …), `PropertyPaneBuilder`, `WorkbenchProvider`, `useWorkbenchContext` |
 | `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasBasicsPlugin`, `CanvasEditor`, `CanvasHostProvider` |
-| `@xmazu/openenvxee-protocol` | Wire contract: `RenderNode`, `ExtensionManifest`, validators, sandbox grants, unified messages |
+| `@xmazu/openenvxee-extensions` | Sandbox author SDK: `./protocol`, element subpaths, `defineExtension`, Vite (`@xmazu/openenvxee-extensions/protocol` for hosts) |
 
 ### Canvas rule (non-negotiable)
 
@@ -84,9 +84,7 @@ Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `workbenc
 Published packages:
 
 - **`@xmazu/openenvxee-schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/elements`** — Preact element vocabulary (`/canvas`, `/html`, `/panel`). Published.
-- **`@openenvx/widget-sdk`** — widget authoring (`defineExtension`, `define*Component`, `renderToElementTree`, Vite packaging, ambient `openenvx`). Published; isolates share this with integrators.
-- **`@xmazu/openenvxee-protocol`** — wire contract (`RenderNode`, `ExtensionManifest`, validators, sandbox grants, message unions). Ships `dist/`; `exports` → `dist/` (`bun`/`import`/`default`). See [PUBLISHING.md](PUBLISHING.md).
+- **`@xmazu/openenvxee-extensions`** — published sandbox author SDK (merged protocol + elements + widget-sdk): `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts import **`@xmazu/openenvxee-extensions/protocol`** only.
 - **`@openenvx/canvas-studio`** — private curated canvas host surface (`WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, sandbox/embed, theme CSS). Workspace TypeScript via `workspace:*` — monorepo hosts use this (not bundled).
 - **`@openenvx/html-studio`** — private curated HTML host surface (`DEFAULT_HTML_STUDIO_PLUGINS`, theme CSS). Monorepo hosts use this; external hosts use `@xmazu/openenvxee-html-studio`.
 - **`@xmazu/openenvxee-studio`** — published fat canvas bundle. Re-exports `@openenvx/canvas-studio` and inlines `@openenvx/workbench`, `@openenvx/canvas`, `@openenvx/canvas-pro`, and their `@openenvx/*` deps into `dist/`. Public surface matches canvas-studio’s allowlist — not a barrel re-export of core/headless/canvas. Plugin authoring uses private `@openenvx/core` + `@openenvx/headless` in-monorepo. Top-level `exports` → `dist/` only (no `development` → `src`). Publish to GitHub Packages (`npm.pkg.github.com`, restricted); `latest` has no sourcemaps, `debug` tag ships maps. Does **not** inline html — HTML hosts use `@xmazu/openenvxee-html-studio`. PNG/JPG/PDF/SVG export is server-side via openenvx-cloud `apps/export-service`.
@@ -194,7 +192,7 @@ bun run changeset     # create a release changeset
 
 ## Publishing
 
-Only `packages/schema` (`@xmazu/openenvxee-schema`), `packages/preview` (`@xmazu/openenvxee-preview`), `packages/elements` (`@openenvx/elements`), `packages/widget-sdk` (`@openenvx/widget-sdk`), `packages/protocol` (`@xmazu/openenvxee-protocol`), `packages/studio` (`@xmazu/openenvxee-studio`), and `packages/openenvxee-html-studio` (`@xmazu/openenvxee-html-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)). Export Worker lives in openenvx-cloud.
+Only `packages/schema` (`@xmazu/openenvxee-schema`), `packages/preview` (`@xmazu/openenvxee-preview`), `packages/extensions` (`@xmazu/openenvxee-extensions`), `packages/studio` (`@xmazu/openenvxee-studio`), and `packages/openenvxee-html-studio` (`@xmazu/openenvxee-html-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)). Export Worker lives in openenvx-cloud.
 
 ## Before you finish
 

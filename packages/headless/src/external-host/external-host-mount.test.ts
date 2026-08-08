@@ -52,25 +52,17 @@ function createMount() {
 
 describe('ExternalHostMount', () => {
   it('unregisters surface registrations when the mount is disposed', () => {
-    const { mount, commands, viewPanelRegistry, icons } = createMount();
+    const { mount, commands } = createMount();
 
     mount.mountSandbox((surface) => {
       surface.registerCommand(new TestCommand('sandbox.run.demo'));
     });
-    mount.mountEmbedPanel((surface) => {
-      surface.registerViewPanel('embed.panel.demo', { kind: 'panel' });
-      surface.registerIcon('embed.icon.demo', { glyph: true });
-    });
 
     expect(commands.has('sandbox.run.demo')).toBe(true);
-    expect(viewPanelRegistry.has('embed.panel.demo')).toBe(true);
-    expect(icons.has('embed.icon.demo')).toBe(true);
 
     mount.dispose();
 
     expect(commands.has('sandbox.run.demo')).toBe(false);
-    expect(viewPanelRegistry.has('embed.panel.demo')).toBe(false);
-    expect(icons.has('embed.icon.demo')).toBe(false);
   });
 
   it('allows remount after dispose without duplicating registrations', () => {

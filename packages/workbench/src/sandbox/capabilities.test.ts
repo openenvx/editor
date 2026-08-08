@@ -6,7 +6,7 @@ import {
   freezeGrant,
   normalizeCapabilities,
 } from './capabilities';
-import type { SandboxExtensionGrant } from '@xmazu/openenvxee-protocol';
+import type { SandboxExtensionGrant } from '@xmazu/openenvxee-extensions/protocol';
 
 const grant: SandboxExtensionGrant = {
   id: 'demo',

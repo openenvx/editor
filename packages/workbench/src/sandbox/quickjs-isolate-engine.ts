@@ -2,7 +2,7 @@ import {
   SANDBOX_BRIDGE_SOURCE,
   type SandboxBridgeRequest,
   type SandboxBridgeResponse,
-} from '@xmazu/openenvxee-protocol';
+} from '@xmazu/openenvxee-extensions/protocol';
 
 import { sandboxBootstrapSource } from './sandbox-bootstrap-source';
 import {

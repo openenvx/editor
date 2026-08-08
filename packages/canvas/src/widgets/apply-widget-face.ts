@@ -1,5 +1,5 @@
-import type { RenderNode } from '@xmazu/openenvxee-protocol';
-import { validateWidgetTree } from '@xmazu/openenvxee-protocol';
+import type { RenderNode } from '@xmazu/openenvxee-extensions/protocol';
+import { validateWidgetTree } from '@xmazu/openenvxee-extensions/protocol';
 import {
   createDefaultTransform,
   type Layer,

@@ -16,13 +16,12 @@ This chapter answers: **what each package owns**, **what hosts/plugins should im
 | Headless vs workbench shell | [workbench-and-headless.md](workbench-and-headless.md) |
 | Canvas / HTML / email engines | [canvas.md](canvas.md) · [html.md](html.md) · [driver-email.md](driver-email.md) |
 | What product hosts import | [studio-and-products.md](studio-and-products.md) |
-| Trust (embed / sandbox) | [extensions.md](extensions.md) · [Plugin-boundaries.md](../../Plugin-boundaries.md) |
-| How to author an extension | [apps/docs/README.md](../../apps/docs/README.md) (pick path) |
+| How to author an extension | [extensions.md](extensions.md) · [extensions-sandbox-guide.md](extensions-sandbox-guide.md) |
 
 ## Dependency direction (do not invert)
 
 ```text
-schema / preview / protocol
+schema / preview / extensions (protocol subpath)
         │
         ▼
       core
@@ -52,10 +51,9 @@ Hard rules:
 | Canvas product host (dashboard, embed) | `@xmazu/openenvxee-studio` (published) or `@openenvx/canvas-studio` (monorepo) |
 | HTML product host | `@xmazu/openenvxee-html-studio` (published) or `@openenvx/html-studio` (monorepo) |
 | Custom shell / playground | `@openenvx/core` + `@openenvx/headless` (+ canvas or html) |
-| In-repo **internal** plugin author | `core` + `headless` contributions; canvas APIs from `@openenvx/canvas` — [extension-guide.md](../../apps/docs/extension-guide.md) |
-| **Sandbox** widget / plugin author | `@openenvx/widget-sdk` + `@openenvx/elements` — [sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md) |
-| Embed parent author | protocol (+ elements `/panel` + widget-sdk `renderPanelTree`) — [sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md#embed-panels) |
-| Scene / export / LLM schemas | `@xmazu/openenvxee-schema` (+ preview / protocol as needed) |
+| In-repo **internal** plugin author | `core` + `headless` — [extensions-host-guide.md](extensions-host-guide.md) |
+| **Sandbox** widget / plugin author | `@xmazu/openenvxee-extensions` — [extensions-sandbox-guide.md](extensions-sandbox-guide.md) |
+| Scene / export / LLM schemas | `@xmazu/openenvxee-schema` (+ preview; protocol types via `@xmazu/openenvxee-extensions/protocol`) |
 
 ## Package catalog
 
@@ -63,15 +61,13 @@ Hard rules:
 | --- | --- | --- | --- |
 | `@xmazu/openenvxee-schema` | yes | Scene Zod model, normalize/validate, template helpers | `.`, `./scene.schema.json` |
 | `@xmazu/openenvxee-preview` | yes | Layer preview descriptors, Render IR types | `.` |
-| `@xmazu/openenvxee-protocol` | yes | `RenderNode`, manifests, validators, sandbox grants/messages | `.` |
-| `@openenvx/elements` | yes | Preact element vocabulary (`/canvas` `/html` `/panel`) | `.`, `./canvas`, `./html`, `./panel`, jsx runtimes |
-| `@openenvx/widget-sdk` | yes | `defineExtension` / `define*Component`, props, `renderToElementTree`, Vite packaging, ambient `openenvx` | `.`, `./vite`, `./openenvx` |
+| `@xmazu/openenvxee-extensions` | yes | Author SDK: `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite | `.`, `./protocol`, `./canvas`, `./html`, `./panel`, `./vite`, `./openenvx`, jsx runtimes |
 | `@openenvx/core` | private | `EditorRuntime`, `PluginManager`, commands, layers, DI, scene store | `.` |
 | `@openenvx/headless` | private | `WorkbenchController`, UI contribution descriptors, property host, `ExternalHostMount` | `.`, `./react` |
 | `@openenvx/canvas` | private | Konva engine, layers, `CanvasBasicsPlugin`, `CanvasEditor` | `.` (+ export/registry subpaths) |
 | `@openenvx/html` | private | HTML blocks, `HtmlBlocksPlugin`, `HtmlEditorPane`, `renderBlockDocument` | `.`, `./runtime` |
 | `@openenvx/driver-email` | private | Email blocks (React-Email), `EmailBlocksPlugin`, `renderEmailDocument` | `.` |
-| `@openenvx/workbench` | private | `WorkbenchShell`, field renderers, sandbox/embed hosts | `.`, `./theme.css` |
+| `@openenvx/workbench` | private | `WorkbenchShell`, field renderers, sandbox host | `.`, `./theme.css` |
 | `@openenvx/canvas-pro` | private | Canvas-only chrome (zoom, transform panes, floating toolbar) | `.` |
 | `@openenvx/agent` | private | Agent chat sidebar plugin | `.`, `./schemas` |
 | `@openenvx/canvas-studio` | private | Curated canvas host API (workspace TS, not bundled) | `.`, `./theme.css`, `./fonts.css` |
@@ -91,11 +87,7 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@xmazu/openenvxee-preview`** — `LayerPreviewBuilder`; Render IR document/node types; IR guards; `RENDER_IR_VERSION`.
 
-**`@xmazu/openenvxee-protocol`** — `RenderNode` / manifest types; `WidgetFaceRenderResult` / `WidgetRegistryEntry`; `validateRenderTree` / `validatePluginTree` / `validateWidgetTree` / `validateExtensionManifest`; sandbox grants + host/parent message unions.
-
-**`@openenvx/elements`** — Preact canvas/HTML/panel intrinsics only.
-
-**`@openenvx/widget-sdk`** — `defineExtension`, `defineCanvasComponent` / `defineHtmlComponent`, `renderToElementTree`, `renderPanelTree`, `buildGrantFromManifest`; Vite `bundleWidgetSources` via `./vite`; isolate ambient via `./openenvx`.
+**`@xmazu/openenvxee-extensions`** — `./protocol`: `RenderNode`, manifests, validators, sandbox grants. `.`: `defineExtension`, `define*Component`, `renderToElementTree`, `renderPanelTree`, `buildGrantFromManifest`. Subpaths: `./canvas` / `./html` / `./panel`, `./vite`, `./openenvx`.
 
 ### Editor backbone (private; not re-exported by studio)
 
@@ -115,7 +107,7 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 ### Shell (private; selective re-export via studio)
 
-**`@openenvx/workbench`** — `WorkbenchShell`, default chrome/fields/inspector plugins, theme/i18n, `SandboxExtensionHost` / `EmbedPanelHost`, layout helpers.
+**`@openenvx/workbench`** — `WorkbenchShell`, default chrome/fields/inspector plugins, theme/i18n, `SandboxExtensionHost`, layout helpers.
 
 Studio re-exports a **fixed allowlist** of workbench symbols (shell + hosts + default plugins) — not the entire workbench barrel. See [`packages/studio/src/index.ts`](../../packages/studio/src/index.ts).
 

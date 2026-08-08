@@ -1,5 +1,8 @@
-import type { RenderChild, RenderNode } from '@xmazu/openenvxee-protocol';
-import { WIDGET_LAYER_ESCAPE_TYPES } from '@xmazu/openenvxee-protocol';
+import type {
+  RenderChild,
+  RenderNode,
+} from '@xmazu/openenvxee-extensions/protocol';
+import { WIDGET_LAYER_ESCAPE_TYPES } from '@xmazu/openenvxee-extensions/protocol';
 import {
   createDefaultTransform,
   type Layer,

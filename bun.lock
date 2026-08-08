@@ -50,9 +50,8 @@
         "@openenvx/canvas": "workspace:*",
         "@openenvx/canvas-studio": "workspace:*",
         "@openenvx/core": "workspace:*",
-        "@openenvx/elements": "workspace:*",
         "@openenvx/headless": "workspace:*",
-        "@openenvx/widget-sdk": "workspace:*",
+        "@xmazu/openenvxee-extensions": "workspace:*",
         "@xmazu/openenvxee-preview": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
         "preact": "^10.26.5",
@@ -117,9 +116,8 @@
       "name": "@openenvxee/html-demo",
       "version": "0.0.0",
       "dependencies": {
-        "@openenvx/elements": "workspace:*",
         "@openenvx/html-studio": "workspace:*",
-        "@openenvx/widget-sdk": "workspace:*",
+        "@xmazu/openenvxee-extensions": "workspace:*",
         "preact": "^10.26.5",
         "react": "19.2.7",
         "react-dom": "19.2.7",
@@ -170,8 +168,8 @@
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
+        "@xmazu/openenvxee-extensions": "workspace:*",
         "@xmazu/openenvxee-preview": "workspace:*",
-        "@xmazu/openenvxee-protocol": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
         "konva": "^10.3.0",
         "lucide-react": "1.24.0",
@@ -285,27 +283,39 @@
         "react-dom": ">=18",
       },
     },
-    "packages/elements": {
-      "name": "@openenvx/elements",
+    "packages/extensions": {
+      "name": "@xmazu/openenvxee-extensions",
       "version": "0.1.0",
+      "bin": {
+        "openenvx-manifest": "./src/cli/openenvx-manifest.ts",
+      },
       "dependencies": {
-        "@xmazu/openenvxee-protocol": "workspace:*",
         "preact": "^10.26.5",
       },
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
+        "esbuild": "^0.25.0",
         "tsup": "catalog:dev",
         "typescript": "catalog:dev",
+        "vite": "8.1.3",
         "vitest": "catalog:testing",
       },
+      "peerDependencies": {
+        "esbuild": "^0.25.0",
+        "vite": ">=5",
+      },
+      "optionalPeers": [
+        "esbuild",
+        "vite",
+      ],
     },
     "packages/headless": {
       "name": "@openenvx/headless",
       "version": "0.1.11",
       "dependencies": {
         "@openenvx/core": "workspace:*",
+        "@xmazu/openenvxee-extensions": "workspace:*",
         "@xmazu/openenvxee-preview": "workspace:*",
-        "@xmazu/openenvxee-protocol": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
       },
       "devDependencies": {
@@ -335,8 +345,8 @@
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
+        "@xmazu/openenvxee-extensions": "workspace:*",
         "@xmazu/openenvxee-preview": "workspace:*",
-        "@xmazu/openenvxee-protocol": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
         "lucide-react": "1.24.0",
       },
@@ -382,7 +392,7 @@
     },
     "packages/openenvxee-html-studio": {
       "name": "@xmazu/openenvxee-html-studio",
-      "version": "0.7.16",
+      "version": "0.7.15",
       "dependencies": {
         "@dnd-kit/core": "6.3.1",
         "@dnd-kit/sortable": "8.0.0",
@@ -421,8 +431,8 @@
         "@rollup/plugin-node-resolve": "^16.0.1",
         "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
+        "@xmazu/openenvxee-extensions": "workspace:*",
         "@xmazu/openenvxee-preview": "workspace:*",
-        "@xmazu/openenvxee-protocol": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
         "esbuild": "^0.25.0",
         "react": "19.2.7",
@@ -444,16 +454,6 @@
         "@xmazu/openenvxee-schema": "workspace:*",
         "uqr": "^0.1.3",
       },
-      "devDependencies": {
-        "@openenvx/typescript-config": "workspace:*",
-        "tsup": "catalog:dev",
-        "typescript": "catalog:dev",
-        "vitest": "catalog:testing",
-      },
-    },
-    "packages/protocol": {
-      "name": "@xmazu/openenvxee-protocol",
-      "version": "0.7.15",
       "devDependencies": {
         "@openenvx/typescript-config": "workspace:*",
         "tsup": "catalog:dev",
@@ -535,34 +535,6 @@
         "tsup": "catalog:dev",
       },
     },
-    "packages/widget-sdk": {
-      "name": "@openenvx/widget-sdk",
-      "version": "0.1.0",
-      "bin": {
-        "openenvx-manifest": "./src/cli/openenvx-manifest.ts",
-      },
-      "dependencies": {
-        "@openenvx/elements": "workspace:*",
-        "@xmazu/openenvxee-protocol": "workspace:*",
-        "preact": "^10.26.5",
-      },
-      "devDependencies": {
-        "@openenvx/typescript-config": "workspace:*",
-        "esbuild": "^0.25.0",
-        "tsup": "catalog:dev",
-        "typescript": "catalog:dev",
-        "vite": "8.1.3",
-        "vitest": "catalog:testing",
-      },
-      "peerDependencies": {
-        "esbuild": "^0.25.0",
-        "vite": ">=5",
-      },
-      "optionalPeers": [
-        "esbuild",
-        "vite",
-      ],
-    },
     "packages/workbench": {
       "name": "@openenvx/workbench",
       "version": "0.1.4",
@@ -580,7 +552,7 @@
         "@radix-ui/react-tabs": "1.1.17",
         "@radix-ui/react-tooltip": "1.2.12",
         "@tanstack/react-virtual": "^3.13.12",
-        "@xmazu/openenvxee-protocol": "workspace:*",
+        "@xmazu/openenvxee-extensions": "workspace:*",
         "@xmazu/openenvxee-schema": "workspace:*",
         "clsx": "2.1.1",
         "cmdk": "1.1.1",
@@ -998,8 +970,6 @@
 
     "@openenvx/driver-email": ["@openenvx/driver-email@workspace:packages/driver-email"],
 
-    "@openenvx/elements": ["@openenvx/elements@workspace:packages/elements"],
-
     "@openenvx/headless": ["@openenvx/headless@workspace:packages/headless"],
 
     "@openenvx/html": ["@openenvx/html@workspace:packages/html"],
@@ -1007,8 +977,6 @@
     "@openenvx/html-studio": ["@openenvx/html-studio@workspace:packages/html-studio"],
 
     "@openenvx/typescript-config": ["@openenvx/typescript-config@workspace:packages/typescript-config"],
-
-    "@openenvx/widget-sdk": ["@openenvx/widget-sdk@workspace:packages/widget-sdk"],
 
     "@openenvx/workbench": ["@openenvx/workbench@workspace:packages/workbench"],
 
@@ -1674,11 +1642,11 @@
 
     "@workflow/serde": ["@workflow/serde@4.1.0", "", {}, "sha512-pav4F2BoirECWR7Nf1TKt+2eETcBj7jj4cBefQ8VXQCA6NPkaKeLfj/zMgi+3zYV5ZIBT4GuUiphsj0/b9hPQQ=="],
 
+    "@xmazu/openenvxee-extensions": ["@xmazu/openenvxee-extensions@workspace:packages/extensions"],
+
     "@xmazu/openenvxee-html-studio": ["@xmazu/openenvxee-html-studio@workspace:packages/openenvxee-html-studio"],
 
     "@xmazu/openenvxee-preview": ["@xmazu/openenvxee-preview@workspace:packages/preview"],
-
-    "@xmazu/openenvxee-protocol": ["@xmazu/openenvxee-protocol@workspace:packages/protocol"],
 
     "@xmazu/openenvxee-schema": ["@xmazu/openenvxee-schema@workspace:packages/schema"],
 

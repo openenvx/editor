@@ -22,7 +22,7 @@
     "@dnd-kit/utilities": "3.2.2",
     "@openenvx/core": "workspace:*",
     "@openenvx/headless": "workspace:*",
-    "@xmazu/openenvxee-protocol": "workspace:*",
+    "@xmazu/openenvxee-extensions": "workspace:*",
     "@xmazu/openenvxee-schema": "workspace:*",
     "@radix-ui/react-dialog": "1.1.19",
     "@radix-ui/react-dropdown-menu": "2.1.20",

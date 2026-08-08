@@ -146,18 +146,6 @@ export {
 } from './version-history/restore-version-command';
 
 export {
-  EmbedPanelHost,
-  mountEmbedPanel,
-  type EmbedPanelHostOptions,
-} from './plugin-panel/embed-panel-host';
-export {
-  PluginPanel,
-  type PluginPanelProps,
-} from './plugin-panel/plugin-panel';
-export type { PluginPanelTransport } from './plugin-panel/plugin-panel-transport';
-export { createPostMessagePluginPanelTransport } from './plugin-panel/create-post-message-plugin-panel-transport';
-export type { PostMessagePluginPanelTransportOptions } from './plugin-panel/create-post-message-plugin-panel-transport';
-export {
   validatePluginTree,
   validateRenderTree,
   MAX_PLUGIN_TREE_NODES,
@@ -166,7 +154,7 @@ export {
   MAX_RENDER_TREE_JSON_CHARS,
   type PluginTreeValidationResult,
   type RenderTreeValidationResult,
-} from '@xmazu/openenvxee-protocol';
+} from '@xmazu/openenvxee-extensions/protocol';
 
 export {
   SandboxExtensionHost,

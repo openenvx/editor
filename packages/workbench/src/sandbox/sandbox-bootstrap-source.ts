@@ -1,4 +1,4 @@
-import { SANDBOX_BRIDGE_SOURCE } from '@xmazu/openenvxee-protocol';
+import { SANDBOX_BRIDGE_SOURCE } from '@xmazu/openenvxee-extensions/protocol';
 
 /** Isolate bootstrap: `openenvx` host bridge + rate-limited `console` shim. */
 export function sandboxBootstrapSource(): string {

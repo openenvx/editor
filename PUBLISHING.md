@@ -1,6 +1,6 @@
 # Publishing
 
-> **Scope rename (breaking for consumers):** published packages moved from `@openenvx/{schema,preview,protocol,studio}` back to `@xmazu/openenvxee-{schema,preview,protocol,studio}` (elements + widget-sdk stay `@openenvx/`*). **Do not publish from an agent** — the owner publishes. Update **openenvx-cloud** (and any embed hosts) to the new names in the same release window; until then those repos will fail to resolve.
+> **Scope rename:** legacy `@xmazu/openenvxee-protocol`, `@openenvx/elements`, and `@openenvx/widget-sdk` are merged into **`@xmazu/openenvxee-extensions`**. **Do not publish from an agent** — the owner publishes.
 
 Packages that leave this monorepo:
 
@@ -8,9 +8,7 @@ Packages that leave this monorepo:
 | --- | --- | --- |
 | `@xmazu/openenvxee-schema` | GitHub npm (`npm.pkg.github.com`) | Built `dist/` + `scene.schema.json` |
 | `@xmazu/openenvxee-preview` | GitHub npm | Built `dist/` — preview descriptors + Render IR |
-| `@openenvx/elements` | `registry.openenvx.com` (public) | Preact element vocabulary (`/canvas` `/html` `/panel`) |
-| `@openenvx/widget-sdk` | `registry.openenvx.com` (public) | Authoring SDK (`define*`, `renderToElementTree`, Vite packaging) |
-| `@xmazu/openenvxee-protocol` | `registry.openenvx.com` (public) | `RenderNode`, manifests, validators, sandbox grants |
+| `@xmazu/openenvxee-extensions` | GitHub npm (`npm.pkg.github.com`, restricted) | Author SDK: `./protocol`, element subpaths, `defineExtension`, Vite |
 | `@xmazu/openenvxee-studio` | GitHub npm (`npm.pkg.github.com`, restricted) | Bundled `dist/` — curated canvas host API (no sourcemaps on `latest`) |
 | `@xmazu/openenvxee-html-studio` | GitHub npm (`npm.pkg.github.com`, restricted) | Per-module `dist/` ESM tree — curated HTML host API + `./runtime` |
 
@@ -56,31 +54,27 @@ bun add @xmazu/openenvxee-preview
 # local: bun run link:preview then bun link @xmazu/openenvxee-preview
 ```
 
-## `@openenvx/elements`
+## `@xmazu/openenvxee-extensions`
 
-Preact element vocabulary only (`/canvas`, `/html`, `/panel`). Same export matrix as schema. Publish to `registry.openenvx.com`.
+Merged sandbox **author** package (replaces `@xmazu/openenvxee-protocol`, `@openenvx/elements`, `@openenvx/widget-sdk`).
 
-```bash
-bun add @openenvx/elements
-```
-
-## `@openenvx/widget-sdk`
-
-Authoring SDK (`defineExtension`, `define*Component`, `renderToElementTree`, `buildGrantFromManifest`, Vite `bundleWidgetSources`). Same export matrix as schema. Publish to `registry.openenvx.com`.
-
-```bash
-bun add @openenvx/widget-sdk
-```
-
-Backend round-trip: call `renderToElementTree()` in Node to emit `RenderNode` JSON for the templates API, then map with host applicators.
-
-## `@xmazu/openenvxee-protocol`
-
-Wire contract (`RenderNode`, `ExtensionManifest`, validators, sandbox grants). Same export matrix as schema. Publish to `registry.openenvx.com`.
+| Subpath | Use |
+| --- | --- |
+| `.` | `defineExtension`, `define*Component`, `renderToElementTree`, `buildGrantFromManifest` |
+| `./protocol` | Hosts: `RenderNode`, manifests, validators, sandbox grants (no Preact) |
+| `./canvas` / `./html` / `./panel` | Preact element vocabulary |
+| `./vite` | `bundleWidgetSources()` for isolates |
+| `./openenvx` | Ambient types for QuickJS |
 
 ```bash
-bun add @xmazu/openenvxee-protocol
+bun add @xmazu/openenvxee-extensions
 ```
+
+**Registry:** GitHub Packages (`https://npm.pkg.github.com`), `access: restricted` under `@xmazu`. Same auth as schema/studio — see openenvx-cloud `.npmrc.example`.
+
+Hosts depend on the same package but import only `@xmazu/openenvxee-extensions/protocol` so Preact does not enter the editor bundle.
+
+Backend round-trip: `renderToElementTree()` in Node for templates API, then host applicators.
 
 ## `@xmazu/openenvxee-studio`
 

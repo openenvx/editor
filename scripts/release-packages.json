@@ -2,8 +2,8 @@
   "comment": "Legacy fallback — prefer release.config.json at repo root.",
   "publish": [
     {
-      "name": "@xmazu/openenvxee-protocol",
-      "dir": "packages/protocol"
+      "name": "@xmazu/openenvxee-extensions",
+      "dir": "packages/extensions"
     },
     {
       "name": "@xmazu/openenvxee-studio",
@@ -17,6 +17,6 @@
   "cloudRepo": "../openenvx-cloud",
   "cloudDeps": [
     "@xmazu/openenvxee-studio",
-    "@xmazu/openenvxee-protocol"
+    "@xmazu/openenvxee-extensions"
   ]
 }

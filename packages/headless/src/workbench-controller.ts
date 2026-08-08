@@ -268,8 +268,6 @@ export class WorkbenchController {
       registerWorkbenchContributions: (...contributions) =>
         this.registerWorkbenchContributions(...contributions),
       mountSandboxHost: (activate) => this.externalHosts.mountSandbox(activate),
-      mountEmbedPanelHost: (activate) =>
-        this.externalHosts.mountEmbedPanel(activate),
       getSnapshot: () => this.getState(),
       loadScene: (scene) => this.loadScene(scene),
       moveViewItem: (viewId, source, target, position) =>

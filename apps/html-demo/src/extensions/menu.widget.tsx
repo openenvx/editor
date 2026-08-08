@@ -1,6 +1,15 @@
+import {
+  defineHtmlComponent,
+  list,
+  string,
+} from '@xmazu/openenvxee-extensions';
 /** @jsxImportSource preact */
-import { Button, Heading, Paragraph, Section } from '@openenvx/elements/html';
-import { defineHtmlComponent, list, string } from '@openenvx/widget-sdk';
+import {
+  Button,
+  Heading,
+  Paragraph,
+  Section,
+} from '@xmazu/openenvxee-extensions/html';
 
 const defaultSections = [
   {

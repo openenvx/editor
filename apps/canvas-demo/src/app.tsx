@@ -5,11 +5,8 @@ import {
   WorkbenchShell,
   createCanvasPropertyHostContextWithApi,
   createLocalStorageWorkbenchLayoutStore,
-  createPostMessagePluginPanelTransport,
   createSandboxExtensionHost,
   DEFAULT_CANVAS_LAYOUT,
-  EmbedPanelHost,
-  mountEmbedPanel,
   mountSandboxExtensions,
 } from '@openenvx/canvas-studio';
 import type { Plugin } from '@openenvx/core';
@@ -27,7 +24,6 @@ import { createDemoVersionHistoryProvider } from './providers/demo-version-histo
 import '@openenvx/canvas-studio/fonts.css';
 import '@openenvx/canvas-studio/theme.css';
 
-const EMBED_PANEL_ID = 'embed.demo';
 const LAYOUT_STORE_KEY = 'openenvx.canvas-demo.workbench-layout';
 
 interface SandboxHot {
@@ -55,10 +51,6 @@ if (import.meta.hot) {
       }
     }
   );
-}
-
-function isEmbedMode(): boolean {
-  return new URLSearchParams(window.location.search).get('embed') === '1';
 }
 
 function createPlugins(): Plugin[] {
@@ -127,33 +119,10 @@ export function App() {
       void sandbox.pushWidgetSource('wm.seating', seatingSource);
       void sandbox.pushWidgetSource('wm.save-the-date', saveTheDateSource);
 
-      if (!isEmbedMode()) {
-        return () => {
-          if (import.meta.hot) {
-            import.meta.hot.data.sandbox = undefined;
-          }
-          disposeSandbox();
-        };
-      }
-
-      const panel = new EmbedPanelHost({
-        declaration: {
-          id: EMBED_PANEL_ID,
-          title: 'Embed',
-          allowedCommands: [],
-          contextScope: 'selection',
-        },
-        permission: 'edit',
-        transport: createPostMessagePluginPanelTransport({
-          allowedOrigins: [window.location.origin],
-        }),
-      });
-      const disposeEmbed = mountEmbedPanel(api, panel);
       return () => {
         if (import.meta.hot) {
           import.meta.hot.data.sandbox = undefined;
         }
-        disposeEmbed();
         disposeSandbox();
       };
     };
@@ -178,8 +147,7 @@ export function App() {
       />
       <style>{`
         html, body, #root { height: 100%; margin: 0; }
-        .canvas-demo-app { height: 100%; display: flex; flex-direction: column; }
-        .canvas-workbench { flex: 1; min-height: 0; }
+        .canvas-demo-app, .canvas-workbench { height: 100%; }
       `}</style>
     </div>
   );

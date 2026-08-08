@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SANDBOX_BRIDGE_SOURCE } from '@xmazu/openenvxee-protocol';
+import { SANDBOX_BRIDGE_SOURCE } from '@xmazu/openenvxee-extensions/protocol';
 
 import { createQuickJsEngine } from './quickjs-isolate-engine';
 import { createQuickJsIsolate } from './quickjs-runtime';

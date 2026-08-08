@@ -68,10 +68,10 @@ flowchart LR
 
 | Package | Role |
 | --- | --- |
-| `@openenvx/elements` | Preact vocabulary only (`/canvas` `/html` `/panel`) |
-| `@openenvx/widget-sdk` | `define*`, props, `renderToElementTree`, Vite packaging, ambient `openenvx` types |
+| `@xmazu/openenvxee-extensions` | Preact vocabulary only (`/canvas` `/html` `/panel`) |
+| `@xmazu/openenvxee-extensions` | `define*`, props, `renderToElementTree`, Vite packaging, ambient `openenvx` types |
 | `@openenvx/workbench` sandbox | Inject `openenvx.*`, capability bridge, `renderWidgetFace` |
-| `@xmazu/openenvxee-protocol` | `RenderNode`, manifests, grants |
+| `@xmazu/openenvxee-extensions/protocol` | `RenderNode`, manifests, grants |
 
 Demo apps import widgets as `openenvx-widget:./foo.widget.tsx` (IIFE **string**). The host React app never executes the widget; the isolate never sees a browser DOM.
 
@@ -128,11 +128,11 @@ flowchart TB
 
 | Subpath | Vocabulary | Maps to |
 | --- | --- | --- |
-| `@openenvx/elements/canvas` | `Stack`, `Row`, `Grid`, `Rect`, `Text`, … | canvas layers |
-| `@openenvx/elements/html` | `Section`, `Row`, `Column`, `Heading`, … | html.* blocks |
-| `@openenvx/elements/panel` | `Pane`, `Menu`, `Toolbar`, … | workbench chrome / inspector |
+| `@xmazu/openenvxee-extensions/canvas` | `Stack`, `Row`, `Grid`, `Rect`, `Text`, … | canvas layers |
+| `@xmazu/openenvxee-extensions/html` | `Section`, `Row`, `Column`, `Heading`, … | html.* blocks |
+| `@xmazu/openenvxee-extensions/panel` | `Pane`, `Menu`, `Toolbar`, … | workbench chrome / inspector |
 
-All emit the same `{ type, props, children }` envelope (`RenderNode` in `@xmazu/openenvxee-protocol`). Expand via `@openenvx/widget-sdk` (`renderToElementTree` / `renderPanelTree`). Embed parents may send plain JSON trees without Preact.
+All emit the same `{ type, props, children }` envelope (`RenderNode` in `@xmazu/openenvxee-extensions/protocol`). Expand via `@xmazu/openenvxee-extensions` (`renderToElementTree` / `renderPanelTree`). Embed parents may send plain JSON trees without Preact.
 
 ## Grants from manifest
 

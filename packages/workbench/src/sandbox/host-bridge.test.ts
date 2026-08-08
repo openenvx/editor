@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { SandboxExtensionGrant } from '@xmazu/openenvxee-protocol';
-import { SANDBOX_BRIDGE_SOURCE } from '@xmazu/openenvxee-protocol';
+import type { SandboxExtensionGrant } from '@xmazu/openenvxee-extensions/protocol';
+import { SANDBOX_BRIDGE_SOURCE } from '@xmazu/openenvxee-extensions/protocol';
 
 import { createSandboxHostBridge } from './host-bridge';
 

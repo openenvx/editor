@@ -6,7 +6,7 @@
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
-      "@xmazu/openenvxee-protocol": ["../protocol/src/index.ts"]
+      "@xmazu/openenvxee-extensions/protocol": ["../extensions/src/protocol/index.ts"]
     }
   },
   "include": ["src"],

@@ -12,7 +12,7 @@
       "@openenvx/headless/react": ["../headless/src/react/workbench-context.tsx"],
       "@xmazu/openenvxee-schema": ["../schema/src/index.ts"],
       "@xmazu/openenvxee-preview": ["../preview/src/index.ts"],
-      "@xmazu/openenvxee-protocol": ["../protocol/src/index.ts"],
+      "@xmazu/openenvxee-extensions/protocol": ["../extensions/src/protocol/index.ts"],
       "@openenvx/html": ["../html/src/index.ts"],
       "@openenvx/html/runtime": ["../html/src/runtime.ts"],
       "@openenvx/html-studio": ["../html-studio/src/index.ts"],

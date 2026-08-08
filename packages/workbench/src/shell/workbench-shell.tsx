@@ -94,7 +94,7 @@ export interface WorkbenchShellProps {
   /**
    * Mount external hosts (sandbox / embed) after start — off PluginManager.
    * Memoize the callback; shell mounts once. Call `mountSandboxExtensions` /
-   * `mountEmbedPanel` inside and return a combined disposer.
+   * `mountSandboxExtensions` inside and return a combined disposer.
    */
   mountExternalHosts?: (api: WorkbenchApi) => () => void;
 }

@@ -9,7 +9,6 @@ import type {
 
 import type { WorkbenchContributionDisposable } from '../registries/workbench-registries';
 import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
-import type { EmbedPanelHostSurface } from './embed-panel-host-surface';
 import type { SandboxHostSurface } from './sandbox-host-surface';
 
 export interface ExternalHostMountDeps {
@@ -46,15 +45,6 @@ export class ExternalHostMount {
   ): () => void {
     return this.mountHost(
       (track) => this.createSandboxHostSurface(track),
-      activate
-    );
-  }
-
-  mountEmbedPanel(
-    activate: (surface: EmbedPanelHostSurface) => void | (() => void)
-  ): () => void {
-    return this.mountHost(
-      (track) => this.createEmbedPanelHostSurface(track),
       activate
     );
   }
@@ -133,42 +123,6 @@ export class ExternalHostMount {
         );
         trackDisposable(disposable);
         return disposable;
-      },
-    };
-  }
-
-  private createEmbedPanelHostSurface(
-    trackDisposable: (disposable: WorkbenchContributionDisposable) => void
-  ): EmbedPanelHostSurface {
-    const { deps } = this;
-    const track = (
-      disposable: WorkbenchContributionDisposable
-    ): WorkbenchContributionDisposable => {
-      trackDisposable(disposable);
-      return disposable;
-    };
-    return {
-      registerWorkbench: (...contributions) =>
-        track(deps.registerWorkbenchContributions(...contributions)),
-      registerViewPanel: (componentId, component) => {
-        deps.viewPanelRegistry.register(componentId, component);
-        deps.onContributionsChanged();
-        return track({
-          dispose: () => {
-            deps.viewPanelRegistry.unregister(componentId);
-            deps.onContributionsChanged();
-          },
-        });
-      },
-      registerIcon: (id, glyph) => {
-        deps.iconRegistry.register(id, glyph);
-        deps.onContributionsChanged();
-        return track({
-          dispose: () => {
-            deps.iconRegistry.unregister(id);
-            deps.onContributionsChanged();
-          },
-        });
       },
     };
   }

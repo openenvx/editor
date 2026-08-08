@@ -1,6 +1,15 @@
+import {
+  boolean,
+  defineHtmlComponent,
+  string,
+} from '@xmazu/openenvxee-extensions';
 /** @jsxImportSource preact */
-import { Button, Heading, Paragraph, Section } from '@openenvx/elements/html';
-import { boolean, defineHtmlComponent, string } from '@openenvx/widget-sdk';
+import {
+  Button,
+  Heading,
+  Paragraph,
+  Section,
+} from '@xmazu/openenvxee-extensions/html';
 
 /** RSVP HTML block — headline, guest name, attending toggle. */
 export const rsvpWidget = defineHtmlComponent({

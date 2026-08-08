@@ -78,7 +78,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@xmazu/openenvxee-preview": "workspace:*",
-    "@xmazu/openenvxee-protocol": "workspace:*",
+    "@xmazu/openenvxee-extensions": "workspace:*",
     "@xmazu/openenvxee-schema": "workspace:*",
     "esbuild": "^0.25.0",
     "react": "19.2.7",

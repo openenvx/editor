@@ -3,7 +3,7 @@ import {
   extensionBlockStore,
   type SandboxHostSurface,
 } from '@openenvx/headless';
-import type { ExtensionManifest } from '@xmazu/openenvxee-protocol';
+import type { ExtensionManifest } from '@xmazu/openenvxee-extensions/protocol';
 import { createDefaultTransform } from '@xmazu/openenvxee-schema';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

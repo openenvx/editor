@@ -1,6 +1,6 @@
-# Extensions — internal, embed, sandbox
+# Extensions — internal vs sandbox
 
-**Audience:** Internal engineers and coding agents. Summary only — full trust model lives in [Plugin-boundaries.md](../../Plugin-boundaries.md).
+**Audience:** Engineers and integrators. Trust detail: [Plugin-boundaries.md](../../Plugin-boundaries.md).
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md) · Widget bridge: [widget-bridge.md](widget-bridge.md).
 
@@ -8,71 +8,67 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 
 **Untrusted extension code must never execute inside the Studio / editor main world.**
 
-## Three ownership trees
+## Two ownership trees
 
 | Term | Meaning | Not |
 | --- | --- | --- |
 | **Plugin** / **WorkbenchPlugin** | Trusted first-party in-process OOP on `PluginManager` | Marketplace / untrusted; external hosts |
-| **Embed panel** / `EmbedPanelHost` | Declarative `render` / `command` trees from a parent page; `mountEmbedPanel` | QuickJS / widgets; `PluginManager` |
 | **Sandbox extension** / `SandboxExtensionHost` | Untrusted QuickJS grant (Worker isolate); `mountSandboxExtensions` | Internal OOP; `PluginManager` |
 
-Sandbox grants further split:
+Sandbox grants split:
 
 |  | **Sandbox plugin** (`kind: 'plugin'`) | **Sandbox widget** (`kind: 'widget'`) |
 | --- | --- | --- |
 | Mental model | Tool you run | Object on the canvas |
-| Primary UI | Off-canvas floating `showUI` panel (iframe) | On-canvas face from elements + widget-sdk (`data.children`) |
+| Primary UI | Off-canvas floating `showUI` panel (iframe) | On-canvas face from `@xmazu/openenvxee-extensions` (`data.children`) |
 | Lifetime | User-run command; Stop closes isolate | Lives with matching layers; **one isolate per `extensionId`** |
-| Delivery | `artifactUrl` + `contentHash`, or pushed `source` | Prefer pushed `source` via parent `widget:source` (integrator bundle) |
+| Delivery | `artifactUrl` + `contentHash`, or pushed `source` | Prefer pushed `source` via parent `widget:source` |
 
-Widgets declare a face with `defineCanvasComponent` / `defineHtmlComponent` from `@openenvx/widget-sdk` (tags from `@openenvx/elements`). The host asks the isolate to expand (`renderWidgetFace`), maps the tree to ordinary layers (AutoLayout resolved on the host for canvas; HTML uses flex blocks), and stores the result under `data.children`. **Persistent state is host `data.values`** — QuickJS does not own document truth. The Inspector is derived from the persisted `manifest`. Bound elements (`bind`) commit inline edits back into `values` and re-expand. `widget.detach` unlocks the face as a normal group. Export needs no isolate because the face is in the document. Backend templates can call `renderToElementTree()` outside the editor (then map with the host applicator).
+Widgets use `defineCanvasComponent` / `defineHtmlComponent` from `@xmazu/openenvxee-extensions`. The host expands (`renderWidgetFace`), maps the tree to layers, and stores under `data.children`. **Persistent state is host `data.values`**. See [widget-bridge.md](widget-bridge.md).
 
 ## Comparison
 
-|  | Internal | Embed panel | Sandbox |
-| --- | --- | --- | --- |
-| Runs where | Same JS bundle | Other document / origin | QuickJS Worker isolate |
-| Authors with | OOP `Plugin` + builders | `@openenvx/elements/panel` → `RenderNode` | JS/TS + `@openenvx/widget-sdk` / elements or `openenvx.*` |
-| Mutation | Direct register / workbench API | `command` allowlist | Allowlisted `executeCommand` + widget `values` |
-| UI | Builders → descriptors → renderers | Tree → validate → **same** mappers → renderers | Sandboxed iframe or widget face layers |
+|  | Internal | Sandbox |
+| --- | --- | --- |
+| Runs where | Same JS bundle | QuickJS Worker isolate |
+| Authors with | OOP `Plugin` + builders (monorepo / future host façade) | `@xmazu/openenvxee-extensions` + `openenvx.*` in isolate |
+| Mutation | Direct register / workbench API | Allowlisted `executeCommand` + widget `values` |
+| UI | Builders → descriptors → renderers | Sandboxed iframe or widget face layers |
 
-## Mount path (first-party adapters only)
+## Mount path
 
 ```text
 WorkbenchShell mountExternalHosts
-  → workbench EmbedPanelHost / SandboxExtensionHost
-  → headless ExternalHostMount
-  → EmbedPanelHostSurface / SandboxHostSurface
+  → SandboxExtensionHost (workbench)
+  → headless ExternalHostMount.mountSandbox
+  → SandboxHostSurface
 ```
 
-Surfaces never expose `InstantiationService`. Isolates / parent pages never receive surfaces. Studio’s `createSandboxExtensionHost` binds canvas widget clicks without workbench importing canvas.
+Studio’s `createSandboxExtensionHost` binds canvas widget clicks without workbench importing canvas.
 
 ## Package map
 
 | Concern | Package |
 | --- | --- |
-| Element vocabulary, messages, `validatePluginTree` / `validateExtensionManifest`, grant types | `@xmazu/openenvxee-protocol` |
-| Preact vocabulary | `@openenvx/elements` |
-| Widget authoring (`defineExtension`, expand) | `@openenvx/widget-sdk` |
-| Tree → builder mappers, `ExternalHostMount`, host surfaces | `@openenvx/headless` |
-| `EmbedPanelHost`, `SandboxExtensionHost`, transport, gate, runtime | `@openenvx/workbench` |
-| Widget click seam + default plugins | `@xmazu/openenvxee-studio` |
+| Author SDK (protocol subpath, elements, defineExtension, Vite) | `@xmazu/openenvxee-extensions` |
+| Host: tree → builders, `ExternalHostMount`, sandbox surface | `@openenvx/headless` |
+| Host: QuickJS runtime, `showUI`, sandbox chrome | `@openenvx/workbench` |
+| Canvas widget seam + default plugins | `@xmazu/openenvxee-studio` / `@openenvx/canvas-studio` |
 | Internal OOP plugins | `core` / `headless` / product plugins |
+
+**Boundary:** `@xmazu/openenvxee-extensions` is author-facing only. Hosts import `@xmazu/openenvxee-extensions/protocol` for validators; rendering stays in workbench + canvas/html.
 
 ## Author guides
 
-| Path | Doc |
+| Doc | Use |
 | --- | --- |
-| Pick internal vs sandbox vs embed | [apps/docs/README.md](../../apps/docs/README.md) |
-| Internal OOP plugins | [apps/docs/extension-guide.md](../../apps/docs/extension-guide.md) |
-| Sandbox widgets / plugins + embed panels | [apps/docs/sandbox-extension-guide.md](../../apps/docs/sandbox-extension-guide.md) |
-| Trust, protocol messages, caps, marketplace | [Plugin-boundaries.md](../../Plugin-boundaries.md) |
-| Widget face pipeline | [widget-bridge.md](widget-bridge.md) |
-| Cloud product API notes | openenvx-cloud `docs/embed/plugin-api.md` (sibling repo) |
+| [extensions-sandbox-guide.md](extensions-sandbox-guide.md) | Sandbox widgets / plugins |
+| [extensions-host-guide.md](extensions-host-guide.md) | Internal OOP plugins (monorepo) |
+| [roadmap.md](roadmap.md) | Planned host React plugin API |
+| [Plugin-boundaries.md](../../Plugin-boundaries.md) | Trust, caps, marketplace |
 
 ## What not to expose to third parties
 
 - Loading external JS into Studio’s main world
-- React `registerViewPanel` / `registerFieldRenderer` / `registerEditorPane` for untrusted code (views are manifest-declared containers + validated `render` trees)
+- React `registerViewPanel` / field renderers for untrusted code without validated trees
 - Binding external trees to internal paths without a host-owned write policy
-- “Trust all origins” transports in production

@@ -1,4 +1,4 @@
-import type { PluginNode } from '@xmazu/openenvxee-protocol';
+import type { PluginNode } from '@xmazu/openenvxee-extensions/protocol';
 
 import {
   createStatusBarBuilder,

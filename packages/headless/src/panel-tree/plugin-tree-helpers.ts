@@ -2,7 +2,7 @@ import type {
   PluginChild,
   PluginNode,
   PluginPropValue,
-} from '@xmazu/openenvxee-protocol';
+} from '@xmazu/openenvxee-extensions/protocol';
 
 import type { ShellDropdownMenuItemDescriptor } from '../builders/shell-dropdown';
 
