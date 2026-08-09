@@ -105,7 +105,7 @@ export class CanvasSvgNodesPropertyPane extends PropertyPaneContribution {
       .row(
         t('canvas.inspector.svgNodes.nodes', 'Nodes'),
         {
-          chrome: false,
+          layout: 'block',
           key: 'svg',
           kind: 'svgNodes',
           label: t('canvas.inspector.svgNodes.nodes', 'Nodes'),

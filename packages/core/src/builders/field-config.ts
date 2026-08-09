@@ -40,6 +40,9 @@ export interface FieldAction {
   onClick: FieldActionClick;
 }
 
+/** Inspector row layout for a property field. @see docs/architecture/property-fields.md */
+export type PropertyFieldLayout = 'stack' | 'inline' | 'block';
+
 /**
  * Optional config passed to `PropertyBuilder.*` methods (third/fourth argument).
  * Applied to the field descriptor via {@link applyFieldConfig}.
@@ -50,11 +53,10 @@ export interface FieldConfigOptions {
   actions?: FieldAction[];
   icon?: string;
   /**
-   * Inspector row layout and inner `FieldChrome` wrapper — not editor toolbar chrome.
-   * `false`: full-width block (label above) and no action/popup wrapper.
-   * @see docs/architecture/property-fields.md
+   * Inspector row layout. Omitted: kind-based default (`select` inline, numbers stacked).
+   * `block`: full-width label above; skips popup/actions `FieldChrome` wrapper.
    */
-  chrome?: boolean;
+  layout?: PropertyFieldLayout;
   /** Debounce property commits (ms). Useful for expensive preview regenerations. */
   debounceMs?: number;
   /** Helper text shown under the field control. */
@@ -63,6 +65,8 @@ export interface FieldConfigOptions {
   placeholder?: string;
   /** Max character length for text-like controls. */
   maxLength?: number;
+  /** Per-field layout `when` (layer `properties()` panes). */
+  when?: string;
 }
 
 export interface CornerRadiusValue {
@@ -173,11 +177,12 @@ export interface FieldConfigTarget {
   popup?: PopupFieldConfig;
   actions?: FieldAction[];
   icon?: string;
-  chrome?: boolean;
+  layout?: PropertyFieldLayout;
   debounceMs?: number;
   description?: string;
   placeholder?: string;
   maxLength?: number;
+  when?: string;
 }
 
 export const DEFAULT_ALIGN_OPTIONS: PropertyFieldOption[] = [
@@ -205,8 +210,8 @@ export function applyFieldConfig(
   if (config.icon) {
     field.icon = config.icon;
   }
-  if (config.chrome !== undefined) {
-    field.chrome = config.chrome;
+  if (config.layout !== undefined) {
+    field.layout = config.layout;
   }
   if (config.debounceMs !== undefined) {
     field.debounceMs = config.debounceMs;
@@ -219,5 +224,8 @@ export function applyFieldConfig(
   }
   if (config.maxLength !== undefined) {
     field.maxLength = config.maxLength;
+  }
+  if (config.when !== undefined) {
+    field.when = config.when;
   }
 }

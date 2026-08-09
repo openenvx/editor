@@ -13,7 +13,8 @@ export class LayerPropertiesPaneFactory {
           new PropertyRowNode(
             field.label,
             field,
-            PropertyPath.layerData(field.key)
+            PropertyPath.layerData(field.key),
+            field.when
           )
       );
 

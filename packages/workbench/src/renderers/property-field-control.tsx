@@ -8,7 +8,7 @@ import type {
 function shouldUseFieldChrome(
   field: PropertyFieldRendererProps['field']
 ): boolean {
-  if (field.chrome === false) {
+  if (field.layout === 'block') {
     return false;
   }
   return Boolean(field.popup?.fields.length || field.actions?.length);

@@ -7,6 +7,15 @@ import type { ViewContainerLocation } from '../contributions/view-contribution';
 import { EditorRuntime } from '../core/editor-runtime';
 import type { Plugin } from '../core/plugin';
 import { PluginManager } from '../core/plugin-manager';
+import {
+  bindEditorDiagnosticsService,
+  logEditorDiagnosticsEnabledBanner,
+  resolveEditorDiagnosticsFromBrowser,
+} from '../diagnostics/editor-diagnostics';
+import {
+  EditorDiagnosticsServiceImpl,
+  type EditorDiagnosticsService,
+} from '../diagnostics/editor-diagnostics-service';
 import { ExternalHostMount } from '../external-host/external-host-mount';
 import { Registry } from '../registries/registry';
 import { ViewProviderRegistryImpl } from '../registries/view-provider-registry';
@@ -40,6 +49,7 @@ import {
   buildSelectionDerivedPatch,
 } from '../state/scene-slice-builder';
 import type { WorkbenchSliceContext } from '../state/workbench-slice-context';
+import { EditorDiagnosticsServiceId } from '../tokens';
 import { setNestedValue } from '../utils/nested-value';
 import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
 import { EditorService } from '../workbench/editor-service';
@@ -106,6 +116,7 @@ export class WorkbenchController {
   /** External hosts (sandbox / embed) — separate from PluginManager. */
   private readonly externalHosts: ExternalHostMount;
   private applyingLayoutSnapshot = false;
+  private readonly diagnostics: EditorDiagnosticsService;
 
   constructor(private readonly options: WorkbenchControllerOptions) {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
@@ -121,6 +132,15 @@ export class WorkbenchController {
     this.runtime = new EditorRuntime(
       new SceneStore(snapshot.scene, snapshot.editorState),
       new EditorService()
+    );
+    const diagnosticsEnabled = resolveEditorDiagnosticsFromBrowser(
+      options.debug ?? false
+    );
+    this.diagnostics = new EditorDiagnosticsServiceImpl(diagnosticsEnabled);
+    bindEditorDiagnosticsService(this.diagnostics);
+    this.runtime.services.registerInstance(
+      EditorDiagnosticsServiceId,
+      this.diagnostics
     );
     this.manager = new PluginManager(this.runtime);
     this.registerCoreServices();
@@ -304,6 +324,13 @@ export class WorkbenchController {
         this.updateProperty(layerId, key, value),
       updateProperties: (layerId, updates) =>
         this.updateProperties(layerId, updates),
+      setEditorDebug: (enabled) => {
+        this.diagnostics.setEnabled(enabled);
+        if (enabled) {
+          logEditorDiagnosticsEnabledBanner();
+        }
+      },
+      isEditorDebug: () => this.diagnostics.isEnabled(),
     };
   }
 

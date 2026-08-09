@@ -6,9 +6,10 @@ export class PropertyBlockNode extends PropertyLayoutNode {
 
   constructor(
     readonly label: string,
-    readonly children: PropertyLayoutNode[]
+    readonly children: PropertyLayoutNode[],
+    when?: string
   ) {
-    super();
+    super(when);
   }
 
   accept<T>(visitor: PropertyLayoutVisitor<T>): T {

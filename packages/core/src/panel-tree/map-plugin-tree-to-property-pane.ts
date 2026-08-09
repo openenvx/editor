@@ -12,6 +12,7 @@ import type {
   PropertyFieldOption,
 } from '../backbone';
 import { encodePluginHandlerCommand } from '../properties/plugin-property-host-context';
+import type { PropertyLayoutWhenOptions } from '../properties/property-layout-when-options';
 import {
   createPropertyPane,
   PropertyBlockBuilder,
@@ -39,6 +40,15 @@ export interface MapPluginTreeToPropertyPaneOptions {
 }
 
 type LayoutTarget = PropertyPaneBuilder | PropertyBlockBuilder;
+
+function layoutWhenOptions(
+  node: PluginNode
+): PropertyLayoutWhenOptions | undefined {
+  if (typeof node.props.when === 'string') {
+    return { when: node.props.when };
+  }
+  return undefined;
+}
 
 function parseOptions(
   value: PluginPropValue | undefined
@@ -171,8 +181,14 @@ function buildFieldFromNode(node: PluginNode): PropertyFieldDescriptor | null {
   if (icon) {
     field.icon = icon;
   }
-  if (typeof node.props.chrome === 'boolean') {
-    field.chrome = node.props.chrome;
+  if (node.props.chrome === false) {
+    field.layout = 'block';
+  } else if (
+    node.props.layout === 'stack' ||
+    node.props.layout === 'inline' ||
+    node.props.layout === 'block'
+  ) {
+    field.layout = node.props.layout;
   }
   const options = parseOptions(node.props.options);
   if (options) {
@@ -243,7 +259,8 @@ function mapLayoutChild(
     builder.row(
       label,
       field,
-      resolveBindPath(fieldNode, panelId) ?? resolveBindPath(node, panelId)
+      resolveBindPath(fieldNode, panelId) ?? resolveBindPath(node, panelId),
+      layoutWhenOptions(node)
     );
     return;
   }
@@ -261,16 +278,24 @@ function mapLayoutChild(
       }
       cells.push({ field, path });
     }
-    builder.inputGroup(asString(node.props.label, 'Group'), cells);
+    builder.inputGroup(
+      asString(node.props.label, 'Group'),
+      cells,
+      layoutWhenOptions(node)
+    );
     return;
   }
 
   if (node.type === 'Block' && builder instanceof PropertyPaneBuilder) {
-    builder.block(asString(node.props.label, 'Block'), (blockBuilder) => {
-      for (const child of pluginNodes(node.children)) {
-        mapLayoutChild(blockBuilder, child, panelId);
-      }
-    });
+    builder.block(
+      asString(node.props.label, 'Block'),
+      (blockBuilder) => {
+        for (const child of pluginNodes(node.children)) {
+          mapLayoutChild(blockBuilder, child, panelId);
+        }
+      },
+      layoutWhenOptions(node)
+    );
     return;
   }
 
@@ -280,7 +305,12 @@ function mapLayoutChild(
     if (!field) {
       return;
     }
-    builder.row(field.label, field, resolveBindPath(node, panelId));
+    builder.row(
+      field.label,
+      field,
+      resolveBindPath(node, panelId),
+      layoutWhenOptions(node)
+    );
   }
 }
 

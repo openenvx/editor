@@ -151,6 +151,12 @@ export type {
   PropertyInputGroupCell,
   PropertyLayoutVisitor,
   PropertyValuePath,
+  PropertyLayoutWhenOptions,
+  PropertyLayoutWhenEvaluator,
+} from './properties';
+export {
+  isPropertyLayoutNodeVisible,
+  propertyLayoutNodeReactKey,
 } from './properties';
 
 export {
@@ -168,6 +174,33 @@ export type {
 } from './workbench/workbench-layout-store';
 export { WorkbenchLayoutStoreId } from './workbench/workbench-layout-store-id';
 export { mergePrimaryContainerOrder } from './workbench/merge-primary-container-order';
+export {
+  evaluatePropertyLayoutWhen,
+  evaluateContextKeyWhenExpression,
+} from './evaluate-when-expression';
+export type {
+  PropertyWhenEvalOptions,
+  PropertyWhenEvalMeta,
+} from './evaluate-when-expression';
+export {
+  bindEditorDiagnosticsService,
+  editorDiagnosticLog,
+  isEditorDiagnosticsEnabled,
+  logEditorDiagnosticsEnabledBanner,
+  resolveEditorDiagnosticsFromBrowser,
+  resetEditorDiagnosticLogsForTests,
+  EDITOR_DEBUG_LOCAL_STORAGE_KEY,
+} from './diagnostics/editor-diagnostics';
+export type { EditorDiagnosticLevel } from './diagnostics/editor-diagnostics';
+export { diagnosePropertyFieldDescriptor } from './properties/property-field-diagnostic';
+export {
+  isBuiltinPropertyFieldKind,
+  safeParsePropertyFieldDescriptor,
+} from './properties/property-field-schema';
+export {
+  EditorDiagnosticsServiceImpl,
+  type EditorDiagnosticsService,
+} from './diagnostics/editor-diagnostics-service';
 export { ShellUiServiceId } from './workbench/shell-ui-service-id';
 export {
   ShellUiServiceImpl,

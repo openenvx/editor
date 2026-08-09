@@ -32,6 +32,9 @@ export function PropertyFieldRow({
         styles.fieldRow,
         variant === 'switch' && styles.fieldRowSwitch,
         variant === 'inline' && styles.fieldRowInline,
+        variant === 'inline' &&
+          description &&
+          styles.fieldRowInlineWithDescription,
         className
       )}
     >

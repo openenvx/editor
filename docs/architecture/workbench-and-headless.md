@@ -78,7 +78,9 @@ flowchart LR
 3. Controller merges plugin panes + synthesized layer panes into inspector views (`content.kind: 'properties'`).
 4. Shell renders via `ViewPane` + `PropertyContentRenderer` (shell-internal — hosts must not import these).
 
-Field descriptors, kinds, and `chrome`: [property-fields.md](property-fields.md).
+Field descriptors, kinds, and `layout`: [property-fields.md](property-fields.md) (including layout-node `when` for conditional rows/blocks).
+
+**Editor diagnostics:** global debug flag (`openenvx:debug`, `WorkbenchControllerOptions.debug`, `api.setEditorDebug`) drives `[OpenEnvx]` console groups (e.g. `property.when` token resolution, `property.field` descriptor validation). See [property-fields.md](property-fields.md#diagnostics-global-editor-debug).
 
 **Naming:** **Inspector** = default secondary container (`workbench.inspector`) hosting canvas/HTML layer property views. Generic form content is a `properties` view + `PropertyPane` / `PropertyPath` in any container.
 

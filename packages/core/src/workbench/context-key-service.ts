@@ -1,3 +1,4 @@
+import { evaluateContextKeyWhenExpression } from '../evaluate-when-expression';
 import { Emitter } from '../runtime/emitter';
 import type { Event } from '../runtime/emitter';
 import { findLayerById } from '../scene/layer-tree';
@@ -28,10 +29,7 @@ export class ContextKeyService {
   }
 
   evaluate(expression: string | undefined): boolean {
-    if (!expression?.trim()) {
-      return true;
-    }
-    return evaluateExpression(expression.trim(), this.keys);
+    return evaluateContextKeyWhenExpression(expression, this.keys);
   }
 
   snapshot(): Record<string, boolean | string | number> {
@@ -87,56 +85,6 @@ export class ContextKeyService {
     this.onDidChangeEmitter.dispose();
     this.keys.clear();
   }
-}
-
-function evaluateExpression(
-  expr: string,
-  keys: Map<string, boolean | string | number>
-): boolean {
-  if (expr.includes('||')) {
-    return expr
-      .split('||')
-      .some((part) => evaluateExpression(part.trim(), keys));
-  }
-  if (expr.includes('&&')) {
-    return expr
-      .split('&&')
-      .every((part) => evaluateExpression(part.trim(), keys));
-  }
-  if (expr.startsWith('!')) {
-    return !evaluateExpression(expr.slice(1).trim(), keys);
-  }
-  const eqMatch = expr.match(/^(.+?)\s*==\s*(.+)$/);
-  if (eqMatch) {
-    const left = resolveValue(eqMatch[1]!.trim(), keys);
-    const right = resolveValue(eqMatch[2]!.trim(), keys);
-    return left === right;
-  }
-  const value = resolveValue(expr, keys);
-  return Boolean(value);
-}
-
-function resolveValue(
-  token: string,
-  keys: Map<string, boolean | string | number>
-): boolean | string | number {
-  if (
-    (token.startsWith("'") && token.endsWith("'")) ||
-    (token.startsWith('"') && token.endsWith('"'))
-  ) {
-    return token.slice(1, -1);
-  }
-  if (token === 'true') {
-    return true;
-  }
-  if (token === 'false') {
-    return false;
-  }
-  const keyValue = keys.get(token);
-  if (keyValue !== undefined) {
-    return keyValue;
-  }
-  return false;
 }
 
 export function createContextKeyService(): ContextKeyService {

@@ -1,8 +1,10 @@
+import { diagnosePropertyFieldDescriptor } from '../properties/property-field-diagnostic';
 import type {
   FieldAction,
   FieldConfigOptions,
   NumericFieldConfig,
   PopupFieldConfig,
+  PropertyFieldLayout,
   PropertyFieldOption,
 } from './field-config';
 import { applyFieldConfig, DEFAULT_ALIGN_OPTIONS } from './field-config';
@@ -60,11 +62,10 @@ export interface PropertyFieldDescriptor {
   label: string;
   icon?: string;
   /**
-   * Inspector row layout and inner `FieldChrome` wrapper — not editor toolbar chrome.
-   * `false`: `PropertyFieldBlock` (label above, full width); skips `FieldChrome` for actions/popups.
-   * Omitted/`true`: `PropertyFieldRow` (layout depends on `kind`, e.g. `select` is inline).
+   * Inspector row layout. Omitted: kind-based default.
+   * `block`: full-width label above; skips `FieldChrome` for actions/popups.
    */
-  chrome?: boolean;
+  layout?: PropertyFieldLayout;
   /** Debounce property commits (ms). Useful for expensive preview regenerations. */
   debounceMs?: number;
   /** Helper text shown under the field control. */
@@ -84,6 +85,11 @@ export interface PropertyFieldDescriptor {
   numeric?: NumericFieldConfig;
   popup?: PopupFieldConfig;
   actions?: FieldAction[];
+  /**
+   * Layout `when` when this field is synthesized into a layer properties pane.
+   * @see docs/architecture/property-fields.md
+   */
+  when?: string;
 }
 
 /** Group of fields in a layer `properties()` section (canvas/HTML layer definitions). */
@@ -219,7 +225,7 @@ export class PropertyBuilder implements FieldHost {
     config?: FieldConfigOptions
   ): this {
     this.pushField({
-      chrome: false,
+      layout: 'block',
       key,
       kind: 'repeater',
       label: repeaterConfig.label ?? key,
@@ -235,7 +241,7 @@ export class PropertyBuilder implements FieldHost {
     config?: FieldConfigOptions
   ): this {
     this.pushField({
-      chrome: false,
+      layout: 'block',
       key,
       kind: 'slotList',
       label: slotListConfig.label ?? key,
@@ -265,7 +271,12 @@ export class PropertyBuilder implements FieldHost {
   }
 
   border(key: string, label?: string, config?: FieldConfigOptions): this {
-    this.pushField({ chrome: false, key, kind: 'border', label: label ?? key });
+    this.pushField({
+      layout: 'block',
+      key,
+      kind: 'border',
+      label: label ?? key,
+    });
     this.applyConfigToLast(config);
     return this;
   }
@@ -301,6 +312,7 @@ export class PropertyBuilder implements FieldHost {
 
   field(descriptor: PropertyFieldDescriptor): this {
     this.pushField(descriptor);
+    diagnosePropertyFieldDescriptor(descriptor);
     return this;
   }
 
@@ -308,6 +320,7 @@ export class PropertyBuilder implements FieldHost {
     const field = this.getLastField();
     if (field) {
       field.numeric = config;
+      diagnosePropertyFieldDescriptor(field);
     }
     return this;
   }
@@ -322,6 +335,7 @@ export class PropertyBuilder implements FieldHost {
     const field = this.getLastField();
     if (field) {
       field.popup = { fields: popupBuilder.build(), icon, title };
+      diagnosePropertyFieldDescriptor(field);
     }
     return this;
   }
@@ -330,6 +344,7 @@ export class PropertyBuilder implements FieldHost {
     const field = this.getLastField();
     if (field) {
       field.actions = actions;
+      diagnosePropertyFieldDescriptor(field);
     }
     return this;
   }
@@ -357,6 +372,7 @@ export class PropertyBuilder implements FieldHost {
     const field = this.getLastField();
     if (field) {
       applyFieldConfig(field, config);
+      diagnosePropertyFieldDescriptor(field);
     }
   }
 
@@ -476,7 +492,7 @@ class PropertySectionBuilder {
     config?: FieldConfigOptions
   ): this {
     this.pushField({
-      chrome: false,
+      layout: 'block',
       key,
       kind: 'repeater',
       label: repeaterConfig.label ?? key,
@@ -492,7 +508,7 @@ class PropertySectionBuilder {
     config?: FieldConfigOptions
   ): this {
     this.pushField({
-      chrome: false,
+      layout: 'block',
       key,
       kind: 'slotList',
       label: slotListConfig.label ?? key,
@@ -522,7 +538,12 @@ class PropertySectionBuilder {
   }
 
   border(key: string, label?: string, config?: FieldConfigOptions): this {
-    this.pushField({ chrome: false, key, kind: 'border', label: label ?? key });
+    this.pushField({
+      layout: 'block',
+      key,
+      kind: 'border',
+      label: label ?? key,
+    });
     this.applyConfigToLast(config);
     return this;
   }
@@ -558,6 +579,7 @@ class PropertySectionBuilder {
 
   field(descriptor: PropertyFieldDescriptor): this {
     this.pushField(descriptor);
+    diagnosePropertyFieldDescriptor(descriptor);
     return this;
   }
 
@@ -565,6 +587,7 @@ class PropertySectionBuilder {
     const field = this.getLastField();
     if (field) {
       field.numeric = config;
+      diagnosePropertyFieldDescriptor(field);
     }
     return this;
   }
@@ -579,6 +602,7 @@ class PropertySectionBuilder {
     const field = this.getLastField();
     if (field) {
       field.popup = { fields: popupBuilder.build(), icon, title };
+      diagnosePropertyFieldDescriptor(field);
     }
     return this;
   }
@@ -587,6 +611,7 @@ class PropertySectionBuilder {
     const field = this.getLastField();
     if (field) {
       field.actions = actions;
+      diagnosePropertyFieldDescriptor(field);
     }
     return this;
   }
@@ -610,6 +635,7 @@ class PropertySectionBuilder {
     const field = this.getLastField();
     if (field) {
       applyFieldConfig(field, config);
+      diagnosePropertyFieldDescriptor(field);
     }
   }
 }
@@ -624,6 +650,7 @@ export type {
   FieldConfigOptions,
   NumericFieldConfig,
   PopupFieldConfig,
+  PropertyFieldLayout,
   CornerRadiusValue,
   PaddingValue,
   ShadowValue,

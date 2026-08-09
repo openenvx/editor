@@ -22,31 +22,37 @@ const serializeVisitor = {
     label: string;
     field: unknown;
     path?: string;
+    when?: string;
   }): unknown {
     return {
       kind: 'row',
       label: node.label,
       path: node.path,
+      when: node.when,
       field: node.field,
     };
   },
   visitBlock(node: {
     label: string;
     children: { accept: (v: typeof serializeVisitor) => unknown }[];
+    when?: string;
   }): unknown {
     return {
       kind: 'block',
       label: node.label,
+      when: node.when,
       children: node.children.map((child) => child.accept(serializeVisitor)),
     };
   },
   visitInputGroup(node: {
     blockLabel: string;
     cells: unknown[];
+    when?: string;
   }): unknown {
     return {
       kind: 'inputGroup',
       blockLabel: node.blockLabel,
+      when: node.when,
       cells: node.cells,
     };
   },
@@ -195,6 +201,30 @@ describe('mapPluginTreeToPropertyPane', () => {
     expect(serializePane(viaTree)).toEqual(serializePane(viaBuilder));
   });
 
+  it('maps legacy chrome:false on plugin fields to layout block', () => {
+    const pane = mapPluginTreeToPropertyPane(
+      n(
+        'Pane',
+        { id: 'ext.panel', title: 'Ext' },
+        n(
+          'Row',
+          { label: 'Slot list' },
+          n('SlotList', {
+            key: 'items',
+            label: 'Items',
+            bind: PropertyPath.layerData('items'),
+            chrome: false,
+          })
+        )
+      )
+    );
+    const row = pane.nodes[0];
+    if (!row || !('field' in row)) {
+      throw new Error('expected row');
+    }
+    expect(row.field.layout).toBe('block');
+  });
+
   it('encodes Action handler clicks as plugin.handler commands', () => {
     const pane = mapPluginTreeToPropertyPane(
       n(
@@ -247,6 +277,45 @@ describe('mapPluginTreeToPropertyPane', () => {
       throw new Error('expected row');
     }
     expect(row.path).toBe('plugin.ext.panel.title');
+  });
+
+  it('maps layout-node when onto rows and blocks', () => {
+    const pane = mapPluginTreeToPropertyPane(
+      n(
+        'Pane',
+        { id: 'pane', title: 'Pane' },
+        n(
+          'Row',
+          {
+            label: 'Blur',
+            when: '$selection.layer.data.enabled',
+          },
+          n('Number', {
+            key: 'blur',
+            label: 'Blur',
+            bind: PropertyPath.layerData('blur'),
+          })
+        ),
+        n(
+          'Block',
+          { label: 'Advanced', when: 'scene.layerSelected' },
+          n('Text', { key: 'detail', label: 'Detail' })
+        )
+      )
+    );
+
+    expect(serializePane(pane)).toMatchObject({
+      nodes: [
+        {
+          kind: 'row',
+          when: '$selection.layer.data.enabled',
+        },
+        {
+          kind: 'block',
+          when: 'scene.layerSelected',
+        },
+      ],
+    });
   });
 
   it('uses panelId as Pane id when props.id is omitted', () => {

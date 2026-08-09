@@ -1,3 +1,4 @@
+import type { EditorDiagnosticsService } from './diagnostics/editor-diagnostics-service';
 import type { LayerRegistry } from './registries/registries';
 import { createServiceId } from './runtime/create-service-id';
 import type { SceneStore } from './scene/scene-store';
@@ -18,3 +19,5 @@ export const SceneStoreServiceId = createServiceId<SceneStore>('sceneStore');
 export const EditorServiceId = createServiceId<EditorService>('editorService');
 export const ContextKeyServiceId =
   createServiceId<ContextKeyService>('contextKeyService');
+export const EditorDiagnosticsServiceId =
+  createServiceId<EditorDiagnosticsService>('editorDiagnostics');

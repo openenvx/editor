@@ -45,7 +45,7 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | [apps/docs/README.md](apps/docs/README.md) | Extension authoring hub — internal vs sandbox vs embed |
 | [apps/docs/extension-guide.md](apps/docs/extension-guide.md) | Internal OOP plugin author API |
 | [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) | Sandbox widgets/plugins + embed panels |
-| [docs/architecture/property-fields.md](docs/architecture/property-fields.md) | Inspector `PropertyFieldDescriptor`, field kinds, `chrome` |
+| [docs/architecture/property-fields.md](docs/architecture/property-fields.md) | Inspector `PropertyFieldDescriptor`, field kinds, `layout` |
 | [packages/canvas/README.md](packages/canvas/README.md) | Canvas install and `CanvasPlugin` |
 | [packages/workbench/Design.md](packages/workbench/Design.md) | Workbench **visual design** tokens only (not API docs) |
 
@@ -160,6 +160,14 @@ All packages are pre-1.0.0. Breaking API changes are expected and preferred over
 - Minimize scope — smallest correct diff.
 - Match surrounding naming, types, and patterns.
 - Do not over-abstract or add tests that only assert the obvious.
+
+## Editor diagnostics
+
+One **global** diagnostics gate for the whole editor (`WorkbenchControllerOptions.debug`, `localStorage` key `openenvx:debug`, `api.setEditorDebug`). Apps typically pass `debug: import.meta.env.DEV` when creating the controller; users can force on/off with `localStorage`.
+
+When implementing or debugging **runtime-visible behavior** (property layout `when`, context keys, `PropertyPath` resolution, contribution visibility), wire actionable **console diagnostics** via `editorDiagnosticLog` / `isEditorDiagnosticsEnabled()` — do not rely on silent falsy expressions. If a feature “does not work”, enable diagnostics and read `[OpenEnvx]` console groups before guessing.
+
+Details: [docs/architecture/workbench-and-headless.md](docs/architecture/workbench-and-headless.md) (diagnostics), [property-fields.md](docs/architecture/property-fields.md) (property `when`).
 
 ## Common tasks
 

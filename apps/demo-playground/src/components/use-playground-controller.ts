@@ -9,6 +9,7 @@ export function usePlaygroundController() {
 
   useEffect(() => {
     const nextController = new WorkbenchController({
+      debug: import.meta.env.DEV,
       initialScene: createCanvasDemoScene(),
       plugins: [new CanvasPlugin()],
     });

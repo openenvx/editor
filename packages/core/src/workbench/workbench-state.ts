@@ -197,6 +197,9 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   revert: () => void;
   serializeScene: () => Scene;
   loadScene: (scene: Scene) => void;
+  /** Global editor diagnostics (console logs for property when, etc.). */
+  setEditorDebug: (enabled: boolean) => void;
+  isEditorDebug: () => boolean;
 }
 
 export interface WorkbenchControllerOptions {
@@ -212,4 +215,9 @@ export interface WorkbenchControllerOptions {
    * enforced (embed consumer). Dashboard authoring should pass false.
    */
   enforceTemplatePolicy?: boolean;
+  /**
+   * Initial editor diagnostics when `localStorage.openenvx:debug` is unset.
+   * Apps often pass `import.meta.env.DEV`.
+   */
+  debug?: boolean;
 }

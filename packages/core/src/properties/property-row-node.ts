@@ -9,9 +9,10 @@ export class PropertyRowNode extends PropertyLayoutNode {
   constructor(
     readonly label: string,
     readonly field: PropertyFieldDescriptor,
-    readonly path?: PropertyValuePath
+    readonly path?: PropertyValuePath,
+    when?: string
   ) {
-    super();
+    super(when);
   }
 
   accept<T>(visitor: PropertyLayoutVisitor<T>): T {

@@ -435,7 +435,7 @@ Map to shadcn/designer `DesignerPane` + `Action*` pattern conceptually. Each pan
 
 ### Field kinds (author once, reuse everywhere)
 
-Property form controls are **descriptor → registered renderer**, not ad-hoc JSX in plugins. **API reference** (kinds, `chrome`, `PropertyFieldDescriptor`, paths): [docs/architecture/property-fields.md](../../docs/architecture/property-fields.md). This file covers **visual** treatment only (density, radii, slot-list row surfaces).
+Property form controls are **descriptor → registered renderer**, not ad-hoc JSX in plugins. **API reference** (kinds, `layout`, `PropertyFieldDescriptor`, paths): [docs/architecture/property-fields.md](../../docs/architecture/property-fields.md). This file covers **visual** treatment only (density, radii, slot-list row surfaces).
 
 - Slot list rows: muted surface + inset ring (`--wb-muted` / `--wb-shadow-control`), header + ghost `IconButton` (trash / plus) — same grammar as layer-tree trailing actions.
 

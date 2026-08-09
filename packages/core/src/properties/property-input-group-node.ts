@@ -7,9 +7,10 @@ export class PropertyInputGroupNode extends PropertyLayoutNode {
 
   constructor(
     readonly blockLabel: string,
-    readonly cells: PropertyInputGroupCell[]
+    readonly cells: PropertyInputGroupCell[],
+    when?: string
   ) {
-    super();
+    super(when);
   }
 
   accept<T>(visitor: PropertyLayoutVisitor<T>): T {

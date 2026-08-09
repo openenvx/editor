@@ -161,6 +161,7 @@ export {
   uniformCornerRadius,
   uniformPadding,
   type PropertyFieldDescriptor,
+  type PropertyFieldLayout,
   type PropertyFieldOption,
   type PropertyFieldKind,
   type PropertySectionDescriptor,
@@ -255,6 +256,7 @@ export {
 export {
   AssetServiceId,
   ContextKeyServiceId,
+  EditorDiagnosticsServiceId,
   EditorServiceId,
   FontServiceId,
   LayerRegistryServiceId,

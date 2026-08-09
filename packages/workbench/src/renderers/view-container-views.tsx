@@ -1,6 +1,8 @@
 import {
   findLayerById,
   createPropertyHostContext,
+  ContextKeyServiceId,
+  evaluatePropertyLayoutWhen,
   PropertyPathResolver,
 } from '@openenvx/core';
 import type {
@@ -13,9 +15,10 @@ import type {
   WorkbenchApi,
 } from '@openenvx/core';
 import type { ComponentType } from 'react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
+import { useContextKeysRevision } from '../hooks/use-context-key';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { ViewPane } from '../layout/view-pane';
 import { PanelSection } from '../primitives/panel-section';
@@ -119,12 +122,32 @@ function PropertiesViewBody({
   layerData: Record<string, unknown> | null;
   primaryLayerId: string | null;
 }) {
+  const { api } = useWorkbenchContext();
+  const contextKeysRevision = useContextKeysRevision();
+
+  const evaluateLayoutWhen = useCallback(
+    (clause?: string, meta?: { nodeLabel?: string }) => {
+      void contextKeysRevision;
+      const keys = api.getService(ContextKeyServiceId);
+      return evaluatePropertyLayoutWhen(clause, {
+        contextKeys: keys?.snapshot() ?? {},
+        readPath: (path) => hostContext.readPath(path),
+        meta: {
+          nodeLabel: meta?.nodeLabel,
+          primaryLayerId,
+        },
+      });
+    },
+    [api, contextKeysRevision, hostContext, primaryLayerId]
+  );
+
   if (view.content.kind !== 'properties') {
     return null;
   }
 
   return (
     <PropertyContentRenderer
+      evaluateLayoutWhen={evaluateLayoutWhen}
       fieldRenderers={fieldRenderers}
       hostContext={hostContext}
       layerData={layerData ?? {}}

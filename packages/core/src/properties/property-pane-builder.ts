@@ -6,14 +6,20 @@ import {
   type PropertyFieldDescriptor,
 } from '../backbone';
 import { PropertyBlockNode } from './property-block-node';
+import { diagnosePropertyFieldDescriptor } from './property-field-diagnostic';
 import { PropertyInputGroupNode } from './property-input-group-node';
 import type { PropertyLayoutNode } from './property-layout-node';
+import type { PropertyLayoutWhenOptions } from './property-layout-when-options';
 import { PropertyPaneDescriptor } from './property-pane-descriptor';
 import { PropertyRowNode } from './property-row-node';
 import type {
   PropertyInputGroupCell,
   PropertyValuePath,
 } from './property-value-path';
+
+function diagnoseField(field: PropertyFieldDescriptor): void {
+  diagnosePropertyFieldDescriptor(field);
+}
 
 function getLastRowField(
   nodes: PropertyLayoutNode[]
@@ -25,6 +31,13 @@ function getLastRowField(
   return null;
 }
 
+function resolveRowWhen(
+  field: PropertyFieldDescriptor,
+  options?: PropertyLayoutWhenOptions
+): string | undefined {
+  return options?.when ?? field.when;
+}
+
 /** Shared layout surface for pane + nested block builders. */
 export class PropertyBlockBuilder {
   readonly nodes: PropertyLayoutNode[] = [];
@@ -32,14 +45,27 @@ export class PropertyBlockBuilder {
   row(
     label: string,
     field: PropertyFieldDescriptor,
-    path?: PropertyValuePath
+    path?: PropertyValuePath,
+    options?: PropertyLayoutWhenOptions
   ): this {
-    this.nodes.push(new PropertyRowNode(label, field, path));
+    this.nodes.push(
+      new PropertyRowNode(label, field, path, resolveRowWhen(field, options))
+    );
+    diagnoseField(field);
     return this;
   }
 
-  inputGroup(blockLabel: string, cells: PropertyInputGroupCell[]): this {
-    this.nodes.push(new PropertyInputGroupNode(blockLabel, cells));
+  inputGroup(
+    blockLabel: string,
+    cells: PropertyInputGroupCell[],
+    options?: PropertyLayoutWhenOptions
+  ): this {
+    for (const cell of cells) {
+      diagnoseField(cell.field);
+    }
+    this.nodes.push(
+      new PropertyInputGroupNode(blockLabel, cells, options?.when)
+    );
     return this;
   }
 
@@ -47,6 +73,7 @@ export class PropertyBlockBuilder {
     const field = getLastRowField(this.nodes);
     if (field) {
       field.numeric = config;
+      diagnoseField(field);
     }
     return this;
   }
@@ -61,6 +88,7 @@ export class PropertyBlockBuilder {
     const field = getLastRowField(this.nodes);
     if (field) {
       field.popup = { fields: popupBuilder.build(), icon, title };
+      diagnoseField(field);
     }
     return this;
   }
@@ -69,6 +97,7 @@ export class PropertyBlockBuilder {
     const field = getLastRowField(this.nodes);
     if (field) {
       field.actions = actions;
+      diagnoseField(field);
     }
     return this;
   }
@@ -104,21 +133,40 @@ export class PropertyPaneBuilder {
   row(
     label: string,
     field: PropertyFieldDescriptor,
-    path?: PropertyValuePath
+    path?: PropertyValuePath,
+    options?: PropertyLayoutWhenOptions
   ): this {
-    this.nodes.push(new PropertyRowNode(label, field, path));
+    this.nodes.push(
+      new PropertyRowNode(label, field, path, resolveRowWhen(field, options))
+    );
+    diagnoseField(field);
     return this;
   }
 
-  inputGroup(blockLabel: string, cells: PropertyInputGroupCell[]): this {
-    this.nodes.push(new PropertyInputGroupNode(blockLabel, cells));
+  inputGroup(
+    blockLabel: string,
+    cells: PropertyInputGroupCell[],
+    options?: PropertyLayoutWhenOptions
+  ): this {
+    for (const cell of cells) {
+      diagnoseField(cell.field);
+    }
+    this.nodes.push(
+      new PropertyInputGroupNode(blockLabel, cells, options?.when)
+    );
     return this;
   }
 
-  block(label: string, build: (builder: PropertyBlockBuilder) => void): this {
+  block(
+    label: string,
+    build: (builder: PropertyBlockBuilder) => void,
+    options?: PropertyLayoutWhenOptions
+  ): this {
     const blockBuilder = new PropertyBlockBuilder();
     build(blockBuilder);
-    this.nodes.push(new PropertyBlockNode(label, blockBuilder.nodes));
+    this.nodes.push(
+      new PropertyBlockNode(label, blockBuilder.nodes, options?.when)
+    );
     return this;
   }
 
@@ -126,6 +174,7 @@ export class PropertyPaneBuilder {
     const field = getLastRowField(this.nodes);
     if (field) {
       field.numeric = config;
+      diagnoseField(field);
     }
     return this;
   }
@@ -140,6 +189,7 @@ export class PropertyPaneBuilder {
     const field = getLastRowField(this.nodes);
     if (field) {
       field.popup = { fields: popupBuilder.build(), icon, title };
+      diagnoseField(field);
     }
     return this;
   }
@@ -148,6 +198,7 @@ export class PropertyPaneBuilder {
     const field = getLastRowField(this.nodes);
     if (field) {
       field.actions = actions;
+      diagnoseField(field);
     }
     return this;
   }

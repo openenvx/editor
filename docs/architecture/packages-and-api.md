@@ -79,7 +79,7 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 ### Editor backbone (private)
 
-**`@openenvx/core`** — `./schema`: Scene Zod, normalize/validate, templates; `./schema/scene.schema.json` for JSON Schema export. `./preview`: LayerPreviewBuilder, Render IR. `.`: `EditorRuntime`, `PluginManager`, `WorkbenchController`, workbench contributions, property panes (`WorkbenchApi.mountSandboxHost` for sandbox panels). `./react`: `WorkbenchProvider`, hooks.
+**`@openenvx/core`** — `./schema`: Scene Zod, normalize/validate, templates; `./schema/scene.schema.json` for JSON Schema export. `./preview`: LayerPreviewBuilder, Render IR. `.`: `EditorRuntime`, `PluginManager`, `WorkbenchController`, workbench contributions, property panes (`WorkbenchApi.mountSandboxHost` for sandbox panels). Property layout: `createPropertyPane`, `PropertyPath.when`, `PropertyLayoutWhenOptions`, `evaluatePropertyLayoutWhen`, `isPropertyLayoutNodeVisible`. `./react`: `WorkbenchProvider`, hooks.
 
 **`@openenvx/canvas`** — `CanvasPlugin`, `CanvasTemplatePlugin`, `CanvasEditor` / `CanvasHostProvider` / `CanvasStage`, layer definitions, `registerCanvasContribution`, transform/print panes, align tools, crop/guides, widget mapping helpers, export helpers.
 

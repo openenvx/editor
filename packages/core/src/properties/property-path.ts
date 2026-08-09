@@ -37,4 +37,9 @@ export const PropertyPath = {
   plugin(panelId: string, key: string): PropertyValuePath {
     return `plugin.${panelId}.${key}`;
   },
+
+  /** Prefix for layout-node `when` expressions that read live property data. */
+  when(path: PropertyValuePath): string {
+    return `$${path}`;
+  },
 };
