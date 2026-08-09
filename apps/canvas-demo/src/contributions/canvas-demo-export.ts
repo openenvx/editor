@@ -1,11 +1,13 @@
 import type { CanvasExportFormat } from '@openenvx/canvas';
-import { AssetServiceId, Command, getActivePage } from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
 import {
+  AssetServiceId,
+  Command,
+  getActivePage,
   StatusBarContribution,
   type StatusBarBuilder,
-} from '@openenvx/headless';
-import type { Scene } from '@xmazu/openenvxee-schema';
+  type CommandContext,
+} from '@openenvx/core';
+import type { Scene } from '@openenvx/core/schema';
 
 import { CanvasDemoExportServiceId } from '../services/canvas-demo-export-service';
 import type { CanvasDemoExportService } from '../services/canvas-demo-export-service';

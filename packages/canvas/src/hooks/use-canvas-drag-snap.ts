@@ -1,5 +1,5 @@
 import type { Layer as SceneLayer } from '@openenvx/core';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@openenvx/core/schema';
 import type Konva from 'konva';
 import { useCallback } from 'react';
 import type { RefObject } from 'react';

@@ -5,7 +5,7 @@ import {
   WorkbenchEventService,
 } from '@openenvx/core';
 import type { CommandContext } from '@openenvx/core';
-import { createDefaultTransform, normalizeScene } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform, normalizeScene } from '@openenvx/core/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

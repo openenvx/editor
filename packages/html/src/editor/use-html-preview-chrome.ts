@@ -1,5 +1,5 @@
 import { ContextKeyServiceId } from '@openenvx/core';
-import { useWorkbenchContext } from '@openenvx/headless/react';
+import { useWorkbenchContext } from '@openenvx/core/react';
 import {
   useCallback,
   useLayoutEffect,

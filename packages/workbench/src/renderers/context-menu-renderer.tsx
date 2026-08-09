@@ -1,5 +1,5 @@
-import type { MenuItemDescriptor } from '@openenvx/headless';
-import { isCommandMenuItem } from '@openenvx/headless';
+import type { MenuItemDescriptor } from '@openenvx/core';
+import { isCommandMenuItem } from '@openenvx/core';
 import { useCallback, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';

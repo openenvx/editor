@@ -1,20 +1,8 @@
 {
   "publish": [
     {
-      "name": "@xmazu/openenvxee-schema",
-      "dir": "packages/schema"
-    },
-    {
-      "name": "@xmazu/openenvxee-preview",
-      "dir": "packages/preview"
-    },
-    {
       "name": "@xmazu/openenvxee-extensions",
       "dir": "packages/extensions"
-    },
-    {
-      "name": "@xmazu/openenvxee-studio",
-      "dir": "packages/studio"
     },
     {
       "name": "@xmazu/openenvxee-html-studio",
@@ -25,18 +13,13 @@
     {
       "repo": "../openenvx-cloud",
       "deps": [
-        "@xmazu/openenvxee-studio",
         "@xmazu/openenvxee-extensions",
-        "@xmazu/openenvxee-schema",
-        "@xmazu/openenvxee-preview"
+        "@xmazu/openenvxee-html-studio"
       ]
     },
     {
       "repo": "../../snapvelo-app",
-      "deps": [
-        "@xmazu/openenvxee-html-studio",
-        "@xmazu/openenvxee-schema"
-      ]
+      "deps": ["@xmazu/openenvxee-html-studio"]
     }
   ]
 }

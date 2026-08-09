@@ -2,7 +2,7 @@ import { ContextKeyServiceId } from '@openenvx/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/headless/react';
+} from '@openenvx/core/react';
 import { memo, useCallback, useState } from 'react';
 
 import { EMAIL_TEMPLATES_SHEET_OPEN_KEY } from '../contributions/email-templates-sidebar';

@@ -230,9 +230,9 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 | Element vocabulary, messages, `validatePluginTree` / `validateExtensionManifest`, sandbox grant types | `@xmazu/openenvxee-extensions/protocol` (published) |
 | Preact element vocabulary (`/canvas` `/html` `/panel`) | `@xmazu/openenvxee-extensions` (published) |
 | Widget authoring (`defineExtension`, expand, Vite packaging) | `@xmazu/openenvxee-extensions` (published) |
-| Tree → builder mappers, plugin host context, manifest → contributions, `ExternalHostMount`, `SandboxHostSurface` / `EmbedPanelHostSurface`, `mountSandboxHost` / `mountEmbedPanelHost` | `@openenvx/headless` |
+| Tree → builder mappers, plugin host context, manifest → contributions, `ExternalHostMount`, `SandboxHostSurface` / `EmbedPanelHostSurface`, `mountSandboxHost` / `mountEmbedPanelHost` | `@openenvx/core` |
 | `EmbedPanelHost`, `SandboxExtensionHost`, `PluginPanel`, postMessage transport, command gate, sandbox runtime | `@openenvx/workbench` |
-| Internal OOP plugins + builders | `@openenvx/core`, `@openenvx/headless`, product plugins (`CanvasPlugin`, …) |
+| Internal OOP plugins + builders | `@openenvx/core`, product plugins (`CanvasPlugin`, …) |
 
 ## Related
 

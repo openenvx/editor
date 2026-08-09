@@ -1,4 +1,4 @@
-import type { Transform } from '@xmazu/openenvxee-schema';
+import type { Transform } from '@openenvx/core/schema';
 import type React from 'react';
 
 import type { ArtboardOffset } from '../artboard-offset';

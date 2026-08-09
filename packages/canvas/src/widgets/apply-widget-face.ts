@@ -1,10 +1,10 @@
-import type { RenderNode } from '@xmazu/openenvxee-extensions/protocol';
-import { validateWidgetTree } from '@xmazu/openenvxee-extensions/protocol';
 import {
   createDefaultTransform,
   type Layer,
   type OpenEnvxWidgetData,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
+import type { RenderNode } from '@xmazu/openenvxee-extensions/protocol';
+import { validateWidgetTree } from '@xmazu/openenvxee-extensions/protocol';
 
 import { mapWidgetTreeToLayers } from './map-widget-tree-to-layers';
 

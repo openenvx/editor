@@ -1,6 +1,5 @@
-import { SimpleServiceContribution } from '@openenvx/core';
-import { WorkbenchPlugin } from '@openenvx/headless';
-import type { WorkbenchPluginContext } from '@openenvx/headless';
+import { SimpleServiceContribution, WorkbenchPlugin } from '@openenvx/core';
+import type { WorkbenchPluginContext } from '@openenvx/core';
 import {
   createBlockCommands,
   createHtmlLayerDefinition,

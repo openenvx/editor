@@ -1,5 +1,5 @@
-import { defineCanvasComponent, string } from '@xmazu/openenvxee-extensions';
 /** @jsxImportSource preact */
+import { defineCanvasComponent, string } from '@xmazu/openenvxee-extensions';
 import { QR as Qr, Stack, Text } from '@xmazu/openenvxee-extensions/canvas';
 
 /** Save-the-date canvas widget — QR + bound title. */

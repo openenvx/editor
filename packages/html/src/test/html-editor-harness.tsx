@@ -5,10 +5,10 @@ import {
   SceneStore,
   SimpleServiceContribution,
   type Selection,
+  WorkbenchController,
+  type WorkbenchApi,
 } from '@openenvx/core';
-import { WorkbenchController } from '@openenvx/headless';
-import type { WorkbenchApi } from '@openenvx/headless';
-import { WorkbenchProvider } from '@openenvx/headless/react';
+import { WorkbenchProvider } from '@openenvx/core/react';
 import { render } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
 import { vi } from 'vitest';

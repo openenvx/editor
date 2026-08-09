@@ -1,5 +1,8 @@
-import type { CommandContext } from '@openenvx/core';
-import { ToolbarContribution, type ToolbarBuilder } from '@openenvx/headless';
+import {
+  type CommandContext,
+  ToolbarContribution,
+  type ToolbarBuilder,
+} from '@openenvx/core';
 
 /** Edit / Preview toggles on the shared top-center overlay toolbar. */
 export class EmailToolbarContribution extends ToolbarContribution {

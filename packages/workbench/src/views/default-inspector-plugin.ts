@@ -3,7 +3,7 @@ import {
   WORKBENCH_INSPECTOR_CONTAINER_ID,
   WorkbenchPlugin,
   type WorkbenchPluginContext,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 
 class InspectorViewContainer extends ViewContainerContribution {
   readonly id = WORKBENCH_INSPECTOR_CONTAINER_ID;

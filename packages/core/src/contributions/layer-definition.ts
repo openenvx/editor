@@ -1,8 +1,7 @@
-import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
-
 import type { PropertySectionDescriptor } from '../builders/property-builder';
 import { Contribution } from '../core/contribution';
 import { ContributionPoint } from '../core/contribution-point';
+import type { LayerPreviewDescriptor } from '../preview';
 import type { CommandContext } from '../runtime/types';
 import type { Layer, Page } from '../scene/types';
 import type { LayerPreviewContext } from './layer-preview-context';

@@ -38,7 +38,7 @@ Host apps typically:
 
 ## `@openenvx/html-studio` (HTML product — monorepo)
 
-Re-exports: `core`, `headless`, `html`, workbench shell surface + HTML sandbox helper.
+Re-exports: `core`, `html`, workbench shell surface + HTML sandbox helper.
 
 ```ts
 export const DEFAULT_HTML_STUDIO_PLUGINS = [new HtmlBlocksPlugin()];

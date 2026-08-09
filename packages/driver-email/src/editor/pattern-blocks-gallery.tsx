@@ -2,7 +2,7 @@ import { ContextKeyServiceId, getActivePage } from '@openenvx/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/headless/react';
+} from '@openenvx/core/react';
 import type { BlockRegistry } from '@openenvx/html';
 import { getPageRootId, resolveInsertParentId } from '@openenvx/html';
 import { memo, useCallback, useMemo, useState } from 'react';

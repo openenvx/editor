@@ -2,7 +2,7 @@ import { getActivePage } from '@openenvx/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/headless/react';
+} from '@openenvx/core/react';
 import { getPageRootId, resolveInsertParentId } from '@openenvx/html';
 import { memo, useCallback } from 'react';
 

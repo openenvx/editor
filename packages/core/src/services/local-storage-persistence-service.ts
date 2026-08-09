@@ -1,7 +1,7 @@
 import {
   normalizeSceneSnapshot,
   type SceneSnapshot,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
 
 import type { PersistenceService } from './types';
 

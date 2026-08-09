@@ -1,4 +1,4 @@
-import type { Layer } from '@xmazu/openenvxee-schema';
+import type { Layer } from '@openenvx/core/schema';
 
 import type { BlockRegistry } from '../block-registry';
 import { findBlock } from './block-tree';

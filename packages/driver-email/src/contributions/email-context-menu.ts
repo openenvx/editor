@@ -1,5 +1,8 @@
-import type { ContributionBuildContext } from '@openenvx/core';
-import { ContextMenuContribution, type MenuBuilder } from '@openenvx/headless';
+import {
+  type ContributionBuildContext,
+  ContextMenuContribution,
+  type MenuBuilder,
+} from '@openenvx/core';
 
 const EMAIL_LAYER_SELECTED = "page.layout == 'email' && scene.layerSelected";
 

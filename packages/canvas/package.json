@@ -27,10 +27,7 @@
   },
   "dependencies": {
     "@openenvx/core": "workspace:*",
-    "@openenvx/headless": "workspace:*",
-    "@xmazu/openenvxee-preview": "workspace:*",
     "@xmazu/openenvxee-extensions": "workspace:*",
-    "@xmazu/openenvxee-schema": "workspace:*",
     "@tiptap/extension-color": "^3.27.3",
     "@tiptap/extension-font-family": "^3.27.3",
     "@tiptap/extension-text-style": "^3.27.3",
@@ -55,7 +52,7 @@
     "vitest": "catalog:testing"
   },
   "peerDependencies": {
-    "@openenvx/headless": ">=0.1.11",
+    "@openenvx/core": ">=0.1.11",
     "react": ">=18",
     "react-dom": ">=18"
   },

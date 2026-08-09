@@ -13,12 +13,12 @@ import type {
   Page,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
+import { createLayerPreviewBuilder } from '@openenvx/core/preview';
 import {
   clampTextCurve,
   createDefaultTransform,
   MAX_TEXT_CURVE,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
 import { z } from 'zod';
 
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';

@@ -26,14 +26,13 @@ const WORKSPACE_PKG = /^(?:@openenvx\/|@xmazu\/openenvxee-)/;
  */
 const WORKSPACE_ENTRIES: Record<string, string> = {
   '@openenvx/core': 'core/src/index.ts',
-  '@openenvx/headless': 'headless/src/index.ts',
-  '@openenvx/headless/react': 'headless/src/react/workbench-context.tsx',
+  '@openenvx/core/react': 'core/src/react/workbench-context.tsx',
+  '@openenvx/core/schema': 'core/src/schema/index.ts',
+  '@openenvx/core/preview': 'core/src/preview/index.ts',
   '@openenvx/html': 'html/src/index.ts',
   '@openenvx/html/runtime': 'html/src/runtime.ts',
   '@openenvx/html-studio': 'html-studio/src/index.ts',
   '@openenvx/workbench': 'workbench/src/index.ts',
-  '@xmazu/openenvxee-schema': 'schema/src/index.ts',
-  '@xmazu/openenvxee-preview': 'preview/src/index.ts',
   '@xmazu/openenvxee-extensions/protocol': 'extensions/src/protocol/index.ts',
 };
 

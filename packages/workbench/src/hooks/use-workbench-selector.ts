@@ -1,4 +1,4 @@
 export {
   useWorkbenchContextSelector,
   useWorkbenchSelector,
-} from '@openenvx/headless/react';
+} from '@openenvx/core/react';

@@ -20,17 +20,10 @@
     "packages/core": {
       "entry": [
         "src/index.ts!",
+        "src/schema/index.ts!",
+        "src/preview/index.ts!",
+        "src/react/workbench-context.tsx!",
         "src/plugins/scene-plugin.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts"
-      ]
-    },
-    "packages/headless": {
-      "entry": [
-        "src/index.ts!",
-        "src/react/workbench-context.tsx!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
@@ -48,28 +41,10 @@
         "!src/**/*.test.ts"
       ]
     },
-    "packages/schema": {
-      "entry": [
-        "src/index.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts"
-      ]
-    },
     "packages/extensions": {
       "entry": [
         "src/index.ts!",
         "src/protocol/index.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts"
-      ]
-    },
-    "packages/preview": {
-      "entry": [
-        "src/index.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
@@ -136,10 +111,7 @@
         "zod",
         "@openenvx/canvas",
         "@openenvx/core",
-        "@openenvx/headless",
-        "@openenvx/workbench",
-        "@xmazu/openenvxee-preview",
-        "@xmazu/openenvxee-schema"
+        "@openenvx/workbench"
       ]
     },
     "packages/openenvxee-html-studio": {
@@ -186,11 +158,8 @@
         "react-i18next",
         "zod",
         "@openenvx/core",
-        "@openenvx/headless",
         "@openenvx/workbench",
-        "@xmazu/openenvxee-preview",
-        "@xmazu/openenvxee-extensions",
-        "@xmazu/openenvxee-schema"
+        "@xmazu/openenvxee-extensions"
       ]
     },
     "packages/html": {

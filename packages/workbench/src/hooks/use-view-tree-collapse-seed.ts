@@ -1,4 +1,4 @@
-import type { ViewTreeItem } from '@openenvx/headless';
+import type { ViewTreeItem } from '@openenvx/core';
 import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
 
 /**

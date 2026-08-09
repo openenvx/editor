@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
-import { useStoreSelector } from '@openenvx/headless/react';
+import { useStoreSelector } from '@openenvx/core/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ExternalStore } from '@openenvx/core';

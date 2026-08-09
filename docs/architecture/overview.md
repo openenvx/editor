@@ -12,12 +12,9 @@ Hub: [Architecture.md](../../Architecture.md).
 Scene JSON (@xmazu/openenvxee-schema)
         │
         ▼
-EditorRuntime + PluginManager (@openenvx/core)
+EditorRuntime + PluginManager + WorkbenchController (@openenvx/core)
         │
         ├── domain engines: canvas / html / drivers
-        │
-        ▼
-WorkbenchController (@openenvx/headless)
         │
         ▼
 WorkbenchShell (@openenvx/workbench)
@@ -29,8 +26,7 @@ WorkbenchShell (@openenvx/workbench)
 | Layer | Job |
 | --- | --- |
 | **Schema** | Canonical Scene / EditorState / SceneSnapshot |
-| **Core** | Plugin host, commands, layers, DI, scene store |
-| **Headless** | Workbench runtime: contributions, layout, property host, external host mounts |
+| **Core** | Plugin host, commands, layers, DI, scene store, workbench runtime (contributions, layout, property host, external host mounts) |
 | **Domain** | Canvas Konva engine, HTML block editor, or email driver (pick one surface per page via `page.layout`) |
 | **Shell** | React chrome that renders contribution descriptors |
 | **Product** | Fat bundles that re-export the stack hosts actually import |
@@ -40,7 +36,7 @@ WorkbenchShell (@openenvx/workbench)
 | You want… | Use |
 | --- | --- |
 | Stage only, own state | `schema` + `canvas` (`CanvasStage`) |
-| Full editor, custom UI | `core` + `headless` + `canvas` / `html` / `driver-email` |
+| Full editor, custom UI | `core` + `canvas` / `html` / `driver-email` |
 | Full Studio product | `@xmazu/openenvxee-studio` (`DEFAULT_STUDIO_PLUGINS`, `WorkbenchShell`) |
 | HTML block product | `@openenvx/html-studio` |
 | Email block editor | `@openenvx/driver-email` + workbench (`apps/email-demo`) |

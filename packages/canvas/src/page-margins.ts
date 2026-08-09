@@ -1,8 +1,8 @@
-import type { Page } from '@xmazu/openenvxee-schema';
+import type { Page } from '@openenvx/core/schema';
 import {
   computePagePrintBoxes,
   isPrintEligiblePage,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
 
 import type { CanvasRect } from './stage/canvas-stage-interaction';
 

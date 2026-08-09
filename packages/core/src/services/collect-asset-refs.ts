@@ -1,4 +1,4 @@
-import type { Layer, Scene } from '@xmazu/openenvxee-schema';
+import type { Layer, Scene } from '@openenvx/core/schema';
 
 function* walkLayers(layers: Layer[]): Generator<Layer> {
   for (const layer of layers) {

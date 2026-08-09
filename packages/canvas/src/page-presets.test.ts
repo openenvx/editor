@@ -1,4 +1,4 @@
-import { toPx } from '@xmazu/openenvxee-schema';
+import { toPx } from '@openenvx/core/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

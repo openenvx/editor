@@ -1,4 +1,4 @@
-import { useWorkbenchContextSelector } from '@openenvx/headless/react';
+import { useWorkbenchContextSelector } from '@openenvx/core/react';
 
 import { AbsoluteEditorPane } from './absolute-editor-pane';
 

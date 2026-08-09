@@ -1,13 +1,10 @@
 import { createCanvasDemoScene } from '@openenvx/canvas';
-import type {
-  DocumentVersion,
-  VersionHistoryProvider,
-} from '@openenvx/headless';
+import type { DocumentVersion, VersionHistoryProvider } from '@openenvx/core';
 import {
   createDefaultEditorState,
   createEmptySceneSnapshot,
   type SceneSnapshot,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
 
 function snapshotFromScene(
   scene: ReturnType<typeof createCanvasDemoScene>

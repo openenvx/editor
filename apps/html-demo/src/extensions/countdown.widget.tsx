@@ -1,5 +1,5 @@
-import { defineHtmlComponent, string } from '@xmazu/openenvxee-extensions';
 /** @jsxImportSource preact */
+import { defineHtmlComponent, string } from '@xmazu/openenvxee-extensions';
 import { Heading, Paragraph, Section } from '@xmazu/openenvxee-extensions/html';
 
 /** Countdown HTML block — target date + label props. */

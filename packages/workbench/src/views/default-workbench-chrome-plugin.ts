@@ -1,13 +1,13 @@
-import { Command } from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
 import {
+  Command,
   CommandPaletteContribution,
   ShellUiServiceId,
   WorkbenchPlugin,
   type CommandPaletteBuilder,
   type ShellUiService,
   type WorkbenchPluginContext,
-} from '@openenvx/headless';
+  type CommandContext,
+} from '@openenvx/core';
 
 import {
   LayersTreeProvider,

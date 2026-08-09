@@ -10,7 +10,6 @@ import {
 } from '@openenvx/workbench';
 
 export * from '@openenvx/core';
-export * from '@openenvx/headless';
 export * from '@openenvx/html';
 
 /**

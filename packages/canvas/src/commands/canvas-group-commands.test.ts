@@ -10,7 +10,7 @@ import {
   normalizeSceneSnapshot,
   type EditorState,
   type Scene,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

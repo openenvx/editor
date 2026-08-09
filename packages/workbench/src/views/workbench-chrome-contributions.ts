@@ -12,9 +12,6 @@ import {
   moveLayerRelativeToTarget,
   movePageRelativeToTarget,
   LayerRegistryServiceId,
-} from '@openenvx/core';
-import type { CommandContext, Layer } from '@openenvx/core';
-import {
   StatusBarContribution,
   TreeDataProvider,
   ViewContainerContribution,
@@ -22,8 +19,10 @@ import {
   type StatusBarBuilder,
   type TreeItem,
   type TreeSelectOptions,
-} from '@openenvx/headless';
-import type { Page } from '@xmazu/openenvxee-schema';
+  type CommandContext,
+  type Layer,
+} from '@openenvx/core';
+import type { Page } from '@openenvx/core/schema';
 
 export const WORKBENCH_SIDEBAR_CONTAINER_ID = 'workbench.sidebar';
 export const WORKBENCH_PAGES_VIEW_ID = 'workbench.pages';

@@ -40,7 +40,7 @@ Widgets use `defineCanvasComponent` / `defineHtmlComponent` from `@xmazu/openenv
 ```text
 WorkbenchShell mountExternalHosts
   → SandboxExtensionHost (workbench)
-  → headless ExternalHostMount.mountSandbox
+  → ExternalHostMount.mountSandbox (core)
   → SandboxHostSurface
 ```
 
@@ -51,10 +51,10 @@ Studio’s `createSandboxExtensionHost` binds canvas widget clicks without workb
 | Concern | Package |
 | --- | --- |
 | Author SDK (protocol subpath, elements, defineExtension, Vite) | `@xmazu/openenvxee-extensions` |
-| Host: tree → builders, `ExternalHostMount`, sandbox surface | `@openenvx/headless` |
+| Host: tree → builders, `ExternalHostMount`, sandbox surface | `@openenvx/core` |
 | Host: QuickJS runtime, `showUI`, sandbox chrome | `@openenvx/workbench` |
 | Canvas widget seam + default plugins | `@xmazu/openenvxee-studio` / `@openenvx/canvas-studio` |
-| Internal OOP plugins | `core` / `headless` / product plugins |
+| Internal OOP plugins | `core` / product plugins |
 
 **Boundary:** `@xmazu/openenvxee-extensions` is author-facing only. Hosts import `@xmazu/openenvxee-extensions/protocol` for validators; rendering stays in workbench + canvas/html.
 

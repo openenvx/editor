@@ -1,9 +1,9 @@
-import type { CommandContext } from '@openenvx/core';
 import {
+  type CommandContext,
   ToolbarContribution,
   type ShellDropdownMenuItemDescriptor,
   type ToolbarBuilder,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 
 import { HTML_ZOOM_PRESETS } from '../editor/html-device-preview';
 

@@ -1,7 +1,4 @@
-import {
-  VersionHistoryProviderId,
-  type DocumentVersion,
-} from '@openenvx/headless';
+import { VersionHistoryProviderId, type DocumentVersion } from '@openenvx/core';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 

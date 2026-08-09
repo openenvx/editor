@@ -18,8 +18,7 @@ Workspace libraries (private, not published — `exports` point at TypeScript `s
 
 - **`@xmazu/openenvxee-schema`** - Scene document model and page presets _(also published — see [PUBLISHING.md](PUBLISHING.md))_
 - **`@xmazu/openenvxee-preview`** - DOM preview rendering for layer types
-- **`@openenvx/core`** - Scene model, plugins, commands, and contribution registries
-- **`@openenvx/headless`** - `WorkbenchController` and headless editor runtime
+- **`@openenvx/core`** - Scene model, plugins, commands, contribution registries, `WorkbenchController` and headless editor runtime
 - **`@openenvx/canvas`** - Canvas engine, layers, Konva stage, TipTap rich text, `CanvasPlugin` (toolbar, smart guides, inspector)
 - **`@openenvx/workbench`** - React workbench UI shell (`WorkbenchShell`, fields, theme)
 - **`@openenvx/agent`** - AI agent sidebar plugin

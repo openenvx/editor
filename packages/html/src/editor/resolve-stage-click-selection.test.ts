@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Page } from '@xmazu/openenvxee-schema';
+import type { Page } from '@openenvx/core/schema';
 
 import { resolveStageClickAction } from './resolve-stage-click-selection';
 

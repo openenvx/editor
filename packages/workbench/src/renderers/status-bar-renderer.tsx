@@ -2,8 +2,8 @@ import type {
   StatusBarItemDescriptor,
   StatusBarItemRendererRegistration,
   StatusBarTextItemDescriptor,
-} from '@openenvx/headless';
-import { isStatusBarDropdownItem } from '@openenvx/headless';
+} from '@openenvx/core';
+import { isStatusBarDropdownItem } from '@openenvx/core';
 import { memo, useMemo } from 'react';
 import type { ComponentType } from 'react';
 

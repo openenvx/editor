@@ -1,5 +1,4 @@
-import { getActivePage, type Scene } from '@openenvx/core';
-import type { ViewDescriptor } from '@openenvx/headless';
+import { getActivePage, type Scene, type ViewDescriptor } from '@openenvx/core';
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 
 import { getLayerAncestorIds } from './get-layer-ancestor-ids';

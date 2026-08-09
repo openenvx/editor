@@ -6,8 +6,8 @@ import type {
   Page,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createLayerPreviewBuilder } from '@openenvx/core/preview';
+import { createDefaultTransform } from '@openenvx/core/schema';
 import { z } from 'zod';
 
 const canvasGroupSchema = z.object({

@@ -6,7 +6,7 @@ import {
   type ViewContainerLocation,
   type VersionHistoryProvider,
   type WorkbenchPluginContext,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 
 import { RestoreVersionCommand } from './restore-version-command';
 import { VersionHistoryPanel } from './version-history-panel';

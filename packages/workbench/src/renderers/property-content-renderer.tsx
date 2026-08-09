@@ -8,8 +8,8 @@ import type {
   PropertyRowNode,
   PropertyValuePath,
   PropertyHostContext,
-} from '@openenvx/headless';
-import { PropertyPath, PropertyPathResolver } from '@openenvx/headless';
+} from '@openenvx/core';
+import { PropertyPath, PropertyPathResolver } from '@openenvx/core';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 

@@ -3,12 +3,12 @@ import {
   getActivePage,
   type Scene,
   type Selection,
+  type EditorPaneHostProps,
 } from '@openenvx/core';
-import type { EditorPaneHostProps } from '@openenvx/headless';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/headless/react';
+} from '@openenvx/core/react';
 import { memo, useCallback, useMemo } from 'react';
 
 import { CanvasHostProvider } from '../canvas-host-context';

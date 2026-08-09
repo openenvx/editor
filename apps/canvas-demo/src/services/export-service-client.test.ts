@@ -1,4 +1,4 @@
-import { RENDER_IR_VERSION } from '@xmazu/openenvxee-preview';
+import { RENDER_IR_VERSION } from '@openenvx/core/preview';
 import { describe, expect, it, vi } from 'vitest';
 
 import { exportViaService } from './export-service-client';

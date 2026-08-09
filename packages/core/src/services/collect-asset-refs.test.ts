@@ -1,4 +1,4 @@
-import { createEmptyScene } from '@xmazu/openenvxee-schema';
+import { createEmptyScene } from '@openenvx/core/schema';
 import { describe, expect, it } from 'vitest';
 
 import { collectAssetRefs } from './collect-asset-refs';

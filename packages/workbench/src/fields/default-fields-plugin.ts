@@ -1,7 +1,4 @@
-import {
-  WorkbenchPlugin,
-  type WorkbenchPluginContext,
-} from '@openenvx/headless';
+import { WorkbenchPlugin, type WorkbenchPluginContext } from '@openenvx/core';
 
 import { AlignFieldRenderer } from './advanced/align-field';
 import { BorderFieldRenderer } from './advanced/border-field';

@@ -1,7 +1,4 @@
-import {
-  ViewContainerContribution,
-  ViewContribution,
-} from '@openenvx/headless';
+import { ViewContainerContribution, ViewContribution } from '@openenvx/core';
 
 export const EMAIL_PATTERNS_CONTAINER_ID = 'email.patterns';
 export const EMAIL_PATTERNS_VIEW_ID = 'email.patterns.gallery';

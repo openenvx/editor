@@ -1,4 +1,8 @@
-import { findLayerById } from '@openenvx/core';
+import {
+  findLayerById,
+  createPropertyHostContext,
+  PropertyPathResolver,
+} from '@openenvx/core';
 import type {
   FieldRendererRegistration,
   PropertyHostContext,
@@ -7,11 +11,7 @@ import type {
   ViewDescriptor,
   ViewPanelRegistration,
   WorkbenchApi,
-} from '@openenvx/headless';
-import {
-  createPropertyHostContext,
-  PropertyPathResolver,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 import type { ComponentType } from 'react';
 import { useMemo } from 'react';
 

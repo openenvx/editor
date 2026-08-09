@@ -1,4 +1,4 @@
-import { normalizeScene } from '@xmazu/openenvxee-schema';
+import { normalizeScene } from '@openenvx/core/schema';
 import { describe, expect, it } from 'vitest';
 
 import { CanvasImageLayer } from './canvas-image-layer';

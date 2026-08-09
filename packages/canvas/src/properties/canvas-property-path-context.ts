@@ -4,18 +4,18 @@ import {
   getActivePage,
   getLayerWriteMode,
   isLayerShownInLayers,
+  createPropertyHostContext,
 } from '@openenvx/core';
 import type {
   PropertyValuePath,
   PropertyHostContext,
   PropertyPathContextOptions,
-} from '@openenvx/headless';
-import { createPropertyHostContext } from '@openenvx/headless';
+} from '@openenvx/core';
 import {
   resolvePageBleedMm,
   resolvePageSafeMm,
   type Transform,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
 
 export interface CanvasPropertyPathContextOptions extends PropertyPathContextOptions {
   updateLayerTransform: (

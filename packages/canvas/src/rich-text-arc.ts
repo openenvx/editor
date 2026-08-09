@@ -1,4 +1,4 @@
-import { clampTextCurve, MAX_TEXT_CURVE } from '@xmazu/openenvxee-schema';
+import { clampTextCurve, MAX_TEXT_CURVE } from '@openenvx/core/schema';
 import Konva from 'konva';
 
 import { measurePlainTextWidth } from './rich-text-layout';

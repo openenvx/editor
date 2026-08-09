@@ -1,4 +1,4 @@
-import { WorkbenchProvider } from '@openenvx/headless/react';
+import { WorkbenchProvider } from '@openenvx/core/react';
 
 import { EditorPaneHost } from './editor-pane-host';
 import { PlaygroundToolbar } from './playground-toolbar';

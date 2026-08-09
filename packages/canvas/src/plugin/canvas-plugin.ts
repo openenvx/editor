@@ -9,9 +9,13 @@ import {
   SimpleServiceContribution,
   SingletonServiceContribution,
 } from '@openenvx/core';
-import type { CommandContext, Layer, PluginContext } from '@openenvx/core';
-import type { WorkbenchPluginContext } from '@openenvx/headless';
-import { normalizeScene } from '@xmazu/openenvxee-schema';
+import type {
+  CommandContext,
+  Layer,
+  PluginContext,
+  WorkbenchPluginContext,
+} from '@openenvx/core';
+import { normalizeScene } from '@openenvx/core/schema';
 
 import { AbsolutePageRules } from '../absolute-page-rules';
 import {

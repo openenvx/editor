@@ -3,7 +3,7 @@ import {
   createPropertyPane,
   PropertyPaneContribution,
   PropertyPath,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 
 const ABSOLUTE_LAYER_SELECTED = 'page.layoutAbsolute && scene.layerSelected';
 const ABSOLUTE_PAGE_ONLY = 'page.layoutAbsolute && !scene.layerSelected';

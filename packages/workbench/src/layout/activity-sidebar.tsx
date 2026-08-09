@@ -10,8 +10,8 @@ import type {
   MenuItemDescriptor,
   ViewContainerDescriptor,
   WorkbenchApi,
-} from '@openenvx/headless';
-import { mergePrimaryContainerOrder } from '@openenvx/headless';
+} from '@openenvx/core';
+import { mergePrimaryContainerOrder } from '@openenvx/core';
 import { Fragment, forwardRef, useCallback, useMemo, useState } from 'react';
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
 

@@ -1,5 +1,4 @@
-import type { Scene } from '@openenvx/core';
-import type { ViewDescriptor, ViewTreeItem } from '@openenvx/headless';
+import type { Scene,ViewDescriptor,ViewTreeItem } from '@openenvx/core';
 import { act, renderHook } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';

@@ -1,6 +1,6 @@
 {
   "name": "@xmazu/openenvxee-html-studio",
-  "version": "0.7.17",
+  "version": "0.7.18",
   "description": "OpenEnvx HTML Studio — curated host surface with workbench and HTML block editor bundled for product apps",
   "license": "UNLICENSED",
   "type": "module",
@@ -69,7 +69,6 @@
   },
   "devDependencies": {
     "@openenvx/core": "workspace:*",
-    "@openenvx/headless": "workspace:*",
     "@openenvx/html": "workspace:*",
     "@openenvx/html-studio": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
@@ -77,9 +76,7 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@xmazu/openenvxee-preview": "workspace:*",
     "@xmazu/openenvxee-extensions": "workspace:*",
-    "@xmazu/openenvxee-schema": "workspace:*",
     "esbuild": "^0.25.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",

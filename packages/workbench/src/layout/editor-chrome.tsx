@@ -1,5 +1,5 @@
-import type { ToolbarPlacement } from '@openenvx/headless';
-import { TOOLBAR_PLACEMENTS } from '@openenvx/headless';
+import type { ToolbarPlacement } from '@openenvx/core';
+import { TOOLBAR_PLACEMENTS } from '@openenvx/core';
 import type { ReactNode } from 'react';
 
 import styles from './editor-chrome.module.css';

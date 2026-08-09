@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@openenvx/canvas": "workspace:*",
-    "@openenvx/headless": "workspace:*",
+    "@openenvx/core": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-router": "latest",

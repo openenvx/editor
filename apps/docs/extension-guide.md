@@ -9,18 +9,18 @@ This is **not** how to write sandbox widgets, sandbox plugins, or embed panels. 
 
 Under-the-hood map: [Architecture.md](../../Architecture.md) · [docs/architecture/](../../docs/architecture/overview.md). Trust model: [Plugin-boundaries.md](../../Plugin-boundaries.md).
 
-## Scene document (`@xmazu/openenvxee-schema`)
+## Scene document (`@openenvx/core/schema`)
 
-The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@xmazu/openenvxee-schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
+The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@openenvx/core/schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
 
-Backend services depend on `@xmazu/openenvxee-schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Cloud `export-service` (openenvx-cloud) imports overlapping leaf schemas (`paddingSchema`, `layerStyleShadowSchema`, …) into its Render IR request schema while keeping Render-IR-specific document shapes local.
+Backend services depend on `@openenvx/core/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Cloud `export-service` (openenvx-cloud) imports overlapping leaf schemas (`paddingSchema`, `layerStyleShadowSchema`, …) into its Render IR request schema while keeping Render-IR-specific document shapes local.
 
 ## OSS vs enterprise shell
 
 | Package | Responsibility |
 | --- | --- |
 | `@openenvx/canvas` | Canvas engine: layers, commands, Konva renderers, `CanvasEditor` |
-| `@openenvx/headless` | Workbench runtime: `WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()` |
+| `@openenvx/core` | Workbench runtime: `WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()` |
 | `@openenvx/core` | Editor host: `EditorRuntime`, `PluginManager`, `registerContribution()` |
 | Your app / `demo-playground` | Wire canvas to workbench via `CanvasHostProvider` + app-owned toolbar/sidebars |
 | `@openenvx/canvas` | Full canvas editor: `CanvasPlugin` (engine + workbench chrome), toolbar, palette, editor pane registration |
@@ -29,7 +29,7 @@ Load `CanvasPlugin` for the full canvas editor. For a minimal custom shell, comp
 
 ### Custom editor host (without `WorkbenchController`)
 
-If you build your own shell instead of `@openenvx/headless`, compose the core host like this:
+If you build your own shell instead of `@openenvx/core`, compose the core host like this:
 
 ```ts
 import {
@@ -46,7 +46,7 @@ const runtime = new EditorRuntime(scene, editor);
 const manager = new PluginManager(runtime);
 
 // Register workbench-specific services on runtime.services before activating plugins.
-// See bootstrapWorkbenchServices() in @openenvx/headless for the headless defaults.
+// See bootstrapWorkbenchServices() in @openenvx/core for the headless defaults.
 
 await manager.activateCorePlugins();
 for (const plugin of plugins) {
@@ -66,11 +66,11 @@ Plugin contributions register through `PluginContext.register()`, which routes t
 
 ### Wiring canvas in a workbench app
 
-`@openenvx/canvas` does not depend on `@openenvx/headless`. The app bridges them:
+`@openenvx/canvas` does not depend on `@openenvx/core`. The app bridges them:
 
 ```tsx
 import { CanvasHostProvider, CanvasEditor } from '@openenvx/canvas';
-import { useWorkbenchContext } from '@openenvx/headless/react';
+import { useWorkbenchContext } from '@openenvx/core/react';
 
 // Provide CanvasHostApi from workbench, then mount CanvasEditor.
 // See apps/demo-playground/src/components/absolute-editor-pane.tsx
@@ -79,7 +79,7 @@ import { useWorkbenchContext } from '@openenvx/headless/react';
 Workbench UI contributions use `WorkbenchPlugin` and `ctx.registerWorkbench()`:
 
 ```ts
-import { WorkbenchPlugin } from '@openenvx/headless';
+import { WorkbenchPlugin } from '@openenvx/core';
 
 class MyWorkbenchPlugin extends WorkbenchPlugin {
   readonly id = 'my.workbench';
@@ -103,7 +103,7 @@ import {
   ViewContainerContribution,
   ViewContribution,
   WorkbenchPlugin,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 
 class MyView extends ViewContribution {
   readonly id = 'my.view';

@@ -17,17 +17,6 @@ import {
   Plugin,
   ShortcutContribution,
   ThemeServiceId,
-} from '@openenvx/core';
-import type {
-  CommandContext,
-  ContributionBuildContext,
-  I18nBundleRegistry,
-  LocalizationService,
-  MenuChoiceProvider,
-  PluginContext,
-  ThemeService,
-} from '@openenvx/core';
-import {
   CommandPaletteContribution,
   ShellUiServiceId,
   SidebarHeaderContribution,
@@ -37,7 +26,14 @@ import {
   type MenuBuilder,
   type SidebarHeaderBuilder,
   type WorkbenchPluginContext,
-} from '@openenvx/headless';
+  type CommandContext,
+  type ContributionBuildContext,
+  type I18nBundleRegistry,
+  type LocalizationService,
+  type MenuChoiceProvider,
+  type PluginContext,
+  type ThemeService,
+} from '@openenvx/core';
 
 import {
   CANVAS_DEMO_EXPORT_FORMATS,

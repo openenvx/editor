@@ -1,4 +1,4 @@
-import type { ViewTreeItem } from '@openenvx/headless';
+import type { ViewTreeItem } from '@openenvx/core';
 import { describe, expect, it } from 'vitest';
 
 import {

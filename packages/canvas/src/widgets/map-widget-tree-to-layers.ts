@@ -1,13 +1,13 @@
+import {
+  createDefaultTransform,
+  type Layer,
+  type Transform,
+} from '@openenvx/core/schema';
 import type {
   RenderChild,
   RenderNode,
 } from '@xmazu/openenvxee-extensions/protocol';
 import { WIDGET_LAYER_ESCAPE_TYPES } from '@xmazu/openenvxee-extensions/protocol';
-import {
-  createDefaultTransform,
-  type Layer,
-  type Transform,
-} from '@xmazu/openenvxee-schema';
 
 import { readLayoutIntent, resolveAutoLayout } from './resolve-auto-layout';
 

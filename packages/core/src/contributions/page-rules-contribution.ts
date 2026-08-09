@@ -1,4 +1,4 @@
-import type { Page, ValidationError } from '@xmazu/openenvxee-schema';
+import type { Page, ValidationError } from '@openenvx/core/schema';
 
 import { Contribution } from '../core/contribution';
 import { ContributionPoint } from '../core/contribution-point';

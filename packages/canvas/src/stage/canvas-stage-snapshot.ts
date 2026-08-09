@@ -1,4 +1,4 @@
-import type { Transform } from '@xmazu/openenvxee-schema';
+import type { Transform } from '@openenvx/core/schema';
 
 import type { CanvasInteractionMode } from '../interactions/canvas-interaction-mode';
 

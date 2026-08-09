@@ -1,4 +1,4 @@
-import type { SceneSnapshot as PersistedSceneSnapshot } from '@xmazu/openenvxee-schema';
+import type { SceneSnapshot as PersistedSceneSnapshot } from '@openenvx/core/schema';
 
 import type { Scene, SceneAsset } from '../scene/types';
 

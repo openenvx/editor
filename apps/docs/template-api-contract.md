@@ -1,6 +1,6 @@
 # Template API contract
 
-Stable contract for building a cloud render API against OpenEnvx templates. Editor and server share `@xmazu/openenvxee-schema` helpers: `extractTemplateManifest`, `applyModifications`, and `validateTemplateNames`.
+Stable contract for building a cloud render API against OpenEnvx templates. Editor and server share `@openenvx/core/schema` helpers: `extractTemplateManifest`, `applyModifications`, and `validateTemplateNames`.
 
 Pin clients to the scene `schemaVersion` (currently `2`). When the modification shape or resolution rules change incompatibly, bump `schemaVersion` and document the delta here.
 

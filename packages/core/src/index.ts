@@ -271,3 +271,4 @@ export type {
   FontService,
   PersistenceService,
 } from './services/types';
+export * from './headless-exports';

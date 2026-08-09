@@ -2,20 +2,18 @@ import {
   Command,
   getActivePage,
   insertLayerIntoContainer,
-} from '@openenvx/core';
-import {
   extensionBlockStore,
   type SandboxHostSurface,
-} from '@openenvx/headless';
-import type {
-  ExtensionManifest,
-  ExtensionWidgetContribution,
-} from '@xmazu/openenvxee-extensions/protocol';
+} from '@openenvx/core';
 import {
   createDefaultTransform,
   type Layer,
   type Page,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
+import type {
+  ExtensionManifest,
+  ExtensionWidgetContribution,
+} from '@xmazu/openenvxee-extensions/protocol';
 
 function sizeFromDefaults(defaults: Record<string, unknown> | undefined): {
   width: number;

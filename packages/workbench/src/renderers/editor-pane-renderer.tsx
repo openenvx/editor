@@ -2,7 +2,7 @@ import type {
   EditorPaneHostProps,
   EditorPaneRegistration,
   LayerSurfaceItem,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 import type { ComponentType } from 'react';
 import { memo } from 'react';
 

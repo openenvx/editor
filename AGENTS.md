@@ -16,7 +16,7 @@ When using thermos skills (thermo-nuclear review, thermo-nuclear code-quality re
 
 **Especially** look for:
 
-- **Architecture** — package/module boundaries, contribution flow, whether code lives in the right package (`core` / `headless` / `canvas` / `html` / `driver-*` / host), and conformance to the docs above
+- **Architecture** — package/module boundaries, contribution flow, whether code lives in the right package (`core` / `canvas` / `html` / `driver-*` / `workbench` / host), and conformance to the docs above
 - **Tight coupling** — cross-package imports that skip the public surface, host/shell leaking into libraries, scene/UI entangled with protocol or sandbox concerns; flag spaghetti and push SOLID / KISS so modules stay loosely coupled and easy to change
 - **Design patterns** — where a known pattern would clarify or shrink the design (and whether existing ones—contributions, registries, property paths, sandbox bridges—are followed or duplicated ad hoc)
 - **Refactor opportunities** — extract shared helpers once, delete dead paths, simplify over-built abstractions; prefer a concrete follow-up over vague “could be cleaner”
@@ -27,11 +27,11 @@ Call these out as first-class findings, not afterthoughts.
 
 OpenEnvx is a composable visual editor framework: plugins register layers, commands, and UI contributions; a headless controller owns scene state; apps compose their own React shell. The monorepo uses **Bun** workspaces:
 
-| Path         | Contents                                                |
-| ------------ | ------------------------------------------------------- |
-| `packages/*` | Publishable libraries (`core`, `canvas`, `headless`, …) |
-| `apps/*`     | Demo apps (`demo-playground`, `docs`)                   |
-| `examples/*` | Example plugins (`image-plugin`)                        |
+| Path         | Contents                                                 |
+| ------------ | -------------------------------------------------------- |
+| `packages/*` | Publishable libraries (`core`, `canvas`, `workbench`, …) |
+| `apps/*`     | Demo apps (`demo-playground`, `docs`)                    |
+| `examples/*` | Example plugins (`image-plugin`)                         |
 
 ## Documentation map
 
@@ -55,14 +55,13 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 
 - **`docs/architecture/*.md`** and package READMEs — **authoritative API and behavior** for agents and integrators. Add or update a chapter when you introduce or change a public descriptor, contribution, or host contract.
 - **[packages/workbench/Design.md](packages/workbench/Design.md)** — **editor shell look-and-feel** (colors, density, component visuals). Do **not** put API tables, prop reference, or integration guides there; link to `docs/architecture/` instead.
-- **JSDoc** — Public types in `@openenvx/core`, `@openenvx/headless`, and other libraries should document non-obvious fields on interfaces (especially contribution and descriptor props). Keep JSDoc in sync when you change the type; mirror substantive behavior in architecture docs when authors need narrative context.
+- **JSDoc** — Public types in `@openenvx/core` and other libraries should document non-obvious fields on interfaces (especially contribution and descriptor props). Keep JSDoc in sync when you change the type; mirror substantive behavior in architecture docs when authors need narrative context.
 
 ## Package placement (hard rules)
 
 | Put it here | Examples |
 | --- | --- |
-| `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
-| `@openenvx/headless` | `WorkbenchController`, `WorkbenchState`, `WorkbenchPlugin`, workbench contributions (`ToolbarContribution`, `PropertyPaneContribution`, …), provider registries (`registerFieldRenderer`, …), `PropertyPaneBuilder`, `WorkbenchProvider`, `useWorkbenchContext` |
+| `@openenvx/core` | Scene (`./schema`), preview IR (`./preview`), `Command`, `Plugin`, `EditorRuntime`, `WorkbenchController`, workbench contributions, `./react` |
 | `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasPlugin`, `CanvasEditor`, `CanvasHostProvider` |
 | `@xmazu/openenvxee-extensions` | Sandbox author SDK: `./protocol`, element subpaths, `defineExtension`, Vite (`@xmazu/openenvxee-extensions/protocol` for hosts) |
 
@@ -79,16 +78,14 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 
 ## Licensing / publishing intent
 
-Internal workspace libraries (`core`, `headless`, `preview`, `canvas`, `workbench`, `agent`, …) are **private** and not published. Their `exports` point at **TypeScript `src/`** so Vite/Bun apps hot-reload and TypeScript resolves types from source without rebuilding.
+Internal workspace libraries (`core`, `canvas`, `workbench`, `agent`, …) are **private** and not published. Their `exports` point at **TypeScript `src/`** so Vite/Bun apps hot-reload and TypeScript resolves types from source without rebuilding.
 
 Published packages:
 
-- **`@xmazu/openenvxee-schema`** — scene model, Zod schemas, template helpers. Ships `dist/` to the registry. See [PUBLISHING.md](PUBLISHING.md).
-- **`@xmazu/openenvxee-extensions`** — published sandbox author SDK (merged protocol + elements + widget-sdk): `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts import **`@xmazu/openenvxee-extensions/protocol`** only.
-- **`@openenvx/canvas-studio`** — private curated canvas host surface (`WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, sandbox/embed, theme CSS). Workspace TypeScript via `workspace:*` — monorepo hosts use this (not bundled).
-- **`@openenvx/html-studio`** — private curated HTML host surface (`DEFAULT_HTML_STUDIO_PLUGINS`, theme CSS). Monorepo hosts use this; external hosts use `@xmazu/openenvxee-html-studio`.
-- **`@xmazu/openenvxee-studio`** — published fat canvas bundle. Re-exports `@openenvx/canvas-studio` and inlines `@openenvx/workbench`, `@openenvx/canvas`, and their `@openenvx/*` deps into `dist/`. Public surface matches canvas-studio’s allowlist — not a barrel re-export of core/headless/canvas. Plugin authoring uses private `@openenvx/core` + `@openenvx/headless` in-monorepo. Top-level `exports` → `dist/` only (no `development` → `src`). Publish to GitHub Packages (`npm.pkg.github.com`, restricted); `latest` has no sourcemaps, `debug` tag ships maps. Does **not** inline html — HTML hosts use `@xmazu/openenvxee-html-studio`. PNG/JPG/PDF/SVG export is server-side via openenvx-cloud `apps/export-service`.
-- **`@xmazu/openenvxee-html-studio`** — published HTML host package. Re-exports `@openenvx/html-studio` and inlines workspace packages into a per-module `dist/` ESM tree (Vite-tree-shakeable; third-party UI deps external). Subpaths: `.` (editor), `./runtime` (Worker-safe `renderBlockDocument`), `./theme.css`. Product hosts own their blocks/plugins (e.g. Snapvelo in snapvelo-app).
+- **`@xmazu/openenvxee-extensions`** — published sandbox author SDK: `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts import **`@xmazu/openenvxee-extensions/protocol`** only.
+- **`@xmazu/openenvxee-html-studio`** — published HTML host package (inlines private core/html/workbench). Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/canvas-studio`** — private curated canvas host surface. Monorepo hosts use workspace TypeScript (not published).
+- **`@openenvx/html-studio`** — private HTML host surface. External hosts use `@xmazu/openenvxee-html-studio`.
 
 ## Host sidebar panels (product hosts)
 
@@ -173,7 +170,7 @@ All packages are pre-1.0.0. Breaking API changes are expected and preferred over
 | Add shell UI chrome | `apps/demo-playground/src/` or your own app |
 | Wire canvas editor to workbench | App shell: `CanvasHostProvider` + `AbsoluteEditorPane` (see `apps/demo-playground`) |
 | Add generic plugin contribution | `packages/core` contribution + `ctx.register()` |
-| Add workbench UI contribution | `@openenvx/headless` + `ctx.registerWorkbench()` via `WorkbenchPlugin` |
+| Add workbench UI contribution | `@openenvx/core` + `ctx.registerWorkbench()` via `WorkbenchPlugin` |
 | Add flow layer type | `packages/canvas/src/layers/` |
 
 ## Commands
@@ -192,7 +189,7 @@ bun run changeset     # create a release changeset
 
 ## Publishing
 
-Only `packages/schema` (`@xmazu/openenvxee-schema`), `packages/preview` (`@xmazu/openenvxee-preview`), `packages/extensions` (`@xmazu/openenvxee-extensions`), `packages/studio` (`@xmazu/openenvxee-studio`), and `packages/openenvxee-html-studio` (`@xmazu/openenvxee-html-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)). Export Worker lives in openenvx-cloud.
+Only `packages/extensions` (`@xmazu/openenvxee-extensions`) and `packages/openenvxee-html-studio` (`@xmazu/openenvxee-html-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)).
 
 ## Before you finish
 

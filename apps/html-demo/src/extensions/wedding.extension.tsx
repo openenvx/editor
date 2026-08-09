@@ -1,5 +1,5 @@
-import { defineExtension, renderPanelTree } from '@xmazu/openenvxee-extensions';
 /** @jsxImportSource preact */
+import { defineExtension, renderPanelTree } from '@xmazu/openenvxee-extensions';
 import { Block, Pane, Text } from '@xmazu/openenvxee-extensions/panel';
 
 import { countdownWidget } from './countdown.widget';

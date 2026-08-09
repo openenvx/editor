@@ -1,6 +1,6 @@
 import type { CanvasExportFormat } from '@openenvx/canvas';
-import type { IrRenderMode, RenderIrDocument } from '@xmazu/openenvxee-preview';
-import type { Scene } from '@xmazu/openenvxee-schema';
+import type { IrRenderMode, RenderIrDocument } from '@openenvx/core/preview';
+import type { Scene } from '@openenvx/core/schema';
 
 export type ExportServiceRequest = {
   background?: 'transparent' | 'white' | string;

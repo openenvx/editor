@@ -1,5 +1,4 @@
-import type { Scene } from '@openenvx/core';
-import type { ViewDescriptor } from '@openenvx/headless';
+import type { Scene, ViewDescriptor } from '@openenvx/core';
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 
 import { getSelectionExpandIds } from './get-selection-expand-ids';

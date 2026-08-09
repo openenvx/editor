@@ -1,4 +1,4 @@
-import { useWorkbenchContext } from '@openenvx/headless/react';
+import { useWorkbenchContext } from '@openenvx/core/react';
 
 const TOOLBAR_ACTIONS = [
   { commandId: 'canvas.insertText', label: 'Add Text' },

@@ -1,5 +1,5 @@
 import { findLayerById, updateLayerInTree } from '@openenvx/core';
-import type { SandboxHostSurface } from '@openenvx/headless';
+import type { SandboxHostSurface } from '@openenvx/core';
 
 /** Scene adapters for widget `data.values` + transform resize. */
 export function createWidgetSceneAdapters(input: {

@@ -1,10 +1,8 @@
-import { Command } from '@openenvx/core';
-import {
+import { Command,
   extensionBlockStore,
-  type SandboxHostSurface,
-} from '@openenvx/headless';
+  type SandboxHostSurface } from '@openenvx/core';
 import type { ExtensionManifest } from '@xmazu/openenvxee-extensions/protocol';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@openenvx/core/schema';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { registerWidgetInsertCommands } from './register-widget-insert-commands';

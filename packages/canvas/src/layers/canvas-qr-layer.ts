@@ -9,8 +9,8 @@ import type {
 import {
   createLayerPreviewBuilder,
   encodeQrToSvg,
-} from '@xmazu/openenvxee-preview';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/preview';
+import { createDefaultTransform } from '@openenvx/core/schema';
 import { z } from 'zod';
 
 export const canvasQrSchema = z.object({

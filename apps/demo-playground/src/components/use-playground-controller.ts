@@ -1,5 +1,5 @@
 import { CanvasPlugin, createCanvasDemoScene } from '@openenvx/canvas';
-import { WorkbenchController } from '@openenvx/headless';
+import { WorkbenchController } from '@openenvx/core';
 import { useEffect, useState } from 'react';
 
 export function usePlaygroundController() {

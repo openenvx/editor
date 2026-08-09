@@ -1,7 +1,4 @@
-import {
-  ViewContainerContribution,
-  ViewContribution,
-} from '@openenvx/headless';
+import { ViewContainerContribution, ViewContribution } from '@openenvx/core';
 
 export const EMAIL_TEMPLATES_CONTAINER_ID = 'email.templates';
 export const EMAIL_TEMPLATES_VIEW_ID = 'email.templates.gallery';

@@ -1,6 +1,6 @@
 # Workbench & headless
 
-**Audience:** Internal engineers and coding agents. Packages: `@openenvx/headless`, `@openenvx/workbench`.
+**Audience:** Internal engineers and coding agents. "Headless" is the UI-agnostic controller/contribution layer that lives inside `@openenvx/core`; "workbench" is the React shell package `@openenvx/workbench`.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -8,12 +8,12 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 
 | Package | Responsibility |
 | --- | --- |
-| `@openenvx/headless` | Runtime: `WorkbenchController`, state, contributions, builders, property host context, `ExternalHostMount` |
+| `@openenvx/core` (headless layer) | Runtime: `WorkbenchController`, state, contributions, builders, property host context, `ExternalHostMount` |
 | `@openenvx/workbench` | React shell: `WorkbenchShell`, field/status renderers, default chrome plugins, sandbox/embed host adapters |
 
-Headless is framework UI-agnostic descriptors. Workbench is the first-party React consumer.
+The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx/core` (`.` and `./react`). Workbench is the first-party React consumer.
 
-## What headless owns
+## What the headless layer (in `@openenvx/core`) owns
 
 - `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` — owns `EditorRuntime`, injects it into `PluginManager`
 - `bootstrapWorkbenchServices()` — headless DI services on the runtime
@@ -23,7 +23,7 @@ Headless is framework UI-agnostic descriptors. Workbench is the first-party Reac
 - Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `SidebarHeaderBuilder`, `PropertyPaneBuilder`
 - `WorkbenchLayout` (independent `activityBar` / `primarySidebar` / `secondarySidebar`), `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
 - Optional `WorkbenchLayoutStore` for persisted visibility + container locations
-- `WorkbenchProvider`, `useWorkbenchContext`
+- `WorkbenchProvider`, `useWorkbenchContext` (from `@openenvx/core/react`)
 - `createPropertyHostContext`, `PropertyPathResolver`, `LayerPropertiesPaneFactory`, `PropertyPath`
 - External hosts (not PluginManager): `ExternalHostMount`, `SandboxHostSurface`, `EmbedPanelHostSurface`, `mountSandboxHost` / `mountEmbedPanelHost`
 
@@ -61,8 +61,6 @@ flowchart LR
   end
   subgraph corePkg [core]
     PropertyBuilder[PropertyBuilder]
-  end
-  subgraph headlessPkg [headless]
     Builder[PropertyPaneBuilder]
     GenericCtx[createPropertyHostContext]
     Factory[LayerPropertiesPaneFactory]
@@ -103,7 +101,7 @@ Isolates / `panel:*` parents never see the surfaces. This is DI isolation, not r
 
 ```text
 PlaygroundShell
-├── WorkbenchProvider          ← @openenvx/headless
+├── WorkbenchProvider          ← @openenvx/core/react
 ├── EditorPaneHost             ← app-owned: CanvasHostProvider + CanvasEditor
 ├── PlaygroundToolbar          ← app-owned
 └── Inspector / sidebars       ← app-owned React UI

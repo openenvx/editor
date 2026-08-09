@@ -13,7 +13,7 @@ import {
   isLayerVisible,
   WIDGET_LAYER_TYPE,
 } from '@openenvx/core';
-import type { Layer, Scene } from '@xmazu/openenvxee-schema';
+import type { Layer, Scene } from '@openenvx/core/schema';
 import {
   memo,
   Suspense,

@@ -1,5 +1,5 @@
-import { WorkbenchPlugin } from '@openenvx/headless';
-import type { WorkbenchPluginContext } from '@openenvx/headless';
+import { WorkbenchPlugin } from '@openenvx/core';
+import type { WorkbenchPluginContext } from '@openenvx/core';
 
 import { ChatPanel } from '../components/chat-panel';
 import {

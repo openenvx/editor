@@ -6,7 +6,7 @@ import {
   updateLayerInTree,
 } from '@openenvx/core';
 import type { CommandContext } from '@openenvx/core';
-import type { Transform } from '@xmazu/openenvxee-schema';
+import type { Transform } from '@openenvx/core/schema';
 
 import { alignTransforms, distributeHorizontally } from '../layer-align/align';
 

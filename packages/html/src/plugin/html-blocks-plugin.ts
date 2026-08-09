@@ -4,9 +4,9 @@ import {
   OpenEnvxWidgetLayer,
   SimpleServiceContribution,
   SingletonServiceContribution,
+  WorkbenchPlugin,
 } from '@openenvx/core';
-import { WorkbenchPlugin } from '@openenvx/headless';
-import type { WorkbenchPluginContext } from '@openenvx/headless';
+import type { WorkbenchPluginContext } from '@openenvx/core';
 
 import {
   BlockRegistryServiceId,

@@ -6,7 +6,7 @@ import type {
   Page,
   PropertySectionDescriptor,
 } from '@openenvx/core';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@openenvx/core/schema';
 import { z } from 'zod';
 
 import { getImagePastePreview } from '../clipboard/image-paste-preview';

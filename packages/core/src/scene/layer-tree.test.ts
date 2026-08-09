@@ -1,4 +1,4 @@
-import type { Layer } from '@xmazu/openenvxee-schema';
+import type { Layer } from '@openenvx/core/schema';
 import { describe, expect, it } from "vitest";
 
 import type { Page } from "./types";

@@ -2,7 +2,7 @@ import { ContextKeyServiceId } from '@openenvx/core';
 import type {
   ViewContainerDescriptor,
   ViewPanelRegistration,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 import { memo, useCallback, useMemo, type ComponentType } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';

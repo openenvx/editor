@@ -2,7 +2,7 @@ import {
   createEmptyScene,
   createEmptySceneSnapshot,
   type SceneSnapshot,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { LocalStoragePersistenceService } from './local-storage-persistence-service';

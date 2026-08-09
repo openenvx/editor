@@ -1,7 +1,7 @@
 import type {
   SidebarHeaderDescriptor,
   ViewContainerLocation,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 import { ChevronDown, MoreHorizontal } from 'lucide-react';
 import { useMemo } from 'react';
 

@@ -1,10 +1,10 @@
+/** @jsxImportSource preact */
 import {
   defineCanvasComponent,
   list,
   select,
   string,
 } from '@xmazu/openenvxee-extensions';
-/** @jsxImportSource preact */
 import { Grid, Stack, Text } from '@xmazu/openenvxee-extensions/canvas';
 
 const STATUS = ['free', 'held', 'seated'] as const;

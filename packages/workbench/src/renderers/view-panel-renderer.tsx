@@ -1,9 +1,9 @@
-import type { Scene } from '@openenvx/core';
 import type {
+  Scene,
   ViewContainerDescriptor,
   ViewDescriptor,
   ViewTreeItem,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 import { ChevronDown, Eye, EyeOff, Lock, LockOpen } from 'lucide-react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 

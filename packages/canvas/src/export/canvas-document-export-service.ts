@@ -1,6 +1,6 @@
 import { createServiceId } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
-import type { LengthUnit, Scene } from '@xmazu/openenvxee-schema';
+import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
+import type { LengthUnit, Scene } from '@openenvx/core/schema';
 
 export type CanvasExportFormat = 'svg' | 'png' | 'jpg' | 'pdf';
 

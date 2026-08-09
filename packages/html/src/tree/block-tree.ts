@@ -6,7 +6,7 @@ import {
   removeLayerFromTree,
   updateLayerInTree,
 } from '@openenvx/core';
-import type { Layer, Page, Scene } from '@xmazu/openenvxee-schema';
+import type { Layer, Page, Scene } from '@openenvx/core/schema';
 
 export function findBlock(
   layers: Layer[],

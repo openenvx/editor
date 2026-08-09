@@ -1,4 +1,4 @@
-import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
+import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
 
 import type { LayerPreviewRendererHostProps } from '../../contributions/layer-preview-renderer-contribution';
 import { LayerPreviewRenderer } from './layer-preview-resolver';

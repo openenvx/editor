@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type { WorkbenchApi } from '@openenvx/headless';
+import type { WorkbenchApi } from '@openenvx/core';
 
 import { proposedChangeSchema } from '../schemas/proposed-changes';
 import { applyProposedChanges } from './apply-proposal';
@@ -20,7 +20,7 @@ vi.mock('@openenvx/core', () => ({
   }),
 }));
 
-vi.mock('@xmazu/openenvxee-schema', () => ({
+vi.mock('@openenvx/core/schema', () => ({
   createDefaultTransform: () => ({
     x: 0,
     y: 0,

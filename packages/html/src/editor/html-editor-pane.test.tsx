@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
-import { getNestedValue } from '@openenvx/headless';
+import { getNestedValue } from '@openenvx/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {

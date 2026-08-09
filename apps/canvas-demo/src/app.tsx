@@ -9,8 +9,7 @@ import {
   DEFAULT_CANVAS_LAYOUT,
   mountSandboxExtensions,
 } from '@openenvx/canvas-studio';
-import type { Plugin } from '@openenvx/core';
-import type { WorkbenchApi } from '@openenvx/headless';
+import type { Plugin, WorkbenchApi } from '@openenvx/core';
 import saveTheDateSource from 'openenvx-widget:./extensions/save-the-date.widget.tsx';
 import seatingSource from 'openenvx-widget:./extensions/seating.widget.tsx';
 import { useMemo } from 'react';

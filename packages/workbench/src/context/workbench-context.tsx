@@ -2,4 +2,4 @@ export {
   WorkbenchProvider,
   useWorkbenchContext,
   type WorkbenchContextValue,
-} from '@openenvx/headless/react';
+} from '@openenvx/core/react';

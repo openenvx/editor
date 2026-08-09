@@ -1,4 +1,4 @@
-import type { EditorState, Layer, Scene } from '@xmazu/openenvxee-schema';
+import type { EditorState, Layer, Scene } from '@openenvx/core/schema';
 
 import { walkLayers } from './layer-tree';
 
@@ -13,7 +13,7 @@ export type {
   SceneSnapshot as SchemaSceneSnapshot,
   Selection,
   Transform,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
 
 /**
  * Scene + editor snapshot.

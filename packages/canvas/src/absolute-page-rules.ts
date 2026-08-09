@@ -1,5 +1,5 @@
 import { PageRulesContribution } from '@openenvx/core';
-import type { Page, ValidationError } from '@xmazu/openenvxee-schema';
+import type { Page, ValidationError } from '@openenvx/core/schema';
 
 import { findPresetForPage, getDefaultPageDimensions } from './page-presets';
 

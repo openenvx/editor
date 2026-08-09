@@ -1,9 +1,14 @@
 {
   "extends": "@openenvx/typescript-config/base.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
     "lib": ["ESNext", "DOM"],
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "paths": {
+      "@xmazu/openenvxee-extensions/protocol": ["../extensions/src/protocol/index.ts"]
+    }
   },
   "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/schema/generate-json-schema.ts"]
 }

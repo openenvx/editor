@@ -1,4 +1,5 @@
 import { sanitizeHtml } from '@openenvx/core';
+import type { Layer } from '@openenvx/core/schema';
 import type {
   RenderChild,
   RenderNode,
@@ -7,7 +8,6 @@ import {
   validateWidgetTree,
   WIDGET_BLOCK_ESCAPE_TYPES,
 } from '@xmazu/openenvxee-extensions/protocol';
-import type { Layer } from '@xmazu/openenvxee-schema';
 
 export interface MapWidgetHtmlTreeOptions {
   /** Id prefix for generated layers (usually the widget layer id). */

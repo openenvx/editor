@@ -1,27 +1,42 @@
 {
   "name": "@openenvx/core",
   "version": "0.1.11",
-  "description": "OpenEnvx foundation - scene model, plugins, commands, contributions",
+  "description": "OpenEnvx foundation - scene model, plugins, commands, workbench controller",
   "license": "MIT",
   "type": "module",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts",
+    "./schema/scene.schema.json": "./scene.schema.json",
+    "./preview": "./src/preview/index.ts",
+    "./react": "./src/react/workbench-context.tsx"
   },
   "scripts": {
+    "generate:json-schema": "bun run src/schema/generate-json-schema.ts",
     "build": "tsup",
     "test": "vitest",
     "bench": "vitest bench --run",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@xmazu/openenvxee-preview": "workspace:*",
-    "@xmazu/openenvxee-schema": "workspace:*",
+    "@xmazu/openenvxee-extensions": "workspace:*",
+    "uqr": "^0.1.3",
     "zod": "4.4.3"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@openenvx/typescript-config": "workspace:*",
+    "@types/react": "^19.2.3",
+    "react": "19.2.7",
     "tsup": "catalog:dev",
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"

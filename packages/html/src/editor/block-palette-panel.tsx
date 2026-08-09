@@ -1,9 +1,8 @@
-import { getActivePage } from '@openenvx/core';
-import { extensionBlockStore } from '@openenvx/headless';
+import { getActivePage, extensionBlockStore } from '@openenvx/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/headless/react';
+} from '@openenvx/core/react';
 import { memo, useCallback, useSyncExternalStore } from 'react';
 
 import {

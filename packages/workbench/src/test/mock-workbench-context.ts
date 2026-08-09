@@ -1,6 +1,6 @@
-import { DEFAULT_WORKBENCH_LAYOUT } from '@openenvx/headless';
-import type { WorkbenchApi, WorkbenchState } from '@openenvx/headless';
-import { normalizeScene } from '@xmazu/openenvxee-schema';
+import { DEFAULT_WORKBENCH_LAYOUT } from '@openenvx/core';
+import type { WorkbenchApi, WorkbenchState } from '@openenvx/core';
+import { normalizeScene } from '@openenvx/core/schema';
 import { vi } from 'vitest';
 
 export function createMockWorkbenchApi(

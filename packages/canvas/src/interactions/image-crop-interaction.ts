@@ -1,4 +1,4 @@
-import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
+import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
 import type Konva from 'konva';
 
 import type {
@@ -58,7 +58,7 @@ function toLiveTransform(
     y: number;
   },
   opacity: number
-): import('@xmazu/openenvxee-schema').Transform {
+): import('@openenvx/core/schema').Transform {
   return {
     height: box.height,
     opacity,

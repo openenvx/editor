@@ -1,7 +1,4 @@
-import {
-  ViewContainerContribution,
-  ViewContribution,
-} from '@openenvx/headless';
+import { ViewContainerContribution, ViewContribution } from '@openenvx/core';
 
 import { AGENT_CHAT_CONTAINER_ID } from '../schemas/proposed-changes';
 

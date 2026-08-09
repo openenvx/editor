@@ -1,9 +1,9 @@
+/** @jsxImportSource preact */
 import {
   boolean,
   defineHtmlComponent,
   string,
 } from '@xmazu/openenvxee-extensions';
-/** @jsxImportSource preact */
 import {
   Button,
   Heading,

@@ -20,8 +20,7 @@ Backend services depend on `@xmazu/openenvxee-schema` too instead of re-declarin
 | Package | Responsibility |
 | --- | --- |
 | `@openenvx/canvas` | Canvas engine: layers, commands, Konva renderers, `CanvasEditor` |
-| `@openenvx/headless` | Workbench runtime: `WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()` |
-| `@openenvx/core` | Editor host: `EditorRuntime`, `PluginManager`, `registerContribution()` |
+| `@openenvx/core` | Editor host: `EditorRuntime`, `PluginManager`, `registerContribution()`, workbench runtime (`WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()`) |
 | Your app / `demo-playground` | Wire canvas to workbench via `CanvasHostProvider` + app-owned toolbar/sidebars |
 | `@openenvx/canvas` | Full canvas editor: `CanvasPlugin` (engine + workbench chrome), toolbar, palette, editor pane registration |
 
@@ -29,7 +28,7 @@ Load `CanvasPlugin` for the full canvas editor. For a minimal custom shell, comp
 
 ### Custom editor host (without `WorkbenchController`)
 
-If you build your own shell instead of `@openenvx/headless`, compose the core host like this:
+If you build your own shell instead of using `@openenvx/workbench`'s `WorkbenchShell`, compose the core host like this:
 
 ```ts
 import {
@@ -46,7 +45,7 @@ const runtime = new EditorRuntime(scene, editor);
 const manager = new PluginManager(runtime);
 
 // Register workbench-specific services on runtime.services before activating plugins.
-// See bootstrapWorkbenchServices() in @openenvx/headless for the headless defaults.
+// See bootstrapWorkbenchServices() in @openenvx/core for the headless defaults.
 
 await manager.activateCorePlugins();
 for (const plugin of plugins) {
@@ -66,11 +65,11 @@ Plugin contributions register through `PluginContext.register()`, which routes t
 
 ### Wiring canvas in a workbench app
 
-`@openenvx/canvas` does not depend on `@openenvx/headless`. The app bridges them:
+`@openenvx/canvas` does not depend on `@openenvx/workbench`. The app bridges them:
 
 ```tsx
 import { CanvasHostProvider, CanvasEditor } from '@openenvx/canvas';
-import { useWorkbenchContext } from '@openenvx/headless/react';
+import { useWorkbenchContext } from '@openenvx/core/react';
 
 // Provide CanvasHostApi from workbench, then mount CanvasEditor.
 // See apps/demo-playground/src/components/absolute-editor-pane.tsx
@@ -79,7 +78,7 @@ import { useWorkbenchContext } from '@openenvx/headless/react';
 Workbench UI contributions use `WorkbenchPlugin` and `ctx.registerWorkbench()`:
 
 ```ts
-import { WorkbenchPlugin } from '@openenvx/headless';
+import { WorkbenchPlugin } from '@openenvx/core';
 
 class MyWorkbenchPlugin extends WorkbenchPlugin {
   readonly id = 'my.workbench';
@@ -103,7 +102,7 @@ import {
   ViewContainerContribution,
   ViewContribution,
   WorkbenchPlugin,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 
 class MyView extends ViewContribution {
   readonly id = 'my.view';

@@ -9,11 +9,11 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core';
 import { ContextKeyServiceId, getActivePage } from '@openenvx/core';
-import type { EditorPaneHostProps } from '@openenvx/headless';
+import type { EditorPaneHostProps } from '@openenvx/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/headless/react';
+} from '@openenvx/core/react';
 import {
   applyHtmlDragEnd,
   applyHtmlDragOver,

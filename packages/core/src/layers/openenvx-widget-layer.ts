@@ -1,9 +1,8 @@
-import { createLayerPreviewBuilder } from '@xmazu/openenvxee-preview';
 import {
   createDefaultTransform,
   type OpenEnvxWidgetData,
   type WidgetManifestSnapshot,
-} from '@xmazu/openenvxee-schema';
+} from '@openenvx/core/schema';
 import { z } from 'zod';
 
 import {
@@ -13,6 +12,7 @@ import {
 import { appendWidgetManifestField } from '../builders/widget-manifest-fields';
 import { LayerDefinition } from '../contributions/layer-definition';
 import type { LayerPreviewContext } from '../contributions/layer-preview-context';
+import { createLayerPreviewBuilder } from '../preview';
 import type { CommandContext } from '../runtime/types';
 import type { Layer, Page } from '../scene/types';
 

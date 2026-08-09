@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { SandboxHostSurface } from '@openenvx/headless';
+import type { SandboxHostSurface } from '@openenvx/core';
 import type { SandboxExtensionGrant } from '@xmazu/openenvxee-extensions/protocol';
 
 import { sha256Hex } from './fetch-artifact';

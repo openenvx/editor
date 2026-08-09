@@ -1,6 +1,6 @@
 import { useDroppable } from '@dnd-kit/core';
 import { isLayerLocked } from '@openenvx/core';
-import type { Layer } from '@xmazu/openenvxee-schema';
+import type { Layer } from '@openenvx/core/schema';
 
 import { dropZoneClassName } from './child-list-chrome';
 

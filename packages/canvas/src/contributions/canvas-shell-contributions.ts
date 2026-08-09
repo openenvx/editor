@@ -1,12 +1,12 @@
-import { findLayerById } from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
 import {
+  findLayerById,
   StatusBarContribution,
   ToolbarContribution,
   type ShellDropdownMenuItemDescriptor,
   type StatusBarBuilder,
   type ToolbarBuilder,
-} from '@openenvx/headless';
+  type CommandContext,
+} from '@openenvx/core';
 
 import { CANVAS_GRID_SIZE_PRESETS } from '../commands/canvas-grid-commands';
 

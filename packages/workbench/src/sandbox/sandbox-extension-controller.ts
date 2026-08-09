@@ -1,4 +1,4 @@
-import type { SandboxHostSurface } from '@openenvx/headless';
+import type { SandboxHostSurface } from '@openenvx/core';
 import type {
   SandboxExtensionGrant,
   SandboxBridgeRequest,

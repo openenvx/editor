@@ -1,5 +1,5 @@
-import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
-import type { Transform } from '@xmazu/openenvxee-schema';
+import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
+import type { Transform } from '@openenvx/core/schema';
 import type Konva from 'konva';
 
 import type {

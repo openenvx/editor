@@ -1,11 +1,10 @@
-import type { PluginContext } from '@openenvx/core';
+import type { PluginContext, WorkbenchPluginContext } from '@openenvx/core';
 import {
   LocalStoragePersistenceService,
   PersistenceServiceId,
   Plugin,
   SimpleServiceContribution,
 } from '@openenvx/core';
-import type { WorkbenchPluginContext } from '@openenvx/headless';
 
 import {
   CanvasDemoExportStatusBar,

@@ -8,10 +8,10 @@ Companion to [Architecture.md](../../Architecture.md). This tracks intentional f
 - Sunset embed / `plugin-panel` host lane from product surface
 - Consolidate author docs under `docs/architecture/`
 
-## Phase 2 — Merge `headless` into `core`
+## Phase 2 — Done
 
-- Single backbone package: scene, commands, `PluginManager`, workbench registries, `ExternalHostMount`
-- Delete `@openenvx/headless` as a separate workspace package; update all imports
+- Merged `@openenvx/headless`, `@xmazu/openenvxee-schema`, and `@xmazu/openenvxee-preview` into private **`@openenvx/core`** (`./schema`, `./preview`, `.`, `./react`)
+- Deleted separate workspace packages; monorepo imports updated
 
 ## Phase 3 — Enterprise editor + React host plugin API
 
@@ -26,4 +26,4 @@ Companion to [Architecture.md](../../Architecture.md). This tracks intentional f
 
 ## Publish note
 
-When cutting a release: publish `@xmazu/openenvxee-extensions`, republish studio/html-studio, bump openenvx-cloud and snapvelo-app in the same window. Stop publishing the old three package names (no shim packages).
+When cutting a release: publish `@xmazu/openenvxee-extensions` and `@xmazu/openenvxee-html-studio` only. Bump product repos in the same window.

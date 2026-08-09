@@ -1,8 +1,8 @@
-import type { ContributionBuildContext } from '@openenvx/core';
 import {
+  type ContributionBuildContext,
   CommandPaletteContribution,
   type CommandPaletteBuilder,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 
 export class CanvasCommandPaletteItems extends CommandPaletteContribution {
   contribute(

@@ -1,5 +1,5 @@
-import type { Layer, Scene } from '@xmazu/openenvxee-schema';
-import { SCHEMA_VERSION } from '@xmazu/openenvxee-schema';
+import type { Layer, Scene } from '@openenvx/core/schema';
+import { SCHEMA_VERSION } from '@openenvx/core/schema';
 
 function transform(x: number, y: number, width = 80, height = 40) {
   return {

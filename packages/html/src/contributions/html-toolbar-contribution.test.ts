@@ -1,4 +1,4 @@
-import { createToolbarBuilder } from '@openenvx/headless';
+import { createToolbarBuilder } from '@openenvx/core';
 import { describe, expect, it } from 'vitest';
 
 import { HtmlToolbarContribution } from './html-toolbar-contribution';

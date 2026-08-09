@@ -32,6 +32,8 @@ Figma-shaped: widgets = nodes; plugins = tools. Embed is a separate, weaker lane
 
 `openenvx.*` exists only inside QuickJS (not in the `showUI` iframe, not in the editor main world).
 
+Widget and manifest TSX must put `/** @jsxImportSource preact */` on the **first line** of the file (before any `import`). The editor shell uses React JSX; without the pragma at the top, `tsc` treats extension elements as React components and fails typecheck.
+
 ### 1. Define the face
 
 ```tsx

@@ -1,5 +1,8 @@
-import type { ContributionBuildContext } from '@openenvx/core';
-import { ContextMenuContribution, type MenuBuilder } from '@openenvx/headless';
+import {
+  type ContributionBuildContext,
+  ContextMenuContribution,
+  type MenuBuilder,
+} from '@openenvx/core';
 
 export class HtmlContextMenu extends ContextMenuContribution {
   contribute(builder: MenuBuilder, ctx: ContributionBuildContext): void {

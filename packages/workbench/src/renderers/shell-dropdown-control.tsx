@@ -1,8 +1,8 @@
 import type {
   ShellDropdownMenuItemDescriptor,
   ToolbarPlacement,
-} from '@openenvx/headless';
-import { isToolbarTopPlacement } from '@openenvx/headless';
+} from '@openenvx/core';
+import { isToolbarTopPlacement } from '@openenvx/core';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { memo, useMemo } from 'react';
 

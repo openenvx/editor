@@ -1,4 +1,4 @@
-import { createDefaultTransform, type Layer } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform, type Layer } from '@openenvx/core/schema';
 
 import type { CreateLayerChange } from '../schemas/proposed-changes';
 

@@ -1,7 +1,7 @@
 import type {
   WorkbenchLayoutSnapshot,
   WorkbenchLayoutStore,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 
 /**
  * Trivial localStorage-backed layout store for demos and hosts that want

@@ -3,19 +3,17 @@ import {
   findLayerById,
   updateLayerInTree,
   walkLayers,
-} from '@openenvx/core';
-import type { SandboxHostSurface, WorkbenchApi } from '@openenvx/headless';
-import {
   createExtensionContributions,
   extensionSurfaceStore,
-} from '@openenvx/headless';
+} from '@openenvx/core';
+import type { SandboxHostSurface, WorkbenchApi } from '@openenvx/core';
+import type { Layer, Scene } from '@openenvx/core/schema';
 import type {
   ExtensionManifest,
   RenderNode,
   SandboxExtensionGrant,
 } from '@xmazu/openenvxee-extensions/protocol';
 import { validatePluginTree } from '@xmazu/openenvxee-extensions/protocol';
-import type { Layer, Scene } from '@xmazu/openenvxee-schema';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 

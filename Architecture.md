@@ -34,7 +34,7 @@ Author how-to (under `docs/architecture/`):
 | Tier | Packages | Who |
 | --- | --- | --- |
 | **Rendering-only** | `schema`, `canvas` | Embed `CanvasStage` in a custom React app with own state. No plugin host. |
-| **Editor backbone** | `core`, `headless`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
+| **Editor backbone** | `core`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers, workbench controller) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
 | **Workbench UI** | `workbench` | React shell (`WorkbenchShell`); workspace-private. |
 | **Published product** | `studio`, `extensions`, `schema`, `preview` | Fat bundle + sandbox author SDK |
 | **HTML studio** | `html`, `html-studio`, `openenvxee-html-studio`, optional `driver-*` | Puck-style block editor + thin studio re-exports + published fat bundle; product hosts own their blocks/plugins |
@@ -47,7 +47,7 @@ Author how-to (under `docs/architecture/`):
 | --- | --- | --- | --- |
 | Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives |
 | Embed / sandbox protocol | `extensions` (`@xmazu/openenvxee-extensions`, `./protocol` subpath) | Published (public) | `RenderNode`, manifests, validators, sandbox grants |
-| Product libs | `headless`, `canvas`, `html`, `driver-email`, `workbench`, `agent`, `canvas-studio`, `html-studio` | Private (workspace) | Workbench runtime, canvas editor, HTML editor, email driver, React shell, agent, studio host surfaces |
+| Product libs | `canvas`, `html`, `driver-email`, `workbench`, `agent`, `canvas-studio`, `html-studio` | Private (workspace) | Canvas editor, HTML editor, email driver, React shell, agent, studio host surfaces |
 | Published product | `studio` | Proprietary; published | Fat bundle inlining workbench + canvas + agent |
 
 ## Placement cheat sheet
@@ -55,8 +55,7 @@ Author how-to (under `docs/architecture/`):
 | Put it here | Examples |
 | --- | --- |
 | `@xmazu/openenvxee-schema` | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
-| `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry` |
-| `@openenvx/headless` | `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context, external host mount surfaces |
+| `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry`, `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context, external host mount surfaces |
 | `@openenvx/canvas` | Konva stage, layers, renderers, `CanvasPlugin`, `CanvasEditor` |
 | `@openenvx/html` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |
 | `@openenvx/driver-email` | Email blocks, `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument` |
@@ -83,8 +82,6 @@ flowchart TB
   subgraph coreHost [core]
     Runtime[EditorRuntime]
     PluginHost[PluginManager]
-  end
-  subgraph headlessPkg [headless]
     WbRegs[WorkbenchRegistries]
     Controller[WorkbenchController]
   end
@@ -103,7 +100,7 @@ flowchart TB
 
 1. `WorkbenchShell` injects default chrome (Pages/Layers + dirty status) plus Inspector / field plugins.
 2. Domain plugins (`CanvasPlugin`, `HtmlBlocksPlugin`, …) register via core + domain registries and workbench contributions.
-3. `WorkbenchController` assembles core + workbench registries into `WorkbenchState`.
+3. `WorkbenchController` (in `@openenvx/core`) assembles core + workbench registries into `WorkbenchState`.
 
 External hosts (sandbox / embed) mount **off** `PluginManager` via `ExternalHostMount` — see [Extensions](docs/architecture/extensions.md) and [Plugin-boundaries.md](Plugin-boundaries.md).
 
@@ -111,7 +108,7 @@ External hosts (sandbox / embed) mount **off** `PluginManager` via `ExternalHost
 
 | Layer | Style | Examples |
 | --- | --- | --- |
-| `core`, `headless`, `canvas`, plugins | **OOP** — abstract classes, builders, visitors | `Plugin`, `Command`, `LayerDefinition`, `PropertyPaneBuilder` |
+| `core`, `canvas`, plugins | **OOP** — abstract classes, builders, visitors | `Plugin`, `Command`, `LayerDefinition`, `PropertyPaneBuilder` |
 | App / shell React UI | **Functional only** — function components and hooks | `WorkbenchShell`, field renderers |
 
 Plugin API surface = classes extending contribution base classes, not plain config objects.

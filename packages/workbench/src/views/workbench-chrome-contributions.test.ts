@@ -1,18 +1,15 @@
 import {
   moveLayerRelativeToTarget,
-} from '@openenvx/core';
-import type { CommandContext, Layer } from '@openenvx/core';
-import {
   TreeDataProvider,
   ViewContainerContribution,
   ViewContribution,
   WorkbenchController,
   WorkbenchPlugin,
   type TreeItem,
-  type WorkbenchPluginContext,
-} from '@openenvx/headless';
-import { createDefaultTransform, normalizeScene } from '@xmazu/openenvxee-schema';
-import type { Page } from '@xmazu/openenvxee-schema';
+  type WorkbenchPluginContext,type CommandContext,type Layer
+} from '@openenvx/core';
+import { createDefaultTransform, normalizeScene } from '@openenvx/core/schema';
+import type { Page } from '@openenvx/core/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

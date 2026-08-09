@@ -10,7 +10,7 @@ Visual shell tokens (spacing, radii, control styling) live in [packages/workbenc
 
 Inspector and sidebar form fields are **descriptors** (`PropertyFieldDescriptor`) rendered by `@openenvx/workbench` field renderers. Plugins do not hand-roll inspector rows; they contribute panes via:
 
-- `PropertyPaneContribution` + `createPropertyPane()` (`@openenvx/headless`)
+- `PropertyPaneContribution` + `createPropertyPane()` (`@openenvx/core`)
 - `PropertyBuilder` on `LayerDefinition.properties()` (`@openenvx/core`)
 - HTML `BlockConfig.fields` → mapped to the same descriptors in `@openenvx/html`
 
@@ -56,7 +56,7 @@ Implementation: `packages/workbench/src/renderers/property-content-renderer.tsx`
 
 ## Field kinds (renderer registry)
 
-Register custom kinds with `registerFieldRenderer` (`@openenvx/headless`); defaults ship in `DefaultWorkbenchFieldsPlugin`.
+Register custom kinds with `registerFieldRenderer` (`@openenvx/core`); defaults ship in `DefaultWorkbenchFieldsPlugin`.
 
 | `kind` | Control | Typical use |
 | --- | --- | --- |

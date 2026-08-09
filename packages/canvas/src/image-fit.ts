@@ -1,4 +1,4 @@
-import type { FocalPoint, ImageFit } from '@xmazu/openenvxee-schema';
+import type { FocalPoint, ImageFit } from '@openenvx/core/schema';
 
 export interface ImageFitBox {
   width: number;

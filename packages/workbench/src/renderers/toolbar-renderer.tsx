@@ -1,9 +1,5 @@
-import { ContextKeyServiceId } from '@openenvx/core';
-import type {
-  ToolbarItemDescriptor,
-  ToolbarPlacement,
-} from '@openenvx/headless';
-import { isToolbarDropdownItem } from '@openenvx/headless';
+import { ContextKeyServiceId, isToolbarDropdownItem } from '@openenvx/core';
+import type { ToolbarItemDescriptor, ToolbarPlacement } from '@openenvx/core';
 import { memo, useMemo } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';

@@ -1,5 +1,5 @@
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
-import type { Layer } from '@xmazu/openenvxee-schema';
+import { createDefaultTransform } from '@openenvx/core/schema';
+import type { Layer } from '@openenvx/core/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

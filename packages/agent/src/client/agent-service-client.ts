@@ -1,4 +1,4 @@
-import type { WorkbenchApi } from '@openenvx/headless';
+import type { WorkbenchApi } from '@openenvx/core';
 import type { UIMessage } from 'ai';
 
 import {

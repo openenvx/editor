@@ -5,7 +5,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import type { ViewTreeItem } from '@openenvx/headless';
+import type { ViewTreeItem } from '@openenvx/core';
 import { memo, useCallback, useRef, useState } from 'react';
 
 import {

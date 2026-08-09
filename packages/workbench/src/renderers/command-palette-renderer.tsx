@@ -1,5 +1,5 @@
-import type { CommandPaletteDescriptor } from '@openenvx/headless';
-import { COMMAND_PALETTE_ALL_TAB_ID } from '@openenvx/headless';
+import type { CommandPaletteDescriptor } from '@openenvx/core';
+import { COMMAND_PALETTE_ALL_TAB_ID } from '@openenvx/core';
 import { useCallback, useMemo, useState } from 'react';
 
 import { usePresence } from '../hooks/use-presence';

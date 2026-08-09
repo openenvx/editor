@@ -1,7 +1,7 @@
 import type { Layer as SceneLayer } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@xmazu/openenvxee-preview';
-import { createDefaultTransform } from '@xmazu/openenvxee-schema';
-import type { Transform } from '@xmazu/openenvxee-schema';
+import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
+import { createDefaultTransform } from '@openenvx/core/schema';
+import type { Transform } from '@openenvx/core/schema';
 import type Konva from 'konva';
 import type { RefObject } from 'react';
 

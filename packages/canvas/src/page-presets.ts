@@ -1,5 +1,5 @@
-import type { LengthUnit, Page } from '@xmazu/openenvxee-schema';
-import { toPx } from '@xmazu/openenvxee-schema';
+import type { LengthUnit, Page } from '@openenvx/core/schema';
+import { toPx } from '@openenvx/core/schema';
 
 export interface PageSizePreset {
   id: string;

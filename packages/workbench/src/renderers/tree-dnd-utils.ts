@@ -1,4 +1,4 @@
-import type { ViewTreeItem } from '@openenvx/headless';
+import type { ViewTreeItem } from '@openenvx/core';
 
 const TREE_INDENT_PX = 6;
 const TREE_BASE_PADDING_PX = 8;

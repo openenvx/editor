@@ -2,7 +2,7 @@ import { useChat } from '@ai-sdk/react';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/headless/react';
+} from '@openenvx/core/react';
 import type { UIMessage } from 'ai';
 import { DefaultChatTransport } from 'ai';
 import { MessageSquare } from 'lucide-react';

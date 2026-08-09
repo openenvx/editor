@@ -3,22 +3,18 @@ import {
   LocalizationServiceId,
   MutableDocumentHostService,
   ThemeServiceId,
-} from '@openenvx/core';
-import type { Plugin } from '@openenvx/core';
-import {
   ShellUiServiceId,
   shouldMountSecondarySidebar,
   TOOLBAR_PLACEMENTS,
-} from '@openenvx/headless';
-import type {
-  PropertyHostContext,
-  PropertyPathContextOptions,
-  LayerSurfaceItem,
-  ToolbarPlacement,
-  WorkbenchApi,
-  WorkbenchControllerOptions,
-} from '@openenvx/headless';
-import type { Scene } from '@xmazu/openenvxee-schema';
+  type Plugin,
+  type PropertyHostContext,
+  type PropertyPathContextOptions,
+  type LayerSurfaceItem,
+  type ToolbarPlacement,
+  type WorkbenchApi,
+  type WorkbenchControllerOptions,
+} from '@openenvx/core';
+import type { Scene } from '@openenvx/core/schema';
 import type { MutableRefObject, ReactNode } from 'react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 

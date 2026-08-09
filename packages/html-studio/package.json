@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@openenvx/core": "workspace:*",
-    "@openenvx/headless": "workspace:*",
     "@openenvx/html": "workspace:*",
     "@openenvx/workbench": "workspace:*"
   },

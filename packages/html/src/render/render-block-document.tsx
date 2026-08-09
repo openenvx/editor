@@ -1,5 +1,5 @@
 import { getLayerChildren, isLayerVisible } from '@openenvx/core';
-import type { Layer, Page } from '@xmazu/openenvxee-schema';
+import type { Layer, Page } from '@openenvx/core/schema';
 import {
   createElement,
   Fragment,

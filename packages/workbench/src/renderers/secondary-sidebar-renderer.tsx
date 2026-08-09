@@ -7,7 +7,7 @@ import {
 import {
   secondaryPanelContainers,
   shouldMountSecondarySidebar,
-} from '@openenvx/headless';
+} from '@openenvx/core';
 import { memo, useMemo } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';

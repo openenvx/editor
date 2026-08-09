@@ -1,4 +1,4 @@
-import { createMenuBuilder } from '@openenvx/headless';
+import { createMenuBuilder } from '@openenvx/core';
 import { describe, expect, it } from 'vitest';
 
 import { CanvasContextMenu } from './canvas-context-menu';
