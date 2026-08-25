@@ -128,7 +128,7 @@ Host pieces:
 ### What not to expose to third parties
 
 - Loading external JS modules into Studio’s main world
-- React `registerViewPanel` / `registerFieldRenderer` / `registerEditorPane` for untrusted code (views arrive as validated panel trees into manifest-declared containers)
+- React `registerViewPanel` / `registerFieldRenderer` / `registerEditorPane` / `registerTopBar` for untrusted code (views arrive as validated panel trees into manifest-declared containers)
 - Binding external trees to internal paths (`selection.layer.*`) without a host-owned write policy
 - A “trust all origins” transport in production
 

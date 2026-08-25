@@ -106,6 +106,7 @@ export class WorkbenchController {
     editorPaneRegistry: new Registry<string, unknown>('overwrite'),
     fieldRendererRegistry: new Registry<string, unknown>('overwrite'),
     statusBarItemRendererRegistry: new Registry<string, unknown>('overwrite'),
+    topBarRegistry: new Registry<string, unknown>('overwrite'),
     viewPanelRegistry: new Registry<string, unknown>('overwrite'),
     viewProviderRegistry: new ViewProviderRegistryImpl(),
   };
@@ -198,6 +199,7 @@ export class WorkbenchController {
     keys.setContext('workbench.primarySidebar', this.layout.primarySidebar);
     keys.setContext('workbench.secondarySidebar', this.layout.secondarySidebar);
     keys.setContext('workbench.editorArea', this.layout.editorArea);
+    keys.setContext('workbench.topBar', this.layout.topBar);
     keys.setContext(
       'template.policyEnforced',
       this.options.enforceTemplatePolicy !== false
@@ -915,6 +917,7 @@ export class WorkbenchController {
       statusBar: chrome.statusBar,
       statusBarItemRenderers: chrome.statusBarItemRenderers,
       toolbarItems: chrome.toolbarItems,
+      topBars: chrome.topBars,
       viewContainers: scene.viewContainers,
       viewLocations: this.locationService.getViewLocations(),
       viewPanels: scene.viewPanels,

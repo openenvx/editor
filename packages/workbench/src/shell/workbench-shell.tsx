@@ -45,6 +45,7 @@ import { OverlayRenderer } from '../renderers/overlay-renderer';
 import { SecondarySidebarRenderer } from '../renderers/secondary-sidebar-renderer';
 import { StatusBarRenderer } from '../renderers/status-bar-renderer';
 import { ToolbarRenderer } from '../renderers/toolbar-renderer';
+import { TopBarRenderer } from '../renderers/top-bar-renderer';
 import {
   DEFAULT_INSPECTOR_PLUGIN_ID,
   DefaultInspectorContainerPlugin,
@@ -67,8 +68,6 @@ export interface WorkbenchShellProps {
   editorTitle?: string;
   layout?: WorkbenchControllerOptions['layout'];
   layoutStore?: WorkbenchControllerOptions['layoutStore'];
-  /** Optional top bar rendered above the editor layout (inside workbench context). */
-  topBar?: ReactNode;
   /**
    * When true (default), embed/template write policy is enforced.
    * Dashboard authoring should pass false so the Embed properties tab appears
@@ -271,18 +270,15 @@ const LayoutRegion = memo(
     showEditorArea,
     renderEditorPane,
     createPropertyHostContext,
-    topBar,
   }: Pick<
     WorkbenchShellProps,
-    | 'showEditorArea'
-    | 'renderEditorPane'
-    | 'createPropertyHostContext'
-    | 'topBar'
+    'showEditorArea' | 'renderEditorPane' | 'createPropertyHostContext'
   >) => {
     const layout = useWorkbenchContextSelector((state) => state.layout);
     const viewContainers = useWorkbenchContextSelector(
       (state) => state.viewContainers
     );
+    const topBars = useWorkbenchContextSelector((state) => state.topBars);
     const showSecondarySidebar = useMemo(
       () => shouldMountSecondarySidebar(layout, viewContainers),
       [layout, viewContainers]
@@ -291,6 +287,11 @@ const LayoutRegion = memo(
     if (!layout) {
       return null;
     }
+
+    const topBar =
+      layout.topBar && topBars && topBars.length > 0 ? (
+        <TopBarRenderer topBars={topBars} />
+      ) : undefined;
 
     return (
       <EditorLayout
@@ -492,7 +493,6 @@ export function WorkbenchShell({
   createPropertyHostContext,
   renderEditorPane,
   mountExternalHosts,
-  topBar,
 }: WorkbenchShellProps) {
   const [activeTheme, setActiveTheme] = useState(theme);
   const [prevThemeProp, setPrevThemeProp] = useState(theme);
@@ -651,7 +651,6 @@ export function WorkbenchShell({
                   createPropertyHostContext={createPropertyHostContext}
                   renderEditorPane={renderEditorPane}
                   showEditorArea={showEditorArea}
-                  topBar={topBar}
                 />
               </div>
             </EditorViewportProvider>

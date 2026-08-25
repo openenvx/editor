@@ -72,6 +72,7 @@ export {
   type SidebarHeaderTitleBinding,
 } from './contributions/sidebar-header-contribution';
 export { ToolbarContribution } from './contributions/toolbar-contribution';
+export { TopBarContribution } from './contributions/top-bar-contribution';
 
 export {
   MenuBuilder,
@@ -216,6 +217,7 @@ export type {
   ViewPanelRegistration,
 } from './workbench/panel-registrations';
 export type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
+export type { TopBarRegistration } from './workbench/top-bar-registration';
 
 export type {
   DocumentVersion,

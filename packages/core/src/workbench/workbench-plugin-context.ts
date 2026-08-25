@@ -38,6 +38,14 @@ export interface WorkbenchPluginContext extends PluginContext {
     componentId: string,
     component: unknown
   ): WorkbenchContributionDisposable;
+  /**
+   * Register the React component for a {@link TopBarContribution} id.
+   * Duplicate ids overwrite.
+   */
+  registerTopBar(
+    id: string,
+    component: unknown
+  ): WorkbenchContributionDisposable;
 }
 
 export interface CreateWorkbenchPluginContextOptions {
@@ -141,6 +149,16 @@ export function createWorkbenchPluginContext(
       return track({
         dispose: () => {
           providerRegistries.viewPanelRegistry.unregister(componentId);
+          onContributionsChanged?.();
+        },
+      });
+    },
+    registerTopBar(id, component) {
+      providerRegistries.topBarRegistry.register(id, component);
+      onContributionsChanged?.();
+      return track({
+        dispose: () => {
+          providerRegistries.topBarRegistry.unregister(id);
           onContributionsChanged?.();
         },
       });

@@ -70,7 +70,7 @@ import '@openenvx/email/theme.css';
 <EmailEditor onChange={save} theme="dark" />
 ```
 
-`EmailEditor` defaults `initialScene` to `createEmailScene()` when omitted. Headless HTML export is `@openenvx/email/runtime` so Node/SSR does not load the shell.
+`EmailEditor` defaults `initialScene` to `createEmailScene()` when omitted. Chrome is the floating artboard overlay toolbars (`editorToolbars: true`) — there is no product top bar on this drop-in. Headless HTML export is `@openenvx/email/runtime` so Node/SSR does not load the shell.
 
 Monorepo HMR stays on `@openenvx/driver-email` + `@openenvx/workbench` (`apps/email-demo`). The published bundle is exercised by `apps/email-package-demo` (`bun run dev:email-package`).
 

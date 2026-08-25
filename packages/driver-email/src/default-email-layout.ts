@@ -4,4 +4,5 @@ import { DEFAULT_WORKBENCH_LAYOUT, type WorkbenchLayout } from '@openenvx/core';
 export const DEFAULT_EMAIL_LAYOUT: WorkbenchLayout = {
   ...DEFAULT_WORKBENCH_LAYOUT,
   editorToolbars: false,
+  topBar: true,
 };

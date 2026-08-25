@@ -4,6 +4,7 @@ export enum WorkbenchPart {
   EditorArea = 'editorArea',
   SecondarySidebar = 'secondarySidebar',
   StatusBar = 'statusBar',
+  TopBar = 'topBar',
 }
 
 export interface WorkbenchLayout {
@@ -14,6 +15,11 @@ export interface WorkbenchLayout {
   statusBar: boolean;
   /** Show editor overlay toolbars (top/bottom placements). */
   editorToolbars: boolean;
+  /**
+   * Shell header above the editor body. Off by default; product plugins
+   * contribute a bar via `TopBarContribution` + `registerTopBar`.
+   */
+  topBar: boolean;
 }
 
 export const DEFAULT_WORKBENCH_LAYOUT: WorkbenchLayout = {
@@ -24,4 +30,6 @@ export const DEFAULT_WORKBENCH_LAYOUT: WorkbenchLayout = {
   primarySidebar: true,
   secondarySidebar: true,
   statusBar: true,
+  /** Defaults to false. Email enables via `DEFAULT_EMAIL_LAYOUT`. */
+  topBar: false,
 };

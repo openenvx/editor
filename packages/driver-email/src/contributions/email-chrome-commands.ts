@@ -11,6 +11,7 @@ export const WORKBENCH_SAVE_AS_COMMAND_ID = 'workbench.saveAs';
 export const WORKBENCH_OPEN_COMMAND_ID = 'workbench.open';
 export const WORKBENCH_TOGGLE_COMMAND_PALETTE_COMMAND_ID =
   'workbench.commandPalette.toggle';
+export const EMAIL_GO_BACK_COMMAND_ID = 'email.goBack';
 
 function getDocumentHost(ctx: CommandContext) {
   if (!ctx.services.has(DocumentHostServiceId)) {
@@ -83,6 +84,22 @@ class ToggleCommandPaletteCommand extends Command {
     }
     ctx.services.get(ShellUiServiceId).toggleCommandPalette();
   }
+}
+
+class EmailGoBackCommand extends Command {
+  readonly id = EMAIL_GO_BACK_COMMAND_ID;
+
+  constructor(private readonly onBack: () => void) {
+    super();
+  }
+
+  execute(): void {
+    this.onBack();
+  }
+}
+
+export function createEmailGoBackCommand(onBack: () => void): Command {
+  return new EmailGoBackCommand(onBack);
 }
 
 export function createEmailChromeCommands(): Command[] {

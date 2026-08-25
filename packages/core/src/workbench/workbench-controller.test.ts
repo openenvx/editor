@@ -21,6 +21,7 @@ import {
   CommandPaletteContribution,
 } from '../contributions/command-palette-contribution';
 import { ToolbarContribution } from '../contributions/toolbar-contribution';
+import { TopBarContribution } from '../contributions/top-bar-contribution';
 import type { CommandPaletteBuilder } from '../builders/command-palette-builder';
 import type { ToolbarBuilder } from '../builders/toolbar-builder';
 import { WorkbenchController } from "./workbench-controller";
@@ -117,6 +118,19 @@ class ToolbarPlugin extends WorkbenchPlugin {
   }
 }
 
+class DemoTopBarContribution extends TopBarContribution {
+  readonly id = 'demo.topBar';
+}
+
+class TopBarPlugin extends WorkbenchPlugin {
+  readonly id = 'topBar';
+
+  activateWorkbench(ctx: WorkbenchPluginContext): void {
+    ctx.registerWorkbench(new DemoTopBarContribution());
+    ctx.registerTopBar('demo.topBar', { kind: 'demo-top-bar' });
+  }
+}
+
 describe(WorkbenchController, () => {
   it("merges empty state", async () => {
     const controller = new WorkbenchController({
@@ -140,6 +154,19 @@ describe(WorkbenchController, () => {
     expect(items.map((item) => item.id)).toEqual([
       'toolbar-visible',
       'toolbar-separator',
+    ]);
+  });
+
+  it("resolves a top bar contribution into state", async () => {
+    const controller = new WorkbenchController({
+      layout: { topBar: true },
+      plugins: [new TopBarPlugin()],
+    });
+    await controller.start();
+    const state = controller.getState();
+    expect(state.layout.topBar).toBe(true);
+    expect(state.topBars).toEqual([
+      { Component: { kind: 'demo-top-bar' }, id: 'demo.topBar' },
     ]);
   });
 

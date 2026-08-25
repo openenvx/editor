@@ -43,6 +43,7 @@ export function createMockWorkbenchApi(
     statusBar: [],
     statusBarItemRenderers: [],
     toolbarItems: [],
+    topBars: [],
     viewContainers: [],
     viewLocations: {},
     viewPanels: [],

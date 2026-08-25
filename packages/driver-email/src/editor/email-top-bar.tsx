@@ -30,6 +30,7 @@ import {
 } from 'react';
 
 import {
+  EMAIL_GO_BACK_COMMAND_ID,
   WORKBENCH_OPEN_COMMAND_ID,
   WORKBENCH_SAVE_AS_COMMAND_ID,
   WORKBENCH_SAVE_COMMAND_ID,
@@ -41,10 +42,6 @@ import {
 } from './email-editor-mode-service';
 
 import styles from './email-top-bar.module.css';
-
-export interface EmailTopBarProps {
-  onBack?: () => void;
-}
 
 function useEmailEditorMode(): EmailEditorMode {
   const { api } = useWorkbenchContext();
@@ -128,7 +125,7 @@ const MODE_OPTIONS: ModeOption[] = [
   },
 ];
 
-export const EmailTopBar = memo(({ onBack }: EmailTopBarProps) => {
+export const EmailTopBar = memo(() => {
   const { executeCommand } = useWorkbenchContext();
   const editorTitle = useWorkbenchContextSelector(
     (state) => state.editor?.title
@@ -153,6 +150,8 @@ export const EmailTopBar = memo(({ onBack }: EmailTopBarProps) => {
     commandStates?.[WORKBENCH_SAVE_AS_COMMAND_ID]?.canExecute ?? false;
   const canOpen =
     commandStates?.[WORKBENCH_OPEN_COMMAND_ID]?.canExecute ?? false;
+  const canGoBack =
+    commandStates?.[EMAIL_GO_BACK_COMMAND_ID]?.canExecute ?? false;
 
   useEffect(() => {
     if (!menuOpen) {
@@ -176,12 +175,12 @@ export const EmailTopBar = memo(({ onBack }: EmailTopBarProps) => {
   return (
     <div className={styles.root}>
       <div className={styles.left}>
-        {onBack ? (
+        {canGoBack ? (
           <button
             aria-label="Back"
             className={styles.backButton}
             type="button"
-            onClick={onBack}
+            onClick={() => void executeCommand(EMAIL_GO_BACK_COMMAND_ID)}
           >
             <ChevronLeft aria-hidden size={14} />
           </button>

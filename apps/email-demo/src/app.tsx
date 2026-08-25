@@ -2,13 +2,12 @@ import {
   createEmailDemoScene,
   DEFAULT_EMAIL_LAYOUT,
   EmailBlocksPlugin,
-  EmailTopBar,
 } from '@openenvx/driver-email';
 import { WorkbenchShell } from '@openenvx/workbench';
 
 import '@openenvx/workbench/theme.css';
 
-const DEFAULT_EMAIL_DEMO_PLUGINS = [new EmailBlocksPlugin()];
+const DEFAULT_EMAIL_DEMO_PLUGINS = [new EmailBlocksPlugin({ topBar: true })];
 
 export function App() {
   return (
@@ -21,7 +20,6 @@ export function App() {
         layout={DEFAULT_EMAIL_LAYOUT}
         plugins={DEFAULT_EMAIL_DEMO_PLUGINS}
         theme="dark"
-        topBar={<EmailTopBar />}
       />
       <style>{`
         html, body, #root { height: 100%; margin: 0; }

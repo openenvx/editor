@@ -14,6 +14,7 @@ import type {
   ViewPanelRegistration,
 } from './panel-registrations';
 import type { StatusBarItemRendererRegistration } from './status-bar-item-renderer-registration';
+import type { TopBarRegistration } from './top-bar-registration';
 import type { WorkbenchLayout } from './workbench-layout';
 import type {
   LayerSurfaceItem,
@@ -52,6 +53,7 @@ export interface ChromeSlice {
   statusBarItemRenderers: StatusBarItemRendererRegistration[];
   toolbarItems: ToolbarItemDescriptor[];
   contextKeys: Record<string, boolean | string | number>;
+  topBars: TopBarRegistration[];
 }
 
 export interface CommandsSlice {

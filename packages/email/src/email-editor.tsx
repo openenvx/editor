@@ -1,7 +1,6 @@
 import type { Scene } from '@openenvx/core/schema';
 import {
   EmailBlocksPlugin,
-  EmailTopBar,
   createEmailScene,
   DEFAULT_EMAIL_LAYOUT,
 } from '@openenvx/driver-email';
@@ -10,7 +9,14 @@ import { useMemo } from 'react';
 
 import './theme.css';
 
-const DEFAULT_EMAIL_PLUGINS = [new EmailBlocksPlugin()];
+const EMAIL_EDITOR_PLUGINS = [new EmailBlocksPlugin()];
+
+/** Drop-in host layout: artboard overlay toolbars, no product top bar. */
+const EMAIL_EDITOR_LAYOUT = {
+  ...DEFAULT_EMAIL_LAYOUT,
+  editorToolbars: true,
+  topBar: false,
+};
 
 export interface EmailEditorProps {
   /** Initial document. Defaults to a welcome-email starter when omitted. */
@@ -21,8 +27,6 @@ export interface EmailEditorProps {
   className?: string;
   editorTitle?: string;
   locale?: string;
-  /** When set, the top bar shows a back control that calls this handler. */
-  onBack?: () => void;
 }
 
 export function EmailEditor({
@@ -32,7 +36,6 @@ export function EmailEditor({
   className,
   editorTitle,
   locale,
-  onBack,
 }: EmailEditorProps) {
   const scene = useMemo(
     () => initialScene ?? createEmailScene(),
@@ -49,12 +52,11 @@ export function EmailEditor({
       editorTitle={editorTitle}
       editorUri="openenvx://email/editor"
       initialScene={scene}
-      layout={DEFAULT_EMAIL_LAYOUT}
+      layout={EMAIL_EDITOR_LAYOUT}
       locale={locale}
       onSceneChange={onChange}
-      plugins={DEFAULT_EMAIL_PLUGINS}
+      plugins={EMAIL_EDITOR_PLUGINS}
       theme={theme}
-      topBar={<EmailTopBar onBack={onBack} />}
     />
   );
 }

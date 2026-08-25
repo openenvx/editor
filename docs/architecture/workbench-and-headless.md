@@ -18,8 +18,8 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 - `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` — owns `EditorRuntime`, injects it into `PluginManager`
 - `bootstrapWorkbenchServices()` — headless DI services on the runtime
 - `WorkbenchPlugin` + `ctx.registerWorkbench()` — UI contribution registration
-- Provider registries: `registerTreeDataProvider`, `registerFieldRenderer`, `registerStatusBarItemRenderer`, `registerEditorPane`
-- Contribution points: Toolbar, CommandPalette, ViewContainer, View, ContextMenu, StatusBar, SidebarHeader, Overlay, PropertyPane
+- Provider registries: `registerTreeDataProvider`, `registerFieldRenderer`, `registerStatusBarItemRenderer`, `registerEditorPane`, `registerTopBar`
+- Contribution points: Toolbar, CommandPalette, ViewContainer, View, ContextMenu, StatusBar, SidebarHeader, Overlay, PropertyPane, TopBar
 - Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `SidebarHeaderBuilder`, `PropertyPaneBuilder`
 - `WorkbenchLayout` (independent `activityBar` / `primarySidebar` / `secondarySidebar`), `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
 - Optional `WorkbenchLayoutStore` for persisted visibility + container locations
@@ -40,17 +40,18 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 
 ## Layout defaults
 
-| Field | `DEFAULT_WORKBENCH_LAYOUT` | Canvas Pro `DEFAULT_CANVAS_LAYOUT` | HTML `DEFAULT_HTML_LAYOUT` |
-| --- | --- | --- | --- |
-| `activityBar` | `true` | `true` | `true` |
-| `primarySidebar` | `true` | `true` | `true` |
-| `secondarySidebar` | `true` | `true` | `true` |
-| `editorToolbars` | `false` | `true` | `true` |
-| Other parts | all enabled | all enabled | all enabled |
+| Field | `DEFAULT_WORKBENCH_LAYOUT` | Canvas Pro `DEFAULT_CANVAS_LAYOUT` | HTML `DEFAULT_HTML_LAYOUT` | Email `DEFAULT_EMAIL_LAYOUT` |
+| --- | --- | --- | --- | --- |
+| `activityBar` | `true` | `true` | `true` | `true` |
+| `primarySidebar` | `true` | `true` | `true` | `true` |
+| `secondarySidebar` | `true` | `true` | `true` | `true` |
+| `editorToolbars` | `false` | `true` | `true` | `false` |
+| `topBar` | `false` | `false` | `false` | `true` |
+| Other parts | all enabled | all enabled | all enabled | all enabled |
 
-Visibility is mutable (`toggleActivityBar` / …). Containers move via `api.moveContainer`. Set `layout: { editorToolbars: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_HTML_LAYOUT`) to show editor overlay toolbars. Items declare a `placement` (`top-left` | `top-center` | `top-right` | `bottom-left` | `bottom-center` | `bottom-right`) via `ToolbarBuilder.placement(...)`.
+Visibility is mutable (`toggleActivityBar` / …). Containers move via `api.moveContainer`. Set `layout: { editorToolbars: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_HTML_LAYOUT`) to show editor overlay toolbars. Items declare a `placement` (`top-left` | `top-center` | `top-right` | `bottom-left` | `bottom-center` | `bottom-right`) via `ToolbarBuilder.placement(...)`. Set `layout: { topBar: true }` (or use `DEFAULT_EMAIL_LAYOUT`) to show the optional shell header; plugins declare `TopBarContribution` and `ctx.registerTopBar(id, Component)`. Highest `priority` wins; later equal priority overwrites. No contribution = no header.
 
-**Host rule (toolbars):** Product engines (canvas / html / email) contribute toolbar descriptors only — no React toolbar components in those packages. Workbench `EditorChrome` + `ToolbarRenderer` render shared `IconButton` / `DropdownMenu` chrome.
+**Host rule (toolbars):** Product engines (canvas / html / email) contribute toolbar descriptors only — no React toolbar components in those packages. Workbench `EditorChrome` + `ToolbarRenderer` render shared `IconButton` / `DropdownMenu` chrome. Product **top bars** (email mode switch, etc.) are the exception: they are optional layout + `TopBarContribution`, not a `WorkbenchShell` prop.
 
 ## Property pane flow
 

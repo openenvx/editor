@@ -55,6 +55,7 @@ export { ContextMenuRenderer } from './renderers/context-menu-renderer';
 export { CommandPaletteRenderer } from './renderers/command-palette-renderer';
 export { OverlayRenderer } from './renderers/overlay-renderer';
 export { StatusBarRenderer } from './renderers/status-bar-renderer';
+export { TopBarRenderer } from './renderers/top-bar-renderer';
 export { EditorChrome } from './layout/editor-chrome';
 export type {
   EditorChromeProps,

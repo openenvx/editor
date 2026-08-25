@@ -34,10 +34,6 @@ await cp(
 
 // Published theme — bundle imports ./theme.css; export ./theme.css → dist/index.css.
 const publishedTheme = `@import './theme/tokens.css';
-
-.openenvx-email-editor {
-  --wb-topbar-height: 48px;
-}
 `;
 
 await Bun.write(path.join(distRoot, 'theme.css'), publishedTheme);

@@ -9,4 +9,5 @@ export enum WorkbenchContributionPoint {
   PropertyPane = 'propertyPane',
   CommandPalette = 'commandPalette',
   Toolbar = 'toolbar',
+  TopBar = 'topBar',
 }

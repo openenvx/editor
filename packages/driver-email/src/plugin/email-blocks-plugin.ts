@@ -18,7 +18,10 @@ import {
   EmailElementsView,
   EMAIL_ELEMENTS_PANEL_COMPONENT_ID,
 } from '../contributions/email-blocks-sidebar';
-import { createEmailChromeCommands } from '../contributions/email-chrome-commands';
+import {
+  createEmailChromeCommands,
+  createEmailGoBackCommand,
+} from '../contributions/email-chrome-commands';
 import { EmailContextMenu } from '../contributions/email-context-menu';
 import {
   EmailPatternsContainer,
@@ -30,6 +33,10 @@ import {
   EmailTemplatesView,
   EMAIL_TEMPLATES_PANEL_COMPONENT_ID,
 } from '../contributions/email-templates-sidebar';
+import {
+  EmailTopBarContribution,
+  EMAIL_TOP_BAR_ID,
+} from '../contributions/email-top-bar-contribution';
 import { EmailBlockPalettePanel } from '../editor/block-palette-panel';
 import {
   createEmailModeCommands,
@@ -37,11 +44,26 @@ import {
   EmailEditorModeServiceImpl,
 } from '../editor/email-editor-mode-service';
 import { EmailEditorPane } from '../editor/email-editor-pane';
+import { EmailTopBar } from '../editor/email-top-bar';
 import { EmailPatternBlocksGallery } from '../editor/pattern-blocks-gallery';
 import { EmailTemplatesGallery } from '../editor/templates-gallery';
 
+export interface EmailBlocksPluginOptions {
+  /**
+   * Register the product top bar (`EmailTopBarContribution`).
+   * Off by default — hosts that want it also set `layout.topBar: true`.
+   */
+  topBar?: boolean;
+  /** When set and `topBar` is true, the top bar shows a back control. */
+  onBack?: () => void;
+}
+
 export class EmailBlocksPlugin extends WorkbenchPlugin {
   readonly id = 'OpenEnvx.email-blocks';
+
+  constructor(private readonly options: EmailBlocksPluginOptions = {}) {
+    super();
+  }
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
     for (const block of allEmailBlocks) {
@@ -72,7 +94,10 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
         pageLayout: 'email',
       }),
       ...createEmailModeCommands(),
-      ...createEmailChromeCommands()
+      ...createEmailChromeCommands(),
+      ...(this.options.topBar && this.options.onBack
+        ? [createEmailGoBackCommand(this.options.onBack)]
+        : [])
     );
     registerHtmlPreviewChrome(ctx, { hideFluidPreset: true });
 
@@ -83,7 +108,8 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
       new EmailPatternsContainer(),
       new EmailPatternsView(),
       new EmailElementsContainer(),
-      new EmailElementsView()
+      new EmailElementsView(),
+      ...(this.options.topBar ? [new EmailTopBarContribution()] : [])
     );
     ctx.registerViewPanel(
       EMAIL_ELEMENTS_PANEL_COMPONENT_ID,
@@ -98,5 +124,8 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
       EmailTemplatesGallery
     );
     ctx.registerEditorPane('email', EmailEditorPane);
+    if (this.options.topBar) {
+      ctx.registerTopBar(EMAIL_TOP_BAR_ID, EmailTopBar);
+    }
   }
 }

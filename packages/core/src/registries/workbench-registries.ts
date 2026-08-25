@@ -5,6 +5,7 @@ import type { PropertyPaneContribution } from '../contributions/property-pane-co
 import type { SidebarHeaderContribution } from '../contributions/sidebar-header-contribution';
 import type { StatusBarContribution } from '../contributions/status-bar-contribution';
 import type { ToolbarContribution } from '../contributions/toolbar-contribution';
+import type { TopBarContribution } from '../contributions/top-bar-contribution';
 import type {
   ViewContainerContribution,
   ViewContribution,
@@ -25,6 +26,7 @@ export class WorkbenchRegistries {
   readonly sidebarHeaders: SidebarHeaderContribution[] = [];
   readonly toolbars: ToolbarContribution[] = [];
   readonly propertyPanes: PropertyPaneContribution[] = [];
+  readonly topBars: TopBarContribution[] = [];
 }
 
 function contributionList(
@@ -58,6 +60,9 @@ function contributionList(
     }
     case 'propertyPane': {
       return registries.propertyPanes;
+    }
+    case 'topBar': {
+      return registries.topBars;
     }
     default: {
       const exhaustive: never = point;

@@ -31,6 +31,7 @@ import type {
   ViewPanelRegistration,
 } from './panel-registrations';
 import type { StatusBarItemRendererRegistration } from './status-bar-item-renderer-registration';
+import type { TopBarRegistration } from './top-bar-registration';
 import type { WorkbenchLayout } from './workbench-layout';
 import type { WorkbenchLayoutStore } from './workbench-layout-store';
 
@@ -119,6 +120,7 @@ export interface WorkbenchState {
   statusBar: StatusBarItemDescriptor[];
   statusBarItemRenderers: StatusBarItemRendererRegistration[];
   toolbarItems: ToolbarItemDescriptor[];
+  topBars: TopBarRegistration[];
   commandStates: Record<string, { canExecute: boolean }>;
   layerSurface: LayerSurfaceItem[];
   contextKeys: Record<string, boolean | string | number>;
