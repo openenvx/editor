@@ -35,7 +35,7 @@ Import `@openenvx/email/theme.css` once (tokens + editor chrome). For Node/SSR H
 
 | Export | Description |
 | --- | --- |
-| `EmailEditor` | Full email editor (layers, inspector, blocks, templates, preview) |
+| `EmailEditor` | Full email editor (layers, inspector, blocks, templates, preview). **Formatted paste:** Cmd/Ctrl+V in the artboard (outside inline text edit) converts clipboard HTML/plain into email blocks (headings, text, lists, links, images, dividers) inserted after the selection. |
 | `createEmailScene()` | Starter welcome-email scene (also the default `initialScene`) |
 | `renderEmailHtml(scene)` | Export email-safe HTML via React-Email |
 | `Scene` | Scene JSON type for persistence |

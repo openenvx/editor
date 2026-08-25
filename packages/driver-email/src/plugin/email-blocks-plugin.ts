@@ -13,6 +13,7 @@ import {
 import { allEmailBlocks } from '../blocks/all-email-blocks';
 import { OpenEmailBlocksSheetCommand } from '../commands/open-blocks-sheet-command';
 import { OpenEmailTemplatesSheetCommand } from '../commands/open-templates-sheet-command';
+import { createEmailPasteCommand } from '../commands/paste-from-clipboard-command';
 import {
   EmailElementsContainer,
   EmailElementsView,
@@ -96,6 +97,7 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
       }),
       ...createEmailModeCommands(),
       ...createEmailChromeCommands(),
+      createEmailPasteCommand(),
       ...(this.options.topBar && this.options.onBack
         ? [createEmailGoBackCommand(this.options.onBack)]
         : [])

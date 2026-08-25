@@ -8,7 +8,11 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { ContextKeyServiceId, getActivePage } from '@openenvx/core';
+import {
+  ContextKeyServiceId,
+  getActivePage,
+  isTypingTarget,
+} from '@openenvx/core';
 import type { EditorPaneHostProps } from '@openenvx/core';
 import {
   useWorkbenchContext,
@@ -129,6 +133,45 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     initialPreset: DEFAULT_EMAIL_DEVICE_PRESET,
     resolveFrameWidth: resolveEmailFrameWidth,
   });
+
+  useEffect(() => {
+    if (mode !== 'edit') {
+      return;
+    }
+    const handlePaste = (event: ClipboardEvent) => {
+      const stage = stageRef.current;
+      if (!stage) {
+        return;
+      }
+      const target = event.target;
+      const active = document.activeElement;
+      const inStage =
+        (target instanceof Node && stage.contains(target)) ||
+        (active instanceof Node && stage.contains(active));
+      if (!inStage) {
+        return;
+      }
+      if (editingTarget) {
+        return;
+      }
+      if (isTypingTarget(event.target)) {
+        return;
+      }
+      const clipboardData = event.clipboardData;
+      if (!clipboardData) {
+        return;
+      }
+      const html = clipboardData.getData('text/html') || null;
+      const plain = clipboardData.getData('text/plain') || null;
+      if (!html?.trim() && !plain?.trim()) {
+        return;
+      }
+      event.preventDefault();
+      void executeCommand('email.pasteFromClipboard', { html, plain });
+    };
+    document.addEventListener('paste', handlePaste);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [editingTarget, executeCommand, mode, stageRef]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
