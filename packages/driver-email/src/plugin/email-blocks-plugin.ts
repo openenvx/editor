@@ -33,6 +33,7 @@ import {
   EmailTemplatesView,
   EMAIL_TEMPLATES_PANEL_COMPONENT_ID,
 } from '../contributions/email-templates-sidebar';
+import { EmailToolbarContribution } from '../contributions/email-toolbar-contribution';
 import {
   EmailTopBarContribution,
   EMAIL_TOP_BAR_ID,
@@ -109,6 +110,7 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
       new EmailPatternsView(),
       new EmailElementsContainer(),
       new EmailElementsView(),
+      new EmailToolbarContribution(),
       ...(this.options.topBar ? [new EmailTopBarContribution()] : [])
     );
     ctx.registerViewPanel(

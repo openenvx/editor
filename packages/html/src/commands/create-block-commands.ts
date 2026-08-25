@@ -6,6 +6,7 @@ import {
   cloneBlockWithNewIds,
   createBlock,
   findBlock,
+  getPageRootId,
   insertAt,
   mapPageLayers,
   moveTo,
@@ -13,6 +14,7 @@ import {
   siblingCount,
   updateBlockData,
 } from '../tree/block-tree';
+import { resolveInsertParentId } from '../tree/resolve-insert-parent-id';
 
 export interface BlockCommandSetOptions {
   /** Command id prefix, e.g. `html` → `html.insertBlock`. */
@@ -171,6 +173,7 @@ export function createBlockCommands(
           type?: string;
           parentId?: string | null;
           index?: number;
+          data?: Record<string, unknown>;
         }
       ): void {
         if (!isDriverPage(ctx)) {
@@ -189,16 +192,26 @@ export function createBlockCommands(
           return;
         }
         const page = ctx.scene.getActivePage();
-        const parentId = args?.parentId ?? null;
-        if (!parentAcceptsChildren(registry, page.layers, parentId)) {
+        const selectedId =
+          ctx.selection.primaryLayerId ??
+          ctx.selection.selectedLayerIds[0] ??
+          null;
+        const rootId = getPageRootId(page, rootType);
+        const parentId =
+          args?.parentId !== undefined
+            ? args.parentId
+            : resolveInsertParentId(page.layers, selectedId, rootId, registry);
+        if (
+          !parentId ||
+          !parentAcceptsChildren(registry, page.layers, parentId)
+        ) {
           return;
         }
         const index = args?.index ?? Number.POSITIVE_INFINITY;
-        const block = createBlock(
-          type,
-          createBlockId(type),
-          config.defaultData
-        );
+        const defaultData = args?.data
+          ? { ...config.defaultData, ...args.data }
+          : config.defaultData;
+        const block = createBlock(type, createBlockId(type), defaultData);
         ctx.scene.apply({
           apply: (scene) =>
             mapPageLayers(scene, page.id, (layers) =>

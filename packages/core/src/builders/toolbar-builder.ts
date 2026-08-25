@@ -48,6 +48,7 @@ export interface ToolbarSeparatorItemDescriptor extends ToolbarItemBase {
 export interface ToolbarDropdownItemDescriptor
   extends ShellDropdownItemBase, ToolbarItemBase {
   variant?: 'toolbar';
+  icon?: string;
 }
 
 export type ToolbarItemDescriptor =
@@ -65,6 +66,7 @@ export interface ToolbarCommandOptions extends ShellItemOptions {
 }
 
 export interface ToolbarDropdownOptions extends ShellItemOptions {
+  icon?: string;
   label?: string;
   labelKey?: string;
   labelBinding?: string;
@@ -119,6 +121,7 @@ class ToolbarRegionBuilder {
       applyShellItemOptions(
         {
           group: options.group,
+          icon: options.icon,
           id,
           items: options.items,
           kind: 'dropdown',

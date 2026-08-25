@@ -46,6 +46,7 @@ export const ToolbarRenderer = memo(
           if (isToolbarDropdownItem(item)) {
             return (
               <ShellDropdownControl
+                icon={item.icon}
                 id={item.id}
                 items={item.items}
                 key={item.id}

@@ -302,4 +302,45 @@ describe('html block commands', () => {
     expect(children[0]!.id).toBe(insertedId);
     runtime.dispose();
   });
+
+  it('inserts under root when parentId is omitted', async () => {
+    const { manager, runtime, store } = createHtmlCommandHarness();
+    const ctx = runtime.createCommandContext();
+
+    await manager
+      .getRegistries()
+      .commands.execute('html.insertBlock', ctx, runtime.getEvents(), {
+        type: 'html.text',
+      });
+
+    const page = store.getScene().pages[0]!;
+    const root = findBlock(page.layers, 'root')!.block;
+    const children = getBlockChildren(root);
+    const inserted = children.at(-1)!;
+    expect(inserted.type).toBe('html.text');
+    expect(findBlock(page.layers, inserted.id)?.parentId).toBe('root');
+
+    runtime.dispose();
+  });
+
+  it('merges data patch onto defaultData when inserting', async () => {
+    const { manager, runtime, store } = createHtmlCommandHarness();
+    const ctx = runtime.createCommandContext();
+
+    await manager
+      .getRegistries()
+      .commands.execute('html.insertBlock', ctx, runtime.getEvents(), {
+        type: 'html.heading',
+        parentId: 'root',
+        data: { level: '1' },
+      });
+
+    const page = store.getScene().pages[0]!;
+    const root = findBlock(page.layers, 'root')!.block;
+    const heading = getBlockChildren(root).at(-1)!;
+    expect(heading.type).toBe('html.heading');
+    expect((heading.data as { level: string }).level).toBe('1');
+
+    runtime.dispose();
+  });
 });

@@ -4,22 +4,25 @@ import type {
 } from '@openenvx/core';
 import { isToolbarTopPlacement } from '@openenvx/core';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useContextKeyValue } from '../hooks/use-context-key';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
+import { WorkbenchIcon } from '../icons/workbench-icon';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroups,
   DropdownMenuTrigger,
 } from '../primitives/dropdown-menu';
+import { IconButton } from '../primitives/icon-button';
 
 import styles from './shell-dropdown.module.css';
 
 export interface ShellDropdownControlProps {
   id: string;
+  icon?: string;
   label?: string;
   labelKey?: string;
   /** Context key whose string/number value is shown as the trigger label. */
@@ -41,9 +44,12 @@ function formatBoundLabel(
   return null;
 }
 
+const HOVER_CLOSE_DELAY_MS = 120;
+
 export const ShellDropdownControl = memo(
   ({
     id,
+    icon,
     label,
     labelKey,
     labelBinding,
@@ -55,6 +61,50 @@ export const ShellDropdownControl = memo(
     const { executeCommand } = useWorkbenchContext();
     const { t } = useWorkbenchTranslation();
     const boundValue = useContextKeyValue(labelBinding ?? '');
+
+    const openOnHover = Boolean(icon);
+    const [hoverOpen, setHoverOpen] = useState(false);
+    const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const clearCloseTimer = useCallback(() => {
+      if (closeTimerRef.current !== null) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    }, []);
+
+    const openFromHover = useCallback(() => {
+      clearCloseTimer();
+      setHoverOpen(true);
+    }, [clearCloseTimer]);
+
+    const scheduleCloseFromHover = useCallback(() => {
+      clearCloseTimer();
+      closeTimerRef.current = setTimeout(() => {
+        setHoverOpen(false);
+        closeTimerRef.current = null;
+      }, HOVER_CLOSE_DELAY_MS);
+    }, [clearCloseTimer]);
+
+    useEffect(() => () => clearCloseTimer(), [clearCloseTimer]);
+
+    const handleHoverOpenChange = useCallback(
+      (next: boolean) => {
+        if (!openOnHover) {
+          return;
+        }
+        clearCloseTimer();
+        setHoverOpen(next);
+      },
+      [clearCloseTimer, openOnHover]
+    );
+
+    const hoverPointerProps = openOnHover
+      ? {
+          onPointerEnter: openFromHover,
+          onPointerLeave: scheduleCloseFromHover,
+        }
+      : undefined;
 
     const displayLabel = useMemo(() => {
       if (labelBinding) {
@@ -94,15 +144,32 @@ export const ShellDropdownControl = memo(
     const Chevron = openUp ? ChevronUp : ChevronDown;
 
     return (
-      <DropdownMenu>
+      <DropdownMenu
+        modal={!openOnHover}
+        onOpenChange={openOnHover ? handleHoverOpenChange : undefined}
+        open={openOnHover ? hoverOpen : undefined}
+      >
         <DropdownMenuTrigger>
-          <button className={triggerClass} type="button">
-            <span>{displayLabel}</span>
-            <Chevron aria-hidden className={styles.chevron} size={12} />
-          </button>
+          {icon ? (
+            <IconButton
+              aria-label={displayLabel}
+              title={displayLabel}
+              type="button"
+              {...hoverPointerProps}
+            >
+              <WorkbenchIcon id={icon} size={14} />
+            </IconButton>
+          ) : (
+            <button className={triggerClass} type="button">
+              <span>{displayLabel}</span>
+              <Chevron aria-hidden className={styles.chevron} size={12} />
+            </button>
+          )}
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side={openUp ? 'top' : 'bottom'}>
-          <DropdownMenuGroups groups={groups} />
+          <div {...hoverPointerProps}>
+            <DropdownMenuGroups groups={groups} />
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
     );
