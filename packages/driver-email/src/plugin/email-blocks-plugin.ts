@@ -18,6 +18,7 @@ import {
   EmailElementsView,
   EMAIL_ELEMENTS_PANEL_COMPONENT_ID,
 } from '../contributions/email-blocks-sidebar';
+import { createEmailChromeCommands } from '../contributions/email-chrome-commands';
 import { EmailContextMenu } from '../contributions/email-context-menu';
 import {
   EmailPatternsContainer,
@@ -29,7 +30,6 @@ import {
   EmailTemplatesView,
   EMAIL_TEMPLATES_PANEL_COMPONENT_ID,
 } from '../contributions/email-templates-sidebar';
-import { EmailToolbarContribution } from '../contributions/email-toolbar-contribution';
 import { EmailBlockPalettePanel } from '../editor/block-palette-panel';
 import {
   createEmailModeCommands,
@@ -71,9 +71,10 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
         typePrefix: 'email.',
         pageLayout: 'email',
       }),
-      ...createEmailModeCommands()
+      ...createEmailModeCommands(),
+      ...createEmailChromeCommands()
     );
-    registerHtmlPreviewChrome(ctx);
+    registerHtmlPreviewChrome(ctx, { hideFluidPreset: true });
 
     ctx.registerWorkbench(
       new EmailContextMenu(),
@@ -82,8 +83,7 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
       new EmailPatternsContainer(),
       new EmailPatternsView(),
       new EmailElementsContainer(),
-      new EmailElementsView(),
-      new EmailToolbarContribution()
+      new EmailElementsView()
     );
     ctx.registerViewPanel(
       EMAIL_ELEMENTS_PANEL_COMPONENT_ID,

@@ -14,7 +14,7 @@ export function App() {
   return (
     <div className="email-package-demo">
       <EmailEditor
-        className="email-package-demo-editor"
+        className="email-package-demo-editor openenvx-email-editor"
         editorTitle="Welcome email"
         onChange={onChange}
         theme="dark"

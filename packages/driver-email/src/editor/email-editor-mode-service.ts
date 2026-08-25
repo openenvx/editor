@@ -1,7 +1,7 @@
 import { Command, createServiceId, Emitter } from '@openenvx/core';
 import type { CommandContext, ContextKeyService, Event } from '@openenvx/core';
 
-export type EmailEditorMode = 'edit' | 'preview';
+export type EmailEditorMode = 'edit' | 'html' | 'preview';
 
 export interface EmailEditorModeService {
   readonly onDidChange: Event<void>;
@@ -65,6 +65,7 @@ export class EmailEditorModeServiceImpl implements EmailEditorModeService {
     keys.setContext('email.editorActive', this.active);
     keys.setContext('email.mode', this.mode);
     keys.setContext('email.modeEdit', this.mode === 'edit');
+    keys.setContext('email.modeHtml', this.mode === 'html');
     keys.setContext('email.modePreview', this.mode === 'preview');
   }
 }
@@ -89,6 +90,18 @@ export class EmailEnterEditModeCommand extends Command {
   }
 }
 
+export class EmailEnterHtmlModeCommand extends Command {
+  readonly id = 'email.enterHtmlMode';
+
+  canExecute(ctx: CommandContext): boolean {
+    return getModeService(ctx) !== null;
+  }
+
+  execute(ctx: CommandContext): void {
+    getModeService(ctx)?.setMode('html');
+  }
+}
+
 export class EmailEnterPreviewModeCommand extends Command {
   readonly id = 'email.enterPreviewMode';
 
@@ -102,5 +115,9 @@ export class EmailEnterPreviewModeCommand extends Command {
 }
 
 export function createEmailModeCommands(): Command[] {
-  return [new EmailEnterEditModeCommand(), new EmailEnterPreviewModeCommand()];
+  return [
+    new EmailEnterEditModeCommand(),
+    new EmailEnterHtmlModeCommand(),
+    new EmailEnterPreviewModeCommand(),
+  ];
 }

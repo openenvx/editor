@@ -67,6 +67,8 @@ export interface WorkbenchShellProps {
   editorTitle?: string;
   layout?: WorkbenchControllerOptions['layout'];
   layoutStore?: WorkbenchControllerOptions['layoutStore'];
+  /** Optional top bar rendered above the editor layout (inside workbench context). */
+  topBar?: ReactNode;
   /**
    * When true (default), embed/template write policy is enforced.
    * Dashboard authoring should pass false so the Embed properties tab appears
@@ -269,9 +271,13 @@ const LayoutRegion = memo(
     showEditorArea,
     renderEditorPane,
     createPropertyHostContext,
+    topBar,
   }: Pick<
     WorkbenchShellProps,
-    'showEditorArea' | 'renderEditorPane' | 'createPropertyHostContext'
+    | 'showEditorArea'
+    | 'renderEditorPane'
+    | 'createPropertyHostContext'
+    | 'topBar'
   >) => {
     const layout = useWorkbenchContextSelector((state) => state.layout);
     const viewContainers = useWorkbenchContextSelector(
@@ -307,6 +313,7 @@ const LayoutRegion = memo(
           />
         }
         statusBar={<StatusBarRegion />}
+        topBar={topBar}
       />
     );
   }
@@ -485,6 +492,7 @@ export function WorkbenchShell({
   createPropertyHostContext,
   renderEditorPane,
   mountExternalHosts,
+  topBar,
 }: WorkbenchShellProps) {
   const [activeTheme, setActiveTheme] = useState(theme);
   const [prevThemeProp, setPrevThemeProp] = useState(theme);
@@ -643,6 +651,7 @@ export function WorkbenchShell({
                   createPropertyHostContext={createPropertyHostContext}
                   renderEditorPane={renderEditorPane}
                   showEditorArea={showEditorArea}
+                  topBar={topBar}
                 />
               </div>
             </EditorViewportProvider>

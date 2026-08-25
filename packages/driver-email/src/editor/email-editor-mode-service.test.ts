@@ -12,7 +12,7 @@ import {
 } from './email-editor-mode-service';
 
 describe('EmailEditorModeService', () => {
-  it('toggles edit/preview and syncs context keys while active', () => {
+  it('toggles edit/html/preview and syncs context keys while active', () => {
     const service = new EmailEditorModeServiceImpl();
     const keys = createContextKeyService();
     service.bindContextKeys(keys);
@@ -20,7 +20,12 @@ describe('EmailEditorModeService', () => {
 
     expect(service.getMode()).toBe('edit');
     expect(keys.get('email.modeEdit')).toBe(true);
+    expect(keys.get('email.modeHtml')).toBe(false);
     expect(keys.get('email.modePreview')).toBe(false);
+
+    service.setMode('html');
+    expect(service.getMode()).toBe('html');
+    expect(keys.get('email.modeHtml')).toBe(true);
 
     service.setMode('preview');
     expect(service.getMode()).toBe('preview');
@@ -33,7 +38,7 @@ describe('EmailEditorModeService', () => {
     const services = new InstantiationService();
     services.registerInstance(EmailEditorModeServiceId, service);
     const ctx = { services } as CommandContext;
-    const [enterEdit, enterPreview] = createEmailModeCommands();
+    const [enterEdit, enterHtml, enterPreview] = createEmailModeCommands();
 
     expect(enterPreview.canExecute?.(ctx)).toBe(false);
     service.setActive(true);
@@ -41,6 +46,9 @@ describe('EmailEditorModeService', () => {
 
     await enterPreview.execute(ctx);
     expect(service.getMode()).toBe('preview');
+
+    await enterHtml.execute(ctx);
+    expect(service.getMode()).toBe('html');
 
     await enterEdit.execute(ctx);
     expect(service.getMode()).toBe('edit');

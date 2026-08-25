@@ -18,8 +18,7 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
-  /* Toolbar floats over the stage — keep light inset so artboard peeks under the pill. */
-  padding: 40px 40px 40px;
+  padding: 24px 32px 32px;
 }
 
 .artboardSlot {
@@ -95,6 +94,23 @@
 .paletteItem:focus-visible {
   outline: none;
   box-shadow: var(--wb-shadow-control-focus);
+}
+
+.htmlSource {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 480px;
+  margin: 0;
+  padding: var(--wb-space-4, 16px);
+  overflow: auto;
+  border-radius: 2px;
+  background: var(--wb-background, #fff);
+  color: var(--wb-foreground, #18181b);
+  font-family: var(--wb-font-mono, ui-monospace, monospace);
+  font-size: var(--wb-text-mono, 11px);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .empty {
