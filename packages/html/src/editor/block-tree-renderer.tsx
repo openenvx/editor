@@ -493,7 +493,6 @@ function SortableBlockNode({
       layer={layer}
       selected={selected}
       setNodeRef={setNodeRef}
-      sortableProps={dragDisabled ? undefined : { ...listeners, ...attributes }}
       dragHandleProps={
         dragDisabled
           ? undefined

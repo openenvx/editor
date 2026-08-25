@@ -118,11 +118,6 @@
   outline-color: var(--wb-selection-muted, rgb(59 130 246 / 50%));
 }
 
-.blockWrapContents.blockWrapDraggable {
-  cursor: grab;
-  touch-action: none;
-}
-
 .blockWrapContents.blockWrapDraggingGhost {
   opacity: 0.4;
   pointer-events: none;
@@ -138,11 +133,6 @@
 .blockWrapContents.blockWrapInsertLineBeforeVertical,
 .blockWrapContents.blockWrapInsertLineAfterVertical {
   position: relative;
-}
-
-.blockWrapDraggable {
-  cursor: grab;
-  touch-action: none;
 }
 
 /* Source stays put and grayed; only the insert line / container highlight moves. */

@@ -35,7 +35,6 @@ export function BlockChrome({
   insideWidget = false,
   chromeDisplay = 'block',
   setNodeRef,
-  sortableProps,
   dragHandleProps,
   children,
 }: {
@@ -59,9 +58,7 @@ export function BlockChrome({
   insideWidget?: boolean;
   chromeDisplay?: 'block' | 'inline' | 'contents';
   setNodeRef?: (node: HTMLElement | null) => void;
-  /** dnd-kit listeners/attributes on the block wrap (full-chrome drag). */
-  sortableProps?: Record<string, unknown>;
-  /** Same listeners on the selection-menu grip (extra affordance). */
+  /** dnd-kit listeners/attributes on the selection-menu Move grip (only drag activator). */
   dragHandleProps?: HTMLAttributes<HTMLButtonElement>;
   children: ReactNode;
 }) {
@@ -257,7 +254,6 @@ export function BlockChrome({
     chromeDisplay === 'contents' ? styles.blockWrapContents : '',
     selected ? styles.blockWrapSelected : '',
     hovered ? styles.blockWrapHovered : '',
-    dragDisabled ? '' : styles.blockWrapDraggable,
     isDraggingGhost ? styles.blockWrapDraggingGhost : '',
     dropContainerPreview ? styles.blockWrapDropContainer : '',
     imageDropActive ? styles.blockWrapImageDrop : '',
@@ -280,7 +276,6 @@ export function BlockChrome({
     onKeyDown: handleKeyDown,
     onPointerEnter: handlePointerEnter,
     onPointerLeave: handlePointerLeave,
-    ...sortableProps,
   };
 
   if (chromeDisplay === 'contents') {
