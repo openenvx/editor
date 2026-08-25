@@ -55,6 +55,7 @@ import {
   type EmailEditorMode,
 } from './email-editor-mode-service';
 import { EmailHtmlPreview } from './email-html-preview';
+import { EmailHtmlSourceEditor } from './email-html-source-editor';
 
 import styles from './email-editor-pane.module.css';
 
@@ -301,6 +302,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   const isPreview = mode === 'preview';
   const isHtml = mode === 'html';
   const isReadOnly = isPreview || isHtml;
+  const needsRenderedHtml = isPreview || isHtml;
 
   useEffect(() => {
     if (!isReadOnly) {
@@ -320,12 +322,12 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   }, [api, clearDrag, editingTarget, isReadOnly]);
 
   useEffect(() => {
-    if (!isReadOnly || !scene || !activePageId) {
+    if (!needsRenderedHtml || !scene || !activePageId) {
       return;
     }
     let cancelled = false;
     const page = getActivePage(scene, activePageId);
-    void renderEmailDocument(page, registry)
+    void renderEmailDocument(page, registry, { pretty: isHtml })
       .then((html) => {
         if (cancelled) {
           return;
@@ -345,10 +347,26 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     return () => {
       cancelled = true;
     };
-  }, [activePageId, isReadOnly, registry, scene]);
+  }, [activePageId, isHtml, needsRenderedHtml, registry, scene]);
 
   if (!(scene && selection)) {
     return null;
+  }
+
+  if (isHtml) {
+    return (
+      <div className={styles.pane}>
+        <div aria-label="Email HTML" className={styles.htmlPane} role="region">
+          {previewError ? (
+            <p className={styles.empty}>{previewError}</p>
+          ) : !previewHtml ? (
+            <p className={styles.empty}>Rendering HTML…</p>
+          ) : (
+            <EmailHtmlSourceEditor sourceHtml={previewHtml} />
+          )}
+        </div>
+      </div>
+    );
   }
 
   const page = getActivePage(scene, selection.activePageId);
@@ -368,18 +386,6 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
       artboardContent = <p className={styles.empty}>Rendering preview…</p>;
     } else {
       artboardContent = <EmailHtmlPreview html={previewHtml} />;
-    }
-  } else if (isHtml) {
-    if (previewError) {
-      artboardContent = <p className={styles.empty}>{previewError}</p>;
-    } else if (!previewHtml) {
-      artboardContent = <p className={styles.empty}>Rendering HTML…</p>;
-    } else {
-      artboardContent = (
-        <pre className={styles.htmlSource}>
-          <code>{previewHtml}</code>
-        </pre>
-      );
     }
   } else {
     artboardContent = (
@@ -424,9 +430,9 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     </div>
   );
 
-  const stage = isReadOnly ? (
+  const stage = isPreview ? (
     <div
-      aria-label={isPreview ? 'Email preview' : 'Email HTML'}
+      aria-label="Email preview"
       className={styles.stage}
       ref={stageRef}
       role="region"
@@ -458,7 +464,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     </div>
   );
 
-  if (isReadOnly) {
+  if (isPreview) {
     return pane;
   }
 

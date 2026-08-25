@@ -1,0 +1,66 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--wb-card, #fff);
+  border-radius: var(--wb-radius-control, 8px);
+  box-shadow: var(--wb-shadow-sm, 0 1px 3px rgb(0 0 0 / 8%));
+}
+
+.editor {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.editor :global(.cm-editor) {
+  height: 100%;
+  background: var(--wb-card, #fff);
+  color: var(--wb-foreground, #18181b);
+  font-family: var(--wb-font-mono, ui-monospace, monospace);
+  font-size: var(--wb-text-mono, 11px);
+  line-height: 1.5;
+}
+
+.editor :global(.cm-scroller) {
+  overflow: auto;
+  font-family: inherit;
+  line-height: inherit;
+}
+
+.editor :global(.cm-gutters) {
+  background: var(--wb-muted, #fbfbfb);
+  border-right: 1px solid var(--wb-border, #dcdcdc);
+  color: var(--wb-muted-foreground, #a1a1aa);
+}
+
+.editor :global(.cm-activeLineGutter) {
+  background: color-mix(in srgb, var(--wb-muted, #fbfbfb) 70%, transparent);
+}
+
+.editor :global(.cm-activeLine) {
+  background: color-mix(in srgb, var(--wb-muted, #fbfbfb) 50%, transparent);
+}
+
+.editor :global(.cm-cursor) {
+  border-left-color: var(--wb-foreground, #18181b);
+}
+
+.editor :global(.cm-selectionBackground),
+.editor :global(.cm-content ::selection) {
+  background: color-mix(
+    in srgb,
+    var(--wb-focus, #3b82f6) 25%,
+    transparent
+  ) !important;
+}
+
+.editor :global(.cm-focused .cm-selectionBackground) {
+  background: color-mix(
+    in srgb,
+    var(--wb-focus, #3b82f6) 35%,
+    transparent
+  ) !important;
+}

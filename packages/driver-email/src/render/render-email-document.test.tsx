@@ -90,4 +90,19 @@ describe('renderEmailDocument', () => {
 
     expect(html).toMatch(/font-size:28px/i);
   });
+
+  it('pretty-prints markup when requested for HTML source view', async () => {
+    const registry = new BlockRegistry();
+    for (const block of builtinEmailBlocks) {
+      registry.register(block);
+    }
+    const scene = createEmailDemoScene();
+    const page = scene.pages[0]!;
+
+    const compact = await renderEmailDocument(page, registry);
+    const pretty = await renderEmailDocument(page, registry, { pretty: true });
+
+    expect(pretty.length).toBeGreaterThan(compact.length);
+    expect(pretty).toContain('\n');
+  });
 });

@@ -18,6 +18,11 @@ function layerData(layer: { data?: unknown }): Record<string, unknown> {
     : {};
 }
 
+export interface RenderEmailDocumentOptions {
+  /** Indent markup for HTML source view; export defaults to compact. */
+  pretty?: boolean;
+}
+
 /**
  * Walk a page's email block tree and produce email-safe HTML via React-Email.
  * Uses the same `BlockConfig.render` functions as the live editor pane
@@ -25,7 +30,8 @@ function layerData(layer: { data?: unknown }): Record<string, unknown> {
  */
 export async function renderEmailDocument(
   page: Page,
-  registry: BlockRegistry
+  registry: BlockRegistry,
+  options?: RenderEmailDocumentOptions
 ): Promise<string> {
   const root = page.layers.find((layer) => layer.type === 'email.root');
   if (!root) {
@@ -68,5 +74,5 @@ export async function renderEmailDocument(
     </Html>
   );
 
-  return render(document);
+  return render(document, { pretty: options?.pretty ?? false });
 }

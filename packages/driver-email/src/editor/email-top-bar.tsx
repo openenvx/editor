@@ -237,40 +237,44 @@ export const EmailTopBar = memo(({ onBack }: EmailTopBarProps) => {
           <Redo2 aria-hidden size={14} />
         </button>
 
-        <span className={styles.divider} />
+        {mode !== 'html' ? (
+          <>
+            <span className={styles.divider} />
 
-        <div className={styles.deviceGroup}>
-          <button
-            aria-label="Desktop preview"
-            aria-pressed={devicePreset === 'desktop'}
-            className={[
-              styles.deviceButton,
-              devicePreset === 'desktop' ? styles.deviceButtonActive : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            type="button"
-            onClick={() => setDevicePreset('desktop')}
-          >
-            <Monitor aria-hidden size={14} />
-          </button>
-          <button
-            aria-label="Mobile preview"
-            aria-pressed={devicePreset === 'mobile'}
-            className={[
-              styles.deviceButton,
-              devicePreset === 'mobile' ? styles.deviceButtonActive : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            type="button"
-            onClick={() => setDevicePreset('mobile')}
-          >
-            <Smartphone aria-hidden size={14} />
-          </button>
-        </div>
+            <div className={styles.deviceGroup}>
+              <button
+                aria-label="Desktop preview"
+                aria-pressed={devicePreset === 'desktop'}
+                className={[
+                  styles.deviceButton,
+                  devicePreset === 'desktop' ? styles.deviceButtonActive : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                type="button"
+                onClick={() => setDevicePreset('desktop')}
+              >
+                <Monitor aria-hidden size={14} />
+              </button>
+              <button
+                aria-label="Mobile preview"
+                aria-pressed={devicePreset === 'mobile'}
+                className={[
+                  styles.deviceButton,
+                  devicePreset === 'mobile' ? styles.deviceButtonActive : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                type="button"
+                onClick={() => setDevicePreset('mobile')}
+              >
+                <Smartphone aria-hidden size={14} />
+              </button>
+            </div>
 
-        <span className={styles.divider} />
+            <span className={styles.divider} />
+          </>
+        ) : null}
 
         <button
           className={styles.saveButton}

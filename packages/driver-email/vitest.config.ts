@@ -7,7 +7,12 @@ export default defineConfig({
     environment: 'jsdom',
     server: {
       deps: {
-        inline: [/@openenvx\//, /@react-email\//],
+        inline: [
+          /@openenvx\//,
+          /@react-email\//,
+          /@codemirror\//,
+          /codemirror/,
+        ],
       },
     },
   },
