@@ -1,6 +1,6 @@
 # Studio & products
 
-**Audience:** Internal engineers and coding agents. Packages: `@openenvx/canvas-studio`, `@xmazu/openenvxee-studio`, `@openenvx/html-studio`, `@xmazu/openenvxee-html-studio`, and the apps that consume them.
+**Audience:** Internal engineers and coding agents. Packages: `@openenvx/canvas-studio`, `@xmazu/openenvxee-studio`, `@openenvx/html-studio`, `@xmazu/openenvxee-html-studio`, `@openenvx/email`, and the apps that consume them.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -12,7 +12,7 @@ Host product apps (dashboard Studio, embed host, demos) should not wire every pr
 2. Inline private deps into published `dist/` where applicable
 3. Ship a default plugin list + sandbox factory helpers
 
-Publishing intent: [PUBLISHING.md](../../PUBLISHING.md). Published today: `studio`, `openenvxee-html-studio`, `schema`, `preview`, `protocol`, `elements`, and `widget-sdk`. Private workspace packages (`canvas-studio`, `html-studio`, …) stay unpublished.
+Publishing intent: [PUBLISHING.md](../../PUBLISHING.md). Published today: `studio`, `openenvxee-html-studio`, `@openenvx/email`, `schema`, `preview`, `protocol`, `elements`, and `widget-sdk`. Private workspace packages (`canvas-studio`, `html-studio`, …) stay unpublished.
 
 ## `@openenvx/canvas-studio` (canvas product — monorepo)
 
@@ -58,6 +58,22 @@ Product hosts (e.g. Snapvelo) own their blocks and sidebar plugins in the produc
 const PLUGINS = [...DEFAULT_HTML_STUDIO_PLUGINS, new MyEventPagePlugin()];
 ```
 
+## `@openenvx/email` (email product — published)
+
+Public npm bundle for open-source email editor hosts. Inlines private core/html/driver-email/workbench into minified ESM. Narrow API — no plugin authoring surface:
+
+```ts
+import { EmailEditor, createEmailScene } from '@openenvx/email';
+import { renderEmailHtml } from '@openenvx/email/runtime';
+import '@openenvx/email/theme.css';
+
+<EmailEditor onChange={save} theme="dark" />
+```
+
+`EmailEditor` defaults `initialScene` to `createEmailScene()` when omitted. Headless HTML export is `@openenvx/email/runtime` so Node/SSR does not load the shell.
+
+Monorepo HMR stays on `@openenvx/driver-email` + `@openenvx/workbench` (`apps/email-demo`). The published bundle is exercised by `apps/email-package-demo` (`bun run dev:email-package`).
+
 ## What hosts must not do
 
 Per AGENTS.md product-host rules:
@@ -69,12 +85,14 @@ Per AGENTS.md product-host rules:
 
 ## Demo apps (monorepo)
 
-| App                    | Role                                  |
-| ---------------------- | ------------------------------------- |
-| `apps/canvas-demo`     | Studio + canvas + external host demos |
-| `apps/demo-playground` | Composable / custom shell patterns    |
-| `apps/html-demo`       | HTML block studio                     |
-| `apps/docs`            | Extension guide and contracts         |
+| App                       | Role                                  |
+| ------------------------- | ------------------------------------- |
+| `apps/canvas-demo`        | Studio + canvas + external host demos |
+| `apps/demo-playground`    | Composable / custom shell patterns    |
+| `apps/html-demo`          | HTML block studio                     |
+| `apps/email-demo`         | Email driver + workbench (HMR)        |
+| `apps/email-package-demo` | Published `@openenvx/email` bundle    |
+| `apps/docs`               | Extension guide and contracts         |
 
 ## Related
 

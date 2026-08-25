@@ -7,6 +7,10 @@
     {
       "name": "@xmazu/openenvxee-html-studio",
       "dir": "packages/openenvxee-html-studio"
+    },
+    {
+      "name": "@openenvx/email",
+      "dir": "packages/email"
     }
   ],
   "consumers": [

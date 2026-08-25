@@ -76,6 +76,12 @@ export interface WorkbenchShellProps {
   showEditorArea?: boolean;
   onOpenDocument?: () => Promise<string | undefined>;
   onSaveAs?: () => Promise<string | undefined>;
+  /**
+   * Called when scene *content* changes (edits, undo/redo, load).
+   * Selection and hover do not fire. The shell always subscribes, so a
+   * callback passed after the first paint still receives later edits.
+   */
+  onSceneChange?: (scene: Scene) => void;
   createPropertyHostContext?: (
     options: PropertyPathContextOptions,
     helpers: {
@@ -322,6 +328,26 @@ function ExternalHostsBinding({
   return null;
 }
 
+function SceneChangeBinding({
+  api,
+  onSceneChangeRef,
+}: {
+  api: WorkbenchApi;
+  onSceneChangeRef: MutableRefObject<((scene: Scene) => void) | undefined>;
+}) {
+  useMountEffect(() => {
+    let lastRevision = api.scene.getContentRevision();
+    return api.scene.subscribe((snapshot) => {
+      if (snapshot.contentRevision === lastRevision) {
+        return;
+      }
+      lastRevision = snapshot.contentRevision;
+      onSceneChangeRef.current?.(api.serializeScene());
+    });
+  });
+  return null;
+}
+
 function ThemeServiceBinding({
   api,
   theme,
@@ -455,6 +481,7 @@ export function WorkbenchShell({
   showEditorArea = true,
   onOpenDocument,
   onSaveAs,
+  onSceneChange,
   createPropertyHostContext,
   renderEditorPane,
   mountExternalHosts,
@@ -477,8 +504,10 @@ export function WorkbenchShell({
 
   const onThemeChangeRef = useRef(onThemeChange);
   const onLocaleChangeRef = useRef(onLocaleChange);
+  const onSceneChangeRef = useRef(onSceneChange);
   onThemeChangeRef.current = onThemeChange;
   onLocaleChangeRef.current = onLocaleChange;
+  onSceneChangeRef.current = onSceneChange;
 
   // TODO: this should happen in plugin manager
   const resolvedPlugins = useMemo(() => {
@@ -588,6 +617,10 @@ export function WorkbenchShell({
               <ExternalHostsBinding
                 api={api}
                 mountExternalHosts={mountExternalHosts}
+              />
+              <SceneChangeBinding
+                api={api}
+                onSceneChangeRef={onSceneChangeRef}
               />
               <WorkbenchShellSubscriptions
                 api={api}

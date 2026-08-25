@@ -20,3 +20,4 @@ export {
   type BlockRenderOverride,
   type RenderBlockDocumentOptions,
 } from './render/render-block-document';
+export { flattenReactChildren } from './tree/flatten-react-children';

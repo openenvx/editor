@@ -45,6 +45,7 @@ Hard rules:
 | --- | --- |
 | Canvas product host (dashboard, embed) | `@openenvx/canvas-studio` (monorepo; `packages/studio` is private) |
 | HTML product host | `@xmazu/openenvxee-html-studio` (published) or `@openenvx/html-studio` (monorepo) |
+| Email product host | `@openenvx/email` (published) or `@openenvx/driver-email` + `@openenvx/workbench` (monorepo) |
 | Custom shell / playground | `@openenvx/core` (+ canvas or html) |
 | In-repo **internal** plugin author | `@openenvx/core` — [extensions-host-guide.md](extensions-host-guide.md) |
 | **Sandbox** widget / plugin author | `@xmazu/openenvxee-extensions` — [extensions-sandbox-guide.md](extensions-sandbox-guide.md) |
@@ -58,12 +59,13 @@ Hard rules:
 | `@openenvx/core` | private | Scene Zod (`./schema`), preview IR (`./preview`), `EditorRuntime`, `WorkbenchController`, contributions | `.`, `./schema`, `./preview`, `./react` |
 | `@openenvx/canvas` | private | Konva engine, layers, `CanvasPlugin`, `CanvasEditor`, canvas workbench chrome | `.` (+ export/registry subpaths) |
 | `@openenvx/html` | private | HTML blocks, `HtmlBlocksPlugin`, `HtmlEditorPane`, `renderBlockDocument` | `.`, `./runtime` |
-| `@openenvx/driver-email` | private | Email blocks (React-Email), `EmailBlocksPlugin`, `renderEmailDocument` | `.` |
+| `@openenvx/driver-email` | private | Email blocks (React-Email), `EmailBlocksPlugin`, `renderEmailDocument`, `renderEmailHtml` | `.`, `./runtime` |
 | `@openenvx/workbench` | private | `WorkbenchShell`, field renderers, sandbox host | `.`, `./theme.css` |
 | `@openenvx/agent` | private | Agent chat sidebar plugin | `.`, `./schemas` |
 | `@openenvx/canvas-studio` | private | Curated canvas host API (workspace TS, not bundled) | `.`, `./theme.css`, `./fonts.css` |
 | `@openenvx/html-studio` | private | Fat HTML product re-exports + `DEFAULT_HTML_STUDIO_PLUGINS` | `.`, `./theme.css` |
 | `@xmazu/openenvxee-html-studio` | yes (restricted, GH Packages) | Per-module publish of html-studio + inlined stack | `.`, `./runtime`, `./theme.css` |
+| `@openenvx/email` | yes (public, npmjs) | Minified email editor (`EmailEditor`, scene + HTML export) | `.`, `./runtime`, `./theme.css` |
 
 Private packages resolve from TypeScript `src/` in the workspace (HMR). Published packages ship `dist/` — see [PUBLISHING.md](../../PUBLISHING.md).
 
@@ -77,6 +79,8 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@xmazu/openenvxee-html-studio`** — published HTML host surface (inlines private core/html/workbench). Subpaths: `.`, `./runtime`, `./theme.css`.
 
+**`@openenvx/email`** — published email editor. Subpaths: `.`, `./runtime`, `./theme.css`. Exports: `EmailEditor`, `EmailEditorProps`, `createEmailScene`, `renderEmailHtml`, `Scene`. Headless HTML export: `@openenvx/email/runtime`.
+
 ### Editor backbone (private)
 
 **`@openenvx/core`** — `./schema`: Scene Zod, normalize/validate, templates; `./schema/scene.schema.json` for JSON Schema export. `./preview`: LayerPreviewBuilder, Render IR. `.`: `EditorRuntime`, `PluginManager`, `WorkbenchController`, workbench contributions, property panes (`WorkbenchApi.mountSandboxHost` for sandbox panels). Property layout: `createPropertyPane`, `PropertyPath.when`, `PropertyLayoutWhenOptions`, `evaluatePropertyLayoutWhen`, `isPropertyLayoutNodeVisible`. `./react`: `WorkbenchProvider`, hooks.
@@ -85,7 +89,7 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@openenvx/html`** — `HtmlBlocksPlugin`, `HtmlEditorPane`, block registry + tree helpers, `createBlockCommands`.
 
-**`@openenvx/driver-email`** — `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument`, email block registry.
+**`@openenvx/driver-email`** — `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument`, `renderEmailHtml` (`./runtime` is the headless export graph).
 
 **`@openenvx/agent`** — `AgentChatPlugin`, chat UI contributions; `./schemas` for proposal Zod types.
 
@@ -118,7 +122,7 @@ Packages are pre-1.0: breaking changes are allowed and preferred over shims ([AG
 
 | Surface | Stability expectation |
 | --- | --- |
-| **Published** (`extensions`, `openenvxee-html-studio`) | Treat as the external contract. Prefer additive changes. Document removals/renames in the PR / changeset. Bump version on every publish. |
+| **Published** (`extensions`, `openenvxee-html-studio`, `@openenvx/email`) | Treat as the external contract. Prefer additive changes. Document removals/renames in the PR / changeset. Bump version on every publish. |
 | **Studio host allowlist** (`packages/canvas-studio/src/index.ts`) | Host apps depend on this list. Adding is fine; removing/renaming is a host break — update openenvx-cloud / embed hosts in the same change window. |
 | **Private workspace libs** (`core`, `canvas`, …) | Free to break inside the monorepo in one PR (update all callers). Do **not** add deprecated dual paths. |
 | **Contribution class hierarchy** (`Plugin`, `Command`, `LayerDefinition`, workbench contributions) | Highest-value internal API. Change carefully; update extension-guide when the authoring shape moves. |

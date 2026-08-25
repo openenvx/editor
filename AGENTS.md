@@ -84,6 +84,7 @@ Published packages:
 
 - **`@xmazu/openenvxee-extensions`** — published sandbox author SDK: `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts import **`@xmazu/openenvxee-extensions/protocol`** only.
 - **`@xmazu/openenvxee-html-studio`** — published HTML host package (inlines private core/html/workbench). Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/email`** — published email editor (public npm, MIT). Drop-in `EmailEditor` + `createEmailScene` + `renderEmailHtml`; inlines private core/html/driver-email/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
 - **`@openenvx/canvas-studio`** — private curated canvas host surface. Monorepo hosts use workspace TypeScript (not published).
 - **`@openenvx/html-studio`** — private HTML host surface. External hosts use `@xmazu/openenvxee-html-studio`.
 
@@ -197,7 +198,7 @@ bun run changeset     # create a release changeset
 
 ## Publishing
 
-Only `packages/extensions` (`@xmazu/openenvxee-extensions`) and `packages/openenvxee-html-studio` (`@xmazu/openenvxee-html-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)).
+Only `packages/extensions` (`@xmazu/openenvxee-extensions`), `packages/openenvxee-html-studio` (`@xmazu/openenvxee-html-studio`), and `packages/email` (`@openenvx/email`) are published (see [PUBLISHING.md](PUBLISHING.md)).
 
 ## Before you finish
 

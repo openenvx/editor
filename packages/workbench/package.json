@@ -2,7 +2,7 @@
   "name": "@openenvx/workbench",
   "version": "0.1.4",
   "description": "React workbench UI — editor layout, primitives, and descriptor renderers",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "main": "./src/index.ts",

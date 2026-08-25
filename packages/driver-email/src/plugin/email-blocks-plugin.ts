@@ -10,8 +10,7 @@ import {
   emailBlockRegistry,
   EmailBlockRegistryServiceId,
 } from '../block-registry';
-import { builtinEmailBlocks } from '../blocks/builtin-blocks';
-import { emailPatternBlocks, emailPatternPartBlocks } from '../blocks/patterns';
+import { allEmailBlocks } from '../blocks/all-email-blocks';
 import { OpenEmailBlocksSheetCommand } from '../commands/open-blocks-sheet-command';
 import { OpenEmailTemplatesSheetCommand } from '../commands/open-templates-sheet-command';
 import {
@@ -40,12 +39,6 @@ import {
 import { EmailEditorPane } from '../editor/email-editor-pane';
 import { EmailPatternBlocksGallery } from '../editor/pattern-blocks-gallery';
 import { EmailTemplatesGallery } from '../editor/templates-gallery';
-
-const allEmailBlocks = [
-  ...builtinEmailBlocks,
-  ...emailPatternPartBlocks,
-  ...emailPatternBlocks,
-];
 
 export class EmailBlocksPlugin extends WorkbenchPlugin {
   readonly id = 'OpenEnvx.email-blocks';

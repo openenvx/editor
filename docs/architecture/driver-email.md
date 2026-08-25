@@ -16,6 +16,7 @@ Block editor for pages with `page.layout === 'email'`. Same core/headless/workbe
 - Own `emailBlockRegistry` + `EmailBlockRegistryServiceId` (does not mix with the html palette)
 - `EmailBlocksPlugin` — layer definitions, `email.*` block commands, **Blocks** activity command (opens sheet) + **Elements** (primitives) sidebar, `EmailEditorPane` for `page.layout === 'email'`. Device/zoom via shared `registerHtmlPreviewChrome()` (`HtmlToolbarContribution` + `HtmlPreviewChromeService`); Edit/Preview via `EmailToolbarContribution` (workbench overlay `top-center`). Hosts should use `DEFAULT_HTML_LAYOUT` (`editorToolbars: true`). Artboard design width 640px — desktop frame 720px with slim body chrome, mobile 390px; `email.root` centers content at editable `maxWidth`, default 600
 - `renderEmailDocument(page, registry)` — walks the layer tree with the same `BlockConfig.render` functions and produces email-safe HTML via `@react-email/render`
+- `renderEmailHtml(scene)` — headless scene export (`./runtime`): fresh registry, requires `page.layout === 'email'`
 
 ## Editing vs export
 
@@ -29,7 +30,7 @@ One `BlockConfig.render` path keeps editor and export content from drifting. Exp
 
 ## Product host
 
-Hosts load `new EmailBlocksPlugin()` (alongside workbench defaults). Demo: `apps/email-demo` (`bun run dev:email`). There is no email-studio fat bundle yet.
+Hosts load `new EmailBlocksPlugin()` (alongside workbench defaults). Demo: `apps/email-demo` (`bun run dev:email`). External OSS hosts use **`@openenvx/email`** (`EmailEditor` drop-in; `./runtime` for Node HTML export; public npm).
 
 ## What does **not** belong here
 

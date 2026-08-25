@@ -8,6 +8,7 @@ Packages that leave this monorepo:
 | --- | --- | --- |
 | `@xmazu/openenvxee-extensions` | GitHub npm (`npm.pkg.github.com`, restricted) | Author SDK: `./protocol`, element subpaths, `defineExtension`, Vite |
 | `@xmazu/openenvxee-html-studio` | GitHub npm (`npm.pkg.github.com`, restricted) | Per-module `dist/` ESM tree — curated HTML host API + `./runtime` |
+| `@openenvx/email` | npmjs (`registry.npmjs.org`, public) | Minified `dist/` ESM — `EmailEditor` + `./runtime` (`renderEmailHtml`) + `./theme.css` |
 
 Scene model, preview descriptors, and editor runtime live in **private** `@openenvx/core` (`./schema`, `./preview`, `.`, `./react`). They are **not** published separately. Canvas hosts use private `@openenvx/canvas-studio` in the monorepo (`packages/studio` is an unpublished build artifact only).
 
@@ -17,7 +18,7 @@ Everything else stays workspace-private and resolves from `src/` during local de
 
 **Hard rule:** published packages must **never** ship an `exports` `development` condition pointing at `src/`. Vite resolves `development` in product apps; published tarballs are `files: ["dist"]` only — that condition breaks consumers. Exports are `types` + `bun` / `import` / `default` → `dist/`.
 
-Root scripts: `publish-packages`, `publish-package:extensions`, `publish-package:html-studio`, `verify-pack`.
+Root scripts: `publish-packages`, `publish-package:extensions`, `publish-package:html-studio`, `publish-package:email`, `verify-pack`.
 
 ## `@xmazu/openenvxee-extensions`
 
@@ -50,6 +51,24 @@ bun add @xmazu/openenvxee-html-studio
 ```
 
 Owner publishes — agents must not. Product hosts own their blocks/plugins.
+
+## `@openenvx/email`
+
+Published email editor for open-source hosts. Inlines private `@openenvx/core`, `@openenvx/html`, `@openenvx/driver-email`, and `@openenvx/workbench` (MIT, unpublished) into minified ESM:
+
+- `.` — `EmailEditor` + `dist/index.css` (tokens + component styles)
+- `./runtime` — `createEmailScene` + `renderEmailHtml` (no shell / TipTap / CSS)
+- `./theme.css` — same file as `dist/index.css`
+
+Third-party UI deps stay external. Public API: `EmailEditor`, `createEmailScene`, `renderEmailHtml`, `Scene` type. No plugin/command/sandbox surface.
+
+Listed in root [`release.config.json`](release.config.json).
+
+```bash
+npm install @openenvx/email
+```
+
+Owner publishes to npm — agents must not.
 
 ## External consumers (openenvx-cloud, etc.)
 

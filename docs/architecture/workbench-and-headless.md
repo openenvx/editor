@@ -29,7 +29,7 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 
 ## What workbench owns
 
-- `WorkbenchShell` — React chrome; auto-injects default plugins; optional `mountExternalHosts` mounts sandbox/embed after start
+- **WorkbenchShell** — React chrome; auto-injects default plugins; optional `onSceneChange` for content persistence; optional `mountExternalHosts` mounts sandbox/embed after start
 - `DefaultWorkbenchChromePlugin` — scene-generic Pages + Layers sidebar, dirty Saved/Unsaved status
 - Default inspector container + field renderer plugins
 - `SandboxExtensionHost` / `mountSandboxExtensions`, `EmbedPanelHost` / `mountEmbedPanel`

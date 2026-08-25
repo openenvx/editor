@@ -45,6 +45,7 @@ export {
 } from './contributions/email-templates-sidebar';
 export { EmailContextMenu } from './contributions/email-context-menu';
 export { createEmailDemoScene } from './create-email-demo-scene';
+export { createEmailDemoScene as createEmailScene } from './create-email-demo-scene';
 export { DEFAULT_HTML_LAYOUT } from '@openenvx/html';
 export { EmailBlockPalettePanel } from './editor/block-palette-panel';
 export { EmailPatternBlocksGallery } from './editor/pattern-blocks-gallery';
@@ -52,6 +53,7 @@ export { EmailTemplatesGallery } from './editor/templates-gallery';
 export { EMAIL_FRAME_WIDTH, EmailEditorPane } from './editor/email-editor-pane';
 export { EmailBlocksPlugin } from './plugin/email-blocks-plugin';
 export { renderEmailDocument } from './render/render-email-document';
+export { renderEmailHtml } from './render/render-email-html';
 export {
   Button,
   Column,
