@@ -25,14 +25,6 @@ import {
   WorkbenchProvider,
   useWorkbenchContext,
 } from '../context/workbench-context';
-import {
-  DEFAULT_DIALOGS_PLUGIN_ID,
-  DefaultDialogsPlugin,
-} from '../dialogs/default-dialogs-plugin';
-import {
-  DEFAULT_FIELDS_PLUGIN_ID,
-  DefaultWorkbenchFieldsPlugin,
-} from '../fields/default-fields-plugin';
 import { useMountEffect } from '../hooks/use-mount-effect';
 import { useWorkbench } from '../hooks/use-workbench';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
@@ -41,6 +33,7 @@ import { WorkbenchI18nProvider } from '../i18n/workbench-i18n-provider';
 import { ActivitySidebar } from '../layout/activity-sidebar';
 import { EditorChrome } from '../layout/editor-chrome';
 import { EditorLayout } from '../layout/editor-layout';
+import { resolveWorkbenchPlugins } from '../plugins/resolve-workbench-plugins';
 import { CommandPaletteRenderer } from '../renderers/command-palette-renderer';
 import { CommandSheetHost } from '../renderers/command-sheet-host';
 import { ContextMenuRenderer } from '../renderers/context-menu-renderer';
@@ -51,18 +44,6 @@ import { SecondarySidebarRenderer } from '../renderers/secondary-sidebar-rendere
 import { StatusBarRenderer } from '../renderers/status-bar-renderer';
 import { ToolbarRenderer } from '../renderers/toolbar-renderer';
 import { TopBarRenderer } from '../renderers/top-bar-renderer';
-import {
-  DEFAULT_VARIABLES_PLUGIN_ID,
-  DefaultVariablesContainerPlugin,
-} from '../variables/default-variables-plugin';
-import {
-  DEFAULT_INSPECTOR_PLUGIN_ID,
-  DefaultInspectorContainerPlugin,
-} from '../views/default-inspector-plugin';
-import {
-  DEFAULT_WORKBENCH_CHROME_PLUGIN_ID,
-  DefaultWorkbenchChromePlugin,
-} from '../views/default-workbench-chrome-plugin';
 
 export interface WorkbenchShellProps {
   plugins: Plugin[];
@@ -527,41 +508,10 @@ export function WorkbenchShell({
   onLocaleChangeRef.current = onLocaleChange;
   onSceneChangeRef.current = onSceneChange;
 
-  // TODO: this should happen in plugin manager
-  const resolvedPlugins = useMemo(() => {
-    const hasFieldsPlugin = plugins.some(
-      (plugin) => plugin.id === DEFAULT_FIELDS_PLUGIN_ID
-    );
-    const hasInspectorPlugin = plugins.some(
-      (plugin) => plugin.id === DEFAULT_INSPECTOR_PLUGIN_ID
-    );
-    const hasVariablesPlugin = plugins.some(
-      (plugin) => plugin.id === DEFAULT_VARIABLES_PLUGIN_ID
-    );
-    const hasDialogsPlugin = plugins.some(
-      (plugin) => plugin.id === DEFAULT_DIALOGS_PLUGIN_ID
-    );
-    const hasChromePlugin = plugins.some(
-      (plugin) => plugin.id === DEFAULT_WORKBENCH_CHROME_PLUGIN_ID
-    );
-    const next = [...plugins];
-    if (!hasChromePlugin) {
-      next.unshift(new DefaultWorkbenchChromePlugin());
-    }
-    if (!hasVariablesPlugin) {
-      next.unshift(new DefaultVariablesContainerPlugin());
-    }
-    if (!hasInspectorPlugin) {
-      next.unshift(new DefaultInspectorContainerPlugin());
-    }
-    if (!hasDialogsPlugin) {
-      next.unshift(new DefaultDialogsPlugin());
-    }
-    if (!hasFieldsPlugin) {
-      next.unshift(new DefaultWorkbenchFieldsPlugin());
-    }
-    return next;
-  }, [plugins]);
+  const resolvedPlugins = useMemo(
+    () => resolveWorkbenchPlugins(plugins),
+    [plugins]
+  );
 
   const workbenchOptions = useMemo(
     (): WorkbenchControllerOptions => ({
