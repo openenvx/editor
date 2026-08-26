@@ -61,6 +61,8 @@ export default {
   'view.workbench.layers.name': 'Layers',
   'workbench.history.reorderPage': 'Reorder page',
   'workbench.history.reorderLayer': 'Reorder layer',
+  'workbench.list.add': 'Add',
+  'workbench.list.reorder': 'Reorder',
   'confirm.confirm': 'Confirm',
   'confirm.cancel': 'Cancel',
   'combobox.search': 'Search…',
@@ -120,4 +122,6 @@ export default {
   'variables.rename': 'Rename',
   'variables.delete': 'Delete',
   'variables.renamePrompt': 'Variable key',
+  'view.workbench.variables.panel.add': 'Create variable',
+  'view.workbench.variables.panel.empty': 'No variables yet.',
 } as const satisfies Record<string, string>;

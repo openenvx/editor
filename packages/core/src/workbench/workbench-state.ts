@@ -25,6 +25,11 @@ import type { SceneStore } from '../scene/scene-store';
 import type { EditorState, Layer, Scene, Selection } from '../scene/types';
 import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
 import type { EditorInput, EditorService } from '../workbench/editor-service';
+import type {
+  ActiveDialog,
+  ConfirmDialogOptions,
+  DialogRegistration,
+} from './dialog-registrations';
 import type { EditorPaneRegistration } from './editor-pane-host-props';
 import type {
   FieldRendererRegistration,
@@ -35,10 +40,19 @@ import type { TopBarRegistration } from './top-bar-registration';
 import type { WorkbenchLayout } from './workbench-layout';
 import type { WorkbenchLayoutStore } from './workbench-layout-store';
 
+export interface ViewTreeItemAction {
+  commandId: string;
+  icon: string;
+  label: string;
+}
+
 export interface ViewTreeItem {
   id: string;
   label: string;
   icon?: string;
+  description?: string;
+  commandId?: string;
+  actions?: ViewTreeItemAction[];
   depth: number;
   hasChildren: boolean;
   source: unknown;
@@ -53,6 +67,7 @@ export interface ViewTreeItem {
 
 export type ViewContent =
   | { kind: 'tree'; items: ViewTreeItem[] }
+  | { kind: 'list'; items: ViewTreeItem[] }
   | {
       kind: 'properties';
       nodes: PropertyLayoutNode[];
@@ -66,12 +81,16 @@ export interface ViewDescriptor {
   containerId: string;
   name: string;
   viewOrder: number;
-  viewSelection: 'layer' | 'page';
+  viewSelection: 'layer' | 'page' | 'none';
   viewHover: 'layer' | 'page' | 'none';
   collapsible: boolean;
   initialCollapsed: boolean;
   supportsReorder: boolean;
   content: ViewContent;
+  /** Footer add button command (list presentation). */
+  addCommandId?: string;
+  /** Footer add button label (list presentation). */
+  addLabel?: string;
   /** Optional glyph id for the accordion section header. */
   icon?: string;
   /**
@@ -128,6 +147,8 @@ export interface WorkbenchState {
   editorPanes: EditorPaneRegistration[];
   fieldRenderers: FieldRendererRegistration[];
   viewPanels: ViewPanelRegistration[];
+  dialogs: DialogRegistration[];
+  activeDialog: ActiveDialog | null;
   editor: EditorInput | null;
   layout: WorkbenchLayout;
 }
@@ -199,6 +220,11 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   revert: () => void;
   serializeScene: () => Scene;
   loadScene: (scene: Scene) => void;
+  openDialog: (id: string, payload?: unknown) => void;
+  closeDialog: (id?: string) => void;
+  showConfirm: (options: ConfirmDialogOptions) => Promise<boolean>;
+  /** Resolves a pending {@link showConfirm} dialog. No-op when none is active. */
+  resolveDialogConfirm: (confirmed: boolean) => void;
   /** Global editor diagnostics (console logs for property when, etc.). */
   setEditorDebug: (enabled: boolean) => void;
   isEditorDebug: () => boolean;

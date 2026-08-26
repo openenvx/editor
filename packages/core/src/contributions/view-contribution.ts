@@ -9,10 +9,22 @@ export type SidebarBehavior = 'panel' | 'dropdown' | 'command';
 /** Where a view container is shown in the workbench shell. */
 export type ViewContainerLocation = 'primary' | 'secondary';
 
+export interface TreeItemAction {
+  commandId: string;
+  icon: string;
+  label: string;
+}
+
 export interface TreeItem {
   id: string;
   label: string;
   icon?: string;
+  /** Secondary line shown in list presentation. */
+  description?: string;
+  /** When set, row click executes this command (list presentation). */
+  commandId?: string;
+  /** Inline row actions (list presentation). */
+  actions?: TreeItemAction[];
   /**
    * When true, the row is a container in the tree (chevron + nest-into drops)
    * even if it currently has no children.
@@ -99,9 +111,18 @@ export abstract class ViewContribution extends WorkbenchContribution {
   abstract readonly name: string;
   viewOrder?: number;
   /** Which scene id drives row selection highlight. Default: layer ids. */
-  viewSelection?: 'layer' | 'page';
+  viewSelection?: 'layer' | 'page' | 'none';
   /** Which scene id drives row hover highlight. Default: layer ids. */
   viewHover?: 'layer' | 'page' | 'none';
+  /**
+   * How a {@link TreeDataProvider} view is rendered. Default: `'tree'`.
+   * `'list'` is for flat catalogs (variables, scripts-like panels).
+   */
+  presentation?: 'tree' | 'list';
+  /** Footer add button command (list presentation). */
+  addCommandId?: string;
+  /** Footer add button label; falls back to i18n when omitted. */
+  addLabel?: string;
   collapsible?: boolean;
   initialCollapsed?: boolean;
   /** Optional glyph id for the accordion section header (`WorkbenchIcon`). */

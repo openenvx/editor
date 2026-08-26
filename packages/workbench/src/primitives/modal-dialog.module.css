@@ -1,0 +1,25 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--wb-backdrop-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog {
+  background: var(--wb-popover);
+  border-radius: var(--wb-radius-md);
+  box-shadow: var(--wb-shadow-float);
+  padding: var(--wb-space-4);
+  min-width: 280px;
+  max-width: 90vw;
+}
+
+.title {
+  margin: 0 0 var(--wb-space-2);
+  font-size: var(--wb-text-base);
+  font-weight: 500;
+  color: var(--wb-foreground);
+}

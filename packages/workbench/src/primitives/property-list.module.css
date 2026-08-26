@@ -26,6 +26,16 @@
   margin-bottom: 0;
 }
 
+.rowHeaderClickable {
+  cursor: pointer;
+}
+
+.rowLeading {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
 .rowLabel {
   flex: 1;
   min-width: 0;

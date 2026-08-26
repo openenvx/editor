@@ -26,6 +26,10 @@ import {
   useWorkbenchContext,
 } from '../context/workbench-context';
 import {
+  DEFAULT_DIALOGS_PLUGIN_ID,
+  DefaultDialogsPlugin,
+} from '../dialogs/default-dialogs-plugin';
+import {
   DEFAULT_FIELDS_PLUGIN_ID,
   DefaultWorkbenchFieldsPlugin,
 } from '../fields/default-fields-plugin';
@@ -40,6 +44,7 @@ import { EditorLayout } from '../layout/editor-layout';
 import { CommandPaletteRenderer } from '../renderers/command-palette-renderer';
 import { CommandSheetHost } from '../renderers/command-sheet-host';
 import { ContextMenuRenderer } from '../renderers/context-menu-renderer';
+import { DialogHost } from '../renderers/dialog-host';
 import { EditorPaneRenderer } from '../renderers/editor-pane-renderer';
 import { OverlayRenderer } from '../renderers/overlay-renderer';
 import { SecondarySidebarRenderer } from '../renderers/secondary-sidebar-renderer';
@@ -127,6 +132,7 @@ const ChromeRegion = memo(
       <>
         {overlays ? <OverlayRenderer overlays={overlays} /> : null}
         <CommandSheetHost />
+        <DialogHost />
         {paletteOpen && commandPalette && commandStates ? (
           <CommandPaletteRenderer
             commandPalette={commandPalette}
@@ -532,6 +538,9 @@ export function WorkbenchShell({
     const hasVariablesPlugin = plugins.some(
       (plugin) => plugin.id === DEFAULT_VARIABLES_PLUGIN_ID
     );
+    const hasDialogsPlugin = plugins.some(
+      (plugin) => plugin.id === DEFAULT_DIALOGS_PLUGIN_ID
+    );
     const hasChromePlugin = plugins.some(
       (plugin) => plugin.id === DEFAULT_WORKBENCH_CHROME_PLUGIN_ID
     );
@@ -544,6 +553,9 @@ export function WorkbenchShell({
     }
     if (!hasVariablesPlugin) {
       next.unshift(new DefaultVariablesContainerPlugin());
+    }
+    if (!hasDialogsPlugin) {
+      next.unshift(new DefaultDialogsPlugin());
     }
     if (!hasFieldsPlugin) {
       next.unshift(new DefaultWorkbenchFieldsPlugin());

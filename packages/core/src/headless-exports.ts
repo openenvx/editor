@@ -10,6 +10,7 @@ export {
   type ViewContent,
   type ViewDescriptor,
   type ViewTreeItem,
+  type ViewTreeItemAction,
   type LayerSurfaceItem,
 } from './workbench/workbench-state';
 export {
@@ -41,6 +42,7 @@ export {
   TreeDataProvider,
   type SidebarBehavior,
   type TreeItem,
+  type TreeItemAction,
   type TreeSelectOptions,
   type ViewContainerLocation,
 } from './contributions/view-contribution';
@@ -52,6 +54,17 @@ export {
   WorkbenchNavigationServiceImpl,
   type WorkbenchNavigationService,
 } from './workbench/workbench-navigation-service';
+export {
+  DialogServiceId,
+  DialogServiceImpl,
+  type DialogService,
+} from './workbench/dialog-service';
+export {
+  WORKBENCH_CONFIRM_DIALOG_ID,
+  type ActiveDialog,
+  type ConfirmDialogOptions,
+  type DialogRegistration,
+} from './workbench/dialog-registrations';
 export {
   RichTextInsertServiceId,
   RichTextInsertServiceImpl,

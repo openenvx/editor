@@ -47,6 +47,8 @@ export function createMockWorkbenchApi(
     viewContainers: [],
     viewLocations: {},
     viewPanels: [],
+    dialogs: [],
+    activeDialog: null,
     ...overrides,
   };
   const executeCommand = vi.fn(async () => true);
@@ -112,6 +114,24 @@ export function createMockWorkbenchApi(
         listeners.delete(listener);
       };
     },
+    openDialog: (id: string, payload?: unknown) => {
+      state.activeDialog = { id, payload };
+      state.revision += 1;
+      notify();
+    },
+    closeDialog: (id?: string) => {
+      if (!state.activeDialog) {
+        return;
+      }
+      if (id && state.activeDialog.id !== id) {
+        return;
+      }
+      state.activeDialog = null;
+      state.revision += 1;
+      notify();
+    },
+    showConfirm: vi.fn(async () => true),
+    resolveDialogConfirm: vi.fn(),
   } as unknown as WorkbenchApi;
 
   return { api, executeCommand, state };

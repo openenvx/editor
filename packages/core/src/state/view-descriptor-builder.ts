@@ -20,11 +20,23 @@ import type {
   ViewTreeItem,
 } from '../workbench/workbench-state';
 
+function resolveViewEmptyMessage(
+  view: ViewContribution,
+  buildCtx: ReturnType<typeof createContributionBuildContext>
+): string | undefined {
+  if (!view.emptyMessage) {
+    return undefined;
+  }
+  return buildCtx.t(`view.${view.id}.empty`, view.emptyMessage);
+}
+
 function viewChrome(
   view: ViewContribution,
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): Pick<
   ViewDescriptor,
+  | 'addCommandId'
+  | 'addLabel'
   | 'collapsible'
   | 'containerId'
   | 'group'
@@ -47,6 +59,12 @@ function viewChrome(
     viewHover: view.viewHover ?? 'none',
     viewOrder: view.viewOrder ?? 0,
     viewSelection: view.viewSelection ?? 'layer',
+    ...(view.addCommandId
+      ? {
+          addCommandId: view.addCommandId,
+          addLabel: buildCtx.t(`view.${view.id}.add`, view.addLabel ?? 'Add'),
+        }
+      : {}),
   };
 }
 
@@ -74,14 +92,14 @@ export function buildViewContainer(
       if (view.componentId) {
         return buildComponentView(view, buildCtx);
       }
+      const provider = viewProviderRegistry.get(view.id);
+      if (provider) {
+        return buildProviderView(view, provider, ctx, buildCtx);
+      }
       if (view.emptyMessage) {
         return buildWelcomeView(view, buildCtx);
       }
-      const provider = viewProviderRegistry.get(view.id);
-      if (!provider) {
-        return buildEmptyView(view, buildCtx);
-      }
-      return buildTreeView(view, provider, ctx, buildCtx);
+      return buildEmptyView(view, buildCtx);
     });
 
   const sidebarBehavior = container.sidebarBehavior ?? 'panel';
@@ -123,7 +141,7 @@ function buildPropertiesView(
       kind: 'properties',
       nodes: pane?.nodes ?? [],
     },
-    emptyMessage: view.emptyMessage,
+    emptyMessage: resolveViewEmptyMessage(view, buildCtx),
     supportsReorder: false,
   };
 }
@@ -132,13 +150,14 @@ function buildWelcomeView(
   view: ViewContribution,
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): ViewDescriptor {
+  const message = resolveViewEmptyMessage(view, buildCtx) ?? '';
   return {
     ...viewChrome(view, buildCtx),
     content: {
       kind: 'welcome',
-      message: view.emptyMessage ?? '',
+      message,
     },
-    emptyMessage: view.emptyMessage,
+    emptyMessage: message || undefined,
     supportsReorder: false,
   };
 }
@@ -153,7 +172,7 @@ function buildComponentView(
       componentId: view.componentId ?? view.id,
       kind: 'component',
     },
-    emptyMessage: view.emptyMessage,
+    emptyMessage: resolveViewEmptyMessage(view, buildCtx),
     supportsReorder: false,
   };
 }
@@ -162,55 +181,80 @@ function buildEmptyView(
   view: ViewContribution,
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): ViewDescriptor {
+  const kind = view.presentation === 'list' ? 'list' : 'tree';
   return {
     ...viewChrome(view, buildCtx),
     collapsible: view.collapsible ?? true,
-    content: { items: [], kind: 'tree' },
+    content: { items: [], kind },
     supportsReorder: false,
     viewHover: view.viewHover ?? 'layer',
   };
 }
 
-function buildTreeView(
+function treeItemToViewItem(
+  treeItem: ReturnType<TreeDataProvider<unknown>['getTreeItem']>,
+  node: unknown,
+  depth: number,
+  hasChildren: boolean
+): ViewTreeItem {
+  return {
+    actions: treeItem.actions,
+    commandId: treeItem.commandId,
+    depth,
+    description: treeItem.description,
+    editLabel: treeItem.editLabel,
+    hasChildren,
+    icon: treeItem.icon,
+    id: treeItem.id,
+    label: treeItem.label,
+    locked: treeItem.locked,
+    lockedCommandId: treeItem.lockedCommandId,
+    renameCommandId: treeItem.renameCommandId,
+    source: node,
+    tooltip: treeItem.tooltip,
+    visible: treeItem.visible,
+    visibilityCommandId: treeItem.visibilityCommandId,
+  };
+}
+
+function buildProviderView(
   view: ViewContribution,
   provider: TreeDataProvider<unknown>,
   ctx: CommandContext,
   buildCtx: ReturnType<typeof createContributionBuildContext>
 ): ViewDescriptor {
+  const presentation = view.presentation ?? 'tree';
   const items: ViewTreeItem[] = [];
+
+  if (presentation === 'list') {
+    const roots = provider.getRootChildren(ctx);
+    // ponytail: async providers return empty until a refresh path exists.
+    if (!(roots instanceof Promise)) {
+      for (const node of roots) {
+        const treeItem = provider.getTreeItem(node, ctx);
+        items.push(treeItemToViewItem(treeItem, node, 0, false));
+      }
+    }
+    return {
+      ...viewChrome(view, buildCtx),
+      collapsible: view.collapsible ?? false,
+      content: { items, kind: 'list' },
+      emptyMessage: resolveViewEmptyMessage(view, buildCtx),
+      supportsReorder: typeof provider.handleMove === 'function',
+      viewHover: view.viewHover ?? 'none',
+    };
+  }
+
   const walk = (nodes: unknown[], depth: number) => {
     for (const node of nodes) {
       const treeItem = provider.getTreeItem(node, ctx);
       const childrenResult = provider.getChildren(node, ctx);
       if (childrenResult instanceof Promise) {
-        items.push({
-          depth,
-          editLabel: treeItem.editLabel,
-          hasChildren: true,
-          icon: treeItem.icon,
-          id: treeItem.id,
-          label: treeItem.label,
-          renameCommandId: treeItem.renameCommandId,
-          source: node,
-        });
+        items.push(treeItemToViewItem(treeItem, node, depth, true));
         continue;
       }
-      items.push({
-        depth,
-        editLabel: treeItem.editLabel,
-        // Provider `collapsible` marks nestable containers even when empty.
-        hasChildren: treeItem.collapsible ?? childrenResult.length > 0,
-        icon: treeItem.icon,
-        id: treeItem.id,
-        label: treeItem.label,
-        locked: treeItem.locked,
-        lockedCommandId: treeItem.lockedCommandId,
-        renameCommandId: treeItem.renameCommandId,
-        source: node,
-        tooltip: treeItem.tooltip,
-        visible: treeItem.visible,
-        visibilityCommandId: treeItem.visibilityCommandId,
-      });
+      const hasChildren = treeItem.collapsible ?? childrenResult.length > 0;
+      items.push(treeItemToViewItem(treeItem, node, depth, hasChildren));
       if (childrenResult.length > 0) {
         walk(childrenResult, depth + 1);
       }
@@ -226,6 +270,7 @@ function buildTreeView(
     ...viewChrome(view, buildCtx),
     collapsible: view.collapsible ?? true,
     content: { items, kind: 'tree' },
+    emptyMessage: resolveViewEmptyMessage(view, buildCtx),
     supportsReorder: typeof provider.handleMove === 'function',
     viewHover: view.viewHover ?? 'layer',
   };

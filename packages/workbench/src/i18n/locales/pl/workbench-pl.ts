@@ -61,6 +61,8 @@ export default {
   'view.workbench.layers.name': 'Warstwy',
   'workbench.history.reorderPage': 'Zmień kolejność strony',
   'workbench.history.reorderLayer': 'Zmień kolejność warstwy',
+  'workbench.list.add': 'Dodaj',
+  'workbench.list.reorder': 'Zmień kolejność',
   'confirm.confirm': 'Potwierdź',
   'confirm.cancel': 'Anuluj',
   'combobox.search': 'Szukaj…',
@@ -120,4 +122,6 @@ export default {
   'variables.rename': 'Zmień nazwę',
   'variables.delete': 'Usuń',
   'variables.renamePrompt': 'Klucz zmiennej',
+  'view.workbench.variables.panel.add': 'Dodaj zmienną',
+  'view.workbench.variables.panel.empty': 'Brak zmiennych.',
 } as const satisfies Record<string, string>;

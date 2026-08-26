@@ -22,6 +22,7 @@ import { useContextKeysRevision } from '../hooks/use-context-key';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { ViewPane } from '../layout/view-pane';
 import { PanelSection } from '../primitives/panel-section';
+import { ListViewRenderer } from './list-view-renderer';
 import { PropertyContentRenderer } from './property-content-renderer';
 import { ViewPanelRenderer } from './view-panel-renderer';
 
@@ -334,6 +335,24 @@ export function ViewContainerViews({
       const showSection = view.collapsible !== false && view.name;
       const body = <ComponentViewBody view={view} viewPanels={viewPanels} />;
       if (!showSection) {
+        return [groupHeading, <div key={view.id}>{body}</div>];
+      }
+      return [
+        groupHeading,
+        <PanelSection
+          collapsible={view.collapsible}
+          defaultOpen={!view.initialCollapsed}
+          icon={view.icon}
+          key={view.id}
+          title={view.name}
+        >
+          {body}
+        </PanelSection>,
+      ];
+    }
+    if (view.content.kind === 'list') {
+      const body = <ListViewRenderer view={view} />;
+      if (view.collapsible === false) {
         return [groupHeading, <div key={view.id}>{body}</div>];
       }
       return [

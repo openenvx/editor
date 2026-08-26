@@ -75,7 +75,8 @@ export {
 export {
   DefaultVariablesContainerPlugin,
   DEFAULT_VARIABLES_PLUGIN_ID,
-  VARIABLES_PANEL_COMPONENT_ID,
+  VARIABLES_VIEW_ID,
+  VariablesTreeProvider,
 } from './variables/default-variables-plugin';
 export {
   DefaultWorkbenchChromePlugin,

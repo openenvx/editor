@@ -18,7 +18,8 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 - `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` — owns `EditorRuntime`, injects it into `PluginManager`
 - `bootstrapWorkbenchServices()` — headless DI services on the runtime
 - `WorkbenchPlugin` + `ctx.registerWorkbench()` — UI contribution registration
-- Provider registries: `registerTreeDataProvider`, `registerFieldRenderer`, `registerStatusBarItemRenderer`, `registerEditorPane`, `registerTopBar`
+- Provider registries: `registerTreeDataProvider`, `registerFieldRenderer`, `registerStatusBarItemRenderer`, `registerEditorPane`, `registerTopBar`, `registerDialog`
+- View content kinds: `tree` (explorer), `list` (flat catalogs with row actions + optional reorder), `properties` (inspector forms), `component` (custom React panels), `welcome` (empty state)
 - Contribution points: Toolbar, CommandPalette, ViewContainer, View, ContextMenu, StatusBar, SidebarHeader, Overlay, PropertyPane, TopBar
 - Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `SidebarHeaderBuilder`, `PropertyPaneBuilder`
 - `WorkbenchLayout` (independent `activityBar` / `primarySidebar` / `secondarySidebar`), `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
@@ -37,6 +38,23 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 - Shared by canvas studio and HTML studio (no canvas branding on generic chrome)
 
 **Host rule:** Product apps declare contributions; the shell renders. Do not mount React panel views from the product host for form/settings panels — use `ViewContribution.buildProperties()` / `emptyMessage` / `when`. Use `registerViewPanel` only for non-form surfaces (chat, version history, …).
+
+**View resolve order** (per `ViewContribution`): `buildProperties` → `componentId` → registered `TreeDataProvider` (`presentation: 'list' | 'tree'`, default `tree`) → `emptyMessage` welcome when no provider → empty tree.
+
+**List views** — declare `presentation: 'list'` on the view and register a `TreeDataProvider`. Optional `addCommandId` / `addLabel` render a footer add button; `TreeItem.actions` render per-row icon buttons. Reorder uses the same `handleMove` / `canMove` hooks as explorer trees.
+
+**Dialogs** — plugins register modal bodies with `ctx.registerDialog(id, Component)`; commands and services open them via `DialogService` / `api.openDialog(id, payload?)`. The shell mounts a single `DialogHost` (no per-feature `*DialogHost` in product hosts). One active dialog at a time — a new `open` replaces the current. Built-in `api.showConfirm({ title, description, confirmLabel?, cancelLabel? })` opens `workbench.confirm` and resolves `Promise<boolean>`. Confirm dialogs resolve via `api.resolveDialogConfirm(confirmed)` (shell-internal; do not reach into `DialogService` from React). Dialog components implement `WorkbenchDialogProps<TPayload>` (`open`, `payload`, `onClose`).
+
+```ts
+ctx.registerDialog('workbench.variables.edit', VariableEditDialog);
+ctx.services
+  .get(DialogServiceId)
+  ?.open('workbench.variables.edit', { mode: 'create' });
+const ok = await api.showConfirm({
+  title: 'Delete?',
+  description: 'Cannot undo.',
+});
+```
 
 ## Layout defaults
 

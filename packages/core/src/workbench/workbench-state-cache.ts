@@ -8,11 +8,12 @@ import type { OverlayDescriptor } from '../contributions/overlay-contribution';
 import type { InteractionState } from '../runtime/interaction-state';
 import type { Scene, Selection } from '../scene/types';
 import type { EditorInput } from '../workbench/editor-service';
-import type { EditorPaneRegistration } from './editor-pane-host-props';
 import type {
   FieldRendererRegistration,
   ViewPanelRegistration,
-} from './panel-registrations';
+} from '../workbench/panel-registrations';
+import type { ActiveDialog, DialogRegistration } from './dialog-registrations';
+import type { EditorPaneRegistration } from './editor-pane-host-props';
 import type { StatusBarItemRendererRegistration } from './status-bar-item-renderer-registration';
 import type { TopBarRegistration } from './top-bar-registration';
 import type { WorkbenchLayout } from './workbench-layout';
@@ -35,6 +36,8 @@ export interface SceneSlice {
   viewContainers: ViewContainerDescriptor[];
   fieldRenderers: FieldRendererRegistration[];
   viewPanels: ViewPanelRegistration[];
+  dialogs: DialogRegistration[];
+  activeDialog: ActiveDialog | null;
 }
 
 export interface EditorSlice {
@@ -100,6 +103,15 @@ export class WorkbenchStateCache {
     this.dirty.add('scene');
     this.dirty.add('editor');
     this.dirty.add('commands');
+  }
+
+  /** Dialog open/close only — avoids rebuilding view trees. */
+  patchDialogState(activeDialog: ActiveDialog | null): void {
+    if (this.sceneSlice) {
+      this.sceneSlice = { ...this.sceneSlice, activeDialog };
+      return;
+    }
+    this.dirty.add('scene');
   }
 
   invalidateSelectionOnly(

@@ -56,6 +56,8 @@ import { EditorService } from '../workbench/editor-service';
 import type { EditorInput } from '../workbench/editor-service';
 import { IconRegistryId } from '../workbench/icon-registry-service-id';
 import { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
+import type { ConfirmDialogOptions } from './dialog-registrations';
+import { DialogServiceImpl, DialogServiceId } from './dialog-service';
 import { ShellUiServiceId } from './shell-ui-service-id';
 import { ViewLocationService } from './view-location-service';
 import {
@@ -101,6 +103,7 @@ export class WorkbenchController {
   private readonly interactionState = new InteractionStateStore();
   private readonly locationService = new ViewLocationService();
   private readonly navigationService = new WorkbenchNavigationServiceImpl();
+  private readonly dialogService = new DialogServiceImpl();
   private revision = 0;
   private disposed = false;
   private detachKeybindings: (() => void) | null = null;
@@ -113,6 +116,7 @@ export class WorkbenchController {
     statusBarItemRendererRegistry: new Registry<string, unknown>('overwrite'),
     topBarRegistry: new Registry<string, unknown>('overwrite'),
     viewPanelRegistry: new Registry<string, unknown>('overwrite'),
+    dialogRegistry: new Registry<string, unknown>('overwrite'),
     viewProviderRegistry: new ViewProviderRegistryImpl(),
   };
   private readonly pluginDisposables = new Map<
@@ -152,6 +156,7 @@ export class WorkbenchController {
       WorkbenchNavigationServiceId,
       this.navigationService
     );
+    this.runtime.services.registerInstance(DialogServiceId, this.dialogService);
     this.manager = new PluginManager(this.runtime);
     this.registerCoreServices();
     this.externalHosts = new ExternalHostMount({
@@ -189,6 +194,7 @@ export class WorkbenchController {
       providerRegistries: this.providerRegistries,
       runtime: this.runtime,
       workbenchRegistries: this.workbenchRegistries,
+      dialogService: this.dialogService,
     };
   }
 
@@ -236,6 +242,10 @@ export class WorkbenchController {
         this.setActiveContainer(location, containerId),
       setSecondarySidebarVisible: (visible) =>
         this.setSecondarySidebarVisible(visible),
+    });
+    this.dialogService.bind(() => {
+      this.stateCache.patchDialogState(this.dialogService.getActive());
+      this.notify();
     });
   }
 
@@ -349,6 +359,10 @@ export class WorkbenchController {
         }
       },
       isEditorDebug: () => this.diagnostics.isEnabled(),
+      openDialog: (id, payload) => this.openDialog(id, payload),
+      closeDialog: (id) => this.closeDialog(id),
+      showConfirm: (options) => this.showConfirm(options),
+      resolveDialogConfirm: (confirmed) => this.resolveDialogConfirm(confirmed),
     };
   }
 
@@ -825,6 +839,22 @@ export class WorkbenchController {
     provider.handleMove?.(source, target, position, ctx);
   }
 
+  openDialog(id: string, payload?: unknown): void {
+    this.dialogService.open(id, payload);
+  }
+
+  closeDialog(id?: string): void {
+    this.dialogService.close(id);
+  }
+
+  showConfirm(options: ConfirmDialogOptions): Promise<boolean> {
+    return this.dialogService.showConfirm(options);
+  }
+
+  resolveDialogConfirm(confirmed: boolean): void {
+    this.dialogService.resolveConfirm(confirmed);
+  }
+
   undo(): boolean {
     return this.runtime.getScene().undo();
   }
@@ -913,10 +943,12 @@ export class WorkbenchController {
     return {
       activeContainerByLocation:
         this.locationService.getActiveContainerByLocation(),
+      activeDialog: scene.activeDialog,
       commandPalette: chrome.commandPalette,
       commandStates: commands.commandStates,
       contextKeys: chrome.contextKeys,
       contextMenu: chrome.contextMenu,
+      dialogs: scene.dialogs,
       editor: editor.editor,
       editorPaneKind: editor.editorPaneKind,
       editorPanes: editor.editorPanes,

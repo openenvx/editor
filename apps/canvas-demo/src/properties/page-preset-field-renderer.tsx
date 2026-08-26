@@ -1,9 +1,12 @@
 import { resolvePagePreset, usePagePresetResize } from '@openenvx/canvas';
-import { ConfirmDialog, Select } from '@openenvx/canvas-studio';
+import { Select } from '@openenvx/canvas-studio';
 import { getActivePage } from '@openenvx/core';
 import type { PropertyFieldDescriptor } from '@openenvx/core';
-import { useWorkbenchContextSelector } from '@openenvx/core/react';
-import { memo, useState } from 'react';
+import {
+  useWorkbenchContext,
+  useWorkbenchContextSelector,
+} from '@openenvx/core/react';
+import { memo } from 'react';
 
 export interface PagePresetFieldRendererProps {
   field: PropertyFieldDescriptor;
@@ -20,71 +23,49 @@ export const PagePresetFieldRenderer = memo(
     onCommand: _onCommand,
   }: PagePresetFieldRendererProps) => {
     const scene = useWorkbenchContextSelector((state) => state.scene);
+    const { api } = useWorkbenchContext();
     const resizePagePreset = usePagePresetResize();
     const page = scene ? getActivePage(scene) : null;
     const currentPresetId = String(
       value ?? field.options?.[0]?.value ?? 'a4-portrait'
     );
-    const [pendingPresetId, setPendingPresetId] = useState<string | null>(null);
-    const [dialogOpen, setDialogOpen] = useState(false);
 
-    const selectedPresetId = pendingPresetId ?? currentPresetId;
-    const pendingPreset = pendingPresetId
-      ? resolvePagePreset(pendingPresetId)
-      : undefined;
-
-    const handlePresetChange = (presetId: string) => {
-      if (presetId === currentPresetId) {
+    const handlePresetChange = async (presetId: string) => {
+      if (!page || presetId === currentPresetId) {
         return;
       }
-      setPendingPresetId(presetId);
-      setDialogOpen(true);
-    };
-
-    const handleCancel = () => {
-      setDialogOpen(false);
-      setPendingPresetId(null);
-    };
-
-    const handleConfirm = () => {
-      if (!pendingPresetId) {
-        return;
+      const preset = resolvePagePreset(presetId);
+      const currentWidth = Math.round(page.width ?? 0);
+      const currentHeight = Math.round(page.height ?? 0);
+      const nextWidth = Math.round(preset?.width ?? currentWidth);
+      const nextHeight = Math.round(preset?.height ?? currentHeight);
+      const ok = await api.showConfirm({
+        cancelLabel: 'Cancel',
+        confirmLabel: 'Resize',
+        description: `Resize from ${currentWidth} × ${currentHeight} px to ${nextWidth} × ${nextHeight} px? All elements on the page will be scaled.`,
+        title: 'Resize page',
+      });
+      if (ok) {
+        void resizePagePreset(presetId);
       }
-      void resizePagePreset(pendingPresetId);
-      setDialogOpen(false);
-      setPendingPresetId(null);
     };
 
     if (!page) {
       return null;
     }
 
-    const currentWidth = Math.round(page.width ?? 0);
-    const currentHeight = Math.round(page.height ?? 0);
-    const nextWidth = Math.round(pendingPreset?.width ?? currentWidth);
-    const nextHeight = Math.round(pendingPreset?.height ?? currentHeight);
-
     return (
-      <>
-        <Select
-          id={`owb-inspector-${layerId}-${field.key}`}
-          onChange={handlePresetChange}
-          options={(field.options ?? []).map((option) => ({
-            label: option.label,
-            value: option.value,
-          }))}
-          value={selectedPresetId}
-        />
-        <ConfirmDialog
-          cancelLabel="Cancel"
-          confirmLabel="Resize"
-          description={`Resize from ${currentWidth} × ${currentHeight} px to ${nextWidth} × ${nextHeight} px? All elements on the page will be scaled.`}
-          onCancel={handleCancel}
-          onConfirm={handleConfirm}
-          open={dialogOpen}
-          title="Resize page"
-        />
-      </>
+      <Select
+        id={`owb-inspector-${layerId}-${field.key}`}
+        onChange={(presetId) => {
+          void handlePresetChange(presetId);
+        }}
+        options={(field.options ?? []).map((option) => ({
+          label: option.label,
+          value: option.value,
+        }))}
+        value={currentPresetId}
+      />
     );
   }
 );

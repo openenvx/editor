@@ -4,7 +4,6 @@
   gap: var(--wb-space-2);
   min-height: 0;
   flex: 1;
-  padding: var(--wb-space-4) 0;
 }
 
 .list {
@@ -46,10 +45,18 @@
   border-radius: var(--wb-radius-sm);
 }
 
-.token {
-  font-family: var(--wb-font-mono);
+.label {
   font-size: var(--wb-text-sm);
   color: var(--wb-foreground);
+}
+
+.labelMono {
+  font-family: var(--wb-font-mono);
+}
+
+.description {
+  font-size: var(--wb-text-xs);
+  color: var(--wb-muted-foreground);
 }
 
 .empty {

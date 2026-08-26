@@ -2,6 +2,7 @@ import { Plus } from 'lucide-react';
 import type {
   ButtonHTMLAttributes,
   CSSProperties,
+  KeyboardEvent,
   ReactNode,
   Ref,
 } from 'react';
@@ -29,6 +30,7 @@ export interface PropertyListRowProps {
   dragging?: boolean;
   rowRef?: Ref<HTMLDivElement>;
   rowStyle?: CSSProperties;
+  onRowClick?: () => void;
 }
 
 export function PropertyListRow({
@@ -40,6 +42,7 @@ export function PropertyListRow({
   dragging,
   rowRef,
   rowStyle,
+  onRowClick,
 }: PropertyListRowProps) {
   const hasHeader = leading || label || actions;
 
@@ -51,9 +54,33 @@ export function PropertyListRow({
     >
       {hasHeader ? (
         <div
-          className={cn(styles.rowHeader, !children && styles.rowHeaderNoBody)}
+          className={cn(
+            styles.rowHeader,
+            !children && styles.rowHeaderNoBody,
+            onRowClick && styles.rowHeaderClickable
+          )}
+          {...(onRowClick
+            ? {
+                onClick: onRowClick,
+                onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onRowClick();
+                  }
+                },
+                role: 'button' as const,
+                tabIndex: 0,
+              }
+            : {})}
         >
-          {leading}
+          {leading ? (
+            <div
+              className={styles.rowLeading}
+              onPointerDown={(event) => event.stopPropagation()}
+            >
+              {leading}
+            </div>
+          ) : null}
           {label ? (
             typeof label === 'string' ? (
               <span className={styles.rowLabel}>{label}</span>
@@ -61,7 +88,14 @@ export function PropertyListRow({
               <div className={styles.rowLabel}>{label}</div>
             )
           ) : null}
-          {actions ? <div className={styles.rowActions}>{actions}</div> : null}
+          {actions ? (
+            <div
+              className={styles.rowActions}
+              onPointerDown={(event) => event.stopPropagation()}
+            >
+              {actions}
+            </div>
+          ) : null}
         </div>
       ) : null}
       {children ? <div className={styles.rowBody}>{children}</div> : null}

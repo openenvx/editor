@@ -1,6 +1,7 @@
 import type { EditorRuntime, Registries } from '../backbone';
 import type { WorkbenchProviderRegistries } from '../registries/workbench-provider-registries';
 import type { WorkbenchRegistries } from '../registries/workbench-registries';
+import type { DialogService } from '../workbench/dialog-service';
 import type { ViewLocationService } from '../workbench/view-location-service';
 import type { WorkbenchLayout } from '../workbench/workbench-layout';
 
@@ -11,4 +12,5 @@ export interface WorkbenchSliceContext {
   providerRegistries: WorkbenchProviderRegistries;
   layout: WorkbenchLayout;
   locationService: ViewLocationService;
+  dialogService: DialogService;
 }
