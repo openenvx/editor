@@ -11,9 +11,12 @@ import './theme.css';
 
 const EMAIL_EDITOR_PLUGINS = [new EmailBlocksPlugin()];
 
-/** Drop-in host layout: artboard overlay toolbars, no product top bar. */
+/** Drop-in layout: artboard + inspector only (no activity bar / left sidebar). */
 const EMAIL_EDITOR_LAYOUT = {
   ...DEFAULT_EMAIL_LAYOUT,
+  activityBar: false,
+  primarySidebar: false,
+  statusBar: false,
   editorToolbars: true,
   topBar: false,
 };
