@@ -548,11 +548,11 @@ export function WorkbenchShell({
     if (!hasChromePlugin) {
       next.unshift(new DefaultWorkbenchChromePlugin());
     }
-    if (!hasInspectorPlugin) {
-      next.unshift(new DefaultInspectorContainerPlugin());
-    }
     if (!hasVariablesPlugin) {
       next.unshift(new DefaultVariablesContainerPlugin());
+    }
+    if (!hasInspectorPlugin) {
+      next.unshift(new DefaultInspectorContainerPlugin());
     }
     if (!hasDialogsPlugin) {
       next.unshift(new DefaultDialogsPlugin());

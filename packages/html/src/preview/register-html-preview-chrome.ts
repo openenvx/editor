@@ -12,6 +12,8 @@ import {
 export interface RegisterHtmlPreviewChromeOptions {
   initialPreset?: HtmlDevicePreset;
   hideFluidPreset?: boolean;
+  /** Hide the floating top-center preview toolbar (e.g. when a product top bar owns device/zoom). */
+  hidePreviewToolbar?: boolean;
   hideZoomControls?: boolean;
 }
 
@@ -34,6 +36,9 @@ function applyHtmlPreviewChromeContextKeys(
   if (options.hideFluidPreset) {
     ctx.contextKeys.setContext('html.hideFluidPreset', true);
   }
+  if (options.hidePreviewToolbar) {
+    ctx.contextKeys.setContext('html.hidePreviewToolbar', true);
+  }
   if (options.hideZoomControls) {
     ctx.contextKeys.setContext('html.hideZoomControls', true);
   }
@@ -44,7 +49,7 @@ function applyHtmlPreviewChromeContextKeys(
  * Safe to call from both HtmlBlocksPlugin and EmailBlocksPlugin.
  *
  * Options from every call are merged before the first registration. Later calls
- * still apply `hideFluidPreset` / `hideZoomControls` context keys; service
+ * still apply `hideFluidPreset` / `hidePreviewToolbar` / `hideZoomControls` context keys; service
  * construction runs only once (when `html.setDevicePreset` is not registered yet).
  */
 export function registerHtmlPreviewChrome(

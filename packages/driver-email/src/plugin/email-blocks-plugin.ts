@@ -111,7 +111,10 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
         ? [createEmailGoBackCommand(this.options.onBack)]
         : [])
     );
-    registerHtmlPreviewChrome(ctx, { hideFluidPreset: true });
+    registerHtmlPreviewChrome(ctx, {
+      hideFluidPreset: true,
+      ...(this.options.topBar ? { hidePreviewToolbar: true } : {}),
+    });
 
     ctx.registerWorkbench(
       new EmailContextMenu(),

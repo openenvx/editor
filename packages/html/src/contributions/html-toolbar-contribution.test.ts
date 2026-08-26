@@ -4,12 +4,13 @@ import { describe, expect, it } from 'vitest';
 import { HtmlToolbarContribution } from './html-toolbar-contribution';
 
 describe('HtmlToolbarContribution', () => {
-  it('gates zoom controls with html.hideZoomControls', () => {
+  it('gates preview toolbar with html.hidePreviewToolbar and zoom with html.hideZoomControls', () => {
     const builder = createToolbarBuilder();
     new HtmlToolbarContribution().contribute(builder, {} as never);
 
     const items = builder.build();
-    const zoomWhen = 'html.previewActive && !html.hideZoomControls';
+    const previewWhen = 'html.previewActive && !html.hidePreviewToolbar';
+    const zoomWhen = `${previewWhen} && !html.hideZoomControls`;
     const zoomIds = [
       'html-toolbar-sep-1',
       'html-toolbar-zoom-out',
@@ -21,9 +22,9 @@ describe('HtmlToolbarContribution', () => {
       const item = items.find((entry) => entry.id === id);
       expect(item?.when, id).toBe(zoomWhen);
     }
+    const mobile = items.find((entry) => entry.id === 'html-toolbar-mobile');
+    expect(mobile?.when).toBe(previewWhen);
     const fluid = items.find((entry) => entry.id === 'html-toolbar-fluid');
-    expect(fluid?.when).toBe(
-      "html.previewActive && !html.hideFluidPreset"
-    );
+    expect(fluid?.when).toBe(`${previewWhen} && !html.hideFluidPreset`);
   });
 });

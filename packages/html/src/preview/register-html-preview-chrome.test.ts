@@ -28,10 +28,11 @@ describe('registerHtmlPreviewChrome', () => {
         register: () => {},
         registerWorkbench: () => {},
       } as never,
-      { hideFluidPreset: true, hideZoomControls: true }
+      { hideFluidPreset: true, hidePreviewToolbar: true, hideZoomControls: true }
     );
 
     expect(contextKeys.get('html.hideFluidPreset')).toBe(true);
+    expect(contextKeys.get('html.hidePreviewToolbar')).toBe(true);
     expect(contextKeys.get('html.hideZoomControls')).toBe(true);
   });
 

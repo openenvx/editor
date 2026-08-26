@@ -25,7 +25,7 @@ class VariablesViewContainer extends ViewContainerContribution {
   readonly title = 'Variables';
   readonly defaultLocation = 'secondary' as const;
   readonly sidebarBehavior = 'panel' as const;
-  readonly sidebarOrder = 5;
+  readonly sidebarOrder = 1;
   readonly when = "page.layout == 'email'";
 }
 

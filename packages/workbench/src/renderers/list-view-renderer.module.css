@@ -69,3 +69,31 @@
 .add {
   margin: 0 var(--wb-space-4);
 }
+
+.rowAction {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: var(--wb-radius-sm);
+  background: transparent;
+  box-shadow: none;
+  color: var(--wb-muted-foreground);
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+
+.rowAction:hover:not(:disabled) {
+  background: transparent;
+  box-shadow: none;
+  color: var(--wb-foreground);
+}
+
+.rowAction:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-control-focus);
+}

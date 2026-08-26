@@ -16,7 +16,6 @@ import {
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { WorkbenchIcon } from '../icons/workbench-icon';
 import { cn } from '../lib/cn';
-import { IconButton } from '../primitives/icon-button';
 import {
   PropertyList,
   PropertyListAdd,
@@ -68,14 +67,15 @@ function ListRow({
   return (
     <PropertyListRow
       actions={item.actions?.map((action) => (
-        <IconButton
+        <button
           aria-label={action.label}
+          className={styles.rowAction}
           key={`${action.commandId}-${action.icon}`}
           onClick={() => onCommand(action.commandId, { id: item.id })}
-          size="sm"
+          type="button"
         >
           <WorkbenchIcon id={action.icon} size={14} />
-        </IconButton>
+        </button>
       ))}
       className={cn(styles.row, isDragging && styles.rowDragging)}
       dragging={isDragging}

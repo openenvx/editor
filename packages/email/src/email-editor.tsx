@@ -9,16 +9,15 @@ import { useMemo } from 'react';
 
 import './theme.css';
 
-const EMAIL_EDITOR_PLUGINS = [new EmailBlocksPlugin()];
+const EMAIL_EDITOR_PLUGINS = [new EmailBlocksPlugin({ topBar: true })];
 
-/** Drop-in layout: artboard + inspector only (no activity bar / left sidebar). */
+/** Drop-in layout: top bar + bottom insert toolbar + inspector (no activity bar / left sidebar). */
 const EMAIL_EDITOR_LAYOUT = {
   ...DEFAULT_EMAIL_LAYOUT,
   activityBar: false,
   primarySidebar: false,
   statusBar: false,
   editorToolbars: true,
-  topBar: false,
 };
 
 export interface EmailEditorProps {

@@ -14,7 +14,9 @@ const HTML_ZOOM_DROPDOWN_ITEMS: ShellDropdownMenuItemDescriptor[] =
     label: `${Math.round(zoom * 100)}%`,
   }));
 
-const HTML_ZOOM_TOOLBAR_WHEN = 'html.previewActive && !html.hideZoomControls';
+const HTML_PREVIEW_TOOLBAR_WHEN =
+  'html.previewActive && !html.hidePreviewToolbar';
+const HTML_ZOOM_TOOLBAR_WHEN = `${HTML_PREVIEW_TOOLBAR_WHEN} && !html.hideZoomControls`;
 
 export class HtmlToolbarContribution extends ToolbarContribution {
   contribute(builder: ToolbarBuilder, _ctx: CommandContext): void {
@@ -27,7 +29,7 @@ export class HtmlToolbarContribution extends ToolbarContribution {
         labelKey: 'toolbar.deviceMobile',
         priority: 0,
         toggledWhen: "html.devicePreset == 'mobile'",
-        when: 'html.previewActive',
+        when: HTML_PREVIEW_TOOLBAR_WHEN,
       })
       .command('html-toolbar-desktop', {
         args: { preset: 'desktop' },
@@ -36,7 +38,7 @@ export class HtmlToolbarContribution extends ToolbarContribution {
         labelKey: 'toolbar.deviceDesktop',
         priority: 1,
         toggledWhen: "html.devicePreset == 'desktop'",
-        when: 'html.previewActive',
+        when: HTML_PREVIEW_TOOLBAR_WHEN,
       })
       .command('html-toolbar-fluid', {
         args: { preset: 'fluid' },
@@ -45,7 +47,7 @@ export class HtmlToolbarContribution extends ToolbarContribution {
         labelKey: 'toolbar.deviceFluid',
         priority: 2,
         toggledWhen: "html.devicePreset == 'fluid'",
-        when: 'html.previewActive && !html.hideFluidPreset',
+        when: `${HTML_PREVIEW_TOOLBAR_WHEN} && !html.hideFluidPreset`,
       })
       .separator('html-toolbar-sep-1', {
         priority: 10,
