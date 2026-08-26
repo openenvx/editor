@@ -49,6 +49,7 @@ function touchedPageIds(previous: Scene, next: Scene): string[] | 'full' {
     previous.assets !== next.assets ||
     previous.components !== next.components ||
     previous.templatePolicy !== next.templatePolicy ||
+    previous.variables !== next.variables ||
     previous.pages.length !== next.pages.length
   ) {
     return 'full';
@@ -270,6 +271,7 @@ export class SceneStore {
         drafted.assets === live.assets &&
         drafted.components === live.components &&
         drafted.templatePolicy === live.templatePolicy &&
+        drafted.variables === live.variables &&
         drafted.schemaVersion === live.schemaVersion)
     ) {
       // True no-op (same root, or new root wrapping identical root refs).

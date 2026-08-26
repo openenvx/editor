@@ -73,6 +73,11 @@ export {
   DEFAULT_INSPECTOR_PLUGIN_ID,
 } from './views/default-inspector-plugin';
 export {
+  DefaultVariablesContainerPlugin,
+  DEFAULT_VARIABLES_PLUGIN_ID,
+  VARIABLES_PANEL_COMPONENT_ID,
+} from './variables/default-variables-plugin';
+export {
   DefaultWorkbenchChromePlugin,
   DEFAULT_WORKBENCH_CHROME_PLUGIN_ID,
   WORKBENCH_TOGGLE_ACTIVITY_BAR_COMMAND_ID,

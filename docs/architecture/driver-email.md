@@ -17,7 +17,7 @@ Block editor for pages with `page.layout === 'email'`. Same core/headless/workbe
 - `EmailBlocksPlugin` — layer definitions, `email.*` block commands (including `email.pasteFromClipboard` — formatted clipboard HTML/plain → blocks in Editor mode), **Blocks** activity command (opens sheet) + **Elements** (primitives) sidebar, `EmailEditorPane` for `page.layout === 'email'`. **Bottom insert bar** (`EmailToolbarContribution` → workbench `EditorChrome` `bottom-center`: undo/redo, text/layout dropdowns, image insert; gated `email.modeEdit`) when `layout.editorToolbars: true`. Optional **top bar** (`EmailBlocksPlugin({ topBar: true })` → `EmailTopBarContribution` + `registerTopBar(EmailTopBar)`) hosts Editor / HTML / Preview mode switch, undo/redo, device presets, save, and file actions; device/zoom via shared `registerHtmlPreviewChrome()` (`HtmlPreviewChromeService`). Hosts that want the header use `DEFAULT_EMAIL_LAYOUT` (`topBar: true`, `editorToolbars: false`). `@openenvx/email` `EmailEditor` uses overlay toolbars only (no top bar). Artboard design width 640px — desktop frame 720px with slim body chrome, mobile 390px; `email.root` centers content at editable `maxWidth`, default 600
 - **Clipboard paste → blocks** — `EmailEditorPane` listens for `paste` in Editor mode (skips inline TipTap and inspector fields). `clipboardHtmlToEmailLayers()` maps headings, paragraphs, lists, links (inline `<a>` in text), https images, and dividers; `email.pasteFromClipboard` inserts after the selection in one undo step (new `email.section` wrapper when pasting at root). Inline text edit keeps native TipTap paste.
 - `renderEmailDocument(page, registry)` — walks the layer tree with the same `BlockConfig.render` functions and produces email-safe HTML via `@react-email/render`
-- `renderEmailHtml(scene)` — headless scene export (`./runtime`): fresh registry, requires `page.layout === 'email'`
+- `renderEmailHtml(scene, options?)` — headless scene export (`./runtime`): optional `variables` map substitutes `{{{key}}}` tokens before render
 
 ## Editing vs export
 
@@ -38,7 +38,9 @@ Hosts load `new EmailBlocksPlugin()` (alongside workbench defaults). Demo: `apps
 
 - Web page blocks (`html.*`) — stay in `@openenvx/html`
 - Konva / absolute layout
-- ESP sending, merge tags, cloud export-service wiring (openenvx-cloud)
+- ESP sending / delivery, cloud export-service wiring (openenvx-cloud)
+
+Template **variables** (`scene.variables`, `{{{key}}}` tokens, `applyTemplateVariables`, Variables inspector tab) live in core + workbench + email chrome — see template contract below.
 
 ## Related
 

@@ -12,12 +12,14 @@ import {
   ContextKeyServiceId,
   getActivePage,
   isTypingTarget,
+  RichTextInsertServiceId,
 } from '@openenvx/core';
 import type { EditorPaneHostProps } from '@openenvx/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/core/react';
+import { applyTemplateVariablesForPreview } from '@openenvx/core/schema';
 import {
   applyHtmlDragEnd,
   applyHtmlDragOver,
@@ -113,6 +115,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   );
   const [sortDraft, setSortDraft] = useState<BlockSortDraft | null>(null);
   const sortDraftRef = useRef<BlockSortDraft | null>(null);
+  const richTextInsertRef = useRef<((text: string) => void) | null>(null);
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const mode = useEmailEditorMode();
@@ -120,6 +123,25 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   useEffect(() => {
     ensureEmailDocumentFont();
   }, []);
+
+  const bindRichTextInsert = useCallback(
+    (insert: ((text: string) => void) | null) => {
+      richTextInsertRef.current = insert;
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (mode !== 'edit') {
+      return;
+    }
+    const service = api.getService(RichTextInsertServiceId);
+    if (!service) {
+      return;
+    }
+    service.setHandler((text) => richTextInsertRef.current?.(text));
+    return () => service.setHandler(null);
+  }, [api, mode]);
 
   const {
     artboardRef,
@@ -369,7 +391,8 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
       return;
     }
     let cancelled = false;
-    const page = getActivePage(scene, activePageId);
+    const previewScene = applyTemplateVariablesForPreview(scene);
+    const page = getActivePage(previewScene, activePageId);
     void renderEmailDocument(page, registry, { pretty: isHtml })
       .then((html) => {
         if (cancelled) {
@@ -433,6 +456,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   } else {
     artboardContent = (
       <BlockTreeRenderer
+        bindRichTextInsert={bindRichTextInsert}
         editingTarget={editingTarget}
         hoveredLayerId={hoveredLayerId}
         layers={page.layers}

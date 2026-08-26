@@ -247,8 +247,14 @@ function BlockContentInner({
     setNodeRef: (node: HTMLElement | null) => void;
   };
 }) {
-  const { onSelect, onStartEdit, onCommitEdit, resolveAssetUrl, scene } =
-    useBlockEditor();
+  const {
+    onSelect,
+    onStartEdit,
+    onCommitEdit,
+    resolveAssetUrl,
+    scene,
+    bindRichTextInsert,
+  } = useBlockEditor();
   const chromeHost = useBlockChromeHostProps();
   const config = registry.get(layer.type);
   const textBlock = isRichTextBlock(registry, layer.type);
@@ -306,6 +312,7 @@ function BlockContentInner({
                 align={
                   toolbar.align ? parseRichTextAlign(data.align) : undefined
                 }
+                bindTextInsert={bindRichTextInsert}
                 html={String(data.html ?? '')}
                 onCommit={handleCommit}
                 toolbar={toolbar}
@@ -556,6 +563,7 @@ export const BlockTreeRenderer = memo(
     onRemove,
     onReplaceImage,
     resolveAssetUrl,
+    bindRichTextInsert,
   }: {
     layers: readonly Layer[];
     registry: BlockRegistry;
@@ -582,6 +590,7 @@ export const BlockTreeRenderer = memo(
       file: File
     ) => void | Promise<void>;
     resolveAssetUrl?: (ref: string) => string;
+    bindRichTextInsert?: (insert: ((text: string) => void) | null) => void;
   }) => {
     const [imageOverride, setImageOverride] = useState<BlockImageTarget | null>(
       null
@@ -612,6 +621,7 @@ export const BlockTreeRenderer = memo(
           onRemove,
           onReplaceImage: onReplaceImage ?? (() => {}),
           resolveAssetUrl: resolveAssetUrl ?? ((ref) => ref),
+          bindRichTextInsert,
         }}
       >
         {layers.map((layer) => (

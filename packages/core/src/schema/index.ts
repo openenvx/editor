@@ -49,6 +49,7 @@ export {
   type SceneSnapshot,
   type Selection,
   type TemplatePolicy,
+  type TemplateVariable,
   type TextAutoFit,
   type Transform,
   type WidgetFieldDef,
@@ -134,3 +135,24 @@ export {
   type TemplateManifest,
   type TemplateNameValidation,
 } from './template';
+
+export {
+  applyTemplateVariables,
+  applyTemplateVariablesForPreview,
+  addVariableToScene,
+  buildSampleVariableValues,
+  createVariableId,
+  extractVariableKeys,
+  formatVariableToken,
+  isValidVariableKey,
+  listVariableUsages,
+  nextVariableKey,
+  removeVariableFromScene,
+  reorderVariablesInScene,
+  resolvePrimaryTextDataPath,
+  rewriteVariableKeyInScene,
+  sceneVariables,
+  updateVariableInScene,
+  validateVariableKeyForCatalog,
+  type VariableKeyValidationReason,
+} from './template-variables';

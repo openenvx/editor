@@ -391,6 +391,16 @@ export interface SceneAssetInline {
 
 export type SceneAsset = SceneAssetInline;
 
+/** Catalog entry for `{{{key}}}` merge-style tokens in layer data strings. */
+export interface TemplateVariable {
+  id: string;
+  /** Token id — `[A-Za-z][A-Za-z0-9_]*`. */
+  key: string;
+  label?: string;
+  /** Editor preview / default render value. */
+  sample?: string;
+}
+
 /** Content-only design document (no editor UI state). */
 export interface Scene {
   schemaVersion: number;
@@ -399,6 +409,8 @@ export interface Scene {
   /** Reusable layer trees referenced by `canvas.instance` layers. */
   components?: Record<string, SceneComponent>;
   templatePolicy?: TemplatePolicy;
+  /** Per-template variable catalog for inline `{{{key}}}` tokens. */
+  variables?: TemplateVariable[];
 }
 
 /** Persisted / transferable document: content + editor UI state. */

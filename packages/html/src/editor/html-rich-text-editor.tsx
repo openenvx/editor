@@ -83,6 +83,8 @@ export interface HtmlRichTextEditorProps {
   /** Bubble-menu sections; defaults show block type + align. */
   toolbar?: ResolvedRichTextToolbar;
   onCommit: (html: string, align?: RichTextAlign) => void;
+  /** Register inline insert handler while this editor is mounted. */
+  bindTextInsert?: (insert: ((text: string) => void) | null) => void;
 }
 
 function readEditorDom(editor: Editor): HTMLElement | null {
@@ -98,6 +100,7 @@ export function HtmlRichTextEditor({
   align,
   toolbar = DEFAULT_TOOLBAR,
   onCommit,
+  bindTextInsert,
 }: HtmlRichTextEditorProps) {
   const syncAlign = align !== undefined && toolbar.align;
   const menuRef = useRef<HTMLDivElement>(null);
@@ -149,6 +152,17 @@ export function HtmlRichTextEditor({
       chain.run();
     },
   });
+
+  useLayoutEffect(() => {
+    if (!bindTextInsert || !editor) {
+      return;
+    }
+    const insert = (text: string) => {
+      editor.chain().focus().insertContent(text).run();
+    };
+    bindTextInsert(insert);
+    return () => bindTextInsert(null);
+  }, [bindTextInsert, editor]);
 
   // Re-run placement when the selection/doc changes.
   const selectionEpoch = useEditorState({

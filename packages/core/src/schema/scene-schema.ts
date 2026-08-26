@@ -389,6 +389,22 @@ function build(o: typeof z.object) {
     name: z.string().optional().describe('Display name.'),
   });
 
+  const templateVariable = o({
+    id: z.string().describe('Stable variable id.'),
+    key: z
+      .string()
+      .regex(/^[A-Za-z][A-Za-z0-9_]*$/, 'Invalid variable key')
+      .describe('Token key used in {{{key}}} syntax.'),
+    label: z
+      .string()
+      .optional()
+      .describe('Display label in the variables panel.'),
+    sample: z
+      .string()
+      .optional()
+      .describe('Sample value for editor preview and defaults.'),
+  });
+
   const scene = o({
     assets: z
       .record(z.string(), sceneAsset)
@@ -410,6 +426,27 @@ function build(o: typeof z.object) {
       })
       .describe('Schema version for compatibility.'),
     templatePolicy: templatePolicy.optional(),
+    variables: z
+      .array(templateVariable)
+      .optional()
+      .superRefine((variables, ctx) => {
+        if (!variables) {
+          return;
+        }
+        const seen = new Set<string>();
+        for (let index = 0; index < variables.length; index += 1) {
+          const entry = variables[index]!;
+          if (seen.has(entry.key)) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `Duplicate variable key: ${entry.key}`,
+              path: [index, 'key'],
+            });
+          }
+          seen.add(entry.key);
+        }
+      })
+      .describe('Template variable catalog for inline {{{key}}} tokens.'),
   });
 
   const editorState = o({

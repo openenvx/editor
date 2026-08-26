@@ -6,7 +6,15 @@ import { EmailToolbarContribution } from './email-toolbar-contribution';
 describe('EmailToolbarContribution', () => {
   it('registers bottom-center edit chrome gated by email edit mode', () => {
     const builder = createToolbarBuilder();
-    new EmailToolbarContribution().contribute(builder, {} as never);
+    new EmailToolbarContribution().contribute(builder, {
+      scene: {
+        getScene: () => ({
+          schemaVersion: 4,
+          pages: [],
+          variables: [{ id: 'v1', key: 'test' }],
+        }),
+      },
+    } as never);
 
     const items = builder.build();
     const when = "page.layout == 'email' && email.modeEdit";
@@ -43,6 +51,17 @@ describe('EmailToolbarContribution', () => {
       .toBe(true);
     if (image && 'args' in image) {
       expect(image.args).toEqual({ type: 'email.image' });
+    }
+
+    const variablesDropdown = items.find(
+      (item) => item.id === 'email-toolbar-variables'
+    );
+    expect(variablesDropdown?.kind).toBe('dropdown');
+    if (variablesDropdown?.kind === 'dropdown') {
+      expect(variablesDropdown.icon).toBe('braces');
+      expect(variablesDropdown.items).toHaveLength(2);
+      expect(variablesDropdown.items[0]?.commandId).toBe('scene.insertVariable');
+      expect(variablesDropdown.items[1]?.commandId).toBe('workbench.createVariable');
     }
   });
 });

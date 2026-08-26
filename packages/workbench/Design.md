@@ -437,7 +437,7 @@ Map to shadcn/designer `DesignerPane` + `Action*` pattern conceptually. Each pan
 
 Property form controls are **descriptor → registered renderer**, not ad-hoc JSX in plugins. **API reference** (kinds, `layout`, `PropertyFieldDescriptor`, paths): [docs/architecture/property-fields.md](../../docs/architecture/property-fields.md). This file covers **visual** treatment only (density, radii, slot-list row surfaces).
 
-- Slot list rows: muted surface + inset ring (`--wb-muted` / `--wb-shadow-control`), header + ghost `IconButton` (trash / plus) — same grammar as layer-tree trailing actions.
+- Slot list / repeater / variables rows: `PropertyList` + `PropertyListRow` + `PropertyListAdd` — muted surface + inset ring (`--wb-muted` / `--wb-shadow-control`), header + ghost `IconButton` (trash / menu) and ghost `sm` add control.
 
 ### Layout pane
 
@@ -555,7 +555,7 @@ Before merging visual changes, check both themes:
 | --- | --- |
 | `src/theme/tokens.css` | Global CSS variables — **single source of truth** |
 | `src/context/theme-context.tsx` | `ThemeProvider`, `useTheme`, `useThemeScope` |
-| `src/primitives/` | `button`, `input`, `input-group`, `segmented-control`, `tabs`, `panel-section`, `icon-button` |
+| `src/primitives/` | `button`, `input`, `input-group`, `property-list`, `segmented-control`, `tabs`, `panel-section`, `icon-button` |
 | `src/layout/` | `editor-layout`, `activity-sidebar`, `canvas-chrome`, `floating-toolbar`, `zoom-controls`, `view-pane` |
 | `src/renderers/` | Descriptor → UI (view tree, property panes, menus) |
 | `src/shell/shell.tsx` | Orchestrator |

@@ -30,6 +30,13 @@ import {
 } from '../scene/page-ops';
 import { reorderLayers, moveLayerToIndex } from '../scene/scene-store';
 import { getActivePage } from '../scene/types';
+import {
+  AddVariableCommand,
+  InsertVariableCommand,
+  RemoveVariableCommand,
+  ReorderVariablesCommand,
+  UpdateVariableCommand,
+} from './template-variable-commands';
 
 export class UndoCommand extends Command {
   readonly id = 'scene.undo';
@@ -725,6 +732,11 @@ export class ScenePlugin extends Plugin {
       new SetLayerWriteModeCommand(),
       new SetLayerShowInLayersCommand(),
       new SetTemplatePolicyCommand(),
+      new AddVariableCommand(),
+      new UpdateVariableCommand(),
+      new RemoveVariableCommand(),
+      new ReorderVariablesCommand(),
+      new InsertVariableCommand(),
       new UndoShortcut(),
       new RedoShortcut(),
       new MoveUpShortcut(),

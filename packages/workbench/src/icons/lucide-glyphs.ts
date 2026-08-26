@@ -1,4 +1,5 @@
 import {
+  Braces,
   CloudCheck,
   PanelLeft,
   AlignCenter,
@@ -58,6 +59,7 @@ export const LUCIDE_GLYPHS: Record<string, LucideIcon> = {
   arrowUp: ArrowUpToLine,
   arrows: ArrowLeftRight,
   boxes: Boxes,
+  braces: Braces,
   circle: Circle,
   cloudCheck: CloudCheck,
   cornerBottomLeft: CornerDownLeft,

@@ -15,6 +15,10 @@ import {
 import type { EventBus } from '../runtime/workbench-events';
 import type { SceneStore } from '../scene/scene-store';
 import {
+  RichTextInsertServiceImpl,
+  RichTextInsertServiceId,
+} from '../services/rich-text-insert-service';
+import {
   ContextKeyServiceId,
   EditorServiceId,
   SceneStoreServiceId,
@@ -80,6 +84,10 @@ export class EditorRuntime {
     this.services.registerInstance(
       DocumentHostServiceId,
       new MutableDocumentHostService()
+    );
+    this.services.registerInstance(
+      RichTextInsertServiceId,
+      new RichTextInsertServiceImpl()
     );
     const localization = this.services.get(LocalizationServiceId);
     this.disposables.add(

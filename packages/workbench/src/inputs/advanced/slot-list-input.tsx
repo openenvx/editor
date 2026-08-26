@@ -1,13 +1,15 @@
 import type { Layer, SlotListFieldConfig } from '@openenvx/core';
-import { Plus, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
-import { Button } from '../../primitives/button';
 import { IconButton } from '../../primitives/icon-button';
 import { PropertyFieldRow } from '../../primitives/property-field-row';
+import {
+  PropertyList,
+  PropertyListAdd,
+  PropertyListRow,
+} from '../../primitives/property-list';
 import type { PropertyFieldRendererProps } from '../../renderers/property-field-types';
 import { getFieldId } from '../../renderers/property-field-types';
-
-import styles from '../../renderers/property-panel.module.css';
 
 export interface SlotListInputProps {
   fieldKey: string;
@@ -50,13 +52,10 @@ export function SlotListInput({
   const rows = Array.isArray(value) ? value.filter(isPartLayer) : [];
 
   return (
-    <div className={styles.slotList}>
+    <PropertyList>
       {rows.map((row, rowIndex) => (
-        <div className={styles.slotListRow} key={row.id}>
-          <div className={styles.slotListRowHeader}>
-            <span className={styles.slotListRowLabel}>
-              {`${slotList.fields[0]?.label ?? 'Item'} ${rowIndex + 1}`}
-            </span>
+        <PropertyListRow
+          actions={
             <IconButton
               aria-label={`Remove item ${rowIndex + 1}`}
               size="sm"
@@ -69,7 +68,10 @@ export function SlotListInput({
             >
               <Trash2 size={12} />
             </IconButton>
-          </div>
+          }
+          key={row.id}
+          label={`${slotList.fields[0]?.label ?? 'Item'} ${rowIndex + 1}`}
+        >
           {slotList.fields.map((sub) => (
             <PropertyFieldRow
               htmlFor={getFieldId(`${layerId}-${row.id}`, sub.key)}
@@ -97,12 +99,9 @@ export function SlotListInput({
               })}
             </PropertyFieldRow>
           ))}
-        </div>
+        </PropertyListRow>
       ))}
-      <Button
-        className={styles.slotListAdd}
-        size="sm"
-        variant="ghost"
+      <PropertyListAdd
         onClick={() => {
           const template = slotList.newPart;
           if (!isPartLayer(template)) {
@@ -115,9 +114,8 @@ export function SlotListInput({
           onUpdate(fieldKey, [...rows, nextPart]);
         }}
       >
-        <Plus size={12} />
         Add
-      </Button>
-    </div>
+      </PropertyListAdd>
+    </PropertyList>
   );
 }

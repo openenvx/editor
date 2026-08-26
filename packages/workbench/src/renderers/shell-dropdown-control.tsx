@@ -8,6 +8,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useContextKeyValue } from '../hooks/use-context-key';
+import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { WorkbenchIcon } from '../icons/workbench-icon';
 import {
@@ -59,6 +60,9 @@ export const ShellDropdownControl = memo(
     placement,
   }: ShellDropdownControlProps) => {
     const { executeCommand } = useWorkbenchContext();
+    const commandStates = useWorkbenchContextSelector(
+      (state) => state.commandStates
+    );
     const { t } = useWorkbenchTranslation();
     const boundValue = useContextKeyValue(labelBinding ?? '');
 
@@ -122,7 +126,7 @@ export const ShellDropdownControl = memo(
     const groups = useMemo(
       () => [
         items.map((item) => ({
-          disabled: false,
+          disabled: !(commandStates?.[item.commandId]?.canExecute ?? true),
           id: `${id}-${item.commandId}`,
           label: item.labelKey
             ? t(item.labelKey)
@@ -133,7 +137,7 @@ export const ShellDropdownControl = memo(
           shortcut: item.shortcut,
         })),
       ],
-      [executeCommand, id, items, t]
+      [commandStates, executeCommand, id, items, t]
     );
 
     const triggerClass =

@@ -45,7 +45,22 @@ export {
   type ViewContainerLocation,
 } from './contributions/view-contribution';
 export { WORKBENCH_INSPECTOR_CONTAINER_ID } from './workbench/inspector-container';
+export { WORKBENCH_VARIABLES_CONTAINER_ID } from './workbench/variables-container';
 export { ViewLocationService } from './workbench/view-location-service';
+export {
+  WorkbenchNavigationServiceId,
+  WorkbenchNavigationServiceImpl,
+  type WorkbenchNavigationService,
+} from './workbench/workbench-navigation-service';
+export {
+  RichTextInsertServiceId,
+  RichTextInsertServiceImpl,
+  type RichTextInsertService,
+} from './services/rich-text-insert-service';
+export {
+  TextBlockInsertServiceId,
+  type TextBlockInsertService,
+} from './services/text-block-insert-service';
 export {
   createWorkbenchPluginContext,
   type WorkbenchPluginContext,

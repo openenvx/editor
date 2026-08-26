@@ -69,6 +69,10 @@ import { attachWorkbenchKeybindings } from './workbench-keybindings';
 import { DEFAULT_WORKBENCH_LAYOUT } from './workbench-layout';
 import type { WorkbenchLayoutSnapshot } from './workbench-layout-store';
 import { WorkbenchLayoutStoreId } from './workbench-layout-store-id';
+import {
+  WorkbenchNavigationServiceImpl,
+  WorkbenchNavigationServiceId,
+} from './workbench-navigation-service';
 import { createWorkbenchPluginContext } from './workbench-plugin-context';
 import type {
   WorkbenchApi,
@@ -96,6 +100,7 @@ export class WorkbenchController {
   private readonly editorSliceBuilder = new EditorSliceBuilder();
   private readonly interactionState = new InteractionStateStore();
   private readonly locationService = new ViewLocationService();
+  private readonly navigationService = new WorkbenchNavigationServiceImpl();
   private revision = 0;
   private disposed = false;
   private detachKeybindings: (() => void) | null = null;
@@ -142,6 +147,10 @@ export class WorkbenchController {
     this.runtime.services.registerInstance(
       EditorDiagnosticsServiceId,
       this.diagnostics
+    );
+    this.runtime.services.registerInstance(
+      WorkbenchNavigationServiceId,
+      this.navigationService
     );
     this.manager = new PluginManager(this.runtime);
     this.registerCoreServices();
@@ -222,6 +231,12 @@ export class WorkbenchController {
         this.setSecondarySidebarVisible(visible),
       toggleSecondarySidebar: () => this.toggleSecondarySidebar(),
     });
+    this.navigationService.bind({
+      setActiveContainer: (location, containerId) =>
+        this.setActiveContainer(location, containerId),
+      setSecondarySidebarVisible: (visible) =>
+        this.setSecondarySidebarVisible(visible),
+    });
   }
 
   private wireStateRefresh(): void {
@@ -233,6 +248,7 @@ export class WorkbenchController {
         this.stateCache.onSceneContentRevision(snapshot.contentRevision);
         if (snapshot.contentRevision !== prevContentRevision) {
           this.stateCache.invalidateSceneContent();
+          this.stateCache.invalidateChrome();
         } else {
           this.stateCache.invalidateSelectionOnly(
             snapshot.scene,

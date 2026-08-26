@@ -147,6 +147,26 @@ describe(SceneStore, () => {
     expect(beforeName).not.toBe("Replaced");
   });
 
+  it("commits scene.variables-only transactions", () => {
+    const store = new SceneStore();
+    expect(store.getScene().variables).toBeUndefined();
+
+    store.apply({
+      apply: (scene) => ({
+        ...scene,
+        variables: [{ id: "var-1", key: "name" }],
+      }),
+      label: "Add variable",
+    });
+
+    expect(store.getScene().variables).toStrictEqual([
+      { id: "var-1", key: "name" },
+    ]);
+    expect(store.canUndo()).toBe(true);
+    expect(store.undo()).toBe(true);
+    expect(store.getScene().variables).toBeUndefined();
+  });
+
   it("supports multi-select", () => {
     const store = new SceneStore();
     const pageId = store.getScene().pages[0]!.id;

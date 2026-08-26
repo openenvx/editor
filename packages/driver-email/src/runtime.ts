@@ -4,4 +4,7 @@
  */
 export { createEmailDemoScene as createEmailScene } from './create-email-demo-scene';
 export { renderEmailDocument } from './render/render-email-document';
-export { renderEmailHtml } from './render/render-email-html';
+export {
+  renderEmailHtml,
+  type RenderEmailHtmlOptions,
+} from './render/render-email-html';

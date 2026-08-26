@@ -3,11 +3,14 @@ import {
   type CommandContext,
   type ToolbarBuilder,
 } from '@openenvx/core';
+import { formatVariableToken } from '@openenvx/core/schema';
 
 const EMAIL_EDIT_WHEN = "page.layout == 'email' && email.modeEdit";
 
 export class EmailToolbarContribution extends ToolbarContribution {
-  contribute(builder: ToolbarBuilder, _ctx: CommandContext): void {
+  contribute(builder: ToolbarBuilder, ctx: CommandContext): void {
+    const variables = ctx.scene.getScene().variables ?? [];
+
     builder
       .placement('bottom-center')
       .command('email-toolbar-undo', {
@@ -89,6 +92,23 @@ export class EmailToolbarContribution extends ToolbarContribution {
             commandId: 'email.insertBlock',
             args: { type: 'email.button' },
             labelKey: 'toolbar.emailButton',
+          },
+        ],
+      })
+      .dropdown('email-toolbar-variables', {
+        icon: 'braces',
+        labelKey: 'toolbar.variables',
+        priority: 13,
+        when: EMAIL_EDIT_WHEN,
+        items: [
+          ...variables.map((variable) => ({
+            commandId: 'scene.insertVariable',
+            args: { key: variable.key },
+            label: formatVariableToken(variable.key),
+          })),
+          {
+            commandId: 'workbench.createVariable',
+            labelKey: 'toolbar.createVariable',
           },
         ],
       });

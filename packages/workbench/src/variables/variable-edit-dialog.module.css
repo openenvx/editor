@@ -1,0 +1,51 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--wb-backdrop-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog {
+  width: min(320px, calc(100vw - var(--wb-space-8)));
+  background: var(--wb-popover);
+  border-radius: var(--wb-radius-md);
+  box-shadow: var(--wb-shadow-float);
+  padding: var(--wb-space-4);
+}
+
+.title {
+  margin: 0 0 var(--wb-space-4);
+  font-size: var(--wb-text-base);
+  font-weight: 600;
+  color: var(--wb-foreground);
+  letter-spacing: -0.01em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-space-3);
+}
+
+.error {
+  margin: 0;
+  color: var(--wb-destructive);
+  font-size: var(--wb-text-xs);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wb-space-2);
+  margin-top: var(--wb-space-4);
+}
+
+.footerActions {
+  display: flex;
+  gap: var(--wb-space-2);
+  margin-left: auto;
+}

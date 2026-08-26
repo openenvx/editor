@@ -60,6 +60,7 @@ function SlotPartContent({
     onReplaceImage,
     resolveAssetUrl,
     scene,
+    bindRichTextInsert,
   } = useBlockEditor();
   const config = registry.get(part.type);
   const textBlock = isRichTextBlock(registry, part.type);
@@ -217,6 +218,7 @@ function SlotPartContent({
                   align={
                     toolbar.align ? parseRichTextAlign(data.align) : undefined
                   }
+                  bindTextInsert={bindRichTextInsert}
                   html={String(data.html ?? '')}
                   onCommit={handleCommit}
                   toolbar={toolbar}

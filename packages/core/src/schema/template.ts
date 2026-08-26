@@ -20,7 +20,7 @@ const HTML_ENTITY_MAP: Record<string, string> = {
   "'": '&#39;',
 };
 
-function escapeHtml(value: string): string {
+export function escapeHtml(value: string): string {
   return value.replaceAll(/[&<>"']/g, (char) => HTML_ENTITY_MAP[char]!);
 }
 

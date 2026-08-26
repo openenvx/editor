@@ -40,7 +40,7 @@ export function getLayerChildren(layer: Layer): Layer[] {
   return data.children;
 }
 
-function mapLayerChildren(
+export function mapLayerChildren(
   layer: Layer,
   mapper: (layers: Layer[]) => Layer[]
 ): Layer {
@@ -155,6 +155,31 @@ export function updateLayerInTree(
       updateLayerInTree(children, layerId, updater)
     );
   });
+}
+
+/** Update a layer by id across pages and component definitions. */
+export function updateLayerByIdInScene(
+  scene: Scene,
+  layerId: string,
+  updater: (layer: Layer) => Layer
+): Scene {
+  const mapTree = (layers: Layer[]) =>
+    updateLayerInTree(layers, layerId, updater);
+  return {
+    ...scene,
+    pages: scene.pages.map((page) => ({
+      ...page,
+      layers: mapTree(page.layers),
+    })),
+    components: scene.components
+      ? Object.fromEntries(
+          Object.entries(scene.components).map(([id, component]) => [
+            id,
+            { ...component, layers: mapTree(component.layers) },
+          ])
+        )
+      : scene.components,
+  };
 }
 
 export function removeLayerFromTree(layers: Layer[], layerId: string): Layer[] {

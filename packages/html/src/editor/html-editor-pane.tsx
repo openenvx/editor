@@ -12,6 +12,7 @@ import {
   AssetServiceId,
   ContextKeyServiceId,
   getActivePage,
+  RichTextInsertServiceId,
 } from '@openenvx/core';
 import type { EditorPaneHostProps } from '@openenvx/core';
 import {
@@ -21,6 +22,7 @@ import {
 import {
   memo,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -67,6 +69,23 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   );
   const [sortDraft, setSortDraft] = useState<BlockSortDraft | null>(null);
   const sortDraftRef = useRef<BlockSortDraft | null>(null);
+  const richTextInsertRef = useRef<((text: string) => void) | null>(null);
+
+  const bindRichTextInsert = useCallback(
+    (insert: ((text: string) => void) | null) => {
+      richTextInsertRef.current = insert;
+    },
+    []
+  );
+
+  useEffect(() => {
+    const service = api.getService(RichTextInsertServiceId);
+    if (!service) {
+      return;
+    }
+    service.setHandler((text) => richTextInsertRef.current?.(text));
+    return () => service.setHandler(null);
+  }, [api]);
 
   const {
     artboardHeight: _artboardHeight,
@@ -322,6 +341,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
             >
               {rootId ? (
                 <BlockTreeRenderer
+                  bindRichTextInsert={bindRichTextInsert}
                   canReplaceImage={canReplaceImage}
                   editingTarget={editingTarget}
                   hoveredLayerId={hoveredLayerId}

@@ -1,4 +1,8 @@
-import { SimpleServiceContribution, WorkbenchPlugin } from '@openenvx/core';
+import {
+  SimpleServiceContribution,
+  WorkbenchPlugin,
+  TextBlockInsertServiceId,
+} from '@openenvx/core';
 import type { WorkbenchPluginContext } from '@openenvx/core';
 import {
   createBlockCommands,
@@ -49,6 +53,7 @@ import { EmailEditorPane } from '../editor/email-editor-pane';
 import { EmailTopBar } from '../editor/email-top-bar';
 import { EmailPatternBlocksGallery } from '../editor/pattern-blocks-gallery';
 import { EmailTemplatesGallery } from '../editor/templates-gallery';
+import { insertEmailTextHtml } from '../insert-email-text-html';
 
 export interface EmailBlocksPluginOptions {
   /**
@@ -71,6 +76,10 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
     for (const block of allEmailBlocks) {
       emailBlockRegistry.register(block);
     }
+
+    ctx.services.registerInstance(TextBlockInsertServiceId, {
+      insert: insertEmailTextHtml,
+    });
 
     ctx.register(
       new SimpleServiceContribution(

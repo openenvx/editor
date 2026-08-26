@@ -1,6 +1,10 @@
 import type { RepeaterFieldConfig } from '@openenvx/core';
 
-import { Button } from '../../primitives/button';
+import {
+  PropertyList,
+  PropertyListAdd,
+  PropertyListRow,
+} from '../../primitives/property-list';
 import type { PropertyFieldRendererProps } from '../../renderers/property-field-types';
 
 import styles from '../../renderers/property-panel.module.css';
@@ -26,9 +30,9 @@ export function RepeaterInput({
 }: RepeaterInputProps) {
   const rows = Array.isArray(value) ? value : [];
   return (
-    <div className={styles.repeater}>
+    <PropertyList>
       {rows.map((row, rowIndex) => (
-        <div className={styles.repeaterRow} key={rowIndex}>
+        <PropertyListRow key={rowIndex}>
           {repeaterFields.map((sub) => (
             <div className={styles.fieldRowFull} key={sub.key}>
               <span className={styles.label}>{sub.label}</span>
@@ -58,20 +62,18 @@ export function RepeaterInput({
               })}
             </div>
           ))}
-        </div>
+        </PropertyListRow>
       ))}
-      <Button
+      <PropertyListAdd
         onClick={() =>
           onUpdate(fieldKey, [
             ...rows,
             Object.fromEntries(repeaterFields.map((f) => [f.key, ''])),
           ])
         }
-        size="sm"
-        variant="outline"
       >
         Add row
-      </Button>
-    </div>
+      </PropertyListAdd>
+    </PropertyList>
   );
 }

@@ -2,9 +2,9 @@
 
 Stable contract for building a cloud render API against OpenEnvx templates. Editor and server share `@xmazu/openenvxee-schema` helpers: `extractTemplateManifest`, `applyModifications`, and `validateTemplateNames`.
 
-Pin clients to the scene `schemaVersion` (currently `2`). When the modification shape or resolution rules change incompatibly, bump `schemaVersion` and document the delta here.
+Pin clients to the scene `schemaVersion` (currently `4`). When the modification shape or resolution rules change incompatibly, bump `schemaVersion` and document the delta here.
 
-Related implementation: [`packages/schema/src/template.ts`](../../packages/schema/src/template.ts).
+Related implementation: [`packages/core/src/schema/template.ts`](../../packages/core/src/schema/template.ts) and [`packages/core/src/schema/template-variables.ts`](../../packages/core/src/schema/template-variables.ts).
 
 ## Concepts
 
@@ -16,6 +16,19 @@ Related implementation: [`packages/schema/src/template.ts`](../../packages/schem
 | Resolved scene | Result of `applyModifications(scene, modifications)` before render/export |
 
 Names are unique per scene (across all pages and nested groups). The editor warns on duplicates via `validateTemplateNames`; the cloud API should reject requests when duplicates exist.
+
+## Inline template variables (catalog + tokens)
+
+Separate from named-layer modifications: a per-scene catalog `scene.variables` and `{{{key}}}` tokens stored in layer `data` string fields (text html, button labels, hrefs, …).
+
+| Piece | API |
+| --- | --- |
+| Catalog | `scene.variables?: { id, key, label?, sample? }[]` |
+| Substitute at render | `applyTemplateVariables(scene, values)` — HTML-escapes values; unknown keys stay as tokens |
+| Editor preview | `applyTemplateVariablesForPreview(scene)` uses each variable's `sample` |
+| Email export | `renderEmailHtml(scene, { variables?: Record<string, string> })` |
+
+Bannerbear `Modification[]` and inline tokens can coexist on the same scene.
 
 ## TemplateManifest
 

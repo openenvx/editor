@@ -52,6 +52,8 @@ export interface BlockEditorContextValue {
     file: File
   ) => void | Promise<void>;
   resolveAssetUrl: (ref: string) => string;
+  /** TipTap insert bridge for toolbar variable tokens. */
+  bindRichTextInsert?: (insert: ((text: string) => void) | null) => void;
 }
 
 const BlockEditorContext = createContext<BlockEditorContextValue | null>(null);

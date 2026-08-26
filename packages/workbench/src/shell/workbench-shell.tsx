@@ -47,6 +47,10 @@ import { StatusBarRenderer } from '../renderers/status-bar-renderer';
 import { ToolbarRenderer } from '../renderers/toolbar-renderer';
 import { TopBarRenderer } from '../renderers/top-bar-renderer';
 import {
+  DEFAULT_VARIABLES_PLUGIN_ID,
+  DefaultVariablesContainerPlugin,
+} from '../variables/default-variables-plugin';
+import {
   DEFAULT_INSPECTOR_PLUGIN_ID,
   DefaultInspectorContainerPlugin,
 } from '../views/default-inspector-plugin';
@@ -525,6 +529,9 @@ export function WorkbenchShell({
     const hasInspectorPlugin = plugins.some(
       (plugin) => plugin.id === DEFAULT_INSPECTOR_PLUGIN_ID
     );
+    const hasVariablesPlugin = plugins.some(
+      (plugin) => plugin.id === DEFAULT_VARIABLES_PLUGIN_ID
+    );
     const hasChromePlugin = plugins.some(
       (plugin) => plugin.id === DEFAULT_WORKBENCH_CHROME_PLUGIN_ID
     );
@@ -534,6 +541,9 @@ export function WorkbenchShell({
     }
     if (!hasInspectorPlugin) {
       next.unshift(new DefaultInspectorContainerPlugin());
+    }
+    if (!hasVariablesPlugin) {
+      next.unshift(new DefaultVariablesContainerPlugin());
     }
     if (!hasFieldsPlugin) {
       next.unshift(new DefaultWorkbenchFieldsPlugin());
