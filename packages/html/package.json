@@ -21,6 +21,7 @@
     "@dnd-kit/sortable": "8.0.0",
     "@openenvx/core": "workspace:*",
     "@xmazu/openenvxee-extensions": "workspace:*",
+    "@tiptap/core": "^3.27.3",
     "@tiptap/extension-color": "^3.27.3",
     "@tiptap/extension-font-family": "^3.27.3",
     "@tiptap/extension-text-align": "3.27.4",

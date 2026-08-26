@@ -1,0 +1,116 @@
+.menu {
+  position: fixed;
+  z-index: 45;
+  min-width: 220px;
+  max-width: 320px;
+  padding: var(--wb-space-1, 4px);
+  border-radius: var(--wb-radius-lg, 10px);
+  background: var(--wb-popover, #ffffff);
+  color: var(--wb-foreground, #18181b);
+  font-family: var(--wb-font-sans, Inter, system-ui, sans-serif);
+  box-shadow: var(
+    --wb-shadow-float,
+    0 8px 24px rgb(0 0 0 / 12%),
+    0 0 0 1px rgb(0 0 0 / 8%)
+  );
+}
+
+.header {
+  margin: 0;
+  padding: 6px 8px 4px;
+  color: var(--wb-muted-foreground, #71717a);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.empty {
+  margin: 0;
+  padding: 6px 8px;
+  color: var(--wb-muted-foreground, #71717a);
+  font-size: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: var(--wb-radius-control, 4px);
+}
+
+.row[data-selected] {
+  background: var(--wb-hover-overlay, rgb(0 0 0 / 6%));
+}
+
+.rowButton {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: none;
+  border-radius: var(--wb-radius-control, 4px);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.rowButton:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-focus, 0 0 0 4px #e5e5e5);
+}
+
+.token {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+
+.rowMenu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-right: 2px;
+  border: none;
+  border-radius: var(--wb-radius-control, 4px);
+  background: transparent;
+  color: var(--wb-muted-foreground, #71717a);
+  cursor: pointer;
+}
+
+.rowMenu:hover {
+  background: var(--wb-hover-overlay, rgb(0 0 0 / 6%));
+  color: var(--wb-foreground, #18181b);
+}
+
+.create {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px;
+  border: none;
+  border-radius: var(--wb-radius-control, 4px);
+  background: transparent;
+  color: var(--wb-foreground, #18181b);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.create:hover {
+  background: var(--wb-hover-overlay, rgb(0 0 0 / 6%));
+}
+
+.create:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-focus, 0 0 0 4px #e5e5e5);
+}

@@ -5,6 +5,10 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { StarterKit } from '@tiptap/starter-kit';
 
 import type { ResolvedRichTextToolbar } from './rich-text-toolbar';
+import {
+  createVariableTokenExtension,
+  type VariableTokenCatalog,
+} from './variable-token-extension';
 
 const DEFAULT_TOOLBAR: ResolvedRichTextToolbar = {
   blockType: true,
@@ -14,7 +18,8 @@ const DEFAULT_TOOLBAR: ResolvedRichTextToolbar = {
 };
 
 export function createRichTextEditorExtensions(
-  toolbar: ResolvedRichTextToolbar = DEFAULT_TOOLBAR
+  toolbar: ResolvedRichTextToolbar = DEFAULT_TOOLBAR,
+  getVariableCatalog?: () => VariableTokenCatalog
 ) {
   return [
     StarterKit.configure({
@@ -43,6 +48,9 @@ export function createRichTextEditorExtensions(
             types: ['heading', 'paragraph'],
           }),
         ]
+      : []),
+    ...(getVariableCatalog
+      ? [createVariableTokenExtension(getVariableCatalog)]
       : []),
   ];
 }

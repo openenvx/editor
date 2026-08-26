@@ -1,4 +1,5 @@
 import type { ConfirmDialogOptions } from '@openenvx/core';
+import { useId } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
@@ -14,6 +15,7 @@ export function ConfirmWorkbenchDialog({
 }: WorkbenchDialogProps<ConfirmDialogOptions>) {
   const { api } = useWorkbenchContext();
   const { t } = useWorkbenchTranslation();
+  const titleId = useId();
 
   if (!payload) {
     return null;
@@ -33,6 +35,7 @@ export function ConfirmWorkbenchDialog({
       onClose={handleCancel}
       open={open}
       title={payload.title}
+      titleId={titleId}
     >
       <p className={styles.description}>{payload.description}</p>
       <div className={styles.actions}>

@@ -115,12 +115,18 @@ export default {
   'variables.invalidKey':
     'Use letters, numbers, and underscores. Must start with a letter.',
   'variables.duplicateKey': 'A variable with this key already exists.',
-  'variables.sampleLabel': 'Sample value',
-  'variables.samplePlaceholder': 'Preview value',
+  'variables.sampleLabel': 'Fallback / sample value',
+  'variables.samplePlaceholder': 'Preview and default value',
+  'variables.missingFallbackTip':
+    'Add a fallback value to avoid empty personalization',
+  'variables.pickerTitle': 'Template variables',
   'variables.reorder': 'Reorder variable',
   'variables.rowMenu': 'Variable actions',
   'variables.rename': 'Rename',
   'variables.delete': 'Delete',
+  'variables.deleteConfirmTitle': 'Delete variable?',
+  'variables.deleteConfirmDescription':
+    'This removes the variable from the template. This cannot be undone.',
   'variables.renamePrompt': 'Variable key',
   'view.workbench.variables.panel.add': 'Create variable',
   'view.workbench.variables.panel.empty': 'No variables yet.',

@@ -4,6 +4,7 @@ import {
   Fragment,
   Suspense,
   useCallback,
+  useMemo,
   useRef,
   useState,
   type DragEvent,
@@ -12,6 +13,7 @@ import {
 
 import type { BlockRegistry } from '../block-registry';
 import { useBlockEditor } from './block-editor-context';
+import { withDisplayRichTextHtml } from './display-rich-text-html';
 import { dataTransferHasFiles, firstImageFile } from './image-file-drop';
 import { HtmlRichTextEditorLazy } from './lazy-rich-text-editor';
 import {
@@ -61,6 +63,7 @@ function SlotPartContent({
     resolveAssetUrl,
     scene,
     bindRichTextInsert,
+    variableMissingTip = '',
   } = useBlockEditor();
   const config = registry.get(part.type);
   const textBlock = isRichTextBlock(registry, part.type);
@@ -81,6 +84,16 @@ function SlotPartContent({
     imageOverride.fieldPath === imagePath;
   const replaceEnabled = Boolean(imageSelected && canReplaceImage);
   const toolbar = resolveSlotRichTextToolbar(hostId, part, scene, registry);
+  const staticDisplayData = useMemo(() => {
+    if (editing || !textBlock) {
+      return data;
+    }
+    return withDisplayRichTextHtml(
+      data,
+      scene.variables ?? [],
+      variableMissingTip
+    );
+  }, [data, editing, scene.variables, textBlock, variableMissingTip]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageDropActive, setImageDropActive] = useState(false);
 
@@ -227,7 +240,7 @@ function SlotPartContent({
             })}
           </Suspense>
         ) : (
-          config.render({ data })
+          config.render({ data: staticDisplayData })
         )}
       </div>
     );

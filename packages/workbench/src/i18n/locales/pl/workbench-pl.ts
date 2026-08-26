@@ -115,12 +115,18 @@ export default {
   'variables.invalidKey':
     'Użyj liter, cyfr i podkreślników. Musi zaczynać się od litery.',
   'variables.duplicateKey': 'Zmienna o tym kluczu już istnieje.',
-  'variables.sampleLabel': 'Wartość podglądu',
-  'variables.samplePlaceholder': 'Wartość podglądu',
+  'variables.sampleLabel': 'Wartość domyślna / podglądu',
+  'variables.samplePlaceholder': 'Wartość podglądu i domyślna',
+  'variables.missingFallbackTip':
+    'Dodaj wartość domyślną, aby uniknąć pustej personalizacji',
+  'variables.pickerTitle': 'Zmienne szablonu',
   'variables.reorder': 'Zmień kolejność zmiennej',
   'variables.rowMenu': 'Akcje zmiennej',
   'variables.rename': 'Zmień nazwę',
   'variables.delete': 'Usuń',
+  'variables.deleteConfirmTitle': 'Usunąć zmienną?',
+  'variables.deleteConfirmDescription':
+    'Spowoduje to usunięcie zmiennej z szablonu. Tej operacji nie można cofnąć.',
   'variables.renamePrompt': 'Klucz zmiennej',
   'view.workbench.variables.panel.add': 'Dodaj zmienną',
   'view.workbench.variables.panel.empty': 'Brak zmiennych.',

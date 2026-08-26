@@ -92,10 +92,15 @@ export function placeFloatingPill(
   }
 
   const span = pillHorizontalSpan(left, align, input.pillWidth);
+  // Only top-hanging chrome (toolbars above the anchor). Bottom toolbars overlap
+  // horizontally but must not push the pill down toward the viewport bottom.
+  const topObstacles = input.obstacles.filter(
+    (obstacle) => obstacle.top < input.anchor.top
+  );
   const minTop = clearanceBelowObstacles(
     span.left,
     span.right,
-    input.obstacles,
+    topObstacles,
     gap,
     topInset
   );

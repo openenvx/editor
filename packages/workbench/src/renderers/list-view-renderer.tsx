@@ -40,12 +40,14 @@ function ListRowLabel({ item }: { item: ViewTreeItem }) {
   );
 }
 
-function SortableListRow({
+function ListRow({
   item,
   onCommand,
+  reorderable,
 }: {
   item: ViewTreeItem;
   onCommand: (commandId: string, args?: Record<string, unknown>) => void;
+  reorderable: boolean;
 }) {
   const { t } = useWorkbenchTranslation();
   const rowClick = item.commandId
@@ -58,8 +60,10 @@ function SortableListRow({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: item.id });
-  const style = sortableDragStyle(transform, transition, isDragging);
+  } = useSortable({ disabled: !reorderable, id: item.id });
+  const style = reorderable
+    ? sortableDragStyle(transform, transition, isDragging)
+    : undefined;
 
   return (
     <PropertyListRow
@@ -77,49 +81,21 @@ function SortableListRow({
       dragging={isDragging}
       label={<ListRowLabel item={item} />}
       leading={
-        <button
-          aria-label={t('workbench.list.reorder')}
-          className={styles.dragHandle}
-          type="button"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical size={14} />
-        </button>
+        reorderable ? (
+          <button
+            aria-label={t('workbench.list.reorder')}
+            className={styles.dragHandle}
+            type="button"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical size={14} />
+          </button>
+        ) : undefined
       }
       onRowClick={rowClick}
-      rowRef={setNodeRef}
+      rowRef={reorderable ? setNodeRef : undefined}
       rowStyle={style}
-    />
-  );
-}
-
-function StaticListRow({
-  item,
-  onCommand,
-}: {
-  item: ViewTreeItem;
-  onCommand: (commandId: string, args?: Record<string, unknown>) => void;
-}) {
-  const rowClick = item.commandId
-    ? () => onCommand(item.commandId!, { id: item.id })
-    : undefined;
-
-  return (
-    <PropertyListRow
-      actions={item.actions?.map((action) => (
-        <IconButton
-          aria-label={action.label}
-          key={`${action.commandId}-${action.icon}`}
-          onClick={() => onCommand(action.commandId, { id: item.id })}
-          size="sm"
-        >
-          <WorkbenchIcon id={action.icon} size={14} />
-        </IconButton>
-      ))}
-      className={styles.row}
-      label={<ListRowLabel item={item} />}
-      onRowClick={rowClick}
     />
   );
 }
@@ -143,6 +119,7 @@ function ListViewBody({
   const { t } = useWorkbenchTranslation();
   const sortableIds = useMemo(() => items.map((entry) => entry.id), [items]);
   const sensors = useSortableContainerSensors();
+  const reorderable = view.supportsReorder;
 
   const handleCommand = useCallback(
     (commandId: string, args?: Record<string, unknown>) => {
@@ -175,12 +152,24 @@ function ListViewBody({
 
   const isEmpty = items.length === 0;
   const addLabel = view.addLabel ?? t('workbench.list.add');
+  const list = (
+    <PropertyList className={styles.list}>
+      {items.map((item) => (
+        <ListRow
+          item={item}
+          key={item.id}
+          onCommand={handleCommand}
+          reorderable={reorderable}
+        />
+      ))}
+    </PropertyList>
+  );
 
   return (
     <div className={styles.panel}>
       {isEmpty && view.emptyMessage ? (
         <p className={styles.empty}>{view.emptyMessage}</p>
-      ) : view.supportsReorder ? (
+      ) : reorderable ? (
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
@@ -190,27 +179,11 @@ function ListViewBody({
             items={sortableIds}
             strategy={verticalListSortingStrategy}
           >
-            <PropertyList className={styles.list}>
-              {items.map((item) => (
-                <SortableListRow
-                  item={item}
-                  key={item.id}
-                  onCommand={handleCommand}
-                />
-              ))}
-            </PropertyList>
+            {list}
           </SortableContext>
         </DndContext>
       ) : (
-        <PropertyList className={styles.list}>
-          {items.map((item) => (
-            <StaticListRow
-              item={item}
-              key={item.id}
-              onCommand={handleCommand}
-            />
-          ))}
-        </PropertyList>
+        list
       )}
       {view.addCommandId ? (
         <PropertyListAdd className={styles.add} onClick={handleAdd}>

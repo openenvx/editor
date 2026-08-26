@@ -8,6 +8,7 @@ import {
   listVariableUsages,
   rewriteVariableKeyInScene,
   validateVariableKeyForCatalog,
+  wrapVariableTokensForDisplay,
 } from './template-variables';
 
 describe('template-variables', () => {
@@ -124,5 +125,22 @@ describe('template-variables', () => {
     expect(validateVariableKeyForCatalog(variables, 'name', 'v1')).toEqual({
       ok: true,
     });
+  });
+
+  it('wrapVariableTokensForDisplay adds chip spans without mutating tokens', () => {
+    const html = '<p>Hi {{{name}}} and {{{missing}}}</p>';
+    const wrapped = wrapVariableTokensForDisplay(
+      html,
+      [
+        { id: 'v1', key: 'name', sample: 'Ada' },
+        { id: 'v2', key: 'missing' },
+      ],
+      { missingTip: 'Add fallback' }
+    );
+    expect(wrapped).toContain('class="openenvx-variable-chip">');
+    expect(wrapped).toContain('openenvx-variable-chip--missing');
+    expect(wrapped).toContain('Add fallback');
+    expect(wrapped).toContain('{{{name}}}');
+    expect(wrapped).toContain('{{{missing}}}');
   });
 });

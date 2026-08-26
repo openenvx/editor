@@ -50,6 +50,7 @@ import {
   type RichTextAlign,
 } from './rich-text-align';
 import { useHtmlPreviewChrome } from './use-html-preview-chrome';
+import { useVariableChipLabels } from './use-variable-chip-labels';
 
 import styles from './html-editor-pane.module.css';
 
@@ -86,6 +87,8 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     service.setHandler((text) => richTextInsertRef.current?.(text));
     return () => service.setHandler(null);
   }, [api]);
+
+  const { missingTip: variableMissingTip } = useVariableChipLabels();
 
   const {
     artboardHeight: _artboardHeight,
@@ -358,6 +361,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
                   scene={scene}
                   selectedId={selectedId}
                   sortDraft={sortDraft}
+                  variableMissingTip={variableMissingTip}
                 />
               ) : (
                 <p className={styles.empty}>No root block on this page.</p>

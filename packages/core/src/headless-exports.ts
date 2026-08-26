@@ -56,7 +56,6 @@ export {
 } from './workbench/workbench-navigation-service';
 export {
   DialogServiceId,
-  DialogServiceImpl,
   type DialogService,
 } from './workbench/dialog-service';
 export {

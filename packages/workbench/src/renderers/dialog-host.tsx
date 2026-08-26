@@ -1,4 +1,6 @@
+import { editorDiagnosticLog } from '@openenvx/core';
 import type { ComponentType } from 'react';
+import { useEffect } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
@@ -16,12 +18,25 @@ export function DialogHost() {
   );
   const dialogs = useWorkbenchContextSelector((state) => state.dialogs);
 
-  if (!activeDialog) {
-    return null;
-  }
+  const entry = activeDialog
+    ? (dialogs ?? []).find((dialog) => dialog.id === activeDialog.id)
+    : undefined;
 
-  const entry = (dialogs ?? []).find((dialog) => dialog.id === activeDialog.id);
-  if (!entry) {
+  useEffect(() => {
+    if (!activeDialog || entry) {
+      return;
+    }
+    editorDiagnosticLog(
+      'dialog.host',
+      'error',
+      `No dialog registered for id "${activeDialog.id}"`,
+      { id: activeDialog.id },
+      `dialog.missing:${activeDialog.id}`
+    );
+    api.closeDialog(activeDialog.id);
+  }, [activeDialog, api, entry]);
+
+  if (!activeDialog || !entry) {
     return null;
   }
 

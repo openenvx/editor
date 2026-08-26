@@ -68,4 +68,24 @@ describe('DialogHost', () => {
     screen.getByRole('button', { name: 'Close' }).click();
     expect(closeDialog).toHaveBeenCalledWith('test.dialog');
   });
+
+  it('closes when the active dialog id is not registered', async () => {
+    const closeDialog = vi.fn();
+    const { api } = createMockWorkbenchApi({
+      activeDialog: { id: 'missing.dialog', payload: { label: 'Ghost' } },
+      dialogs: [{ id: 'test.dialog', Component: TestDialog }],
+    });
+    api.closeDialog = closeDialog;
+
+    const { container } = render(
+      <WorkbenchProvider api={api}>
+        <DialogHost />
+      </WorkbenchProvider>
+    );
+
+    await vi.waitFor(() => {
+      expect(closeDialog).toHaveBeenCalledWith('missing.dialog');
+    });
+    expect(container.firstChild).toBeNull();
+  });
 });

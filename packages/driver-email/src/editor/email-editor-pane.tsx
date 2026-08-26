@@ -34,6 +34,7 @@ import {
   type BlockSortDraft,
   type HtmlDevicePreset,
   type RichTextAlign,
+  useVariableChipLabels,
 } from '@openenvx/html';
 import {
   memo,
@@ -142,6 +143,8 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     service.setHandler((text) => richTextInsertRef.current?.(text));
     return () => service.setHandler(null);
   }, [api, mode]);
+
+  const { missingTip: variableMissingTip } = useVariableChipLabels();
 
   const {
     artboardRef,
@@ -470,6 +473,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
         scene={scene}
         selectedId={selectedId}
         sortDraft={sortDraft}
+        variableMissingTip={variableMissingTip}
       />
     );
   }

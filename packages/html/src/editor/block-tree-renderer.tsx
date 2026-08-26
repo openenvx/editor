@@ -19,6 +19,7 @@ import {
   Suspense,
   useCallback,
   useEffect,
+  useMemo,
   useState,
   type HTMLAttributes,
   type KeyboardEvent,
@@ -46,6 +47,7 @@ import {
   type BlockImageTarget,
 } from './block-editor-context';
 import { childListInsertChrome, dropZoneClassName } from './child-list-chrome';
+import { withDisplayRichTextHtml } from './display-rich-text-html';
 import { HtmlRichTextEditorLazy } from './lazy-rich-text-editor';
 import {
   primaryImageFieldKey,
@@ -254,6 +256,7 @@ function BlockContentInner({
     resolveAssetUrl,
     scene,
     bindRichTextInsert,
+    variableMissingTip = '',
   } = useBlockEditor();
   const chromeHost = useBlockChromeHostProps();
   const config = registry.get(layer.type);
@@ -267,6 +270,16 @@ function BlockContentInner({
   );
   const slotNodes = buildSlotNodes(layer, registry);
   const toolbar = resolveRichTextToolbar(layer, scene, registry);
+  const staticDisplayData = useMemo(() => {
+    if (editing || !textBlock) {
+      return data;
+    }
+    return withDisplayRichTextHtml(
+      data,
+      scene.variables ?? [],
+      variableMissingTip
+    );
+  }, [data, editing, scene.variables, textBlock, variableMissingTip]);
 
   const handleEditableClick = useCallback(
     (event: MouseEvent) => {
@@ -333,13 +346,13 @@ function BlockContentInner({
         onClick={handleEditableClick}
         onKeyDown={handleEditableKeyDown}
       >
-        {config.render({ data })}
+        {config.render({ data: staticDisplayData })}
       </div>
     );
   }
 
   return config.render({
-    data,
+    data: textBlock && !editing ? staticDisplayData : data,
     children: acceptsChildren ? (
       <ContainerChildren
         insideWidget={insideWidget}
@@ -564,6 +577,7 @@ export const BlockTreeRenderer = memo(
     onReplaceImage,
     resolveAssetUrl,
     bindRichTextInsert,
+    variableMissingTip = '',
   }: {
     layers: readonly Layer[];
     registry: BlockRegistry;
@@ -591,6 +605,7 @@ export const BlockTreeRenderer = memo(
     ) => void | Promise<void>;
     resolveAssetUrl?: (ref: string) => string;
     bindRichTextInsert?: (insert: ((text: string) => void) | null) => void;
+    variableMissingTip?: string;
   }) => {
     const [imageOverride, setImageOverride] = useState<BlockImageTarget | null>(
       null
@@ -622,6 +637,7 @@ export const BlockTreeRenderer = memo(
           onReplaceImage: onReplaceImage ?? (() => {}),
           resolveAssetUrl: resolveAssetUrl ?? ((ref) => ref),
           bindRichTextInsert,
+          variableMissingTip,
         }}
       >
         {layers.map((layer) => (

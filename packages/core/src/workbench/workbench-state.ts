@@ -8,6 +8,7 @@ import type { OverlayDescriptor } from '../contributions/overlay-contribution';
 import type {
   SidebarBehavior,
   ViewContainerLocation,
+  TreeItemAction,
 } from '../contributions/view-contribution';
 import type { Plugin } from '../core/plugin';
 import type { SandboxHostSurface } from '../external-host/sandbox-host-surface';
@@ -40,11 +41,7 @@ import type { TopBarRegistration } from './top-bar-registration';
 import type { WorkbenchLayout } from './workbench-layout';
 import type { WorkbenchLayoutStore } from './workbench-layout-store';
 
-export interface ViewTreeItemAction {
-  commandId: string;
-  icon: string;
-  label: string;
-}
+export type ViewTreeItemAction = TreeItemAction;
 
 export interface ViewTreeItem {
   id: string;

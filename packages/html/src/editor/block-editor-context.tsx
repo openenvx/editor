@@ -54,6 +54,8 @@ export interface BlockEditorContextValue {
   resolveAssetUrl: (ref: string) => string;
   /** TipTap insert bridge for toolbar variable tokens. */
   bindRichTextInsert?: (insert: ((text: string) => void) | null) => void;
+  /** Tooltip for variable chips when catalog entry lacks `sample`. */
+  variableMissingTip?: string;
 }
 
 const BlockEditorContext = createContext<BlockEditorContextValue | null>(null);

@@ -1,6 +1,16 @@
+import {
+  useWorkbenchContext,
+  useWorkbenchContextSelector,
+} from '@openenvx/core/react';
 import type { Editor } from '@tiptap/react';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 
 import {
@@ -20,6 +30,16 @@ import {
 } from './rich-text-align';
 import { createRichTextEditorExtensions } from './rich-text-editor-extensions';
 import type { ResolvedRichTextToolbar } from './rich-text-toolbar';
+import { useVariableChipLabels } from './use-variable-chip-labels';
+import { VariableSuggestMenu } from './variable-suggest-menu';
+import {
+  detectVariableSuggest,
+  filterVariableSuggestions,
+  insertVariableTokenAtSuggest,
+  isRichTextBlurInsideVariableChrome,
+  type VariableSuggestAnchor,
+} from './variable-suggest-state';
+import type { VariableTokenCatalog } from './variable-token-extension';
 
 import styles from './html-editor-pane.module.css';
 
@@ -102,37 +122,135 @@ export function HtmlRichTextEditor({
   onCommit,
   bindTextInsert,
 }: HtmlRichTextEditorProps) {
+  const { executeCommand } = useWorkbenchContext();
+  const sceneVariables =
+    useWorkbenchContextSelector((state) => state.scene?.variables) ?? [];
+  const { missingTip, pickerTitle, createVariable } = useVariableChipLabels();
   const syncAlign = align !== undefined && toolbar.align;
   const menuRef = useRef<HTMLDivElement>(null);
+  const catalogRef = useRef<VariableTokenCatalog>({
+    variables: [],
+    missingTip: '',
+  });
+  const editorRef = useRef<Editor | null>(null);
+  const suggestRef = useRef<VariableSuggestAnchor | null>(null);
+  const suggestDismissedRef = useRef(false);
+  const highlightRef = useRef(0);
   const [placement, setPlacement] = useState<FloatingPillPlacement | null>(
     null
   );
+  const [suggestAnchor, setSuggestAnchor] =
+    useState<VariableSuggestAnchor | null>(null);
+  const [highlightIndex, setHighlightIndex] = useState(0);
+
+  catalogRef.current = { variables: sceneVariables, missingTip };
+
+  const filteredSuggestions = suggestAnchor
+    ? filterVariableSuggestions(sceneVariables, suggestAnchor.filter)
+    : [];
+
+  const syncSuggestFromEditor = useCallback((activeEditor: Editor) => {
+    if (suggestDismissedRef.current) {
+      setSuggestAnchor(null);
+      suggestRef.current = null;
+      return;
+    }
+    const next = detectVariableSuggest(activeEditor);
+    suggestRef.current = next;
+    setSuggestAnchor(next);
+    if (next) {
+      highlightRef.current = 0;
+      setHighlightIndex(0);
+    }
+  }, []);
+
+  const dismissSuggest = useCallback(() => {
+    suggestDismissedRef.current = true;
+    suggestRef.current = null;
+    setSuggestAnchor(null);
+  }, []);
+
+  const pickVariable = useCallback((activeEditor: Editor, key: string) => {
+    const anchor = suggestRef.current;
+    if (!anchor) {
+      return;
+    }
+    insertVariableTokenAtSuggest(activeEditor, anchor, key);
+    suggestDismissedRef.current = false;
+    suggestRef.current = null;
+    setSuggestAnchor(null);
+  }, []);
 
   const editor = useEditor({
     autofocus: false,
     content: html,
     editorProps: {
       handleKeyDown: (view, event) => {
-        if (event.key !== 'Escape') {
-          return false;
+        const suggest = suggestRef.current;
+        const suggestions = suggest
+          ? filterVariableSuggestions(
+              catalogRef.current.variables,
+              suggest.filter
+            )
+          : [];
+
+        if (suggest && suggestions.length > 0) {
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            const next = (highlightRef.current + 1) % suggestions.length;
+            highlightRef.current = next;
+            setHighlightIndex(next);
+            return true;
+          }
+          if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            const next =
+              (highlightRef.current - 1 + suggestions.length) %
+              suggestions.length;
+            highlightRef.current = next;
+            setHighlightIndex(next);
+            return true;
+          }
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            const picked = suggestions[highlightRef.current];
+            const activeEditor = editorRef.current;
+            if (picked && activeEditor) {
+              pickVariable(activeEditor, picked.key);
+            }
+            return true;
+          }
         }
-        event.preventDefault();
-        event.stopPropagation();
-        onCommit(
-          normalizeCommittedRichTextHtml(view.dom.innerHTML || html),
-          syncAlign ? textAlignFromProseMirrorDom(view.dom) : undefined
-        );
-        return true;
+
+        if (event.key === 'Escape') {
+          if (suggest) {
+            event.preventDefault();
+            event.stopPropagation();
+            dismissSuggest();
+            return true;
+          }
+          event.preventDefault();
+          event.stopPropagation();
+          onCommit(
+            normalizeCommittedRichTextHtml(view.dom.innerHTML || html),
+            syncAlign ? textAlignFromProseMirrorDom(view.dom) : undefined
+          );
+          return true;
+        }
+
+        if (event.key.length === 1 && !event.metaKey && !event.ctrlKey) {
+          suggestDismissedRef.current = false;
+        }
+
+        return false;
       },
     },
-    extensions: createRichTextEditorExtensions(toolbar),
+    extensions: createRichTextEditorExtensions(
+      toolbar,
+      () => catalogRef.current
+    ),
     onBlur: ({ editor: activeEditor, event }) => {
-      const related = event.relatedTarget;
-      if (
-        related instanceof Node &&
-        related instanceof Element &&
-        related.closest('[data-openenvx-rich-text-bubble]')
-      ) {
+      if (isRichTextBlurInsideVariableChrome(event.relatedTarget)) {
         return;
       }
       onCommit(
@@ -151,20 +269,32 @@ export function HtmlRichTextEditor({
       }
       chain.run();
     },
+    onTransaction: ({ editor: activeEditor }) => {
+      syncSuggestFromEditor(activeEditor);
+    },
   });
+
+  editorRef.current = editor;
 
   useLayoutEffect(() => {
     if (!bindTextInsert || !editor) {
       return;
     }
     const insert = (text: string) => {
+      suggestDismissedRef.current = false;
       editor.chain().focus().insertContent(text).run();
     };
     bindTextInsert(insert);
     return () => bindTextInsert(null);
   }, [bindTextInsert, editor]);
 
-  // Re-run placement when the selection/doc changes.
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+    syncSuggestFromEditor(editor);
+  }, [editor, syncSuggestFromEditor]);
+
   const selectionEpoch = useEditorState({
     editor,
     selector: ({ editor: active }) =>
@@ -181,6 +311,13 @@ export function HtmlRichTextEditor({
 
     const updatePosition = () => {
       setPlacement(placeRichTextBubble(editor, menuRef.current));
+      if (suggestRef.current) {
+        const next = detectVariableSuggest(editor);
+        if (next) {
+          suggestRef.current = next;
+          setSuggestAnchor(next);
+        }
+      }
     };
 
     const editorDom = readEditorDom(editor);
@@ -216,6 +353,29 @@ export function HtmlRichTextEditor({
     };
   }, [editor, selectionEpoch]);
 
+  const handlePick = useCallback(
+    (key: string) => {
+      if (!editor) {
+        return;
+      }
+      pickVariable(editor, key);
+    },
+    [editor, pickVariable]
+  );
+
+  const handleCreate = useCallback(() => {
+    dismissSuggest();
+    void executeCommand('workbench.createVariable');
+  }, [dismissSuggest, executeCommand]);
+
+  const handleEdit = useCallback(
+    (id: string) => {
+      dismissSuggest();
+      void executeCommand('workbench.editVariable', { id });
+    },
+    [dismissSuggest, executeCommand]
+  );
+
   if (!editor) {
     return null;
   }
@@ -231,6 +391,7 @@ export function HtmlRichTextEditor({
               ref={menuRef}
               className={styles.bubbleMenuPortal}
               data-align={placement.align}
+              data-openenvx-rich-text-bubble=""
               style={{ top: placement.top, left: placement.left }}
             >
               <HtmlRichTextBubbleMenuToolbar
@@ -238,6 +399,25 @@ export function HtmlRichTextEditor({
                 toolbar={toolbar}
               />
             </div>,
+            document.body
+          )
+        : null}
+      {suggestAnchor
+        ? createPortal(
+            <VariableSuggestMenu
+              anchor={suggestAnchor}
+              createLabel={createVariable}
+              highlightedIndex={highlightIndex}
+              title={pickerTitle}
+              variables={filteredSuggestions}
+              onCreate={handleCreate}
+              onEdit={handleEdit}
+              onHighlight={(index) => {
+                highlightRef.current = index;
+                setHighlightIndex(index);
+              }}
+              onPick={handlePick}
+            />,
             document.body
           )
         : null}

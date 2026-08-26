@@ -1,13 +1,31 @@
+import type { WorkbenchApi } from '@openenvx/core';
 import type { Editor } from '@tiptap/react';
-import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import {
+  createHtmlWorkbench,
+  renderWithWorkbench,
+} from '../test/html-editor-harness';
 import {
   HtmlRichTextEditor,
   shouldShowRichTextBubbleMenu,
 } from './html-rich-text-editor';
 
 afterEach(cleanup);
+
+let api: WorkbenchApi;
+let dispose: () => void;
+
+beforeEach(async () => {
+  const harness = await createHtmlWorkbench();
+  api = harness.api;
+  dispose = harness.dispose;
+});
+
+afterEach(() => {
+  dispose();
+});
 
 function mockEditor(args: {
   empty?: boolean;
@@ -59,7 +77,10 @@ describe('shouldShowRichTextBubbleMenu', () => {
 describe('HtmlRichTextEditor', () => {
   it('commits HTML on blur', async () => {
     const onCommit = vi.fn();
-    render(<HtmlRichTextEditor html="<p>Hello</p>" onCommit={onCommit} />);
+    renderWithWorkbench(
+      api,
+      <HtmlRichTextEditor html="<p>Hello</p>" onCommit={onCommit} />
+    );
 
     await waitFor(() => {
       expect(
@@ -79,7 +100,10 @@ describe('HtmlRichTextEditor', () => {
 
   it('commits on Escape', async () => {
     const onCommit = vi.fn();
-    render(<HtmlRichTextEditor html="<p>Hello</p>" onCommit={onCommit} />);
+    renderWithWorkbench(
+      api,
+      <HtmlRichTextEditor html="<p>Hello</p>" onCommit={onCommit} />
+    );
 
     await waitFor(() => {
       expect(document.querySelector('[contenteditable="true"]')).toBeTruthy();
@@ -97,7 +121,8 @@ describe('HtmlRichTextEditor', () => {
 
   it('seeds block align into TipTap and commits it back', async () => {
     const onCommit = vi.fn();
-    render(
+    renderWithWorkbench(
+      api,
       <HtmlRichTextEditor
         align="center"
         html="Our new article"

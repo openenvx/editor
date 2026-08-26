@@ -113,6 +113,7 @@ export {
   type ActivitySidebarProps,
 } from './layout/activity-sidebar';
 export { ConfirmDialog } from './primitives/confirm-dialog';
+export { DialogHost, type WorkbenchDialogProps } from './renderers/dialog-host';
 export {
   Sheet,
   SheetClose,

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import { useEffect } from 'react';
 
 import { usePresence } from '../hooks/use-presence';
@@ -15,6 +15,8 @@ export interface ModalDialogProps {
   children: ReactNode;
   footer?: ReactNode;
   contentClassName?: string;
+  /** Extra attributes on the dialog surface (e.g. editor blur-guard markers). */
+  dialogProps?: HTMLAttributes<HTMLDivElement>;
 }
 
 export function ModalDialog({
@@ -25,6 +27,7 @@ export function ModalDialog({
   children,
   footer,
   contentClassName,
+  dialogProps,
 }: ModalDialogProps) {
   const { present, state } = usePresence(open);
 
@@ -65,6 +68,7 @@ export function ModalDialog({
         className={cn(styles.dialog, overlaySurface.surface, contentClassName)}
         data-state={state}
         role="dialog"
+        {...dialogProps}
       >
         <h3 className={styles.title} id={titleId}>
           {title}

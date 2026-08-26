@@ -4,7 +4,14 @@ import {
   validateVariableKeyForCatalog,
   type TemplateVariable,
 } from '@openenvx/core/schema';
-import { memo, useCallback, useEffect, useId, useState } from 'react';
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useId,
+  useState,
+  type HTMLAttributes,
+} from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
@@ -25,7 +32,7 @@ export type VariableEditPayload =
 
 export const VariableEditDialog = memo(
   ({ open, payload, onClose }: WorkbenchDialogProps<VariableEditPayload>) => {
-    const { executeCommand } = useWorkbenchContext();
+    const { api, executeCommand } = useWorkbenchContext();
     const scene = useWorkbenchContextSelector((state) => state.scene);
     const { t } = useWorkbenchTranslation();
     const titleId = useId();
@@ -97,13 +104,22 @@ export const VariableEditDialog = memo(
       t,
     ]);
 
-    const handleDelete = useCallback(() => {
+    const handleDelete = useCallback(async () => {
       if (payload?.mode !== 'edit') {
+        return;
+      }
+      const ok = await api.showConfirm({
+        cancelLabel: t('confirm.cancel'),
+        confirmLabel: t('variables.delete'),
+        description: t('variables.deleteConfirmDescription'),
+        title: t('variables.deleteConfirmTitle'),
+      });
+      if (!ok) {
         return;
       }
       void executeCommand('scene.removeVariable', { id: payload.variable.id });
       onClose();
-    }, [executeCommand, onClose, payload]);
+    }, [api, executeCommand, onClose, payload, t]);
 
     if (!payload) {
       return null;
@@ -117,6 +133,11 @@ export const VariableEditDialog = memo(
     return (
       <ModalDialog
         contentClassName={styles.dialog}
+        dialogProps={
+          {
+            'data-openenvx-variable-dialog': '',
+          } as HTMLAttributes<HTMLDivElement>
+        }
         onClose={onClose}
         open={open}
         title={title}

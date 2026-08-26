@@ -106,4 +106,23 @@ describe('placeFloatingPill', () => {
       left: 200,
     });
   });
+
+  it('ignores bottom toolbars that overlap horizontally', () => {
+    const bottomToolbar: Box = { top: 720, left: 400, bottom: 760, right: 800 };
+    const placement = placeFloatingPill({
+      anchor: { top: 200, left: 100, bottom: 240, right: 300 },
+      align: 'top-center',
+      pillWidth: 200,
+      pillHeight: 40,
+      viewport: VIEWPORT,
+      obstacles: [bottomToolbar],
+      outlinePad: 0,
+    });
+    expect(placement).toEqual({
+      kind: 'placed',
+      align: 'top-center',
+      top: 200 - FLOATING_PILL_GAP_PX,
+      left: 200,
+    });
+  });
 });

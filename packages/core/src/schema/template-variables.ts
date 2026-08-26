@@ -11,7 +11,8 @@ import { escapeHtml } from './template';
 import type { Layer, Scene, TemplateVariable } from './types';
 
 const VARIABLE_KEY_PATTERN = /^[A-Za-z][A-Za-z0-9_]*$/;
-const TOKEN_CAPTURE_RE = /\{\{\{([A-Za-z][A-Za-z0-9_]*)\}\}\}/g;
+export const VARIABLE_TOKEN_CAPTURE_RE = /\{\{\{([A-Za-z][A-Za-z0-9_]*)\}\}\}/g;
+const TOKEN_CAPTURE_RE = VARIABLE_TOKEN_CAPTURE_RE;
 
 export function isValidVariableKey(key: string): boolean {
   return VARIABLE_KEY_PATTERN.test(key);
@@ -340,6 +341,63 @@ export function nextVariableKey(variables: TemplateVariable[]): string {
     index += 1;
   }
   return `${base}${index}`;
+}
+
+/** True when the variable has a non-empty preview/fallback `sample`. */
+export function variableHasFallback(variable: TemplateVariable): boolean {
+  return (variable.sample?.trim() ?? '') !== '';
+}
+
+/** Global class names for editor-only variable chips (not persisted in scene HTML). */
+export const VARIABLE_CHIP_CLASS = 'openenvx-variable-chip';
+export const VARIABLE_CHIP_MISSING_CLASS = 'openenvx-variable-chip--missing';
+export const VARIABLE_CHIP_TIP_CLASS = 'openenvx-variable-chip-tip';
+
+export interface WrapVariableTokensOptions {
+  /** Tooltip shown on hover when fallback is missing or key is unknown. */
+  missingTip?: string;
+}
+
+export interface VariableChipPresentation {
+  className: string;
+  title?: string;
+}
+
+/** Editor chip classes/title for a token key (static HTML + TipTap decorations). */
+export function resolveVariableChipPresentation(
+  key: string,
+  variables: TemplateVariable[],
+  missingTip = ''
+): VariableChipPresentation {
+  const variable = variables.find((entry) => entry.key === key);
+  const hasFallback = variable ? variableHasFallback(variable) : false;
+  if (hasFallback) {
+    return { className: VARIABLE_CHIP_CLASS };
+  }
+  return {
+    className: `${VARIABLE_CHIP_CLASS} ${VARIABLE_CHIP_MISSING_CLASS}`,
+    title: missingTip || undefined,
+  };
+}
+
+/** Wrap `{{{key}}}` tokens in display-only chip spans. Does not mutate stored HTML. */
+export function wrapVariableTokensForDisplay(
+  html: string,
+  variables: TemplateVariable[],
+  options: WrapVariableTokensOptions = {}
+): string {
+  if (!html.includes('{{{')) {
+    return html;
+  }
+  const missingTip = options.missingTip ?? '';
+  return html.replace(TOKEN_CAPTURE_RE, (match, key: string) => {
+    const chip = resolveVariableChipPresentation(key, variables, missingTip);
+    if (!chip.title) {
+      return `<span class="${chip.className}">${match}</span>`;
+    }
+    const tip = `<span class="${VARIABLE_CHIP_TIP_CLASS}">${escapeHtml(chip.title)}</span>`;
+    return `<span class="${chip.className}">${match}${tip}</span>`;
+  });
 }
 
 /** Primary inline-text field for variable insertion by layer type. */
