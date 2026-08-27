@@ -186,7 +186,7 @@
         "!src/**/*.test.tsx"
       ]
     },
-    "packages/email": {
+    "packages/email-studio": {
       "entry": [
         "src/index.ts!",
         "src/runtime.ts!",
@@ -247,10 +247,46 @@
     },
     "packages/canvas-studio": {
       "entry": [
-        "src/index.ts!"
+        "src/index.ts!",
+        "src/runtime.ts!",
+        "tsup.config.ts!",
+        "build-dts.ts!",
+        "verify-pack.ts!"
       ],
       "project": [
-        "src/**/*.{ts,tsx}"
+        "src/**/*.{ts,tsx}",
+        "tsup.config.ts",
+        "build-dts.ts",
+        "verify-pack.ts"
+      ],
+      "ignoreDependencies": [
+        "@dnd-kit/core",
+        "@dnd-kit/sortable",
+        "@dnd-kit/utilities",
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-dropdown-menu",
+        "@radix-ui/react-popover",
+        "@radix-ui/react-select",
+        "@radix-ui/react-slot",
+        "@radix-ui/react-tabs",
+        "@radix-ui/react-tooltip",
+        "@tanstack/react-virtual",
+        "@tiptap/extension-color",
+        "@tiptap/extension-font-family",
+        "@tiptap/extension-text-style",
+        "@tiptap/pm",
+        "@tiptap/react",
+        "@tiptap/starter-kit",
+        "clsx",
+        "cmdk",
+        "i18next",
+        "konva",
+        "lucide-react",
+        "react-colorful",
+        "react-i18next",
+        "react-konva",
+        "zod",
+        "@xmazu/openenvxee-extensions"
       ]
     },
     "apps/demo-playground": {

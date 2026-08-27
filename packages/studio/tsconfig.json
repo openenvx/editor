@@ -12,7 +12,6 @@
       "@openenvx/core/schema": ["../core/src/schema/index.ts"],
       "@openenvx/core/preview": ["../core/src/preview/index.ts"],
       "@openenvx/canvas": ["../canvas/src/index.ts"],
-      "@openenvx/canvas-studio": ["../canvas-studio/src/index.ts"],
       "@openenvx/agent": ["../agent/src/index.ts"],
       "@openenvx/workbench": ["../workbench/src/index.ts"]
     }

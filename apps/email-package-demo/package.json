@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "(cd ../../packages/email && bun run build) && tsc --noEmit && vite build",
+    "build": "(cd ../../packages/email-studio && bun run build) && tsc --noEmit && vite build",
     "test": "vitest run --passWithNoTests",
     "preview": "vite preview",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@openenvx/email": "workspace:*",
+    "@openenvx/email-studio": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },

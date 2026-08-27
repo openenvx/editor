@@ -3,12 +3,12 @@ import path from 'node:path';
 
 import { $ } from 'bun';
 
-const emailRoot = import.meta.dirname;
-const distRoot = path.join(emailRoot, 'dist');
+const canvasStudioRoot = import.meta.dirname;
+const distRoot = path.join(canvasStudioRoot, 'dist');
 
 const LEAKED_TYPE =
-  /CanvasRect|LAYER_WRITE_MODES|WorkbenchShell|createEmailDemoScene|TemplatePolicy|PluginLayer/;
-const INTERNAL_PATH = /package\/dist\/(workbench|html|driver-email|theme)\//;
+  /CanvasRect|LAYER_WRITE_MODES|WorkbenchShell|createCanvasDemoScene|TemplatePolicy|PluginLayer|Konva/;
+const INTERNAL_PATH = /package\/dist\/(workbench|canvas|theme)\//;
 
 function fail(message: string): never {
   console.error(`ERROR: ${message}`);
@@ -18,6 +18,7 @@ function fail(message: string): never {
 const indexJs = await readFile(path.join(distRoot, 'index.js'), 'utf-8');
 const runtimeJs = await readFile(path.join(distRoot, 'runtime.js'), 'utf-8');
 const indexCss = await readFile(path.join(distRoot, 'index.css'), 'utf-8');
+const fontsCss = await readFile(path.join(distRoot, 'fonts.css'), 'utf-8');
 const indexDts = await readFile(path.join(distRoot, 'index.d.ts'), 'utf-8');
 const runtimeDts = await readFile(path.join(distRoot, 'runtime.d.ts'), 'utf-8');
 
@@ -33,29 +34,16 @@ if (runtimeJs.split('\n').length > 200) {
 if (indexJs.includes('.module.css')) {
   fail('dist/index.js still imports CSS modules — they must be compiled');
 }
-if (!indexCss.includes('ProseMirror') || !indexCss.includes('cm-editor')) {
-  fail(
-    'dist/index.css missing compiled :global selectors (ProseMirror / cm-editor)'
-  );
+if (!indexCss.includes('.root') && !indexCss.includes('openenvx')) {
+  fail('dist/index.css missing compiled workbench tokens');
 }
 if (indexCss.includes(':global(')) {
   fail(
     'dist/index.css still contains :global() — CSS modules must be compiled'
   );
 }
-if ((indexCss.match(/\.root\{/g) ?? []).length > 2) {
-  fail('CSS modules were not hashed — colliding .root rules break the shell');
-}
-if (!/root:"e_/.test(indexJs)) {
-  fail('CSS module maps missing from JS — shell class names would be empty');
-}
-if (
-  /topBar:"(e_[^"]+)"[^}]*root:"\1"/.test(indexJs) ||
-  /root:"(e_[^"]+)"[^}]*topBar:"\1"/.test(indexJs)
-) {
-  fail(
-    'CSS module hashes collide within a file — pattern must include [local]'
-  );
+if (fontsCss.trim().length === 0) {
+  fail('dist/fonts.css is empty');
 }
 if (indexDts.split('\n').length > 80 || runtimeDts.split('\n').length > 40) {
   fail('public .d.ts is too large — do not inline the internal schema');
@@ -64,8 +52,8 @@ if (LEAKED_TYPE.test(indexDts) || LEAKED_TYPE.test(runtimeDts)) {
   fail('public .d.ts leaks internal types');
 }
 
-await $`bun pm pack --ignore-scripts`.cwd(emailRoot);
-const packed = await readdir(emailRoot);
+await $`bun pm pack --ignore-scripts`.cwd(canvasStudioRoot);
+const packed = await readdir(canvasStudioRoot);
 const tgz = packed
   .filter((name) => name.endsWith('.tgz'))
   .toSorted()
@@ -74,7 +62,7 @@ if (!tgz) {
   fail('bun pm pack did not produce a tarball');
 }
 
-const tgzPath = path.join(emailRoot, tgz);
+const tgzPath = path.join(canvasStudioRoot, tgz);
 const listing = await $`tar -tzf ${tgzPath}`.text();
 const pkgJson = await $`tar -xOf ${tgzPath} package/package.json`.text();
 await rm(tgzPath);
@@ -83,14 +71,13 @@ if (listing.split('\n').some((line) => line.endsWith('.map'))) {
   fail('release tarball must not include sourcemaps');
 }
 if (INTERNAL_PATH.test(listing)) {
-  fail(
-    'release tarball must not include workbench/html/driver-email CSS trees'
-  );
+  fail('release tarball must not include workbench/canvas CSS trees');
 }
 for (const required of [
   'package/dist/index.js',
   'package/dist/runtime.js',
   'package/dist/index.css',
+  'package/dist/fonts.css',
   'package/dist/index.d.ts',
   'package/dist/runtime.d.ts',
 ]) {
@@ -113,6 +100,9 @@ if (!def?.includes('dist/')) {
 if (!pkg.exports?.['./theme.css']) {
   fail('missing ./theme.css export');
 }
+if (!pkg.exports?.['./fonts.css']) {
+  fail('missing ./fonts.css export');
+}
 if (!pkg.exports?.['./runtime']) {
   fail('missing ./runtime export');
 }
@@ -122,7 +112,7 @@ if (!pkg.files?.includes('dist')) {
 const deps = pkg.dependencies ?? {};
 const bad = Object.entries(deps).filter(
   ([key, value]) =>
-    (key.startsWith('@openenvx/') && key !== '@openenvx/email') ||
+    (key.startsWith('@openenvx/') && key !== '@openenvx/canvas-studio') ||
     value.startsWith('workspace:') ||
     value.startsWith('catalog:')
 );
@@ -130,4 +120,4 @@ if (bad.length > 0) {
   fail(`bad runtime deps: ${JSON.stringify(Object.fromEntries(bad))}`);
 }
 
-console.log(`email pack ok (${tgz}), default export: ${def}`);
+console.log(`canvas-studio pack ok (${tgz}), default export: ${def}`);

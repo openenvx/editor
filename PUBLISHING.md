@@ -8,9 +8,10 @@ Packages that leave this monorepo:
 | --- | --- | --- |
 | `@xmazu/openenvxee-extensions` | GitHub npm (`npm.pkg.github.com`, restricted) | Author SDK: `./protocol`, element subpaths, `defineExtension`, Vite |
 | `@xmazu/openenvxee-html-studio` | GitHub npm (`npm.pkg.github.com`, restricted) | Per-module `dist/` ESM tree — curated HTML host API + `./runtime` |
-| `@openenvx/email` | npmjs (`registry.npmjs.org`, public) | Minified `dist/` ESM + one CSS file — `EmailEditor` + `./runtime` (`renderEmailHtml`) + `./theme.css`. No source maps; public `.d.ts` is a narrow surface. |
+| `@openenvx/email-studio` | npmjs (`registry.npmjs.org`, public) | Minified `dist/` ESM + one CSS file — `EmailEditor` + `./runtime` (`renderEmailHtml`) + `./theme.css`. No source maps; public `.d.ts` is a narrow surface. |
+| `@openenvx/canvas-studio` | npmjs (`registry.npmjs.org`, public) | Minified `dist/` ESM + CSS — `CanvasEditor` + `./runtime` (`createCanvasScene`) + `./theme.css` + `./fonts.css`. No source maps; narrow `.d.ts`. |
 
-Scene model, preview descriptors, and editor runtime live in **private** `@openenvx/core` (`./schema`, `./preview`, `.`, `./react`). They are **not** published separately. Canvas hosts use private `@openenvx/canvas-studio` in the monorepo (`packages/studio` is an unpublished build artifact only).
+Scene model, preview descriptors, and editor runtime live in **private** `@openenvx/core` (`./schema`, `./preview`, `.`, `./react`). They are **not** published separately. Monorepo canvas hosts use `@openenvx/canvas` + `@openenvx/workbench` (HMR). Product host allowlists live on unpublished `@xmazu/openenvxee-studio` (`packages/studio`).
 
 Export Worker lives in **openenvx-cloud** (`apps/export-service`), not this repo.
 
@@ -18,7 +19,7 @@ Everything else stays workspace-private and resolves from `src/` during local de
 
 **Hard rule:** published packages must **never** ship an `exports` `development` condition pointing at `src/`. Vite resolves `development` in product apps; published tarballs are `files: ["dist"]` only — that condition breaks consumers. Exports are `types` + `bun` / `import` / `default` → `dist/`.
 
-Root scripts: `publish-packages`, `publish-package:extensions`, `publish-package:html-studio`, `publish-package:email`, `verify-pack`.
+Root scripts: `publish-packages`, `publish-package:extensions`, `publish-package:html-studio`, `publish-package:email-studio`, `publish-package:canvas-studio`, `verify-pack`.
 
 ## `@xmazu/openenvxee-extensions`
 
@@ -52,7 +53,7 @@ bun add @xmazu/openenvxee-html-studio
 
 Owner publishes — agents must not. Product hosts own their blocks/plugins.
 
-## `@openenvx/email`
+## `@openenvx/email-studio`
 
 Published email editor for open-source hosts. Inlines private `@openenvx/core`, `@openenvx/html`, `@openenvx/driver-email`, and `@openenvx/workbench` (MIT, unpublished) into minified ESM:
 
@@ -67,7 +68,26 @@ Third-party UI deps stay external. No plugin/command/sandbox surface.
 Listed in root [`release.config.json`](release.config.json).
 
 ```bash
-npm install @openenvx/email
+npm install @openenvx/email-studio
+```
+
+Owner publishes to npm — agents must not.
+
+## `@openenvx/canvas-studio`
+
+Published canvas editor for open-source hosts. Inlines private `@openenvx/core`, `@openenvx/canvas`, and `@openenvx/workbench` into minified ESM:
+
+- `.` — `CanvasEditor` (`dist/index.js`, `"use client"`) + `dist/index.css`
+- `./runtime` — `createCanvasScene` (no shell / Konva / CSS)
+- `./theme.css` — same file as `dist/index.css`
+- `./fonts.css` — canvas font catalog (hosts must allow Google Fonts in CSP)
+
+Narrow public `.d.ts` (`CanvasEditor`, opaque `Scene`, scene factory). No raster/PDF export — use cloud export-service or your host pipeline.
+
+Listed in root [`release.config.json`](release.config.json).
+
+```bash
+npm install @openenvx/canvas-studio
 ```
 
 Owner publishes to npm — agents must not.

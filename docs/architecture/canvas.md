@@ -37,7 +37,7 @@ App shell (or studio) provides:
 1. `WorkbenchProvider` / `WorkbenchShell`
 2. `CanvasHostProvider` around the editor region
 3. Editor pane that mounts `CanvasEditor` for `page.layout === 'absolute'` (registered by `CanvasPlugin`)
-4. Plugins: `CanvasPlugin` (or `DEFAULT_STUDIO_PLUGINS` from canvas-studio); optional `CanvasTemplatePlugin`, agent, product plugins
+4. Plugins: `CanvasPlugin` (or `DEFAULT_STUDIO_PLUGINS` from `@xmazu/openenvxee-studio`); optional `CanvasTemplatePlugin`, agent, product plugins
 
 See `apps/canvas-demo` / `apps/demo-playground` and [studio-and-products.md](studio-and-products.md).
 

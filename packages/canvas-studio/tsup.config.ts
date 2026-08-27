@@ -1,14 +1,16 @@
 import { readFileSync } from 'node:fs';
-import { readFile, writeFile } from 'node:fs/promises';
+import { copyFile, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
+import type { Plugin } from 'esbuild';
 import { defineConfig } from 'tsup';
 
 const require = createRequire(import.meta.url);
 const { bundle } = require('lightningcss') as typeof import('lightningcss');
 
 const packageRoot = import.meta.dirname;
+const packagesRoot = path.resolve(packageRoot, '..');
 const distRoot = path.join(packageRoot, 'dist');
 const pkg = JSON.parse(
   readFileSync(path.join(packageRoot, 'package.json'), 'utf-8')
@@ -28,13 +30,7 @@ function compiledCss(): string {
     .join('');
 }
 
-/**
- * tsup's postcss plugin onLoad-handles every path ending in `.css` first,
- * including other namespaces, and returns `loader: "css"` — so CSS module
- * imports compile to `{}` and class names collide. Resolve to a non-`.css`
- * path so lightningcss can hash locals and emit real JS maps.
- */
-function compileCssModules() {
+function compileCssModules(): Plugin {
   return {
     name: 'compile-css-modules',
     setup(build) {
@@ -95,13 +91,9 @@ export default defineConfig({
   clean: true,
   outDir: 'dist',
   tsconfig: 'tsconfig.build.json',
-  noExternal: [
-    /^@openenvx\//,
-    /^@xmazu\/openenvxee-/,
-    ...Object.keys(pkg.dependencies),
-  ],
-  // Keep only React peer deps external so Vite loads one prebuilt chunk, not 40+ packages.
+  noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/],
   external: [
+    ...Object.keys(pkg.dependencies),
     ...Object.keys(pkg.peerDependencies),
     'react/jsx-runtime',
     'react-dom/client',
@@ -109,6 +101,7 @@ export default defineConfig({
   esbuildPlugins: [compileCssModules()],
   esbuildOptions(options) {
     options.legalComments = 'none';
+    options.platform = 'browser';
     if (withSourcemap) {
       options.sourcesContent = true;
     }
@@ -116,9 +109,13 @@ export default defineConfig({
   async onSuccess() {
     const css = compiledCss();
     if (css.trim().length === 0) {
-      throw new Error('email publish build produced no CSS');
+      throw new Error('canvas-studio publish build produced no CSS');
     }
     await writeFile(path.join(distRoot, 'index.css'), css);
+    await copyFile(
+      path.join(packagesRoot, 'canvas/src/fonts/fonts.css'),
+      path.join(distRoot, 'fonts.css')
+    );
 
     const indexJsPath = path.join(distRoot, 'index.js');
     const indexJs = await readFile(indexJsPath, 'utf-8');

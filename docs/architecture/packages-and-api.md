@@ -28,7 +28,7 @@ extensions (protocol subpath)
         │
         ├── canvas / html / driver-email / agent
         ▼
-   workbench (React shell) ◄── canvas-studio / html-studio (fat re-exports)
+   workbench (React shell) ◄── studio / html-studio (fat re-exports)
 ```
 
 Hard rules:
@@ -43,9 +43,10 @@ Hard rules:
 
 | Consumer | Prefer importing |
 | --- | --- |
-| Canvas product host (dashboard, embed) | `@openenvx/canvas-studio` (monorepo; `packages/studio` is private) |
+| Canvas product host (dashboard, embed) | `@xmazu/openenvxee-studio` (proprietary allowlist) or `@openenvx/canvas` + `@openenvx/workbench` (monorepo HMR) |
 | HTML product host | `@xmazu/openenvxee-html-studio` (published) or `@openenvx/html-studio` (monorepo) |
-| Email product host | `@openenvx/email` (published) or `@openenvx/driver-email` + `@openenvx/workbench` (monorepo) |
+| Email product host | `@openenvx/email-studio` (published) or `@openenvx/driver-email` + `@openenvx/workbench` (monorepo) |
+| OSS canvas drop-in | `@openenvx/canvas-studio` (published) |
 | Custom shell / playground | `@openenvx/core` (+ canvas or html) |
 | In-repo **internal** plugin author | `@openenvx/core` — [extensions-host-guide.md](extensions-host-guide.md) |
 | **Sandbox** widget / plugin author | `@xmazu/openenvxee-extensions` — [extensions-sandbox-guide.md](extensions-sandbox-guide.md) |
@@ -62,10 +63,11 @@ Hard rules:
 | `@openenvx/driver-email` | private | Email blocks (React-Email), `EmailBlocksPlugin`, `renderEmailDocument`, `renderEmailHtml` | `.`, `./runtime` |
 | `@openenvx/workbench` | private | `WorkbenchShell`, field renderers, sandbox host | `.`, `./theme.css` |
 | `@openenvx/agent` | private | Agent chat sidebar plugin | `.`, `./schemas` |
-| `@openenvx/canvas-studio` | private | Curated canvas host API (workspace TS, not bundled) | `.`, `./theme.css`, `./fonts.css` |
+| `@openenvx/canvas-studio` | yes (public, npmjs) | Minified canvas editor (`CanvasEditor`, scene factory) | `.`, `./runtime`, `./theme.css`, `./fonts.css` |
 | `@openenvx/html-studio` | private | Fat HTML product re-exports + `DEFAULT_HTML_STUDIO_PLUGINS` | `.`, `./theme.css` |
+| `@xmazu/openenvxee-studio` | private | Canvas host allowlist (`WorkbenchShell`, sandbox factory) | `.`, `./theme.css`, `./fonts.css` |
 | `@xmazu/openenvxee-html-studio` | yes (restricted, GH Packages) | Per-module publish of html-studio + inlined stack | `.`, `./runtime`, `./theme.css` |
-| `@openenvx/email` | yes (public, npmjs) | Minified email editor (`EmailEditor`, scene + HTML export) | `.`, `./runtime`, `./theme.css` |
+| `@openenvx/email-studio` | yes (public, npmjs) | Minified email editor (`EmailEditor`, scene + HTML export) | `.`, `./runtime`, `./theme.css` |
 
 Private packages resolve from TypeScript `src/` in the workspace (HMR). Published packages ship `dist/` — see [PUBLISHING.md](../../PUBLISHING.md).
 
@@ -79,7 +81,9 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@xmazu/openenvxee-html-studio`** — published HTML host surface (inlines private core/html/workbench). Subpaths: `.`, `./runtime`, `./theme.css`.
 
-**`@openenvx/email`** — published email editor. Subpaths: `.`, `./runtime`, `./theme.css`. Exports: `EmailEditor`, `EmailEditorProps`, `createEmailScene`, `renderEmailHtml`, `RenderEmailHtmlOptions`, `Scene` (opaque JSON for persistence — not the internal schema). Headless HTML export: `@openenvx/email/runtime`. Published `.d.ts` is handwritten and must stay narrow.
+**`@openenvx/email-studio`** — published email editor. Subpaths: `.`, `./runtime`, `./theme.css`. Exports: `EmailEditor`, `EmailEditorProps`, `createEmailScene`, `renderEmailHtml`, `RenderEmailHtmlOptions`, `Scene` (opaque JSON for persistence — not the internal schema). Headless HTML export: `@openenvx/email-studio/runtime`. Published `.d.ts` is handwritten and must stay narrow.
+
+**`@openenvx/canvas-studio`** — published canvas editor. Subpaths: `.`, `./runtime`, `./theme.css`, `./fonts.css`. Exports: `CanvasEditor`, `CanvasEditorProps`, `createCanvasScene`, `Scene` (opaque JSON). Headless scene factory: `@openenvx/canvas-studio/runtime`. No raster export.
 
 ### Editor backbone (private)
 
@@ -97,11 +101,7 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@openenvx/workbench`** — `WorkbenchShell`, default chrome/fields/inspector plugins, theme/i18n, `SandboxExtensionHost`, layout helpers.
 
-Canvas-studio re-exports a **fixed allowlist** of workbench symbols — not the entire workbench barrel. See [`packages/canvas-studio/src/index.ts`](../../packages/canvas-studio/src/index.ts).
-
-### Product fat bundles
-
-**`@openenvx/canvas-studio`** — curated host allowlist (`WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, layout/property helpers, sandbox/embed, theme CSS). Workspace TypeScript via `workspace:*` — monorepo hosts use this.
+**`@xmazu/openenvxee-studio`** — curated canvas host allowlist (`WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, layout/property helpers, sandbox/embed, theme CSS). Source: `packages/studio/src/index.ts`.
 
 **`@openenvx/html-studio`** — private HTML fat package (`export *` core/html + selective workbench + `DEFAULT_HTML_STUDIO_PLUGINS`).
 
@@ -122,8 +122,8 @@ Packages are pre-1.0: breaking changes are allowed and preferred over shims ([AG
 
 | Surface | Stability expectation |
 | --- | --- |
-| **Published** (`extensions`, `openenvxee-html-studio`, `@openenvx/email`) | Treat as the external contract. Prefer additive changes. Document removals/renames in the PR / changeset. Bump version on every publish. |
-| **Studio host allowlist** (`packages/canvas-studio/src/index.ts`) | Host apps depend on this list. Adding is fine; removing/renaming is a host break — update openenvx-cloud / embed hosts in the same change window. |
+| **Published** (`extensions`, `openenvxee-html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) | Treat as the external contract. Prefer additive changes. Document removals/renames in the PR / changeset. Bump version on every publish. |
+| **Studio host allowlist** (`packages/studio/src/index.ts`) | Host apps depend on this list. Adding is fine; removing/renaming is a host break — update openenvx-cloud / embed hosts in the same change window. |
 | **Private workspace libs** (`core`, `canvas`, …) | Free to break inside the monorepo in one PR (update all callers). Do **not** add deprecated dual paths. |
 | **Contribution class hierarchy** (`Plugin`, `Command`, `LayerDefinition`, workbench contributions) | Highest-value internal API. Change carefully; update extension-guide when the authoring shape moves. |
 | **Scene JSON / protocol wire** | Highest external cost. Schema/protocol changes need consumer awareness (cloud export, agents, embeds). |

@@ -84,8 +84,9 @@ Published packages:
 
 - **`@xmazu/openenvxee-extensions`** — published sandbox author SDK: `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts import **`@xmazu/openenvxee-extensions/protocol`** only.
 - **`@xmazu/openenvxee-html-studio`** — published HTML host package (inlines private core/html/workbench). Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/email`** — published email editor (public npm, MIT). Drop-in `EmailEditor` + `createEmailScene` + `renderEmailHtml`; inlines private core/html/driver-email/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/canvas-studio`** — private curated canvas host surface. Monorepo hosts use workspace TypeScript (not published).
+- **`@openenvx/email-studio`** — published email editor (public npm, MIT). Drop-in `EmailEditor` + `createEmailScene` + `renderEmailHtml`; inlines private core/html/driver-email/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/canvas-studio`** — published canvas editor (public npm, MIT). Drop-in `CanvasEditor` + `createCanvasScene`; inlines private core/canvas/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`, `./fonts.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@xmazu/openenvxee-studio`** — unpublished proprietary canvas host allowlist (`packages/studio`). Monorepo canvas demos use `@openenvx/canvas` + `@openenvx/workbench` directly.
 - **`@openenvx/html-studio`** — private HTML host surface. External hosts use `@xmazu/openenvxee-html-studio`.
 
 ## Host sidebar panels (product hosts)
@@ -198,7 +199,7 @@ bun run changeset     # create a release changeset
 
 ## Publishing
 
-Only `packages/extensions` (`@xmazu/openenvxee-extensions`), `packages/openenvxee-html-studio` (`@xmazu/openenvxee-html-studio`), and `packages/email` (`@openenvx/email`) are published (see [PUBLISHING.md](PUBLISHING.md)).
+Only `packages/extensions` (`@xmazu/openenvxee-extensions`), `packages/openenvxee-html-studio` (`@xmazu/openenvxee-html-studio`), `packages/email-studio` (`@openenvx/email-studio`), and `packages/canvas-studio` (`@openenvx/canvas-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)).
 
 ## Before you finish
 

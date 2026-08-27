@@ -1,1 +1,5 @@
 @import '../../workbench/src/theme/tokens.css';
+
+.openenvx-canvas-editor {
+  --wb-topbar-height: 48px;
+}

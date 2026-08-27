@@ -1,6 +1,6 @@
 {
-  "name": "@openenvx/email",
-  "version": "0.1.2",
+  "name": "@openenvx/email-studio",
+  "version": "0.1.0",
   "description": "OpenEnvx email editor — drop-in React component with bundled workbench UI",
   "license": "MIT",
   "type": "module",
@@ -104,10 +104,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/xmazu/openenvxee-editor.git",
-    "directory": "packages/email"
+    "directory": "packages/email-studio"
   },
   "bugs": {
     "url": "https://github.com/xmazu/openenvxee-editor/issues"
   },
-  "homepage": "https://github.com/xmazu/openenvxee-editor/tree/main/packages/email"
+  "homepage": "https://github.com/xmazu/openenvxee-editor/tree/main/packages/email-studio"
 }

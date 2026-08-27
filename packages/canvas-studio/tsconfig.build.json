@@ -3,8 +3,16 @@
   "include": ["src", "../typescript-config/css-modules.d.ts"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
   "compilerOptions": {
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "outDir": "dist",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
     "jsx": "react-jsx",
     "strictNullChecks": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@openenvx/core": ["../core/src/index.ts"],

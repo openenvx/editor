@@ -63,7 +63,6 @@
   },
   "devDependencies": {
     "@openenvx/canvas": "workspace:*",
-    "@openenvx/canvas-studio": "workspace:*",
     "@openenvx/core": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
     "@openenvx/workbench": "workspace:*",

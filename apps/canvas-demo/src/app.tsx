@@ -1,27 +1,31 @@
-import { createCanvasDemoScene } from '@openenvx/canvas';
 import {
-  DEFAULT_STUDIO_PLUGINS,
+  createCanvasDemoScene,
+  createCanvasPropertyHostContextWithApi,
+  DEFAULT_CANVAS_LAYOUT,
+} from '@openenvx/canvas';
+import type { Plugin, WorkbenchApi } from '@openenvx/core';
+import {
+  createLocalStorageWorkbenchLayoutStore,
+  mountSandboxExtensions,
   VersionHistoryPlugin,
   WorkbenchShell,
-  createCanvasPropertyHostContextWithApi,
-  createLocalStorageWorkbenchLayoutStore,
-  createSandboxExtensionHost,
-  DEFAULT_CANVAS_LAYOUT,
-  mountSandboxExtensions,
-} from '@openenvx/canvas-studio';
-import type { Plugin, WorkbenchApi } from '@openenvx/core';
+} from '@openenvx/workbench';
 import saveTheDateSource from 'openenvx-widget:./extensions/save-the-date.widget.tsx';
 import seatingSource from 'openenvx-widget:./extensions/seating.widget.tsx';
 import { useMemo } from 'react';
 
+import {
+  createSandboxExtensionHost,
+  DEFAULT_STUDIO_PLUGINS,
+} from './create-sandbox-extension-host';
 import saveTheDateManifest from './extensions/save-the-date.extension';
 import seatingManifest from './extensions/seating.extension';
 import { CanvasDemoChromePlugin } from './plugins/canvas-demo-chrome-plugin';
 import { CanvasDemoPlugin } from './plugins/canvas-demo-plugin';
 import { createDemoVersionHistoryProvider } from './providers/demo-version-history-provider';
 
-import '@openenvx/canvas-studio/fonts.css';
-import '@openenvx/canvas-studio/theme.css';
+import '@openenvx/canvas/fonts.css';
+import '@openenvx/workbench/theme.css';
 
 const LAYOUT_STORE_KEY = 'openenvx.canvas-demo.workbench-layout';
 

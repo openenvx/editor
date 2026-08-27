@@ -1,11 +1,11 @@
 import { resolvePagePreset, usePagePresetResize } from '@openenvx/canvas';
-import { Select } from '@openenvx/canvas-studio';
 import { getActivePage } from '@openenvx/core';
 import type { PropertyFieldDescriptor } from '@openenvx/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/core/react';
+import { Select } from '@openenvx/workbench';
 import { memo } from 'react';
 
 export interface PagePresetFieldRendererProps {

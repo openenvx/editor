@@ -9,8 +9,12 @@
       "dir": "packages/openenvxee-html-studio"
     },
     {
-      "name": "@openenvx/email",
-      "dir": "packages/email"
+      "name": "@openenvx/email-studio",
+      "dir": "packages/email-studio"
+    },
+    {
+      "name": "@openenvx/canvas-studio",
+      "dir": "packages/canvas-studio"
     }
   ],
   "consumers": [
