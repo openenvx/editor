@@ -60,11 +60,11 @@ const PLUGINS = [...DEFAULT_HTML_STUDIO_PLUGINS, new MyEventPagePlugin()];
 
 ## `@openenvx/email` (email product — published)
 
-Public npm bundle for open-source email editor hosts. Inlines private core/html/driver-email/workbench into minified ESM. Narrow API — no plugin authoring surface:
+Public npm bundle for open-source email editor hosts. Inlines private core/html/driver-email/workbench into minified ESM (no source maps; CSS modules compiled into one file; public `.d.ts` does not leak the internal scene schema). Narrow API — no plugin authoring surface:
 
 ```ts
-import { EmailEditor, createEmailScene } from '@openenvx/email';
-import { renderEmailHtml } from '@openenvx/email/runtime';
+import { EmailEditor, type Scene } from '@openenvx/email';
+import { createEmailScene, renderEmailHtml } from '@openenvx/email/runtime';
 import '@openenvx/email/theme.css';
 
 <EmailEditor onChange={save} theme="dark" />

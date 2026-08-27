@@ -79,7 +79,7 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@xmazu/openenvxee-html-studio`** — published HTML host surface (inlines private core/html/workbench). Subpaths: `.`, `./runtime`, `./theme.css`.
 
-**`@openenvx/email`** — published email editor. Subpaths: `.`, `./runtime`, `./theme.css`. Exports: `EmailEditor`, `EmailEditorProps`, `createEmailScene`, `renderEmailHtml`, `Scene`. Headless HTML export: `@openenvx/email/runtime`.
+**`@openenvx/email`** — published email editor. Subpaths: `.`, `./runtime`, `./theme.css`. Exports: `EmailEditor`, `EmailEditorProps`, `createEmailScene`, `renderEmailHtml`, `RenderEmailHtmlOptions`, `Scene` (opaque JSON for persistence — not the internal schema). Headless HTML export: `@openenvx/email/runtime`. Published `.d.ts` is handwritten and must stay narrow.
 
 ### Editor backbone (private)
 

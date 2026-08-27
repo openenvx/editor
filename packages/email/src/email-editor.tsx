@@ -1,11 +1,11 @@
-import type { Scene } from '@openenvx/core/schema';
-import {
-  EmailBlocksPlugin,
-  createEmailScene,
-  DEFAULT_EMAIL_LAYOUT,
-} from '@openenvx/driver-email';
+import type { Scene as CoreScene } from '@openenvx/core/schema';
 import { WorkbenchShell } from '@openenvx/workbench';
 import { useMemo } from 'react';
+
+import { createEmailDemoScene as createEmailScene } from '../../driver-email/src/create-email-demo-scene';
+import { DEFAULT_EMAIL_LAYOUT } from '../../driver-email/src/default-email-layout';
+import { EmailBlocksPlugin } from '../../driver-email/src/plugin/email-blocks-plugin';
+import type { Scene } from './scene';
 
 import './theme.css';
 
@@ -53,10 +53,16 @@ export function EmailEditor({
       className={shellClassName}
       editorTitle={editorTitle}
       editorUri="openenvx://email/editor"
-      initialScene={scene}
+      initialScene={scene as CoreScene}
       layout={EMAIL_EDITOR_LAYOUT}
       locale={locale}
-      onSceneChange={onChange}
+      onSceneChange={
+        onChange
+          ? (next) => {
+              onChange(next as unknown as Scene);
+            }
+          : undefined
+      }
       plugins={EMAIL_EDITOR_PLUGINS}
       theme={theme}
     />

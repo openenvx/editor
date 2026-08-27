@@ -190,13 +190,15 @@
       "entry": [
         "src/index.ts!",
         "src/runtime.ts!",
+        "tsup.config.ts!",
         "build-dts.ts!",
-        "tsup.config.ts!"
+        "verify-pack.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
+        "tsup.config.ts",
         "build-dts.ts",
-        "tsup.config.ts"
+        "verify-pack.ts"
       ],
       "ignoreDependencies": [
         "@dnd-kit/core",
