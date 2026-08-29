@@ -1,4 +1,5 @@
-import { createHtmlDemoScene, type Scene } from '@openenvx/html-studio';
+import type { Scene } from '@openenvx/core/schema';
+import { createHtmlDemoScene } from '@openenvx/html';
 
 import { menuWidget } from './extensions/menu.widget';
 

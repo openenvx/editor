@@ -1,22 +1,20 @@
-import {
-  DEFAULT_HTML_STUDIO_PLUGINS,
-  WorkbenchShell,
-  createHtmlSandboxExtensionHost,
-  DEFAULT_HTML_LAYOUT,
-  mountSandboxExtensions,
-  type WorkbenchApi,
-} from '@openenvx/html-studio';
+import type { WorkbenchApi } from '@openenvx/core';
+import { DEFAULT_HTML_LAYOUT, HtmlBlocksPlugin } from '@openenvx/html';
+import { mountSandboxExtensions, WorkbenchShell } from '@openenvx/workbench';
 import countdownSource from 'openenvx-widget:./extensions/countdown.widget.tsx';
 import menuSource from 'openenvx-widget:./extensions/menu.widget.tsx';
 import rsvpSource from 'openenvx-widget:./extensions/rsvp.widget.tsx';
 import { useMemo } from 'react';
 
+import { createHtmlSandboxExtensionHost } from './create-html-sandbox-extension-host';
 import { createMenuDemoScene } from './create-menu-demo-scene';
 import weddingManifest, {
   guestsViewTree,
 } from './extensions/wedding.extension';
 
-import '@openenvx/html-studio/theme.css';
+import '@openenvx/workbench/theme.css';
+
+const DEFAULT_HTML_DEMO_PLUGINS = [new HtmlBlocksPlugin()];
 
 interface SandboxHot {
   pushWidgetSource: (id: string, source: string) => Promise<void>;
@@ -131,7 +129,7 @@ export function App() {
         initialScene={createMenuDemoScene()}
         layout={DEFAULT_HTML_LAYOUT}
         mountExternalHosts={mountExternalHosts}
-        plugins={DEFAULT_HTML_STUDIO_PLUGINS}
+        plugins={DEFAULT_HTML_DEMO_PLUGINS}
       />
       <style>{`
         html, body, #root { height: 100%; margin: 0; }

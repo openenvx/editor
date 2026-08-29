@@ -9,6 +9,8 @@ import {
   type SandboxExtensionHostOptions,
 } from '@openenvx/workbench';
 
+export { HtmlEditor, type HtmlEditorProps } from './html-editor';
+
 export * from '@openenvx/core';
 export * from '@openenvx/html';
 

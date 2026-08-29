@@ -1,6 +1,6 @@
 # Email driver (React-Email)
 
-**Audience:** Internal engineers and coding agents. Package: `@openenvx/driver-email`.
+**Audience:** Contributors and integrators. Package: `@openenvx/driver-email`.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md) · HTML sibling: [html.md](html.md).
 

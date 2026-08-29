@@ -1,6 +1,6 @@
 # Studio & products
 
-**Audience:** Internal engineers and coding agents. Packages: `@openenvx/canvas-studio`, `@xmazu/openenvxee-studio`, `@openenvx/html-studio`, `@xmazu/openenvxee-html-studio`, `@openenvx/email-studio`, and the apps that consume them.
+**Audience:** Contributors and integrators. Packages: `@openenvx/canvas-studio`, `@xmazu/openenvxee-studio`, `@openenvx/html-studio`, `@openenvx/email-studio`, and the apps that consume them.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -12,7 +12,7 @@ Host product apps (dashboard Studio, embed host, demos) should not wire every pr
 2. Inline private deps into published `dist/` where applicable
 3. Ship a default plugin list + sandbox factory helpers
 
-Publishing intent: [PUBLISHING.md](../../PUBLISHING.md). Published OSS drop-ins: `@openenvx/email-studio`, `@openenvx/canvas-studio`. Published proprietary/restricted: `openenvxee-html-studio`, `extensions`. Private workspace: `html-studio`, unpublished `@xmazu/openenvxee-studio` (`packages/studio`).
+Publishing details: [PUBLISHING.md](../../PUBLISHING.md). Public MIT drop-ins: `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-studio`. The extension SDK is MIT licensed but may use a restricted registry. `@xmazu/openenvxee-studio` remains a private product integration.
 
 ## `@openenvx/canvas-studio` (canvas product — published)
 
@@ -41,27 +41,36 @@ export const DEFAULT_STUDIO_PLUGINS = [new CanvasPlugin()];
 
 `createSandboxExtensionHost(options)` wires canvas widget click binding + `WIDGET_LAYER_TYPE` so **workbench never imports canvas**; studio is the seam.
 
-## `@openenvx/html-studio` (HTML product — monorepo)
+## `@openenvx/html-studio` (HTML product — published)
 
-Re-exports: `core`, `html`, workbench shell surface + HTML sandbox helper.
+Public npm bundle for HTML block editor hosts. Inlines private core/html/workbench into minified ESM. Drop-in `HtmlEditor` plus host composition API for product apps (Snapvelo-style plugin hosts):
 
 ```ts
-export const DEFAULT_HTML_STUDIO_PLUGINS = [new HtmlBlocksPlugin()];
+import { HtmlEditor } from '@openenvx/html-studio';
+import { createHtmlScene, renderBlockDocument } from '@openenvx/html-studio/runtime';
+import '@openenvx/html-studio/theme.css';
+
+<HtmlEditor onChange={save} theme="dark" />
 ```
 
-## `@xmazu/openenvxee-html-studio` (HTML product — published)
-
-GitHub Packages publish of `@openenvx/html-studio`. Inlines workspace packages (workbench/html/core/…) into a **per-module `dist/` ESM tree** (Vite-tree-shakeable); third-party deps stay external. Subpaths:
-
-- `.` — editor host surface (`WorkbenchShell`, plugins, authoring API) → `dist/openenvxee-html-studio/src/index.js`
-- `./runtime` — Worker-safe block configs + `renderBlockDocument` (no TipTap / DnD / shell)
-- `./theme.css` — workbench tokens
-
-Product hosts (e.g. Snapvelo) own their blocks and sidebar plugins in the product repo and compose:
+Product hosts compose custom plugins:
 
 ```ts
+import {
+  DEFAULT_HTML_STUDIO_PLUGINS,
+  WorkbenchShell,
+} from '@openenvx/html-studio';
+
 const PLUGINS = [...DEFAULT_HTML_STUDIO_PLUGINS, new MyEventPagePlugin()];
 ```
+
+Subpaths:
+
+- `.` — `HtmlEditor` + host surface (`WorkbenchShell`, plugins, authoring API)
+- `./runtime` — Worker-safe `renderBlockDocument` + block registry (no TipTap / DnD / shell)
+- `./theme.css` — compiled workbench tokens + editor CSS
+
+Monorepo HMR stays on `@openenvx/html` + `@openenvx/workbench` (`apps/html-demo`). The published bundle is exercised by `apps/html-package-demo` (`bun run dev:html-package`).
 
 ## `@openenvx/email-studio` (email product — published)
 
@@ -95,7 +104,8 @@ Per AGENTS.md product-host rules:
 | `apps/canvas-demo`         | Canvas + workbench HMR + sandbox demos     |
 | `apps/canvas-package-demo` | Published `@openenvx/canvas-studio` bundle |
 | `apps/demo-playground`     | Composable / custom shell patterns         |
-| `apps/html-demo`           | HTML block studio                          |
+| `apps/html-demo`           | HTML + workbench HMR + sandbox demos       |
+| `apps/html-package-demo`   | Published `@openenvx/html-studio` bundle   |
 | `apps/email-demo`          | Email driver + workbench (HMR)             |
 | `apps/email-package-demo`  | Published `@openenvx/email-studio` bundle  |
 | `apps/docs`                | Extension guide and contracts              |

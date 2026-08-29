@@ -1,6 +1,6 @@
 # Overview — how OpenEnvx fits together
 
-**Audience:** Internal engineers and coding agents. Safe base for later external “how OpenEnvx works” docs.
+**Audience:** Contributors and integrators who want to understand the editor before choosing a package.
 
 OpenEnvx is a **composable visual editor framework**, not a single monolithic design tool. A scene document is the content source of truth; plugins register layers, commands, and UI; a headless controller owns runtime state; product apps compose a React shell (or bring their own).
 
@@ -19,8 +19,9 @@ EditorRuntime + PluginManager + WorkbenchController (@openenvx/core)
         ▼
 WorkbenchShell (@openenvx/workbench)
         │
-        ├── canvas studio  (@xmazu/openenvxee-studio)
-        └── html studio    (@openenvx/html-studio)
+        ├── canvas studio  (@openenvx/canvas-studio)
+        ├── html studio    (@openenvx/html-studio)
+        └── email studio  (@openenvx/email-studio)
 ```
 
 | Layer | Job |
@@ -37,8 +38,8 @@ WorkbenchShell (@openenvx/workbench)
 | --- | --- |
 | Stage only, own state | `schema` + `canvas` (`CanvasStage`) |
 | Full editor, custom UI | `core` + `canvas` / `html` / `driver-email` |
-| Full Studio product | `@xmazu/openenvxee-studio` (`DEFAULT_STUDIO_PLUGINS`, `WorkbenchShell`) |
-| HTML block product | `@openenvx/html-studio` |
+| Full canvas product | `@openenvx/canvas-studio` |
+| HTML block product | `@openenvx/html-studio` (published) or `@openenvx/html` + workbench (monorepo HMR) |
 | Email block editor | `@openenvx/driver-email` + workbench (`apps/email-demo`) |
 | Untrusted parent panels | `plugin-protocol` + embed host (never main-world JS) |
 | Untrusted scripts / widgets | Sandbox QuickJS Worker path (never main-world JS) |

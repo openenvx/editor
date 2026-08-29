@@ -10,8 +10,8 @@
       "dir": "packages/studio"
     },
     {
-      "name": "@xmazu/openenvxee-html-studio",
-      "dir": "packages/openenvxee-html-studio"
+      "name": "@openenvx/html-studio",
+      "dir": "packages/html-studio"
     }
   ],
   "cloudRepo": "../openenvx-cloud",

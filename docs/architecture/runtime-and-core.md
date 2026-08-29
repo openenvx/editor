@@ -1,6 +1,6 @@
 # Runtime & core
 
-**Audience:** Internal engineers and coding agents. Package: `@openenvx/core` (+ `@xmazu/openenvxee-schema` for the document).
+**Audience:** Contributors and integrators. Package: `@openenvx/core` (+ the scene schema exposed through its `./schema` entry point).
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 

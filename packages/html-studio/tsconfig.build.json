@@ -1,14 +1,14 @@
 {
   "extends": "@openenvx/typescript-config/base.json",
   "include": ["src", "../typescript-config/css-modules.d.ts"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/test/**"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
   "compilerOptions": {
     "noEmit": false,
     "allowImportingTsExtensions": false,
     "outDir": "dist",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
     "jsx": "react-jsx",
     "strictNullChecks": true,
     "resolveJsonModule": true,
@@ -16,14 +16,12 @@
     "baseUrl": ".",
     "paths": {
       "@openenvx/core": ["../core/src/index.ts"],
-      "@openenvx/core": ["../core/src/index.ts"],
       "@openenvx/core/react": ["../core/src/react/workbench-context.tsx"],
       "@openenvx/core/schema": ["../core/src/schema/index.ts"],
       "@openenvx/core/preview": ["../core/src/preview/index.ts"],
       "@xmazu/openenvxee-extensions/protocol": ["../extensions/src/protocol/index.ts"],
       "@openenvx/html": ["../html/src/index.ts"],
       "@openenvx/html/runtime": ["../html/src/runtime.ts"],
-      "@openenvx/html-studio": ["../html-studio/src/index.ts"],
       "@openenvx/workbench": ["../workbench/src/index.ts"]
     }
   }

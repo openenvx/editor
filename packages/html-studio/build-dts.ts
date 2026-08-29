@@ -3,11 +3,11 @@ import path from 'node:path';
 import { rollup } from 'rollup';
 import dts from 'rollup-plugin-dts';
 
-const studioRoot = import.meta.dirname;
+const packageRoot = import.meta.dirname;
 
 async function buildDts(entry: string, outfile: string) {
   const bundle = await rollup({
-    input: path.join(studioRoot, entry),
+    input: path.join(packageRoot, entry),
     plugins: [
       {
         name: 'css-module-stub',
@@ -25,7 +25,7 @@ async function buildDts(entry: string, outfile: string) {
         },
       },
       dts({
-        tsconfig: path.join(studioRoot, 'tsconfig.build.json'),
+        tsconfig: path.join(packageRoot, 'tsconfig.build.json'),
         respectExternal: true,
       }),
     ],
@@ -44,9 +44,10 @@ async function buildDts(entry: string, outfile: string) {
   });
 
   await bundle.write({
-    file: path.join(studioRoot, outfile),
+    file: path.join(packageRoot, outfile),
     format: 'es',
   });
+
   await bundle.close();
 }
 

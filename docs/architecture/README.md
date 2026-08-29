@@ -1,6 +1,6 @@
 # Architecture chapters
 
-Deep under-the-hood docs for OpenEnvx. Start at the hub: [Architecture.md](../../Architecture.md).
+These chapters explain how OpenEnvx is structured for contributors and integrators. Start with the [repository README](../../README.md) for installation, then use the [architecture hub](../../Architecture.md) to choose a topic.
 
 | Chapter | Topic |
 | --- | --- |
@@ -16,7 +16,7 @@ Deep under-the-hood docs for OpenEnvx. Start at the hub: [Architecture.md](../..
 | [extensions.md](extensions.md) | Internal vs sandbox (summary) |
 | [extensions-sandbox-guide.md](extensions-sandbox-guide.md) | Sandbox widget/plugin authoring |
 | [extensions-host-guide.md](extensions-host-guide.md) | Internal OOP plugins |
-| [roadmap.md](roadmap.md) | Package/API roadmap |
+| [roadmap.md](roadmap.md) | Package/API roadmap and known boundaries |
 | [packages-and-api.md](packages-and-api.md) | Package map, public exports, stability rules |
 
-Companion: [Plugin-boundaries.md](../../Plugin-boundaries.md) · Stubs: [apps/docs/README.md](../../apps/docs/README.md).
+Companion: [Plugin-boundaries.md](../../Plugin-boundaries.md) · Extension authoring: [apps/docs/README.md](../../apps/docs/README.md) · Contribution guide: [CONTRIBUTING.md](../../CONTRIBUTING.md).

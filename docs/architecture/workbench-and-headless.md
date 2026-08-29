@@ -1,6 +1,6 @@
 # Workbench & headless
 
-**Audience:** Internal engineers and coding agents. "Headless" is the UI-agnostic controller/contribution layer that lives inside `@openenvx/core`; "workbench" is the React shell package `@openenvx/workbench`.
+**Audience:** Contributors and integrators. "Headless" is the UI-agnostic controller/contribution layer that lives inside `@openenvx/core`; "workbench" is the React shell package `@openenvx/workbench`.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 

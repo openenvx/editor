@@ -1,6 +1,6 @@
 # Canvas
 
-**Audience:** Internal engineers and coding agents. Package: `@openenvx/canvas`.
+**Audience:** Contributors and integrators. Package: `@openenvx/canvas`.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 

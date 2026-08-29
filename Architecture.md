@@ -2,7 +2,7 @@
 
 Package boundaries and contribution flow for the monorepo.
 
-**Audience:** Internal engineers and coding agents. Structure is meant to peel into external docs later without a rewrite.
+**Audience:** Contributors, integrators, and maintainers. This is the map for understanding package boundaries before changing code.
 
 **Also read:** [Plugin-boundaries.md](Plugin-boundaries.md) — internal vs external plugins, protocol trust boundary, and cloud/marketplace runners. Do not load untrusted plugin JS into the editor main world.
 
@@ -35,9 +35,9 @@ Author how-to (under `docs/architecture/`):
 | --- | --- | --- |
 | **Rendering-only** | `schema`, `canvas` | Embed `CanvasStage` in a custom React app with own state. No plugin host. |
 | **Editor backbone** | `core`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers, workbench controller) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
-| **Workbench UI** | `workbench` | React shell (`WorkbenchShell`); workspace-private. |
-| **Published product** | `studio`, `extensions`, `email-studio`, `canvas-studio` | Drop-in editors + sandbox author SDK + proprietary host allowlist |
-| **HTML studio** | `html`, `html-studio`, `openenvxee-html-studio`, optional `driver-*` | Puck-style block editor + thin studio re-exports + published fat bundle; product hosts own their blocks/plugins |
+| **Workbench UI** | `workbench` | React shell (`WorkbenchShell`); currently workspace-private. |
+| **Published product** | `extensions`, `html-studio`, `email-studio`, `canvas-studio` | Drop-in editors and sandbox author SDK |
+| **HTML editor** | `html`, `html-studio` (published) | Puck-style block editor + published drop-in `@openenvx/html-studio` bundle |
 | **Email editor** | `driver-email`, `email-studio` (published) | React-Email block editor + published drop-in `@openenvx/email-studio` bundle |
 | **Canvas editor** | `canvas`, `canvas-studio` (published) | Konva canvas editor + published drop-in `@openenvx/canvas-studio` bundle |
 
@@ -45,12 +45,12 @@ Author how-to (under `docs/architecture/`):
 
 ## Package tiers
 
-| Tier | Packages | License / publish (intent) | Responsibility |
+| Tier | Packages | License / publish | Responsibility |
 | --- | --- | --- | --- |
-| Foundation | `schema`, `preview`, `core` | Private (workspace); `schema` also published | Scene model (Zod + JSON Schema), plugin host primitives |
-| Embed / sandbox protocol | `extensions` (`@xmazu/openenvxee-extensions`, `./protocol` subpath) | Published (public) | `RenderNode`, manifests, validators, sandbox grants |
-| Product libs | `canvas`, `html`, `driver-email`, `workbench` (MIT, unpublished), `agent`, `html-studio` | Private (workspace) | Canvas editor, HTML editor, email driver, React shell, agent, HTML studio host surface |
-| Published product | `studio` (proprietary), `@openenvx/email-studio`, `@openenvx/canvas-studio` (public MIT) | Published | Drop-in editors + proprietary host allowlist |
+| Foundation | `schema`, `preview`, `core` | Workspace packages; MIT where declared | Scene model (Zod + JSON Schema), plugin host primitives |
+| Embed / sandbox protocol | `extensions` (`@xmazu/openenvxee-extensions`, `./protocol` subpath) | Published package, MIT; registry access may vary | `RenderNode`, manifests, validators, sandbox grants |
+| Product libs | `canvas`, `html`, `driver-email`, `workbench`, `agent` | Workspace packages; package licenses apply | Canvas editor, HTML editor, email driver, React shell, agent |
+| Published product | `@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio` | Public npm, MIT | Drop-in editors for open-source hosts |
 
 ## Placement cheat sheet
 
@@ -64,8 +64,7 @@ Author how-to (under `docs/architecture/`):
 | `@openenvx/workbench` | `WorkbenchShell`, field renderers, sandbox/embed hosts |
 | `@xmazu/openenvxee-studio` | Published fat bundle of canvas host allowlist (unpublished from this repo) |
 | `@openenvx/canvas-studio` | Published canvas drop-in (`CanvasEditor`, `createCanvasScene`; minified `dist/` + `./runtime`) |
-| `@openenvx/html-studio` | HTML product re-exports + `DEFAULT_HTML_STUDIO_PLUGINS` |
-| `@xmazu/openenvxee-html-studio` | Published HTML host (re-exports html-studio; per-module `dist/` + `./runtime`) |
+| `@openenvx/html-studio` | Published HTML drop-in (`HtmlEditor`, host composition API; minified `dist/` + `./runtime`) |
 | `@openenvx/email-studio` | Published email editor (`EmailEditor`, `createEmailScene`, `renderEmailHtml`; minified `dist/` + `./runtime`) |
 | `@xmazu/openenvxee-extensions` | Sandbox author SDK (`./protocol`, `/canvas`, `/html`, `/panel`, Vite) |
 

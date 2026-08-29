@@ -19,11 +19,11 @@ Companion to [Architecture.md](../../Architecture.md). This tracks intentional f
 - Adapter wraps existing contribution classes internally
 - Phase 3b: extend façade toward layer types / field renderers (today’s internal-only surface)
 
-## Phase 4 — Align published html-studio
+## Phase 4 — Done
 
-- `@xmazu/openenvxee-html-studio` uses the same host-plugin story as canvas studio
-- Narrow accidental `export *` from core/headless on the published HTML bundle
+- `@openenvx/html-studio` published on public npm (minified bundle + drop-in `HtmlEditor` + host composition API)
+- Legacy `@xmazu/openenvxee-html-studio` removed from this repo
 
 ## Publish note
 
-When cutting a release: publish `@xmazu/openenvxee-extensions` and `@xmazu/openenvxee-html-studio` only. Bump product repos in the same window.
+When cutting a release: publish `@xmazu/openenvxee-extensions`, `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-studio`. Bump product repos in the same window.

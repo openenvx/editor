@@ -114,21 +114,19 @@
         "@openenvx/workbench"
       ]
     },
-    "packages/openenvxee-html-studio": {
+    "packages/html-studio": {
       "entry": [
         "src/index.ts!",
         "src/runtime.ts!",
-        "build.ts!",
+        "tsup.config.ts!",
         "build-dts.ts!",
-        "copy-dist-assets.ts!",
-        "publish-debug.ts!"
+        "verify-pack.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
-        "build.ts",
+        "tsup.config.ts",
         "build-dts.ts",
-        "copy-dist-assets.ts",
-        "publish-debug.ts"
+        "verify-pack.ts"
       ],
       "ignoreDependencies": [
         "@dnd-kit/core",
@@ -235,14 +233,6 @@
         "react-i18next",
         "zod",
         "@xmazu/openenvxee-extensions"
-      ]
-    },
-    "packages/html-studio": {
-      "entry": [
-        "src/index.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}"
       ]
     },
     "packages/canvas-studio": {

@@ -1,6 +1,6 @@
 # HTML block editor
 
-**Audience:** Internal engineers and coding agents. Package: `@openenvx/html` (+ product re-exports in `@openenvx/html-studio`).
+**Audience:** Contributors and integrators. Package: `@openenvx/html` (+ product re-exports in `@openenvx/html-studio`).
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -43,13 +43,7 @@ Inspector fields for slot parts use paths like `slots.headline.0.data.html`.
 
 ## Product host
 
-`@openenvx/html-studio` re-exports core + headless + html + workbench shell surface and ships:
-
-```ts
-export const DEFAULT_HTML_STUDIO_PLUGINS = [new HtmlBlocksPlugin()];
-```
-
-Demo: `apps/html-demo`. See [studio-and-products.md](studio-and-products.md).
+`@openenvx/html-studio` (published) re-exports core + html + workbench shell surface for product hosts, or use `@openenvx/html` + `@openenvx/workbench` directly in the monorepo for HMR.
 
 ## What does **not** belong in html
 

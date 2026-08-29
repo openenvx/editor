@@ -8,7 +8,6 @@
     "baseUrl": ".",
     "paths": {
       "@openenvx/core": ["../core/src/index.ts"],
-      "@openenvx/core": ["../core/src/index.ts"],
       "@openenvx/core/react": ["../core/src/react/workbench-context.tsx"],
       "@openenvx/core/schema": ["../core/src/schema/index.ts"],
       "@openenvx/core/preview": ["../core/src/preview/index.ts"],
