@@ -33,7 +33,7 @@
     "@tiptap/extension-text-style": "^3.27.3",
     "@tiptap/pm": "^3.27.3",
     "@tiptap/react": "^3.27.3",
-    "@tiptap/starter-kit": "^3.27.3",
+    "@tiptap/starter-kit": "^3.30.5",
     "konva": "^10.3.0",
     "lucide-react": "1.24.0",
     "react-konva": "^19.2.5",
