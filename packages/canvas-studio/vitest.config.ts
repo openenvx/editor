@@ -5,7 +5,7 @@ export default defineConfig({
     environment: 'jsdom',
     server: {
       deps: {
-        inline: [/@openenvx\//],
+        inline: [/@openenvx\//, 'zod'],
       },
     },
   },

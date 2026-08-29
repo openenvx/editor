@@ -7,6 +7,7 @@ export default defineConfig({
       deps: {
         inline: [
           /@openenvx\//,
+          'zod',
           /@react-email\//,
           /@codemirror\//,
           /codemirror/,

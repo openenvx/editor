@@ -11,6 +11,7 @@
       "@openenvx/core/react": ["../core/src/react/workbench-context.tsx"],
       "@openenvx/core/schema": ["../core/src/schema/index.ts"],
       "@openenvx/core/preview": ["../core/src/preview/index.ts"],
+      "@xmazu/openenvxee-extensions/protocol": ["../extensions/src/protocol/index.ts"],
       "@openenvx/canvas": ["../canvas/src/index.ts"],
       "@openenvx/workbench": ["../workbench/src/index.ts"]
     }

@@ -33,6 +33,8 @@ packages/*/src/**/*.js.map
 packages/*/src/**/*.d.ts.map
 packages/*/src/**/*.d.ts
 !packages/**/css-modules.d.ts
+!packages/extensions/src/openenvx.d.ts
+!packages/extensions/src/vite/client.d.ts
 
 
 # Debug
