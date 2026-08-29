@@ -90,6 +90,16 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           bunx git-cliff --tag "v$VERSION" -o CHANGELOG.md
 
+      - name: Build studio packages
+        run: |
+          bun run build --filter=@openenvx/html-studio --filter=@openenvx/email-studio --filter=@openenvx/canvas-studio
+
+      - name: Verify publish tarballs
+        run: |
+          bun run verify-pack:html-studio
+          bun run verify-pack:email-studio
+          bun run verify-pack:canvas-studio
+
       - name: Commit version bump and tag
         run: |
           VERSION="${{ steps.version.outputs.version }}"
@@ -100,16 +110,6 @@ jobs:
           git tag "v$VERSION"
           git push
           git push origin "v$VERSION"
-
-      - name: Build studio packages
-        run: |
-          bun run build --filter=@openenvx/html-studio --filter=@openenvx/email-studio --filter=@openenvx/canvas-studio
-
-      - name: Verify publish tarballs
-        run: |
-          bun run verify-pack:html-studio
-          bun run verify-pack:email-studio
-          bun run verify-pack:canvas-studio
 
       - name: Publish to npm
         run: |

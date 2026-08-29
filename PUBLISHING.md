@@ -47,8 +47,8 @@ Releases are **manual** via GitHub Actions — not on every push to `main`.
    - compute the next semver (from the latest `v*` tag, or bump from current `package.json` when no tags exist)
    - set the same version on all three studio `package.json` files
    - update `CHANGELOG.md`
-   - commit `chore(release): vX.Y.Z`, tag `vX.Y.Z`, and push
    - build and run `verify-pack` on each studio package
+   - commit `chore(release): vX.Y.Z`, tag `vX.Y.Z`, and push
    - `npm publish --access public --provenance` for `html-studio`, `email-studio`, `canvas-studio`
    - create a GitHub Release with git-cliff release notes
 

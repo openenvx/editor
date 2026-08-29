@@ -16,7 +16,7 @@
     "lint": "turbo run lint",
     "check": "ultracite check && knip",
     "check-types": "turbo run check-types --filter='!./apps/*'",
-    "precommit": "bun run check && turbo run check-types --filter='...[HEAD]' --filter='!./apps/*'",
+    "precommit": "bun run check && turbo run check-types --filter='...[HEAD]' --filter='!./apps/*' && turbo run build --filter='...[HEAD]' --filter='!./apps/*'",
     "knip": "knip",
     "fix": "ultracite fix",
     "changelog": "git-cliff --unreleased",

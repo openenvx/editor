@@ -1,2 +1,6 @@
 #!/usr/bin/env sh
+set -e
+
+bun run fix
+git add -u
 bun run precommit
