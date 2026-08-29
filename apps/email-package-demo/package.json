@@ -13,11 +13,11 @@
   "dependencies": {
     "@openenvx/email-studio": "workspace:*",
     "react": "19.2.7",
-    "react-dom": "19.2.7"
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@types/react": "^19.2.3",
-    "@types/react-dom": "^19.2.3",
+    "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "6.0.3",
     "typescript": "catalog:dev",
     "vite": "8.1.3",
