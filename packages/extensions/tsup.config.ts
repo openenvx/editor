@@ -7,6 +7,7 @@ export default createLibraryConfig({
     '!src/**/*.d.ts',
     '!src/cli/**',
     '!src/openenvx.d.ts',
+    '!src/vite/**',
   ],
   external: [
     'preact',
