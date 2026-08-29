@@ -149,32 +149,32 @@
 [data-owb-theme='dark'] {
   color-scheme: dark;
 
-  /* Surfaces — graphite panel chrome over a near-black canvas */
-  --wb-background: #2a2a2a;
-  --wb-canvas-field: #1e1e1e;
-  --wb-card: #222222;
-  --wb-popover: #2a2a2a;
-  --wb-property-popover: #222222;
-  --wb-menu: rgb(42 42 42 / 92%);
-  --wb-popup-header: #222222;
-  --wb-muted: #373737;
-  --wb-border: #373737;
-  --wb-chrome-button: #373737;
-  --wb-sidebar-segment-active: #3c3c3c;
+  /* Surfaces — warm nocturnal: near-black canvas, charcoal chrome, module steps */
+  --wb-background: #1d1c1b;
+  --wb-canvas-field: #181716;
+  --wb-card: #252422;
+  --wb-popover: #302e2b;
+  --wb-property-popover: #252422;
+  --wb-menu: rgb(48 46 43 / 92%);
+  --wb-popup-header: #252422;
+  --wb-muted: #2c2a28;
+  --wb-border: rgba(255, 255, 255, 0.06);
+  --wb-chrome-button: #2c2a28;
+  --wb-sidebar-segment-active: #302e2b;
   --wb-sidebar-row-selected: rgb(255 255 255 / 11%);
   --wb-sidebar-row-hovered: rgb(255 255 255 / 5%);
 
-  /* Text — classic rgba: --wb-foreground is read into Konva */
-  --wb-foreground: rgba(255, 255, 255, 0.9);
-  --wb-muted-foreground: rgba(255, 255, 255, 0.62);
+  /* Text — hex for Konva-safe --wb-foreground */
+  --wb-foreground: #f4f1ec;
+  --wb-muted-foreground: #c5c0b9;
 
   /* Actions */
-  --wb-primary: #f2f2f2;
-  --wb-primary-foreground: #1e1e1e;
-  --wb-focus: oklch(60% 0.15 258);
+  --wb-primary: #f4f1ec;
+  --wb-primary-foreground: #181716;
+  --wb-focus: #d8d2c9;
   --wb-menu-highlight: oklch(55% 0.145 258);
   --wb-menu-highlight-foreground: #ffffff;
-  --wb-destructive: #f56a63;
+  --wb-destructive: #e87979;
 
   /* Canvas-facing — Konva cannot parse modern `rgb(… / α)` or oklch */
   --wb-selection: #3b82f6;
@@ -186,40 +186,40 @@
   --wb-artboard-border: #e5e7eb;
   --wb-artboard-shadow-color: rgba(0, 0, 0, 0.55);
 
-  /* Tooltip — lifted above the panel, hairline outlined */
-  --wb-tooltip: rgb(74 74 74 / 94%);
-  --wb-tooltip-foreground: rgb(255 255 255 / 92%);
-  --wb-tooltip-border: #555555;
+  /* Tooltip — elevated module, hairline outlined */
+  --wb-tooltip: rgb(48 46 43 / 94%);
+  --wb-tooltip-foreground: rgb(244 241 236 / 92%);
+  --wb-tooltip-border: rgba(255, 255, 255, 0.06);
   --wb-tooltip-shadow: 0 2px 8px -2px rgb(0 0 0 / 55%);
 
   /* Overlays */
   --wb-hover-overlay: rgb(255 255 255 / 6%);
   --wb-active-overlay: rgb(255 255 255 / 9%);
-  --wb-divider-color: rgb(255 255 255 / 9%);
-  --wb-border-subtle: rgb(255 255 255 / 10%);
-  --wb-backdrop-overlay: rgb(17 17 17 / 72%);
+  --wb-divider-color: rgb(255 255 255 / 6%);
+  --wb-border-subtle: rgb(255 255 255 / 6%);
+  --wb-backdrop-overlay: rgba(12, 11, 10, 0.72);
 
-  /* Elevation — solid hairline outlines, depth from tonal steps */
-  --wb-shadow-xs: 0 0 0 1px rgb(255 255 255 / 8%);
-  --wb-shadow-sm: 0 0 0 1px rgb(255 255 255 / 12%);
-  --wb-segment-active-ring: 0 0 0 1px rgb(255 255 255 / 10%);
-  --wb-shadow-md: 0 0 0 1px rgb(255 255 255 / 8%), 0 1px 3px rgb(0 0 0 / 40%);
+  /* Elevation — warm hairline outlines, depth from tonal steps */
+  --wb-shadow-xs: 0 0 0 1px rgb(255 255 255 / 6%);
+  --wb-shadow-sm: 0 0 0 1px rgb(255 255 255 / 8%);
+  --wb-segment-active-ring: 0 0 0 1px rgb(255 255 255 / 6%);
+  --wb-shadow-md: 0 0 0 1px rgb(255 255 255 / 6%), 0 1px 3px rgb(0 0 0 / 40%);
   --wb-shadow-float:
-    0 0 0 1px #444444, 0 8px 24px -6px rgb(0 0 0 / 55%),
+    0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px -6px rgb(0 0 0 / 55%),
     0 16px 48px -12px rgb(0 0 0 / 45%);
   --wb-shadow-control:
-    0 0 0 1px rgb(255 255 255 / 9%), inset 0 1px rgb(255 255 255 / 6%);
+    0 0 0 1px rgb(255 255 255 / 6%), inset 0 1px rgb(255 255 255 / 6%);
   --wb-shadow-control-hover:
-    0 0 0 1px rgb(255 255 255 / 16%), inset 0 1px rgb(255 255 255 / 7%);
+    0 0 0 1px rgb(255 255 255 / 12%), inset 0 1px rgb(255 255 255 / 7%);
   --wb-shadow-control-focus:
-    inset 0 0 0 2px var(--wb-focus), 0 0 0 1px rgb(255 255 255 / 9%);
-  --wb-shadow-focus: 0 0 0 1px var(--wb-focus), 0 0 0 3px rgb(68 121 223 / 35%);
+    inset 0 0 0 1px var(--wb-focus), 0 0 0 1px rgb(255 255 255 / 6%);
+  --wb-shadow-focus: 0 0 0 1px var(--wb-focus);
   --wb-shadow-artboard:
     0 1px 3px rgb(0 0 0 / 50%), 0 12px 32px -8px rgb(0 0 0 / 55%);
 
   /* Hairline dividers */
-  --wb-hairline: 1px solid rgb(255 255 255 / 8%);
-  --wb-divider: 1px solid #373737;
+  --wb-hairline: 1px solid rgba(255, 255, 255, 0.06);
+  --wb-divider: 1px solid rgba(255, 255, 255, 0.06);
 
   /* Scrollbars */
   --wb-scrollbar-thumb: rgb(255 255 255 / 28%);

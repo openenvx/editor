@@ -4,13 +4,14 @@ Designing the `@openenvx/workbench` React UI for canvas/flow editor authors on *
 
 **Goal:** A composable, performant editor shell that reads as a **native desktop design tool**, not a web app in a browser tab.
 
-**Tone:** Tool-native, dense, physical. Achromatic chrome; colour only where it carries meaning.
+**Tone:** Tool-native, dense, physical. Achromatic chrome; colour only where it carries meaning. In dark mode the palette is a **warm nocturnal** family — near-black canvas, charcoal modules, cream type — aligned with the product dashboard, not a cool graphite console or a luminous-blue command center.
 
 **Primary reference:** [Figma](https://figma.com) — density, menu grammar, canvas-only accent  
-**Material reference:** [Paper](https://paper.design) — translucent chrome, lit controls, oklch ramps  
+**Material reference:** [Paper](https://paper.design) — translucent chrome, lit controls, oklch ramps (light theme)  
+**Dark surface references:** Henry / ai.work, Metaview, Linear — soft-edged dark modules, near-black canvas, tonal layering, restrained functional accents  
 **Secondary reference:** Framer / Artboard Studio editor screens (Refero) — three-column canvas layout patterns
 
-**Status (v4):** Token system rebuilt on the Figma/Paper palette. Every workbench CSS module is token-driven, so the palette, density, radius, and material are changed from [`tokens.css`](src/theme/tokens.css) alone — `canvas`, `html`, `driver-email`, and `agent` inherit it.
+**Status (v5):** Dark theme retinted to the warm nocturnal palette. Light theme, type scale, density, radii, and layout metrics unchanged. Every workbench CSS module is token-driven — palette changes land in [`tokens.css`](src/theme/tokens.css) alone; `canvas`, `html`, `driver-email`, and `agent` inherit it.
 
 ---
 
@@ -18,7 +19,7 @@ Designing the `@openenvx/workbench` React UI for canvas/flow editor authors on *
 
 | Layer | Reviewed | Takeaway |
 | --- | --- | --- |
-| Styles | shadcn/ui, Linear dark | shadcn owns component grammar (10px inputs, inset rings, achromatic hierarchy); Linear owns quiet dark density |
+| Styles | shadcn/ui, Linear dark | shadcn owns component grammar (10px inputs, inset rings, achromatic hierarchy); Linear owns quiet dark density and tonal surface layering |
 | Screens | Framer, Artboard Studio, Glorify, Modyfi | Pro editors share: slim top bar, tabbed left rail, centered white artboard, right inspector with sectioned properties, floating bottom toolbar |
 | Product | shadcn/designer | Composable shell (`Designer`, `DesignerPane`, `Action*`), CSS-var layer model, hook-driven actions — our architecture should mirror this separation even if APIs differ |
 
@@ -34,32 +35,48 @@ Preserve:
   - Achromatic UI chrome; colour only for canvas selection + semantic states
   - White artboard as the visual hero; chrome recedes
   - Floating bottom toolbar pill on canvas (not full-width chrome row)
-
-App-native grammar (what stops it reading like a website):
   - 11px workhorse UI type — 12px only for section headers
   - Tight radii: 5px controls, 6px panels/menus, 10px floating surfaces
   - Menus are translucent + backdrop-blurred, not opaque cards
   - Menu rows are 24px with a solid blue full-row highlight and white text
+  - Blue (#3b82f6) canvas selection handles only
+
+App-native grammar (what stops it reading like a website):
   - Light controls are LIT: hairline border + inset white top highlight + 1px drop
   - Custom thin scrollbars; `color-scheme` set so native widgets follow the theme
+
+Dark theme (warm nocturnal — shared color family with product dashboard):
+  - Near-black canvas (#181716), charcoal panel chrome (#1D1C1B), module surfaces (#252422)
+  - Cream primary text (#F4F1EC), warm body/muted text (#C5C0B9)
+  - Hairline borders at rgba(255,255,255,0.06); depth from tonal steps, not shadows
+  - Light neutral primary action (#F4F1EC fill, #181716 text)
+  - Focus: 1px light-neutral stroke (#D8D2C9), no glow — keyboard focus only
 
 Role rules:
   - Blue (#3b82f6): canvas selection handles, dimension badge, transform state ONLY
   - Menu highlight blue (--wb-menu-highlight): highlighted menu/command rows ONLY
-  - Focus ring (--wb-focus): 1px accent stroke + 3px soft halo on inputs
+  - Focus ring (--wb-focus): light theme = blue inset + halo; dark theme = 1px #D8D2C9, no halo
   - Muted foreground: labels, captions, inactive icons, chevrons
-  - Never use accent blue for panel backgrounds, tab fills, or button defaults
+  - Never use accent blue for panel backgrounds, tab fills, button defaults, or dark focus
+
+Deliberate fork from dashboard:
+  - Dashboard uses tonal nav selection on a spacious assistant home
+  - Workbench keeps solid blue menu-row highlight (native menu grammar, not a rail)
+  - Workbench keeps Figma density (11px, 24px rows, 56/240/280 layout) — not dashboard home composition
 
 Reject:
+  - Dashboard-home chrome in the editor (greeting headers, setup checklists, case timelines)
+  - Cool-neutral dark greys (#2a2a2a graphite) that fight the warm dashboard palette
+  - Luminous blue as dark focus, CTA, or brand accent
   - Flat grey panels with no elevation hierarchy
   - Opaque menu cards with drop shadows but no outline
   - 12–13px type everywhere (reads like a web form, not a tool)
-  - Decorative gradients, purple accents, warm cream palettes
+  - Decorative gradients, purple accents, colored status pills
 ```
 
 ---
 
-## Token system (v4 — current)
+## Token system (v5 — current)
 
 All tokens live in [`src/theme/tokens.css`](src/theme/tokens.css). The file defines two built-in scopes — `[data-owb-theme="light"]` (default) and `[data-owb-theme="dark"]` — plus a shared `[data-owb-theme]` layer for theme-agnostic type, spacing, radius, metrics, and material.
 
@@ -69,31 +86,32 @@ Every workbench CSS module should resolve colour, radius, and metrics from these
 
 | Token | Light | Dark | Role |
 | --- | --- | --- | --- |
-| `--wb-background` | `#f0f0f0` | `#2a2a2a` | Panel chrome: activity bar, sidebars, inspector |
-| `--wb-canvas-field` | `#d9d9d9` | `#1e1e1e` | Infinite canvas workspace — always darker than chrome |
-| `--wb-card` | `#ffffff` | `#222222` | Elevated inset surfaces (active tab, cards) |
-| `--wb-popover` | `#ffffff` | `#2a2a2a` | Opaque floating surfaces with interactive content |
-| `--wb-property-popover` | `#ffffff` | `#222222` | Property popup shell |
-| `--wb-menu` | `rgb(247 247 247 / 92%)` | `rgb(42 42 42 / 92%)` | Menus — translucent, paired with `--wb-surface-blur` |
-| `--wb-popup-header` | `#dddddd` | `#222222` | Popup title bars |
-| `--wb-muted` | `#fbfbfb` | `#373737` | Control fill: inputs, segment track, chips |
-| `--wb-border` | `#dcdcdc` | `#373737` | Structural dividers |
+| `--wb-background` | `#f0f0f0` | `#1D1C1B` | Panel chrome: activity bar, sidebars, inspector |
+| `--wb-canvas-field` | `#d9d9d9` | `#181716` | Infinite canvas workspace — always darker than chrome |
+| `--wb-card` | `#ffffff` | `#252422` | Elevated inset surfaces (active tab, cards) |
+| `--wb-popover` | `#ffffff` | `#302E2B` | Opaque floating surfaces with interactive content |
+| `--wb-property-popover` | `#ffffff` | `#252422` | Property popup shell |
+| `--wb-menu` | `rgb(247 247 247 / 92%)` | `rgb(48 46 43 / 92%)` | Menus — translucent, paired with `--wb-surface-blur` |
+| `--wb-popup-header` | `#dddddd` | `#252422` | Popup title bars |
+| `--wb-muted` | `#fbfbfb` | `#2C2A28` | Control fill: inputs, segment track, chips |
+| `--wb-border` | `#dcdcdc` | `rgba(255,255,255,0.06)` | Structural dividers |
 | `--wb-artboard` | `#ffffff` | `#ffffff` | Artboard fill — the hero surface |
 
-Light chrome is grey and controls sit **lighter** than the panel; dark chrome is graphite and controls sit **lighter** than the panel too. In both directions the canvas field is the darkest region so the artboard reads as the subject.
+Light chrome is grey and controls sit **lighter** than the panel; dark chrome is warm charcoal and controls sit **lighter** than the panel too. In both directions the canvas field is the darkest region so the artboard reads as the subject.
 
 ### Text and accent
 
 | Token | Light | Dark | Role |
 | --- | --- | --- | --- |
-| `--wb-foreground` | `rgba(0, 0, 0, 0.9)` | `rgba(255, 255, 255, 0.9)` | Primary text (Konva-safe classic rgba) |
-| `--wb-muted-foreground` | `rgba(0, 0, 0, 0.62)` | `rgba(255, 255, 255, 0.62)` | Labels, captions, inactive icons |
-| `--wb-focus` | `oklch(74% 0.12 258)` | `oklch(60% 0.15 258)` | Focus stroke |
+| `--wb-foreground` | `rgba(0, 0, 0, 0.9)` | `#F4F1EC` | Primary text (Konva-safe hex in dark) |
+| `--wb-muted-foreground` | `rgba(0, 0, 0, 0.62)` | `#C5C0B9` | Labels, captions, inactive icons |
+| `--wb-focus` | `oklch(74% 0.12 258)` | `#D8D2C9` | Focus stroke — blue in light, light-neutral in dark |
 | `--wb-menu-highlight` | `oklch(67% 0.17 258)` | `oklch(55% 0.145 258)` | Highlighted menu / command row |
 | `--wb-menu-highlight-foreground` | `#ffffff` | `#ffffff` | Text on a highlighted row |
-| `--wb-primary` | `#1e1e1e` | `#f2f2f2` | High-contrast CTA fill |
-| `--wb-destructive` | `#d5232c` | `#f56a63` | Delete, error |
-| `--wb-tooltip` | `rgb(30 30 30 / 94%)` | `rgb(74 74 74 / 94%)` | Tooltip pill — inverse in light, lifted in dark |
+| `--wb-primary` | `#1e1e1e` | `#F4F1EC` | High-contrast CTA fill |
+| `--wb-primary-foreground` | `#f2f2f2` | `#181716` | Text on primary action |
+| `--wb-destructive` | `#d5232c` | `#E87979` | Delete, error |
+| `--wb-tooltip` | `rgb(30 30 30 / 94%)` | `rgb(48 46 43 / 94%)` | Tooltip pill — inverse in light, elevated in dark |
 | `--wb-tooltip-shadow` | drop shadow | drop shadow | Tooltip elevation |
 
 **Canvas-facing tokens stay Konva-safe hex / classic `rgba(r, g, b, a)`.** `--wb-selection`, `--wb-selection-muted`, `--wb-smart-guide`, `--wb-page-margin`, `--wb-grid`, `--wb-foreground`, and the `--wb-artboard*` set are read with `getComputedStyle` and handed to Konva by [`useCanvasThemeColors`](../canvas/src/use-canvas-theme-colors.ts). Do not express those in modern `rgb(… / α)`, `oklch`, or `oklab` — Konva's colour parser returns NaN.
@@ -156,9 +174,9 @@ These flip between white and black overlays so hover states and dividers stay su
 | --- | --- | --- | --- |
 | `--wb-hover-overlay` | `rgb(0 0 0 / 6%)` | `rgb(255 255 255 / 6%)` | Hover on transparent controls |
 | `--wb-active-overlay` | `rgb(0 0 0 / 9%)` | `rgb(255 255 255 / 9%)` | Pressed / active backgrounds |
-| `--wb-divider-color` | `rgb(0 0 0 / 8%)` | `rgb(255 255 255 / 9%)` | Structural dividers |
-| `--wb-border-subtle` | `rgb(0 0 0 / 10%)` | `rgb(255 255 255 / 10%)` | Subtle borders on elevated surfaces |
-| `--wb-backdrop-overlay` | `rgb(0 0 0 / 35%)` | `rgb(17 17 17 / 72%)` | Modal / overlay backdrops |
+| `--wb-divider-color` | `rgb(0 0 0 / 8%)` | `rgb(255 255 255 / 6%)` | Structural dividers |
+| `--wb-border-subtle` | `rgb(0 0 0 / 10%)` | `rgb(255 255 255 / 6%)` | Subtle borders on elevated surfaces |
+| `--wb-backdrop-overlay` | `rgb(0 0 0 / 35%)` | `rgba(12, 11, 10, 0.72)` | Modal / overlay backdrops |
 
 ### Control shadows (inputs, selects, switches)
 
@@ -170,10 +188,11 @@ Light controls are **lit, not flat**: a hairline border, an inset white highligh
 | --- | --- | --- |
 | `--wb-shadow-control` | hairline + inset white top highlight + 1px drop | hairline ring + faint inset highlight |
 | `--wb-shadow-control-hover` | stronger hairline, same lighting | stronger hairline ring |
-| `--wb-shadow-control-focus` | 2px inset `--wb-focus` + hairline | 2px inset `--wb-focus` + hairline |
-| `--wb-shadow-float` | hairline + layered soft drops | solid `#444` outline + layered drops |
+| `--wb-shadow-control-focus` | 2px inset `--wb-focus` + hairline | 1px inset `--wb-focus` + hairline (no glow) |
+| `--wb-shadow-focus` | 1px `--wb-focus` + 3px soft blue halo | 1px `--wb-focus` only (no halo) |
+| `--wb-shadow-float` | hairline + layered soft drops | warm hairline + layered drops |
 
-Field focus rings are drawn **inside** the control (inset), so a focused field never grows into its neighbours in a dense inspector. Buttons, tabs, and icon buttons keep the outer halo via `--wb-shadow-focus`.
+Field focus rings are drawn **inside** the control (inset), so a focused field never grows into its neighbours in a dense inspector. Buttons, tabs, and icon buttons use the outer ring via `--wb-shadow-focus` — in dark mode that is a single 1px light-neutral stroke with no glow.
 
 Where the engine supports `corner-shape`, controls switch to `superellipse(1.3)` and the radius scale steps up — a squircle reads tighter than the same circular radius. It is scoped to controls: `corner-shape` does not inherit, and applying it broadly would flatten intentional circles built on `--wb-radius-full`.
 
@@ -211,12 +230,12 @@ Custom themes are added by consumers in their own CSS. No workbench code changes
 
 ```css
 [data-owb-theme='brand'] {
-  --wb-background: #0f172a;
-  --wb-foreground: #f8fafc;
-  --wb-canvas-field: #1e293b;
-  --wb-muted: #334155;
-  --wb-border: #475569;
-  --wb-selection: #38bdf8;
+  --wb-background: #1d1c1b;
+  --wb-foreground: #f4f1ec;
+  --wb-canvas-field: #181716;
+  --wb-muted: #2c2a28;
+  --wb-border: rgba(255, 255, 255, 0.06);
+  --wb-selection: #3b82f6;
 }
 ```
 
@@ -233,6 +252,8 @@ Portals render outside the shell DOM tree, so the active theme is propagated thr
 OpenWorkbench should feel like a **native design tool that happens to run in a browser** — not a web app wearing an editor costume.
 
 The product is the **artboard**. Everything else is scaffolding: thin, dense, and visually quiet. What separates the two is mostly material, not layout: an app has lit controls, translucent menus, hairline outlines, 11px type, and native-feeling scrollbars; a website has flat fills, opaque cards, 14px type, and browser scrollbars.
+
+In dark mode the chrome shares a warm nocturnal palette with the product dashboard — near-black canvas, charcoal modules, cream type — while keeping editor density and grammar intact.
 
 We copy the grammar of Figma and Paper **through tokens and CSS modules** — no Tailwind, no shadcn dependency. The components are ours.
 
@@ -294,6 +315,14 @@ The single loudest "is this an app?" signal. All four share `dropdown-menu.modul
 - Separators are inset to the row content (margin `--wb-space-1` vertical) — they do **not** bleed full width
 - Shortcut labels go through `formatShortcut`: Apple glyphs on Apple hosts, `Ctrl+…` elsewhere
 
+### Command palette
+
+Centered modal, max-width ~560px, `--wb-popover` fill, `--wb-radius-lg`, `--wb-shadow-float`, `--wb-backdrop-overlay` backdrop. Useful but secondary to visible navigation. No luminous blue glow.
+
+### Modal / overlay
+
+Backdrop uses `--wb-backdrop-overlay`. Panel uses `--wb-popover`, `--wb-radius-lg`, and `--wb-shadow-float`. Primary action is light fill with dark text in dark mode; secondary action is quiet outline/ghost.
+
 ### Tooltip
 
 - Inverse pill: `--wb-tooltip` fill, `--wb-tooltip-foreground` text, `--wb-tooltip-border` hairline
@@ -306,7 +335,7 @@ The single loudest "is this an app?" signal. All four share `dropdown-menu.modul
 - Rest: `--wb-shadow-control` — lit in light (hairline + inset top highlight + drop), hairline ring in dark
 - Radius: `--wb-radius-control`
 - Padding: 0 `--wb-control-padding-x`
-- Focus: `--wb-shadow-control-focus` (2px inset `--wb-focus`, both themes). NumericInput also shows it while scrubbing via `[data-scrubbing]`.
+- Focus: `--wb-shadow-control-focus` (inset `--wb-focus`; 2px in light, 1px in dark). NumericInput also shows it while scrubbing via `[data-scrubbing]`.
 - Digits use `font-variant-numeric: tabular-nums` so values do not reflow while dragged
 - NumericInput: right-aligned mono, optional scrub handle; used in X/Y/W/H pairs
 
@@ -482,12 +511,14 @@ Bind to `layer.transform` when canvas layer selected.
 | Decision | Source | Role rule | Why |
 | --- | --- | --- | --- |
 | Grey chrome, darker canvas, white artboard | Figma / Paper | Artboard is hero surface | Canvas must be the darkest region or the artboard stops reading as the subject |
+| Warm nocturnal dark palette | Dashboard / Linear | Dark surfaces only | Aligns product chrome without changing editor density or anatomy |
 | 11px workhorse type | Figma | All body/menu/tree text | 12–13px reads as a web form; density is what makes it feel like a tool |
 | 5px control radius | Paper radius ramp | Inputs, buttons, segments | 10px reads consumer-web; tools are tight |
 | Lit light controls | Paper `--shadow-control` | Inputs, selects, chips | A flat fill reads as a `<div>`; a border + inset top highlight reads as a surface |
 | Translucent blurred menus | Figma / macOS | Menus and tooltips only | Opaque cards are the strongest "website" tell |
-| Blue full-row menu highlight | Figma / macOS | Menu + command rows | Grey hover fills read as web list items |
-| Blue selection canvas-only | Figma | Canvas handles | Keeps accent meaningful; focus uses `--wb-focus` |
+| Blue full-row menu highlight | Figma / macOS | Menu + command rows | Grey hover fills read as web list items; dashboard nav is a different grammar |
+| Blue selection canvas-only | Figma | Canvas handles | Keeps accent meaningful |
+| Light-neutral dark focus | Dashboard | Keyboard focus in dark | No luminous blue glow; 1px #D8D2C9 stroke only |
 | Solid outline on every float | Paper `--color-popup-outline` | Menus, popovers, toolbar | Shadow-only floats look like web cards |
 | `color-scheme` + custom scrollbars | Native apps | Whole shell | Browser-default scrollbars break the illusion instantly |
 | System/Inter stack | Figma / Paper | All UI text | Matches host OS text rendering |
@@ -498,37 +529,22 @@ Bind to `layer.transform` when canvas layer selected.
 
 ---
 
-## Implementation roadmap
+## Version history
 
-### Phase 1 — Token realignment
+### v5 — Warm nocturnal dark (current)
 
-- [x] Rebuild `tokens.css` on the Figma/Paper palette (v4)
+- [x] Retint `[data-owb-theme="dark"]` in `tokens.css` to warm near-black / charcoal / cream palette
+- [x] Dark focus: 1px light-neutral (#D8D2C9), no blue glow
+- [x] Light theme, type scale, density, radii, layout metrics unchanged
+- [x] Canvas selection and menu highlight blue unchanged
+
+### v4 — Figma/Paper palette
+
+- [x] Rebuild `tokens.css` on the Figma/Paper palette
 - [x] 11px type scale; tight radius ramp; 24px controls, 24px menu rows
 - [x] Lit control shadows in light; hairline-outlined floats in both themes
 - [x] Translucent blurred menus + blue full-row highlight
 - [x] `color-scheme`, custom scrollbars, `::selection`, font smoothing
-
-### Phase 2 — Component refinement (1 PR)
-
-- [ ] Add `InputGroup`, `FieldGrid` primitives
-- [ ] Refine `LayerTreeRow` (icons, lock, selection state)
-- [ ] Restyle `FloatingToolbarRenderer` (lighter float, tighter icons)
-- [ ] Restyle sidebar `Tabs` as full-width segment control
-- [ ] `PanelSection` hairline separators
-
-### Phase 3 — Property panes (1 PR)
-
-- [x] Secondary sidebar uses shared `ViewContainerViews` for tree / properties / component content (replaces standalone `PropertyPanelRenderer`)
-- [x] Shared scroll chrome is `ViewPane`; **Inspector** remains only as the default secondary container for canvas layer/node property views
-- [ ] Wire Layer pane to transform (X/Y/W/H)
-- [ ] Add Styles pane color swatch row
-- [ ] Phase 2 layout fields behind `PropertyBuilder` extensions in canvas layers
-
-### Phase 4 — Canvas polish (1 PR)
-
-- [ ] Artboard shadow token
-- [ ] Selection size tooltip popover
-- [ ] Zoom chip ↔ viewport sync (already wired; restyle only)
 
 ---
 
@@ -537,12 +553,13 @@ Bind to `layer.transform` when canvas layer selected.
 Before merging visual changes, check both themes:
 
 - [ ] Artboard is the brightest surface; the canvas field is the darkest region
-- [ ] No blue outside canvas selection, focus rings, and menu highlights
+- [ ] No blue outside canvas selection and menu highlights (dark focus is light-neutral, not blue)
 - [ ] Menus are translucent and blurred, with a solid blue highlighted row
 - [ ] Light controls read as lit surfaces, not flat fills
 - [ ] Every floating surface has a 1px outline, not just a drop shadow
 - [ ] Body text is 11px; only section headers are 12px
 - [ ] Scrollbars are the thin custom ones, not the browser default
+- [ ] Dark chrome uses warm near-black / charcoal tones, not cool graphite greys
 - [ ] Prefer tokens over new colour/size literals in `*.module.css`
 - [ ] Canvas-facing tokens stay Konva-safe hex / classic `rgba` (never modern `rgb(… / α)`, `oklch`, `oklab`)
 - [ ] Prefer the spacing scale; document intentional off-grid one-offs (activity pill, tooltip)
@@ -576,4 +593,7 @@ import '@openenvx/workbench/theme.css';
 
 - [Figma](https://figma.com) — density, menu grammar, canvas-only accent
 - [Paper](https://paper.design) — material reference: translucent chrome, lit controls, oklch ramps, radius scale
+- Henry / ai.work — soft-edged dark modules, restrained functional accents
+- Metaview — near-black AI-product atmosphere, generous tonal hierarchy
+- Linear — quiet tonal layering, disciplined navigation
 - Refero: Framer dark editor, Artboard Studio, Glorify canvas editors — three-column pattern evidence
