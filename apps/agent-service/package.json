@@ -23,11 +23,11 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250710.0",
+    "@cloudflare/workers-types": "^5.20260826.1",
     "@openenvx/core": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
     "typescript": "catalog:dev",
-    "vitest": "4.1.10",
-    "wrangler": "^4.24.0"
+    "vitest": "4.1.11",
+    "wrangler": "^4.126.0"
   }
 }
