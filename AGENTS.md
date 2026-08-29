@@ -7,6 +7,7 @@ Instructions for coding agents working in the OpenEnvx monorepo.
 - **Never create or use git worktrees** (`git worktree`, isolated worktree agents, etc.). Work only in this checkout.
 - **Never commit** (and never push). Leave staging and commits to the human; do not run `git commit` unless they explicitly ask in that message.
 - **Never remove or disable a user-facing editor feature** (selection chrome, clone/delete menu, toolbars, panels, commands, etc.) to “fix” layout/spacing/bugs — without **explicit approval in that message**. Fix the root cause; keep the feature. `chromeDisplay: 'contents'` (or any trick that drops the selection menu) is only for hard structural cases already established (e.g. `email.column` / `<td>`), not a general spacing hammer.
+- **When the human asks you to commit**, use [Conventional Commits](https://www.conventionalcommits.org/) — see [Commit messages](#commit-messages-conventional-commits) below. Release changelogs are generated from git history via git-cliff.
 
 ## Thermos / thermo-nuclear reviews
 
@@ -128,6 +129,37 @@ All source files use **kebab-case** filenames.
 - **Tests:** `*.test.ts` / `*.test.tsx` beside the module, same kebab-case stem.
 
 Match the surrounding package convention before creating files.
+
+### Commit messages (conventional commits)
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) for every commit (human or agent). Root [CHANGELOG.md](CHANGELOG.md) is built from git history via [git-cliff](cliff.toml).
+
+**Format:** `type(scope): subject` — imperative, lowercase subject, no trailing period.
+
+| Type | Use for |
+| --- | --- |
+| `feat` | New user-facing capability or public API |
+| `fix` | Bug fix |
+| `refactor` | Code change that is not a fix or feature |
+| `perf` | Performance improvement |
+| `docs` | Documentation only |
+| `test` | Tests only |
+| `chore` | Tooling, deps, repo hygiene (not `chore(release)` — reserved for the release workflow) |
+| `ci` | CI / GitHub Actions |
+
+**Scope** (optional but preferred): package or area — e.g. `canvas`, `html-studio`, `workbench`, `extensions`, `release`.
+
+**Examples:**
+
+```
+feat(html-studio): add theme prop to HtmlEditor
+fix(canvas): correct snap guide offset at high zoom
+refactor(core): extract property path resolver
+docs: document MPL-2.0 license
+chore: bump turbo
+```
+
+Breaking changes: append `!` after type/scope (`feat(core)!: rename Scene export`) or add a `BREAKING CHANGE:` footer in the commit body.
 
 ### Type and interface naming
 
