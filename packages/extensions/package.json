@@ -2,7 +2,7 @@
   "name": "@xmazu/openenvxee-extensions",
   "version": "0.7.18",
   "description": "OpenEnvx sandbox extension author SDK — protocol wire types, element vocabulary, defineExtension, Vite packaging",
-  "license": "MIT",
+  "license": "MPL-2.0",
   "type": "module",
   "files": [
     "dist",

@@ -1,6 +1,7 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignoreExportsUsedInFile": true,
+  "ignoreBinaries": ["const", "gh"],
   "ignoreDependencies": [
     "eslint-plugin-github",
     "eslint-plugin-sonarjs",
@@ -9,12 +10,10 @@
   "workspaces": {
     ".": {
       "entry": [
-        "package.json",
-        "scripts/**/*.{js,ts,mts}!"
+        "package.json"
       ],
       "project": [
-        "*.{js,ts,mts}",
-        "scripts/**/*.{js,ts,mts}"
+        "*.{js,ts,mts}"
       ]
     },
     "packages/core": {

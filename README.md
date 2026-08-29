@@ -4,7 +4,7 @@
 
 OpenEnvx is an open-source foundation for canvas, HTML, and email editors. It gives you a schema-first document model, a headless runtime, and a contribution system for layers, commands, inspectors, and panels. Use a ready-made editor or compose the pieces around your own application.
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](packages/html-studio/package.json) [![CI](https://github.com/openenvx/openenvx/actions/workflows/ci.yml/badge.svg)](https://github.com/openenvx/openenvx/actions/workflows/ci.yml)
+[![License: MPL-2.0](https://img.shields.io/badge/license-MPL--2.0-blue.svg)](LICENSE) [![CI](https://github.com/openenvx/openenvx/actions/workflows/ci.yml/badge.svg)](https://github.com/openenvx/openenvx/actions/workflows/ci.yml)
 
 > **Early development:** OpenEnvx is pre-1.0. APIs and package boundaries may change.
 
@@ -60,10 +60,9 @@ Each editor includes a `runtime` entry point for headless scene creation or rend
 packages/   reusable libraries and published editor packages
 apps/       demos, package smoke tests, and documentation
 docs/       architecture and integration guides
-scripts/    release and repository tooling
 ```
 
-The published MIT packages are the supported external entry points. Some lower-level workspace packages and product-specific integrations remain private while their APIs settle; the package catalog documents the boundary.
+The published MPL-2.0 packages are the supported external entry points. Some lower-level workspace packages and product-specific integrations remain private while their APIs settle; the package catalog documents the boundary.
 
 ## Explore the docs
 
@@ -100,4 +99,4 @@ Bug reports and feature discussions belong in [GitHub Issues](https://github.com
 
 ## License
 
-Public packages identify their license in their own `package.json` files. The published editor packages and extension SDK are MIT licensed; review the package boundary before depending on private workspace code.
+OpenEnvx Editor is licensed under [Mozilla Public License 2.0](LICENSE) (MPL-2.0). Published npm packages and the extension SDK use the same license; private workspace packages (`packages/studio`, `packages/agent`) are proprietary.

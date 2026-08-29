@@ -48,4 +48,4 @@ Headless helpers live on `@openenvx/canvas-studio/runtime`:
 
 ## License
 
-MIT
+MPL-2.0 — see [LICENSE](../../../LICENSE) in the repository root.

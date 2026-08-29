@@ -82,4 +82,4 @@ The main entry also re-exports core scene types, HTML block APIs, and workbench 
 
 ## License
 
-MIT
+MPL-2.0 — see [LICENSE](../../../LICENSE) in the repository root.

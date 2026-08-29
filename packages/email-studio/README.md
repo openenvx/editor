@@ -52,4 +52,4 @@ Headless helpers live on `@openenvx/email-studio/runtime`:
 
 ## License
 
-MIT
+MPL-2.0 — see [LICENSE](../../../LICENSE) in the repository root.

@@ -48,7 +48,7 @@ Pull requests should explain:
 - what problem the change solves;
 - which package or public surface it affects;
 - how it was tested;
-- whether documentation, a changeset, or a feature-matrix update is needed.
+- whether documentation or a feature-matrix update is needed.
 
 Keep commits and pull requests small enough to review. Maintainers may ask for a design issue or split a broad change into separate pull requests.
 

@@ -29,3 +29,7 @@ export const demo = defineCanvasComponent({
 | `./protocol`                      | Hosts validate trees (no Preact)     |
 | `./canvas` / `./html` / `./panel` | Element vocabulary                   |
 | `./vite`                          | `bundleWidgetSources()` for isolates |
+
+## License
+
+MPL-2.0 — see [LICENSE](../../LICENSE) in the repository root.

@@ -2,7 +2,7 @@
   "name": "@openenvx/html-studio",
   "version": "0.1.1",
   "description": "OpenEnvx HTML block editor — drop-in React component and product host surface",
-  "license": "MIT",
+  "license": "MPL-2.0",
   "type": "module",
   "files": [
     "dist"

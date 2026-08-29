@@ -47,16 +47,16 @@ Author how-to (under `docs/architecture/`):
 
 | Tier | Packages | License / publish | Responsibility |
 | --- | --- | --- | --- |
-| Foundation | `schema`, `preview`, `core` | Workspace packages; MIT where declared | Scene model (Zod + JSON Schema), plugin host primitives |
-| Embed / sandbox protocol | `extensions` (`@xmazu/openenvxee-extensions`, `./protocol` subpath) | Published package, MIT; registry access may vary | `RenderNode`, manifests, validators, sandbox grants |
+| Foundation | `schema`, `preview`, `core` | Workspace packages; MPL-2.0 | Scene model (Zod + JSON Schema), plugin host primitives |
+| Embed / sandbox protocol | `extensions` (`@xmazu/openenvxee-extensions`, `./protocol` subpath) | Published package, MPL-2.0; registry access may vary | `RenderNode`, manifests, validators, sandbox grants |
 | Product libs | `canvas`, `html`, `driver-email`, `workbench`, `agent` | Workspace packages; package licenses apply | Canvas editor, HTML editor, email driver, React shell, agent |
-| Published product | `@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio` | Public npm, MIT | Drop-in editors for open-source hosts |
+| Published product | `@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio` | Public npm, MPL-2.0 | Drop-in editors for open-source hosts |
 
 ## Placement cheat sheet
 
 | Put it here | Examples |
 | --- | --- |
-| `@xmazu/openenvxee-schema` | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
+| `@openenvx/core` (`./schema`) | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
 | `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry`, `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context, external host mount surfaces |
 | `@openenvx/canvas` | Konva stage, layers, renderers, `CanvasPlugin`, `CanvasEditor` |
 | `@openenvx/html` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |

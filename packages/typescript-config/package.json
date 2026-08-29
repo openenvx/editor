@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "license": "MIT",
+  "license": "MPL-2.0",
   "exports": {
     "./base.json": "./base.json",
     "./css-modules.d.ts": "./css-modules.d.ts",

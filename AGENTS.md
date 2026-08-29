@@ -27,11 +27,10 @@ Call these out as first-class findings, not afterthoughts.
 
 OpenEnvx is a composable visual editor framework: plugins register layers, commands, and UI contributions; a headless controller owns scene state; apps compose their own React shell. The monorepo uses **Bun** workspaces:
 
-| Path         | Contents                                                 |
-| ------------ | -------------------------------------------------------- |
-| `packages/*` | Publishable libraries (`core`, `canvas`, `workbench`, …) |
-| `apps/*`     | Demo apps (`demo-playground`, `docs`)                    |
-| `examples/*` | Example plugins (`image-plugin`)                         |
+| Path | Contents |
+| --- | --- |
+| `packages/*` | Libraries (`core`, `canvas`, `workbench`, published `*-studio`, …) |
+| `apps/*` | Demos (`demo-playground`, `*-demo`, `*-package-demo`), `agent-service` |
 
 ## Documentation map
 
@@ -83,9 +82,9 @@ Internal workspace libraries (`core`, `canvas`, `workbench`, `agent`, …) are *
 Published packages:
 
 - **`@xmazu/openenvxee-extensions`** — published sandbox author SDK: `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts import **`@xmazu/openenvxee-extensions/protocol`** only.
-- **`@openenvx/html-studio`** — published HTML editor (public npm, MIT). Drop-in `HtmlEditor` + host composition API + `./runtime` (`renderBlockDocument`); inlines private core/html/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/email-studio`** — published email editor (public npm, MIT). Drop-in `EmailEditor` + `createEmailScene` + `renderEmailHtml`; inlines private core/html/driver-email/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/canvas-studio`** — published canvas editor (public npm, MIT). Drop-in `CanvasEditor` + `createCanvasScene`; inlines private core/canvas/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`, `./fonts.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/html-studio`** — published HTML editor (public npm, MPL-2.0). Drop-in `HtmlEditor` + host composition API + `./runtime` (`renderBlockDocument`); inlines private core/html/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/email-studio`** — published email editor (public npm, MPL-2.0). Drop-in `EmailEditor` + `createEmailScene` + `renderEmailHtml`; inlines private core/html/driver-email/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/canvas-studio`** — published canvas editor (public npm, MPL-2.0). Drop-in `CanvasEditor` + `createCanvasScene`; inlines private core/canvas/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`, `./fonts.css`. See [PUBLISHING.md](PUBLISHING.md).
 - **`@xmazu/openenvxee-studio`** — unpublished proprietary canvas host allowlist (`packages/studio`). Monorepo canvas demos use `@openenvx/canvas` + `@openenvx/workbench` directly.
 
 ## Host sidebar panels (product hosts)
@@ -142,7 +141,6 @@ Do **not** use Hungarian `I` prefixes on interfaces or type aliases.
 
 - Prefer `interface` for object shapes; use `type` for unions and aliases.
 - Name interfaces and types in **PascalCase** without a leading `I`.
-- `bun run check:interface-names` enforces this in CI and pre-commit.
 
 ### No backward compatibility until 1.0.0
 
@@ -193,12 +191,12 @@ bun run fix           # auto-fix lint/format (ultracite)
 bun run check         # lint (ultracite) + knip
 bun run check-types   # tsc --noEmit across packages (excl. apps)
 bun run precommit     # ultracite + knip + check-types for packages dirty vs HEAD (excl. apps)
-bun run changeset     # create a release changeset
+bun run changelog     # preview unreleased changelog (git-cliff)
 ```
 
 ## Publishing
 
-Only `packages/extensions` (`@xmazu/openenvxee-extensions`), `packages/html-studio` (`@openenvx/html-studio`), `packages/email-studio` (`@openenvx/email-studio`), and `packages/canvas-studio` (`@openenvx/canvas-studio`) are published (see [PUBLISHING.md](PUBLISHING.md)).
+Only `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-studio` are published via the GitHub Actions **Release** workflow (see [PUBLISHING.md](PUBLISHING.md)). `@xmazu/openenvxee-extensions` publishes separately to GitHub Packages.
 
 ## Before you finish
 
