@@ -11,6 +11,11 @@ import {
 } from '../test/html-editor-harness';
 import { BlockTreeRenderer } from './block-tree-renderer';
 
+vi.mock('./lazy-rich-text-editor', async () => {
+  const { HtmlRichTextEditor } = await import('./html-rich-text-editor');
+  return { HtmlRichTextEditorLazy: HtmlRichTextEditor };
+});
+
 afterEach(cleanup);
 
 let api: WorkbenchApi;
@@ -26,7 +31,17 @@ afterEach(() => {
   disposeWorkbench();
 });
 
-/** jsdom elements have 0×0 boxes — floating selection pill hides without this. */
+/** TipTap mounts `.ProseMirror` with `contenteditable` — allow either selector. */
+async function waitForRichTextEditor(): Promise<HTMLElement> {
+  return waitFor(() => {
+    const node = document.querySelector(
+      '.ProseMirror, [contenteditable="true"]'
+    );
+    expect(node).toBeTruthy();
+    return node as HTMLElement;
+  });
+}
+
 async function withMockedBlockRects(
   run: () => void | Promise<void>
 ): Promise<void> {
@@ -139,9 +154,7 @@ describe('BlockTreeRenderer', () => {
       editingTarget: { hostId: 'heading-1', dataPath: 'html' },
     });
 
-    await waitFor(() => {
-      expect(document.querySelector('[contenteditable="true"]')).toBeTruthy();
-    });
+    await waitForRichTextEditor();
     expect(
       screen.queryByRole('toolbar', { name: 'Heading actions' })
     ).toBeNull();
@@ -153,11 +166,7 @@ describe('BlockTreeRenderer', () => {
       editingTarget: { hostId: 'heading-1', dataPath: 'html' },
     });
 
-    const editable = await waitFor(() => {
-      const node = document.querySelector('[contenteditable="true"]');
-      expect(node).toBeTruthy();
-      return node as HTMLElement;
-    });
+    const editable = await waitForRichTextEditor();
 
     const event = new KeyboardEvent('keydown', {
       key: ' ',
@@ -196,13 +205,7 @@ describe('BlockTreeRenderer', () => {
       editingTarget: { hostId: 'heading-1', dataPath: 'html' },
     });
 
-    await waitFor(() => {
-      expect(document.querySelector('[contenteditable="true"]')).toBeTruthy();
-    });
-
-    const editable = document.querySelector(
-      '[contenteditable="true"]'
-    ) as HTMLElement;
+    const editable = await waitForRichTextEditor();
     expect(editable.closest('h2')).toBeTruthy();
   });
 
@@ -214,13 +217,7 @@ describe('BlockTreeRenderer', () => {
       },
     });
 
-    await waitFor(() => {
-      expect(document.querySelector('[contenteditable="true"]')).toBeTruthy();
-    });
-
-    const editable = document.querySelector(
-      '[contenteditable="true"]'
-    ) as HTMLElement;
+    const editable = await waitForRichTextEditor();
     expect(editable.closest('h1')).toBeTruthy();
   });
 
