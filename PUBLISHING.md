@@ -73,16 +73,20 @@ The release workflow reads GitHub Actions secret **`NPM_TOKEN`** (exact name). `
 
 1. Log in as a user who can publish `@openenvx/*`
 2. **Access Tokens → Generate New Token → Granular Access Token**
-3. Permissions: **Packages and scopes → Read and write** for `@openenvx` (or each studio package)
-4. Copy the token once (`npm_…`) into the GitHub secret — no quotes, no trailing newline
+3. Permissions: **Packages and scopes → Read and write** for `@openenvx`
+4. Enable **Bypass 2FA** (required for CI publish when your npm account has 2FA)
+5. Do **not** set IP allowlisting unless you know your CI egress IPs (GitHub-hosted runners use dynamic IPs)
+6. Copy the token once (`npm_` + 36 chars is normal length) into the GitHub secret `NPM_TOKEN`
 
-**Verify locally before re-running CI:**
+**Important:** granular publish tokens with bypass-2FA **cannot** call `npm whoami` (npm returns 401/403 on identity endpoints). That is expected. The release workflow skips `whoami` and authenticates at `npm publish` instead.
+
+**Verify locally (optional):**
 
 ```bash
-npm whoami --registry https://registry.npmjs.org   # after: export NPM_TOKEN='npm_...'
+export NODE_AUTH_TOKEN='npm_...'
+printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > ~/.npmrc
+npm publish ./packages/html-studio --dry-run --access public
 ```
-
-The publish step trims whitespace, checks the `npm_` prefix, runs `npm whoami`, then `npm publish`.
 
 Optional: you can also configure [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC, no token) for each package. If you use trusted publishing instead, remove `NPM_TOKEN` from the publish step and do not set `NODE_AUTH_TOKEN` in the job.
 

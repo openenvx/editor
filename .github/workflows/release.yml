@@ -120,26 +120,19 @@ jobs:
 
       - name: Publish to npm
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          NPM_TOKEN="$(printf '%s' "${NPM_TOKEN}" | tr -d '[:space:]')"
-          if [ -z "${NPM_TOKEN}" ]; then
+          NODE_AUTH_TOKEN="$(printf '%s' "${NODE_AUTH_TOKEN}" | tr -d '[:space:]')"
+          export NODE_AUTH_TOKEN
+          if [ -z "${NODE_AUTH_TOKEN}" ]; then
             echo "ERROR: GitHub secret NPM_TOKEN is missing or empty for this repository."
             echo "If the secret is org-wide, open GitHub → Organization settings → Secrets → NPM_TOKEN"
             echo "and ensure openenvx/editor is in Repository access. A repo secret with the same name overrides the org secret."
             exit 1
           fi
-          if [ "${NPM_TOKEN#npm_}" = "${NPM_TOKEN}" ]; then
-            echo "ERROR: NPM_TOKEN does not look like an npm token (expected prefix npm_)."
-            exit 1
-          fi
-          echo "NPM_TOKEN length: ${#NPM_TOKEN}"
-          printf '//registry.npmjs.org/:_authToken=%s\n' "${NPM_TOKEN}" > "${HOME}/.npmrc"
-          if ! npm whoami --registry https://registry.npmjs.org; then
-            echo "ERROR: npm rejected NPM_TOKEN (401). Regenerate a granular npm token with Packages: Read and Write for @openenvx."
-            echo "npmjs.com → Access Tokens → Generate New Token → Granular Access Token"
-            exit 1
-          fi
+          # Granular publish tokens (especially bypass-2FA) cannot call identity endpoints like whoami.
+          # npm publish is the real auth check for CI tokens.
+          printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > "${HOME}/.npmrc"
           for pkg in packages/html-studio packages/email-studio packages/canvas-studio; do
             echo "Publishing $pkg"
             # `./` is required: npm treats `packages/foo` as github:packages/foo (EALLOWGIT).
