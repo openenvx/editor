@@ -7,7 +7,9 @@ export function createLibraryConfig(options = {}) {
   return defineConfig({
     entry: ['src/**/*.{ts,tsx}', '!src/**/*.test.{ts,tsx}', '!src/**/*.d.ts'],
     format: ['esm'],
-    dts: true,
+    // Private workspace libs resolve types from `src/`; DTS here OOMs in CI.
+    // Published packages (e.g. extensions) pass `dts: true`.
+    dts: false,
     bundle: false,
     sourcemap: true,
     clean: true,

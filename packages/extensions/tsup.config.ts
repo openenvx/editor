@@ -1,6 +1,7 @@
 import { createLibraryConfig } from '@openenvx/typescript-config/tsup.library';
 
 export default createLibraryConfig({
+  dts: true,
   entry: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.test.{ts,tsx}',
