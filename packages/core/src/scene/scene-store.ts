@@ -135,7 +135,7 @@ export class SceneStore {
 
   /**
    * Deep-cloned snapshot for persistence / external export.
-   * Do not use for hot paths — prefer `onDidChangeScene` (shared immutable refs).
+   * Do not use for hot paths - prefer `onDidChangeScene` (shared immutable refs).
    */
   getSnapshot(): SceneSnapshot {
     return {
@@ -175,7 +175,7 @@ export class SceneStore {
   }
 
   setScene(scene: Scene): void {
-    // Full validation: load / trust-boundary replace (no history — clipboard /
+    // Full validation: load / trust-boundary replace (no history - clipboard /
     // hydrate paths that must not invent an undo step).
     this.scene = this.finalizeSceneFull(scene);
     this.syncEditorStateToScene();
@@ -276,7 +276,7 @@ export class SceneStore {
     ) {
       // True no-op (same root, or new root wrapping identical root refs).
       // In-place mutators that return the live root corrupt the store without
-      // a history step — path-copy is required for real edits.
+      // a history step - path-copy is required for real edits.
       return;
     }
     const nextScene = this.finalizeScene(drafted, live);

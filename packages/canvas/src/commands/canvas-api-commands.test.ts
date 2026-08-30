@@ -129,7 +129,7 @@ describe('UpdateLayerTransformCommand dataPatch', () => {
 });
 
 describe('UpdateLayerTransformCommand group child isolation', () => {
-  it('updates only the moved child — siblings and group origin stay put', () => {
+  it('updates only the moved child - siblings and group origin stay put', () => {
     const siblingTransform = {
       ...createDefaultTransform(),
       height: 40,

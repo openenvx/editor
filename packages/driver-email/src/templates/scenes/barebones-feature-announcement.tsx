@@ -251,7 +251,7 @@ export function createBarebonesFeatureAnnouncementScene(options?: {
   return sceneFromEmailJsx(
     <Email
       id="email-root"
-      preheader={`Release notes — ${companyName}`}
+      preheader={`Release notes - ${companyName}`}
       style={{
         backgroundColor: BG_2,
         paddingTop: 32,

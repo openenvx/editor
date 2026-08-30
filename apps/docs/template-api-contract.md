@@ -112,8 +112,8 @@ Server steps:
 
 Template layers (named):
 
-- `headline` — `canvas.text`, html `Hello`, `autoFit: 'shrink'`, box 320×80, fontSize 40
-- `hero` — `canvas.image`, `fit: 'cover'`, focalPoint `{ x: 0.5, y: 0.2 }`
+- `headline` - `canvas.text`, html `Hello`, `autoFit: 'shrink'`, box 320×80, fontSize 40
+- `hero` - `canvas.image`, `fit: 'cover'`, focalPoint `{ x: 0.5, y: 0.2 }`
 
 Manifest:
 
@@ -157,7 +157,7 @@ Resolved scene: headline `data.html` becomes escaped paragraph text; hero `data.
 | Case | Recommended API behavior |
 | --- | --- |
 | Unknown modification `name` | `400` listing unknown names (or skip if you choose lenient mode) |
-| Duplicate layer names in template | `400` — template invalid until renamed |
+| Duplicate layer names in template | `400` - template invalid until renamed |
 | Type mismatch (e.g. `imageUrl` on text) | Ignore irrelevant fields; do not fail |
 | Missing template | `404` |
 | `schemaVersion` newer than server | `409` / `422` unsupported version |

@@ -201,7 +201,7 @@ function toAbsoluteOffset(
 }
 
 /**
- * Rotate a top-left-origin transform around its center — same as Konva.Transformer.
+ * Rotate a top-left-origin transform around its center - same as Konva.Transformer.
  */
 export function rotateTransformAroundCenter(
   transform: Transform,

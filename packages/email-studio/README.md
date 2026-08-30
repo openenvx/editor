@@ -32,9 +32,9 @@ export function App() {
 }
 ```
 
-Import `@openenvx/email-studio/theme.css` if your bundler does not apply CSS imported from JS (the React entry already pulls in the same file). For Node/SSR HTML export, import `@openenvx/email-studio/runtime` — it does not load the editor shell.
+Import `@openenvx/email-studio/theme.css` if your bundler does not apply CSS imported from JS (the React entry already pulls in the same file). For Node/SSR HTML export, import `@openenvx/email-studio/runtime` - it does not load the editor shell.
 
-The published tarball is minified ESM + one CSS file. Types are a narrow public surface (`EmailEditor`, `Scene` as opaque JSON, HTML export helpers) — not the internal editor schema.
+The published tarball is minified ESM + one CSS file. Types are a narrow public surface (`EmailEditor`, `Scene` as opaque JSON, HTML export helpers) - not the internal editor schema.
 
 ## Public API
 
@@ -52,4 +52,4 @@ Headless helpers live on `@openenvx/email-studio/runtime`:
 
 ## License
 
-MPL-2.0 — see [LICENSE](../../../LICENSE) in the repository root.
+MPL-2.0 - see [LICENSE](../../../LICENSE) in the repository root.

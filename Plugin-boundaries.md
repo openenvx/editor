@@ -14,9 +14,9 @@ How **internal** (first-party) and **external** (embed / sandbox) extensions rel
 
 **Do not share the PluginManager DI tree with external hosts.** Trusted OOP plugins activate with full `WorkbenchPluginContext` (`services`). Sandbox and embed hosts mount on narrow surfaces (`SandboxHostSurface` / `EmbedPanelHostSurface`) that never expose `InstantiationService`. Untrusted isolates / protocol parents never see either surface.
 
-This is **DI isolation**, not registry isolation: sandbox still registers run commands on the shared `CommandService`, and embed panels still register workbench contributions / view panels / icons so the shell palette and sidebars can render them. `SandboxHostSurface` is privileged for the first-party adapter (scene read/write + `executeCommand`) — isolates never receive it; capability gates stay on the host bridge.
+This is **DI isolation**, not registry isolation: sandbox still registers run commands on the shared `CommandService`, and embed panels still register workbench contributions / view panels / icons so the shell palette and sidebars can render them. `SandboxHostSurface` is privileged for the first-party adapter (scene read/write + `executeCommand`) - isolates never receive it; capability gates stay on the host bridge.
 
-Figma parity (plugins vs widgets, isolate + `showUI` iframe) lives on the **sandbox** path only. Embed panels stay a separate, safer/weaker trust path — do not force them onto QuickJS.
+Figma parity (plugins vs widgets, isolate + `showUI` iframe) lives on the **sandbox** path only. Embed panels stay a separate, safer/weaker trust path - do not force them onto QuickJS.
 
 ## Hard rule
 
@@ -115,7 +115,7 @@ Treat `@xmazu/openenvxee-extensions/protocol` as the **only** public wire surfac
 | Extension → host | `render` | Surface id + validated `RenderNode` tree (views, inspector panes, widget faces) |
 | Extension → host | `command` | Request a host command (allowlisted) |
 
-Static contributions (widgets, blocks, commands, viewContainers, views, chrome trees) live in `ExtensionManifest` / `openenvx.extension.json`. There is **no** runtime `panel:manifest` / `allowManifest` path — chrome is build-time.
+Static contributions (widgets, blocks, commands, viewContainers, views, chrome trees) live in `ExtensionManifest` / `openenvx.extension.json`. There is **no** runtime `panel:manifest` / `allowManifest` path - chrome is build-time.
 
 Host pieces:
 
@@ -136,23 +136,23 @@ Host pieces:
 
 The protocol shape is enough as the **interaction model**. Seal these before treating it as a product boundary:
 
-1. **Manifest ∩ grant** — effective caps are the intersection of `ExtensionManifest.permissions` and the host grant; contribute chrome only from the validated static manifest.
-2. **Default `contextScope` to `selection`** — product default for embeds; `scene` can exfiltrate the full document to the parent and needs explicit host opt-in.
-3. **Semantic allowlists** — command ids via `allowedCommands`; external `render` binds must be `plugin.<surfaceId>.*` (validated + mapped).
+1. **Manifest ∩ grant** - effective caps are the intersection of `ExtensionManifest.permissions` and the host grant; contribute chrome only from the validated static manifest.
+2. **Default `contextScope` to `selection`** - product default for embeds; `scene` can exfiltrate the full document to the parent and needs explicit host opt-in.
+3. **Semantic allowlists** - command ids via `allowedCommands`; external `render` binds must be `plugin.<surfaceId>.*` (validated + mapped).
 4. **Mandatory origin checks** on the transport.
-5. **Capability negotiation** — grow beyond `v: 1` with an explicit capabilities list so the surface can evolve without silent breakage.
+5. **Capability negotiation** - grow beyond `v: 1` with an explicit capabilities list so the surface can evolve without silent breakage.
 
 Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/public/embed-parent.html) at `/embed-parent.html`; the iframe loads `/?embed=1` with `EmbedPanelHost` via `WorkbenchShell` `mountExternalHosts` (`contextScope: 'selection'`, empty `allowedCommands`). Sandbox demos: canvas-demo seating / save-the-date; html-demo countdown / RSVP.
 
 ## QuickJS sandbox (Phase V.1 / V.1.1)
 
-Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workbench `SandboxExtensionHost` + canvas widget click bind), mounted with `mountSandboxExtensions` / `WorkbenchShell` `mountExternalHosts`: **one QuickJS isolate per extension in a dedicated Web Worker** — never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` nodes carry **local** `data.values` plus a rendered face in `data.children` (collaborative CRDT deferred). Customer widgets push `source` over `widget:source`; first-party grants still use signed URLs + content hashes (minted by openenvx-cloud).
+Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workbench `SandboxExtensionHost` + canvas widget click bind), mounted with `mountSandboxExtensions` / `WorkbenchShell` `mountExternalHosts`: **one QuickJS isolate per extension in a dedicated Web Worker** - never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` nodes carry **local** `data.values` plus a rendered face in `data.children` (collaborative CRDT deferred). Customer widgets push `source` over `widget:source`; first-party grants still use signed URLs + content hashes (minted by openenvx-cloud).
 
-**Plugin lifecycle:** production hosts default `autoStartPlugins: false` — sandbox plugins start via `openenvx.sandbox.run.<id>` (user-run). Demos may opt into auto-start. Closing the floating UI panel does not stop the isolate; **Stop** / `closePlugin` does.
+**Plugin lifecycle:** production hosts default `autoStartPlugins: false` - sandbox plugins start via `openenvx.sandbox.run.<id>` (user-run). Demos may opt into auto-start. Closing the floating UI panel does not stop the isolate; **Stop** / `closePlugin` does.
 
 **OK to run:** cloud-minted, hash-pinned, capability-scoped extensions that you (or a customer org admin) explicitly installed for a session.
 
-**Not OK yet:** open marketplace / “anyone uploads JS and it runs in every Studio” — that needs cloud grant/signing, kill switch, version pinning, and further CPU/UI hardening beyond this boundary. Marketplace distribution remains deferred.
+**Not OK yet:** open marketplace / “anyone uploads JS and it runs in every Studio” - that needs cloud grant/signing, kill switch, version pinning, and further CPU/UI hardening beyond this boundary. Marketplace distribution remains deferred.
 
 ### Isolation caps (V.1.1)
 
@@ -175,9 +175,9 @@ Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workben
 
 **Widget isolate granularity:** one QuickJS isolate per `extensionId` (shared by all instances of that widget). Face render + handler invoke are serialized per controller (`widgetOpTail`) so instances cannot interleave async work. Isolate-per-instance is deferred (memory under the concurrent-isolate cap).
 
-**Sandbox plugin lane (decision note):** widget face expand needs QuickJS for deterministic server-side `renderToElementTree`. Sandbox **plugins** already ship UI as `showUI` HTML — the same case where this doc prefers an iframe over a script isolate. Keeping QuickJS for plugins is intentional for a single bridge/`openenvx.*` authoring model in V.1; a future split (iframe-as-isolate for plugins, QuickJS only for widgets) would delete the async-CPU problem class for the plugin lane without changing the protocol messages.
+**Sandbox plugin lane (decision note):** widget face expand needs QuickJS for deterministic server-side `renderToElementTree`. Sandbox **plugins** already ship UI as `showUI` HTML - the same case where this doc prefers an iframe over a script isolate. Keeping QuickJS for plugins is intentional for a single bridge/`openenvx.*` authoring model in V.1; a future split (iframe-as-isolate for plugins, QuickJS only for widgets) would delete the async-CPU problem class for the plugin lane without changing the protocol messages.
 
-UI iframe messages use `postMessage(..., '*')` because the sandboxed frame has an opaque null origin — the host still checks `event.source === iframe.contentWindow`.
+UI iframe messages use `postMessage(..., '*')` because the sandboxed frame has an opaque null origin - the host still checks `event.source === iframe.contentWindow`.
 
 See openenvx-cloud `docs/embed/plugin-api.md`.
 
@@ -199,7 +199,7 @@ flowchart TB
 | Where plugin logic runs | When to use |
 | --- | --- |
 | Customer parent page | Today’s embed |
-| Sandboxed iframe on a plugin origin (e.g. `plugins.openenvx.com/<id>/`) | Plugin is a small web UI — simplest for authors |
+| Sandboxed iframe on a plugin origin (e.g. `plugins.openenvx.com/<id>/`) | Plugin is a small web UI - simplest for authors |
 | Cloudflare Worker (or similar) | Server-side tree generation from events / config |
 | QuickJS / Wasm / V8 isolate | Authors upload **raw JS scripts** that must not get DOM/`fetch` by default |
 
@@ -215,7 +215,7 @@ Rules if you sandbox JS:
 - Run in a **Worker** only in production hosts (never `eval` / dynamic `import()` / in-process QuickJS on the editor UI thread). Unit tests may set `preferInProcess: true`.
 - Capabilities stay host-side (`allowedCommands`, grant capabilities)
 
-Cloudflare Workers already provide V8 isolates — often enough without shipping QuickJS yourself. QuickJS-in-Wasm is useful when the same tiny sandbox must run in browser _and_ on the server.
+Cloudflare Workers already provide V8 isolates - often enough without shipping QuickJS yourself. QuickJS-in-Wasm is useful when the same tiny sandbox must run in browser _and_ on the server.
 
 Prefer iframe or Worker-without-user-JS first; reach for script isolates only when the authoring model is “upload a script,” not “ship a small app.”
 
@@ -236,10 +236,10 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 
 ## Related
 
-- [Architecture.md](Architecture.md) — package boundaries hub
-- [docs/architecture/extensions.md](docs/architecture/extensions.md) — short extensions summary for agents
-- [apps/docs/README.md](apps/docs/README.md) — authoring hub (internal vs sandbox vs embed)
-- [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) — how to write widgets / sandbox plugins / embed panels
-- [apps/docs/extension-guide.md](apps/docs/extension-guide.md) — internal OOP plugins only
-- [FEATURES.md](FEATURES.md) — embed panels + sandbox extensions rows
-- [PUBLISHING.md](PUBLISHING.md) — protocol publish / link notes
+- [Architecture.md](Architecture.md) - package boundaries hub
+- [docs/architecture/extensions.md](docs/architecture/extensions.md) - short extensions summary for agents
+- [apps/docs/README.md](apps/docs/README.md) - authoring hub (internal vs sandbox vs embed)
+- [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) - how to write widgets / sandbox plugins / embed panels
+- [apps/docs/extension-guide.md](apps/docs/extension-guide.md) - internal OOP plugins only
+- [FEATURES.md](FEATURES.md) - embed panels + sandbox extensions rows
+- [PUBLISHING.md](PUBLISHING.md) - protocol publish / link notes

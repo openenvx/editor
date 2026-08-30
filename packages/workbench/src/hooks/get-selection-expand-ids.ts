@@ -2,7 +2,7 @@ import { getActivePage, type Scene } from '@openenvx/core';
 
 import { getLayerAncestorIds } from './get-layer-ancestor-ids';
 
-/** Selected layer ids plus ancestors — expand so selection is visible. */
+/** Selected layer ids plus ancestors - expand so selection is visible. */
 export function getSelectionExpandIds(
   scene: Scene,
   selectedLayerIds: Set<string>

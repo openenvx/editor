@@ -1,7 +1,7 @@
 {
   "name": "@openenvx/workbench",
   "version": "0.1.4",
-  "description": "React workbench UI — editor layout, primitives, and descriptor renderers",
+  "description": "React workbench UI - editor layout, primitives, and descriptor renderers",
   "license": "MPL-2.0",
   "private": true,
   "type": "module",

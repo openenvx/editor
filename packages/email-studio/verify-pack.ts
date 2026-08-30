@@ -31,7 +31,7 @@ if (runtimeJs.split('\n').length > 200) {
   fail('dist/runtime.js does not look minified (too many lines)');
 }
 if (indexJs.includes('.module.css')) {
-  fail('dist/index.js still imports CSS modules — they must be compiled');
+  fail('dist/index.js still imports CSS modules - they must be compiled');
 }
 if (!indexCss.includes('ProseMirror') || !indexCss.includes('cm-editor')) {
   fail(
@@ -40,25 +40,25 @@ if (!indexCss.includes('ProseMirror') || !indexCss.includes('cm-editor')) {
 }
 if (indexCss.includes(':global(')) {
   fail(
-    'dist/index.css still contains :global() — CSS modules must be compiled'
+    'dist/index.css still contains :global() - CSS modules must be compiled'
   );
 }
 if ((indexCss.match(/\.root\{/g) ?? []).length > 2) {
-  fail('CSS modules were not hashed — colliding .root rules break the shell');
+  fail('CSS modules were not hashed - colliding .root rules break the shell');
 }
 if (!/root:"e_/.test(indexJs)) {
-  fail('CSS module maps missing from JS — shell class names would be empty');
+  fail('CSS module maps missing from JS - shell class names would be empty');
 }
 if (
   /topBar:"(e_[^"]+)"[^}]*root:"\1"/.test(indexJs) ||
   /root:"(e_[^"]+)"[^}]*topBar:"\1"/.test(indexJs)
 ) {
   fail(
-    'CSS module hashes collide within a file — pattern must include [local]'
+    'CSS module hashes collide within a file - pattern must include [local]'
   );
 }
 if (indexDts.split('\n').length > 80 || runtimeDts.split('\n').length > 40) {
-  fail('public .d.ts is too large — do not inline the internal schema');
+  fail('public .d.ts is too large - do not inline the internal schema');
 }
 if (LEAKED_TYPE.test(indexDts) || LEAKED_TYPE.test(runtimeDts)) {
   fail('public .d.ts leaks internal types');

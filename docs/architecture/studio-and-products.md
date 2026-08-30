@@ -14,7 +14,7 @@ Host product apps (dashboard Studio, embed host, demos) should not wire every pr
 
 Publishing details: [PUBLISHING.md](../../PUBLISHING.md). Public MPL-2.0 drop-ins: `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-studio`. The extension SDK is MPL-2.0 licensed but may use a restricted registry. `@xmazu/openenvxee-studio` remains a private product integration.
 
-## `@openenvx/canvas-studio` (canvas product — published)
+## `@openenvx/canvas-studio` (canvas product - published)
 
 Public npm drop-in for open-source canvas editor hosts. Inlines private core/canvas/workbench into minified ESM:
 
@@ -27,11 +27,11 @@ import '@openenvx/canvas-studio/fonts.css';
 <CanvasEditor onChange={save} theme="dark" />
 ```
 
-`CanvasEditor` defaults `initialScene` to `createCanvasScene()` when omitted. Headless scene factory is `@openenvx/canvas-studio/runtime`. Raster/PDF export is not included — use cloud export-service or your host pipeline.
+`CanvasEditor` defaults `initialScene` to `createCanvasScene()` when omitted. Headless scene factory is `@openenvx/canvas-studio/runtime`. Raster/PDF export is not included - use cloud export-service or your host pipeline.
 
 Monorepo HMR stays on `@openenvx/canvas` + `@openenvx/workbench` (`apps/canvas-demo`). The published bundle is exercised by `apps/canvas-package-demo` (`bun run dev:canvas-package`).
 
-## `@xmazu/openenvxee-studio` (canvas product — proprietary host allowlist)
+## `@xmazu/openenvxee-studio` (canvas product - proprietary host allowlist)
 
 Unpublished fat bundle source in `packages/studio`. Curated host allowlist: `WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, `createSandboxExtensionHost`, layout/property helpers. External product hosts that need the full allowlist install the GitHub Packages build when published from product repos.
 
@@ -41,7 +41,7 @@ export const DEFAULT_STUDIO_PLUGINS = [new CanvasPlugin()];
 
 `createSandboxExtensionHost(options)` wires canvas widget click binding + `WIDGET_LAYER_TYPE` so **workbench never imports canvas**; studio is the seam.
 
-## `@openenvx/html-studio` (HTML product — published)
+## `@openenvx/html-studio` (HTML product - published)
 
 Public npm bundle for HTML block editor hosts. Inlines private core/html/workbench into minified ESM. Drop-in `HtmlEditor` plus host composition API for product apps (Snapvelo-style plugin hosts):
 
@@ -66,15 +66,15 @@ const PLUGINS = [...DEFAULT_HTML_STUDIO_PLUGINS, new MyEventPagePlugin()];
 
 Subpaths:
 
-- `.` — `HtmlEditor` + host surface (`WorkbenchShell`, plugins, authoring API)
-- `./runtime` — Worker-safe `renderBlockDocument` + block registry (no TipTap / DnD / shell)
-- `./theme.css` — compiled workbench tokens + editor CSS
+- `.` - `HtmlEditor` + host surface (`WorkbenchShell`, plugins, authoring API)
+- `./runtime` - Worker-safe `renderBlockDocument` + block registry (no TipTap / DnD / shell)
+- `./theme.css` - compiled workbench tokens + editor CSS
 
 Monorepo HMR stays on `@openenvx/html` + `@openenvx/workbench` (`apps/html-demo`). The published bundle is exercised by `apps/html-package-demo` (`bun run dev:html-package`).
 
-## `@openenvx/email-studio` (email product — published)
+## `@openenvx/email-studio` (email product - published)
 
-Public npm bundle for open-source email editor hosts. Inlines private core/html/driver-email/workbench into minified ESM (no source maps; CSS modules compiled into one file; public `.d.ts` does not leak the internal scene schema). Narrow API — no plugin authoring surface:
+Public npm bundle for open-source email editor hosts. Inlines private core/html/driver-email/workbench into minified ESM (no source maps; CSS modules compiled into one file; public `.d.ts` does not leak the internal scene schema). Narrow API - no plugin authoring surface:
 
 ```ts
 import { EmailEditor, type Scene } from '@openenvx/email-studio';
@@ -92,7 +92,7 @@ Monorepo HMR stays on `@openenvx/driver-email` + `@openenvx/workbench` (`apps/em
 
 Per AGENTS.md product-host rules:
 
-- Do **not** mount React panel views from the product host for form/settings — declare `ViewContribution` with `buildProperties` / `emptyMessage` / `when`
+- Do **not** mount React panel views from the product host for form/settings - declare `ViewContribution` with `buildProperties` / `emptyMessage` / `when`
 - Do **not** import shell-internal `ViewPane` / `PropertyContentRenderer`
 - Use `registerViewPanel` only for non-form surfaces
 - Embed **policy/data API** stays in editor-core; embed **product panels** (e.g. Embed Options) live in the product host repo, not canvas Inspector contributions

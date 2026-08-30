@@ -2,7 +2,7 @@
 
 Sandbox **author** SDK: wire protocol (`./protocol`), Preact element tags (`./canvas`, `./html`, `./panel`), `defineExtension`, `renderToElementTree`, and Vite isolate packaging (`./vite`).
 
-Host rendering (QuickJS, workbench, scene applicators) is **not** in this package — install `@xmazu/openenvxee-studio` or `@openenvx/html-studio` to host the editor.
+Host rendering (QuickJS, workbench, scene applicators) is **not** in this package - install `@xmazu/openenvxee-studio` or `@openenvx/html-studio` to host the editor.
 
 ```tsx
 /** @jsxImportSource @xmazu/openenvxee-extensions */
@@ -32,4 +32,4 @@ export const demo = defineCanvasComponent({
 
 ## License
 
-MPL-2.0 — see [LICENSE](../../LICENSE) in the repository root.
+MPL-2.0 - see [LICENSE](../../LICENSE) in the repository root.

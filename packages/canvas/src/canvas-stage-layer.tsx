@@ -201,7 +201,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
         return;
       }
       event.cancelBubble = true;
-      // Always notify the widget bridge — host no-ops when the target is not
+      // Always notify the widget bridge - host no-ops when the target is not
       // under an openenvx.widget (or is the widget itself with no handler).
       emitOpenEnvxWidgetClick(layer.id);
       interaction?.onClick?.(layer.id);
@@ -278,7 +278,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
       pointerDragCleanupRef.current?.();
       pointerDragCleanupRef.current = null;
 
-      // Ignore right/middle — selection + context menu own those gestures.
+      // Ignore right/middle - selection + context menu own those gestures.
       if ('button' in event.evt && event.evt.button !== 0) {
         return;
       }
@@ -317,7 +317,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
         return;
       }
 
-      // Bubbled from a descendant layer — that child owns the gesture.
+      // Bubbled from a descendant layer - that child owns the gesture.
       const knownIds = new Set(
         runtime.layersRef.current.map((item) => item.layer.id)
       );

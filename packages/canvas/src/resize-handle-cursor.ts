@@ -60,7 +60,7 @@ export function resolveResizeHandleCursor(
   return 'pointer';
 }
 
-// Last stage content we wrote — clear can run after selection drops and no node is available.
+// Last stage content we wrote - clear can run after selection drops and no node is available.
 let lastStageContent: HTMLElement | null = null;
 
 export function setStageContentCursor(

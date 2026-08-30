@@ -27,7 +27,7 @@ export const MIN_RICH_TEXT_FONT_SIZE = 4;
 
 export interface RichTextResizeSession {
   anchor: RichTextResizeAnchor;
-  /** Immutable drag-start transform — opposite corner/edge is pinned here. */
+  /** Immutable drag-start transform - opposite corner/edge is pinned here. */
   origin: Transform;
   /** Immutable font size at drag start. */
   startFontSize: number;
@@ -308,7 +308,7 @@ export function positionPinnedToOppositeCorner(
 
 /**
  * Uniform corner scale from pointer vs drag-start origin.
- * Never reads Konva scale — pointer alone drives size so Transformer cannot fight bake.
+ * Never reads Konva scale - pointer alone drives size so Transformer cannot fight bake.
  */
 export function computeCornerResizeFromPointer(
   session: RichTextResizeSession,

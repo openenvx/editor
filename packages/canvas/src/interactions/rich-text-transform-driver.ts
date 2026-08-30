@@ -1,7 +1,7 @@
 /**
  * Live rich-text transforms are pointer-driven (see rich-text-resize /
  * rich-text-interaction-contracts). Konva Transformer scale must never be the
- * source of truth during a corner/edge bake — otherwise bake + Transformer
+ * source of truth during a corner/edge bake - otherwise bake + Transformer
  * fight and the box jumps.
  */
 import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
@@ -47,7 +47,7 @@ export type RichTextView = Extract<
 >;
 
 export interface RichTextCornerSession {
-  /** Immutable font size at drag start — never overwrite during live bake. */
+  /** Immutable font size at drag start - never overwrite during live bake. */
   startFontSize: number;
   layerId: string;
   origin: Transform;

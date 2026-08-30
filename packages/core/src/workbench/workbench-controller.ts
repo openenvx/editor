@@ -123,7 +123,7 @@ export class WorkbenchController {
     string,
     WorkbenchContributionDisposable[]
   >();
-  /** External hosts (sandbox / embed) — separate from PluginManager. */
+  /** External hosts (sandbox / embed) - separate from PluginManager. */
   private readonly externalHosts: ExternalHostMount;
   private applyingLayoutSnapshot = false;
   private readonly diagnostics: EditorDiagnosticsService;

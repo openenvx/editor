@@ -1,4 +1,4 @@
-/** Keys whose values are opaque plugin data — cloned verbatim, never walked. */
+/** Keys whose values are opaque plugin data - cloned verbatim, never walked. */
 const OPAQUE_KEYS = new Set(['custom']);
 
 /**

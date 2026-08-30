@@ -155,7 +155,7 @@ export function ActivitySidebar({
   const showPrimarySidebar =
     layout?.primarySidebar !== false &&
     (showActivityBar || panelContainers.length <= 1);
-  /** Only panels are sortable — dropdown/command can't share a drag surface with their click target. */
+  /** Only panels are sortable - dropdown/command can't share a drag surface with their click target. */
   const sortableIds = useMemo(
     () => panelContainers.map((container) => container.id),
     [panelContainers]

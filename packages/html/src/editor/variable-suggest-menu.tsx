@@ -58,7 +58,7 @@ export const VariableSuggestMenu = memo(
         <p className={styles.header}>{title}</p>
         <div className={styles.list} ref={listRef}>
           {variables.length === 0 ? (
-            <p className={styles.empty}>—</p>
+            <p className={styles.empty}>-</p>
           ) : (
             variables.map((variable, index) => (
               <div

@@ -23,7 +23,7 @@ function createStubCtx() {
 }
 
 describe('slot composite blocks', () => {
-  it('keeps hero atomic — slots are not data.children', () => {
+  it('keeps hero atomic - slots are not data.children', () => {
     const hero = createHero();
     expect(hasChildLayers(hero)).toBe(false);
     expect(

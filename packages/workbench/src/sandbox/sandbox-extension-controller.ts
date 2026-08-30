@@ -62,7 +62,7 @@ export type SandboxUiContextListener = () => void;
 /**
  * Isolate key for the runtime map.
  *
- * **Decision (V.1.1):** one QuickJS isolate per `extensionId` for widgets —
+ * **Decision (V.1.1):** one QuickJS isolate per `extensionId` for widgets -
  * not per layer instance. Instances share the registry/handlers bag; the host
  * serializes face render + handler invoke via `widgetOpTail` /
  * `withWidgetLayerContext` so async work from different layers cannot
@@ -91,7 +91,7 @@ export class SandboxExtensionController {
   private notifySeq = 0;
   /**
    * Active widget layer for bridge values/resize/showUI.
-   * Set only while render/invoke runs — never fall back to a baked start() id
+   * Set only while render/invoke runs - never fall back to a baked start() id
    * (shared per-extension isolates serve many layer instances).
    */
   private activeWidgetLayerId: string | null = null;
@@ -176,7 +176,7 @@ export class SandboxExtensionController {
     return this.uiState;
   }
 
-  /** Close the floating UI panel only — does not stop the isolate. */
+  /** Close the floating UI panel only - does not stop the isolate. */
   closeUi(extensionId?: string, layerId?: string): void {
     if (!this.uiState) {
       return;
@@ -303,7 +303,7 @@ export class SandboxExtensionController {
 
   /**
    * Push widget source from the parent page (no artifact fetch).
-   * Requires an existing grant — does not mint capabilities.
+   * Requires an existing grant - does not mint capabilities.
    */
   async pushWidgetSource(extensionId: string, source: string): Promise<void> {
     const existing = this.grantById.get(extensionId);
@@ -422,7 +422,7 @@ export class SandboxExtensionController {
   /**
    * Invoke a handler id inside the extension isolate for a widget layer.
    * Installs applyProps for the full handler lifetime (including async).
-   * Handler pass is not a face-render pass — executeCommand / showUI allowed.
+   * Handler pass is not a face-render pass - executeCommand / showUI allowed.
    * Awaits async settlement so the Worker eval timeout covers handler work.
    */
   async invokeWidgetHandler(

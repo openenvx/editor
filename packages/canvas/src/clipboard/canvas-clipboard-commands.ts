@@ -213,7 +213,7 @@ async function finalizeImagePaste(
       delete data.uploading;
       return data;
     });
-    // Layer gone and upload failed — drop the unreclaimed object URL.
+    // Layer gone and upload failed - drop the unreclaimed object URL.
     if (!cleared) {
       paste.revokePreview();
     }

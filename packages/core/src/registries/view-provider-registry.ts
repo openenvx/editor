@@ -1,6 +1,6 @@
 import type { TreeDataProvider } from '../contributions/view-contribution';
 
-/** Registration options — Spring-style `@Primary` / `@Order` (lower order = higher priority). */
+/** Registration options - Spring-style `@Primary` / `@Order` (lower order = higher priority). */
 export interface ViewProviderRegisterOptions {
   /** Wins over non-primary providers for the same view id. */
   primary?: boolean;

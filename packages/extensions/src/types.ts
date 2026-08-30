@@ -43,5 +43,5 @@ export interface WidgetManifest {
   defaults?: Record<string, unknown>;
 }
 
-/** Wire tree — always {@link RenderNode} from protocol. */
+/** Wire tree - always {@link RenderNode} from protocol. */
 export type { RenderNode, RenderChild };

@@ -1,4 +1,4 @@
-/** Workbench UI contribution slots — registered in workbench-registries.ts. */
+/** Workbench UI contribution slots - registered in workbench-registries.ts. */
 export enum WorkbenchContributionPoint {
   ViewContainer = 'viewContainer',
   View = 'view',

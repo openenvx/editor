@@ -56,7 +56,7 @@ export function computeUnionBounds(layers: Layer[]): LayerBounds {
 
 /**
  * Local-space group outline: tight AABB of children (farthest point on each
- * side). Pure — does not mutate children or the group origin. Empty group
+ * side). Pure - does not mutate children or the group origin. Empty group
  * falls back to the stored box.
  */
 export function computeGroupOutlineBounds(

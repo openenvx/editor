@@ -172,7 +172,7 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
     ) {
       return false;
     }
-    // Page/Email frame stays the sole top-level row — never move it or hoist beside it.
+    // Page/Email frame stays the sole top-level row - never move it or hoist beside it.
     if (isLayoutRootLayer(source)) {
       return false;
     }
@@ -241,7 +241,7 @@ export class WorkbenchLayersView extends ViewContribution {
   readonly name = 'Layers';
   readonly viewOrder = 10;
   readonly viewHover = 'layer' as const;
-  /** Flat under the Layers container — document `*.root` is the tree root. */
+  /** Flat under the Layers container - document `*.root` is the tree root. */
   readonly collapsible = false;
 }
 
@@ -254,7 +254,7 @@ export class WorkbenchSidebarContainer extends ViewContainerContribution {
   readonly sidebarOrder = 10;
 }
 
-/** Generic dirty indicators — canvas zoom/selection stay in `@openenvx/canvas`. */
+/** Generic dirty indicators - canvas zoom/selection stay in `@openenvx/canvas`. */
 export class WorkbenchStatusBarContribution extends StatusBarContribution {
   contribute(builder: StatusBarBuilder, _ctx: CommandContext): void {
     builder

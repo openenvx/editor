@@ -38,7 +38,7 @@ export interface RepeaterFieldConfig {
   options?: { value: string; label: string }[];
 }
 
-/** Config for a `slotList` field — rows are part layers under `data.slots`. */
+/** Config for a `slotList` field - rows are part layers under `data.slots`. */
 export interface SlotListFieldConfig {
   /** Template part cloned (with a fresh id) when the user clicks Add. */
   newPart: unknown;

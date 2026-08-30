@@ -31,7 +31,7 @@ export function App() {
 
 Import `@openenvx/canvas-studio/theme.css` and `@openenvx/canvas-studio/fonts.css` if your bundler does not apply CSS imported from JS. For headless scene creation without the shell, import `@openenvx/canvas-studio/runtime`.
 
-Raster/PDF/SVG export is not included — use your host export pipeline or OpenEnvx cloud export-service.
+Raster/PDF/SVG export is not included - use your host export pipeline or OpenEnvx cloud export-service.
 
 ## Public API
 
@@ -48,4 +48,4 @@ Headless helpers live on `@openenvx/canvas-studio/runtime`:
 
 ## License
 
-MPL-2.0 — see [LICENSE](../../../LICENSE) in the repository root.
+MPL-2.0 - see [LICENSE](../../../LICENSE) in the repository root.

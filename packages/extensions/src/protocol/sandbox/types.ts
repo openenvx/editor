@@ -17,8 +17,8 @@ export function isSandboxCapability(value: string): value is SandboxCapability {
 
 /**
  * Figma-shaped grant kind:
- * - `plugin` — off-canvas tool (user-run, clientStorage, primary showUI)
- * - `widget` — on-canvas object (`data.values`, one isolate per extension)
+ * - `plugin` - off-canvas tool (user-run, clientStorage, primary showUI)
+ * - `widget` - on-canvas object (`data.values`, one isolate per extension)
  * See Plugin-boundaries.md “Plugins vs widgets”.
  */
 export type SandboxExtensionKind = 'plugin' | 'widget';

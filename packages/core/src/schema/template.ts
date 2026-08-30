@@ -1,6 +1,6 @@
 /**
  * Bannerbear-style template contract: named layers are addressable via
- * modifications. Pure scene transforms — shared by editor preview and cloud render.
+ * modifications. Pure scene transforms - shared by editor preview and cloud render.
  */
 import type {
   CanvasCircleData,

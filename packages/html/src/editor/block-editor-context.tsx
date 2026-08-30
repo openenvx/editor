@@ -4,7 +4,7 @@ import { createContext, useContext, type ReactNode } from 'react';
 import type { BlockSortDraft } from './block-dnd';
 import type { RichTextAlign } from './rich-text-align';
 
-/** Inline edit target — `dataPath` is `html` for plain blocks or a dotted slot path. */
+/** Inline edit target - `dataPath` is `html` for plain blocks or a dotted slot path. */
 export interface BlockEditTarget {
   hostId: string;
   dataPath: string;

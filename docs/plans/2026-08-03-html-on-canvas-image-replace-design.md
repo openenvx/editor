@@ -6,15 +6,15 @@
 
 ## Goal
 
-Let organizers replace images from the HTML editor surface — selection-pill **Replace image** plus drop/click on the image — using `AssetService`, not inspector-only URL fields. Works for built-in blocks (`html.image`, `html.hero` background) and product composites (e.g. Snapvelo event page).
+Let organizers replace images from the HTML editor surface - selection-pill **Replace image** plus drop/click on the image - using `AssetService`, not inspector-only URL fields. Works for built-in blocks (`html.image`, `html.hero` background) and product composites (e.g. Snapvelo event page).
 
 ## Decisions
 
 | Topic | Choice |
 | --- | --- |
-| Interaction | **B** — pill Replace + drop/click on surface |
+| Interaction | **B** - pill Replace + drop/click on surface |
 | Storage | `AssetService.upload(file)` → write returned ref into the image field |
-| Which blocks | **A** — any `BlockConfig` with an `image` field (heuristic primary key) |
+| Which blocks | **A** - any `BlockConfig` with an `image` field (heuristic primary key) |
 | Implementation | Editor chrome wraps selected block; authors do not add upload UI in `render` |
 | Slots | Drop on an `html.image` slot face writes nested path on the host (`slots.<key>.<i>.data.src`); host pill still replaces host primary image field |
 

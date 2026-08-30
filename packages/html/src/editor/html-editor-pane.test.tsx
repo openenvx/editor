@@ -10,7 +10,7 @@ import { HtmlEditorPane } from './html-editor-pane';
 
 afterEach(cleanup);
 
-/** jsdom elements have 0×0 boxes — floating selection pill hides without this. */
+/** jsdom elements have 0×0 boxes - floating selection pill hides without this. */
 async function withMockedBlockRects(
   run: () => void | Promise<void>
 ): Promise<void> {
@@ -302,7 +302,7 @@ describe('HtmlEditorPane', () => {
 
       await api.executeCommand('html.zoomAuto');
       await waitFor(() => {
-        // 100% = fit-width — scaled slot never exceeds the design frame.
+        // 100% = fit-width - scaled slot never exceeds the design frame.
         expect(Number.parseFloat(artboard.style.width)).toBeGreaterThan(0);
         expect(Number.parseFloat(artboard.style.width)).toBeLessThanOrEqual(
           1600

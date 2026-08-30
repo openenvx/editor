@@ -13,7 +13,7 @@ export interface CheckboxProps extends Omit<
   onChange: (checked: boolean) => void;
 }
 
-/** shadcn-style checkbox — square control with check indicator. */
+/** shadcn-style checkbox - square control with check indicator. */
 export function Checkbox({
   checked,
   onChange,

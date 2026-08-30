@@ -30,8 +30,8 @@
 .artboard {
   /* Body color comes from email.root; keep the frame transparent so the
      centered 600px white card reads against the page background.
-     Document stack + 16px root — not workbench chrome — so edit matches export.
-     line-height: normal (not 1.5) — forced 1.5 inherited into Section <td>s and
+     Document stack + 16px root - not workbench chrome - so edit matches export.
+     line-height: normal (not 1.5) - forced 1.5 inherited into Section <td>s and
      inflated gaps above inline social icons. */
   transform-origin: top left;
   min-height: 480px;
@@ -44,7 +44,7 @@
   font-weight: 400;
 }
 
-/* Kill host UA heading metrics — blocks set explicit size/weight inline. */
+/* Kill host UA heading metrics - blocks set explicit size/weight inline. */
 .artboard :is(h1, h2, h3) {
   font-family: inherit;
 }

@@ -37,7 +37,7 @@ export interface EmailJsxProps {
   href?: string;
   src?: string;
   alt?: string;
-  /** email.heading — `h1` | `h2` | `h3` */
+  /** email.heading - `h1` | `h2` | `h3` */
   as?: 'h1' | 'h2' | 'h3' | '1' | '2' | '3';
   /** Override text/heading body when children are awkward */
   html?: string;
@@ -51,7 +51,7 @@ function createEmailJsxComponent(type: EmailJsxType): EmailJsxComponent {
   return Comp;
 }
 
-/** Document root — maps to `email.root`. */
+/** Document root - maps to `email.root`. */
 export const Email = createEmailJsxComponent('email.root');
 export const Section = createEmailJsxComponent('email.section');
 export const Row = createEmailJsxComponent('email.row');
@@ -61,7 +61,7 @@ export const Text = createEmailJsxComponent('email.text');
 export const Button = createEmailJsxComponent('email.button');
 export const Img = createEmailJsxComponent('email.image');
 export const ImageLink = createEmailJsxComponent('email.imageLink');
-/** Inline `<a>` inside Text/Heading — serialized to HTML, not a Scene layer. */
+/** Inline `<a>` inside Text/Heading - serialized to HTML, not a Scene layer. */
 export const Link = createEmailJsxComponent('email.link');
 
 export function isEmailJsxComponent(type: unknown): type is EmailJsxComponent {

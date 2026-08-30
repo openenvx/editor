@@ -109,7 +109,7 @@ const googleFontsById = new Map(
   GOOGLE_FONT_CATALOG.map((font) => [font.id.toLowerCase(), font] as const)
 );
 
-/** OS-provided fonts — no remote load; rely on the host system. */
+/** OS-provided fonts - no remote load; rely on the host system. */
 export const SYSTEM_FONT_CATALOG: readonly CanvasFontCatalogEntry[] = [
   { id: 'Arial', family: 'Arial, Helvetica, sans-serif' },
   { id: 'Helvetica', family: 'Helvetica, Arial, sans-serif' },

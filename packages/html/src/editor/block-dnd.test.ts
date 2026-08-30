@@ -371,7 +371,7 @@ describe('usesContainerNestPreview', () => {
     expect(usesContainerNestPreview('html.flex', {})).toBe(true);
   });
 
-  it('uses insert lines for grid (no wrap — linear order marker)', () => {
+  it('uses insert lines for grid (no wrap - linear order marker)', () => {
     expect(usesContainerNestPreview('html.grid', { columns: 2 })).toBe(false);
   });
 

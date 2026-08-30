@@ -21,7 +21,7 @@ export interface RenderOptions {
  * Expand a widget element tree to {@link RenderNode} JSON.
  * Hosts map this further into scene layers (`applyWidgetFace` / HTML twin).
  *
- * No isolate globals — values write-back uses an optional values-pass
+ * No isolate globals - values write-back uses an optional values-pass
  * (Node/tests) or host-installed `openenvx.widget.applyProps` (QuickJS).
  */
 export function renderToElementTree(

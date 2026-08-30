@@ -1,6 +1,6 @@
 import type { Scene } from '@openenvx/core/schema';
 /**
- * Worker-safe runtime surface — block configs + static document render.
+ * Worker-safe runtime surface - block configs + static document render.
  * Does not pull WorkbenchShell, TipTap editors, or DnD chrome.
  */
 import { createHtmlDemoScene as createHtmlDemoSceneImpl } from '@openenvx/html';

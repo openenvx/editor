@@ -20,7 +20,7 @@ export function logEditorDiagnosticsEnabledBanner(): void {
   editorDiagnosticLog(
     'diagnostics',
     'info',
-    'Editor diagnostics enabled — [OpenEnvx] property.when, property.field, and other scopes will log here.',
+    'Editor diagnostics enabled - [OpenEnvx] property.when, property.field, and other scopes will log here.',
     {
       localStorageKey: EDITOR_DEBUG_LOCAL_STORAGE_KEY,
       hint: 'Set localStorage openenvx:debug to 0 to disable, or api.setEditorDebug(false).',
@@ -35,7 +35,7 @@ export function isEditorDiagnosticsEnabled(): boolean {
 
 /**
  * Resolve initial enabled state (browser only). Call once when creating the controller.
- * `controllerDefault` — e.g. `import.meta.env.DEV` from the app shell.
+ * `controllerDefault` - e.g. `import.meta.env.DEV` from the app shell.
  */
 export function resolveEditorDiagnosticsFromBrowser(
   controllerDefault = false,

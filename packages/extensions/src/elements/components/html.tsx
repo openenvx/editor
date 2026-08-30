@@ -89,7 +89,7 @@ export function Divider(props: { color?: string } = {}): JSX.Element {
   return intrinsic('Divider', props as Record<string, unknown>);
 }
 
-/** Raw markup escape hatch — sanitization happens in the `html.raw` sink. */
+/** Raw markup escape hatch - sanitization happens in the `html.raw` sink. */
 export function Html(props: { markup: string }): JSX.Element {
   return intrinsic('Html', props as Record<string, unknown>);
 }

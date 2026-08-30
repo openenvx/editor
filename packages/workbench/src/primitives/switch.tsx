@@ -12,7 +12,7 @@ export interface SwitchProps extends Omit<
   onChange: (checked: boolean) => void;
 }
 
-/** shadcn-style pill switch — property toggles and section header enables. */
+/** shadcn-style pill switch - property toggles and section header enables. */
 export function Switch({
   checked,
   onChange,

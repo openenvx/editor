@@ -68,7 +68,7 @@ import styles from './email-editor-pane.module.css';
 
 export { EMAIL_FRAME_WIDTH } from './email-device-preview';
 
-/** Slim desktop chrome — content fills most of the frame with a bit of body around it. */
+/** Slim desktop chrome - content fills most of the frame with a bit of body around it. */
 const DEFAULT_EMAIL_DEVICE_PRESET: HtmlDevicePreset = 'desktop';
 
 function useEmailEditorMode(): EmailEditorMode {
@@ -201,7 +201,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   );
-  // ponytail: BeforeDragging freezes droppable rects — scroll mid-drag can mis-hit.
+  // ponytail: BeforeDragging freezes droppable rects - scroll mid-drag can mis-hit.
   const measuring = useMemo(
     () => ({
       droppable: { strategy: MeasuringStrategy.BeforeDragging },

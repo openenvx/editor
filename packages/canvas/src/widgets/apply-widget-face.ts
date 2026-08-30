@@ -35,7 +35,7 @@ export function applyWidgetFace(widgetLayer: Layer, tree: RenderNode): Layer {
     if (root.type === 'canvas.group') {
       children = (root.data as { children: Layer[] }).children ?? [];
       // Root-group handlers (e.g. onClick on the outer Stack) retarget to the
-      // widget envelope — the group id is discarded by unwrap.
+      // widget envelope - the group id is discarded by unwrap.
       const rootHandlers = handlers[root.id];
       if (rootHandlers) {
         handlers[widgetLayer.id] = {

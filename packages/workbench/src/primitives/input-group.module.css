@@ -1,4 +1,4 @@
-/* Paired numeric fields (X/Y, W/H) — separate fields side by side. */
+/* Paired numeric fields (X/Y, W/H) - separate fields side by side. */
 .group {
   display: grid;
   grid-auto-flow: column;

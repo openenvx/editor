@@ -4,7 +4,7 @@
 
 Hub: [Architecture.md](../../Architecture.md) · Workbench flow: [workbench-and-headless.md](workbench-and-headless.md).
 
-Visual shell tokens (spacing, radii, control styling) live in [packages/workbench/Design.md](../../packages/workbench/Design.md) — that file is **design reference only**, not API documentation.
+Visual shell tokens (spacing, radii, control styling) live in [packages/workbench/Design.md](../../packages/workbench/Design.md) - that file is **design reference only**, not API documentation.
 
 ## What this is
 
@@ -24,7 +24,7 @@ Types and JSDoc source of truth: `packages/core/src/builders/property-builder.ts
 | `kind` | Registered renderer id (`text`, `select`, `color`, …). |
 | `label` | Human label; row label in `PropertyFieldRow` / block title in `PropertyFieldBlock`. |
 | `icon` | Optional icon for popups or auxiliary UI. |
-| `layout` | Inspector row layout — see below. |
+| `layout` | Inspector row layout - see below. |
 | `debounceMs` | Delay writes to the scene (expensive preview). |
 | `description` | Helper text under the control. |
 | `placeholder` | Placeholder for text-like kinds. |
@@ -45,10 +45,10 @@ Controls how the workbench lays out label and control for a property field.
 
 | Value | Row layout (`PropertyContentRenderer`) | Inner wrapper (`PropertyFieldControl`) |
 | --- | --- | --- |
-| omitted | `PropertyFieldRow` — variant depends on `kind` (`select` / `segmented` → inline; `toggle` / `checkbox` → switch; else stacked) | `FieldChrome` when the field has `popup` sub-fields or `actions` |
-| `'inline'` | `PropertyFieldRow` inline — label beside control | `FieldChrome` when popup/actions present |
-| `'stack'` | `PropertyFieldRow` default — label above control | `FieldChrome` when popup/actions present |
-| `'block'` | `PropertyFieldBlock` — label **above**, full width | No `FieldChrome` wrapper |
+| omitted | `PropertyFieldRow` - variant depends on `kind` (`select` / `segmented` → inline; `toggle` / `checkbox` → switch; else stacked) | `FieldChrome` when the field has `popup` sub-fields or `actions` |
+| `'inline'` | `PropertyFieldRow` inline - label beside control | `FieldChrome` when popup/actions present |
+| `'stack'` | `PropertyFieldRow` default - label above control | `FieldChrome` when popup/actions present |
+| `'block'` | `PropertyFieldBlock` - label **above**, full width | No `FieldChrome` wrapper |
 
 Built-in kinds that default to `layout: 'block'` in `PropertyBuilder` include `repeater`, `slotList`, and `border` (full-width or multi-control fields).
 
@@ -83,10 +83,10 @@ HTML `FieldDef` in `@openenvx/html` supports a subset; map advanced kinds via cu
 
 Beyond single rows:
 
-- `row(label, field, path?, options?)` — one `PropertyFieldDescriptor` bound to `PropertyPath.*`
-- `inputGroup(blockLabel, cells, options?)` — horizontal group (e.g. X/Y, W/H)
-- `block(label, build, options?)` — nested group of rows
-- `when(clause)` / `priority(n)` / `headerToggle(path)` — **whole pane** visibility and section header switch
+- `row(label, field, path?, options?)` - one `PropertyFieldDescriptor` bound to `PropertyPath.*`
+- `inputGroup(blockLabel, cells, options?)` - horizontal group (e.g. X/Y, W/H)
+- `block(label, build, options?)` - nested group of rows
+- `when(clause)` / `priority(n)` / `headerToggle(path)` - **whole pane** visibility and section header switch
 
 Paths use `PropertyPath` (`layerData`, `layerById`, transform paths via canvas host context, etc.).
 
@@ -108,7 +108,7 @@ PropertyPath.when(PropertyPath.layerData('shadowEnabled'));
 // => '$selection.layer.data.shadowEnabled'
 ```
 
-Example — show Blur only when Enabled is on; show Advanced block when layout is absolute and mode is advanced:
+Example - show Blur only when Enabled is on; show Advanced block when layout is absolute and mode is advanced:
 
 ```ts
 createPropertyPane('shadow', 'Shadow')
@@ -132,7 +132,7 @@ Visibility re-evaluates when property values change (live `readPath`) and when c
 
 ### Diagnostics (global editor debug)
 
-Property `when` issues are hard to spot (bare path vs `$path`, wrong `layerById`, missing context key). Use **global editor diagnostics** — one flag for the whole workbench, not per-feature keys.
+Property `when` issues are hard to spot (bare path vs `$path`, wrong `layerById`, missing context key). Use **global editor diagnostics** - one flag for the whole workbench, not per-feature keys.
 
 | Enable | How |
 | --- | --- |
@@ -142,10 +142,10 @@ Property `when` issues are hard to spot (bare path vs `$path`, wrong `layerById`
 
 With diagnostics on, the console shows:
 
-- **`[OpenEnvx] property.when`** — unknown context keys (with “did you mean”), bare `selection.layer…` tokens (suggest `$…`), unresolved `$` paths, and collapsed summaries when a clause hides a row/block (`primaryLayerId`, token resolutions).
-- **`[OpenEnvx] property.field`** — invalid field descriptors validated with per-kind Zod `strictObject` schemas when a pane row or `PropertyBuilder` field is assembled. **Error** for missing required props (e.g. `select` without `options`). **Warn** for props not used by that kind (e.g. `numeric` on `segmented`). **Info** for soft hints (e.g. `image` without `uploadCommandId`). Custom field kinds (`kind` not in the built-in set) skip strict unused-key checks.
+- **`[OpenEnvx] property.when`** - unknown context keys (with “did you mean”), bare `selection.layer…` tokens (suggest `$…`), unresolved `$` paths, and collapsed summaries when a clause hides a row/block (`primaryLayerId`, token resolutions).
+- **`[OpenEnvx] property.field`** - invalid field descriptors validated with per-kind Zod `strictObject` schemas when a pane row or `PropertyBuilder` field is assembled. **Error** for missing required props (e.g. `select` without `options`). **Warn** for props not used by that kind (e.g. `numeric` on `segmented`). **Info** for soft hints (e.g. `image` without `uploadCommandId`). Custom field kinds (`kind` not in the built-in set) skip strict unused-key checks.
 
-Example — `numeric` on `segmented` is ignored at render time; with diagnostics on you get a warn suggesting `number` or `cornerRadius`:
+Example - `numeric` on `segmented` is ignored at render time; with diagnostics on you get a warn suggesting `number` or `cornerRadius`:
 
 ```ts
 .row('Corner radius', {
@@ -162,6 +162,6 @@ Layer `properties()` sections (`PropertyBuilder` on canvas/HTML layer definition
 
 ## Related
 
-- [workbench-and-headless.md](workbench-and-headless.md) — contribution flow, host rules
-- [html.md](html.md) — block `FieldDef` mapping
-- [packages/workbench/Design.md](../../packages/workbench/Design.md) — visual design tokens only
+- [workbench-and-headless.md](workbench-and-headless.md) - contribution flow, host rules
+- [html.md](html.md) - block `FieldDef` mapping
+- [packages/workbench/Design.md](../../packages/workbench/Design.md) - visual design tokens only

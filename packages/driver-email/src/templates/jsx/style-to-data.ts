@@ -39,7 +39,7 @@ function splitPadding(value: unknown): {
     return { paddingY: parts[0], paddingX: parts[1] };
   }
   if (parts.length === 3) {
-    // top | x | bottom — model is symmetric paddingY; prefer top when unequal
+    // top | x | bottom - model is symmetric paddingY; prefer top when unequal
     const paddingY = parts[0] === parts[2] ? parts[0] : parts[0];
     return { paddingY, paddingX: parts[1] };
   }
@@ -106,7 +106,7 @@ export function styleToBlockData(
       paddingRight !== undefined &&
       paddingLeft !== paddingRight
     ) {
-      // ponytail: column model is symmetric paddingX — keep left when unequal
+      // ponytail: column model is symmetric paddingX - keep left when unequal
       paddingX = paddingLeft;
     }
   }
@@ -120,7 +120,7 @@ export function styleToBlockData(
       paddingBottom !== undefined &&
       paddingTop !== paddingBottom
     ) {
-      // ponytail: section model is symmetric paddingY — keep top when unequal
+      // ponytail: section model is symmetric paddingY - keep top when unequal
       paddingY = paddingTop;
     }
   }

@@ -20,7 +20,7 @@ export interface SessionPolicy {
 export interface BuildGrantFromManifestOptions {
   manifest: ExtensionManifest;
   session: SessionPolicy;
-  /** Optional artifact / pushed source — host fills delivery. */
+  /** Optional artifact / pushed source - host fills delivery. */
   artifactUrl?: string;
   contentHash?: string;
   source?: string;
@@ -30,7 +30,7 @@ export interface BuildGrantFromManifestOptions {
  * Derive a {@link SandboxExtensionGrant} from an {@link ExtensionManifest}
  * intersected with session policy. Delivery fields (source/artifact) stay host-owned.
  *
- * `requestedCommands` defaults to `[]` when omitted — never inferred from
+ * `requestedCommands` defaults to `[]` when omitted - never inferred from
  * `contributes.commands` (UI chrome ≠ execute allowlist).
  */
 export function buildGrantFromManifest(

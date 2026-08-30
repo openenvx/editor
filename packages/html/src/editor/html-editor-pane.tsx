@@ -106,7 +106,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
   );
   // Preview indicators don't reflow layout; remeasuring during drag re-fires
   // onDragOver → setState loops (max update depth).
-  // ponytail: BeforeDragging freezes droppable rects — scroll mid-drag can mis-hit.
+  // ponytail: BeforeDragging freezes droppable rects - scroll mid-drag can mis-hit.
   const measuring = useMemo(
     () => ({
       droppable: { strategy: MeasuringStrategy.BeforeDragging },
@@ -130,7 +130,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
           api.updateProperty(layerId, fieldPath, ref);
         })
         .catch(() => {
-          // ponytail: v1 silent failure — toast when workbench status API is ready.
+          // ponytail: v1 silent failure - toast when workbench status API is ready.
         });
     },
     [api, assets]

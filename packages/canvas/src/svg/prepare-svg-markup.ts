@@ -8,7 +8,7 @@ export function prepareSvgMarkup(
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"></svg>';
   }
 
-  // ponytail: regex sanitizer — upgrade to DOMPurify/linkedom if untrusted SVG grows
+  // ponytail: regex sanitizer - upgrade to DOMPurify/linkedom if untrusted SVG grows
   svg = svg
     .replaceAll(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
     .replaceAll(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, '')
@@ -32,7 +32,7 @@ export function prepareSvgMarkup(
     svg = svg.replaceAll('currentColor', options.fill);
   }
   if (options?.stroke) {
-    // only replace stroke="currentColor" style uses — keep fill tints separate
+    // only replace stroke="currentColor" style uses - keep fill tints separate
     svg = svg.replaceAll(
       /stroke\s*=\s*(['"])currentColor\1/gi,
       `stroke="${options.stroke}"`

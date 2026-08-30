@@ -14,7 +14,7 @@ OpenEnvx is a composable visual-editor framework: plugins register layers, comma
 
 ## Brand Personality
 
-Precise, quiet, tool-native. Architectural monochrome — the artboard is the hero, the chrome recedes. Confidence through density and alignment, not decoration.
+Precise, quiet, tool-native. Architectural monochrome - the artboard is the hero, the chrome recedes. Confidence through density and alignment, not decoration.
 
 ## Anti-references
 
@@ -25,10 +25,10 @@ Precise, quiet, tool-native. Architectural monochrome — the artboard is the he
 
 ## Design Principles
 
-1. The artboard is the hero; chrome is scaffolding — thin, precise, visually quiet.
+1. The artboard is the hero; chrome is scaffolding - thin, precise, visually quiet.
 2. Accent color (blue) marks selection and state only, never decoration.
 3. One type family, tight scale; mono + tabular numerals for all numeric fields.
-4. Same control vocabulary everywhere — descriptor → registered renderer, no ad-hoc controls.
+4. Same control vocabulary everywhere - descriptor → registered renderer, no ad-hoc controls.
 5. Motion conveys state (reveal, expand, feedback) at 150–250 ms; reduced-motion always honored.
 
 ## Accessibility & Inclusion

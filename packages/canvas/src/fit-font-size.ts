@@ -1,6 +1,6 @@
 /**
  * Binary-search a font size that fits a fixed-height box.
- * Pure — callers supply their own measure function (canvas DOM, server, etc.).
+ * Pure - callers supply their own measure function (canvas DOM, server, etc.).
  */
 export function fitFontSize(
   measureHeight: (fontSize: number) => number,

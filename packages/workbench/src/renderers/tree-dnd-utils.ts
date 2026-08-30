@@ -77,7 +77,7 @@ export function buildFlatTree(
       parentId,
     });
 
-    // Only push parents that actually show children — empty nestable rows
+    // Only push parents that actually show children - empty nestable rows
     // stay nest targets without claiming the next sibling as their child.
     const next = items[index + 1];
     if (
@@ -136,7 +136,7 @@ function zoneForRow(
   }
 
   // Bottom edge = sibling after only when the container has no visible kids
-  // (empty or collapsed) — otherwise bottom-of-header looks like "first child".
+  // (empty or collapsed) - otherwise bottom-of-header looks like "first child".
   const showsChildren = Boolean(nextItem && nextItem.depth > item.depth);
   if (!showsChildren && y >= rect.height - edge) {
     return 'after';
@@ -301,7 +301,7 @@ export function findPointerTarget(
 
   const lastItem = items.at(-1)!;
   const lastRect = rowRects.get(lastItem.id);
-  // Past the list = sibling after last row — never nest-into (even empty containers).
+  // Past the list = sibling after last row - never nest-into (even empty containers).
   if (lastRect && clientY >= lastRect.bottom) {
     return { overId: lastItem.id, zone: 'after' };
   }

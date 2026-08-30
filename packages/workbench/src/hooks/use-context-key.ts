@@ -3,7 +3,7 @@ import { useRef, useSyncExternalStore } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 
-/** Bumps when any context key changes — use to re-render toggled toolbar buttons. */
+/** Bumps when any context key changes - use to re-render toggled toolbar buttons. */
 export function useContextKeysRevision(): number {
   const { api } = useWorkbenchContext();
   const keys = api.getService(ContextKeyServiceId);

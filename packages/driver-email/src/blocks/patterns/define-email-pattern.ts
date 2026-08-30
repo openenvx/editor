@@ -3,7 +3,7 @@ import type { BlockConfig } from '@openenvx/html';
 /**
  * Gallery entry: block config + sheet metadata in one place.
  * Patterns are layout containers (`acceptsChildren`) whose `defaultData.children`
- * are Elements visible in Layers — not `data.slots`.
+ * are Elements visible in Layers - not `data.slots`.
  */
 export interface EmailPatternEntry {
   block: BlockConfig;

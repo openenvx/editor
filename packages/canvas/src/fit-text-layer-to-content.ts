@@ -51,8 +51,8 @@ interface CanvasTextDataLike {
 
 export interface FitTextLayerOptions {
   /**
-   * `height` — keep width, remasure height (templates / column layout).
-   * `box` — hug both width and height to content (new inserts / paste).
+   * `height` - keep width, remasure height (templates / column layout).
+   * `box` - hug both width and height to content (new inserts / paste).
    */
   mode?: FitTextLayerMode;
   /** Cap for `mode: 'box'` (long pasted lines wrap instead of growing forever). */
@@ -76,7 +76,7 @@ function readTextData(layer: Layer): CanvasTextDataLike | null {
 
 /**
  * If `key` remasures a `canvas.text` box, return the fitted transform + patch.
- * Otherwise `null` — callers should use plain `updateProperty`.
+ * Otherwise `null` - callers should use plain `updateProperty`.
  */
 export function resolveTextBoxFitPropertyUpdate(
   scene: Scene,

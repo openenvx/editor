@@ -104,7 +104,7 @@ export async function fetchAndVerifyArtifact(input: {
     if (!response.ok) {
       throw new Error(`Artifact fetch failed: ${response.status}`);
     }
-    // Keep abort armed through body read — headers-only timeout left streams hanging.
+    // Keep abort armed through body read - headers-only timeout left streams hanging.
     const buffer = await readBodyLimited(response, maxBytes, controller.signal);
     const actual = await sha256Hex(buffer);
     if (actual !== expected) {

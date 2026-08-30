@@ -1,7 +1,7 @@
 {
   "name": "@openenvx/html-studio",
-  "version": "0.1.1",
-  "description": "OpenEnvx HTML block editor — drop-in React component and product host surface",
+  "version": "0.1.2",
+  "description": "OpenEnvx HTML block editor - drop-in React component and product host surface",
   "license": "MPL-2.0",
   "type": "module",
   "files": [
@@ -97,11 +97,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xmazu/openenvxee-editor.git",
+    "url": "git+https://github.com/openenvx/editor.git",
     "directory": "packages/html-studio"
   },
   "bugs": {
-    "url": "https://github.com/xmazu/openenvxee-editor/issues"
+    "url": "https://github.com/openenvx/editor/issues"
   },
-  "homepage": "https://github.com/xmazu/openenvxee-editor/tree/main/packages/html-studio"
+  "homepage": "https://github.com/openenvx/editor/tree/main/packages/html-studio"
 }

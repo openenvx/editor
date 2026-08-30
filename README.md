@@ -39,8 +39,8 @@ export function App() {
 
 Other ready-made editors:
 
-- [`@openenvx/canvas-studio`](packages/canvas-studio/README.md) — absolute-positioned canvas documents.
-- [`@openenvx/email-studio`](packages/email-studio/README.md) — responsive, email-safe block documents.
+- [`@openenvx/canvas-studio`](packages/canvas-studio/README.md) - absolute-positioned canvas documents.
+- [`@openenvx/email-studio`](packages/email-studio/README.md) - responsive, email-safe block documents.
 
 Each editor includes a `runtime` entry point for headless scene creation or rendering. See the package README for the complete public API.
 
@@ -66,12 +66,12 @@ The published MPL-2.0 packages are the supported external entry points. Some low
 
 ## Explore the docs
 
-- [Architecture hub](Architecture.md) — package tiers, boundaries, and contribution flow.
-- [Architecture chapters](docs/architecture/README.md) — runtime, workbench, canvas, HTML, email, extensions, and APIs.
-- [Package and API guide](docs/architecture/packages-and-api.md) — what to import and what is intentionally internal.
-- [Extension authoring](apps/docs/README.md) — trusted plugins and sandbox extensions.
-- [Publishing guide](PUBLISHING.md) — package contents and maintainer release workflow.
-- [Feature matrix](FEATURES.md) — current capabilities and roadmap.
+- [Architecture hub](Architecture.md) - package tiers, boundaries, and contribution flow.
+- [Architecture chapters](docs/architecture/README.md) - runtime, workbench, canvas, HTML, email, extensions, and APIs.
+- [Package and API guide](docs/architecture/packages-and-api.md) - what to import and what is intentionally internal.
+- [Extension authoring](apps/docs/README.md) - trusted plugins and sandbox extensions.
+- [Publishing guide](PUBLISHING.md) - package contents and maintainer release workflow.
+- [Feature matrix](FEATURES.md) - current capabilities and roadmap.
 
 ## Development
 

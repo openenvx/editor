@@ -23,7 +23,7 @@ const pendingHost = new Map<
 >();
 
 let engine: QuickJsEngine | null = null;
-/** Serialize eval + uiMessage — QuickJS context is single-entry. */
+/** Serialize eval + uiMessage - QuickJS context is single-entry. */
 let isolateChain: Promise<void> = Promise.resolve();
 
 function post(message: WorkerToHost): void {

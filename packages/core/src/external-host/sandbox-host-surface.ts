@@ -5,7 +5,7 @@ import type { WorkbenchContribution } from '../workbench-contributions/workbench
 /**
  * Host surface for sandbox extensions (first-party adapter only).
  * Omits InstantiationService / PluginContext; still grants scene + commands.
- * Isolates never receive this — capability gates stay on the host bridge.
+ * Isolates never receive this - capability gates stay on the host bridge.
  */
 export interface SandboxHostSurface {
   getSelection(): Selection;

@@ -97,7 +97,7 @@ function SlotPartContent({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageDropActive, setImageDropActive] = useState(false);
 
-  // Isolate from parent BlockChrome dnd-kit listeners — otherwise pointerdown
+  // Isolate from parent BlockChrome dnd-kit listeners - otherwise pointerdown
   // on logo/text starts dragging the whole composite instead of selecting.
   const stopParentDrag = useCallback((event: { stopPropagation(): void }) => {
     event.stopPropagation();
@@ -117,7 +117,7 @@ function SlotPartContent({
   const handleImageActivate = useCallback(() => {
     selectHost();
     if (imageSelected && canReplaceImage) {
-      // Already targeted — click opens replace (design: select first, then click).
+      // Already targeted - click opens replace (design: select first, then click).
       fileInputRef.current?.click();
       return;
     }
@@ -133,7 +133,7 @@ function SlotPartContent({
 
   const handleTextActivate = useCallback(() => {
     selectHost();
-    // Text faces are not image targets — clear so the pill falls back to the
+    // Text faces are not image targets - clear so the pill falls back to the
     // host primary image field (hero background) when the host is selected.
     setImageOverride(null);
     if (editable) {

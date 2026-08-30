@@ -88,7 +88,7 @@ function logImageUploadHint(field: PropertyFieldDescriptor): void {
   editorDiagnosticLog(
     PROPERTY_FIELD_SCOPE,
     'info',
-    'Image field has no uploadCommandId — upload affordance will be hidden.',
+    'Image field has no uploadCommandId - upload affordance will be hidden.',
     { key: field.key, kind: field.kind },
     `field|image|${field.key}|upload-hint`
   );

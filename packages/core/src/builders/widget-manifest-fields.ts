@@ -46,7 +46,7 @@ export function appendWidgetManifestField(
       break;
     }
     case 'repeater': {
-      // ponytail: repeater of nested objects — expose as JSON text until PropertyBuilder
+      // ponytail: repeater of nested objects - expose as JSON text until PropertyBuilder
       // gains nested object repeater wiring for widget manifests.
       section.text(path, `${label} (JSON)`);
       break;

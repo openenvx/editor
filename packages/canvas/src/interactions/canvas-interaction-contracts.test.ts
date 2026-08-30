@@ -1,5 +1,5 @@
 /**
- * Canvas interaction contracts — regression guards against features fighting
+ * Canvas interaction contracts - regression guards against features fighting
  * each other (drag vs transform vs handle-drag vs preview).
  *
  * Rule of thumb: exactly one exclusive interaction owns the stage at a time.

@@ -31,7 +31,7 @@ function compiledCss(): string {
 
 /**
  * tsup's postcss plugin onLoad-handles every path ending in `.css` first,
- * including other namespaces, and returns `loader: "css"` — so CSS module
+ * including other namespaces, and returns `loader: "css"` - so CSS module
  * imports compile to `{}` and class names collide. Resolve to a non-`.css`
  * path so lightningcss can hash locals and emit real JS maps.
  */

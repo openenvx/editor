@@ -98,7 +98,7 @@ function textAlignFromProseMirrorDom(dom: HTMLElement): RichTextAlign {
 
 export interface HtmlRichTextEditorProps {
   html: string;
-  /** Block-level align (`data.align`) — seeded into TipTap and written back on commit. */
+  /** Block-level align (`data.align`) - seeded into TipTap and written back on commit. */
   align?: RichTextAlign;
   /** Bubble-menu sections; defaults show block type + align. */
   toolbar?: ResolvedRichTextToolbar;

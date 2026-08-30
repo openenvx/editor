@@ -161,7 +161,7 @@ export const sectionBlock: BlockConfig = {
   },
 };
 
-/** React-Email `<Row>` — table row; children should be `email.column`. */
+/** React-Email `<Row>` - table row; children should be `email.column`. */
 export const rowBlock: BlockConfig = {
   type: 'email.row',
   label: 'Row',
@@ -194,7 +194,7 @@ export const rowBlock: BlockConfig = {
   ),
 };
 
-/** React-Email `<Column>` — table cell inside a Row. */
+/** React-Email `<Column>` - table cell inside a Row. */
 export const columnBlock: BlockConfig = {
   type: 'email.column',
   label: 'Column',

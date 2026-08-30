@@ -32,21 +32,21 @@ if (runtimeJs.split('\n').length > 200) {
   fail('dist/runtime.js does not look minified (too many lines)');
 }
 if (indexJs.includes('.module.css')) {
-  fail('dist/index.js still imports CSS modules — they must be compiled');
+  fail('dist/index.js still imports CSS modules - they must be compiled');
 }
 if (!indexCss.includes('.root') && !indexCss.includes('openenvx')) {
   fail('dist/index.css missing compiled workbench tokens');
 }
 if (indexCss.includes(':global(')) {
   fail(
-    'dist/index.css still contains :global() — CSS modules must be compiled'
+    'dist/index.css still contains :global() - CSS modules must be compiled'
   );
 }
 if (fontsCss.trim().length === 0) {
   fail('dist/fonts.css is empty');
 }
 if (indexDts.split('\n').length > 80 || runtimeDts.split('\n').length > 40) {
-  fail('public .d.ts is too large — do not inline the internal schema');
+  fail('public .d.ts is too large - do not inline the internal schema');
 }
 if (LEAKED_TYPE.test(indexDts) || LEAKED_TYPE.test(runtimeDts)) {
   fail('public .d.ts leaks internal types');

@@ -225,7 +225,7 @@ export function SandboxUiPanel({
       }
       const panel = panelRef.current;
       const active = document.activeElement;
-      // Only when focus is in host chrome — not while the canvas (or other UI) owns keys.
+      // Only when focus is in host chrome - not while the canvas (or other UI) owns keys.
       if (!(panel && active && panel.contains(active))) {
         return;
       }

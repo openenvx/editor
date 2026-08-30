@@ -157,7 +157,7 @@ function measureTextPathRect(options: {
  * Path + tight box for curved text.
  *
  * Layout is a pure function of text metrics + curve (seeded from glyph
- * advance + estimated bounds — never the previous box), so remasuring while
+ * advance + estimated bounds - never the previous box), so remasuring while
  * scrubbing does not walk the box sideways.
  */
 export function layoutCurvedText(options: {

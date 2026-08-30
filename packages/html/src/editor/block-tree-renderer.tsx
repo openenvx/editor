@@ -110,7 +110,7 @@ function DropInsertLine({ vertical = false }: { vertical?: boolean }) {
   );
 }
 
-/** Keep items put during drag — preview uses an insert line, not live swaps. */
+/** Keep items put during drag - preview uses an insert line, not live swaps. */
 const staticSortingStrategy: SortingStrategy = () => null;
 
 function visibleEntriesForParent(
@@ -435,7 +435,7 @@ function isEditingLayer(
   editingTarget: BlockEditTarget | null,
   layerId: string
 ): boolean {
-  // Any in-place edit on this host (plain `html` or slot path) — disables grab cursor.
+  // Any in-place edit on this host (plain `html` or slot path) - disables grab cursor.
   return editingTarget?.hostId === layerId;
 }
 

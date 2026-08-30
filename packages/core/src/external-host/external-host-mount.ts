@@ -32,7 +32,7 @@ export interface ExternalHostMountDeps {
 
 /**
  * Deep module for external host mount lifecycle + narrow surface construction.
- * Isolates / iframes never see this — only first-party Host adapters hold surfaces.
+ * Isolates / iframes never see this - only first-party Host adapters hold surfaces.
  */
 export class ExternalHostMount {
   private readonly disposables = new Set<() => void>();

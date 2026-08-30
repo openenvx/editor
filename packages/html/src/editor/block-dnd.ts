@@ -338,7 +338,7 @@ export function sameOrderedIds(
  * Same-parent: index of the active id in orderedIds.
  * Cross-parent: placeholderIndex among the target's visible children.
  *
- * Does not reorder the live tree — the source stays put; callers only move
+ * Does not reorder the live tree - the source stays put; callers only move
  * an absolute insert marker among the unchanged siblings.
  */
 export function sortInsertLineIndex(

@@ -95,7 +95,7 @@ export interface ViewDescriptor {
    * heading in the shell.
    */
   group?: string;
-  /** viewsWelcome analogue — used when content is welcome or for empty properties. */
+  /** viewsWelcome analogue - used when content is welcome or for empty properties. */
   emptyMessage?: string;
 }
 

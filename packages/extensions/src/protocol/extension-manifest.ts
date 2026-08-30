@@ -44,7 +44,7 @@ export interface ExtensionWidgetContribution {
   defaults?: Record<string, unknown>;
 }
 
-/** Static chrome trees — same shape as former runtime panel:manifest. */
+/** Static chrome trees - same shape as former runtime panel:manifest. */
 export interface ExtensionChromeContribution {
   menu?: RenderNode;
   toolbar?: RenderNode;
@@ -54,7 +54,7 @@ export interface ExtensionChromeContribution {
 
 export interface ExtensionContributes {
   widgets?: ExtensionWidgetContribution[];
-  /** HTML blocks — same shape as widgets with kinds including `html`. */
+  /** HTML blocks - same shape as widgets with kinds including `html`. */
   blocks?: ExtensionWidgetContribution[];
   commands?: ExtensionCommandContribution[];
   viewContainers?: ExtensionViewContainerContribution[];
@@ -77,7 +77,7 @@ export interface ExtensionManifest {
   name: string;
   version?: string;
   activation?: ExtensionActivationEvent[];
-  /** Requested capabilities — intersected with the host grant. */
+  /** Requested capabilities - intersected with the host grant. */
   permissions?: SandboxCapability[];
   /**
    * Command ids the isolate may call via `executeCommand`.

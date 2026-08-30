@@ -183,7 +183,7 @@ export function useCanvasStageRuntime(
   const selectedLayer = selectedPrimary
     ? flattenedLayerById.get(selectedPrimary)
     : undefined;
-  // Size label / handle layout sit at artboard root — use absolute transform.
+  // Size label / handle layout sit at artboard root - use absolute transform.
   const selectedTransform =
     selectedLayer?.absoluteTransform ?? selectedLayer?.layer.transform ?? null;
   const selectedInteraction = selectedLayer

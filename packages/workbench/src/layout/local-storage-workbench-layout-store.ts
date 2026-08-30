@@ -18,7 +18,7 @@ export function createLocalStorageWorkbenchLayoutStore(
           return null;
         }
         const parsed = JSON.parse(raw) as WorkbenchLayoutSnapshot;
-        // ponytail: shallow parse only; corrupt keys are dropped on apply — add Zod if hosts need strict validation.
+        // ponytail: shallow parse only; corrupt keys are dropped on apply - add Zod if hosts need strict validation.
         if (!parsed || typeof parsed !== 'object') {
           return null;
         }

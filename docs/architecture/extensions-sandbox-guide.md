@@ -11,7 +11,7 @@ Trust model: [Plugin-boundaries.md](../../Plugin-boundaries.md). Widget pipeline
 |  | Sandbox **widget** | Sandbox **plugin** | **Embed** panel |
 | --- | --- | --- | --- |
 | Mental model | Object on the canvas / HTML page | Tool the user runs | Parent-page chrome over an iframe host |
-| Grant `kind` | `'widget'` | `'plugin'` | N/A — `EmbedPanelHost` |
+| Grant `kind` | `'widget'` | `'plugin'` | N/A - `EmbedPanelHost` |
 | Primary UI | On-canvas face (`data.children`) | Off-canvas `showUI` iframe | Declarative `render` trees from parent |
 | State | Host `data.values` (isolate expands only) | `clientStorage` / bridge (session) | Parent owns state; host gets `command` / `render` |
 | Lifetime | Lives with matching layers; one isolate per `extensionId` | Starts on run command; Stop closes isolate | Mounted while host session lasts |
@@ -28,7 +28,7 @@ Figma-shaped: widgets = nodes; plugins = tools. Embed is a separate, weaker lane
 1. **Document state** lives on the host scene layer (`data.values`).
 2. **Face expand** (Preact → `RenderNode`) runs in the **QuickJS** isolate when the host calls `renderWidgetFace`.
 3. **Bridge** (`openenvx.setSyncedState` / `applyProps`) writes values back to the host; the host re-asks for a face expand.
-4. **Paint** is host Konva / HTML on ordinary `data.children` layers — not Preact on the canvas.
+4. **Paint** is host Konva / HTML on ordinary `data.children` layers - not Preact on the canvas.
 
 `openenvx.*` exists only inside QuickJS (not in the `showUI` iframe, not in the editor main world).
 
@@ -69,7 +69,7 @@ Rules:
 
 - Persistent state = **props** (`data.values`), not Preact `useState` (hooks die with the isolate).
 - Prefer `openenvx.widget.useSyncedState` inside isolate code; `setProps` batches patches onto the same host values.
-- Face render must stay pure w.r.t. document writes other than values — `executeCommand` / `showUI` throw while `widget.rendering`.
+- Face render must stay pure w.r.t. document writes other than values - `executeCommand` / `showUI` throw while `widget.rendering`.
 - `onClick` / other `on*` handlers become handler IDs on the host; never pass live functions across the boundary.
 - Use `bind="propName"` or dotted paths (e.g. `bind="sections.0.title"`) on face elements when inline edit should write back into `values`.
 
@@ -103,7 +103,7 @@ export default defineExtension({
 });
 ```
 
-Use `buildGrantFromManifest({ manifest, session: sessionPolicy, source })` so grant caps/`requestedCommands` intersect the session (delivery `source` / artifact stays host-owned). Omitting `requestedCommands` means no execute allowlist — never inferred from `contributes.commands`.
+Use `buildGrantFromManifest({ manifest, session: sessionPolicy, source })` so grant caps/`requestedCommands` intersect the session (delivery `source` / artifact stays host-owned). Omitting `requestedCommands` means no execute allowlist - never inferred from `contributes.commands`.
 
 ### 3. Bundle + push source
 
@@ -111,7 +111,7 @@ Use `buildGrantFromManifest({ manifest, session: sessionPolicy, source })` so gr
 import { bundleWidgetSources } from '@xmazu/openenvxee-extensions/vite';
 export default { plugins: [bundleWidgetSources()] };
 
-// app — host never runs this; only a string for the isolate
+// app - host never runs this; only a string for the isolate
 import source from 'openenvx-widget:./seating.widget.tsx';
 await sandbox.pushWidgetSource('wm.seating', source);
 

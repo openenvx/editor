@@ -49,7 +49,7 @@ if (runtimeJs.split('\n').length > 200) {
   fail('dist/runtime.js does not look minified (too many lines)');
 }
 if (indexJs.includes('.module.css')) {
-  fail('dist/index.js still imports CSS modules — they must be compiled');
+  fail('dist/index.js still imports CSS modules - they must be compiled');
 }
 if (!indexCss.includes('ProseMirror') || indexCss.includes(':global(')) {
   fail(
@@ -57,7 +57,7 @@ if (!indexCss.includes('ProseMirror') || indexCss.includes(':global(')) {
   );
 }
 if (!/root:"e_/.test(indexJs)) {
-  fail('CSS module maps missing from JS — shell class names would be empty');
+  fail('CSS module maps missing from JS - shell class names would be empty');
 }
 if (sandboxWorkerJs.trim().length === 0) {
   fail('dist/sandbox-worker.js is empty');

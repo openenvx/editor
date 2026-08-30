@@ -17,7 +17,7 @@ function isTypingInputType(type: string | null | undefined): boolean {
 
 /**
  * True when keyboard/clipboard should stay with the focused control
- * (text-like inputs, textarea, select, contenteditable) — not editor shortcuts.
+ * (text-like inputs, textarea, select, contenteditable) - not editor shortcuts.
  */
 export function isTypingTarget(target: EventTarget | null): boolean {
   if (!target || typeof target !== 'object') {

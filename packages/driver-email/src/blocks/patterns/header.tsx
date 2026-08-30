@@ -8,7 +8,7 @@ import { createDefaultChild } from './pattern-helpers';
 /**
  * Centered logo + horizontal nav.
  * Children in Layers: first = logo, remaining = nav links (order contract).
- * ponytail: Index-as-role is fragile under reorder — upgrade to data.role /
+ * ponytail: Index-as-role is fragile under reorder - upgrade to data.role /
  * typed regions when patterns need safe cross-region moves.
  */
 export default defineEmailPattern({

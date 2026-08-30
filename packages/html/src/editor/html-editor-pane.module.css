@@ -14,7 +14,7 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
-  /* Toolbar floats over the stage — keep light inset so artboard peeks under the pill. */
+  /* Toolbar floats over the stage - keep light inset so artboard peeks under the pill. */
   padding: 40px 40px 40px;
 }
 
@@ -29,7 +29,7 @@
   min-height: 480px;
   background: var(--wb-card, #ffffff);
   box-shadow: var(--wb-shadow-sm, 0 1px 3px rgb(0 0 0 / 8%));
-  /* Selection pill is portaled to document.body — theme starts at (0,0). */
+  /* Selection pill is portaled to document.body - theme starts at (0,0). */
   box-sizing: border-box;
   padding: 0;
 }
@@ -78,7 +78,7 @@
   font-size: var(--wb-text-sm, 12px);
 }
 
-/* Padding must stay 0 — chrome wrappers must not reflow block content vs export. */
+/* Padding must stay 0 - chrome wrappers must not reflow block content vs export. */
 .blockWrap {
   --block-chrome-outline-offset: 2px;
   --block-chrome-outline-width: 1px;
@@ -100,7 +100,7 @@
 }
 
 /*
- * Contents chrome mounts on the block root (e.g. email `<td>`) — no wrapper
+ * Contents chrome mounts on the block root (e.g. email `<td>`) - no wrapper
  * element (invalid `<div>` inside `<tr>`). Selection menu is omitted for
  * contents chrome only in that case (no box to anchor).
  */
@@ -141,7 +141,7 @@
   pointer-events: none;
 }
 
-/* Absolute insert lines — must not affect sibling layout. */
+/* Absolute insert lines - must not affect sibling layout. */
 .blockWrapInsertLineBefore::before,
 .blockWrapInsertLineAfter::after,
 .blockWrapInsertLineBeforeVertical::before,
@@ -208,7 +208,7 @@
   min-height: 24px;
 }
 
-/* Whole flex/grid nest target — preview matches “drop inside this container”. */
+/* Whole flex/grid nest target - preview matches “drop inside this container”. */
 .blockWrapDropContainer {
   outline: 2px dashed #3b82f6;
   background: rgba(59, 130, 246, 0.12);
@@ -239,7 +239,7 @@
   position: fixed;
   /*
    * Anchored via inline top/left from the block rect (portaled to body so
-   * overflow:hidden ancestors — logo circles, rounded heroes — don't clip).
+   * overflow:hidden ancestors - logo circles, rounded heroes - don't clip).
    * Floating pill pinned near the block top; may sit over the block when top
    * chrome / viewport inset forces it down.
    */

@@ -150,7 +150,7 @@ describe('useViewTreeCollapseSeed', () => {
 
     expect(result.current.collapsed.has('group')).toBe(false);
 
-    // Same items again — still expanded
+    // Same items again - still expanded
     act(() => {
       result.current.setCollapsed((prev) => new Set(prev));
     });

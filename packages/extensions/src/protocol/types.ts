@@ -1,4 +1,4 @@
-/** Property pane element kinds — compile to fluent builders via headless mapper. */
+/** Property pane element kinds - compile to fluent builders via headless mapper. */
 export const PLUGIN_PROPERTY_ELEMENT_TYPES = [
   'Pane',
   'Row',
@@ -25,7 +25,7 @@ export const PLUGIN_PROPERTY_ELEMENT_TYPES = [
 ] as const;
 
 /**
- * Chrome contribution element kinds — compile to menu/toolbar/status/palette builders.
+ * Chrome contribution element kinds - compile to menu/toolbar/status/palette builders.
  */
 export const PLUGIN_CHROME_ELEMENT_TYPES = [
   'Menu',

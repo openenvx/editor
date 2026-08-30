@@ -1,4 +1,4 @@
-# Widget bridge — outside world to canvas / HTML
+# Widget bridge - outside world to canvas / HTML
 
 **Audience:** Integrators and coding agents. How a developer-authored Preact component becomes pixels (or HTML) inside the hosted editor.
 
@@ -8,7 +8,7 @@ Related: [extensions.md](extensions.md), [Plugin-boundaries.md](../../Plugin-bou
 
 | Concern | Owner | Notes |
 | --- | --- | --- |
-| Persistent widget state | **Host document** — `openenvx.widget` layer `data.values` | Survives reload / export; Inspector edits this |
+| Persistent widget state | **Host document** - `openenvx.widget` layer `data.values` | Survives reload / export; Inspector edits this |
 | Face expand (Preact → `RenderNode`) | **QuickJS isolate** | Host calls `renderWidgetFace`; isolate must not own document truth |
 | Handler functions | **Isolate** (ephemeral) | Serialized as ids on `data.handlers`; invoked back into QuickJS |
 | Map tree → scene layers | **Host** (`applyWidgetFace` / HTML twin) | AutoLayout / flex resolved on host |
@@ -136,7 +136,7 @@ All emit the same `{ type, props, children }` envelope (`RenderNode` in `@xmazu/
 
 ## Grants from manifest
 
-`defineExtension` declares `permissions` + optional `requestedCommands` (execute allowlist — not inferred from `contributes.commands`). Host builds the session grant with:
+`defineExtension` declares `permissions` + optional `requestedCommands` (execute allowlist - not inferred from `contributes.commands`). Host builds the session grant with:
 
 ```ts
 buildGrantFromManifest({ manifest, session: sessionPolicy, source });

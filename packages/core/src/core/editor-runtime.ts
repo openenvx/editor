@@ -100,7 +100,7 @@ export class EditorRuntime {
   private wireEvents(): void {
     this.disposables.add(
       this.scene.onDidChangeScene((snapshot) => {
-        // Use the event payload — do not call getSnapshot() again (avoids a second clone).
+        // Use the event payload - do not call getSnapshot() again (avoids a second clone).
         this.editor.updateScene(snapshot.scene, snapshot.contentRevision);
         this.syncContextKeys();
         this.events.emit(WorkbenchEvents.DidChangeScene, snapshot);

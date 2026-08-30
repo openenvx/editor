@@ -86,7 +86,7 @@ function ensurePages(scene: Scene): Scene {
   };
 }
 
-/** Structural page defaults only — no layout-specific rules. */
+/** Structural page defaults only - no layout-specific rules. */
 function applyStructuralPageDefaults(scene: Scene): Scene {
   return {
     ...scene,

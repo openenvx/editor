@@ -31,7 +31,7 @@ function stopMenuEvent(event: PointerEvent) {
   event.stopPropagation();
 }
 
-/** Portaled menus sit on `document.body` — copy shell theme for `--wb-*`. */
+/** Portaled menus sit on `document.body` - copy shell theme for `--wb-*`. */
 function readDocumentTheme(): string {
   const scoped = document.querySelector('[data-owb-theme]');
   return scoped instanceof HTMLElement

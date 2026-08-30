@@ -1,5 +1,5 @@
 /**
- * Rich-text resize contracts — guards against the conflicts that caused
+ * Rich-text resize contracts - guards against the conflicts that caused
  * text boxes to jump while dragging corner handles:
  *
  * 1. Pointer (not Konva scaleX/Y) owns live corner size.
@@ -129,7 +129,7 @@ describe('rich text resize interaction contracts', () => {
     const end = computeCornerResizeFromPointer(
       {
         ...s,
-        // CONTRACT: still the original start — never mid.fontSize
+        // CONTRACT: still the original start - never mid.fontSize
         startFontSize: s.startFontSize,
       },
       { x: origin.x + origin.width * 2.25, y: origin.y + origin.height * 2.25 },

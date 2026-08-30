@@ -120,7 +120,7 @@ export function useHandleDragSession({
   const [activeHandleAnchorState, setActiveHandleAnchor] = useState<
     string | null
   >(null);
-  // Live node position while dragging — scene transform only commits on drag end.
+  // Live node position while dragging - scene transform only commits on drag end.
   const [liveHandlePosition, setLiveHandlePosition] = useState<{
     x: number;
     y: number;
@@ -268,7 +268,7 @@ export function useHandleDragSession({
     [nodeRefs]
   );
 
-  // Scene transform catches up after drag end — drop the live override.
+  // Scene transform catches up after drag end - drop the live override.
   useEffect(() => {
     setLiveHandlePosition(null);
   }, [selectedTransform]);

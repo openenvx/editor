@@ -1,15 +1,15 @@
 # Live collaboration + Figma-style comments (deferred)
 
-**Status:** Roadmap / deferred — decisions captured 2026-08-03; not implementing now.  
+**Status:** Roadmap / deferred - decisions captured 2026-08-03; not implementing now.  
 **Product context:** Email-template collaboration platform first; ports must work for every editor (canvas, HTML, email, future).  
 **Related:** [FEATURES.md](../../FEATURES.md) (Real-time collaboration, P2).
 
 ## Goals
 
 1. **Realtime shared editing** via Liveblocks (or a future provider) for scene documents.
-2. **Figma-style comments** — canvas/document-anchored pins, threads, resolve — **async**, not Liveblocks Comments.
+2. **Figma-style comments** - canvas/document-anchored pins, threads, resolve - **async**, not Liveblocks Comments.
 3. **Provider-agnostic ports** so Liveblocks is one adapter, not the product API.
-4. **Editor-agnostic** — any scene-based editor; first host wire = email, then canvas/HTML without redesign.
+4. **Editor-agnostic** - any scene-based editor; first host wire = email, then canvas/HTML without redesign.
 
 ## Non-goals (v1 when built)
 
@@ -23,7 +23,7 @@
 | --- | --- |
 | Scope | Shared scene + presence **and** own Figma-style comments in the same first ship |
 | Comments product | Own implementation (async review pins); **not** Liveblocks Comments |
-| Sync model | **Whole-scene sync** — room holds scene JSON; local `SceneStore.apply` pushes; remote updates apply via controlled replace/apply |
+| Sync model | **Whole-scene sync** - room holds scene JSON; local `SceneStore.apply` pushes; remote updates apply via controlled replace/apply |
 | Portability | DI ports + adapters (`CollaborationPort`, `CommentPort`); Liveblocks = collab adapter only |
 | Editor coverage | Ports editor-agnostic; first product wire = email (`driver-email` / email host) |
 | Pricing intent | Pay Liveblocks for presence + storage/collab minutes only; comments stay on our backend |
@@ -44,14 +44,14 @@ openenvx-cloud (later)        # room auth endpoint + CommentPort HTTP/DB
 host (email-demo → cloud)     # wire adapters; CollabPlugin UI
 ```
 
-Mutation hub stays in core: remote updates must go through `SceneStore` (`apply` / controlled restore), not ad-hoc UI writes. Presence UI overlays live in the engine/shell that owns the surface (email pane / canvas) — not in `core`.
+Mutation hub stays in core: remote updates must go through `SceneStore` (`apply` / controlled restore), not ad-hoc UI writes. Presence UI overlays live in the engine/shell that owns the surface (email pane / canvas) - not in `core`.
 
 ```text
 Host
   → CollabPlugin (presence chrome, comment pins UI)
   → CollaborationPort + CommentPort
        ├── LiveblocksCollabAdapter   (rooms, presence, whole-scene storage)
-       ├── HttpCommentAdapter        (own API — threads / pins / resolve)
+       ├── HttpCommentAdapter        (own API - threads / pins / resolve)
        └── (future) OtherCollabAdapter
   → SceneStore
 ```
@@ -62,7 +62,7 @@ Host
 | ------------------------------ | -------------------- |
 | Presence (who's here, cursors) | Yes                  |
 | Whole-scene Storage sync       | Yes                  |
-| Comments                       | **No** — own backend |
+| Comments                       | **No** - own backend |
 
 Rough cost (sync only): Free hard-caps (e.g. 3k collab minutes); Pro ~$30/mo credits; collab minutes only when 2+ people share a room (`$0.002` / user-minute). See [liveblocks.io/pricing](https://liveblocks.io/pricing).
 

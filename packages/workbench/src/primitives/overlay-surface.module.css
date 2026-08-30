@@ -6,7 +6,7 @@
  *   data-[side=bottom]:slide-in-from-top-2 (etc.)
  *
  * Keyframes live in this module so Vite scopes animation-name + @keyframes
- * together — global token keyframes left Presence waiting on animationend forever.
+ * together - global token keyframes left Presence waiting on animationend forever.
  */
 
 @keyframes enter {
@@ -85,7 +85,7 @@
   pointer-events: none;
 }
 
-/* data-[side=*]:slide-in-from-*-2 — enter only, like shadcn */
+/* data-[side=*]:slide-in-from-*-2 - enter only, like shadcn */
 .surface[data-side='bottom'][data-state='open'] {
   --wb-enter-translate-y: -0.5rem;
 }

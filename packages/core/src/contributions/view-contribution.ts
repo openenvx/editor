@@ -43,7 +43,7 @@ export interface TreeItem {
 }
 
 export interface TreeSelectOptions {
-  /** Shift / ⌘ / Ctrl — toggle into or out of the current selection. */
+  /** Shift / ⌘ / Ctrl - toggle into or out of the current selection. */
   additive?: boolean;
 }
 

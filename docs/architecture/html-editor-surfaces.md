@@ -30,4 +30,4 @@ Page-root props still show in the Inspector when the root is selected (via artbo
 
 ## Why the root has no BlockChrome
 
-Nested blocks need a chrome box for outline, hover, drag, and the selection pill. The page root _is_ the frame — wrapping it in chrome would fight layout (full-bleed backgrounds, email columns, product roots). Selection for page props is therefore artboard-driven, not chrome-driven.
+Nested blocks need a chrome box for outline, hover, drag, and the selection pill. The page root _is_ the frame - wrapping it in chrome would fight layout (full-bleed backgrounds, email columns, product roots). Selection for page props is therefore artboard-driven, not chrome-driven.

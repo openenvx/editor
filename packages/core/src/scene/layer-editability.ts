@@ -99,13 +99,13 @@ export function canEditLayerData(layer: Layer, key?: string): boolean {
   return allowed.includes(key);
 }
 
-/** `html.root` / `email.root` — sole page frame; never a reorder sibling or delete target. */
+/** `html.root` / `email.root` - sole page frame; never a reorder sibling or delete target. */
 export function isLayoutRootLayer(layer: Layer): boolean {
   return layer.type.endsWith('.root');
 }
 
 export function canDeleteLayer(layer: Layer, scene: Scene): boolean {
-  // Page/Email frame is structural — never remove from Layers or shortcuts.
+  // Page/Email frame is structural - never remove from Layers or shortcuts.
   if (isLayoutRootLayer(layer)) {
     return false;
   }

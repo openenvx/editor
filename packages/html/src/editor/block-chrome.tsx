@@ -104,7 +104,7 @@ export function BlockChrome({
   const handleClick = useCallback(
     (event: MouseEvent) => {
       event.stopPropagation();
-      // React-Email Button/Link render <a href> — don't navigate / hash-scroll in the editor.
+      // React-Email Button/Link render <a href> - don't navigate / hash-scroll in the editor.
       const target = event.target;
       const el =
         target instanceof Element
@@ -218,7 +218,7 @@ export function BlockChrome({
     [handleReplaceFile, replaceEnabled]
   );
 
-  // Contents chrome attaches to the block root (`<td>`) — no wrapper element.
+  // Contents chrome attaches to the block root (`<td>`) - no wrapper element.
   const bindHostRef = useCallback(
     (node: HTMLElement | null) => {
       setNodeRef?.(node);

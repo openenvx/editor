@@ -18,7 +18,7 @@ function resolveRotateAnchorStrokeColor(strokeColor: string): string {
 }
 
 /**
- * Lucide `refresh-cw` paths (24×24 viewBox) — ISC license.
+ * Lucide `refresh-cw` paths (24×24 viewBox) - ISC license.
  * @see https://lucide.dev/icons/refresh-cw
  */
 const REFRESH_CW_PATHS = [

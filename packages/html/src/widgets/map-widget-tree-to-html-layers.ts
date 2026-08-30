@@ -88,7 +88,7 @@ function plainData(data: unknown): Record<string, unknown> {
 
 /**
  * Map a validated HTML widget element tree to html.* scene layers.
- * Browser flex handles layout — no host AutoLayout resolver.
+ * Browser flex handles layout - no host AutoLayout resolver.
  */
 export function mapWidgetTreeToHtmlLayers(
   root: RenderNode,

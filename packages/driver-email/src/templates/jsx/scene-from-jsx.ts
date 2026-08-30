@@ -96,7 +96,7 @@ function headingLevel(as: EmailJsxProps['as']): '1' | '2' | '3' {
 }
 
 function elementToLayer(element: ReactElement, nextId: () => string): Layer {
-  // Expand local helpers (FeatureBlock, …) — they are not Scene nodes.
+  // Expand local helpers (FeatureBlock, …) - they are not Scene nodes.
   if (
     typeof element.type === 'function' &&
     !isEmailJsxComponent(element.type)
@@ -138,7 +138,7 @@ function elementToLayer(element: ReactElement, nextId: () => string): Layer {
   }
   if (props.width !== undefined) {
     if (type === 'email.image' || type === 'email.imageLink') {
-      // Image blocks expect numeric px — `Number("23px")` used to fall back to 600.
+      // Image blocks expect numeric px - `Number("23px")` used to fall back to 600.
       data.width =
         typeof props.width === 'number'
           ? props.width

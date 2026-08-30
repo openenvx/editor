@@ -39,7 +39,7 @@ const DEFAULT_TOOLBAR: ResolvedRichTextToolbar = {
   align: true,
 };
 
-/** Bubble portals to body — copy shell theme so `--wb-*` tokens resolve. */
+/** Bubble portals to body - copy shell theme so `--wb-*` tokens resolve. */
 function readDocumentTheme(): string {
   const scoped = document.querySelector('[data-owb-theme]');
   return scoped instanceof HTMLElement

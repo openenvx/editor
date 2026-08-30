@@ -33,7 +33,7 @@ import {
 
 export interface MapPluginTreeToPropertyPaneOptions {
   /**
-   * External panel id — only `plugin.${panelId}.*` binds are allowed;
+   * External panel id - only `plugin.${panelId}.*` binds are allowed;
    * missing binds default to that prefix + field key.
    */
   panelId?: string;
@@ -89,7 +89,7 @@ function parseFieldActionClick(value: unknown): FieldActionClick | null {
   if (record.type === 'toggle' && typeof record.key === 'string') {
     return { type: 'toggle', key: record.key };
   }
-  // Encode plugin handlers as command ids at map time — keep FieldActionClick plugin-free.
+  // Encode plugin handlers as command ids at map time - keep FieldActionClick plugin-free.
   if (record.type === 'handler' && typeof record.handlerId === 'string') {
     return {
       type: 'command',

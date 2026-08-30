@@ -85,7 +85,7 @@ export interface WorkbenchShellProps {
     editorPaneKind: string;
   }) => ReactNode;
   /**
-   * Mount external hosts (sandbox / embed) after start — off PluginManager.
+   * Mount external hosts (sandbox / embed) after start - off PluginManager.
    * Memoize the callback; shell mounts once. Call `mountSandboxExtensions` /
    * `mountSandboxExtensions` inside and return a combined disposer.
    */

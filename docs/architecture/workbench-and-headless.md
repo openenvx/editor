@@ -15,9 +15,9 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 
 ## What the headless layer (in `@openenvx/core`) owns
 
-- `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` — owns `EditorRuntime`, injects it into `PluginManager`
-- `bootstrapWorkbenchServices()` — headless DI services on the runtime
-- `WorkbenchPlugin` + `ctx.registerWorkbench()` — UI contribution registration
+- `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` - owns `EditorRuntime`, injects it into `PluginManager`
+- `bootstrapWorkbenchServices()` - headless DI services on the runtime
+- `WorkbenchPlugin` + `ctx.registerWorkbench()` - UI contribution registration
 - Provider registries: `registerTreeDataProvider`, `registerFieldRenderer`, `registerStatusBarItemRenderer`, `registerEditorPane`, `registerTopBar`, `registerDialog`
 - View content kinds: `tree` (explorer), `list` (flat catalogs with row actions + optional reorder), `properties` (inspector forms), `component` (custom React panels), `welcome` (empty state)
 - Contribution points: Toolbar, CommandPalette, ViewContainer, View, ContextMenu, StatusBar, SidebarHeader, Overlay, PropertyPane, TopBar
@@ -30,20 +30,20 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 
 ## What workbench owns
 
-- **WorkbenchShell** — React chrome; resolves default plugins via `resolveWorkbenchPlugins()` (ordered catalog in `packages/workbench/src/plugins/resolve-workbench-plugins.ts`); optional `onSceneChange` for content persistence; optional `mountExternalHosts` mounts sandbox/embed after start
-- `DefaultWorkbenchChromePlugin` — scene-generic Pages + Layers sidebar, dirty Saved/Unsaved status
+- **WorkbenchShell** - React chrome; resolves default plugins via `resolveWorkbenchPlugins()` (ordered catalog in `packages/workbench/src/plugins/resolve-workbench-plugins.ts`); optional `onSceneChange` for content persistence; optional `mountExternalHosts` mounts sandbox/embed after start
+- `DefaultWorkbenchChromePlugin` - scene-generic Pages + Layers sidebar, dirty Saved/Unsaved status
 - Default inspector container + field renderer plugins
 - `SandboxExtensionHost` / `mountSandboxExtensions`, `EmbedPanelHost` / `mountEmbedPanel`
 - `PluginPanel`, postMessage transport, command gate helpers
 - Shared by canvas studio and HTML studio (no canvas branding on generic chrome)
 
-**Host rule:** Product apps declare contributions; the shell renders. Do not mount React panel views from the product host for form/settings panels — use `ViewContribution.buildProperties()` / `emptyMessage` / `when`. Use `registerViewPanel` only for non-form surfaces (chat, version history, …).
+**Host rule:** Product apps declare contributions; the shell renders. Do not mount React panel views from the product host for form/settings panels - use `ViewContribution.buildProperties()` / `emptyMessage` / `when`. Use `registerViewPanel` only for non-form surfaces (chat, version history, …).
 
 **View resolve order** (per `ViewContribution`): `buildProperties` → `componentId` → registered `TreeDataProvider` (`presentation: 'list' | 'tree'`, default `tree`) → `emptyMessage` welcome when no provider → empty tree.
 
-**List views** — declare `presentation: 'list'` on the view and register a `TreeDataProvider`. Optional `addCommandId` / `addLabel` render a footer add button; `TreeItem.actions` render per-row icon buttons. Reorder uses the same `handleMove` / `canMove` hooks as explorer trees.
+**List views** - declare `presentation: 'list'` on the view and register a `TreeDataProvider`. Optional `addCommandId` / `addLabel` render a footer add button; `TreeItem.actions` render per-row icon buttons. Reorder uses the same `handleMove` / `canMove` hooks as explorer trees.
 
-**Dialogs** — plugins register modal bodies with `ctx.registerDialog(id, Component)`; commands and services open them via `DialogService` / `api.openDialog(id, payload?)`. The shell mounts a single `DialogHost` (no per-feature `*DialogHost` in product hosts). One active dialog at a time — a new `open` replaces the current. Built-in `api.showConfirm({ title, description, confirmLabel?, cancelLabel? })` opens `workbench.confirm` and resolves `Promise<boolean>`. Confirm dialogs resolve via `api.resolveDialogConfirm(confirmed)` (shell-internal; do not reach into `DialogService` from React). Dialog components implement `WorkbenchDialogProps<TPayload>` (`open`, `payload`, `onClose`).
+**Dialogs** - plugins register modal bodies with `ctx.registerDialog(id, Component)`; commands and services open them via `DialogService` / `api.openDialog(id, payload?)`. The shell mounts a single `DialogHost` (no per-feature `*DialogHost` in product hosts). One active dialog at a time - a new `open` replaces the current. Built-in `api.showConfirm({ title, description, confirmLabel?, cancelLabel? })` opens `workbench.confirm` and resolves `Promise<boolean>`. Confirm dialogs resolve via `api.resolveDialogConfirm(confirmed)` (shell-internal; do not reach into `DialogService` from React). Dialog components implement `WorkbenchDialogProps<TPayload>` (`open`, `payload`, `onClose`).
 
 ```ts
 ctx.registerDialog('workbench.variables.edit', VariableEditDialog);
@@ -69,7 +69,7 @@ const ok = await api.showConfirm({
 
 Visibility is mutable (`toggleActivityBar` / …). Containers move via `api.moveContainer`. Set `layout: { editorToolbars: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_HTML_LAYOUT`) to show editor overlay toolbars. Items declare a `placement` (`top-left` | `top-center` | `top-right` | `bottom-left` | `bottom-center` | `bottom-right`) via `ToolbarBuilder.placement(...)`. Set `layout: { topBar: true }` (or use `DEFAULT_EMAIL_LAYOUT`) to show the optional shell header; plugins declare `TopBarContribution` and `ctx.registerTopBar(id, Component)`. Highest `priority` wins; later equal priority overwrites. No contribution = no header.
 
-**Host rule (toolbars):** Product engines (canvas / html / email) contribute toolbar descriptors only — no React toolbar components in those packages. Workbench `EditorChrome` + `ToolbarRenderer` render shared `IconButton` / `DropdownMenu` chrome. Product **top bars** (email mode switch, etc.) are the exception: they are optional layout + `TopBarContribution`, not a `WorkbenchShell` prop.
+**Host rule (toolbars):** Product engines (canvas / html / email) contribute toolbar descriptors only - no React toolbar components in those packages. Workbench `EditorChrome` + `ToolbarRenderer` render shared `IconButton` / `DropdownMenu` chrome. Product **top bars** (email mode switch, etc.) are the exception: they are optional layout + `TopBarContribution`, not a `WorkbenchShell` prop.
 
 ## Property pane flow
 
@@ -95,7 +95,7 @@ flowchart LR
 1. Plugins subclass `PropertyPaneContribution` and implement `buildDescriptor()` via `createPropertyPane()`.
 2. `LayerDefinition.properties()` returns core `PropertySectionDescriptor[]`.
 3. Controller merges plugin panes + synthesized layer panes into inspector views (`content.kind: 'properties'`).
-4. Shell renders via `ViewPane` + `PropertyContentRenderer` (shell-internal — hosts must not import these).
+4. Shell renders via `ViewPane` + `PropertyContentRenderer` (shell-internal - hosts must not import these).
 
 Field descriptors, kinds, and `layout`: [property-fields.md](property-fields.md) (including layout-node `when` for conditional rows/blocks).
 
@@ -103,7 +103,7 @@ Field descriptors, kinds, and `layout`: [property-fields.md](property-fields.md)
 
 **Naming:** **Inspector** = default secondary container (`workbench.inspector`) hosting canvas/HTML layer property views. Generic form content is a `properties` view + `PropertyPane` / `PropertyPath` in any container.
 
-`PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas transform panes) merged into the Inspector — not for embed/dashboard product hosts. Product hosts use `ViewContribution.buildProperties()`.
+`PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas transform panes) merged into the Inspector - not for embed/dashboard product hosts. Product hosts use `ViewContribution.buildProperties()`.
 
 ## External host mount (DI isolation)
 

@@ -4,7 +4,7 @@ import path from 'node:path';
 import type { Plugin, ResolvedConfig } from 'vite';
 
 export interface BundleWidgetSourcesOptions {
-  /** Optional esbuild alias map. Rarely needed — packages resolve from exports. */
+  /** Optional esbuild alias map. Rarely needed - packages resolve from exports. */
   alias?: Record<string, string>;
 }
 
@@ -14,7 +14,7 @@ const RESOLVED_PREFIX = `\0${OPENENVX_WIDGET_PREFIX}`;
 
 /**
  * Vite packaging plugin: turn a widget TSX entry into an IIFE **string** for QuickJS.
- * Not a runtime API — only delivery. After eval the module must call
+ * Not a runtime API - only delivery. After eval the module must call
  * `openenvx.widget.register` (or `define*Component`, which does).
  *
  * Dev HMR: invalidates the virtual module and accepts via `import.meta.hot`
@@ -24,7 +24,7 @@ const RESOLVED_PREFIX = `\0${OPENENVX_WIDGET_PREFIX}`;
  * // vite.config.ts
  * plugins: [bundleWidgetSources()]
  *
- * // app.tsx — host never runs this; only a string payload for the isolate
+ * // app.tsx - host never runs this; only a string payload for the isolate
  * import source from 'openenvx-widget:./seating.widget.tsx'
  * if (import.meta.hot) {
  *   import.meta.hot.accept((mod) => {

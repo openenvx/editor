@@ -63,7 +63,7 @@ function findHtmlLikeRootId(page: Page): string | null {
 
 /**
  * Register host Commands that drop widget layers for each widgets/blocks
- * contribution. Command id is `${widget.id}.insert`. Outer-world path — no
+ * contribution. Command id is `${widget.id}.insert`. Outer-world path - no
  * internal Plugin. HTML pages nest under the page `*.root`; canvas pages append to
  * page.layers. `contributes.blocks` also register in {@link extensionBlockStore}
  * for the HTML Blocks palette.

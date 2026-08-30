@@ -97,7 +97,7 @@
   color: var(--wb-foreground);
 }
 
-/* Leading check gutter — reserved so labels align whether checked or not. */
+/* Leading check gutter - reserved so labels align whether checked or not. */
 .itemIndicator {
   display: inline-flex;
   flex-shrink: 0;

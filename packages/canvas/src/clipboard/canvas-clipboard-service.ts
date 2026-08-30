@@ -187,7 +187,7 @@ export class CanvasClipboardService {
 
   /**
    * Build an image layer immediately (`uploading` + session blob preview).
-   * Scene JSON keeps an empty `assetRef` until upload finishes — no `blob:` in history.
+   * Scene JSON keeps an empty `assetRef` until upload finishes - no `blob:` in history.
    * Pass `assets` from `ctx.services.get(AssetServiceId)` so host overrides apply.
    */
   createImageLayerFromExternalPaste(

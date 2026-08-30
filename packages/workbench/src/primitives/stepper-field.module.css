@@ -81,7 +81,7 @@
   box-shadow: var(--wb-shadow-control-focus);
 }
 
-/* Popup action row — matches shadcn/designer inspector popover */
+/* Popup action row - matches shadcn/designer inspector popover */
 .popup {
   display: flex;
   align-items: flex-start;

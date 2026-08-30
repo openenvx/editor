@@ -17,7 +17,7 @@ export class BlockRegistry {
     return [...this.configs.values()];
   }
 
-  /** Palette entries — respects `BlockConfig.palette` (roots default hidden). */
+  /** Palette entries - respects `BlockConfig.palette` (roots default hidden). */
   getPaletteBlocks(): BlockConfig[] {
     return this.getAll().filter((config) => {
       if (config.palette === false) {

@@ -2,7 +2,7 @@ import type { BlockConfig } from '../block-config';
 
 /**
  * Host shell for sandbox HTML widgets. Face layers live in `data.children`
- * (mapped from the isolate render tree). Not listed in the built-in palette —
+ * (mapped from the isolate render tree). Not listed in the built-in palette -
  * extension blocks appear via {@link extensionBlockStore}.
  */
 export const openenvxWidgetBlock: BlockConfig = {

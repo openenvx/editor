@@ -1,6 +1,6 @@
 /**
  * Document-level email font (react-email `Font` + live artboard).
- * Canvas FontService is intentionally not used — email clients need
+ * Canvas FontService is intentionally not used - email clients need
  * @font-face + a web-safe fallback stack.
  */
 
@@ -24,7 +24,7 @@ export const EMAIL_FALLBACK_FONT_FAMILY = [
 )[];
 
 /**
- * Latin Inter variable face — same file for 400 / 600 / 700 (Google Fonts CSS).
+ * Latin Inter variable face - same file for 400 / 600 / 700 (Google Fonts CSS).
  * Declare one @font-face per weight so bold headings are not synthesized.
  */
 export const EMAIL_FONT_WOFF2_URL =
@@ -41,7 +41,7 @@ export function emailFontStack(): string {
   return `${EMAIL_FONT_FAMILY}, ${EMAIL_FALLBACK_FONT_FAMILY.join(', ')}`;
 }
 
-/** Explicit heading metrics — avoid browser UA h1/h2 sizes (differ host vs iframe). */
+/** Explicit heading metrics - avoid browser UA h1/h2 sizes (differ host vs iframe). */
 export function emailHeadingStyle(level: 1 | 2 | 3): {
   fontSize: number;
   fontWeight: number;

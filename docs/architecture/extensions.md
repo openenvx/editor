@@ -1,4 +1,4 @@
-# Extensions — internal vs sandbox
+# Extensions - internal vs sandbox
 
 **Audience:** Engineers and integrators. Trust detail: [Plugin-boundaries.md](../../Plugin-boundaries.md).
 

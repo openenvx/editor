@@ -282,7 +282,7 @@ export function CanvasRulers({
   const rulerInset = showRulers ? RULER_SIZE_PX : 0;
 
   // Keep a stable DOM tree when toggling rulers so stageHost (and its
-  // ResizeObserver) never remounts — swapping wrappers was collapsing size to 0.
+  // ResizeObserver) never remounts - swapping wrappers was collapsing size to 0.
   return (
     <div
       className={

@@ -3,7 +3,59 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
-## [Unreleased]
+## [0.1.2] - 2026-08-30
+
+### Other
+
+- Update npm publish instructions and workflow
+
+- Revised the `PUBLISHING.md` documentation to clarify the use of `NPM_TOKEN` for publishing and the option for npm trusted publishing.
+- Updated the GitHub Actions workflow to use `actions/setup-node@v7` and ensure the current npm CLI is installed.
+- Enhanced the verification step for package repository metadata to align with npm trusted publishing requirements.
+
+These changes improve the clarity and reliability of the publishing process.
+
+- V0.1.6
+
+- Standardize punctuation and formatting across documentation
+
+- Updated various markdown files to replace em dashes with hyphens for consistency.
+- Revised the formatting of lists and instructions to ensure uniformity in style.
+- Enhanced clarity in the `PUBLISHING.md` and `README.md` files regarding package publishing and documentation references.
+
+These changes improve the readability and professionalism of the documentation.
+
+## [0.1.5] - 2026-08-30
+
+### Other
+
+- Update npm trusted publishing instructions and repository URLs
+
+- Enhanced the `PUBLISHING.md` documentation to clarify the configuration for npm trusted publishing, including exact matching requirements for repository URLs.
+- Added a verification step in the `release.yml` workflow to ensure that each package's `repository.url` matches the expected format for trusted publishing.
+- Updated `package.json` files for `html-studio`, `email-studio`, and `canvas-studio` to correct the repository URLs to the new format.
+
+These changes improve the reliability of the publishing process and ensure compliance with npm's trusted publishing requirements.
+
+- V0.1.4
+
+- V0.1.5
+
+## [0.1.3] - 2026-08-30
+
+### Other
+
+- Enhance release workflow with skip_bump option
+
+- Added a `skip_bump` input to the release workflow, allowing users to retry a failed publish without incrementing the version.
+- Updated the `release.yml` to conditionally skip version bumping, changelog updates, and tagging based on the `skip_bump` input.
+- Clarified publishing instructions in `PUBLISHING.md` to include guidance on using the `skip_bump` feature.
+
+These changes improve the flexibility and reliability of the release process.
+
+- V0.1.3
+
+## [0.1.2] - 2026-08-30
 
 ### Bug Fixes
 
@@ -18,6 +70,11 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Fix
 
 - Fix
+
+
+### Documentation
+
+- Update AGENTS.md with guidelines for commit messages and add esbuild dependency
 
 
 ### Other
@@ -1030,6 +1087,63 @@ These changes improve the overall clarity and consistency of the package structu
 
 - Fixes
 
+- Update licensing and documentation for clarity
+
+- Changed the license for all published packages from MIT to MPL-2.0, ensuring consistency across the project.
+- Updated `README.md` and `PUBLISHING.md` to reflect the new licensing information and clarify the publishing process.
+- Revised `AGENTS.md` and `Architecture.md` to align with the new license and improve overall documentation clarity.
+- Added a new `CHANGELOG.md` to document notable changes and updates across the project.
+
+These changes enhance the project's compliance and provide clearer guidance for contributors and users.
+
+- Update TypeScript configuration and vitest settings across packages
+
+- Added new TypeScript paths for `@xmazu/openenvxee-extensions/protocol` in `canvas-studio` and `email-studio` packages to improve module resolution.
+- Updated `vitest.config.ts` files in multiple packages to include 'zod' in the inline dependencies, ensuring compatibility and preventing issues with module imports.
+- Introduced new declaration files for `openenvx` in the `extensions` package, defining interfaces for the OpenEnvx API and enhancing type safety.
+
+These changes enhance the TypeScript setup and testing configurations, improving overall development experience and code quality.
+
+- Update dependencies and tsup configuration
+
+- Added `@types/node` dependency to `bun.lock` and `packages/extensions/package.json` for improved type definitions.
+- Updated `tsup.config.ts` to exclude the `src/vite/**` directory from the build process, refining the output and ensuring only relevant files are included.
+
+These changes enhance type safety and optimize the build configuration for the extensions package.
+
+- Enhance pre-commit hook and update release workflow
+
+- Updated the pre-commit hook to include a step for running `bun run fix` and staging changes, ensuring code quality before commits.
+- Modified the `release.yml` workflow to streamline the build and verification process for studio packages, improving the release pipeline.
+- Clarified the publishing steps in `PUBLISHING.md` to ensure consistency in versioning and release practices.
+
+These changes improve the development workflow and enhance the reliability of the release process.
+
+- Update tsup configuration to skip DTS generation
+
+- Modified `tsup.config.ts` to disable DTS generation for the private package, addressing memory issues during the build process in CI.
+- Added comments to clarify the reasoning behind skipping DTS, ensuring better understanding for future maintainers.
+
+These changes optimize the build process for the canvas package by preventing out-of-memory errors related to large type definitions.
+
+- Update tsup configuration for private packages
+
+- Removed DTS generation for the canvas and workbench packages to prevent out-of-memory errors during the build process in CI.
+- Updated the extensions package to enable DTS generation, ensuring type definitions are included for published packages.
+- Clarified comments in the tsup.library.js file regarding DTS handling for private and published packages.
+
+These changes optimize the build process and improve type safety for the extensions package.
+
+- Enhance BlockTreeRenderer tests with rich text editor wait function
+
+- Introduced a new `waitForRichTextEditor` function to streamline the process of waiting for the rich text editor to mount, allowing for more flexible selector handling.
+- Updated existing tests in `block-tree-renderer.test.tsx` to utilize the new function, improving readability and reducing redundancy in the test code.
+- Mocked the lazy loading of the rich text editor to ensure proper isolation during testing.
+
+These changes enhance the reliability and maintainability of the BlockTreeRenderer tests.
+
+- V0.1.2
+
 
 ### Refactor
 
@@ -1052,5 +1166,13 @@ These changes significantly enhance the usability and flexibility of the propert
 - Incremented version numbers for relevant packages to reflect the updates and improvements made.
 
 These changes significantly enhance the usability and flexibility of the property management system within the workbench, providing a more streamlined editing experience for users.
+
+- Refactor BlockTreeRenderer tests to use Workbench API
+
+- Updated tests in `block-tree-renderer.test.tsx` to utilize the new `renderWithWorkbench` function, enhancing test isolation and setup.
+- Introduced `beforeEach` and `afterEach` hooks to manage the Workbench lifecycle, ensuring a clean state for each test.
+- Adjusted multiple render calls to incorporate the Workbench API, improving the overall testing framework and reliability.
+
+These changes streamline the testing process for the BlockTreeRenderer component, promoting better practices in test management.
 
 <!-- generated by git-cliff -->

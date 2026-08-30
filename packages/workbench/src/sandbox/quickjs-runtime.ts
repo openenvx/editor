@@ -33,8 +33,8 @@ function resolveWorkerUrl(override?: string | URL): URL {
       : override;
   }
   // Source / Vite HMR: import.meta.url ends in .ts → co-located TypeScript worker.
-  // Published dist (flat or preserveModules) ends in .js — even when the path still
-  // contains /src/ — so load sandbox-worker.js beside this module.
+  // Published dist (flat or preserveModules) ends in .js - even when the path still
+  // contains /src/ - so load sandbox-worker.js beside this module.
   const meta = import.meta.url;
   if (/\.tsx?([?#]|$)/.test(meta)) {
     return new URL('quickjs.worker.ts', meta);
@@ -50,7 +50,7 @@ function postToWorker(worker: Worker, message: HostToWorker): void {
 
 /**
  * Creates one QuickJS isolate in a dedicated Web Worker (Figma-style).
- * In-process isolate is test-only (`preferInProcess: true`) — never a silent fallback.
+ * In-process isolate is test-only (`preferInProcess: true`) - never a silent fallback.
  */
 export async function createQuickJsIsolate(input: {
   onHostCall: BridgeHandler;

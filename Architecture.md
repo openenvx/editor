@@ -4,7 +4,7 @@ Package boundaries and contribution flow for the monorepo.
 
 **Audience:** Contributors, integrators, and maintainers. This is the map for understanding package boundaries before changing code.
 
-**Also read:** [Plugin-boundaries.md](Plugin-boundaries.md) — internal vs external plugins, protocol trust boundary, and cloud/marketplace runners. Do not load untrusted plugin JS into the editor main world.
+**Also read:** [Plugin-boundaries.md](Plugin-boundaries.md) - internal vs external plugins, protocol trust boundary, and cloud/marketplace runners. Do not load untrusted plugin JS into the editor main world.
 
 ## Deep chapters
 
@@ -24,10 +24,10 @@ Package boundaries and contribution flow for the monorepo.
 
 Author how-to (under `docs/architecture/`):
 
-- [extensions.md](docs/architecture/extensions.md) — lanes overview
-- [extensions-sandbox-guide.md](docs/architecture/extensions-sandbox-guide.md) — sandbox widgets / plugins
-- [extensions-host-guide.md](docs/architecture/extensions-host-guide.md) — internal OOP plugins
-- [roadmap.md](docs/architecture/roadmap.md) — enterprise host API roadmap
+- [extensions.md](docs/architecture/extensions.md) - lanes overview
+- [extensions-sandbox-guide.md](docs/architecture/extensions-sandbox-guide.md) - sandbox widgets / plugins
+- [extensions-host-guide.md](docs/architecture/extensions-host-guide.md) - internal OOP plugins
+- [roadmap.md](docs/architecture/roadmap.md) - enterprise host API roadmap
 
 ## Client tiers (monorepo)
 
@@ -104,20 +104,20 @@ flowchart TB
 2. Domain plugins (`CanvasPlugin`, `HtmlBlocksPlugin`, …) register via core + domain registries and workbench contributions.
 3. `WorkbenchController` (in `@openenvx/core`) assembles core + workbench registries into `WorkbenchState`.
 
-External hosts (sandbox / embed) mount **off** `PluginManager` via `ExternalHostMount` — see [Extensions](docs/architecture/extensions.md) and [Plugin-boundaries.md](Plugin-boundaries.md).
+External hosts (sandbox / embed) mount **off** `PluginManager` via `ExternalHostMount` - see [Extensions](docs/architecture/extensions.md) and [Plugin-boundaries.md](Plugin-boundaries.md).
 
-## Code style — OOP vs functional
+## Code style - OOP vs functional
 
 | Layer | Style | Examples |
 | --- | --- | --- |
-| `core`, `canvas`, plugins | **OOP** — abstract classes, builders, visitors | `Plugin`, `Command`, `LayerDefinition`, `PropertyPaneBuilder` |
-| App / shell React UI | **Functional only** — function components and hooks | `WorkbenchShell`, field renderers |
+| `core`, `canvas`, plugins | **OOP** - abstract classes, builders, visitors | `Plugin`, `Command`, `LayerDefinition`, `PropertyPaneBuilder` |
+| App / shell React UI | **Functional only** - function components and hooks | `WorkbenchShell`, field renderers |
 
 Plugin API surface = classes extending contribution base classes, not plain config objects.
 
 ## Related
 
-- [Packages & public API](docs/architecture/packages-and-api.md) — exports, who imports what, stability
-- [FEATURES.md](FEATURES.md) — product capability matrix
-- [PUBLISHING.md](PUBLISHING.md) — what ships to the registry
-- [AGENTS.md](AGENTS.md) — agent workflow and placement rules
+- [Packages & public API](docs/architecture/packages-and-api.md) - exports, who imports what, stability
+- [FEATURES.md](FEATURES.md) - product capability matrix
+- [PUBLISHING.md](PUBLISHING.md) - what ships to the registry
+- [AGENTS.md](AGENTS.md) - agent workflow and placement rules

@@ -289,7 +289,7 @@ function build(o: typeof z.object) {
         }),
         type: z.literal('openenvx.widget'),
       }),
-      // Plugin escape hatch — must be last; builtin type strings are excluded
+      // Plugin escape hatch - must be last; builtin type strings are excluded
       // so invalid builtin payloads cannot fall through to this branch.
       o({
         ...layerBase,

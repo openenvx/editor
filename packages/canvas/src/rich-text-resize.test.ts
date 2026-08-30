@@ -357,7 +357,7 @@ describe('computeCornerResizeFromPointer', () => {
       { x: 10 + 320, y: 20 - 50 },
       measure
     );
-    // Bottom-left of origin is (10, 100) — both results must keep it.
+    // Bottom-left of origin is (10, 100) - both results must keep it.
     expect(a.transform.x).toBe(10);
     expect(a.transform.y + a.transform.height).toBe(100);
     expect(b.transform.x).toBe(10);

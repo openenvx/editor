@@ -13,7 +13,7 @@ export type WidgetHandler = (payload?: unknown) => void | Promise<void>;
 export type HandlerRegistry = Map<string, WidgetHandler>;
 
 let handlerSeq = 0;
-/** ponytail: single active registry — not re-entrant across nested begin/end. */
+/** ponytail: single active registry - not re-entrant across nested begin/end. */
 let activeRegistry: HandlerRegistry | null = null;
 
 /** Begin a render pass; `on*` function props land in this map as handler ids. */
@@ -41,7 +41,7 @@ export function serializePropValue(
 ): SerializedPropValue {
   if (typeof value === 'function') {
     if (!registry) {
-      // Drop handlers outside a render pass rather than throw — pure expand
+      // Drop handlers outside a render pass rather than throw - pure expand
       // used in tests may not register a registry.
       return undefined;
     }

@@ -1,4 +1,4 @@
-# Overview — how OpenEnvx fits together
+# Overview - how OpenEnvx fits together
 
 **Audience:** Contributors and integrators who want to understand the editor before choosing a package.
 
@@ -58,13 +58,13 @@ Scene-generic chrome (Pages, Layers, dirty status, Inspector container) lives in
 
 ## Commands are the mutation hub
 
-Trusted code mutates the scene through **commands** on the shared command service — not ad-hoc store writes from random UI. External paths (embed / sandbox `command` messages, sandbox `executeCommand`) hit the same hub behind allowlists.
+Trusted code mutates the scene through **commands** on the shared command service - not ad-hoc store writes from random UI. External paths (embed / sandbox `command` messages, sandbox `executeCommand`) hit the same hub behind allowlists.
 
 ## Next chapters
 
-1. [Runtime & core](runtime-and-core.md) — host primitives
-2. [Workbench & headless](workbench-and-headless.md) — UI contribution system
-3. [Canvas](canvas.md) / [HTML](html.md) / [Email driver](driver-email.md) — domain engines
-4. [Studio & products](studio-and-products.md) — what apps import
-5. [Extensions](extensions.md) — trust boundaries summary
-6. [Packages & public API](packages-and-api.md) — exports and stability
+1. [Runtime & core](runtime-and-core.md) - host primitives
+2. [Workbench & headless](workbench-and-headless.md) - UI contribution system
+3. [Canvas](canvas.md) / [HTML](html.md) / [Email driver](driver-email.md) - domain engines
+4. [Studio & products](studio-and-products.md) - what apps import
+5. [Extensions](extensions.md) - trust boundaries summary
+6. [Packages & public API](packages-and-api.md) - exports and stability

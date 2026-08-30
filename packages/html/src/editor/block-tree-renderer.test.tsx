@@ -31,7 +31,7 @@ afterEach(() => {
   disposeWorkbench();
 });
 
-/** TipTap mounts `.ProseMirror` with `contenteditable` — allow either selector. */
+/** TipTap mounts `.ProseMirror` with `contenteditable` - allow either selector. */
 async function waitForRichTextEditor(): Promise<HTMLElement> {
   return waitFor(() => {
     const node = document.querySelector(
@@ -518,7 +518,7 @@ describe('BlockTreeRenderer', () => {
     expect(cellWrap?.tagName).toBe('TD');
     expect(cellWrap?.className).toContain('blockWrapContents');
     expect(cellWrap?.className).toContain('blockWrapSelected');
-    // Selection menu is omitted — contents has no box to anchor.
+    // Selection menu is omitted - contents has no box to anchor.
     expect(
       cellWrap?.querySelector('[aria-label="Cell actions"]')
     ).toBeNull();

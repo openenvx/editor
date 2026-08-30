@@ -14,7 +14,7 @@ import {
 
 const fontsByFamily = new Map<string, FontDescriptor>();
 const fontsById = new Map<string, FontDescriptor>();
-/** Google (or provider) face keys — canvas-private, not on core FontDescriptor. */
+/** Google (or provider) face keys - canvas-private, not on core FontDescriptor. */
 const variantsById = new Map<string, string[]>();
 const loadedFaceKeys = new Set<string>();
 const stylesheetPromises = new Map<string, Promise<void>>();
@@ -236,7 +236,7 @@ export const canvasFontService: FontService = {
   },
 };
 
-/** Test helper — clears runtime registrations and reseeds the catalog. */
+/** Test helper - clears runtime registrations and reseeds the catalog. */
 export function resetCanvasFontServiceForTests(): void {
   fontsByFamily.clear();
   fontsById.clear();

@@ -101,7 +101,7 @@ function layerSize(layer: Layer): { width: number; height: number } {
  * Place child layers according to Stack / Grid intent.
  * Text layers are measured first via {@link fitCanvasTextLayerToContent}.
  *
- * ponytail: no wrap line-breaking for intrinsic-width children yet — explicit
+ * ponytail: no wrap line-breaking for intrinsic-width children yet - explicit
  * widths required for wrap rows; upgrade with a real flex measure pass.
  */
 export function resolveAutoLayout(

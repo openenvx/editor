@@ -159,7 +159,7 @@ function appendSlotSection(
   registry: BlockRegistry
 ): void {
   const partConfig = registry.get(slotDef.partType);
-  // ponytail: unregistered part types omit slot UI — register all slot partType values on BlockRegistry.
+  // ponytail: unregistered part types omit slot UI - register all slot partType values on BlockRegistry.
   if (!partConfig) {
     return;
   }

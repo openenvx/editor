@@ -33,7 +33,7 @@ export const PropertyPath = {
     return `command.${commandId}`;
   },
 
-  /** External plugin panel value path — read/write via plugin-backed host context. */
+  /** External plugin panel value path - read/write via plugin-backed host context. */
   plugin(panelId: string, key: string): PropertyValuePath {
     return `plugin.${panelId}.${key}`;
   },

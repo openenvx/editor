@@ -6,7 +6,7 @@ import type { FlattenedStageLayer } from './flatten-layer-surface';
 import { flattenStageLayers } from './flatten-layer-surface';
 
 /**
- * Hover outline must use absoluteTransform from flattenStageLayers — relative
+ * Hover outline must use absoluteTransform from flattenStageLayers - relative
  * face-child coords would paint at the artboard origin while content sits under
  * the widget parent offset.
  */

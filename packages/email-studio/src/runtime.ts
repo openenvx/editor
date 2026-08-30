@@ -1,5 +1,5 @@
 /**
- * Headless HTML export — no WorkbenchShell, TipTap, or component CSS.
+ * Headless HTML export - no WorkbenchShell, TipTap, or component CSS.
  * Browser/editor hosts can import the same helpers from `@openenvx/email-studio`.
  */
 import type { Scene as CoreScene } from '@openenvx/core/schema';

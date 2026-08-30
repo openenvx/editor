@@ -15,7 +15,7 @@ export * from '@openenvx/core';
 export * from '@openenvx/html';
 
 /**
- * Workbench host surface — shell + plugins + chrome helpers only.
+ * Workbench host surface - shell + plugins + chrome helpers only.
  * No ViewPane / PropertyContentRenderer / panel React re-exports.
  */
 export {

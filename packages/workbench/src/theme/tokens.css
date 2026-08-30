@@ -1,6 +1,6 @@
-/* Theme-agnostic tokens — shared by every [data-owb-theme] scope. */
+/* Theme-agnostic tokens - shared by every [data-owb-theme] scope. */
 [data-owb-theme] {
-  /* Typography — 11px is the workhorse UI size (Figma/Paper density) */
+  /* Typography - 11px is the workhorse UI size (Figma/Paper density) */
   --wb-text-xs: 10px;
   --wb-text-sm: 11px;
   --wb-text-base: 12px;
@@ -17,7 +17,7 @@
   --wb-space-5: 20px;
   --wb-space-6: 24px;
 
-  /* Radius — tight on controls, generous only on floating surfaces */
+  /* Radius - tight on controls, generous only on floating surfaces */
   --wb-radius-sm: 3px;
   --wb-radius-control: 5px;
   --wb-radius-md: 6px;
@@ -38,10 +38,10 @@
   --wb-secondary-sidebar-width: 280px;
   --wb-layer-row-height: 24px;
 
-  /* Material — translucent chrome reads as an app window, not a web page */
+  /* Material - translucent chrome reads as an app window, not a web page */
   --wb-surface-blur: saturate(180%) blur(20px);
 
-  /* Motion — state reveals only, never decoration */
+  /* Motion - state reveals only, never decoration */
   --wb-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --wb-duration-fast: 140ms;
   --wb-duration: 200ms;
@@ -61,7 +61,7 @@
 [data-owb-theme='light'] {
   color-scheme: light;
 
-  /* Surfaces — grey panel chrome, white cards, canvas darker than chrome */
+  /* Surfaces - grey panel chrome, white cards, canvas darker than chrome */
   --wb-background: #f0f0f0;
   --wb-canvas-field: #d9d9d9;
   --wb-card: #ffffff;
@@ -78,7 +78,7 @@
   --wb-sidebar-row-selected: rgb(0 0 0 / 9%);
   --wb-sidebar-row-hovered: rgb(0 0 0 / 4%);
 
-  /* Text — classic rgba: --wb-foreground is read into Konva */
+  /* Text - classic rgba: --wb-foreground is read into Konva */
   --wb-foreground: rgba(0, 0, 0, 0.9);
   --wb-muted-foreground: rgba(0, 0, 0, 0.62);
 
@@ -90,7 +90,7 @@
   --wb-menu-highlight-foreground: #ffffff;
   --wb-destructive: #d5232c;
 
-  /* Canvas-facing — Konva cannot parse modern `rgb(… / α)` or oklch */
+  /* Canvas-facing - Konva cannot parse modern `rgb(… / α)` or oklch */
   --wb-selection: #3b82f6;
   --wb-selection-muted: rgba(59, 130, 246, 0.5);
   --wb-smart-guide: #ec4899;
@@ -100,7 +100,7 @@
   --wb-artboard-border: #d8d8d8;
   --wb-artboard-shadow-color: rgba(0, 0, 0, 0.18);
 
-  /* Tooltip — high-contrast inverse pill */
+  /* Tooltip - high-contrast inverse pill */
   --wb-tooltip: rgb(30 30 30 / 94%);
   --wb-tooltip-foreground: rgb(255 255 255 / 92%);
   --wb-tooltip-border: transparent;
@@ -113,7 +113,7 @@
   --wb-border-subtle: rgb(0 0 0 / 10%);
   --wb-backdrop-overlay: rgb(0 0 0 / 35%);
 
-  /* Elevation — controls are lit from above, not flat web fills */
+  /* Elevation - controls are lit from above, not flat web fills */
   --wb-shadow-xs: 0 0 0 1px rgb(0 0 0 / 8%);
   --wb-shadow-sm: 0 0 0 1px rgb(0 0 0 / 11%);
   --wb-segment-active-ring:
@@ -149,7 +149,7 @@
 [data-owb-theme='dark'] {
   color-scheme: dark;
 
-  /* Surfaces — warm nocturnal: near-black canvas, charcoal chrome, module steps */
+  /* Surfaces - warm nocturnal: near-black canvas, charcoal chrome, module steps */
   --wb-background: #1d1c1b;
   --wb-canvas-field: #181716;
   --wb-card: #252422;
@@ -164,7 +164,7 @@
   --wb-sidebar-row-selected: rgb(255 255 255 / 11%);
   --wb-sidebar-row-hovered: rgb(255 255 255 / 5%);
 
-  /* Text — hex for Konva-safe --wb-foreground */
+  /* Text - hex for Konva-safe --wb-foreground */
   --wb-foreground: #f4f1ec;
   --wb-muted-foreground: #c5c0b9;
 
@@ -176,7 +176,7 @@
   --wb-menu-highlight-foreground: #ffffff;
   --wb-destructive: #e87979;
 
-  /* Canvas-facing — Konva cannot parse modern `rgb(… / α)` or oklch */
+  /* Canvas-facing - Konva cannot parse modern `rgb(… / α)` or oklch */
   --wb-selection: #3b82f6;
   --wb-selection-muted: rgba(59, 130, 246, 0.5);
   --wb-smart-guide: #ec4899;
@@ -186,7 +186,7 @@
   --wb-artboard-border: #e5e7eb;
   --wb-artboard-shadow-color: rgba(0, 0, 0, 0.55);
 
-  /* Tooltip — elevated module, hairline outlined */
+  /* Tooltip - elevated module, hairline outlined */
   --wb-tooltip: rgb(48 46 43 / 94%);
   --wb-tooltip-foreground: rgb(244 241 236 / 92%);
   --wb-tooltip-border: rgba(255, 255, 255, 0.06);
@@ -199,7 +199,7 @@
   --wb-border-subtle: rgb(255 255 255 / 6%);
   --wb-backdrop-overlay: rgba(12, 11, 10, 0.72);
 
-  /* Elevation — warm hairline outlines, depth from tonal steps */
+  /* Elevation - warm hairline outlines, depth from tonal steps */
   --wb-shadow-xs: 0 0 0 1px rgb(255 255 255 / 6%);
   --wb-shadow-sm: 0 0 0 1px rgb(255 255 255 / 8%);
   --wb-segment-active-ring: 0 0 0 1px rgb(255 255 255 / 6%);

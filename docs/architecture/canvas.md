@@ -15,11 +15,11 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 - Canvas layer definitions, clipboard, canvas commands (`canvas.exportImage`, `canvas.setPagePreset`, …)
 - Canvas renderer / preview / interaction contributions and `Canvas*ServiceId` tokens
 - `CanvasRegistriesReader`, `PageResizeService`
-- `useCanvasRegistries()`, `useCanvasApi()` — require `CanvasHostProvider`
-- `CanvasPlugin` — engine + canvas-only workbench chrome (toolbar, inspector panes, smart guides, align/crop, editor pane)
-- Optional `CanvasTemplatePlugin` — template data panel
+- `useCanvasRegistries()`, `useCanvasApi()` - require `CanvasHostProvider`
+- `CanvasPlugin` - engine + canvas-only workbench chrome (toolbar, inspector panes, smart guides, align/crop, editor pane)
+- Optional `CanvasTemplatePlugin` - template data panel
 - `registerCanvasContribution()` for third-party renderers, interactions, layer preview renderers
-- `CanvasStageInteractionService` — optional stage drag/resize adjustment + overlay primitives
+- `CanvasStageInteractionService` - optional stage drag/resize adjustment + overlay primitives
 - Page size presets and `AbsolutePageRules` (`layout: 'absolute'`)
 
 ### Override hooks
@@ -28,7 +28,7 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 - Generic layer handles on `CanvasLayerInteractionContribution` (`providesHandles`, `layoutHandles`, `onHandleDrag*`)
 - Optional `dataPatch` on `canvas.updateLayerTransform` (merges into `layer.data`)
 
-Scene-generic chrome (Pages/Layers, dirty status) is workbench default — registered by `DefaultWorkbenchChromePlugin`, not `CanvasPlugin`.
+Scene-generic chrome (Pages/Layers, dirty status) is workbench default - registered by `DefaultWorkbenchChromePlugin`, not `CanvasPlugin`.
 
 ## Wiring in a workbench app
 

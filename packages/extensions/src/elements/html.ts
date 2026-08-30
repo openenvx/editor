@@ -1,4 +1,4 @@
-/** HTML element set — import from `@xmazu/openenvxee-extensions/html`. */
+/** HTML element set - import from `@xmazu/openenvxee-extensions/html`. */
 export {
   Section,
   Row,

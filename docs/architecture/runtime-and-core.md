@@ -75,7 +75,7 @@ Three registration styles in the stack:
 
 ## Page rules
 
-Providers register `PageRulesContribution` keyed by `page.layout`. `SceneStore` applies them after structural `normalizeScene` — e.g. absolute page dims / presets from canvas, HTML-specific constraints from html.
+Providers register `PageRulesContribution` keyed by `page.layout`. `SceneStore` applies them after structural `normalizeScene` - e.g. absolute page dims / presets from canvas, HTML-specific constraints from html.
 
 ## What does **not** belong in core
 

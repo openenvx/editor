@@ -1,4 +1,4 @@
-/** Session-only blob: preview URLs — never written into durable scene/history JSON. */
+/** Session-only blob: preview URLs - never written into durable scene/history JSON. */
 const previewByLayerId = new Map<string, string>();
 
 export function registerImagePastePreview(layerId: string, url: string): void {

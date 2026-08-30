@@ -18,8 +18,8 @@ export type {
 /**
  * Scene + editor snapshot.
  *
- * - `SceneStore.getSnapshot()` — deep clone (persistence / export).
- * - `onDidChangeScene` / history — **shared** refs; treat as immutable.
+ * - `SceneStore.getSnapshot()` - deep clone (persistence / export).
+ * - `onDidChangeScene` / history - **shared** refs; treat as immutable.
  */
 export interface SceneSnapshot {
   scene: Scene;

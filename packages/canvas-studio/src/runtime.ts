@@ -1,5 +1,5 @@
 /**
- * Headless scene factory — no WorkbenchShell or component CSS.
+ * Headless scene factory - no WorkbenchShell or component CSS.
  * Browser/editor hosts can import the same helper from `@openenvx/canvas-studio/runtime`.
  */
 import { createCanvasDemoScene } from '@openenvx/canvas';

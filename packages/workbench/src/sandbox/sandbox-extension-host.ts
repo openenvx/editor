@@ -24,7 +24,7 @@ import { createWidgetSceneAdapters } from './widget-scene-adapters';
 
 const DEFAULT_WIDGET_LAYER_TYPE = 'openenvx.widget';
 
-/** Resolve face medium from manifest kinds — single-kind only; ambiguous → canvas. */
+/** Resolve face medium from manifest kinds - single-kind only; ambiguous → canvas. */
 function resolveWidgetFaceKind(
   kinds: ('canvas' | 'html')[] | undefined
 ): 'canvas' | 'html' {
@@ -119,7 +119,7 @@ export interface SandboxExtensionHostOptions {
   /** Absolute Worker URL. Required for non-source hosts that do not co-locate the worker. */
   workerUrl?: string | URL;
   /**
-   * Test-only. Allows in-process QuickJS. Production hosts must omit this —
+   * Test-only. Allows in-process QuickJS. Production hosts must omit this -
    * extension JS runs in a dedicated Worker only.
    */
   preferInProcess?: boolean;
@@ -140,7 +140,7 @@ export interface SandboxExtensionHostOptions {
 }
 
 /**
- * External sandbox host — not a WorkbenchPlugin / PluginManager citizen.
+ * External sandbox host - not a WorkbenchPlugin / PluginManager citizen.
  * Mount via {@link mountSandboxExtensions} on a narrow {@link SandboxHostSurface}.
  */
 export class SandboxExtensionHost {

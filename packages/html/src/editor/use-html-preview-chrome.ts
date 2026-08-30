@@ -63,7 +63,7 @@ export function useHtmlPreviewChrome(options?: {
 
   const resolveWidth = options?.resolveFrameWidth ?? defaultResolveFrameWidth;
 
-  // Subscribe must be referentially stable — a new function each render
+  // Subscribe must be referentially stable - a new function each render
   // unsubscribes/resubscribes, flipping setActive and context keys in a loop.
   const subscribe = useCallback((onStoreChange: () => void) => {
     const instance = chromeRef.current;

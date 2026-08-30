@@ -6,9 +6,9 @@ import { createDefaultChild } from './pattern-helpers';
 
 /**
  * Hero image + centered article intro and CTA.
- * Layout container — children are Elements visible in Layers.
+ * Layout container - children are Elements visible in Layers.
  * Order: image, then centered eyebrow / title / body / button.
- * ponytail: Index-as-role is fragile under reorder — upgrade to data.role /
+ * ponytail: Index-as-role is fragile under reorder - upgrade to data.role /
  * typed regions when patterns need safe cross-region moves.
  */
 export default defineEmailPattern({

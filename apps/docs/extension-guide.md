@@ -2,9 +2,9 @@
 
 How to extend OpenEnvx with **first-party, in-process** plugins (`PluginManager`, OOP `Plugin` / `WorkbenchPlugin`, canvas layer definitions).
 
-This is **not** how to write sandbox widgets, sandbox plugins, or embed panels. Those are untrusted paths — see the hub and the sandbox guide:
+This is **not** how to write sandbox widgets, sandbox plugins, or embed panels. Those are untrusted paths - see the hub and the sandbox guide:
 
-- **[Authoring hub — pick a path](README.md)**
+- **[Authoring hub - pick a path](README.md)**
 - **[Sandbox & embed guide](sandbox-extension-guide.md)**
 
 Under-the-hood map: [Architecture.md](../../Architecture.md) · [docs/architecture/](../../docs/architecture/overview.md). Trust model: [Plugin-boundaries.md](../../Plugin-boundaries.md).
@@ -94,8 +94,8 @@ class MyWorkbenchPlugin extends WorkbenchPlugin {
 
 Views use the same **declare / register** split as VS Code: view metadata is a static contribution (`contributes.views` ↔ `ViewContribution`), while the tree data is a **runtime registration** against a view id (`vscode.window.registerTreeDataProvider` ↔ `ctx.registerTreeDataProvider`). The tree data provider is a data-layer concern, not a contribution point.
 
-1. **Declare** view metadata — `ViewContribution` (`id`, `containerId`, `name`, optional `when`) via `ctx.registerWorkbench()`.
-2. **Register** tree data — `ctx.registerTreeDataProvider(viewId, provider, options?)` (optional `primary`, `order`).
+1. **Declare** view metadata - `ViewContribution` (`id`, `containerId`, `name`, optional `when`) via `ctx.registerWorkbench()`.
+2. **Register** tree data - `ctx.registerTreeDataProvider(viewId, provider, options?)` (optional `primary`, `order`).
 
 ```ts
 import {
@@ -109,7 +109,7 @@ class MyView extends ViewContribution {
   readonly id = 'my.view';
   readonly containerId = 'my.sidebar';
   readonly name = 'My View';
-  when = 'myApp.showView'; // optional — same evaluator as toolbar/menu when clauses
+  when = 'myApp.showView'; // optional - same evaluator as toolbar/menu when clauses
 }
 
 class MyTreeProvider extends TreeDataProvider<MyNode> {
@@ -134,9 +134,9 @@ class MyViewPlugin extends WorkbenchPlugin {
 }
 ```
 
-**Hide a view** — omit its plugin from `plugins[]` (composition), or set `when` on the declaration and drive the context key from your plugin.
+**Hide a view** - omit its plugin from `plugins[]` (composition), or set `when` on the declaration and drive the context key from your plugin.
 
-**Replace a tree** — register a provider with `primary` or `order`:
+**Replace a tree** - register a provider with `primary` or `order`:
 
 ```ts
 activateWorkbench(ctx) {
@@ -149,7 +149,7 @@ activateWorkbench(ctx) {
 
 Resolution matches Spring `@Primary` / `@Order`: primary beats non-primary; among equals, lower `order` wins. Multiple primaries at the same order is an error.
 
-**List presentation** — flat catalogs (variables, scripts-like panels) use the same `TreeDataProvider` API with `presentation: 'list'` on the view declaration:
+**List presentation** - flat catalogs (variables, scripts-like panels) use the same `TreeDataProvider` API with `presentation: 'list'` on the view declaration:
 
 ```ts
 class VariablesView extends ViewContribution {
@@ -215,7 +215,7 @@ Duplicate kinds overwrite earlier registrations so enterprise plugins activating
 
 `WorkbenchShell` auto-injects `DefaultWorkbenchChromePlugin` (Pages + Layers activity sidebar + dirty status). `CanvasPlugin` registers canvas-only chrome. Optional `CanvasTemplatePlugin` adds the template data panel.
 
-**Custom sidebar header** (per activity-bar panel — document title / file menu / icon actions):
+**Custom sidebar header** (per activity-bar panel - document title / file menu / icon actions):
 
 ```ts
 class LayersSidebarHeader extends SidebarHeaderContribution {
@@ -249,7 +249,7 @@ activateWorkbench(ctx) {
 
 Lowest `priority` wins per `containerId`. Other activity-bar panels keep the default header. Title menus reuse `DropdownMenuRenderer`.
 
-**Top bar** (optional shell header — email mode switch, etc.):
+**Top bar** (optional shell header - email mode switch, etc.):
 
 1. Set `layout: { topBar: true }` (or use `DEFAULT_EMAIL_LAYOUT`).
 2. Declare `TopBarContribution` via `ctx.registerWorkbench()`.
@@ -268,7 +268,7 @@ activateWorkbench(ctx) {
 
 Highest `priority` wins; later equal priority overwrites. Omit the plugin (or set `layout.topBar: false`) to hide the header. `WorkbenchShell` has no `topBar` prop.
 
-**Form / settings sidebars** (VS Code `views` + properties): declare only — no React panel:
+**Form / settings sidebars** (VS Code `views` + properties): declare only - no React panel:
 
 ```ts
 class EmbedOptionsView extends ViewContribution {
@@ -322,9 +322,9 @@ registerCanvasContribution(ctx, [
 
 | Contribution | Registry slot | Scope |
 | --- | --- | --- |
-| `CanvasLayerRendererContribution` | `canvasLayerRenderers` | Per `kind` — Konva node for a layer type |
-| `LayerPreviewRendererContribution` | `layerPreviewRenderers` | Per `kind` — DOM preview for a layer type |
-| `CanvasLayerInteractionContribution` | `canvasLayerInteractions` | Per `kind` — transformer anchors, edit overlay, custom handles |
+| `CanvasLayerRendererContribution` | `canvasLayerRenderers` | Per `kind` - Konva node for a layer type |
+| `LayerPreviewRendererContribution` | `layerPreviewRenderers` | Per `kind` - DOM preview for a layer type |
+| `CanvasLayerInteractionContribution` | `canvasLayerInteractions` | Per `kind` - transformer anchors, edit overlay, custom handles |
 
 ## Overriding built-in contributions
 
@@ -394,7 +394,7 @@ Layer definitions can forward unknown data through `renderPreview` (passthrough 
 
 ## Stage interaction service (optional)
 
-OSS `@openenvx/canvas` does not include snapping or design-tool overlays. Optional stage behavior is registered as a **service** — no React components in the extension API.
+OSS `@openenvx/canvas` does not include snapping or design-tool overlays. Optional stage behavior is registered as a **service** - no React components in the extension API.
 
 ```ts
 import {
@@ -430,7 +430,7 @@ The stage controller resolves the service via `useCanvasStageInteraction()` insi
 
 ## HTML composite blocks (named slots)
 
-`@openenvx/html` blocks can declare named **slots** — real nested part layers that stay invisible to the Layers tree.
+`@openenvx/html` blocks can declare named **slots** - real nested part layers that stay invisible to the Layers tree.
 
 Parts live under `data.slots`, not `data.children`. Core's tree walk only descends `data.children`, so a slotted block appears as one atomic row, cannot be dropped into, and cannot expose parts for independent delete/drag.
 

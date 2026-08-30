@@ -9,7 +9,7 @@ export const HTML_DEVICE_WIDTHS: Record<
   desktop: 1600,
 };
 
-/** Fit-width at 100% — normal editing size on load. */
+/** Fit-width at 100% - normal editing size on load. */
 export const DEFAULT_HTML_DEVICE_PRESET: HtmlDevicePreset = 'fluid';
 
 /**
@@ -78,7 +78,7 @@ export function resolveEffectiveZoom(
   return clampHtmlZoom(zoomFactor) * fitZoom;
 }
 
-/** Layout width after zoom — keeps the scaled frame proportional on the stage. */
+/** Layout width after zoom - keeps the scaled frame proportional on the stage. */
 export function resolveScaledFrameWidth(
   frameWidth: number,
   zoom: number

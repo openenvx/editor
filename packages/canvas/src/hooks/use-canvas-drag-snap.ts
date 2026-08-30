@@ -68,7 +68,7 @@ export function useCanvasDragSnap({
       const knownIds = new Set(
         layersRef.current.map((entry) => entry.layer.id)
       );
-      // Nested (in group/widget): Canva-style — no document guides/snap.
+      // Nested (in group/widget): Canva-style - no document guides/snap.
       if (collectAncestorLayerIds(node, knownIds).length > 0) {
         setInteractionOverlays();
         return;

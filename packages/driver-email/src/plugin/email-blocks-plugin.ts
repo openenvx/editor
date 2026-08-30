@@ -58,7 +58,7 @@ import { insertEmailTextHtml } from '../insert-email-text-html';
 export interface EmailBlocksPluginOptions {
   /**
    * Register the product top bar (`EmailTopBarContribution`).
-   * Off by default — hosts that want it also set `layout.topBar: true`.
+   * Off by default - hosts that want it also set `layout.topBar: true`.
    */
   topBar?: boolean;
   /** When set and `topBar` is true, the top bar shows a back control. */

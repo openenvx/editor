@@ -18,7 +18,7 @@
   flex-direction: column;
 }
 
-/* Overlay only the pill — clicks pass through to the editor underneath. */
+/* Overlay only the pill - clicks pass through to the editor underneath. */
 .slot {
   position: absolute;
   z-index: 10;

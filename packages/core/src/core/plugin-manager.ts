@@ -53,7 +53,7 @@ export class PluginManager {
   private readonly lifecycle = new Lifecycle();
 
   constructor(private readonly runtime: EditorRuntime) {
-    // Live lookup — contributions registered later are visible immediately.
+    // Live lookup - contributions registered later are visible immediately.
     this.runtime
       .getScene()
       .setPageRulesLookup((layout) => this.registries.pageRules.get(layout));

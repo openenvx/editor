@@ -46,7 +46,7 @@ export type FieldDef =
       options: { label: string; value: string }[];
     };
 
-/** Named slot on a composite block — parts live under `data.slots`, not `data.children`. */
+/** Named slot on a composite block - parts live under `data.slots`, not `data.children`. */
 export interface SlotDef {
   label: string;
   /** Block type registered in the BlockRegistry (e.g. `html.heading`). */
@@ -110,7 +110,7 @@ export interface BlockConfig {
    * - `contents`: mount selection/DnD on the block's DOM root (no wrapper div).
    *   Required for `email.column` (`<td>`) so a chrome box is not inserted
    *   between `<tr>` and `<td>`. Editor CSS uses `position: relative` on the
-   *   host element — not CSS `display: contents` (invalid for table cells).
+   *   host element - not CSS `display: contents` (invalid for table cells).
    */
   chromeDisplay?: 'block' | 'inline' | 'contents';
   /**

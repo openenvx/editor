@@ -6,21 +6,21 @@ Instructions for coding agents working in the OpenEnvx monorepo.
 
 - **Never create or use git worktrees** (`git worktree`, isolated worktree agents, etc.). Work only in this checkout.
 - **Never commit** (and never push). Leave staging and commits to the human; do not run `git commit` unless they explicitly ask in that message.
-- **Never remove or disable a user-facing editor feature** (selection chrome, clone/delete menu, toolbars, panels, commands, etc.) to “fix” layout/spacing/bugs — without **explicit approval in that message**. Fix the root cause; keep the feature. `chromeDisplay: 'contents'` (or any trick that drops the selection menu) is only for hard structural cases already established (e.g. `email.column` / `<td>`), not a general spacing hammer.
-- **When the human asks you to commit**, use [Conventional Commits](https://www.conventionalcommits.org/) — see [Commit messages](#commit-messages-conventional-commits) below. Release changelogs are generated from git history via git-cliff.
+- **Never remove or disable a user-facing editor feature** (selection chrome, clone/delete menu, toolbars, panels, commands, etc.) to “fix” layout/spacing/bugs - without **explicit approval in that message**. Fix the root cause; keep the feature. `chromeDisplay: 'contents'` (or any trick that drops the selection menu) is only for hard structural cases already established (e.g. `email.column` / `<td>`), not a general spacing hammer.
+- **When the human asks you to commit**, use [Conventional Commits](https://www.conventionalcommits.org/) - see [Commit messages](#commit-messages-conventional-commits) below. Release changelogs are generated from git history via git-cliff.
 
 ## Thermos / thermo-nuclear reviews
 
 When using thermos skills (thermo-nuclear review, thermo-nuclear code-quality review, or similar) to review code, go beyond bugs and style.
 
-**Architecture docs check (required):** Before scoring the diff, read [Architecture.md](Architecture.md) and the relevant chapters under [docs/architecture/](docs/architecture/overview.md) (pick by what the change touches — e.g. workbench → `workbench-and-headless.md`, canvas → `canvas.md`, html/email → `html.md` / `driver-email.md`, packages/exports → `packages-and-api.md`). Verify the change **follows** those docs: package tiers, placement cheat sheet, contribution flow, public API boundaries, and hard rules (canvas not in `core`, host sidebars via contributions, etc.). Flag drifts from the written architecture as first-class findings, not nits. Also use [Plugin-boundaries.md](Plugin-boundaries.md) when the diff touches embed/sandbox/external plugins.
+**Architecture docs check (required):** Before scoring the diff, read [Architecture.md](Architecture.md) and the relevant chapters under [docs/architecture/](docs/architecture/overview.md) (pick by what the change touches - e.g. workbench → `workbench-and-headless.md`, canvas → `canvas.md`, html/email → `html.md` / `driver-email.md`, packages/exports → `packages-and-api.md`). Verify the change **follows** those docs: package tiers, placement cheat sheet, contribution flow, public API boundaries, and hard rules (canvas not in `core`, host sidebars via contributions, etc.). Flag drifts from the written architecture as first-class findings, not nits. Also use [Plugin-boundaries.md](Plugin-boundaries.md) when the diff touches embed/sandbox/external plugins.
 
 **Especially** look for:
 
-- **Architecture** — package/module boundaries, contribution flow, whether code lives in the right package (`core` / `canvas` / `html` / `driver-*` / `workbench` / host), and conformance to the docs above
-- **Tight coupling** — cross-package imports that skip the public surface, host/shell leaking into libraries, scene/UI entangled with protocol or sandbox concerns; flag spaghetti and push SOLID / KISS so modules stay loosely coupled and easy to change
-- **Design patterns** — where a known pattern would clarify or shrink the design (and whether existing ones—contributions, registries, property paths, sandbox bridges—are followed or duplicated ad hoc)
-- **Refactor opportunities** — extract shared helpers once, delete dead paths, simplify over-built abstractions; prefer a concrete follow-up over vague “could be cleaner”
+- **Architecture** - package/module boundaries, contribution flow, whether code lives in the right package (`core` / `canvas` / `html` / `driver-*` / `workbench` / host), and conformance to the docs above
+- **Tight coupling** - cross-package imports that skip the public surface, host/shell leaking into libraries, scene/UI entangled with protocol or sandbox concerns; flag spaghetti and push SOLID / KISS so modules stay loosely coupled and easy to change
+- **Design patterns** - where a known pattern would clarify or shrink the design (and whether existing ones-contributions, registries, property paths, sandbox bridges-are followed or duplicated ad hoc)
+- **Refactor opportunities** - extract shared helpers once, delete dead paths, simplify over-built abstractions; prefer a concrete follow-up over vague “could be cleaner”
 
 Call these out as first-class findings, not afterthoughts.
 
@@ -42,7 +42,7 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | [docs/architecture/packages-and-api.md](docs/architecture/packages-and-api.md) | Package map, public exports, who imports what, pre-1.0 stability |
 | [Plugin-boundaries.md](Plugin-boundaries.md) | Internal vs external plugins, protocol trust boundary, cloud/marketplace runners |
 | [FEATURES.md](FEATURES.md) | Product capability matrix, Polotno gap tracking, what we should still offer |
-| [apps/docs/README.md](apps/docs/README.md) | Extension authoring hub — internal vs sandbox vs embed |
+| [apps/docs/README.md](apps/docs/README.md) | Extension authoring hub - internal vs sandbox vs embed |
 | [apps/docs/extension-guide.md](apps/docs/extension-guide.md) | Internal OOP plugin author API |
 | [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) | Sandbox widgets/plugins + embed panels |
 | [docs/architecture/property-fields.md](docs/architecture/property-fields.md) | Inspector `PropertyFieldDescriptor`, field kinds, `layout` |
@@ -53,9 +53,9 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 
 ### Documentation vs design reference
 
-- **`docs/architecture/*.md`** and package READMEs — **authoritative API and behavior** for agents and integrators. Add or update a chapter when you introduce or change a public descriptor, contribution, or host contract.
-- **[packages/workbench/Design.md](packages/workbench/Design.md)** — **editor shell look-and-feel** (colors, density, component visuals). Do **not** put API tables, prop reference, or integration guides there; link to `docs/architecture/` instead.
-- **JSDoc** — Public types in `@openenvx/core` and other libraries should document non-obvious fields on interfaces (especially contribution and descriptor props). Keep JSDoc in sync when you change the type; mirror substantive behavior in architecture docs when authors need narrative context.
+- **`docs/architecture/*.md`** and package READMEs - **authoritative API and behavior** for agents and integrators. Add or update a chapter when you introduce or change a public descriptor, contribution, or host contract.
+- **[packages/workbench/Design.md](packages/workbench/Design.md)** - **editor shell look-and-feel** (colors, density, component visuals). Do **not** put API tables, prop reference, or integration guides there; link to `docs/architecture/` instead.
+- **JSDoc** - Public types in `@openenvx/core` and other libraries should document non-obvious fields on interfaces (especially contribution and descriptor props). Keep JSDoc in sync when you change the type; mirror substantive behavior in architecture docs when authors need narrative context.
 
 ## Package placement (hard rules)
 
@@ -82,11 +82,11 @@ Internal workspace libraries (`core`, `canvas`, `workbench`, `agent`, …) are *
 
 Published packages:
 
-- **`@xmazu/openenvxee-extensions`** — published sandbox author SDK: `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts import **`@xmazu/openenvxee-extensions/protocol`** only.
-- **`@openenvx/html-studio`** — published HTML editor (public npm, MPL-2.0). Drop-in `HtmlEditor` + host composition API + `./runtime` (`renderBlockDocument`); inlines private core/html/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/email-studio`** — published email editor (public npm, MPL-2.0). Drop-in `EmailEditor` + `createEmailScene` + `renderEmailHtml`; inlines private core/html/driver-email/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/canvas-studio`** — published canvas editor (public npm, MPL-2.0). Drop-in `CanvasEditor` + `createCanvasScene`; inlines private core/canvas/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`, `./fonts.css`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@xmazu/openenvxee-studio`** — unpublished proprietary canvas host allowlist (`packages/studio`). Monorepo canvas demos use `@openenvx/canvas` + `@openenvx/workbench` directly.
+- **`@xmazu/openenvxee-extensions`** - published sandbox author SDK: `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts import **`@xmazu/openenvxee-extensions/protocol`** only.
+- **`@openenvx/html-studio`** - published HTML editor (public npm, MPL-2.0). Drop-in `HtmlEditor` + host composition API + `./runtime` (`renderBlockDocument`); inlines private core/html/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/email-studio`** - published email editor (public npm, MPL-2.0). Drop-in `EmailEditor` + `createEmailScene` + `renderEmailHtml`; inlines private core/html/driver-email/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/canvas-studio`** - published canvas editor (public npm, MPL-2.0). Drop-in `CanvasEditor` + `createCanvasScene`; inlines private core/canvas/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`, `./fonts.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@xmazu/openenvxee-studio`** - unpublished proprietary canvas host allowlist (`packages/studio`). Monorepo canvas demos use `@openenvx/canvas` + `@openenvx/workbench` directly.
 
 ## Host sidebar panels (product hosts)
 
@@ -100,12 +100,12 @@ Product apps (dashboard Studio, embed host) register host sidebars the **VS Code
 | `registerTreeDataProvider` | `ctx.registerTreeDataProvider` (data only) |
 | Settings / properties form | `ViewContribution.buildProperties()` → `createPropertyPane` + field kinds + `PropertyPath` |
 | `viewsWelcome` | `emptyMessage` on a view (often with `when: '!scene.layerSelected'`) |
-| WebviewView | `registerViewPanel` — **only** non-form surfaces (chat, version history, template data) |
+| WebviewView | `registerViewPanel` - **only** non-form surfaces (chat, version history, template data) |
 
 **Hard rules:**
 
 - Form/settings panels: `WorkbenchPlugin` + `registerWorkbench(container, ...views)` with `buildProperties` / `emptyMessage` / `when`. Zero React panel components in the host.
-- Product hosts: use `ViewContribution.buildProperties()` only. `PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas transform panes) merged into the default **Inspector** container — not for embed/dashboard hosts.
+- Product hosts: use `ViewContribution.buildProperties()` only. `PropertyPaneContribution` is for **built-in** workbench plugins (e.g. canvas transform panes) merged into the default **Inspector** container - not for embed/dashboard hosts.
 - **Naming:** **Inspector** = the default secondary container (`workbench.inspector`) and the canvas layer/node property views it hosts. Generic form content is a `properties` view + `PropertyPane` / `PropertyPath` / `PropertyHostContext` (any container). Headless `createPropertyHostContext` resolves `layerProp` / `templatePolicy` paths; canvas hosts pass `createCanvasPropertyHostContext` for transform and page bleed/safe paths.
 - Do **not** import or compose `ViewPane` / `PropertyContentRenderer` from the host (they are shell-internal).
 - Before adding a new primitive: inventory published exports and call sites; prefer reuse; only then extend core.
@@ -134,7 +134,7 @@ Match the surrounding package convention before creating files.
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) for every commit (human or agent). Root [CHANGELOG.md](CHANGELOG.md) is built from git history via [git-cliff](cliff.toml).
 
-**Format:** `type(scope): subject` — imperative, lowercase subject, no trailing period.
+**Format:** `type(scope): subject` - imperative, lowercase subject, no trailing period.
 
 | Type | Use for |
 | --- | --- |
@@ -144,10 +144,10 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) for every commi
 | `perf` | Performance improvement |
 | `docs` | Documentation only |
 | `test` | Tests only |
-| `chore` | Tooling, deps, repo hygiene (not `chore(release)` — reserved for the release workflow) |
+| `chore` | Tooling, deps, repo hygiene (not `chore(release)` - reserved for the release workflow) |
 | `ci` | CI / GitHub Actions |
 
-**Scope** (optional but preferred): package or area — e.g. `canvas`, `html-studio`, `workbench`, `extensions`, `release`.
+**Scope** (optional but preferred): package or area - e.g. `canvas`, `html-studio`, `workbench`, `extensions`, `release`.
 
 **Examples:**
 
@@ -180,15 +180,15 @@ All packages are pre-1.0.0. Breaking API changes are expected and preferred over
 
 - Do **not** add migration shims, dual code paths, deprecated API fallbacks, or compatibility adapters for removed APIs.
 - **Remove** dead code when replacing an API instead of keeping the old path alive.
-- Do **not** run deprecation cycles — rename or replace in place and update callers in the same change.
+- Do **not** run deprecation cycles - rename or replace in place and update callers in the same change.
 - After **1.0.0**, semver applies and breaking changes require a major version bump.
 
 ### Implementation discipline
 
 - Follow **SOLID**, **KISS**, **YAGNI**, and clean-code principles on every change. Prefer the smallest design that solves the real problem; delete dead paths instead of layering workarounds.
-- Prefer known **design patterns** already used in this repo (contributions, registries, property paths, strategy/adapters at trust boundaries) over inventing new frameworks. Extract a shared helper once when two call sites share real logic — do not couple unrelated modules.
+- Prefer known **design patterns** already used in this repo (contributions, registries, property paths, strategy/adapters at trust boundaries) over inventing new frameworks. Extract a shared helper once when two call sites share real logic - do not couple unrelated modules.
 - **Loose coupling:** a feature module must not reach into another feature’s internals. Cross features via public package exports, contribution APIs,events, or narrow adapters (e.g. DOM markers / pure geometry), never by importing shell/renderer code into content chrome or vice versa.
-- Minimize scope — smallest correct diff.
+- Minimize scope - smallest correct diff.
 - Match surrounding naming, types, and patterns.
 - Do not over-abstract or add tests that only assert the obvious.
 
@@ -196,7 +196,7 @@ All packages are pre-1.0.0. Breaking API changes are expected and preferred over
 
 One **global** diagnostics gate for the whole editor (`WorkbenchControllerOptions.debug`, `localStorage` key `openenvx:debug`, `api.setEditorDebug`). Apps typically pass `debug: import.meta.env.DEV` when creating the controller; users can force on/off with `localStorage`.
 
-When implementing or debugging **runtime-visible behavior** (property layout `when`, context keys, `PropertyPath` resolution, contribution visibility), wire actionable **console diagnostics** via `editorDiagnosticLog` / `isEditorDiagnosticsEnabled()` — do not rely on silent falsy expressions. If a feature “does not work”, enable diagnostics and read `[OpenEnvx]` console groups before guessing.
+When implementing or debugging **runtime-visible behavior** (property layout `when`, context keys, `PropertyPath` resolution, contribution visibility), wire actionable **console diagnostics** via `editorDiagnosticLog` / `isEditorDiagnosticsEnabled()` - do not rely on silent falsy expressions. If a feature “does not work”, enable diagnostics and read `[OpenEnvx]` console groups before guessing.
 
 Details: [docs/architecture/workbench-and-headless.md](docs/architecture/workbench-and-headless.md) (diagnostics), [property-fields.md](docs/architecture/property-fields.md) (property `when`).
 
@@ -234,8 +234,8 @@ Only `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-st
 
 After all code changes for the task are done, **always** run these from the repo root and fix every failure before stopping:
 
-1. `bun run fix` — apply Ultracite auto-fixes
-2. `bun run precommit` — `check` (ultracite + knip) + Turbo `check-types` for packages changed vs `HEAD` (and their dependents), excluding `apps/*`. Full-repo gate is `bun run build && bun run test` (what CI runs).
+1. `bun run fix` - apply Ultracite auto-fixes
+2. `bun run precommit` - `check` (ultracite + knip) + Turbo `check-types` for packages changed vs `HEAD` (and their dependents), excluding `apps/*`. Full-repo gate is `bun run build && bun run test` (what CI runs).
 
 If either command fails, fix the reported errors, then re-run both until they pass. Do not leave lint, format, knip, build, or test failures unresolved.
 

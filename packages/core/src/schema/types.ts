@@ -315,7 +315,7 @@ export interface OpenEnvxWidgetLayer extends LayerBase {
   data: OpenEnvxWidgetData;
 }
 
-/** Unknown plugin layer — structural fields validated; data opaque. */
+/** Unknown plugin layer - structural fields validated; data opaque. */
 export interface PluginLayer extends LayerBase {
   type: string;
   data: unknown;
@@ -371,7 +371,7 @@ export interface Page {
 }
 
 /**
- * Editor UI state — not part of the content Scene consumed by LLMs/SDKs.
+ * Editor UI state - not part of the content Scene consumed by LLMs/SDKs.
  * Persisted alongside Scene in SceneSnapshot.
  */
 export interface EditorState {
@@ -394,7 +394,7 @@ export type SceneAsset = SceneAssetInline;
 /** Catalog entry for `{{{key}}}` merge-style tokens in layer data strings. */
 export interface TemplateVariable {
   id: string;
-  /** Token id — `[A-Za-z][A-Za-z0-9_]*`. */
+  /** Token id - `[A-Za-z][A-Za-z0-9_]*`. */
   key: string;
   label?: string;
   /** Editor preview / default render value. */

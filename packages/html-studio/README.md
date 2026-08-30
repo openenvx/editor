@@ -34,7 +34,7 @@ export function App() {
 }
 ```
 
-Import `@openenvx/html-studio/theme.css` if your bundler does not apply CSS imported from JS. For Node/SSR block rendering, import `@openenvx/html-studio/runtime` — it does not load the editor shell.
+Import `@openenvx/html-studio/theme.css` if your bundler does not apply CSS imported from JS. For Node/SSR block rendering, import `@openenvx/html-studio/runtime` - it does not load the editor shell.
 
 ## Product hosts (compose plugins)
 
@@ -82,4 +82,4 @@ The main entry also re-exports core scene types, HTML block APIs, and workbench 
 
 ## License
 
-MPL-2.0 — see [LICENSE](../../../LICENSE) in the repository root.
+MPL-2.0 - see [LICENSE](../../../LICENSE) in the repository root.

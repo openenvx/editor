@@ -105,7 +105,7 @@ export class WorkbenchStateCache {
     this.dirty.add('commands');
   }
 
-  /** Dialog open/close only — avoids rebuilding view trees. */
+  /** Dialog open/close only - avoids rebuilding view trees. */
   patchDialogState(activeDialog: ActiveDialog | null): void {
     if (this.sceneSlice) {
       this.sceneSlice = { ...this.sceneSlice, activeDialog };
