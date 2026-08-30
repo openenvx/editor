@@ -1,12 +1,30 @@
 import { DndContext } from '@dnd-kit/core';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { WorkbenchApi } from '@openenvx/core';
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createHtmlDemoScene } from '../create-html-demo-scene';
-import { createBlockRegistry } from '../test/html-editor-harness';
+import {
+  createBlockRegistry,
+  createHtmlWorkbench,
+  renderWithWorkbench,
+} from '../test/html-editor-harness';
 import { BlockTreeRenderer } from './block-tree-renderer';
 
 afterEach(cleanup);
+
+let api: WorkbenchApi;
+let disposeWorkbench: () => void;
+
+beforeEach(async () => {
+  const harness = await createHtmlWorkbench();
+  api = harness.api;
+  disposeWorkbench = harness.dispose;
+});
+
+afterEach(() => {
+  disposeWorkbench();
+});
 
 /** jsdom elements have 0×0 boxes — floating selection pill hides without this. */
 async function withMockedBlockRects(
@@ -55,7 +73,7 @@ function renderTree(
   const onDuplicate = overrides.onDuplicate ?? vi.fn();
   const onRemove = overrides.onRemove ?? vi.fn();
 
-  const result = render(
+  const result = renderWithWorkbench(api,
     <DndContext>
       <BlockTreeRenderer
         editingTarget={overrides.editingTarget ?? null}
@@ -247,7 +265,7 @@ describe('BlockTreeRenderer', () => {
       ],
     };
     const registry = createBlockRegistry();
-    render(
+    renderWithWorkbench(api,
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
@@ -281,7 +299,7 @@ describe('BlockTreeRenderer', () => {
   it('outlines the hovered block from hoveredLayerId', () => {
     const scene = createHtmlDemoScene();
     const registry = createBlockRegistry();
-    render(
+    renderWithWorkbench(api,
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
@@ -308,7 +326,7 @@ describe('BlockTreeRenderer', () => {
   it('renders insert-line preview from sortDraft', () => {
     const scene = createHtmlDemoScene();
     const registry = createBlockRegistry();
-    render(
+    renderWithWorkbench(api,
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
@@ -337,7 +355,7 @@ describe('BlockTreeRenderer', () => {
   it('renders container nest preview highlight', () => {
     const scene = createHtmlDemoScene();
     const registry = createBlockRegistry();
-    render(
+    renderWithWorkbench(api,
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
@@ -404,7 +422,7 @@ describe('BlockTreeRenderer', () => {
         },
       ],
     };
-    render(
+    renderWithWorkbench(api,
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
@@ -482,7 +500,7 @@ describe('BlockTreeRenderer', () => {
         },
       ],
     };
-    const { container } = render(
+    const { container } = renderWithWorkbench(api,
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
@@ -566,7 +584,7 @@ describe('BlockTreeRenderer', () => {
       };
       const onSelect = vi.fn();
       const onReplaceImage = vi.fn();
-      render(
+      renderWithWorkbench(api,
         <DndContext>
           <BlockTreeRenderer
             canReplaceImage
