@@ -73,7 +73,7 @@
     "i18next": "^26.3.4",
     "lucide-react": "1.24.0",
     "react-colorful": "^5.7.0",
-    "react-i18next": "^17.0.8",
+    "react-i18next": "^17.0.12",
     "zod": "4.4.3"
   },
   "devDependencies": {
