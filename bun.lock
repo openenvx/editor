@@ -76,7 +76,7 @@
         "@openenvx/core": "workspace:*",
         "@tiptap/extension-color": "^3.27.3",
         "@tiptap/extension-font-family": "^3.27.3",
-        "@tiptap/extension-text-style": "^3.27.3",
+        "@tiptap/extension-text-style": "^3.30.5",
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
@@ -106,7 +106,7 @@
     },
     "packages/canvas-studio": {
       "name": "@openenvx/canvas-studio",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@dnd-kit/core": "6.3.1",
         "@dnd-kit/sortable": "8.0.0",
@@ -121,7 +121,7 @@
         "@tanstack/react-virtual": "^3.13.12",
         "@tiptap/extension-color": "^3.27.3",
         "@tiptap/extension-font-family": "^3.27.3",
-        "@tiptap/extension-text-style": "^3.27.3",
+        "@tiptap/extension-text-style": "^3.30.5",
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
@@ -219,7 +219,7 @@
     },
     "packages/email-studio": {
       "name": "@openenvx/email-studio",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@codemirror/commands": "^6.11.0",
         "@codemirror/lang-html": "^6.4.12",
@@ -243,7 +243,7 @@
         "@tiptap/extension-color": "^3.27.3",
         "@tiptap/extension-font-family": "^3.27.3",
         "@tiptap/extension-text-align": "3.27.4",
-        "@tiptap/extension-text-style": "^3.27.3",
+        "@tiptap/extension-text-style": "^3.30.5",
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
@@ -316,7 +316,7 @@
         "@tiptap/extension-color": "^3.27.3",
         "@tiptap/extension-font-family": "^3.27.3",
         "@tiptap/extension-text-align": "3.27.4",
-        "@tiptap/extension-text-style": "^3.27.3",
+        "@tiptap/extension-text-style": "^3.30.5",
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
@@ -344,7 +344,7 @@
     },
     "packages/html-studio": {
       "name": "@openenvx/html-studio",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@dnd-kit/core": "6.3.1",
         "@dnd-kit/sortable": "8.0.0",
@@ -360,7 +360,7 @@
         "@tiptap/extension-color": "^3.27.3",
         "@tiptap/extension-font-family": "^3.27.3",
         "@tiptap/extension-text-align": "3.27.4",
-        "@tiptap/extension-text-style": "^3.27.3",
+        "@tiptap/extension-text-style": "^3.30.5",
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
@@ -1112,7 +1112,7 @@
 
     "@tiptap/extension-text-align": ["@tiptap/extension-text-align@3.27.4", "", { "peerDependencies": { "@tiptap/core": "3.27.4" } }, "sha512-ArfL7GLOXCSmrmiBiaWwAf7RPHXDdxLGPru29qKDLQDthjXcNOdlwlPBbolRu7mXwlSmaYpqWGrG75/AEat3mw=="],
 
-    "@tiptap/extension-text-style": ["@tiptap/extension-text-style@3.29.2", "", { "peerDependencies": { "@tiptap/core": "3.29.2" } }, "sha512-aQad9V9ROaEi3hE4g5z9wQ6lv5FSnzlnWFMVJxRjNlwXgm7H0fymxb4rGfca+pAwYkiRwpKYh1LatpJw2ECQAA=="],
+    "@tiptap/extension-text-style": ["@tiptap/extension-text-style@3.30.5", "", { "peerDependencies": { "@tiptap/core": "3.30.5" } }, "sha512-libXk+nSBOQmUiKneMegnipSVz7n/YfCuSVUxXn4LjAdD9zdpWgH2uBXbxo2q211dA7KxJyUhkPGoCpG0RmPQA=="],
 
     "@tiptap/extension-underline": ["@tiptap/extension-underline@3.27.4", "", { "peerDependencies": { "@tiptap/core": "3.27.4" } }, "sha512-nRJGvRyEXDtINlHTW+C2oWcL3vmX1URVxAPpkD3Zwn5Rb/vEeOU/pk/w97I0iid816MR4iVbvl1XhbUVegK9gQ=="],
 
