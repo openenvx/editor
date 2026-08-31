@@ -81,7 +81,7 @@
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
         "@xmazu/openenvxee-extensions": "workspace:*",
-        "konva": "^10.3.0",
+        "konva": "^10.3.2",
         "lucide-react": "1.24.0",
         "react-konva": "^19.2.5",
         "zod": "4.4.3",
@@ -106,7 +106,7 @@
     },
     "packages/canvas-studio": {
       "name": "@openenvx/canvas-studio",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@dnd-kit/core": "6.3.1",
         "@dnd-kit/sortable": "8.0.0",
@@ -128,7 +128,7 @@
         "clsx": "2.1.1",
         "cmdk": "1.1.1",
         "i18next": "^26.3.4",
-        "konva": "^10.3.0",
+        "konva": "^10.3.2",
         "lucide-react": "1.24.0",
         "react-colorful": "^5.7.0",
         "react-i18next": "^17.0.8",
@@ -219,7 +219,7 @@
     },
     "packages/email-studio": {
       "name": "@openenvx/email-studio",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@codemirror/commands": "^6.11.0",
         "@codemirror/lang-html": "^6.4.12",
@@ -344,7 +344,7 @@
     },
     "packages/html-studio": {
       "name": "@openenvx/html-studio",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "@dnd-kit/core": "6.3.1",
         "@dnd-kit/sortable": "8.0.0",
@@ -1646,7 +1646,7 @@
 
     "knip": ["knip@6.27.0", "", { "dependencies": { "fdir": "^6.5.0", "formatly": "^0.3.0", "get-tsconfig": "4.14.0", "jiti": "^2.7.0", "oxc-parser": "^0.137.0", "oxc-resolver": "11.21.3", "picomatch": "^4.0.4", "smol-toml": "^1.6.1", "strip-json-comments": "5.0.3", "tinyglobby": "^0.2.17", "unbash": "^4.0.1", "yaml": "^2.9.0", "zod": "^4.1.11" }, "bin": { "knip": "bin/knip.js", "knip-bun": "bin/knip-bun.js" } }, "sha512-CngYEYrD0n20N06FXA8n3u/0Wnnugoa+B9k14OP+iKIgkCHuzvIdsP3nfwjhByoc1WfogpxfiriMboAXFETDUw=="],
 
-    "konva": ["konva@10.3.0", "", {}, "sha512-gt19K2gzY4lHbnkvsku7eSmB+A9PTS2jG4F9coBMsdjM1UKfJNxJbDbXVpeCW1wjEGRwBD3nBamcHnqJhAeKlg=="],
+    "konva": ["konva@10.3.2", "", { "peerDependencies": { "canvas": "^3.0.0", "skia-canvas": "^3.0.0" }, "optionalPeers": ["canvas", "skia-canvas"] }, "sha512-A9GLx+Vj0PNnybjNq/St/S8utrksuSKOR8EzO2RTjA0SlmR9JipahcCXWW0vXz/9wjZCwAEtBtJFCUGe5mD/4g=="],
 
     "language-subtag-registry": ["language-subtag-registry@0.3.23", "", {}, "sha512-0K65Lea881pHotoGEa5gDlMxt3pctLi2RplBb7Ezh4rRdLEOtgi7n4EwK9lamnUCkKBqaeKRVebTq6BAxSkpXQ=="],
 
