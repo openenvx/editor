@@ -4,6 +4,7 @@ import type { PropertySectionDescriptor } from '../builders/property-builder';
 import type { SidebarHeaderDescriptor } from '../builders/sidebar-header-builder';
 import type { StatusBarItemDescriptor } from '../builders/status-bar-builder';
 import type { ToolbarItemDescriptor } from '../builders/toolbar-builder';
+import type { TopBarItemDescriptor } from '../builders/top-bar-builder';
 import type { OverlayDescriptor } from '../contributions/overlay-contribution';
 import type {
   SidebarBehavior,
@@ -37,7 +38,6 @@ import type {
   ViewPanelRegistration,
 } from './panel-registrations';
 import type { StatusBarItemRendererRegistration } from './status-bar-item-renderer-registration';
-import type { TopBarRegistration } from './top-bar-registration';
 import type { WorkbenchLayout } from './workbench-layout';
 import type { WorkbenchLayoutStore } from './workbench-layout-store';
 
@@ -136,7 +136,7 @@ export interface WorkbenchState {
   statusBar: StatusBarItemDescriptor[];
   statusBarItemRenderers: StatusBarItemRendererRegistration[];
   toolbarItems: ToolbarItemDescriptor[];
-  topBars: TopBarRegistration[];
+  topBarItems: TopBarItemDescriptor[];
   commandStates: Record<string, { canExecute: boolean }>;
   layerSurface: LayerSurfaceItem[];
   contextKeys: Record<string, boolean | string | number>;

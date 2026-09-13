@@ -119,7 +119,19 @@ class ToolbarPlugin extends WorkbenchPlugin {
 }
 
 class DemoTopBarContribution extends TopBarContribution {
-  readonly id = 'demo.topBar';
+  contribute(builder, _ctx): void {
+    builder
+      .placement('left')
+      .title('demo-title', { titleBinding: 'editorTitle', priority: 0 })
+      .end()
+      .placement('right')
+      .command('demo-save', {
+        commandId: 'scene.undo',
+        label: 'Save',
+        priority: 0,
+        variant: 'primary',
+      });
+  }
 }
 
 class TopBarPlugin extends WorkbenchPlugin {
@@ -127,7 +139,6 @@ class TopBarPlugin extends WorkbenchPlugin {
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
     ctx.registerWorkbench(new DemoTopBarContribution());
-    ctx.registerTopBar('demo.topBar', { kind: 'demo-top-bar' });
   }
 }
 
@@ -157,7 +168,7 @@ describe(WorkbenchController, () => {
     ]);
   });
 
-  it("resolves a top bar contribution into state", async () => {
+  it("merges top bar items from contributions", async () => {
     const controller = new WorkbenchController({
       layout: { topBar: true },
       plugins: [new TopBarPlugin()],
@@ -165,8 +176,9 @@ describe(WorkbenchController, () => {
     await controller.start();
     const state = controller.getState();
     expect(state.layout.topBar).toBe(true);
-    expect(state.topBars).toEqual([
-      { Component: { kind: 'demo-top-bar' }, id: 'demo.topBar' },
+    expect(state.topBarItems.map((item) => item.id)).toEqual([
+      'demo-title',
+      'demo-save',
     ]);
   });
 

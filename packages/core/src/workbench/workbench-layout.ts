@@ -15,10 +15,7 @@ export interface WorkbenchLayout {
   statusBar: boolean;
   /** Show editor overlay toolbars (top/bottom placements). */
   editorToolbars: boolean;
-  /**
-   * Shell header above the editor body. Off by default; product plugins
-   * contribute a bar via `TopBarContribution` + `registerTopBar`.
-   */
+  /** Shell header above the editor body. Off by default; product plugins contribute actions via `TopBarContribution`. */
   topBar: boolean;
 }
 

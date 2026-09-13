@@ -146,6 +146,7 @@ export { collectCanvasFontFamilies } from './collect-canvas-font-families';
 export { useCanvasFontPreload } from './use-canvas-font-preload';
 export {
   CanvasPlugin,
+  type CanvasPluginOptions,
   createCanvasDemoScene,
   InsertCanvasTextCommand,
   InsertCanvasImageCommand,

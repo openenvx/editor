@@ -1,17 +1,23 @@
+import type { CommandContext } from '../backbone';
+import type { TopBarBuilder } from '../builders/top-bar-builder';
 import { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
 import { WorkbenchContributionPoint } from '../workbench-contributions/workbench-contribution-point';
 
-/**
- * Declares a workbench top bar. Pair with `ctx.registerTopBar(id, Component)`.
- * Highest {@link priority} wins when multiple contributions are visible;
- * later equal priority overwrites. Optional {@link when} uses context keys.
- */
+/** Declares top-bar actions merged into the shell header when `layout.topBar` is true. */
 export abstract class TopBarContribution extends WorkbenchContribution {
   readonly contributionPoint = WorkbenchContributionPoint.TopBar;
 
-  /** Registry key for `registerTopBar`. */
-  abstract readonly id: string;
-  /** Higher wins. Default 0. */
-  priority?: number;
-  when?: string;
+  abstract contribute(builder: TopBarBuilder, ctx: CommandContext): void;
 }
+
+export type {
+  TopBarCommandItemDescriptor,
+  TopBarDropdownItemDescriptor,
+  TopBarGroupItemDescriptor,
+  TopBarItemDescriptor,
+  TopBarPlacement,
+  TopBarSeparatorItemDescriptor,
+  TopBarStatusItemDescriptor,
+  TopBarTitleBinding,
+  TopBarTitleItemDescriptor,
+} from '../builders/top-bar-builder';

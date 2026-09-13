@@ -10,6 +10,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useCanvasHost } from '../canvas-host-context';
 import {
   CanvasGridSettingsServiceId,
+  CanvasMarginsSettingsServiceId,
   CanvasRulerGuidesSettingsServiceId,
 } from '../canvas-service-tokens';
 import { CanvasStage } from '../canvas-stage';
@@ -19,6 +20,7 @@ import type {
 } from '../canvas-stage';
 import { captureClipboardDataTransferSync } from '../clipboard/read-external-clipboard';
 import { collectCanvasFontFamilies } from '../collect-canvas-font-families';
+import type { CanvasMarginsSettingsSnapshot } from '../display/canvas-margins-settings';
 import {
   flattenLayerSurface,
   flattenStageLayers,
@@ -143,9 +145,10 @@ export const CanvasEditor = memo(
     const viewportRef = useRef<ViewportController | null>(null);
     const containerSizeRef = useRef(containerSize);
     const [editingLayerId, setEditingLayerId] = useState<string | null>(null);
-    const [showMargins, setShowMargins] = useState(() =>
-      defaultShowMarginsForPage(page)
-    );
+    const [marginsSettings, setMarginsSettings] =
+      useState<CanvasMarginsSettingsSnapshot>(() => ({
+        showMargins: defaultShowMarginsForPage(page),
+      }));
     const [gridSettings, setGridSettings] =
       useState<CanvasGridSettingsSnapshot>(() => ({
         enabled: false,
@@ -166,6 +169,14 @@ export const CanvasEditor = memo(
     const rulerGuidesService = host.getService(
       CanvasRulerGuidesSettingsServiceId
     );
+    const marginsService = host.getService(CanvasMarginsSettingsServiceId);
+
+    useEffect(() => {
+      if (!marginsService) {
+        return;
+      }
+      marginsService.setShowMargins(defaultShowMarginsForPage(page));
+    }, [marginsService, page]);
 
     useEffect(() => {
       if (!gridService) {
@@ -182,6 +193,16 @@ export const CanvasEditor = memo(
       setRulerSettings(rulerGuidesService.getSnapshot());
       return rulerGuidesService.subscribe(setRulerSettings);
     }, [rulerGuidesService]);
+
+    useEffect(() => {
+      if (!marginsService) {
+        return;
+      }
+      setMarginsSettings(marginsService.getSnapshot());
+      return marginsService.subscribe(setMarginsSettings);
+    }, [marginsService]);
+
+    const showMargins = marginsSettings.showMargins;
 
     const pageGuides = useMemo(
       (): readonly UserGuide[] => page.guides ?? [],
@@ -627,63 +648,6 @@ export const CanvasEditor = memo(
             />
           </div>
         </CanvasRulers>
-        {gridService ||
-        pageMarginBounds ||
-        pageBleedEdgeBounds ||
-        rulerGuidesService ? (
-          <div
-            className={
-              showRulers
-                ? `${styles.chromeToggles} ${styles.chromeTogglesWithRulers}`
-                : styles.chromeToggles
-            }
-          >
-            {rulerGuidesService ? (
-              <button
-                aria-pressed={rulerSettings.showRulers}
-                className={
-                  rulerSettings.showRulers
-                    ? styles.chromeToggleActive
-                    : styles.chromeToggle
-                }
-                onClick={() => {
-                  void host.executeCommand('canvas.toggleRulers');
-                }}
-                type="button"
-              >
-                Rulers
-              </button>
-            ) : null}
-            {gridService ? (
-              <button
-                aria-pressed={gridSettings.enabled}
-                className={
-                  gridSettings.enabled
-                    ? styles.chromeToggleActive
-                    : styles.chromeToggle
-                }
-                onClick={() => {
-                  void host.executeCommand('canvas.toggleGrid');
-                }}
-                type="button"
-              >
-                Grid
-              </button>
-            ) : null}
-            {pageMarginBounds || pageBleedEdgeBounds ? (
-              <button
-                aria-pressed={showMargins}
-                className={
-                  showMargins ? styles.marginToggleActive : styles.marginToggle
-                }
-                onClick={() => setShowMargins((current) => !current)}
-                type="button"
-              >
-                Margins
-              </button>
-            ) : null}
-          </div>
-        ) : null}
       </div>
     );
   }

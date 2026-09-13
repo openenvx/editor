@@ -95,29 +95,45 @@ export class CanvasToolbarContribution extends ToolbarContribution {
         labelKey: 'toolbar.qrTool',
         priority: 12,
       })
-      .separator('canvas-toolbar-separator-2', { priority: 20 })
-      .command('canvas-toolbar-grid', {
-        commandId: 'canvas.toggleGrid',
-        icon: 'grid',
-        labelKey: 'toolbar.grid',
-        priority: 20,
-      })
       .dropdown('canvas-toolbar-grid-size', {
         items: CANVAS_GRID_SIZE_DROPDOWN_ITEMS,
         labelKey: 'toolbar.gridSize',
-        priority: 20.5,
-      })
-      .command('canvas-toolbar-rulers', {
-        commandId: 'canvas.toggleRulers',
-        icon: 'ruler',
-        labelKey: 'toolbar.rulers',
-        priority: 21,
+        priority: 20,
+        when: 'page.layoutAbsolute',
       })
       .dropdown('canvas-toolbar-zoom', {
         items: CANVAS_ZOOM_DROPDOWN_ITEMS,
         labelBinding: 'editorZoomPercent',
         labelSuffix: '%',
-        priority: 22,
+        priority: 21,
+      })
+      .separator('canvas-toolbar-separator-display', {
+        priority: 30,
+        when: 'page.layoutAbsolute',
+      })
+      .command('canvas-toolbar-rulers', {
+        commandId: 'canvas.toggleRulers',
+        icon: 'ruler',
+        labelKey: 'toolbar.rulers',
+        priority: 31,
+        toggledWhen: 'canvas.showRulers',
+        when: 'page.layoutAbsolute',
+      })
+      .command('canvas-toolbar-grid', {
+        commandId: 'canvas.toggleGrid',
+        icon: 'grid',
+        labelKey: 'toolbar.grid',
+        priority: 32,
+        toggledWhen: 'canvas.gridEnabled',
+        when: 'page.layoutAbsolute',
+      })
+      .command('canvas-toolbar-margins', {
+        commandId: 'canvas.toggleMargins',
+        icon: 'margins',
+        labelKey: 'toolbar.margins',
+        priority: 33,
+        toggledWhen: 'canvas.showMargins',
+        when: 'page.layoutAbsolute',
       });
   }
 }

@@ -2,6 +2,7 @@ import { createServiceId } from '@openenvx/core';
 
 import type { CanvasClipboardService } from './clipboard/canvas-clipboard-service';
 import type { CanvasCommandRequestService } from './commands/canvas-command-request-service';
+import type { CanvasMarginsSettings } from './display/canvas-margins-settings';
 import type { CanvasGridSettings } from './grid/canvas-grid-settings';
 import type { PageResizeService } from './page-resize/page-resize-types';
 import type { CanvasRegistriesReader } from './registry/canvas-registries-reader';
@@ -22,3 +23,5 @@ export const CanvasGridSettingsServiceId =
   createServiceId<CanvasGridSettings>('canvasGridSettings');
 export const CanvasRulerGuidesSettingsServiceId =
   createServiceId<CanvasRulerGuidesSettings>('canvasRulerGuidesSettings');
+export const CanvasMarginsSettingsServiceId =
+  createServiceId<CanvasMarginsSettings>('canvasMarginsSettings');

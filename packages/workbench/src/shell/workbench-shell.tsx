@@ -269,7 +269,9 @@ const LayoutRegion = memo(
     const viewContainers = useWorkbenchContextSelector(
       (state) => state.viewContainers
     );
-    const topBars = useWorkbenchContextSelector((state) => state.topBars);
+    const topBarItems = useWorkbenchContextSelector(
+      (state) => state.topBarItems
+    );
     const showSecondarySidebar = useMemo(
       () => shouldMountSecondarySidebar(layout, viewContainers),
       [layout, viewContainers]
@@ -280,8 +282,8 @@ const LayoutRegion = memo(
     }
 
     const topBar =
-      layout.topBar && topBars && topBars.length > 0 ? (
-        <TopBarRenderer topBars={topBars} />
+      layout.topBar && topBarItems && topBarItems.length > 0 ? (
+        <TopBarRenderer items={topBarItems} />
       ) : undefined;
 
     return (

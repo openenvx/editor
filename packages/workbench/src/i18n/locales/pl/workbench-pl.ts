@@ -17,6 +17,7 @@ export default {
   'toolbar.grid': 'Siatka',
   'toolbar.gridSize': 'Rozmiar siatki',
   'toolbar.rulers': 'Linijki',
+  'toolbar.margins': 'Marginesy',
   'toolbar.textTool': 'Narzędzie tekstu',
   'toolbar.imageTool': 'Narzędzie obrazu',
   'toolbar.emailText': 'Tekst',

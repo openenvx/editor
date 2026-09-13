@@ -44,10 +44,7 @@ export {
   EmailTemplatesView,
 } from './contributions/email-templates-sidebar';
 export { EmailContextMenu } from './contributions/email-context-menu';
-export {
-  EMAIL_TOP_BAR_ID,
-  EmailTopBarContribution,
-} from './contributions/email-top-bar-contribution';
+export { EmailTopBarContribution } from './contributions/email-top-bar-contribution';
 export { createEmailDemoScene } from './create-email-demo-scene';
 export { createEmailDemoScene as createEmailScene } from './create-email-demo-scene';
 export { DEFAULT_EMAIL_LAYOUT } from './default-email-layout';
@@ -55,7 +52,6 @@ export { EmailBlockPalettePanel } from './editor/block-palette-panel';
 export { EmailPatternBlocksGallery } from './editor/pattern-blocks-gallery';
 export { EmailTemplatesGallery } from './editor/templates-gallery';
 export { EMAIL_FRAME_WIDTH, EmailEditorPane } from './editor/email-editor-pane';
-export { EmailTopBar } from './editor/email-top-bar';
 export {
   EmailBlocksPlugin,
   type EmailBlocksPluginOptions,

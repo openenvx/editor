@@ -13,8 +13,7 @@ import { createSidebarHeaderBuilder } from '../builders/sidebar-header-builder';
 import type { SidebarHeaderDescriptor } from '../builders/sidebar-header-builder';
 import { createStatusBarBuilder } from '../builders/status-bar-builder';
 import { createToolbarBuilder } from '../builders/toolbar-builder';
-import type { TopBarContribution } from '../contributions/top-bar-contribution';
-import type { TopBarRegistration } from '../workbench/top-bar-registration';
+import { createTopBarBuilder } from '../builders/top-bar-builder';
 import type { ChromeSlice } from '../workbench/workbench-state-cache';
 import type { WorkbenchSliceContext } from './workbench-slice-context';
 
@@ -58,30 +57,6 @@ function buildSidebarHeaders(
   }
 
   return Object.fromEntries(winners);
-}
-
-function buildTopBars(
-  contributions: TopBarContribution[],
-  getComponent: (id: string) => unknown | undefined,
-  evaluateWhen: (when: string | undefined) => boolean
-): TopBarRegistration[] {
-  let winner: TopBarContribution | undefined;
-  for (const contribution of contributions) {
-    if (!evaluateWhen(contribution.when)) {
-      continue;
-    }
-    if (!winner || (contribution.priority ?? 0) >= (winner.priority ?? 0)) {
-      winner = contribution;
-    }
-  }
-  if (!winner) {
-    return [];
-  }
-  const Component = getComponent(winner.id);
-  if (!Component) {
-    return [];
-  }
-  return [{ Component, id: winner.id }];
 }
 
 export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
@@ -148,15 +123,18 @@ export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
     .filter((item) => evaluateWhen(item.when))
     .toSorted((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
 
+  const topBarBuilder = createTopBarBuilder();
+  for (const contribution of workbenchRegistries.topBars) {
+    contribution.contribute(topBarBuilder, commandCtx);
+  }
+  const topBarItems = topBarBuilder
+    .build()
+    .filter((item) => evaluateWhen(item.when))
+    .toSorted((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
+
   const sidebarHeaders = buildSidebarHeaders(
     workbenchRegistries.sidebarHeaders,
     buildCtx,
-    evaluateWhen
-  );
-
-  const topBars = buildTopBars(
-    workbenchRegistries.topBars,
-    (id) => ctx.providerRegistries.topBarRegistry.get(id),
     evaluateWhen
   );
 
@@ -169,6 +147,6 @@ export function buildChromeSlice(ctx: WorkbenchSliceContext): ChromeSlice {
     statusBar,
     statusBarItemRenderers,
     toolbarItems,
-    topBars,
+    topBarItems,
   };
 }

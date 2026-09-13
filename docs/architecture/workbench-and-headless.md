@@ -18,10 +18,10 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 - `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` - owns `EditorRuntime`, injects it into `PluginManager`
 - `bootstrapWorkbenchServices()` - headless DI services on the runtime
 - `WorkbenchPlugin` + `ctx.registerWorkbench()` - UI contribution registration
-- Provider registries: `registerTreeDataProvider`, `registerFieldRenderer`, `registerStatusBarItemRenderer`, `registerEditorPane`, `registerTopBar`, `registerDialog`
+- Provider registries: `registerTreeDataProvider`, `registerFieldRenderer`, `registerStatusBarItemRenderer`, `registerEditorPane`, `registerDialog`
 - View content kinds: `tree` (explorer), `list` (flat catalogs with row actions + optional reorder), `properties` (inspector forms), `component` (custom React panels), `welcome` (empty state)
 - Contribution points: Toolbar, CommandPalette, ViewContainer, View, ContextMenu, StatusBar, SidebarHeader, Overlay, PropertyPane, TopBar
-- Builders: `MenuBuilder`, `ToolbarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `SidebarHeaderBuilder`, `PropertyPaneBuilder`
+- Builders: `MenuBuilder`, `ToolbarBuilder`, `TopBarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `SidebarHeaderBuilder`, `PropertyPaneBuilder`
 - `WorkbenchLayout` (independent `activityBar` / `primarySidebar` / `secondarySidebar`), `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
 - Optional `WorkbenchLayoutStore` for persisted visibility + container locations
 - `WorkbenchProvider`, `useWorkbenchContext` (from `@openenvx/core/react`)
@@ -64,12 +64,12 @@ const ok = await api.showConfirm({
 | `primarySidebar` | `true` | `true` | `true` | `true` |
 | `secondarySidebar` | `true` | `true` | `true` | `true` |
 | `editorToolbars` | `false` | `true` | `true` | `false` |
-| `topBar` | `false` | `false` | `false` | `true` |
+| `topBar` | `false` | `true` | `false` | `true` |
 | Other parts | all enabled | all enabled | all enabled | all enabled |
 
-Visibility is mutable (`toggleActivityBar` / …). Containers move via `api.moveContainer`. Set `layout: { editorToolbars: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_HTML_LAYOUT`) to show editor overlay toolbars. Items declare a `placement` (`top-left` | `top-center` | `top-right` | `bottom-left` | `bottom-center` | `bottom-right`) via `ToolbarBuilder.placement(...)`. Set `layout: { topBar: true }` (or use `DEFAULT_EMAIL_LAYOUT`) to show the optional shell header; plugins declare `TopBarContribution` and `ctx.registerTopBar(id, Component)`. Highest `priority` wins; later equal priority overwrites. No contribution = no header.
+Visibility is mutable (`toggleActivityBar` / …). Containers move via `api.moveContainer`. Set `layout: { editorToolbars: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_HTML_LAYOUT`) to show editor overlay toolbars. Items declare a `placement` (`top-left` | `top-center` | `top-right` | `bottom-left` | `bottom-center` | `bottom-right`) via `ToolbarBuilder.placement(...)`. Set `layout: { topBar: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_EMAIL_LAYOUT`) to show the optional shell header; plugins contribute actions via `TopBarContribution` + `TopBarBuilder` (`left` | `center` | `right` placements). Workbench `TopBarRenderer` renders the merged descriptors. No contribution = no header.
 
-**Host rule (toolbars):** Product engines (canvas / html / email) contribute toolbar descriptors only - no React toolbar components in those packages. Workbench `EditorChrome` + `ToolbarRenderer` render shared `IconButton` / `DropdownMenu` chrome. Product **top bars** (email mode switch, etc.) are the exception: they are optional layout + `TopBarContribution`, not a `WorkbenchShell` prop.
+**Host rule (toolbars):** Product engines (canvas / html / email) contribute toolbar and top-bar descriptors only - no React toolbar/top-bar components in those packages. Workbench `EditorChrome` + `ToolbarRenderer` / `TopBarRenderer` render shared button and dropdown chrome.
 
 ## Property pane flow
 

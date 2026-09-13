@@ -35,10 +35,12 @@ interface ToolbarItemBase {
 
 export interface ToolbarCommandItemDescriptor extends ToolbarItemBase {
   kind?: 'command';
-  icon: string;
-  labelKey: string;
+  icon?: string;
+  label?: string;
+  labelKey?: string;
   commandId: string;
   args?: unknown;
+  presentation?: 'icon' | 'label';
 }
 
 export interface ToolbarSeparatorItemDescriptor extends ToolbarItemBase {
@@ -57,12 +59,15 @@ export type ToolbarItemDescriptor =
   | ToolbarDropdownItemDescriptor;
 
 export interface ToolbarCommandOptions extends ShellItemOptions {
-  icon: string;
-  labelKey: string;
+  icon?: string;
+  label?: string;
+  labelKey?: string;
   commandId: string;
   args?: unknown;
   group?: number;
   toggledWhen?: string;
+  /** `icon` (default) or labeled text button. */
+  presentation?: 'icon' | 'label';
 }
 
 export interface ToolbarDropdownOptions extends ShellItemOptions {
@@ -91,8 +96,10 @@ class ToolbarRegionBuilder {
           icon: options.icon,
           id,
           kind: 'command',
+          label: options.label,
           labelKey: options.labelKey,
           placement: this.placement,
+          presentation: options.presentation,
           toggledWhen: options.toggledWhen,
         },
         options

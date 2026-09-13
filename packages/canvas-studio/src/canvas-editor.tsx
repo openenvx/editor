@@ -12,7 +12,7 @@ import type { Scene } from './scene';
 
 import './theme.css';
 
-const CANVAS_EDITOR_PLUGINS = [new CanvasPlugin()];
+const CANVAS_EDITOR_PLUGINS = [new CanvasPlugin({ topBar: true })];
 
 export interface CanvasEditorProps {
   /** Initial document. Defaults to a blank artboard when omitted. */

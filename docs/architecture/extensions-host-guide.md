@@ -202,7 +202,6 @@ activateWorkbench(ctx) {
   ctx.registerFieldRenderer('color', ColorFieldRenderer);
   ctx.registerStatusBarItemRenderer('dropdown', StatusBarDropdownRenderer);
   ctx.registerEditorPane('absolute', AbsoluteEditorPane);
-  ctx.registerTopBar('email.topBar', EmailTopBar);
 }
 ```
 
@@ -244,24 +243,37 @@ activateWorkbench(ctx) {
 
 Lowest `priority` wins per `containerId`. Other activity-bar panels keep the default header. Title menus reuse `DropdownMenuRenderer`.
 
-**Top bar** (optional shell header - email mode switch, etc.):
+**Top bar** (optional shell header - email mode switch, canvas save chrome, etc.):
 
-1. Set `layout: { topBar: true }` (or use `DEFAULT_EMAIL_LAYOUT`).
-2. Declare `TopBarContribution` via `ctx.registerWorkbench()`.
-3. Register the React component with `ctx.registerTopBar(id, Component)` (same id).
+1. Set `layout: { topBar: true }` (or use `DEFAULT_EMAIL_LAYOUT` / `DEFAULT_CANVAS_LAYOUT`).
+2. Declare `TopBarContribution` via `ctx.registerWorkbench()` and contribute actions with `TopBarBuilder` (`left` | `center` | `right` placements).
 
 ```ts
 class EmailTopBarContribution extends TopBarContribution {
-  readonly id = 'email.topBar';
+  contribute(builder, _ctx) {
+    builder
+      .placement('center')
+      .group('modes', {
+        groupVariant: 'segmented',
+        items: [
+          {
+            id: 'mode-edit',
+            commandId: 'email.enterEditMode',
+            label: 'Editor',
+            placement: 'center',
+            toggledWhen: 'email.modeEdit',
+          },
+        ],
+      });
+  }
 }
 
 activateWorkbench(ctx) {
   ctx.registerWorkbench(new EmailTopBarContribution());
-  ctx.registerTopBar('email.topBar', EmailTopBar);
 }
 ```
 
-Highest `priority` wins; later equal priority overwrites. Omit the plugin (or set `layout.topBar: false`) to hide the header. `WorkbenchShell` has no `topBar` prop.
+Workbench `TopBarRenderer` merges contributions into one header. Omit the plugin (or set `layout.topBar: false`) to hide the header. `WorkbenchShell` has no `topBar` prop.
 
 **Form / settings sidebars** (VS Code `views` + properties): declare only - no React panel:
 

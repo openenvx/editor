@@ -36,7 +36,7 @@ Monorepo HMR stays on `@openenvx/canvas` + `@openenvx/workbench` (`apps/canvas-d
 Unpublished fat bundle source in `packages/studio`. Curated host allowlist: `WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, `createSandboxExtensionHost`, layout/property helpers. External product hosts that need the full allowlist install the GitHub Packages build when published from product repos.
 
 ```ts
-export const DEFAULT_STUDIO_PLUGINS = [new CanvasPlugin()];
+export const DEFAULT_STUDIO_PLUGINS = [new CanvasPlugin({ topBar: true })];
 ```
 
 `createSandboxExtensionHost(options)` wires canvas widget click binding + `WIDGET_LAYER_TYPE` so **workbench never imports canvas**; studio is the seam.

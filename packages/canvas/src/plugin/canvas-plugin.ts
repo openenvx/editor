@@ -22,6 +22,7 @@ import {
   CanvasClipboardServiceId,
   CanvasCommandRequestServiceId,
   CanvasGridSettingsServiceId,
+  CanvasMarginsSettingsServiceId,
   CanvasPageResizeServiceId,
   CanvasRulerGuidesSettingsServiceId,
   CanvasStageInteractionServiceId,
@@ -74,6 +75,7 @@ import {
   InsertCanvasGroupCommand,
   UngroupSelectionCommand,
 } from '../commands/canvas-group-commands';
+import { ToggleCanvasMarginsCommand } from '../commands/canvas-margins-commands';
 import {
   AddCanvasGuideCommand,
   ClearCanvasGuidesCommand,
@@ -90,6 +92,7 @@ import {
 } from '../commands/canvas-zoom-commands';
 import { ResetImageCropCommand } from '../commands/reset-image-crop-command';
 import { DetachWidgetCommand } from '../commands/widget-detach-command';
+import { createCanvasChromeCommands } from '../contributions/canvas-chrome-commands';
 import { CanvasCommandPaletteItems } from '../contributions/canvas-command-palette';
 import { CanvasContextMenu } from '../contributions/canvas-context-menu';
 import { canvasPropertyPaneContributions } from '../contributions/canvas-property-pane-contributions';
@@ -97,7 +100,10 @@ import {
   CanvasStatusBarContribution,
   CanvasToolbarContribution,
 } from '../contributions/canvas-shell-contributions';
+import { CanvasTopBarContribution } from '../contributions/canvas-top-bar-contribution';
 import { proImageCanvasContributions } from '../contributions/pro-image-contributions';
+import { bindCanvasDisplayContextKeys } from '../display/bind-canvas-display-context-keys';
+import { CanvasMarginsSettings } from '../display/canvas-margins-settings';
 import { AbsoluteEditorPane } from '../editor/absolute-editor-pane';
 import { SvgNodesFieldRenderer } from '../fields/svg-nodes-field';
 import { canvasFontService } from '../fonts/canvas-font-service';
@@ -337,8 +343,17 @@ export class UploadAssetCommand extends Command {
   }
 }
 
+export interface CanvasPluginOptions {
+  /** Register the product top bar (`CanvasTopBarContribution`). */
+  topBar?: boolean;
+}
+
 export class CanvasPlugin extends Plugin {
   readonly id = 'openenvx.canvas';
+
+  constructor(private readonly options: CanvasPluginOptions = {}) {
+    super();
+  }
 
   activate(ctx: PluginContext): void {
     ensureCanvasRegistriesInstalled(ctx);
@@ -403,6 +418,7 @@ export class CanvasPlugin extends Plugin {
       new ToggleCanvasGridCommand(),
       new SetCanvasGridSizeCommand(),
       new ToggleCanvasRulersCommand(),
+      new ToggleCanvasMarginsCommand(),
       new ClearCanvasGuidesCommand(),
       new AddCanvasGuideCommand(),
       new MoveCanvasGuideCommand(),
@@ -424,13 +440,22 @@ export class CanvasPlugin extends Plugin {
         CanvasRulerGuidesSettingsServiceId,
         CanvasRulerGuidesSettings
       ),
+      new SingletonServiceContribution(
+        CanvasMarginsSettingsServiceId,
+        CanvasMarginsSettings
+      ),
       new SimpleServiceContribution(CanvasPageResizeServiceId, () => ({
         resizeSceneToPreset: resizeSceneToPagePreset,
       })),
       new SimpleServiceContribution(FontServiceId, () => canvasFontService)
     );
 
+    bindCanvasDisplayContextKeys(ctx);
+
     const workbench = ctx as WorkbenchPluginContext;
+    if (this.options.topBar) {
+      ctx.register(...createCanvasChromeCommands());
+    }
     workbench.registerEditorPane('absolute', AbsoluteEditorPane);
     workbench.registerFieldRenderer('svgNodes', SvgNodesFieldRenderer);
     workbench.registerWorkbench(
@@ -438,6 +463,7 @@ export class CanvasPlugin extends Plugin {
       new CanvasCommandPaletteItems(),
       new CanvasStatusBarContribution(),
       new CanvasToolbarContribution(),
+      ...(this.options.topBar ? [new CanvasTopBarContribution()] : []),
       ...canvasPropertyPaneContributions
     );
     ctx.register(

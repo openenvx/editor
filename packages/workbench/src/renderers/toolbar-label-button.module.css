@@ -1,0 +1,31 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--wb-radius-control);
+  background: transparent;
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.button:hover:not(:disabled) {
+  color: var(--wb-foreground);
+}
+
+.buttonActive {
+  background: var(--wb-active-overlay);
+  color: var(--wb-foreground);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

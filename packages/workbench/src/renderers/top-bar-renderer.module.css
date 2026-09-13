@@ -15,33 +15,37 @@
 }
 
 .left,
+.center,
 .right {
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   gap: var(--wb-space-1);
   min-width: 0;
 }
 
+.left,
+.right {
+  position: relative;
+  z-index: 1;
+}
+
 .right {
   flex-shrink: 0;
 }
 
-.backButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 var(--wb-space-2) 0 0;
-  border: none;
-  background: transparent;
-  color: var(--wb-muted-foreground);
-  cursor: pointer;
-  transition: color 0.12s ease;
+.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+  display: none;
+  transform: translate(-50%, -50%);
 }
 
-.backButton:hover {
-  color: var(--wb-foreground);
+@media (min-width: 768px) {
+  .center {
+    display: flex;
+  }
 }
 
 .titleButton {
@@ -52,15 +56,9 @@
   color: var(--wb-foreground);
   font-size: var(--wb-text-sm);
   font-weight: 500;
-  cursor: pointer;
-  transition: color 0.12s ease;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.titleButton:hover {
-  color: color-mix(in srgb, var(--wb-foreground) 80%, transparent);
 }
 
 @media (min-width: 768px) {
@@ -69,55 +67,7 @@
   }
 }
 
-.center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 0;
-  display: none;
-  align-items: center;
-  gap: 2px;
-  padding: 2px;
-  border-radius: var(--wb-radius-sm);
-  background: var(--wb-muted);
-  transform: translate(-50%, -50%);
-}
-
-@media (min-width: 768px) {
-  .center {
-    display: flex;
-  }
-}
-
-.modeButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: var(--wb-radius-sm);
-  background: transparent;
-  color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-xs);
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background 0.12s ease,
-    color 0.12s ease,
-    box-shadow 0.12s ease;
-}
-
-.modeButton:hover {
-  color: var(--wb-foreground);
-}
-
-.modeButtonActive {
-  background: var(--wb-background);
-  color: var(--wb-foreground);
-  box-shadow: var(--wb-shadow-xs);
-}
-
-.saved {
+.status {
   display: none;
   align-items: center;
   gap: var(--wb-space-1);
@@ -126,12 +76,12 @@
 }
 
 @media (min-width: 640px) {
-  .saved {
+  .status {
     display: flex;
   }
 }
 
-.savedIcon {
+.statusIcon {
   color: #10b981;
 }
 
@@ -162,68 +112,50 @@
   cursor: not-allowed;
 }
 
+.iconButtonActive {
+  background: var(--wb-active-overlay);
+  color: var(--wb-foreground);
+}
+
 @media (min-width: 640px) {
   .iconButton {
     display: inline-flex;
   }
 }
 
-.divider {
-  display: none;
-  width: 1px;
-  height: 20px;
-  margin: 0 var(--wb-space-1);
-  background: var(--wb-border);
-}
-
-@media (min-width: 640px) {
-  .divider {
-    display: block;
-  }
-}
-
-.deviceGroup {
-  display: none;
-  align-items: center;
-  gap: 2px;
-  padding: 2px;
-  border-radius: var(--wb-radius-sm);
-  background: var(--wb-muted);
-}
-
-@media (min-width: 640px) {
-  .deviceGroup {
-    display: flex;
-  }
-}
-
-.deviceButton {
+.labelButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
+  height: 28px;
+  padding: 0 12px;
   border: none;
-  border-radius: var(--wb-radius-sm);
+  border-radius: var(--wb-radius-control);
   background: transparent;
   color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+  font-weight: 500;
   cursor: pointer;
   transition:
     background 0.12s ease,
-    color 0.12s ease,
-    box-shadow 0.12s ease;
+    color 0.12s ease;
 }
 
-.deviceButton:hover {
+.labelButton:hover:not(:disabled) {
   color: var(--wb-foreground);
 }
 
-.deviceButtonActive {
-  background: var(--wb-background);
+.labelButtonActive {
+  background: var(--wb-active-overlay);
   color: var(--wb-foreground);
-  box-shadow: var(--wb-shadow-xs);
 }
 
-.saveButton {
+.labelButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.primaryButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -241,11 +173,74 @@
   transition: opacity 0.12s ease;
 }
 
-.saveButton:hover:not(:disabled) {
+.primaryButton:hover:not(:disabled) {
   opacity: 0.9;
 }
 
-.saveButton:disabled {
+.primaryButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.divider {
+  display: none;
+  width: 1px;
+  height: 20px;
+  margin: 0 var(--wb-space-1);
+  background: var(--wb-border);
+}
+
+@media (min-width: 640px) {
+  .divider {
+    display: block;
+  }
+}
+
+.segmentedGroup,
+.inlineGroup {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--wb-radius-sm);
+  background: var(--wb-muted);
+}
+
+.inlineGroup {
+  background: transparent;
+  padding: 0;
+  gap: var(--wb-space-1);
+}
+
+.segmentedButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--wb-radius-sm);
+  background: transparent;
+  color: var(--wb-muted-foreground);
+  font-size: var(--wb-text-xs);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.segmentedButton:hover:not(:disabled) {
+  color: var(--wb-foreground);
+}
+
+.segmentedButtonActive {
+  background: var(--wb-background);
+  color: var(--wb-foreground);
+  box-shadow: var(--wb-shadow-xs);
+}
+
+.segmentedButton:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }

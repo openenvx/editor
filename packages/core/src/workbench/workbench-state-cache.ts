@@ -4,6 +4,7 @@ import type { PropertySectionDescriptor } from '../builders/property-builder';
 import type { SidebarHeaderDescriptor } from '../builders/sidebar-header-builder';
 import type { StatusBarItemDescriptor } from '../builders/status-bar-builder';
 import type { ToolbarItemDescriptor } from '../builders/toolbar-builder';
+import type { TopBarItemDescriptor } from '../builders/top-bar-builder';
 import type { OverlayDescriptor } from '../contributions/overlay-contribution';
 import type { InteractionState } from '../runtime/interaction-state';
 import type { Scene, Selection } from '../scene/types';
@@ -15,7 +16,6 @@ import type {
 import type { ActiveDialog, DialogRegistration } from './dialog-registrations';
 import type { EditorPaneRegistration } from './editor-pane-host-props';
 import type { StatusBarItemRendererRegistration } from './status-bar-item-renderer-registration';
-import type { TopBarRegistration } from './top-bar-registration';
 import type { WorkbenchLayout } from './workbench-layout';
 import type {
   LayerSurfaceItem,
@@ -56,7 +56,7 @@ export interface ChromeSlice {
   statusBarItemRenderers: StatusBarItemRendererRegistration[];
   toolbarItems: ToolbarItemDescriptor[];
   contextKeys: Record<string, boolean | string | number>;
-  topBars: TopBarRegistration[];
+  topBarItems: TopBarItemDescriptor[];
 }
 
 export interface CommandsSlice {

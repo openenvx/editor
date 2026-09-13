@@ -161,6 +161,27 @@ export {
   type ToolbarPlacement,
 } from './builders/toolbar-builder';
 export {
+  TopBarBuilder,
+  createTopBarBuilder,
+  isTopBarDropdownItem,
+  isTopBarGroupItem,
+  TOP_BAR_PLACEMENTS,
+  type TopBarCommandOptions,
+  type TopBarDropdownOptions,
+  type TopBarGroupOptions,
+  type TopBarItemDescriptor,
+  type TopBarCommandItemDescriptor,
+  type TopBarDropdownItemDescriptor,
+  type TopBarGroupItemDescriptor,
+  type TopBarSeparatorItemDescriptor,
+  type TopBarStatusItemDescriptor,
+  type TopBarStatusOptions,
+  type TopBarTitleItemDescriptor,
+  type TopBarTitleOptions,
+  type TopBarTitleBinding,
+  type TopBarPlacement,
+} from './builders/top-bar-builder';
+export {
   type ShellDropdownItemBase,
   type ShellDropdownMenuItemDescriptor,
 } from './builders/shell-dropdown';
@@ -244,7 +265,6 @@ export type {
   ViewPanelRegistration,
 } from './workbench/panel-registrations';
 export type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
-export type { TopBarRegistration } from './workbench/top-bar-registration';
 
 export type {
   DocumentVersion,

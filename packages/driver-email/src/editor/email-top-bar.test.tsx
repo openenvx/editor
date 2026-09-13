@@ -2,7 +2,6 @@ import { WorkbenchController } from '@openenvx/core';
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
-import { EMAIL_TOP_BAR_ID } from '../contributions/email-top-bar-contribution';
 import { createEmailDemoScene } from '../create-email-demo-scene';
 import { DEFAULT_EMAIL_LAYOUT } from '../default-email-layout';
 import { EmailBlocksPlugin } from '../plugin/email-blocks-plugin';
@@ -15,16 +14,16 @@ describe('EmailTopBar contribution', () => {
     expect(DEFAULT_EMAIL_LAYOUT.topBar).toBe(true);
   });
 
-  it('does not register the top bar by default', async () => {
+  it('does not contribute top bar actions by default', async () => {
     const { api, dispose } = await createEmailWorkbench();
     try {
-      expect(api.getSnapshot().topBars).toEqual([]);
+      expect(api.getSnapshot().topBarItems).toEqual([]);
     } finally {
       dispose();
     }
   });
 
-  it('registers the email top bar when the plugin opts in', async () => {
+  it('contributes email top bar actions when the plugin opts in', async () => {
     const controller = new WorkbenchController({
       initialScene: createEmailDemoScene(),
       layout: DEFAULT_EMAIL_LAYOUT,
@@ -32,9 +31,12 @@ describe('EmailTopBar contribution', () => {
     });
     await controller.start();
     try {
-      expect(controller.api.getSnapshot().topBars.map((bar) => bar.id)).toEqual(
-        [EMAIL_TOP_BAR_ID]
-      );
+      const ids = controller.api
+        .getSnapshot()
+        .topBarItems.map((item) => item.id);
+      expect(ids).toContain('email-topbar-title');
+      expect(ids).toContain('email-topbar-modes');
+      expect(ids).toContain('email-topbar-save');
     } finally {
       controller.dispose();
     }

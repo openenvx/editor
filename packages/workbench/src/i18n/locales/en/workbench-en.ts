@@ -17,6 +17,7 @@ export default {
   'toolbar.grid': 'Grid',
   'toolbar.gridSize': 'Grid size',
   'toolbar.rulers': 'Rulers',
+  'toolbar.margins': 'Margins',
   'toolbar.textTool': 'Text tool',
   'toolbar.imageTool': 'Image tool',
   'toolbar.emailText': 'Text',

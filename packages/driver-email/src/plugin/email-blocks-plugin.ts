@@ -39,10 +39,7 @@ import {
   EMAIL_TEMPLATES_PANEL_COMPONENT_ID,
 } from '../contributions/email-templates-sidebar';
 import { EmailToolbarContribution } from '../contributions/email-toolbar-contribution';
-import {
-  EmailTopBarContribution,
-  EMAIL_TOP_BAR_ID,
-} from '../contributions/email-top-bar-contribution';
+import { EmailTopBarContribution } from '../contributions/email-top-bar-contribution';
 import { EmailBlockPalettePanel } from '../editor/block-palette-panel';
 import {
   createEmailModeCommands,
@@ -50,7 +47,6 @@ import {
   EmailEditorModeServiceImpl,
 } from '../editor/email-editor-mode-service';
 import { EmailEditorPane } from '../editor/email-editor-pane';
-import { EmailTopBar } from '../editor/email-top-bar';
 import { EmailPatternBlocksGallery } from '../editor/pattern-blocks-gallery';
 import { EmailTemplatesGallery } from '../editor/templates-gallery';
 import { insertEmailTextHtml } from '../insert-email-text-html';
@@ -140,8 +136,5 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
       EmailTemplatesGallery
     );
     ctx.registerEditorPane('email', EmailEditorPane);
-    if (this.options.topBar) {
-      ctx.registerTopBar(EMAIL_TOP_BAR_ID, EmailTopBar);
-    }
   }
 }
