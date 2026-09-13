@@ -3,6 +3,60 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.1.3] - 2026-09-13
+
+### Other
+
+- Enhance rich text editing and block navigation in HTML editor
+
+- Improved the rich text editing experience by implementing keyboard shortcuts for inserting sibling text blocks and handling boundary intents (Enter, Backspace, Arrow keys).
+- Introduced a new `useBlockTextFlow` hook to manage text editing state and interactions, streamlining the editing process in both HTML and email editors.
+- Added functionality to navigate between adjacent text blocks, enhancing user experience when editing rich text content.
+- Updated related tests to ensure proper functionality of new features and maintain code reliability.
+
+These changes significantly enhance the usability and functionality of the rich text editor within the HTML editing environment.
+
+- Enhance canvas layout and top bar functionality
+
+- Introduced a new `CanvasMarginsSettings` service to manage visibility of page margins, allowing users to toggle margins in the canvas editor.
+- Updated the `CanvasPlugin` to optionally register a top bar via `CanvasTopBarContribution`, improving the user interface for canvas operations.
+- Enhanced the default canvas layout to include the top bar and editor toolbars, streamlining the editing experience.
+- Refactored the `CanvasEditor` to integrate margin settings and updated related components to support the new functionality.
+
+These changes significantly improve the usability and flexibility of the canvas editing environment.
+
+- Introduce VariablesPlugin and enhance variable management in canvas
+
+- Added a new `@openenvx/variables` package, introducing the `VariablesPlugin` for managing variables within the canvas and email editors.
+- Integrated variable support into the rich text editor, allowing users to insert and manage variables seamlessly.
+- Updated the canvas and email plugins to utilize the new `VariablesPlugin`, enhancing the editing experience with variable suggestions and management dialogs.
+- Removed the obsolete `FEATURES.md` file to streamline documentation.
+
+These changes significantly improve the functionality and usability of variable management across the OpenEnvx platform.
+
+- Remove obsolete FEATURES.md file
+
+- Deleted the `FEATURES.md` file to streamline documentation and eliminate outdated content. This change helps maintain clarity and focus on current features and enhancements within the OpenEnvx platform.
+
+- Enhance canvas export functionality and update documentation
+
+- Introduced new export capabilities for canvas, allowing users to export documents in PNG and JPG formats directly from the editor.
+- Added support for exporting to PDF in Node environments, enhancing the versatility of the canvas package.
+- Updated the `CanvasEditor` and related components to integrate the new export features, improving user experience.
+- Revised documentation to reflect changes in export options and clarified the usage of the `@openenvx/canvas/export` module.
+- Removed outdated references to cloud export services, streamlining the documentation for clarity.
+
+These enhancements significantly improve the export functionality and usability of the canvas editing environment.
+
+- Update package dependencies and improve type handling
+
+- Added `@openenvx/core` as a dependency in multiple package configurations to enhance functionality across the project.
+- Simplified the build scripts in various package demos by removing unnecessary directory changes, streamlining the build process.
+- Improved type handling in the canvas package by refining type assertions in the `App` component, enhancing type safety and clarity.
+- Introduced optional dependencies for `@napi-rs/canvas` and `pdf-lib`, allowing for more flexible package management.
+
+These changes enhance the overall structure and type safety of the project, improving developer experience and maintainability.
+
 ## [0.1.2] - 2026-08-30
 
 ### Bug Fixes
@@ -1099,6 +1153,8 @@ These changes enhance the reliability and maintainability of the BlockTreeRender
 - Adjusted the release workflow in release.yml to use NODE_AUTH_TOKEN instead of NPM_TOKEN for improved security and clarity.
 
 These changes enhance the documentation and improve the security of the publishing process.
+
+- V0.1.2
 
 
 ### Refactor
