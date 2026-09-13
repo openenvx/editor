@@ -49,14 +49,14 @@ Hard rules:
 | OSS canvas drop-in | `@openenvx/canvas-studio` (published) |
 | Custom shell / playground | `@openenvx/core` (+ canvas or html) |
 | In-repo **internal** plugin author | `@openenvx/core` - [extensions-host-guide.md](extensions-host-guide.md) |
-| **Sandbox** widget / plugin author | `@xmazu/openenvxee-extensions` - [extensions-sandbox-guide.md](extensions-sandbox-guide.md) |
+| **Sandbox** widget / plugin author | `@openenvx/editor-sandbox` - [extensions-sandbox-guide.md](extensions-sandbox-guide.md) |
 | Scene / preview / Render IR (in-monorepo) | `@openenvx/core/schema`, `@openenvx/core/preview` |
 
 ## Package catalog
 
 | Package | Publish | Owns | Entry points |
 | --- | --- | --- | --- |
-| `@xmazu/openenvxee-extensions` | yes | Author SDK: `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite | `.`, `./protocol`, … |
+| `@openenvx/editor-sandbox` | yes | Author SDK: `./protocol`, `./host`, `./canvas-widget`, `/canvas` `/html` `/panel`, `defineExtension`, Vite | `.`, `./protocol`, … |
 | `@openenvx/core` | workspace | Scene Zod (`./schema`), preview IR (`./preview`), `EditorRuntime`, `WorkbenchController`, contributions | `.`, `./schema`, `./preview`, `./react` |
 | `@openenvx/canvas` | workspace | Konva engine, layers, `CanvasPlugin`, `CanvasEditor`, canvas workbench chrome | `.` (+ export/registry subpaths) |
 | `@openenvx/html` | workspace | HTML blocks, `HtmlBlocksPlugin`, `HtmlEditorPane`, `renderBlockDocument` | `.`, `./runtime` |
@@ -66,7 +66,7 @@ Hard rules:
 | `@openenvx/agent` | workspace | Agent chat sidebar plugin | `.`, `./schemas` |
 | `@openenvx/canvas-studio` | yes (public, npmjs) | Minified canvas editor (`CanvasEditor`, scene factory) | `.`, `./runtime`, `./theme.css`, `./fonts.css` |
 | `@openenvx/html-studio` | yes (public, npmjs) | Minified HTML editor (`HtmlEditor`, host composition API) | `.`, `./runtime`, `./theme.css` |
-| `@xmazu/openenvxee-studio` | private | Product-specific canvas host allowlist | `.`, `./theme.css`, `./fonts.css` |
+| `@openenvx/canvas-studio` | private | Product-specific canvas host allowlist | `.`, `./theme.css`, `./fonts.css` |
 | `@openenvx/email-studio` | yes (public, npmjs) | Minified email editor (`EmailEditor`, scene + HTML export) | `.`, `./runtime`, `./theme.css` |
 
 Private packages resolve from TypeScript `src/` in the workspace (HMR). Published packages ship `dist/` - see [PUBLISHING.md](../../PUBLISHING.md).
@@ -77,7 +77,7 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 ### Published
 
-**`@xmazu/openenvxee-extensions`** - `./protocol`: `RenderNode`, manifests, validators, sandbox grants. `.`: `defineExtension`, `define*Component`, `renderToElementTree`, `renderPanelTree`, `buildGrantFromManifest`. Subpaths: `./canvas` / `./html` / `./panel`, `./vite`, `./openenvx`.
+**`@openenvx/editor-sandbox`** - `./protocol`: `RenderNode`, manifests, validators, sandbox grants. `.`: `defineExtension`, `define*Component`, `renderToElementTree`, `renderPanelTree`, `buildGrantFromManifest`. `./host`: QuickJS runtime, `SandboxExtensionHost`, `mountSandboxExtensions`. `./canvas-widget`: `applyWidgetFace`, `mapWidgetTreeToLayers`, layout resolver. Subpaths: `./canvas` / `./html` / `./panel`, `./vite`, `./openenvx`.
 
 **`@openenvx/html-studio`** - published HTML editor. Subpaths: `.`, `./runtime`, `./theme.css`. Exports: `HtmlEditor`, `HtmlEditorProps`, host composition API (`WorkbenchShell`, `WorkbenchPlugin`, contributions), `DEFAULT_HTML_STUDIO_PLUGINS`, `createHtmlSandboxExtensionHost`. `./runtime`: `createHtmlScene`, `renderBlockDocument`, `BlockRegistry`, `builtinBlocks`. Wide `.d.ts` for product hosts.
 
@@ -103,7 +103,7 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@openenvx/workbench`** - `WorkbenchShell`, default chrome/fields/inspector plugins, theme/i18n, `SandboxExtensionHost`, layout helpers.
 
-**`@xmazu/openenvxee-studio`** - curated canvas host allowlist (`WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, layout/property helpers, sandbox/embed, theme CSS). Source: `packages/studio/src/index.ts`.
+**`@openenvx/canvas-studio`** - curated canvas host allowlist (`WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, layout/property helpers, sandbox/embed, theme CSS). Source: `packages/studio/src/index.ts`.
 
 **`@openenvx/html-studio`** - published HTML editor (`HtmlEditor`, host composition API, `DEFAULT_HTML_STUDIO_PLUGINS`, sandbox factory). Source: `packages/html-studio/src/index.ts`.
 

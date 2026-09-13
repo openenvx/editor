@@ -20,18 +20,18 @@ Sandbox grants split:
 |  | **Sandbox plugin** (`kind: 'plugin'`) | **Sandbox widget** (`kind: 'widget'`) |
 | --- | --- | --- |
 | Mental model | Tool you run | Object on the canvas |
-| Primary UI | Off-canvas floating `showUI` panel (iframe) | On-canvas face from `@xmazu/openenvxee-extensions` (`data.children`) |
+| Primary UI | Off-canvas floating `showUI` panel (iframe) | On-canvas face from `@openenvx/editor-sandbox` (`data.children`) |
 | Lifetime | User-run command; Stop closes isolate | Lives with matching layers; **one isolate per `extensionId`** |
 | Delivery | `artifactUrl` + `contentHash`, or pushed `source` | Prefer pushed `source` via parent `widget:source` |
 
-Widgets use `defineCanvasComponent` / `defineHtmlComponent` from `@xmazu/openenvxee-extensions`. The host expands (`renderWidgetFace`), maps the tree to layers, and stores under `data.children`. **Persistent state is host `data.values`**. See [widget-bridge.md](widget-bridge.md).
+Widgets use `defineCanvasComponent` / `defineHtmlComponent` from `@openenvx/editor-sandbox`. The host expands (`renderWidgetFace`), maps the tree to layers, and stores under `data.children`. **Persistent state is host `data.values`**. See [widget-bridge.md](widget-bridge.md).
 
 ## Comparison
 
 |  | Internal | Sandbox |
 | --- | --- | --- |
 | Runs where | Same JS bundle | QuickJS Worker isolate |
-| Authors with | OOP `Plugin` + builders (monorepo / future host façade) | `@xmazu/openenvxee-extensions` + `openenvx.*` in isolate |
+| Authors with | OOP `Plugin` + builders (monorepo / future host façade) | `@openenvx/editor-sandbox` + `openenvx.*` in isolate |
 | Mutation | Direct register / workbench API | Allowlisted `executeCommand` + widget `values` |
 | UI | Builders → descriptors → renderers | Sandboxed iframe or widget face layers |
 
@@ -39,24 +39,24 @@ Widgets use `defineCanvasComponent` / `defineHtmlComponent` from `@xmazu/openenv
 
 ```text
 WorkbenchShell mountExternalHosts
-  → SandboxExtensionHost (workbench)
-  → ExternalHostMount.mountSandbox (core)
-  → SandboxHostSurface
+  → mountSandboxExtensions (@openenvx/editor-sandbox/host)
+  → SandboxExtensionHost + SandboxHostSurface (built from WorkbenchApi)
 ```
 
-Studio’s `createSandboxExtensionHost` binds canvas widget clicks without workbench importing canvas.
+Product studios (`createHtmlSandboxExtensionHost`, canvas equivalents) bind engine-specific widget faces without `@openenvx/workbench` importing canvas/html.
 
 ## Package map
 
 | Concern | Package |
 | --- | --- |
-| Author SDK (protocol subpath, elements, defineExtension, Vite) | `@xmazu/openenvxee-extensions` |
-| Host: tree → builders, `ExternalHostMount`, sandbox surface | `@openenvx/core` |
-| Host: QuickJS runtime, `showUI`, sandbox chrome | `@openenvx/workbench` |
-| Canvas widget seam + default plugins | `@xmazu/openenvxee-studio` (`packages/studio`) |
+| Author SDK (protocol, elements, defineExtension, Vite) | `@openenvx/editor-sandbox` |
+| Host runtime (QuickJS, `SandboxExtensionHost`, panel-tree → contributions) | `@openenvx/editor-sandbox/host` |
+| Workbench shell (renders contributions only) | `@openenvx/workbench` |
+| Scene / controller | `@openenvx/core` |
+| Canvas/HTML widget face mapping | `@openenvx/canvas`, `@openenvx/html` (import `./protocol` types only) |
 | Internal OOP plugins | `core` / product plugins |
 
-**Boundary:** `@xmazu/openenvxee-extensions` is author-facing only. Hosts import `@xmazu/openenvxee-extensions/protocol` for validators; rendering stays in workbench + canvas/html.
+**Boundary:** Extension authors use `@openenvx/editor-sandbox`. Hosts opt in via `@openenvx/editor-sandbox/host` on `mountExternalHosts`. `@openenvx/workbench` and `@openenvx/core` have no sandbox runtime coupling.
 
 ## Author guides
 

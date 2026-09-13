@@ -11,9 +11,9 @@ Maintainer reference for building and publishing packages that leave this reposi
 | `@openenvx/html-studio` | npmjs (`registry.npmjs.org`, public) | Minified `dist/` ESM + CSS - `HtmlEditor` + host composition API + `./runtime` (`renderBlockDocument`) + `./theme.css` |
 | `@openenvx/email-studio` | npmjs (`registry.npmjs.org`, public) | Minified `dist/` ESM + CSS - `EmailEditor` + `./runtime` (`renderEmailHtml`) + `./theme.css` |
 | `@openenvx/canvas-studio` | npmjs (`registry.npmjs.org`, public) | Minified `dist/` ESM + CSS - `CanvasEditor` + `./runtime` (`createCanvasScene`) + `./theme.css` + `./fonts.css` |
-| `@xmazu/openenvxee-extensions` | GitHub Packages (`npm.pkg.github.com`, restricted) | Sandbox author SDK - **not** part of the automated npm release workflow |
+| `@openenvx/editor-sandbox` | GitHub Packages (`npm.pkg.github.com`, restricted) | Sandbox author SDK - **not** part of the automated npm release workflow |
 
-Scene model, preview descriptors, and editor runtime live in workspace `@openenvx/core` (`./schema`, `./preview`, `.`, `./react`). They are **not** published separately. Monorepo hosts use `@openenvx/canvas` / `@openenvx/html` / `@openenvx/driver-email` + `@openenvx/workbench` (HMR). Product host allowlists live on unpublished `@xmazu/openenvxee-studio` (`packages/studio`).
+Scene model, preview descriptors, and editor runtime live in workspace `@openenvx/core` (`./schema`, `./preview`, `.`, `./react`). They are **not** published separately. Monorepo hosts use `@openenvx/canvas` / `@openenvx/html` / `@openenvx/driver-email` + `@openenvx/workbench` (HMR). Product host allowlists live on unpublished `@openenvx/canvas-studio` (`packages/studio`).
 
 Canvas raster/PDF export lives in workspace `@openenvx/canvas` (`./export` for browser PNG/JPG, `./export/node` for Node PNG/JPG/PDF). It is **not** bundled into published `@openenvx/canvas-studio`.
 
@@ -23,7 +23,7 @@ Everything else stays workspace-private and resolves from `src/` during local de
 
 ## License
 
-OpenEnvx Editor is [Mozilla Public License 2.0](LICENSE) (MPL-2.0). The three npm studio packages and `@xmazu/openenvxee-extensions` declare `MPL-2.0` in `package.json`. Private product packages (`packages/studio`, `packages/agent`) remain proprietary (`UNLICENSED`).
+OpenEnvx Editor is [Mozilla Public License 2.0](LICENSE) (MPL-2.0). The three npm studio packages and `@openenvx/editor-sandbox` declare `MPL-2.0` in `package.json`. Private product packages (`packages/studio`, `packages/agent`) remain proprietary (`UNLICENSED`).
 
 ## Versioning
 
@@ -139,10 +139,10 @@ Published canvas editor. Subpaths: `.`, `./runtime`, `./theme.css`, `./fonts.css
 npm install @openenvx/canvas-studio
 ```
 
-### `@xmazu/openenvxee-extensions`
+### `@openenvx/editor-sandbox`
 
-Published separately to GitHub Packages (restricted `@xmazu` scope). Hosts import `@xmazu/openenvxee-extensions/protocol` only.
+Published separately when released. Authors use `.` and element subpaths; hosts opt in via `@openenvx/editor-sandbox/host` on `mountExternalHosts`.
 
 ## External consumers
 
-Legacy pins on `@xmazu/openenvxee-schema`, `@xmazu/openenvxee-preview`, `@xmazu/openenvxee-studio`, or `@xmazu/openenvxee-html-studio` are no longer published from this repo. Migrate to `@openenvx/html-studio` / inlined core as appropriate, or vendor Scene helpers - **not** by publishing `@openenvx/core`.
+Legacy pins on `@openenvx/core/schema`, `@openenvx/core/preview`, `@openenvx/canvas-studio`, or `@openenvx/html-studio` are no longer published from this repo. Migrate to `@openenvx/html-studio` / inlined core as appropriate, or vendor Scene helpers - **not** by publishing `@openenvx/core`.

@@ -63,7 +63,7 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 | --- | --- |
 | `@openenvx/core` | Scene (`./schema`), preview IR (`./preview`), `Command`, `Plugin`, `EditorRuntime`, `WorkbenchController`, workbench contributions, `./react` |
 | `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasPlugin`, `CanvasEditor`, `CanvasHostProvider` |
-| `@xmazu/openenvxee-extensions` | Sandbox author SDK: `./protocol`, element subpaths, `defineExtension`, Vite (`@xmazu/openenvxee-extensions/protocol` for hosts) |
+| `@openenvx/editor-sandbox` | Sandbox author SDK (`./protocol`, element subpaths, `defineExtension`, Vite) + host runtime (`./host`) + canvas widget face bridge (`./canvas-widget`) |
 
 ### Canvas rule (non-negotiable)
 
@@ -82,11 +82,10 @@ Internal workspace libraries (`core`, `canvas`, `workbench`, `agent`, …) are *
 
 Published packages:
 
-- **`@xmazu/openenvxee-extensions`** - published sandbox author SDK: `./protocol`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts import **`@xmazu/openenvxee-extensions/protocol`** only.
+- **`@openenvx/editor-sandbox`** - published sandbox SDK: `./protocol`, `./host`, `./canvas-widget`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts opt in via **`@openenvx/editor-sandbox/host`** on `mountExternalHosts`; canvas faces map via **`@openenvx/editor-sandbox/canvas-widget`** (`applyWidgetFace`).
 - **`@openenvx/html-studio`** - published HTML editor (public npm, MPL-2.0). Drop-in `HtmlEditor` + host composition API + `./runtime` (`renderBlockDocument`); inlines private core/html/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
 - **`@openenvx/email-studio`** - published email editor (public npm, MPL-2.0). Drop-in `EmailEditor` + `createEmailScene` + `renderEmailHtml`; inlines private core/html/driver-email/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
 - **`@openenvx/canvas-studio`** - published canvas editor (public npm, MPL-2.0). Drop-in `CanvasEditor` + `createCanvasScene`; inlines private core/canvas/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`, `./fonts.css`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@xmazu/openenvxee-studio`** - unpublished proprietary canvas host allowlist (`packages/studio`). Monorepo canvas demos use `@openenvx/canvas` + `@openenvx/workbench` directly.
 
 ## Host sidebar panels (product hosts)
 
@@ -228,7 +227,7 @@ bun run changelog     # preview unreleased changelog (git-cliff)
 
 ## Publishing
 
-Only `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-studio` are published via the GitHub Actions **Release** workflow (see [PUBLISHING.md](PUBLISHING.md)). `@xmazu/openenvxee-extensions` publishes separately to GitHub Packages.
+Only `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-studio` are published via the GitHub Actions **Release** workflow (see [PUBLISHING.md](PUBLISHING.md)). `@openenvx/editor-sandbox` may publish separately when released.
 
 ## Before you finish
 

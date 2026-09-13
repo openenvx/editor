@@ -83,7 +83,7 @@ async function buildSandboxWorker(): Promise<void> {
   await mkdir(distRoot, { recursive: true });
   await esbuild.build({
     entryPoints: [
-      path.join(packagesRoot, 'workbench/src/sandbox/quickjs.worker.ts'),
+      path.join(packagesRoot, 'editor-sandbox/src/host/quickjs.worker.ts'),
     ],
     outfile: outFile,
     bundle: true,
@@ -109,7 +109,7 @@ export default defineConfig({
   clean: true,
   outDir: 'dist',
   tsconfig: 'tsconfig.build.json',
-  noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/],
+  noExternal: [/^@openenvx\//],
   external: [
     ...Object.keys(pkg.dependencies),
     ...Object.keys(pkg.peerDependencies),

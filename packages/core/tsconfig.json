@@ -5,9 +5,7 @@
     "lib": ["ESNext", "DOM"],
     "strictNullChecks": true,
     "baseUrl": ".",
-    "paths": {
-      "@xmazu/openenvxee-extensions/protocol": ["../extensions/src/protocol/index.ts"]
-    }
+    "paths": {}
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/schema/generate-json-schema.ts"]

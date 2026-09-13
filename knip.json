@@ -42,10 +42,13 @@
         "!src/**/*.test.ts"
       ]
     },
-    "packages/extensions": {
+    "packages/editor-sandbox": {
       "entry": [
         "src/index.ts!",
-        "src/protocol/index.ts!"
+        "src/protocol/index.ts!",
+        "src/host/index.ts!",
+        "src/host/quickjs.worker.ts!",
+        "src/canvas-widget/index.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
@@ -74,8 +77,7 @@
     },
     "packages/workbench": {
       "entry": [
-        "src/index.ts!",
-        "src/sandbox/quickjs.worker.ts!"
+        "src/index.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
@@ -168,7 +170,7 @@
         "zod",
         "@openenvx/core",
         "@openenvx/workbench",
-        "@xmazu/openenvxee-extensions"
+        "@openenvx/editor-sandbox"
       ]
     },
     "packages/html": {
@@ -243,7 +245,7 @@
         "react-colorful",
         "react-i18next",
         "zod",
-        "@xmazu/openenvxee-extensions"
+        "@openenvx/editor-sandbox"
       ]
     },
     "packages/canvas-studio": {
@@ -286,8 +288,7 @@
         "react-colorful",
         "react-i18next",
         "react-konva",
-        "zod",
-        "@xmazu/openenvxee-extensions"
+        "zod"
       ]
     },
     "apps/demo-playground": {

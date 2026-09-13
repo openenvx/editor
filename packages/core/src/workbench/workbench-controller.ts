@@ -16,7 +16,6 @@ import {
   EditorDiagnosticsServiceImpl,
   type EditorDiagnosticsService,
 } from '../diagnostics/editor-diagnostics-service';
-import { ExternalHostMount } from '../external-host/external-host-mount';
 import { Registry } from '../registries/registry';
 import { ViewProviderRegistryImpl } from '../registries/view-provider-registry';
 import type { WorkbenchProviderRegistries } from '../registries/workbench-provider-registries';
@@ -54,7 +53,6 @@ import { setNestedValue } from '../utils/nested-value';
 import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
 import { EditorService } from '../workbench/editor-service';
 import type { EditorInput } from '../workbench/editor-service';
-import { IconRegistryId } from '../workbench/icon-registry-service-id';
 import { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
 import type { ConfirmDialogOptions } from './dialog-registrations';
 import { DialogServiceImpl, DialogServiceId } from './dialog-service';
@@ -122,8 +120,6 @@ export class WorkbenchController {
     string,
     WorkbenchContributionDisposable[]
   >();
-  /** External hosts (sandbox / embed) - separate from PluginManager. */
-  private readonly externalHosts: ExternalHostMount;
   private applyingLayoutSnapshot = false;
   private readonly diagnostics: EditorDiagnosticsService;
 
@@ -158,29 +154,6 @@ export class WorkbenchController {
     this.runtime.services.registerInstance(DialogServiceId, this.dialogService);
     this.manager = new PluginManager(this.runtime);
     this.registerCoreServices();
-    this.externalHosts = new ExternalHostMount({
-      getSceneStore: () => this.runtime.getScene(),
-      getEvents: () => this.runtime.getEvents(),
-      runCommand: async (commandId, args) => {
-        const result = await this.runCommand(commandId, args);
-        return { executed: result.executed };
-      },
-      registerCommand: (command) => {
-        this.manager.getRegistries().commands.register(command);
-      },
-      unregisterCommand: (commandId) => {
-        this.manager.getRegistries().commands.unregister(commandId);
-      },
-      onCommandsChanged: () => {
-        this.stateCache.invalidateCommands();
-        this.notify();
-      },
-      registerWorkbenchContributions: (...contributions) =>
-        this.registerWorkbenchContributions(...contributions),
-      viewPanelRegistry: this.providerRegistries.viewPanelRegistry,
-      iconRegistry: this.runtime.services.get(IconRegistryId),
-      onContributionsChanged: () => this.invalidateContributions(),
-    });
     this.syncLayoutContextKeys();
     this.wireStateRefresh();
   }
@@ -315,7 +288,6 @@ export class WorkbenchController {
       getService: (token) => this.getService(token),
       registerWorkbenchContributions: (...contributions) =>
         this.registerWorkbenchContributions(...contributions),
-      mountSandboxHost: (activate) => this.externalHosts.mountSandbox(activate),
       getSnapshot: () => this.getState(),
       loadScene: (scene) => this.loadScene(scene),
       moveViewItem: (viewId, source, target, position) =>
@@ -891,7 +863,6 @@ export class WorkbenchController {
       return;
     }
     this.disposed = true;
-    this.externalHosts.dispose();
     this.detachKeybindings?.();
     this.detachKeybindings = null;
     for (const dispose of this.eventDisposables) {

@@ -48,7 +48,7 @@ Author how-to (under `docs/architecture/`):
 | Tier | Packages | License / publish | Responsibility |
 | --- | --- | --- | --- |
 | Foundation | `schema`, `preview`, `core` | Workspace packages; MPL-2.0 | Scene model (Zod + JSON Schema), plugin host primitives |
-| Embed / sandbox protocol | `extensions` (`@xmazu/openenvxee-extensions`, `./protocol` subpath) | Published package, MPL-2.0; registry access may vary | `RenderNode`, manifests, validators, sandbox grants |
+| Sandbox extensions | `editor-sandbox` (`@openenvx/editor-sandbox`, `./protocol`, `./host`) | Published package, MPL-2.0 | Author SDK, protocol validators, optional QuickJS host runtime |
 | Product libs | `canvas`, `html`, `driver-email`, `workbench`, `agent` | Workspace packages; package licenses apply | Canvas editor, HTML editor, email driver, React shell, agent |
 | Published product | `@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio` | Public npm, MPL-2.0 | Drop-in editors for open-source hosts |
 
@@ -57,17 +57,17 @@ Author how-to (under `docs/architecture/`):
 | Put it here | Examples |
 | --- | --- |
 | `@openenvx/core` (`./schema`) | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
-| `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry`, `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context, external host mount surfaces |
+| `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry`, `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context |
 | `@openenvx/canvas` | Konva stage, layers, renderers, `CanvasPlugin`, `CanvasEditor` |
 | `@openenvx/html` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |
 | `@openenvx/driver-email` | Email blocks, `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument`, `renderEmailHtml` |
 | `@openenvx/variables` | Opt-in `VariablesPlugin` (catalog sidebar + edit dialog); `./tiptap` chip/suggest helpers |
-| `@openenvx/workbench` | `WorkbenchShell`, field renderers, sandbox/embed hosts |
-| `@xmazu/openenvxee-studio` | Published fat bundle of canvas host allowlist (unpublished from this repo) |
+| `@openenvx/workbench` | `WorkbenchShell`, field renderers, layout chrome (`mountExternalHosts` seam only) |
+| `@openenvx/canvas-studio` | Published fat bundle of canvas host allowlist (unpublished from this repo) |
 | `@openenvx/canvas-studio` | Published canvas drop-in (`CanvasEditor`, `createCanvasScene`; minified `dist/` + `./runtime`) |
 | `@openenvx/html-studio` | Published HTML drop-in (`HtmlEditor`, host composition API; minified `dist/` + `./runtime`) |
 | `@openenvx/email-studio` | Published email editor (`EmailEditor`, `createEmailScene`, `renderEmailHtml`; minified `dist/` + `./runtime`) |
-| `@xmazu/openenvxee-extensions` | Sandbox author SDK (`./protocol`, `/canvas`, `/html`, `/panel`, Vite) |
+| `@openenvx/editor-sandbox` | Sandbox author SDK + host (`./protocol`, `./host`, `/canvas`, `/html`, `/panel`, Vite) |
 
 ## Contribution flow (sketch)
 

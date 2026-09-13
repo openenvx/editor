@@ -3,11 +3,11 @@ import type { Layer } from '@openenvx/core/schema';
 import type {
   RenderChild,
   RenderNode,
-} from '@xmazu/openenvxee-extensions/protocol';
+} from '@openenvx/editor-sandbox/protocol';
 import {
   validateWidgetTree,
   WIDGET_BLOCK_ESCAPE_TYPES,
-} from '@xmazu/openenvxee-extensions/protocol';
+} from '@openenvx/editor-sandbox/protocol';
 
 export interface MapWidgetHtmlTreeOptions {
   /** Id prefix for generated layers (usually the widget layer id). */

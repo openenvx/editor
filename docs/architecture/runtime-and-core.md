@@ -17,7 +17,7 @@ Plugin host primitives and the editor runtime. **No** canvas types, Konva, workb
 | `PropertyBuilder` | Layer property field/section descriptors (`LayerDefinition.properties()`) |
 | `Registry<K, V>` | Keyed runtime registrations (distinct from static contributions and DI services) |
 
-## Scene document (`@xmazu/openenvxee-schema`)
+## Scene document (`@openenvx/core/schema`)
 
 Canonical content Scene JSON is Zod v4 (`sceneSchemaLenient` / `sceneSchemaCanonical`). Defaults, `validateScene` / `normalizeScene`, and published `scene.schema.json` come from that schema.
 

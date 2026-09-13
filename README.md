@@ -52,7 +52,7 @@ Each editor includes a `runtime` entry point for headless scene creation or rend
 | Build a custom editor shell | `@openenvx/core` plus `@openenvx/canvas` or `@openenvx/html` |
 | Render or automate documents | A package's `runtime` entry point |
 | Add trusted in-process features | The plugin and contribution APIs |
-| Build isolated widgets or panels | [`@xmazu/openenvxee-extensions`](packages/extensions/README.md) |
+| Build isolated widgets or panels | [`@openenvx/editor-sandbox`](packages/editor-sandbox/README.md) |
 
 ## Repository layout
 

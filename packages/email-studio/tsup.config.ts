@@ -96,7 +96,7 @@ export default defineConfig({
   clean: true,
   outDir: 'dist',
   tsconfig: 'tsconfig.build.json',
-  noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/],
+  noExternal: [/^@openenvx\//],
   // Leave third-party packages to the host bundler. This avoids esbuild's
   // dynamic-require wrapper when a dependency exposes only a CommonJS build.
   external: [

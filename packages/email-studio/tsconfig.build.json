@@ -23,7 +23,9 @@
       "@openenvx/html/runtime": ["../html/src/runtime.ts"],
       "@openenvx/driver-email": ["../driver-email/src/index.ts"],
       "@openenvx/driver-email/runtime": ["../driver-email/src/runtime.ts"],
-      "@openenvx/workbench": ["../workbench/src/index.ts"]
+      "@openenvx/workbench": ["../workbench/src/index.ts"],
+      "@openenvx/editor-sandbox/host": ["../editor-sandbox/src/host/index.ts"],
+      "@openenvx/editor-sandbox/protocol": ["../editor-sandbox/src/protocol/index.ts"]
     }
   }
 }

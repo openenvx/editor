@@ -10,7 +10,7 @@ import styles from './sheet.module.css';
 
 export type SheetSide = 'left' | 'right';
 
-/** @xmazu / BeyondCanvas Sheet root (`@radix-ui/react-dialog`). */
+/** Sheet root (`@radix-ui/react-dialog`). */
 export function Sheet(props: SheetPrimitive.DialogProps) {
   return <SheetPrimitive.Root {...props} />;
 }

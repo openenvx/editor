@@ -85,9 +85,8 @@ export interface WorkbenchShellProps {
     editorPaneKind: string;
   }) => ReactNode;
   /**
-   * Mount external hosts (sandbox / embed) after start - off PluginManager.
-   * Memoize the callback; shell mounts once. Call `mountSandboxExtensions` /
-   * `mountSandboxExtensions` inside and return a combined disposer.
+   * Mount external hosts (e.g. `@openenvx/editor-sandbox/host`) after start -
+   * off PluginManager. Memoize the callback; shell mounts once.
    */
   mountExternalHosts?: (api: WorkbenchApi) => () => void;
 }

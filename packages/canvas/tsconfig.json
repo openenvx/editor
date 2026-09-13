@@ -3,7 +3,8 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "resolveJsonModule": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "baseUrl": "."
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]

@@ -1,0 +1,14 @@
+{
+  "extends": "@openenvx/typescript-config/base.json",
+  "include": ["src/host", "../typescript-config/css-modules.d.ts"],
+  "exclude": ["src/host/**/*.test.ts", "src/host/**/*.test.tsx"],
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@openenvx/core": ["../core/src/index.ts"],
+      "@openenvx/core/schema": ["../core/src/schema/index.ts"]
+    }
+  }
+}

@@ -1,0 +1,182 @@
+import { describe, expect, it } from 'vitest';
+import { SANDBOX_BRIDGE_SOURCE } from '../protocol';
+
+import { createQuickJsEngine } from './quickjs-isolate-engine';
+import { createQuickJsIsolate } from './quickjs-runtime';
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+describe('QuickJS isolate', () => {
+  it('runs extension code in-process only when preferInProcess is set', async () => {
+    const isolate = await createQuickJsIsolate({
+      preferInProcess: true,
+      onHostCall: async (request) => ({
+        source: SANDBOX_BRIDGE_SOURCE,
+        v: 1,
+        id: request.id,
+        ok: true,
+        result: { pageId: 'page-1' },
+      }),
+    });
+
+    await isolate.evalModule(`
+      globalThis.__result = null;
+      openenvx.getPageId().then((pageId) => {
+        globalThis.__result = pageId;
+      });
+    `);
+
+    await delay(50);
+    isolate.dispose();
+  });
+
+  it('refuses missing worker without preferInProcess', async () => {
+    await expect(
+      createQuickJsIsolate({
+        workerUrl: 'http://127.0.0.1:9/openenvx-missing-sandbox-worker.js',
+        onHostCall: async (request) => ({
+          source: SANDBOX_BRIDGE_SOURCE,
+          v: 1,
+          id: request.id,
+          ok: true,
+          result: null,
+        }),
+      })
+    ).rejects.toThrow(/Sandbox (requires a Web Worker|worker)|ModuleNotFound|BuildMessage/);
+  }, 20_000);
+
+  it('engine bootstrap exposes openenvx API', async () => {
+    const calls: string[] = [];
+    const engine = await createQuickJsEngine({
+      onHostCall: async (request) => {
+        calls.push(request.method);
+        return {
+          source: SANDBOX_BRIDGE_SOURCE,
+          v: 1,
+          id: request.id,
+          ok: true,
+          result: null,
+        };
+      },
+    });
+    await engine.evalModule(`openenvx.notify('hi');`);
+    await delay(50);
+    expect(calls).toContain('notify');
+    engine.dispose();
+  });
+
+  it('interrupts tight loops with CPU limit', async () => {
+    const engine = await createQuickJsEngine({
+      cpuLimitMs: 50,
+      onHostCall: async (request) => ({
+        source: SANDBOX_BRIDGE_SOURCE,
+        v: 1,
+        id: request.id,
+        ok: true,
+        result: null,
+      }),
+    });
+    await expect(
+      engine.evalModule('while (true) {}')
+    ).rejects.toThrow(/Sandbox CPU (limit|budget) exceeded/);
+    engine.dispose();
+  }, 10_000);
+
+  it('enforces cumulative CPU budget across async host calls', async () => {
+    const engine = await createQuickJsEngine({
+      cpuLimitMs: 200,
+      cpuBudgetPerWindowMs: 100,
+      evalTimeoutMs: 3000,
+      onHostCall: async (request) => ({
+        source: SANDBOX_BRIDGE_SOURCE,
+        v: 1,
+        id: request.id,
+        ok: true,
+        result: null,
+      }),
+    });
+    await expect(
+      engine.evalModule(`
+        (async function () {
+          for (var i = 0; i < 20; i++) {
+            await openenvx.getSelection();
+          }
+        })()
+      `)
+    ).rejects.toThrow(/Sandbox CPU budget exceeded/);
+    engine.dispose();
+  }, 10_000);
+
+  it('keeps the isolate usable after an ordinary eval failure', async () => {
+    const engine = await createQuickJsEngine({
+      onHostCall: async (request) => ({
+        source: SANDBOX_BRIDGE_SOURCE,
+        v: 1,
+        id: request.id,
+        ok: true,
+        result: null,
+      }),
+    });
+    await expect(engine.evalModule('throw new Error("boom")')).rejects.toThrow(
+      /Sandbox eval failed:.*boom/
+    );
+    await engine.evalModule(`globalThis.__recovered = 1;`);
+    const recovered = await engine.evalModule(`globalThis.__recovered`);
+    expect(recovered).toBe(1);
+    engine.dispose();
+  }, 10_000);
+
+  it('delivers UI messages to openenvx.ui.onmessage', async () => {
+    const engine = await createQuickJsEngine({
+      onHostCall: async (request) => ({
+        source: SANDBOX_BRIDGE_SOURCE,
+        v: 1,
+        id: request.id,
+        ok: true,
+        result: null,
+      }),
+    });
+    await engine.evalModule(`
+      globalThis.__uiMsgs = [];
+      openenvx.ui.onmessage = function (msg) {
+        globalThis.__uiMsgs.push(msg);
+      };
+    `);
+    engine.deliverUiMessage({ type: 'ping', n: 1 });
+    await engine.evalModule(`
+      if (!globalThis.__uiMsgs || globalThis.__uiMsgs.length !== 1) {
+        throw new Error('ui message not delivered');
+      }
+      if (globalThis.__uiMsgs[0].type !== 'ping' || globalThis.__uiMsgs[0].n !== 1) {
+        throw new Error('ui message payload mismatch');
+      }
+    `);
+    engine.dispose();
+  });
+
+  it('routes openenvx.ui.postMessage through postToUI host call', async () => {
+    const calls: { method: string; params: unknown }[] = [];
+    const engine = await createQuickJsEngine({
+      onHostCall: async (request) => {
+        calls.push({ method: request.method, params: request.params });
+        return {
+          source: SANDBOX_BRIDGE_SOURCE,
+          v: 1,
+          id: request.id,
+          ok: true,
+          result: null,
+        };
+      },
+    });
+    await engine.evalModule(`openenvx.ui.postMessage({ type: 'hello' });`);
+    await delay(50);
+    expect(calls.some((c) => c.method === 'postToUI')).toBe(true);
+    const post = calls.find((c) => c.method === 'postToUI');
+    expect(post?.params).toEqual({ pluginMessage: { type: 'hello' } });
+    engine.dispose();
+  });
+});

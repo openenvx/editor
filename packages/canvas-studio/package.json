@@ -82,7 +82,6 @@
     "@openenvx/workbench": "workspace:*",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@xmazu/openenvxee-extensions": "workspace:*",
     "esbuild": "^0.25.0",
     "lightningcss": "^1.32.0",
     "rollup": "^4.57.0",

@@ -1,7 +1,6 @@
 export { WorkbenchController } from './workbench/workbench-controller';
 export { bootstrapWorkbenchServices } from './workbench/bootstrap-workbench-services';
 export type { WorkbenchServiceDeps } from './workbench/bootstrap-workbench-services';
-export type { SandboxHostSurface } from './external-host/sandbox-host-surface';
 export {
   type WorkbenchApi,
   type WorkbenchControllerOptions,
@@ -276,37 +275,4 @@ export { VersionHistoryProviderId } from './version-history/version-history-serv
 export { getNestedValue, setNestedValue } from './utils/nested-value';
 export { isTypingTarget } from './utils/is-typing-target';
 
-export { mapPluginTreeToPropertyPane } from './panel-tree/map-plugin-tree-to-property-pane';
-export {
-  mapPluginTreeToMenu,
-  contributePluginTreeToMenu,
-} from './panel-tree/map-plugin-tree-to-menu';
-export {
-  mapPluginTreeToToolbar,
-  contributePluginTreeToToolbar,
-} from './panel-tree/map-plugin-tree-to-toolbar';
-export {
-  mapPluginTreeToStatusBar,
-  contributePluginTreeToStatusBar,
-} from './panel-tree/map-plugin-tree-to-status-bar';
-export {
-  mapPluginTreeToPalette,
-  contributePluginTreeToPalette,
-} from './panel-tree/map-plugin-tree-to-palette';
-export {
-  createManifestContributions,
-  type CreateManifestContributionsResult,
-  type CreateManifestContributionsOptions,
-} from './panel-tree/create-manifest-contributions';
-export {
-  createExtensionContributions,
-  intersectExtensionPermissions,
-  type CreateExtensionContributionsResult,
-  type CreateExtensionContributionsOptions,
-} from './panel-tree/create-extension-contributions';
-export { extensionSurfaceStore } from './panel-tree/extension-surface-store';
-export {
-  extensionBlockStore,
-  type ExtensionBlockPaletteEntry,
-} from './panel-tree/extension-block-store';
 export type { WorkbenchContributionDisposable } from './registries/workbench-registries';

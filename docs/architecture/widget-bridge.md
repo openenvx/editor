@@ -11,7 +11,7 @@ Related: [extensions.md](extensions.md), [Plugin-boundaries.md](../../Plugin-bou
 | Persistent widget state | **Host document** - `openenvx.widget` layer `data.values` | Survives reload / export; Inspector edits this |
 | Face expand (Preact → `RenderNode`) | **QuickJS isolate** | Host calls `renderWidgetFace`; isolate must not own document truth |
 | Handler functions | **Isolate** (ephemeral) | Serialized as ids on `data.handlers`; invoked back into QuickJS |
-| Map tree → scene layers | **Host** (`applyWidgetFace` / HTML twin) | AutoLayout / flex resolved on host |
+| Map tree → scene layers | **Host** (`@openenvx/editor-sandbox/canvas-widget` `applyWidgetFace` / HTML twin) | AutoLayout / flex resolved on host |
 | Paint (Konva / HTML) | **Host canvas / HTML engine** | Ordinary layers under `data.children` |
 | `openenvx.*` bridge | **Workbench** injects into isolate only | Never available in `showUI` iframe or editor main world |
 
@@ -68,10 +68,11 @@ flowchart LR
 
 | Package | Role |
 | --- | --- |
-| `@xmazu/openenvxee-extensions` | Preact vocabulary only (`/canvas` `/html` `/panel`) |
-| `@xmazu/openenvxee-extensions` | `define*`, props, `renderToElementTree`, Vite packaging, ambient `openenvx` types |
-| `@openenvx/workbench` sandbox | Inject `openenvx.*`, capability bridge, `renderWidgetFace` |
-| `@xmazu/openenvxee-extensions/protocol` | `RenderNode`, manifests, grants |
+| `@openenvx/editor-sandbox` | Preact vocabulary only (`/canvas` `/html` `/panel`) |
+| `@openenvx/editor-sandbox` | `define*`, props, `renderToElementTree`, Vite packaging, ambient `openenvx` types |
+| `@openenvx/editor-sandbox/host` | Inject `openenvx.*`, capability bridge, `renderWidgetFace` |
+| `@openenvx/editor-sandbox/canvas-widget` | `applyWidgetFace`, `mapWidgetTreeToLayers`, layout resolver for canvas faces |
+| `@openenvx/editor-sandbox/protocol` | `RenderNode`, manifests, grants |
 
 Demo apps import widgets as `openenvx-widget:./foo.widget.tsx` (IIFE **string**). The host React app never executes the widget; the isolate never sees a browser DOM.
 
@@ -128,11 +129,11 @@ flowchart TB
 
 | Subpath | Vocabulary | Maps to |
 | --- | --- | --- |
-| `@xmazu/openenvxee-extensions/canvas` | `Stack`, `Row`, `Grid`, `Rect`, `Text`, … | canvas layers |
-| `@xmazu/openenvxee-extensions/html` | `Section`, `Row`, `Column`, `Heading`, … | html.* blocks |
-| `@xmazu/openenvxee-extensions/panel` | `Pane`, `Menu`, `Toolbar`, … | workbench chrome / inspector |
+| `@openenvx/editor-sandbox/canvas` | `Stack`, `Row`, `Grid`, `Rect`, `Text`, … | canvas layers |
+| `@openenvx/editor-sandbox/html` | `Section`, `Row`, `Column`, `Heading`, … | html.* blocks |
+| `@openenvx/editor-sandbox/panel` | `Pane`, `Menu`, `Toolbar`, … | workbench chrome / inspector |
 
-All emit the same `{ type, props, children }` envelope (`RenderNode` in `@xmazu/openenvxee-extensions/protocol`). Expand via `@xmazu/openenvxee-extensions` (`renderToElementTree` / `renderPanelTree`). Embed parents may send plain JSON trees without Preact.
+All emit the same `{ type, props, children }` envelope (`RenderNode` in `@openenvx/editor-sandbox/protocol`). Expand via `@openenvx/editor-sandbox` (`renderToElementTree` / `renderPanelTree`). Embed parents may send plain JSON trees without Preact.
 
 ## Grants from manifest
 

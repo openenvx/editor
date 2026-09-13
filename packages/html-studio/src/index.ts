@@ -1,14 +1,14 @@
 import type { Layer } from '@openenvx/core';
 import {
+  SandboxExtensionHost,
+  type SandboxExtensionHostOptions,
+} from '@openenvx/editor-sandbox/host';
+import {
   applyHtmlWidgetFace,
   HtmlBlocksPlugin,
   setOpenEnvxHtmlWidgetClickHandler,
 } from '@openenvx/html';
 import { VariablesPlugin } from '@openenvx/variables';
-import {
-  SandboxExtensionHost,
-  type SandboxExtensionHostOptions,
-} from '@openenvx/workbench';
 
 export { HtmlEditor, type HtmlEditorProps } from './html-editor';
 
@@ -45,10 +45,13 @@ export {
   workbenchPlBundle,
   WorkbenchShell,
   type WorkbenchShellProps,
+} from '@openenvx/workbench';
+
+export {
   SandboxExtensionHost,
   mountSandboxExtensions,
   type SandboxExtensionHostOptions,
-} from '@openenvx/workbench';
+} from '@openenvx/editor-sandbox/host';
 
 /** Sandbox host wired for HTML widget faces. */
 export function createHtmlSandboxExtensionHost(

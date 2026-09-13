@@ -1,6 +1,6 @@
 # Studio & products
 
-**Audience:** Contributors and integrators. Packages: `@openenvx/canvas-studio`, `@xmazu/openenvxee-studio`, `@openenvx/html-studio`, `@openenvx/email-studio`, and the apps that consume them.
+**Audience:** Contributors and integrators. Packages: `@openenvx/canvas-studio`, `@openenvx/canvas-studio`, `@openenvx/html-studio`, `@openenvx/email-studio`, and the apps that consume them.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -12,7 +12,7 @@ Host product apps (dashboard Studio, embed host, demos) should not wire every pr
 2. Inline private deps into published `dist/` where applicable
 3. Ship a default plugin list + sandbox factory helpers
 
-Publishing details: [PUBLISHING.md](../../PUBLISHING.md). Public MPL-2.0 drop-ins: `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-studio`. The extension SDK is MPL-2.0 licensed but may use a restricted registry. `@xmazu/openenvxee-studio` remains a private product integration.
+Publishing details: [PUBLISHING.md](../../PUBLISHING.md). Public MPL-2.0 drop-ins: `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-studio`. The extension SDK is MPL-2.0 licensed but may use a restricted registry. `@openenvx/canvas-studio` remains a private product integration.
 
 ## `@openenvx/canvas-studio` (canvas product - published)
 
@@ -31,7 +31,7 @@ import '@openenvx/canvas-studio/fonts.css';
 
 Monorepo HMR stays on `@openenvx/canvas` + `@openenvx/workbench` (`apps/canvas-demo`). The published bundle is exercised by `apps/canvas-package-demo` (`bun run dev:canvas-package`).
 
-## `@xmazu/openenvxee-studio` (canvas product - proprietary host allowlist)
+## `@openenvx/canvas-studio` (canvas product - proprietary host allowlist)
 
 Unpublished fat bundle source in `packages/studio`. Curated host allowlist: `WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, `createSandboxExtensionHost`, layout/property helpers. External product hosts that need the full allowlist install the GitHub Packages build when published from product repos.
 

@@ -12,7 +12,6 @@ import type {
   TreeItemAction,
 } from '../contributions/view-contribution';
 import type { Plugin } from '../core/plugin';
-import type { SandboxHostSurface } from '../external-host/sandbox-host-surface';
 import type { LayerPreviewDescriptor } from '../preview/layer-preview';
 import type { PropertyLayoutNode } from '../properties/property-layout-node';
 import type { PropertyValuePath } from '../properties/property-value-path';
@@ -195,20 +194,12 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   toggleSecondarySidebar: () => void;
   getService: <T>(token: ServiceId<T>) => T | undefined;
   /**
-   * Register workbench contributions at runtime (e.g. from a validated
-   * ExtensionManifest via createExtensionContributions).
+   * Register workbench contributions at runtime (e.g. from an external host).
    * Dispose to remove them and refresh chrome/scene slices.
    */
   registerWorkbenchContributions: (
     ...contributions: WorkbenchContribution[]
   ) => WorkbenchContributionDisposable;
-  /**
-   * Mount a sandbox host on a narrow surface (not PluginManager).
-   * Returns dispose for the mount.
-   */
-  mountSandboxHost: (
-    activate: (surface: SandboxHostSurface) => void | (() => void)
-  ) => () => void;
   undo: () => boolean;
   redo: () => boolean;
   save: (saveFn?: (input: EditorInput) => Promise<void>) => Promise<void>;

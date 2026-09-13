@@ -91,7 +91,7 @@ export default defineConfig({
   clean: true,
   outDir: 'dist',
   tsconfig: 'tsconfig.build.json',
-  noExternal: [/^@openenvx\//, /^@xmazu\/openenvxee-/],
+  noExternal: [/^@openenvx\//],
   external: [
     ...Object.keys(pkg.dependencies),
     ...Object.keys(pkg.peerDependencies),

@@ -15,7 +15,7 @@ Trust model: [Plugin-boundaries.md](../../Plugin-boundaries.md). Widget pipeline
 | Primary UI | On-canvas face (`data.children`) | Off-canvas `showUI` iframe | Declarative `render` trees from parent |
 | State | Host `data.values` (isolate expands only) | `clientStorage` / bridge (session) | Parent owns state; host gets `command` / `render` |
 | Lifetime | Lives with matching layers; one isolate per `extensionId` | Starts on run command; Stop closes isolate | Mounted while host session lasts |
-| Package | `@xmazu/openenvxee-extensions` + `@xmazu/openenvxee-extensions` | widget-sdk + optional HTML UI bundle | protocol (+ elements `/panel` + `renderPanelTree`) |
+| Package | `@openenvx/editor-sandbox` + `@openenvx/editor-sandbox` | widget-sdk + optional HTML UI bundle | protocol (+ elements `/panel` + `renderPanelTree`) |
 
 Figma-shaped: widgets = nodes; plugins = tools. Embed is a separate, weaker lane (no QuickJS).
 
@@ -38,12 +38,8 @@ Widget and manifest TSX must put `/** @jsxImportSource preact */` on the **first
 
 ```tsx
 /** @jsxImportSource preact */
-import { Stack, Text } from '@xmazu/openenvxee-extensions/canvas';
-import {
-  defineCanvasComponent,
-  string,
-  color,
-} from '@xmazu/openenvxee-extensions';
+import { Stack, Text } from '@openenvx/editor-sandbox/canvas';
+import { defineCanvasComponent, string, color } from '@openenvx/editor-sandbox';
 
 export const seatingWidget = defineCanvasComponent({
   id: 'wm.seating',
@@ -64,8 +60,8 @@ export const seatingWidget = defineCanvasComponent({
 
 | Surface | API | Element vocabulary |
 | --- | --- | --- |
-| Canvas (`page.layout: 'absolute'`) | `defineCanvasComponent` | `@xmazu/openenvxee-extensions/canvas` |
-| HTML (`page.layout: 'html'`) | `defineHtmlComponent` | `@xmazu/openenvxee-extensions/html` |
+| Canvas (`page.layout: 'absolute'`) | `defineCanvasComponent` | `@openenvx/editor-sandbox/canvas` |
+| HTML (`page.layout: 'html'`) | `defineHtmlComponent` | `@openenvx/editor-sandbox/html` |
 
 Rules:
 
@@ -82,8 +78,8 @@ Canvas example: [`seating.widget.tsx`](../canvas-demo/src/extensions/seating.wid
 
 ```tsx
 /** @jsxImportSource preact */
-import { Toolbar, ToolbarCommand } from '@xmazu/openenvxee-extensions/panel';
-import { defineExtension, renderPanelTree } from '@xmazu/openenvxee-extensions';
+import { Toolbar, ToolbarCommand } from '@openenvx/editor-sandbox/panel';
+import { defineExtension, renderPanelTree } from '@openenvx/editor-sandbox';
 import { seatingWidget } from './seating.widget';
 
 const toolbar = renderPanelTree(
@@ -110,7 +106,7 @@ Use `buildGrantFromManifest({ manifest, session: sessionPolicy, source })` so gr
 ### 3. Bundle + push source
 
 ```ts
-import { bundleWidgetSources } from '@xmazu/openenvxee-extensions/vite';
+import { bundleWidgetSources } from '@openenvx/editor-sandbox/vite';
 export default { plugins: [bundleWidgetSources()] };
 
 // app - host never runs this; only a string for the isolate
@@ -131,8 +127,8 @@ After eval, the module must call `openenvx.widget.register` (or `define*Componen
 ### 4. Types
 
 ```ts
-/// <reference types="@xmazu/openenvxee-extensions/vite/client" />
-/// <reference types="@xmazu/openenvxee-extensions/openenvx" />
+/// <reference types="@openenvx/editor-sandbox/vite/client" />
+/// <reference types="@openenvx/editor-sandbox/openenvx" />
 ```
 
 ---
@@ -147,7 +143,7 @@ User-run tools (`kind: 'plugin'`). Primary UI is `openenvx.showUI` → sandboxed
 
 Parent page sends validated `RenderNode` trees (optionally authored with elements `/panel` + `renderPanelTree`). No QuickJS. See [Plugin-boundaries.md](../../Plugin-boundaries.md).
 
-| Panel authoring helpers | `@xmazu/openenvxee-extensions/panel` + `@xmazu/openenvxee-extensions` `renderPanelTree` |
+| Panel authoring helpers | `@openenvx/editor-sandbox/panel` + `@openenvx/editor-sandbox` `renderPanelTree` |
 
 ---
 

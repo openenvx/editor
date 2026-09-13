@@ -9,11 +9,11 @@ This is **not** how to write sandbox widgets, sandbox plugins, or embed panels. 
 
 Under-the-hood map: [Architecture.md](../../Architecture.md) · [docs/architecture/](../../docs/architecture/overview.md). Trust model: [Plugin-boundaries.md](../../Plugin-boundaries.md).
 
-## Scene document (`@xmazu/openenvxee-schema`)
+## Scene document (`@openenvx/core/schema`)
 
-The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@xmazu/openenvxee-schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
+The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@openenvx/core/schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
 
-Backend services depend on `@xmazu/openenvxee-schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Node canvas raster/PDF export uses `@openenvx/canvas/export/node` against the same Scene JSON.
+Backend services depend on `@openenvx/core/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Node canvas raster/PDF export uses `@openenvx/canvas/export/node` against the same Scene JSON.
 
 ## OSS vs enterprise shell
 

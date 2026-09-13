@@ -16,6 +16,7 @@
     "./registry": "./src/plugin/canvas-registry-service.ts",
     "./contributions/layer-preview-renderer-contribution": "./src/contributions/layer-preview-renderer-contribution.ts",
     "./artboard-offset": "./src/artboard-offset.ts",
+    "./fit-text-layer-to-content": "./src/fit-text-layer-to-content.ts",
     "./rich-text-layout": "./src/rich-text-layout.ts",
     "./rich-text-typography": "./src/rich-text-typography.ts",
     "./fonts.css": "./src/fonts/fonts.css"
@@ -36,7 +37,6 @@
     "@tiptap/pm": "^3.27.3",
     "@tiptap/react": "^3.27.3",
     "@tiptap/starter-kit": "^3.27.3",
-    "@xmazu/openenvxee-extensions": "workspace:*",
     "konva": "^10.3.0",
     "lucide-react": "1.24.0",
     "react-konva": "^19.2.5",
