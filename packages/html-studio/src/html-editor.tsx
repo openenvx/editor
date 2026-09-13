@@ -4,12 +4,13 @@ import {
   DEFAULT_HTML_LAYOUT,
   HtmlBlocksPlugin,
 } from '@openenvx/html';
+import { VariablesPlugin } from '@openenvx/variables';
 import { WorkbenchShell } from '@openenvx/workbench';
 import { useMemo } from 'react';
 
 import './theme.css';
 
-const HTML_EDITOR_PLUGINS = [new HtmlBlocksPlugin()];
+const HTML_EDITOR_PLUGINS = [new HtmlBlocksPlugin(), new VariablesPlugin()];
 
 export interface HtmlEditorProps {
   /** Initial document. Defaults to a starter block page when omitted. */

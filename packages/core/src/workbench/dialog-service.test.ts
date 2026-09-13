@@ -9,9 +9,9 @@ describe('DialogServiceImpl', () => {
     const listener = vi.fn();
     service.subscribe(listener);
 
-    service.open('workbench.variables.edit', { mode: 'create' });
+    service.open('openenvx.variables.edit', { mode: 'create' });
     expect(service.getActive()).toEqual({
-      id: 'workbench.variables.edit',
+      id: 'openenvx.variables.edit',
       payload: { mode: 'create' },
     });
     expect(listener).toHaveBeenCalledTimes(1);
@@ -90,11 +90,11 @@ describe('DialogServiceImpl', () => {
       title: 'Delete?',
       description: 'Cannot undo.',
     });
-    service.open('workbench.variables.edit', { mode: 'create' });
+    service.open('openenvx.variables.edit', { mode: 'create' });
 
     await expect(pending).resolves.toBe(false);
     expect(service.getActive()).toEqual({
-      id: 'workbench.variables.edit',
+      id: 'openenvx.variables.edit',
       payload: { mode: 'create' },
     });
   });

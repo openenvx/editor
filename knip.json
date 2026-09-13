@@ -60,6 +60,16 @@
         "!src/**/*.test.ts"
       ]
     },
+    "packages/variables": {
+      "entry": [
+        "src/index.ts!",
+        "src/tiptap/index.ts!"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "!src/**/*.test.ts"
+      ]
+    },
     "packages/workbench": {
       "entry": [
         "src/index.ts!",

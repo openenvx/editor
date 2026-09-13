@@ -41,7 +41,7 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | [docs/architecture/](docs/architecture/overview.md) | Under-the-hood chapters (runtime, workbench, canvas, html, studio, extensions) |
 | [docs/architecture/packages-and-api.md](docs/architecture/packages-and-api.md) | Package map, public exports, who imports what, pre-1.0 stability |
 | [Plugin-boundaries.md](Plugin-boundaries.md) | Internal vs external plugins, protocol trust boundary, cloud/marketplace runners |
-| [FEATURES.md](FEATURES.md) | Product capability matrix, Polotno gap tracking, what we should still offer |
+| [FEATURES.md](FEATURES.md) | Product capability matrix and Polotno gap tracking |
 | [apps/docs/README.md](apps/docs/README.md) | Extension authoring hub - internal vs sandbox vs embed |
 | [apps/docs/extension-guide.md](apps/docs/extension-guide.md) | Internal OOP plugin author API |
 | [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) | Sandbox widgets/plugins + embed panels |

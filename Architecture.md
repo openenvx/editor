@@ -61,6 +61,7 @@ Author how-to (under `docs/architecture/`):
 | `@openenvx/canvas` | Konva stage, layers, renderers, `CanvasPlugin`, `CanvasEditor` |
 | `@openenvx/html` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |
 | `@openenvx/driver-email` | Email blocks, `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument`, `renderEmailHtml` |
+| `@openenvx/variables` | Opt-in `VariablesPlugin` (catalog sidebar + edit dialog); `./tiptap` chip/suggest helpers |
 | `@openenvx/workbench` | `WorkbenchShell`, field renderers, sandbox/embed hosts |
 | `@xmazu/openenvxee-studio` | Published fat bundle of canvas host allowlist (unpublished from this repo) |
 | `@openenvx/canvas-studio` | Published canvas drop-in (`CanvasEditor`, `createCanvasScene`; minified `dist/` + `./runtime`) |

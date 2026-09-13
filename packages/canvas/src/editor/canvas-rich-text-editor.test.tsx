@@ -1,17 +1,36 @@
+import { WorkbenchProvider } from '@openenvx/core/react';
+import { normalizeScene } from '@openenvx/core/schema';
+import { createMockWorkbenchApi } from '@openenvx/workbench';
 import { render, waitFor } from '@testing-library/react';
+import type { ComponentProps } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { CanvasRichTextEditor } from './canvas-rich-text-editor';
 
+function renderRichTextEditor(
+  props: Omit<ComponentProps<typeof CanvasRichTextEditor>, 'onCommit'> & {
+    onCommit?: () => void;
+  }
+) {
+  const { api } = createMockWorkbenchApi({
+    scene: normalizeScene({
+      pages: [{ id: 'p1', name: 'Page', layout: 'flow', layers: [] }],
+    }),
+  });
+  const view = render(
+    <WorkbenchProvider api={api}>
+      <CanvasRichTextEditor onCommit={() => {}} {...props} />
+    </WorkbenchProvider>
+  );
+  return { api, ...view };
+}
+
 describe('CanvasRichTextEditor', () => {
   it('renders TipTap content from html', async () => {
-    const { container } = render(
-      <CanvasRichTextEditor
-        html="<p><strong>Bold</strong> text</p>"
-        onCommit={() => {}}
-        zoom={1}
-      />
-    );
+    const { container } = renderRichTextEditor({
+      html: '<p><strong>Bold</strong> text</p>',
+      zoom: 1,
+    });
 
     await waitFor(() => {
       expect(container.querySelector('.ProseMirror')).toBeTruthy();
@@ -21,13 +40,10 @@ describe('CanvasRichTextEditor', () => {
   });
 
   it('selects all text on mount', async () => {
-    render(
-      <CanvasRichTextEditor
-        html="<p><strong>Bold</strong> text</p>"
-        onCommit={() => {}}
-        zoom={1}
-      />
-    );
+    renderRichTextEditor({
+      html: '<p><strong>Bold</strong> text</p>',
+      zoom: 1,
+    });
 
     await waitFor(() => {
       expect(window.getSelection()?.toString()).toBe('Bold text');

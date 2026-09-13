@@ -9,7 +9,8 @@ describe('HtmlToolbarContribution', () => {
     new HtmlToolbarContribution().contribute(builder, {} as never);
 
     const items = builder.build();
-    const previewWhen = 'html.previewActive && !html.hidePreviewToolbar';
+    const previewWhen =
+      'html.previewActive && !workbench.topBar && !html.hidePreviewToolbar';
     const zoomWhen = `${previewWhen} && !html.hideZoomControls`;
     const zoomIds = [
       'html-toolbar-sep-1',

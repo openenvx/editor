@@ -1,4 +1,5 @@
 import type { Scene as CoreScene } from '@openenvx/core/schema';
+import { VariablesPlugin } from '@openenvx/variables';
 import { WorkbenchShell } from '@openenvx/workbench';
 import { useMemo } from 'react';
 
@@ -9,7 +10,7 @@ import type { Scene } from './scene';
 
 import './theme.css';
 
-const EMAIL_EDITOR_PLUGINS = [new EmailBlocksPlugin({ topBar: true })];
+const EMAIL_EDITOR_PLUGINS = [new EmailBlocksPlugin(), new VariablesPlugin()];
 
 /** Drop-in layout: top bar + bottom insert toolbar + inspector (no activity bar / left sidebar). */
 const EMAIL_EDITOR_LAYOUT = {

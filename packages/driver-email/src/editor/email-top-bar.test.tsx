@@ -27,7 +27,7 @@ describe('EmailTopBar contribution', () => {
     const controller = new WorkbenchController({
       initialScene: createEmailDemoScene(),
       layout: DEFAULT_EMAIL_LAYOUT,
-      plugins: [new EmailBlocksPlugin({ topBar: true })],
+      plugins: [new EmailBlocksPlugin()],
     });
     await controller.start();
     try {

@@ -343,17 +343,8 @@ export class UploadAssetCommand extends Command {
   }
 }
 
-export interface CanvasPluginOptions {
-  /** Register the product top bar (`CanvasTopBarContribution`). */
-  topBar?: boolean;
-}
-
 export class CanvasPlugin extends Plugin {
   readonly id = 'openenvx.canvas';
-
-  constructor(private readonly options: CanvasPluginOptions = {}) {
-    super();
-  }
 
   activate(ctx: PluginContext): void {
     ensureCanvasRegistriesInstalled(ctx);
@@ -453,9 +444,7 @@ export class CanvasPlugin extends Plugin {
     bindCanvasDisplayContextKeys(ctx);
 
     const workbench = ctx as WorkbenchPluginContext;
-    if (this.options.topBar) {
-      ctx.register(...createCanvasChromeCommands());
-    }
+    ctx.register(...createCanvasChromeCommands());
     workbench.registerEditorPane('absolute', AbsoluteEditorPane);
     workbench.registerFieldRenderer('svgNodes', SvgNodesFieldRenderer);
     workbench.registerWorkbench(
@@ -463,7 +452,7 @@ export class CanvasPlugin extends Plugin {
       new CanvasCommandPaletteItems(),
       new CanvasStatusBarContribution(),
       new CanvasToolbarContribution(),
-      ...(this.options.topBar ? [new CanvasTopBarContribution()] : []),
+      new CanvasTopBarContribution(),
       ...canvasPropertyPaneContributions
     );
     ctx.register(

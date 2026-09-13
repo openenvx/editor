@@ -5,7 +5,7 @@ import {
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { memo, useCallback, useEffect, useRef } from 'react';
 
-import type { VariableSuggestAnchor } from './variable-suggest-state';
+import type { VariableSuggestAnchor } from './tiptap/variable-suggest-state';
 
 import styles from './variable-suggest-menu.module.css';
 
@@ -19,6 +19,8 @@ export interface VariableSuggestMenuProps {
   onPick: (key: string) => void;
   onCreate: () => void;
   onEdit: (id: string) => void;
+  showCreate?: boolean;
+  showEdit?: boolean;
 }
 
 export const VariableSuggestMenu = memo(
@@ -32,6 +34,8 @@ export const VariableSuggestMenu = memo(
     onPick,
     onCreate,
     onEdit,
+    showCreate = true,
+    showEdit = true,
   }: VariableSuggestMenuProps) => {
     const listRef = useRef<HTMLDivElement>(null);
 
@@ -78,28 +82,32 @@ export const VariableSuggestMenu = memo(
                     {formatVariableToken(variable.key)}
                   </span>
                 </button>
-                <button
-                  aria-label="Edit variable"
-                  className={styles.rowMenu}
-                  type="button"
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => onEdit(variable.id)}
-                >
-                  <MoreHorizontal size={14} />
-                </button>
+                {showEdit ? (
+                  <button
+                    aria-label="Edit variable"
+                    className={styles.rowMenu}
+                    type="button"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => onEdit(variable.id)}
+                  >
+                    <MoreHorizontal size={14} />
+                  </button>
+                ) : null}
               </div>
             ))
           )}
         </div>
-        <button
-          className={styles.create}
-          type="button"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={onCreate}
-        >
-          <Plus aria-hidden size={14} />
-          {createLabel}
-        </button>
+        {showCreate ? (
+          <button
+            className={styles.create}
+            type="button"
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={onCreate}
+          >
+            <Plus aria-hidden size={14} />
+            {createLabel}
+          </button>
+        ) : null}
       </div>
     );
   }

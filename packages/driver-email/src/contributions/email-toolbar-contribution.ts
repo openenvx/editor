@@ -107,7 +107,7 @@ export class EmailToolbarContribution extends ToolbarContribution {
             label: formatVariableToken(variable.key),
           })),
           {
-            commandId: 'workbench.createVariable',
+            commandId: 'variables.create',
             labelKey: 'toolbar.createVariable',
           },
         ],

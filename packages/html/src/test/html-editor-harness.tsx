@@ -9,6 +9,7 @@ import {
   type WorkbenchApi,
 } from '@openenvx/core';
 import { WorkbenchProvider } from '@openenvx/core/react';
+import { VariablesPlugin } from '@openenvx/variables';
 import { render } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
 import { vi } from 'vitest';
@@ -75,7 +76,7 @@ export async function createHtmlWorkbench(): Promise<{
 }> {
   const controller = new WorkbenchController({
     initialScene: createHtmlDemoScene(),
-    plugins: [new HtmlBlocksPlugin()],
+    plugins: [new HtmlBlocksPlugin(), new VariablesPlugin()],
   });
   await controller.start();
   return {

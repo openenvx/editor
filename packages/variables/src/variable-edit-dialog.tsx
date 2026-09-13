@@ -1,9 +1,21 @@
 import {
+  useWorkbenchContext,
+  useWorkbenchContextSelector,
+} from '@openenvx/core/react';
+import {
   nextVariableKey,
   sceneVariables,
   validateVariableKeyForCatalog,
   type TemplateVariable,
 } from '@openenvx/core/schema';
+import {
+  Button,
+  Input,
+  ModalDialog,
+  PropertyFieldRow,
+  useWorkbenchTranslation,
+  type WorkbenchDialogProps,
+} from '@openenvx/workbench';
 import {
   memo,
   useCallback,
@@ -13,18 +25,11 @@ import {
   type HTMLAttributes,
 } from 'react';
 
-import { useWorkbenchContext } from '../context/workbench-context';
-import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
-import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
-import { Button } from '../primitives/button';
-import { Input } from '../primitives/input';
-import { ModalDialog } from '../primitives/modal-dialog';
-import { PropertyFieldRow } from '../primitives/property-field-row';
-import type { WorkbenchDialogProps } from '../renderers/dialog-host';
+import { VARIABLES_EDIT_DIALOG_ID } from './constants';
 
 import styles from './variable-edit-dialog.module.css';
 
-export const WORKBENCH_VARIABLES_EDIT_DIALOG_ID = 'workbench.variables.edit';
+export { VARIABLES_EDIT_DIALOG_ID };
 
 export type VariableEditPayload =
   | { mode: 'create' }

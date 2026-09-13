@@ -61,7 +61,7 @@ describe('EmailToolbarContribution', () => {
       expect(variablesDropdown.icon).toBe('braces');
       expect(variablesDropdown.items).toHaveLength(2);
       expect(variablesDropdown.items[0]?.commandId).toBe('scene.insertVariable');
-      expect(variablesDropdown.items[1]?.commandId).toBe('workbench.createVariable');
+      expect(variablesDropdown.items[1]?.commandId).toBe('variables.create');
     }
   });
 });

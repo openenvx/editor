@@ -52,12 +52,7 @@ import { EmailTemplatesGallery } from '../editor/templates-gallery';
 import { insertEmailTextHtml } from '../insert-email-text-html';
 
 export interface EmailBlocksPluginOptions {
-  /**
-   * Register the product top bar (`EmailTopBarContribution`).
-   * Off by default - hosts that want it also set `layout.topBar: true`.
-   */
-  topBar?: boolean;
-  /** When set and `topBar` is true, the top bar shows a back control. */
+  /** When set, the top bar shows a back control. */
   onBack?: () => void;
 }
 
@@ -103,13 +98,12 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
       ...createEmailModeCommands(),
       ...createEmailChromeCommands(),
       createEmailPasteCommand(),
-      ...(this.options.topBar && this.options.onBack
+      ...(this.options.onBack
         ? [createEmailGoBackCommand(this.options.onBack)]
         : [])
     );
     registerHtmlPreviewChrome(ctx, {
       hideFluidPreset: true,
-      ...(this.options.topBar ? { hidePreviewToolbar: true } : {}),
     });
 
     ctx.registerWorkbench(
@@ -121,7 +115,7 @@ export class EmailBlocksPlugin extends WorkbenchPlugin {
       new EmailElementsContainer(),
       new EmailElementsView(),
       new EmailToolbarContribution(),
-      ...(this.options.topBar ? [new EmailTopBarContribution()] : [])
+      new EmailTopBarContribution()
     );
     ctx.registerViewPanel(
       EMAIL_ELEMENTS_PANEL_COMPONENT_ID,

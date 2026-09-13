@@ -73,12 +73,6 @@ export {
   DEFAULT_INSPECTOR_PLUGIN_ID,
 } from './views/default-inspector-plugin';
 export {
-  DefaultVariablesContainerPlugin,
-  DEFAULT_VARIABLES_PLUGIN_ID,
-  VARIABLES_VIEW_ID,
-  VariablesTreeProvider,
-} from './variables/default-variables-plugin';
-export {
   DefaultWorkbenchChromePlugin,
   DEFAULT_WORKBENCH_CHROME_PLUGIN_ID,
   WORKBENCH_TOGGLE_ACTIVITY_BAR_COMMAND_ID,
@@ -112,7 +106,12 @@ export {
   ActivitySidebar,
   type ActivitySidebarProps,
 } from './layout/activity-sidebar';
+export { Button } from './primitives/button';
+export { createMockWorkbenchApi } from './test/mock-workbench-context';
 export { ConfirmDialog } from './primitives/confirm-dialog';
+export { Input } from './primitives/input';
+export { ModalDialog } from './primitives/modal-dialog';
+export { PropertyFieldRow } from './primitives/property-field-row';
 export { DialogHost, type WorkbenchDialogProps } from './renderers/dialog-host';
 export {
   Sheet,

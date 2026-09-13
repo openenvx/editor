@@ -2,15 +2,13 @@ import { DialogServiceId, WorkbenchNavigationServiceId } from '@openenvx/core';
 import { normalizeScene } from '@openenvx/core/schema';
 import { describe, expect, it, vi } from 'vitest';
 
-import { CreateVariableCommand, EditVariableCommand } from './default-variables-plugin';
-import { WORKBENCH_VARIABLES_EDIT_DIALOG_ID } from './variable-edit-dialog';
+import { VARIABLES_EDIT_DIALOG_ID } from './constants';
+import { CreateVariableCommand, EditVariableCommand } from './variables-plugin';
 
 function createCommandContext(sceneOverrides: Record<string, unknown> = {}) {
   const scene = normalizeScene({
-    pages: [{ id: 'p1', name: 'Page', layout: 'email', layers: [] }],
-    variables: [
-      { id: 'var-1', key: 'name', label: 'Name', type: 'string', defaultValue: '' },
-    ],
+    pages: [{ id: 'p1', name: 'Page', layout: 'absolute', layers: [] }],
+    variables: [{ id: 'var-1', key: 'name', label: 'Name' }],
     ...sceneOverrides,
   });
   const open = vi.fn();
@@ -33,14 +31,14 @@ function createCommandContext(sceneOverrides: Record<string, unknown> = {}) {
   };
 }
 
-describe('DefaultVariablesPlugin commands', () => {
+describe('VariablesPlugin commands', () => {
   it('opens create dialog with create payload', () => {
     const ctx = createCommandContext();
     const command = new CreateVariableCommand();
 
     command.execute(ctx as never);
 
-    expect(ctx.open).toHaveBeenCalledWith(WORKBENCH_VARIABLES_EDIT_DIALOG_ID, {
+    expect(ctx.open).toHaveBeenCalledWith(VARIABLES_EDIT_DIALOG_ID, {
       mode: 'create',
     });
   });
@@ -52,7 +50,7 @@ describe('DefaultVariablesPlugin commands', () => {
     expect(command.canExecute(ctx as never, { id: 'var-1' })).toBe(true);
     command.execute(ctx as never, { id: 'var-1' });
 
-    expect(ctx.open).toHaveBeenCalledWith(WORKBENCH_VARIABLES_EDIT_DIALOG_ID, {
+    expect(ctx.open).toHaveBeenCalledWith(VARIABLES_EDIT_DIALOG_ID, {
       mode: 'edit',
       variable: expect.objectContaining({ id: 'var-1', key: 'name' }),
     });

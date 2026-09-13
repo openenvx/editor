@@ -1,3 +1,7 @@
+import {
+  createVariableTokenExtension,
+  type VariableTokenCatalog,
+} from '@openenvx/variables/tiptap';
 import { Color } from '@tiptap/extension-color';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { TextAlign } from '@tiptap/extension-text-align';
@@ -5,10 +9,6 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { StarterKit } from '@tiptap/starter-kit';
 
 import type { ResolvedRichTextToolbar } from './rich-text-toolbar';
-import {
-  createVariableTokenExtension,
-  type VariableTokenCatalog,
-} from './variable-token-extension';
 
 const DEFAULT_TOOLBAR: ResolvedRichTextToolbar = {
   blockType: true,

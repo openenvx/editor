@@ -1,7 +1,19 @@
+import {
+  useWorkbenchContext,
+  useWorkbenchContextSelector,
+} from '@openenvx/core/react';
+import {
+  useVariableChipLabels,
+  useVariableRichTextSuggest,
+  VariableSuggestMenu,
+} from '@openenvx/variables';
+import { isRichTextBlurInsideVariableChrome } from '@openenvx/variables/tiptap';
 import type { EditorState } from '@tiptap/pm/state';
 import type { Editor } from '@tiptap/react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
+import { useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 import {
   DEFAULT_RICH_TEXT_FILL,
@@ -51,21 +63,47 @@ export function CanvasRichTextEditor({
   zoom,
   onCommit,
 }: CanvasRichTextEditorProps) {
+  const { executeCommand } = useWorkbenchContext();
+  const sceneVariables =
+    useWorkbenchContextSelector((state) => state.scene?.variables) ?? [];
+  const { missingTip, pickerTitle, createVariable } = useVariableChipLabels();
+  const editorRef = useRef<Editor | null>(null);
+  const {
+    catalogRef,
+    createMenuProps,
+    handleSuggestKeyDown,
+    syncSuggestFromEditor,
+  } = useVariableRichTextSuggest({
+    createVariable,
+    executeCommand,
+    missingTip,
+    pickerTitle,
+    sceneVariables,
+  });
+
   const editor = useEditor({
     autofocus: false,
     content: html,
     editorProps: {
       handleKeyDown: (view, event) => {
-        if (event.key !== 'Escape') {
-          return false;
+        if (handleSuggestKeyDown(event, editorRef)) {
+          return true;
         }
-        event.preventDefault();
-        onCommit(view.dom.innerHTML || html);
-        return true;
+
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          onCommit(view.dom.innerHTML || html);
+          return true;
+        }
+
+        return false;
       },
     },
-    extensions: createRichTextEditorExtensions(),
+    extensions: createRichTextEditorExtensions(() => catalogRef.current),
     onBlur: ({ editor: activeEditor, event }) => {
+      if (isRichTextBlurInsideVariableChrome(event.relatedTarget)) {
+        return;
+      }
       const related = event.relatedTarget;
       if (
         related instanceof Element &&
@@ -82,12 +120,18 @@ export function CanvasRichTextEditor({
         .focus(undefined, { scrollIntoView: false })
         .run();
     },
+    onTransaction: ({ editor: activeEditor }) => {
+      syncSuggestFromEditor(activeEditor);
+    },
   });
+
+  editorRef.current = editor;
 
   if (!editor) {
     return null;
   }
 
+  const menuProps = createMenuProps(editor);
   const scaledFontSize = fontSize * zoom;
 
   return (
@@ -110,6 +154,9 @@ export function CanvasRichTextEditor({
       >
         <RichTextBubbleMenuToolbar editor={editor} />
       </BubbleMenu>
+      {menuProps
+        ? createPortal(<VariableSuggestMenu {...menuProps} />, document.body)
+        : null}
       <EditorContent editor={editor} />
     </div>
   );

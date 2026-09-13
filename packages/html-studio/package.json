@@ -72,6 +72,7 @@
   "devDependencies": {
     "@openenvx/core": "workspace:*",
     "@openenvx/html": "workspace:*",
+    "@openenvx/variables": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
     "@openenvx/workbench": "workspace:*",
     "@types/react": "^19.2.17",

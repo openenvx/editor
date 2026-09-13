@@ -23,7 +23,7 @@ export class VariablesTreeProvider extends TreeDataProvider<TemplateVariable> {
     return {
       actions: [
         {
-          commandId: 'workbench.editVariable',
+          commandId: 'variables.edit',
           icon: 'pencil',
           label: 'Edit variable',
         },

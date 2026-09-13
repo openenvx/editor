@@ -151,46 +151,21 @@ Resolution matches Spring `@Primary` / `@Order`: primary beats non-primary; amon
 **List presentation** - flat catalogs (variables, scripts-like panels) use the same `TreeDataProvider` API with `presentation: 'list'` on the view declaration:
 
 ```ts
-class VariablesView extends ViewContribution {
-  readonly id = 'workbench.variables.panel';
-  readonly containerId = WORKBENCH_VARIABLES_CONTAINER_ID;
-  readonly name = 'Variables';
-  readonly presentation = 'list';
-  readonly viewSelection = 'none';
-  readonly emptyMessage = 'No variables yet.';
-  readonly addCommandId = 'workbench.createVariable';
-}
+import { VariablesPlugin } from '@openenvx/variables';
 
-class VariablesTreeProvider extends TreeDataProvider<TemplateVariable> {
-  getRootChildren(ctx) {
-    return sceneVariables(ctx.scene.getScene());
-  }
-  getChildren() {
-    return [];
-  }
-  getTreeItem(variable) {
-    return {
-      id: variable.id,
-      label: formatVariableToken(variable.key),
-      description: variable.label,
-      actions: [
-        { commandId: 'workbench.editVariable', icon: 'pencil', label: 'Edit' },
-      ],
-    };
-  }
-}
+// Product hosts compose the built-in catalog plugin — do not reimplement.
+const plugins = [new CanvasPlugin(), new VariablesPlugin()];
 
-activateWorkbench(ctx) {
-  ctx.registerWorkbench(new VariablesViewContainer(), new VariablesView());
-  ctx.registerTreeDataProvider('workbench.variables.panel', new VariablesTreeProvider());
-  ctx.registerDialog('workbench.variables.edit', VariableEditDialog);
-}
-
-// Commands open the dialog via DialogService:
-ctx.services.get(DialogServiceId)?.open('workbench.variables.edit', { mode: 'create' });
+// Commands: variables.create / variables.edit; dialog id openenvx.variables.edit
+ctx.services
+  .get(DialogServiceId)
+  ?.open('openenvx.variables.edit', { mode: 'create' });
 
 // Simple confirms use the built-in workbench dialog:
-const ok = await api.showConfirm({ title: 'Delete?', description: 'Cannot undo.' });
+const ok = await api.showConfirm({
+  title: 'Delete?',
+  description: 'Cannot undo.',
+});
 ```
 
 ### Workbench renderer providers

@@ -3,7 +3,6 @@ import {
   DialogServiceId,
   ViewContainerContribution,
   ViewContribution,
-  WORKBENCH_VARIABLES_CONTAINER_ID,
   WorkbenchNavigationServiceId,
   WorkbenchPlugin,
   type CommandContext,
@@ -12,37 +11,36 @@ import {
 import { sceneVariables } from '@openenvx/core/schema';
 
 import {
-  VariableEditDialog,
-  WORKBENCH_VARIABLES_EDIT_DIALOG_ID,
-} from './variable-edit-dialog';
+  VARIABLES_CONTAINER_ID,
+  VARIABLES_EDIT_DIALOG_ID,
+  VARIABLES_PLUGIN_ID,
+  VARIABLES_VIEW_ID,
+} from './constants';
+import { VariableEditDialog } from './variable-edit-dialog';
 import { VariablesTreeProvider } from './variables-tree-provider';
 
-export const VARIABLES_VIEW_ID = 'workbench.variables.panel';
-export const DEFAULT_VARIABLES_PLUGIN_ID = 'openworkbench.default-variables';
-
 class VariablesViewContainer extends ViewContainerContribution {
-  readonly id = WORKBENCH_VARIABLES_CONTAINER_ID;
+  readonly id = VARIABLES_CONTAINER_ID;
   readonly title = 'Variables';
   readonly defaultLocation = 'secondary' as const;
   readonly sidebarBehavior = 'panel' as const;
   readonly sidebarOrder = 1;
-  readonly when = "page.layout == 'email'";
 }
 
 class VariablesView extends ViewContribution {
   readonly id = VARIABLES_VIEW_ID;
-  readonly containerId = WORKBENCH_VARIABLES_CONTAINER_ID;
+  readonly containerId = VARIABLES_CONTAINER_ID;
   readonly name = 'Variables';
   readonly presentation = 'list' as const;
   readonly viewSelection = 'none' as const;
   readonly collapsible = false;
   readonly viewOrder = 0;
   readonly emptyMessage = 'No variables yet.';
-  readonly addCommandId = 'workbench.createVariable';
+  readonly addCommandId = 'variables.create';
 }
 
 class OpenVariablesPanelCommand extends Command {
-  readonly id = 'workbench.openVariablesPanel';
+  readonly id = 'variables.openPanel';
 
   canExecute(): boolean {
     return true;
@@ -54,15 +52,12 @@ class OpenVariablesPanelCommand extends Command {
       return;
     }
     navigation.setSecondarySidebarVisible(true);
-    navigation.setActiveContainer(
-      'secondary',
-      WORKBENCH_VARIABLES_CONTAINER_ID
-    );
+    navigation.setActiveContainer('secondary', VARIABLES_CONTAINER_ID);
   }
 }
 
 export class CreateVariableCommand extends Command {
-  readonly id = 'workbench.createVariable';
+  readonly id = 'variables.create';
 
   canExecute(): boolean {
     return true;
@@ -72,21 +67,16 @@ export class CreateVariableCommand extends Command {
     const navigation = ctx.services.get(WorkbenchNavigationServiceId);
     if (navigation) {
       navigation.setSecondarySidebarVisible(true);
-      navigation.setActiveContainer(
-        'secondary',
-        WORKBENCH_VARIABLES_CONTAINER_ID
-      );
+      navigation.setActiveContainer('secondary', VARIABLES_CONTAINER_ID);
     }
-    ctx.services
-      .get(DialogServiceId)
-      ?.open(WORKBENCH_VARIABLES_EDIT_DIALOG_ID, {
-        mode: 'create',
-      });
+    ctx.services.get(DialogServiceId)?.open(VARIABLES_EDIT_DIALOG_ID, {
+      mode: 'create',
+    });
   }
 }
 
 export class EditVariableCommand extends Command {
-  readonly id = 'workbench.editVariable';
+  readonly id = 'variables.edit';
 
   canExecute(ctx: CommandContext, args?: unknown): boolean {
     const patch = args as { id?: string } | undefined;
@@ -109,17 +99,15 @@ export class EditVariableCommand extends Command {
     if (!variable) {
       return;
     }
-    ctx.services
-      .get(DialogServiceId)
-      ?.open(WORKBENCH_VARIABLES_EDIT_DIALOG_ID, {
-        mode: 'edit',
-        variable,
-      });
+    ctx.services.get(DialogServiceId)?.open(VARIABLES_EDIT_DIALOG_ID, {
+      mode: 'edit',
+      variable,
+    });
   }
 }
 
-export class DefaultVariablesContainerPlugin extends WorkbenchPlugin {
-  readonly id = DEFAULT_VARIABLES_PLUGIN_ID;
+export class VariablesPlugin extends WorkbenchPlugin {
+  readonly id = VARIABLES_PLUGIN_ID;
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
     ctx.register(
@@ -132,8 +120,6 @@ export class DefaultVariablesContainerPlugin extends WorkbenchPlugin {
       VARIABLES_VIEW_ID,
       new VariablesTreeProvider()
     );
-    ctx.registerDialog(WORKBENCH_VARIABLES_EDIT_DIALOG_ID, VariableEditDialog);
+    ctx.registerDialog(VARIABLES_EDIT_DIALOG_ID, VariableEditDialog);
   }
 }
-
-export { VariablesTreeProvider };

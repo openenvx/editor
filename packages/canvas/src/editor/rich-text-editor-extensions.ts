@@ -1,3 +1,7 @@
+import {
+  createVariableTokenExtension,
+  type VariableTokenCatalog,
+} from '@openenvx/variables/tiptap';
 import { Color } from '@tiptap/extension-color';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { TextStyle } from '@tiptap/extension-text-style';
@@ -11,7 +15,9 @@ export const RICH_TEXT_FONT_FAMILY_OPTIONS = [
   'Courier New',
 ] as const;
 
-export function createRichTextEditorExtensions() {
+export function createRichTextEditorExtensions(
+  getVariableCatalog?: () => VariableTokenCatalog
+) {
   return [
     StarterKit.configure({
       blockquote: false,
@@ -24,5 +30,8 @@ export function createRichTextEditorExtensions() {
     TextStyle,
     Color,
     FontFamily,
+    ...(getVariableCatalog
+      ? [createVariableTokenExtension(getVariableCatalog)]
+      : []),
   ];
 }

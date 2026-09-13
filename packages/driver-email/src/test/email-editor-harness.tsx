@@ -1,5 +1,6 @@
 import { WorkbenchController, type WorkbenchApi } from '@openenvx/core';
 import { WorkbenchProvider } from '@openenvx/core/react';
+import { VariablesPlugin } from '@openenvx/variables';
 import { render } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -13,7 +14,7 @@ export async function createEmailWorkbench(): Promise<{
 }> {
   const controller = new WorkbenchController({
     initialScene: createEmailDemoScene(),
-    plugins: [new EmailBlocksPlugin()],
+    plugins: [new EmailBlocksPlugin(), new VariablesPlugin()],
   });
   await controller.start();
   return {

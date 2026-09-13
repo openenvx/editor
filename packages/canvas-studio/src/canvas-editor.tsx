@@ -5,6 +5,7 @@ import {
   DEFAULT_CANVAS_LAYOUT,
 } from '@openenvx/canvas';
 import type { Scene as CoreScene } from '@openenvx/core/schema';
+import { VariablesPlugin } from '@openenvx/variables';
 import { WorkbenchShell } from '@openenvx/workbench';
 import { useMemo } from 'react';
 
@@ -12,7 +13,7 @@ import type { Scene } from './scene';
 
 import './theme.css';
 
-const CANVAS_EDITOR_PLUGINS = [new CanvasPlugin({ topBar: true })];
+const CANVAS_EDITOR_PLUGINS = [new CanvasPlugin(), new VariablesPlugin()];
 
 export interface CanvasEditorProps {
   /** Initial document. Defaults to a blank artboard when omitted. */

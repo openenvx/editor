@@ -1,0 +1,16 @@
+{
+  "extends": "@openenvx/typescript-config/base.json",
+  "include": ["src", "../typescript-config/css-modules.d.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "paths": {
+      "@openenvx/core": ["../core/src/index.ts"],
+      "@openenvx/core/react": ["../core/src/react/workbench-context.tsx"],
+      "@openenvx/core/schema": ["../core/src/schema/index.ts"],
+      "@openenvx/workbench": ["../workbench/src/index.ts"]
+    }
+  }
+}

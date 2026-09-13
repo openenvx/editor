@@ -79,6 +79,7 @@
   "devDependencies": {
     "@openenvx/core": "workspace:*",
     "@openenvx/driver-email": "workspace:*",
+    "@openenvx/variables": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
     "@openenvx/workbench": "workspace:*",
     "@types/react": "^19.2.17",

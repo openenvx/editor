@@ -2,15 +2,15 @@ import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/core/react';
+import {
+  useVariableChipLabels,
+  useVariableRichTextSuggest,
+  VariableSuggestMenu,
+} from '@openenvx/variables';
+import { isRichTextBlurInsideVariableChrome } from '@openenvx/variables/tiptap';
 import type { Editor } from '@tiptap/react';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import {
@@ -35,16 +35,6 @@ import {
 } from './rich-text-boundary';
 import { createRichTextEditorExtensions } from './rich-text-editor-extensions';
 import type { ResolvedRichTextToolbar } from './rich-text-toolbar';
-import { useVariableChipLabels } from './use-variable-chip-labels';
-import { VariableSuggestMenu } from './variable-suggest-menu';
-import {
-  detectVariableSuggest,
-  filterVariableSuggestions,
-  insertVariableTokenAtSuggest,
-  isRichTextBlurInsideVariableChrome,
-  type VariableSuggestAnchor,
-} from './variable-suggest-state';
-import type { VariableTokenCatalog } from './variable-token-extension';
 
 import styles from './html-editor-pane.module.css';
 
@@ -142,109 +132,41 @@ export function HtmlRichTextEditor({
   const { missingTip, pickerTitle, createVariable } = useVariableChipLabels();
   const syncAlign = align !== undefined && toolbar.align;
   const menuRef = useRef<HTMLDivElement>(null);
-  const catalogRef = useRef<VariableTokenCatalog>({
-    variables: [],
-    missingTip: '',
-  });
   const editorRef = useRef<Editor | null>(null);
   const onBoundaryRef = useRef(onBoundary);
   onBoundaryRef.current = onBoundary;
-  const suggestRef = useRef<VariableSuggestAnchor | null>(null);
-  const suggestDismissedRef = useRef(false);
-  const highlightRef = useRef(0);
+  const {
+    catalogRef,
+    createMenuProps,
+    handleSuggestKeyDown,
+    resetSuggestDismissed,
+    suggestRef,
+    syncSuggestFromEditor,
+  } = useVariableRichTextSuggest({
+    createVariable,
+    executeCommand,
+    missingTip,
+    pickerTitle,
+    sceneVariables,
+  });
   const [placement, setPlacement] = useState<FloatingPillPlacement | null>(
     null
   );
-  const [suggestAnchor, setSuggestAnchor] =
-    useState<VariableSuggestAnchor | null>(null);
-  const [highlightIndex, setHighlightIndex] = useState(0);
-
-  catalogRef.current = { variables: sceneVariables, missingTip };
-
-  const filteredSuggestions = suggestAnchor
-    ? filterVariableSuggestions(sceneVariables, suggestAnchor.filter)
-    : [];
-
-  const syncSuggestFromEditor = useCallback((activeEditor: Editor) => {
-    if (suggestDismissedRef.current) {
-      setSuggestAnchor(null);
-      suggestRef.current = null;
-      return;
-    }
-    const next = detectVariableSuggest(activeEditor);
-    suggestRef.current = next;
-    setSuggestAnchor(next);
-    if (next) {
-      highlightRef.current = 0;
-      setHighlightIndex(0);
-    }
-  }, []);
-
-  const dismissSuggest = useCallback(() => {
-    suggestDismissedRef.current = true;
-    suggestRef.current = null;
-    setSuggestAnchor(null);
-  }, []);
-
-  const pickVariable = useCallback((activeEditor: Editor, key: string) => {
-    const anchor = suggestRef.current;
-    if (!anchor) {
-      return;
-    }
-    insertVariableTokenAtSuggest(activeEditor, anchor, key);
-    suggestDismissedRef.current = false;
-    suggestRef.current = null;
-    setSuggestAnchor(null);
-  }, []);
 
   const editor = useEditor({
     autofocus: false,
     content: html,
     editorProps: {
       handleKeyDown: (view, event) => {
-        const suggest = suggestRef.current;
-        const suggestions = suggest
-          ? filterVariableSuggestions(
-              catalogRef.current.variables,
-              suggest.filter
-            )
-          : [];
-
-        if (suggest && suggestions.length > 0) {
-          if (event.key === 'ArrowDown') {
-            event.preventDefault();
-            const next = (highlightRef.current + 1) % suggestions.length;
-            highlightRef.current = next;
-            setHighlightIndex(next);
-            return true;
-          }
-          if (event.key === 'ArrowUp') {
-            event.preventDefault();
-            const next =
-              (highlightRef.current - 1 + suggestions.length) %
-              suggestions.length;
-            highlightRef.current = next;
-            setHighlightIndex(next);
-            return true;
-          }
-          if (event.key === 'Enter') {
-            event.preventDefault();
-            const picked = suggestions[highlightRef.current];
-            const activeEditor = editorRef.current;
-            if (picked && activeEditor) {
-              pickVariable(activeEditor, picked.key);
-            }
-            return true;
-          }
+        if (
+          handleSuggestKeyDown(event, editorRef, {
+            stopPropagationOnSuggestEscape: true,
+          })
+        ) {
+          return true;
         }
 
         if (event.key === 'Escape') {
-          if (suggest) {
-            event.preventDefault();
-            event.stopPropagation();
-            dismissSuggest();
-            return true;
-          }
           event.preventDefault();
           event.stopPropagation();
           onCommit(
@@ -262,10 +184,6 @@ export function HtmlRichTextEditor({
             event.preventDefault();
             return true;
           }
-        }
-
-        if (event.key.length === 1 && !event.metaKey && !event.ctrlKey) {
-          suggestDismissedRef.current = false;
         }
 
         return false;
@@ -309,12 +227,12 @@ export function HtmlRichTextEditor({
       return;
     }
     const insert = (text: string) => {
-      suggestDismissedRef.current = false;
+      resetSuggestDismissed();
       editor.chain().focus().insertContent(text).run();
     };
     bindTextInsert(insert);
     return () => bindTextInsert(null);
-  }, [bindTextInsert, editor]);
+  }, [bindTextInsert, editor, resetSuggestDismissed]);
 
   useEffect(() => {
     if (!editor) {
@@ -340,11 +258,7 @@ export function HtmlRichTextEditor({
     const updatePosition = () => {
       setPlacement(placeRichTextBubble(editor, menuRef.current));
       if (suggestRef.current) {
-        const next = detectVariableSuggest(editor);
-        if (next) {
-          suggestRef.current = next;
-          setSuggestAnchor(next);
-        }
+        syncSuggestFromEditor(editor);
       }
     };
 
@@ -379,34 +293,13 @@ export function HtmlRichTextEditor({
       window.removeEventListener('resize', onScrollOrResize);
       ro?.disconnect();
     };
-  }, [editor, selectionEpoch]);
-
-  const handlePick = useCallback(
-    (key: string) => {
-      if (!editor) {
-        return;
-      }
-      pickVariable(editor, key);
-    },
-    [editor, pickVariable]
-  );
-
-  const handleCreate = useCallback(() => {
-    dismissSuggest();
-    void executeCommand('workbench.createVariable');
-  }, [dismissSuggest, executeCommand]);
-
-  const handleEdit = useCallback(
-    (id: string) => {
-      dismissSuggest();
-      void executeCommand('workbench.editVariable', { id });
-    },
-    [dismissSuggest, executeCommand]
-  );
+  }, [editor, selectionEpoch, suggestRef, syncSuggestFromEditor]);
 
   if (!editor) {
     return null;
   }
+
+  const menuProps = createMenuProps(editor);
 
   return (
     <div
@@ -430,24 +323,8 @@ export function HtmlRichTextEditor({
             document.body
           )
         : null}
-      {suggestAnchor
-        ? createPortal(
-            <VariableSuggestMenu
-              anchor={suggestAnchor}
-              createLabel={createVariable}
-              highlightedIndex={highlightIndex}
-              title={pickerTitle}
-              variables={filteredSuggestions}
-              onCreate={handleCreate}
-              onEdit={handleEdit}
-              onHighlight={(index) => {
-                highlightRef.current = index;
-                setHighlightIndex(index);
-              }}
-              onPick={handlePick}
-            />,
-            document.body
-          )
+      {menuProps
+        ? createPortal(<VariableSuggestMenu {...menuProps} />, document.body)
         : null}
       <EditorContent editor={editor} />
     </div>

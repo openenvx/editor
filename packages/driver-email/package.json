@@ -34,6 +34,7 @@
     "react-dom": ">=18"
   },
   "devDependencies": {
+    "@openenvx/variables": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
     "@testing-library/react": "16.3.2",
     "@types/react": "^19.2.3",

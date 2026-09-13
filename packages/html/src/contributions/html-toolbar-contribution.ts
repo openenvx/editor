@@ -15,7 +15,7 @@ const HTML_ZOOM_DROPDOWN_ITEMS: ShellDropdownMenuItemDescriptor[] =
   }));
 
 const HTML_PREVIEW_TOOLBAR_WHEN =
-  'html.previewActive && !html.hidePreviewToolbar';
+  'html.previewActive && !workbench.topBar && !html.hidePreviewToolbar';
 const HTML_ZOOM_TOOLBAR_WHEN = `${HTML_PREVIEW_TOOLBAR_WHEN} && !html.hideZoomControls`;
 
 export class HtmlToolbarContribution extends ToolbarContribution {

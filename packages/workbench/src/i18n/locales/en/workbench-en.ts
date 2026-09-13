@@ -129,6 +129,6 @@ export default {
   'variables.deleteConfirmDescription':
     'This removes the variable from the template. This cannot be undone.',
   'variables.renamePrompt': 'Variable key',
-  'view.workbench.variables.panel.add': 'Create variable',
-  'view.workbench.variables.panel.empty': 'No variables yet.',
+  'view.openenvx.variables.panel.add': 'Create variable',
+  'view.openenvx.variables.panel.empty': 'No variables yet.',
 } as const satisfies Record<string, string>;

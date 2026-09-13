@@ -129,6 +129,6 @@ export default {
   'variables.deleteConfirmDescription':
     'Spowoduje to usunięcie zmiennej z szablonu. Tej operacji nie można cofnąć.',
   'variables.renamePrompt': 'Klucz zmiennej',
-  'view.workbench.variables.panel.add': 'Dodaj zmienną',
-  'view.workbench.variables.panel.empty': 'Brak zmiennych.',
+  'view.openenvx.variables.panel.add': 'Dodaj zmienną',
+  'view.openenvx.variables.panel.empty': 'Brak zmiennych.',
 } as const satisfies Record<string, string>;

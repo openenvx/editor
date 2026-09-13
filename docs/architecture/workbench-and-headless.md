@@ -46,10 +46,14 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 **Dialogs** - plugins register modal bodies with `ctx.registerDialog(id, Component)`; commands and services open them via `DialogService` / `api.openDialog(id, payload?)`. The shell mounts a single `DialogHost` (no per-feature `*DialogHost` in product hosts). One active dialog at a time - a new `open` replaces the current. Built-in `api.showConfirm({ title, description, confirmLabel?, cancelLabel? })` opens `workbench.confirm` and resolves `Promise<boolean>`. Confirm dialogs resolve via `api.resolveDialogConfirm(confirmed)` (shell-internal; do not reach into `DialogService` from React). Dialog components implement `WorkbenchDialogProps<TPayload>` (`open`, `payload`, `onClose`).
 
 ```ts
-ctx.registerDialog('workbench.variables.edit', VariableEditDialog);
+import { VariablesPlugin } from '@openenvx/variables';
+
+// Compose into product plugin lists — not auto-injected by workbench.
+const plugins = [new CanvasPlugin(), new VariablesPlugin()];
+
 ctx.services
   .get(DialogServiceId)
-  ?.open('workbench.variables.edit', { mode: 'create' });
+  ?.open('openenvx.variables.edit', { mode: 'create' });
 const ok = await api.showConfirm({
   title: 'Delete?',
   description: 'Cannot undo.',
@@ -67,9 +71,9 @@ const ok = await api.showConfirm({
 | `topBar` | `false` | `true` | `false` | `true` |
 | Other parts | all enabled | all enabled | all enabled | all enabled |
 
-Visibility is mutable (`toggleActivityBar` / …). Containers move via `api.moveContainer`. Set `layout: { editorToolbars: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_HTML_LAYOUT`) to show editor overlay toolbars. Items declare a `placement` (`top-left` | `top-center` | `top-right` | `bottom-left` | `bottom-center` | `bottom-right`) via `ToolbarBuilder.placement(...)`. Set `layout: { topBar: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_EMAIL_LAYOUT`) to show the optional shell header; plugins contribute actions via `TopBarContribution` + `TopBarBuilder` (`left` | `center` | `right` placements). Workbench `TopBarRenderer` renders the merged descriptors. No contribution = no header.
+Visibility is mutable (`toggleActivityBar` / …). Containers move via `api.moveContainer`. Set `layout: { editorToolbars: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_HTML_LAYOUT`) to show editor overlay toolbars. Items declare a `placement` (`top-left` | `top-center` | `top-right` | `bottom-left` | `bottom-center` | `bottom-right`) via `ToolbarBuilder.placement(...)`. Set `layout: { topBar: true }` (or use `DEFAULT_CANVAS_LAYOUT` / `DEFAULT_EMAIL_LAYOUT`) to show the optional shell header; domain plugins **always** contribute items via `TopBarContribution` + `TopBarBuilder` (`left` | `center` | `right` placements) — never gate registration behind plugin constructor flags. Workbench `TopBarRenderer` renders the merged descriptors when `layout.topBar` is true. No contribution = no header.
 
-**Host rule (toolbars):** Product engines (canvas / html / email) contribute toolbar and top-bar descriptors only - no React toolbar/top-bar components in those packages. Workbench `EditorChrome` + `ToolbarRenderer` / `TopBarRenderer` render shared button and dropdown chrome.
+**Host rule (toolbars):** Product engines (canvas / html / email) contribute toolbar and top-bar descriptors only - no React toolbar/top-bar components in those packages. Workbench `EditorChrome` + `ToolbarRenderer` / `TopBarRenderer` render shared button and dropdown chrome. HTML preview overlay toolbars use `when: '!workbench.topBar'` so device/zoom chrome hides when the layout header is on.
 
 ## Property pane flow
 

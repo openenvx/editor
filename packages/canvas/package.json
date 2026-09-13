@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@openenvx/core": "workspace:*",
+    "@openenvx/variables": "workspace:*",
     "@xmazu/openenvxee-extensions": "workspace:*",
     "@tiptap/extension-color": "^3.27.3",
     "@tiptap/extension-font-family": "^3.27.3",
@@ -40,6 +41,7 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@openenvx/workbench": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
     "tsup": "catalog:dev",
     "@testing-library/react": "16.3.2",

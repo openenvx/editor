@@ -1,7 +1,7 @@
+import type { CommandContext } from '@openenvx/core';
 import { normalizeScene } from '@openenvx/core/schema';
 import { describe, expect, it } from 'vitest';
 
-import type { CommandContext } from '@openenvx/core';
 import { VariablesTreeProvider } from './variables-tree-provider';
 
 function createCtx(scene: ReturnType<typeof normalizeScene>): CommandContext {
@@ -20,10 +20,8 @@ describe('VariablesTreeProvider', () => {
   it('maps variables to list tree items with edit action', () => {
     const provider = new VariablesTreeProvider();
     const scene = normalizeScene({
-      pages: [{ id: 'p1', name: 'Email', layout: 'email', layers: [] }],
-      variables: [
-        { id: 'v1', key: 'name', label: 'Recipient name' },
-      ],
+      pages: [{ id: 'p1', name: 'Canvas', layout: 'absolute', layers: [] }],
+      variables: [{ id: 'v1', key: 'name', label: 'Recipient name' }],
     });
     const ctx = createCtx(scene);
 
@@ -37,7 +35,7 @@ describe('VariablesTreeProvider', () => {
       description: 'Recipient name',
       actions: [
         {
-          commandId: 'workbench.editVariable',
+          commandId: 'variables.edit',
           icon: 'pencil',
           label: 'Edit variable',
         },
@@ -48,11 +46,8 @@ describe('VariablesTreeProvider', () => {
   it('reorders variables via handleMove', () => {
     const provider = new VariablesTreeProvider();
     const scene = normalizeScene({
-      pages: [{ id: 'p1', name: 'Email', layout: 'email', layers: [] }],
-      variables: [
-        { id: 'v1', key: 'a' },
-        { id: 'v2', key: 'b' },
-      ],
+      pages: [{ id: 'p1', name: 'Canvas', layout: 'absolute', layers: [] }],
+      variables: [{ id: 'v1', key: 'a' }, { id: 'v2', key: 'b' }],
     });
     const ctx = createCtx(scene);
     const [first, second] = provider.getRootChildren(ctx);

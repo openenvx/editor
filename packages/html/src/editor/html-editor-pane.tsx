@@ -18,6 +18,7 @@ import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/core/react';
+import { useVariableChipLabels } from '@openenvx/variables';
 import {
   memo,
   useCallback,
@@ -45,7 +46,6 @@ import {
 import { resolveStageClickAction } from './resolve-stage-click-selection';
 import { useBlockTextFlow } from './use-block-text-flow';
 import { useHtmlPreviewChrome } from './use-html-preview-chrome';
-import { useVariableChipLabels } from './use-variable-chip-labels';
 
 import styles from './html-editor-pane.module.css';
 

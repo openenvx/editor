@@ -61,6 +61,7 @@ Hard rules:
 | `@openenvx/canvas` | workspace | Konva engine, layers, `CanvasPlugin`, `CanvasEditor`, canvas workbench chrome | `.` (+ export/registry subpaths) |
 | `@openenvx/html` | workspace | HTML blocks, `HtmlBlocksPlugin`, `HtmlEditorPane`, `renderBlockDocument` | `.`, `./runtime` |
 | `@openenvx/driver-email` | workspace | Email blocks (React-Email), `EmailBlocksPlugin`, `renderEmailDocument`, `renderEmailHtml` | `.`, `./runtime` |
+| `@openenvx/variables` | workspace | Opt-in `VariablesPlugin` (catalog sidebar + dialog); `./tiptap` chip/suggest helpers | `.`, `./tiptap` |
 | `@openenvx/workbench` | workspace | `WorkbenchShell`, field renderers, sandbox host | `.`, `./theme.css` |
 | `@openenvx/agent` | workspace | Agent chat sidebar plugin | `.`, `./schemas` |
 | `@openenvx/canvas-studio` | yes (public, npmjs) | Minified canvas editor (`CanvasEditor`, scene factory) | `.`, `./runtime`, `./theme.css`, `./fonts.css` |
@@ -93,6 +94,8 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 **`@openenvx/html`** - `HtmlBlocksPlugin`, `HtmlEditorPane`, block registry + tree helpers, `createBlockCommands`.
 
 **`@openenvx/driver-email`** - `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument`, `renderEmailHtml` (`./runtime` is the headless export graph).
+
+**`@openenvx/variables`** - `VariablesPlugin` (opt-in secondary sidebar catalog + create/edit dialog). `./tiptap`: `createVariableTokenExtension`, `detectVariableSuggest`, `insertVariableTokenAtSuggest`. Main export: `VariableSuggestMenu`, `useVariableRichTextSuggest`, `useVariableChipLabels`. Compose into canvas/html/email studios; not auto-injected by workbench.
 
 **`@openenvx/agent`** - `AgentChatPlugin`, chat UI contributions; `./schemas` for proposal Zod types.
 

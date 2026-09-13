@@ -68,7 +68,7 @@ export {
 } from './editor/html-device-preview';
 export { useHtmlDeviceStageMetrics } from './editor/use-html-device-stage-metrics';
 export { useHtmlPreviewChrome } from './editor/use-html-preview-chrome';
-export { useVariableChipLabels } from './editor/use-variable-chip-labels';
+export { useVariableChipLabels } from '@openenvx/variables';
 export { HtmlToolbarContribution } from './contributions/html-toolbar-contribution';
 export {
   HtmlPreviewChromeServiceId,

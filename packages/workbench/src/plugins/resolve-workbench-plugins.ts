@@ -9,10 +9,6 @@ import {
   DefaultWorkbenchFieldsPlugin,
 } from '../fields/default-fields-plugin';
 import {
-  DEFAULT_VARIABLES_PLUGIN_ID,
-  DefaultVariablesContainerPlugin,
-} from '../variables/default-variables-plugin';
-import {
   DEFAULT_INSPECTOR_PLUGIN_ID,
   DefaultInspectorContainerPlugin,
 } from '../views/default-inspector-plugin';
@@ -46,13 +42,8 @@ export const DEFAULT_WORKBENCH_PLUGIN_SPECS: readonly WorkbenchDefaultPluginSpec
       create: () => new DefaultInspectorContainerPlugin(),
     },
     {
-      id: DEFAULT_VARIABLES_PLUGIN_ID,
-      order: 30,
-      create: () => new DefaultVariablesContainerPlugin(),
-    },
-    {
       id: DEFAULT_WORKBENCH_CHROME_PLUGIN_ID,
-      order: 40,
+      order: 30,
       create: () => new DefaultWorkbenchChromePlugin(),
     },
   ];
