@@ -1,10 +1,10 @@
 import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
-import type { FocalPoint, ImageFit } from '@openenvx/core/schema';
 import { memo } from 'react';
 import { Image as KonvaImage, Rect } from 'react-konva';
 
 import type { CanvasLayerRendererHostProps } from '../contributions/canvas-layer-renderer-contribution';
 import { computeImageFitLayout } from '../image-fit';
+import { readImageFocalPoint, readImageFit } from '../preview-image-fields';
 import {
   ImageUploadingOverlay,
   imageUploadingOpacity,
@@ -14,27 +14,6 @@ import { useLoadedImage } from './use-loaded-image';
 export { useLoadedImage } from './use-loaded-image';
 
 type ImageView = Extract<LayerPreviewDescriptor, { kind: 'image' }>;
-
-function readFit(view: ImageView): ImageFit | undefined {
-  const fit = view.fit;
-  if (fit === 'cover' || fit === 'contain' || fit === 'fill') {
-    return fit;
-  }
-  return undefined;
-}
-
-function readFocalPoint(view: ImageView): FocalPoint | undefined {
-  const focal = view.focalPoint;
-  if (
-    focal &&
-    typeof focal === 'object' &&
-    typeof (focal as FocalPoint).x === 'number' &&
-    typeof (focal as FocalPoint).y === 'number'
-  ) {
-    return focal as FocalPoint;
-  }
-  return undefined;
-}
 
 export const ImageCanvasRenderer = memo(
   ({ view, width, height, hidden = false }: CanvasLayerRendererHostProps) => {
@@ -61,8 +40,8 @@ export const ImageCanvasRenderer = memo(
     const layout = computeImageFitLayout(
       { height: image.naturalHeight, width: image.naturalWidth },
       { height, width },
-      readFit(descriptor),
-      readFocalPoint(descriptor)
+      readImageFit(descriptor),
+      readImageFocalPoint(descriptor)
     );
 
     return (

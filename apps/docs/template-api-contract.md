@@ -1,6 +1,6 @@
 # Template API contract
 
-Stable contract for building a cloud render API against OpenEnvx templates. Editor and server share `@openenvx/core/schema` helpers: `extractTemplateManifest`, `applyModifications`, and `validateTemplateNames`.
+Stable contract for building a host/server render API against OpenEnvx templates. Editor and server share `@openenvx/core/schema` helpers: `extractTemplateManifest`, `applyModifications`, and `validateTemplateNames`.
 
 Pin clients to the scene `schemaVersion` (currently `2`). When the modification shape or resolution rules change incompatibly, bump `schemaVersion` and document the delta here.
 
@@ -15,7 +15,7 @@ Related implementation: [`packages/schema/src/template.ts`](../../packages/schem
 | Modifications | Bannerbear-style payload: `modifications: Modification[]` keyed by `name` |
 | Resolved scene | Result of `applyModifications(scene, modifications)` before render/export |
 
-Names are unique per scene (across all pages and nested groups). The editor warns on duplicates via `validateTemplateNames`; the cloud API should reject requests when duplicates exist.
+Names are unique per scene (across all pages and nested groups). The editor warns on duplicates via `validateTemplateNames`; the host API should reject requests when duplicates exist.
 
 ## TemplateManifest
 
@@ -68,7 +68,7 @@ Valid fields by kind:
 | `image` | `imageUrl`, `hidden`                                           |
 | `color` | `color`, `hidden`                                              |
 
-Unknown `name` values are skipped (no error from `applyModifications`). Prefer validating against the manifest first in the cloud API.
+Unknown `name` values are skipped (no error from `applyModifications`). Prefer validating against the manifest first in the host API.
 
 ## Resolution rules
 
@@ -79,7 +79,7 @@ Unknown `name` values are skipped (no error from `applyModifications`). Prefer v
    - Text shrink: when `data.autoFit === 'shrink'`, renderers call `fitFontSize(measureFn, boxHeight, minFontSize, fontSize)` so content stays inside the fixed transform box (`packages/canvas/src/fit-font-size.ts`).
    - Text box grow (editor / preview): after injecting copy, call `applyModificationsWithTextFit` from `@openenvx/canvas` (or `fitSceneCanvasTextToContent` on an already-resolved scene) so `transform.height` matches the wrapped content at the template width. Skips `autoFit: 'shrink'` and curved text. Pure `applyModifications` alone does not remasure.
    - Image: `data.fit` is `cover | contain | fill` with optional `data.focalPoint: { x, y }` in 0..1 (`packages/canvas/src/image-fit.ts`). Absent `fit` = legacy stretch (`fill`).
-5. Export/render the resolved scene with the same fit algorithms so canvas preview and server output match. For cloud render of non-shrink text, remasure with `applyModificationsWithTextFit` (or equivalent) before rasterizing if the box should hug injected copy.
+5. Export/render the resolved scene with the same fit algorithms so canvas preview and server output match. For server render of non-shrink text, remasure with `applyModificationsWithTextFit` (or equivalent) before rasterizing if the box should hug injected copy.
 
 ## Cloud API sketch
 
@@ -106,7 +106,7 @@ Server steps:
 3. If `validateTemplateNames(scene).duplicates.length > 0` → `400` with duplicate names.
 4. Reject unknown modification names (recommended) or skip them.
 5. `const resolved = applyModificationsWithTextFit(scene, modifications)` (or `applyModifications` then `fitSceneCanvasTextToContent` when you need the pure schema step separately).
-6. Render resolved scene (reuse openenvx-cloud export-service). Honor shrink-to-fit and image fit during rasterization.
+6. Render resolved scene with `exportCanvasDocument` from `@openenvx/canvas/export/node`. Honor shrink-to-fit and image fit during rasterization.
 
 ## End-to-end example
 

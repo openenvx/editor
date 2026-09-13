@@ -15,7 +15,7 @@ Maintainer reference for building and publishing packages that leave this reposi
 
 Scene model, preview descriptors, and editor runtime live in workspace `@openenvx/core` (`./schema`, `./preview`, `.`, `./react`). They are **not** published separately. Monorepo hosts use `@openenvx/canvas` / `@openenvx/html` / `@openenvx/driver-email` + `@openenvx/workbench` (HMR). Product host allowlists live on unpublished `@xmazu/openenvxee-studio` (`packages/studio`).
 
-Export Worker lives in **openenvx-cloud** (`apps/export-service`), not this repo.
+Canvas raster/PDF export lives in workspace `@openenvx/canvas` (`./export` for browser PNG/JPG, `./export/node` for Node PNG/JPG/PDF). It is **not** bundled into published `@openenvx/canvas-studio`.
 
 Everything else stays workspace-private and resolves from `src/` during local development.
 
@@ -143,6 +143,6 @@ npm install @openenvx/canvas-studio
 
 Published separately to GitHub Packages (restricted `@xmazu` scope). Hosts import `@xmazu/openenvxee-extensions/protocol` only.
 
-## External consumers (openenvx-cloud, etc.)
+## External consumers
 
 Legacy pins on `@xmazu/openenvxee-schema`, `@xmazu/openenvxee-preview`, `@xmazu/openenvxee-studio`, or `@xmazu/openenvxee-html-studio` are no longer published from this repo. Migrate to `@openenvx/html-studio` / inlined core as appropriate, or vendor Scene helpers - **not** by publishing `@openenvx/core`.

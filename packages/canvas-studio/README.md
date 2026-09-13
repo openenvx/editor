@@ -31,7 +31,7 @@ export function App() {
 
 Import `@openenvx/canvas-studio/theme.css` and `@openenvx/canvas-studio/fonts.css` if your bundler does not apply CSS imported from JS. For headless scene creation without the shell, import `@openenvx/canvas-studio/runtime`.
 
-Raster/PDF/SVG export is not included - use your host export pipeline or OpenEnvx cloud export-service.
+Browser PNG/JPG export in a workbench host: `useCanvasApi().exportImage()` (bundled via `CanvasPlugin`). Monorepo / custom hosts can also import `@openenvx/canvas/export` (browser PNG/JPG) and `@openenvx/canvas/export/node` (Node PNG/JPG/PDF) from the workspace `@openenvx/canvas` package — those subpaths are **not** published on npm with `canvas-studio`.
 
 ## Public API
 

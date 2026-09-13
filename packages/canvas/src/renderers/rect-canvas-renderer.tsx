@@ -3,6 +3,7 @@ import { memo } from 'react';
 import { Group, Rect } from 'react-konva';
 
 import type { CanvasLayerRendererHostProps } from '../contributions/canvas-layer-renderer-contribution';
+import { parseShadowColor, parseShadowOpacity } from '../preview-shadow';
 import {
   cornerRadiusToKonva,
   normalizeCornerRadius,
@@ -10,21 +11,6 @@ import {
 } from '../style-utils';
 
 type RectView = Extract<LayerPreviewDescriptor, { kind: 'rect' }>;
-
-function parseShadowOpacity(color: string): number {
-  if (color.length === 9 && color.startsWith('#')) {
-    const alpha = Number.parseInt(color.slice(7, 9), 16) / 255;
-    return Number.isNaN(alpha) ? 1 : alpha;
-  }
-  return 1;
-}
-
-function parseShadowColor(color: string): string {
-  if (color.length === 9 && color.startsWith('#')) {
-    return color.slice(0, 7);
-  }
-  return color;
-}
 
 export const RectCanvasRenderer = memo(
   ({ view, width, height, hidden = false }: CanvasLayerRendererHostProps) => {

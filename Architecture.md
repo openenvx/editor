@@ -4,7 +4,7 @@ Package boundaries and contribution flow for the monorepo.
 
 **Audience:** Contributors, integrators, and maintainers. This is the map for understanding package boundaries before changing code.
 
-**Also read:** [Plugin-boundaries.md](Plugin-boundaries.md) - internal vs external plugins, protocol trust boundary, and cloud/marketplace runners. Do not load untrusted plugin JS into the editor main world.
+**Also read:** [Plugin-boundaries.md](Plugin-boundaries.md) - internal vs external plugins, protocol trust boundary, and marketplace runners. Do not load untrusted plugin JS into the editor main world.
 
 ## Deep chapters
 

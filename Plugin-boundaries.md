@@ -146,13 +146,13 @@ Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/p
 
 ## QuickJS sandbox (Phase V.1 / V.1.1)
 
-Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workbench `SandboxExtensionHost` + canvas widget click bind), mounted with `mountSandboxExtensions` / `WorkbenchShell` `mountExternalHosts`: **one QuickJS isolate per extension in a dedicated Web Worker** - never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` nodes carry **local** `data.values` plus a rendered face in `data.children` (collaborative CRDT deferred). Customer widgets push `source` over `widget:source`; first-party grants still use signed URLs + content hashes (minted by openenvx-cloud).
+Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workbench `SandboxExtensionHost` + canvas widget click bind), mounted with `mountSandboxExtensions` / `WorkbenchShell` `mountExternalHosts`: **one QuickJS isolate per extension in a dedicated Web Worker** - never silently on the editor UI thread. In-process isolate is test-only (`preferInProcess: true`). Host bridge uses capability + command allowlists; `showUI` is a sandboxed iframe (`allow-scripts` only → opaque origin); `openenvx.widget` nodes carry **local** `data.values` plus a rendered face in `data.children` (collaborative CRDT deferred). Customer widgets push `source` over `widget:source`; first-party grants still use signed URLs + content hashes (minted by the product host).
 
 **Plugin lifecycle:** production hosts default `autoStartPlugins: false` - sandbox plugins start via `openenvx.sandbox.run.<id>` (user-run). Demos may opt into auto-start. Closing the floating UI panel does not stop the isolate; **Stop** / `closePlugin` does.
 
-**OK to run:** cloud-minted, hash-pinned, capability-scoped extensions that you (or a customer org admin) explicitly installed for a session.
+**OK to run:** host-minted, hash-pinned, capability-scoped extensions that you (or a customer org admin) explicitly installed for a session.
 
-**Not OK yet:** open marketplace / “anyone uploads JS and it runs in every Studio” - that needs cloud grant/signing, kill switch, version pinning, and further CPU/UI hardening beyond this boundary. Marketplace distribution remains deferred.
+**Not OK yet:** open marketplace / “anyone uploads JS and it runs in every Studio” - that needs grant/signing, kill switch, version pinning, and further CPU/UI hardening beyond this boundary. Marketplace distribution remains deferred.
 
 ### Isolation caps (V.1.1)
 
@@ -179,22 +179,9 @@ Implemented via `@xmazu/openenvxee-studio` `createSandboxExtensionHost` (workben
 
 UI iframe messages use `postMessage(..., '*')` because the sandboxed frame has an opaque null origin - the host still checks `event.source === iframe.contentWindow`.
 
-See openenvx-cloud `docs/embed/plugin-api.md`.
+## Remote / marketplace plugins
 
-## Cloud-hosted / marketplace plugins
-
-If OpenEnvx Cloud hosts plugins “added by people,” **only the other endpoint moves**. Studio’s job stays the same: speak the protocol (embed) or mint sandbox grants.
-
-```mermaid
-flowchart TB
-  subgraph studio [Studio - trusted]
-    Host["PluginPanel + validate + builders + render"]
-  end
-  subgraph cloud [OpenEnvx Cloud]
-    Runner["Plugin runner"]
-  end
-  Host <-->|"panel:context / tree / event / command"| Runner
-```
+If a product host runs plugins “added by people,” **only the other endpoint moves**. Studio’s job stays the same: speak the protocol (embed) or mint sandbox grants.
 
 | Where plugin logic runs | When to use |
 | --- | --- |

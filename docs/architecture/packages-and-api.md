@@ -89,7 +89,7 @@ Truth is always `packages/*/src/index.ts` (and secondary entries). This section 
 
 **`@openenvx/core`** - `./schema`: Scene Zod, normalize/validate, templates; `./schema/scene.schema.json` for JSON Schema export. `./preview`: LayerPreviewBuilder, Render IR. `.`: `EditorRuntime`, `PluginManager`, `WorkbenchController`, workbench contributions, property panes (`WorkbenchApi.mountSandboxHost` for sandbox panels). Property layout: `createPropertyPane`, `PropertyPath.when`, `PropertyLayoutWhenOptions`, `evaluatePropertyLayoutWhen`, `isPropertyLayoutNodeVisible`. `./react`: `WorkbenchProvider`, hooks.
 
-**`@openenvx/canvas`** - `CanvasPlugin`, `CanvasTemplatePlugin`, `CanvasEditor` / `CanvasHostProvider` / `CanvasStage`, layer definitions, `registerCanvasContribution`, transform/print panes, align tools, crop/guides, widget mapping helpers, export helpers.
+**`@openenvx/canvas`** (workspace-only; not published to npm) - `CanvasPlugin`, `CanvasTemplatePlugin`, `CanvasEditor` / `CanvasHostProvider` / `CanvasStage`, layer definitions, `registerCanvasContribution`, transform/print panes, align tools, crop/guides, widget mapping helpers. `./export` (browser PNG/JPG), `./export/node` (Node PNG/JPG/PDF; requires optional `@napi-rs/canvas` + `pdf-lib`), `./document-export` (types + `CanvasDocumentExportService`). Published `@openenvx/canvas-studio` bundles in-browser `useCanvasApi().exportImage()` only.
 
 **`@openenvx/html`** - `HtmlBlocksPlugin`, `HtmlEditorPane`, block registry + tree helpers, `createBlockCommands`.
 
@@ -125,10 +125,10 @@ Packages are pre-1.0: breaking changes are allowed and preferred over shims ([AG
 | Surface | Stability expectation |
 | --- | --- |
 | **Published** (`extensions`, `@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) | Treat as the external contract. Prefer additive changes. Document removals/renames in the PR / changeset. Bump version on every publish. |
-| **Studio host allowlist** (`packages/studio/src/index.ts`) | Host apps depend on this list. Adding is fine; removing/renaming is a host break - update openenvx-cloud / embed hosts in the same change window. |
+| **Studio host allowlist** (`packages/studio/src/index.ts`) | Host apps depend on this list. Adding is fine; removing/renaming is a host break - update embed hosts in the same change window. |
 | **Private workspace libs** (`core`, `canvas`, …) | Free to break inside the monorepo in one PR (update all callers). Do **not** add deprecated dual paths. |
 | **Contribution class hierarchy** (`Plugin`, `Command`, `LayerDefinition`, workbench contributions) | Highest-value internal API. Change carefully; update extension-guide when the authoring shape moves. |
-| **Scene JSON / protocol wire** | Highest external cost. Schema/protocol changes need consumer awareness (cloud export, agents, embeds). |
+| **Scene JSON / protocol wire** | Highest external cost. Schema/protocol changes need consumer awareness (Node export, agents, embeds). |
 
 ### Practical checklist before changing an export
 

@@ -30,7 +30,7 @@
 
 ## Open (decide when picking up)
 
-- **Auth + durable comments backend:** lean toward ports/adapters in editor-core + Liveblocks auth + comment API in openenvx-cloud (not decided). Demo-only stub is fine for a first spike.
+- **Auth + durable comments backend:** lean toward ports/adapters in editor-core + Liveblocks auth + comment API in the product host (not decided). Demo-only stub is fine for a first spike.
 - Undo/redo under multiplayer (per-client local stack vs shared).
 - Presence payload (cursor, selection, viewport).
 - Comment anchor model (node/block id + page-relative x/y; email vs canvas specifics).
@@ -40,8 +40,8 @@
 ```text
 packages/collab/              # ports + SceneStore bridge (provider-agnostic)
 packages/collab-liveblocks/   # Liveblocks CollaborationPort adapter (optional dep)
-openenvx-cloud (later)        # room auth endpoint + CommentPort HTTP/DB
-host (email-demo → cloud)     # wire adapters; CollabPlugin UI
+product host (later)            # room auth endpoint + CommentPort HTTP/DB
+host (email-demo → product)     # wire adapters; CollabPlugin UI
 ```
 
 Mutation hub stays in core: remote updates must go through `SceneStore` (`apply` / controlled restore), not ad-hoc UI writes. Presence UI overlays live in the engine/shell that owns the surface (email pane / canvas) - not in `core`.
@@ -68,13 +68,13 @@ Rough cost (sync only): Free hard-caps (e.g. 3k collab minutes); Pro ~$30/mo cre
 
 ## Why not Liveblocks Comments
 
-Product wants Figma-like pins that work async (offline other user, review/approval). Liveblocks Comments is room-live, metered at `$0.01`/comment, and couples UX/data to their model. Own comments keyed to `documentId` / version / node + position fit openenvx-cloud persistence and avoid that meter.
+Product wants Figma-like pins that work async (offline other user, review/approval). Liveblocks Comments is room-live, metered at `$0.01`/comment, and couples UX/data to their model. Own comments keyed to `documentId` / version / node + position fit host persistence and avoid that meter.
 
 ## Pickup checklist
 
-1. Confirm cloud vs demo auth/comments backend.
+1. Confirm product vs demo auth/comments backend.
 2. Add `packages/collab` ports + whole-scene `SceneStore` bridge.
-3. Add Liveblocks adapter package; wire `email-demo` (then cloud email host).
+3. Add Liveblocks adapter package; wire `email-demo` (then product email host).
 4. Ship CommentPort + pin UI (email first).
 5. Reuse same ports for canvas / HTML hosts.
 6. Update FEATURES.md status when shipping; consider CRDT upgrade path later without changing host APIs.

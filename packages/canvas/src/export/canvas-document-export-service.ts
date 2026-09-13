@@ -1,8 +1,7 @@
 import { createServiceId } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
 import type { LengthUnit, Scene } from '@openenvx/core/schema';
 
-export type CanvasExportFormat = 'svg' | 'png' | 'jpg' | 'pdf';
+export type CanvasExportFormat = 'png' | 'jpg' | 'pdf';
 
 export interface CanvasExportOptions {
   format: CanvasExportFormat;
@@ -11,6 +10,8 @@ export interface CanvasExportOptions {
   quality?: number;
   background?: 'transparent' | 'white' | string;
   fileName?: string;
+  /** When true, export throws if any image asset fails to load. Defaults to false in browser, true in Node. */
+  strictAssets?: boolean;
 }
 
 export interface CanvasExportDimensions {
@@ -21,27 +22,12 @@ export interface CanvasExportDimensions {
   pagePresetId?: string;
 }
 
-export interface CanvasExportFallback {
-  requestedFormat: CanvasExportFormat;
-  actualFormat: CanvasExportFormat;
-  reason: string;
-}
-
 export interface CanvasExportResult {
   mimeType: string;
   data: Uint8Array;
   dimensions: CanvasExportDimensions;
   fileName?: string;
-  fallback?: CanvasExportFallback;
-}
-
-export interface CanvasPreviewSvgSerializer {
-  readonly kind: string;
-  toSvgFragment(descriptor: LayerPreviewDescriptor, ctx: unknown): string;
-}
-
-interface CanvasPreviewSerializerRegisterOptions {
-  override?: boolean;
+  missingImageSrcs?: string[];
 }
 
 export interface CanvasDocumentExportService {
@@ -51,10 +37,6 @@ export interface CanvasDocumentExportService {
     options: CanvasExportOptions
   ): Promise<CanvasExportResult>;
   supportsFormat(format: CanvasExportFormat): boolean;
-  registerPreviewSerializer(
-    serializer: CanvasPreviewSvgSerializer,
-    options?: CanvasPreviewSerializerRegisterOptions
-  ): void;
 }
 
 export const CanvasDocumentExportServiceId =

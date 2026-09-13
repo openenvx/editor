@@ -24,7 +24,8 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 
 ### Override hooks
 
-- Per-kind override of renderers / interactions / preview / SVG export (server) via `{ override: true }`
+- Per-kind override of renderers / interactions / preview via `{ override: true }`
+- Headless raster export: `@openenvx/canvas/export` (browser PNG/JPG), `@openenvx/canvas/export/node` (Node PNG/JPG/PDF); `canvas.exportImage` via `CanvasDocumentExportService`
 - Generic layer handles on `CanvasLayerInteractionContribution` (`providesHandles`, `layoutHandles`, `onHandleDrag*`)
 - Optional `dataPatch` on `canvas.updateLayerTransform` (merges into `layer.data`)
 

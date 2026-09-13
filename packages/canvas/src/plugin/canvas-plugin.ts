@@ -105,14 +105,15 @@ import { proImageCanvasContributions } from '../contributions/pro-image-contribu
 import { bindCanvasDisplayContextKeys } from '../display/bind-canvas-display-context-keys';
 import { CanvasMarginsSettings } from '../display/canvas-margins-settings';
 import { AbsoluteEditorPane } from '../editor/absolute-editor-pane';
+import { BrowserCanvasDocumentExportService } from '../export/browser/canvas-document-export-service';
+import { CanvasDocumentExportServiceId } from '../export/canvas-document-export-service';
 import { SvgNodesFieldRenderer } from '../fields/svg-nodes-field';
 import { canvasFontService } from '../fonts/canvas-font-service';
 import { CanvasGridSettings } from '../grid/canvas-grid-settings';
 import { CanvasI18nBundle } from '../i18n/canvas-i18n-bundle';
+import { builtinCanvasLayerDefinitions } from '../layers/builtin-canvas-layer-definitions';
 import { CanvasCircleLayer } from '../layers/canvas-circle-layer';
-import { CanvasGroupLayer } from '../layers/canvas-group-layer';
 import { CanvasImageLayer } from '../layers/canvas-image-layer';
-import { CanvasInstanceLayer } from '../layers/canvas-instance-layer';
 import { CanvasQrLayer } from '../layers/canvas-qr-layer';
 import { CanvasRectLayer } from '../layers/canvas-rect-layer';
 import { CanvasSvgLayer } from '../layers/canvas-svg-layer';
@@ -358,15 +359,7 @@ export class CanvasPlugin extends Plugin {
     ctx.register(
       new AbsolutePageRules(),
       new CanvasI18nBundle(),
-      new CanvasTextLayer(),
-      new CanvasImageLayer(),
-      new CanvasSvgLayer(),
-      new CanvasQrLayer(),
-      new CanvasRectLayer(),
-      new CanvasCircleLayer(),
-      new CanvasGroupLayer(),
-      new CanvasInstanceLayer(),
-      new OpenEnvxWidgetLayer(),
+      ...builtinCanvasLayerDefinitions(),
       new InsertCanvasTextCommand(),
       new InsertOpenEnvxWidgetCommand(),
       new DetachWidgetCommand(),
@@ -438,7 +431,11 @@ export class CanvasPlugin extends Plugin {
       new SimpleServiceContribution(CanvasPageResizeServiceId, () => ({
         resizeSceneToPreset: resizeSceneToPagePreset,
       })),
-      new SimpleServiceContribution(FontServiceId, () => canvasFontService)
+      new SimpleServiceContribution(FontServiceId, () => canvasFontService),
+      new SingletonServiceContribution(
+        CanvasDocumentExportServiceId,
+        BrowserCanvasDocumentExportService
+      )
     );
 
     bindCanvasDisplayContextKeys(ctx);

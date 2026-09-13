@@ -27,7 +27,7 @@ import '@openenvx/canvas-studio/fonts.css';
 <CanvasEditor onChange={save} theme="dark" />
 ```
 
-`CanvasEditor` defaults `initialScene` to `createCanvasScene()` when omitted. Headless scene factory is `@openenvx/canvas-studio/runtime`. Raster/PDF export is not included - use cloud export-service or your host pipeline.
+`CanvasEditor` defaults `initialScene` to `createCanvasScene()` when omitted. Headless scene factory is `@openenvx/canvas-studio/runtime`. In-browser export for npm hosts: `useCanvasApi().exportImage()`. Monorepo / custom hosts may import `@openenvx/canvas/export` (browser PNG/JPG) or `@openenvx/canvas/export/node` (Node PNG/JPG/PDF) from workspace `@openenvx/canvas` — not bundled in the published studio tarball.
 
 Monorepo HMR stays on `@openenvx/canvas` + `@openenvx/workbench` (`apps/canvas-demo`). The published bundle is exercised by `apps/canvas-package-demo` (`bun run dev:canvas-package`).
 

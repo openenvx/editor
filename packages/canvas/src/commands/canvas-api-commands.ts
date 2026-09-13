@@ -405,7 +405,8 @@ export class ExportImageCommand extends Command {
   }
 
   async execute(
-    ctx: CommandContext
+    ctx: CommandContext,
+    args?: unknown
   ): Promise<{ mimeType: string; dataUrl: string } | null> {
     const exporter = getDocumentExporter(ctx);
     if (!exporter) {
@@ -413,8 +414,27 @@ export class ExportImageCommand extends Command {
     }
     const scene = ctx.scene.getScene();
     const page = getActivePage(scene);
+    const options =
+      args && typeof args === 'object'
+        ? (args as {
+            background?: 'transparent' | 'white' | string;
+            dpi?: number;
+            fileName?: string;
+            format?: 'png' | 'jpg';
+            quality?: number;
+            scale?: number;
+            strictAssets?: boolean;
+          })
+        : {};
+    const format = options.format === 'jpg' ? 'jpg' : 'png';
     const result = await exporter.exportDocument(scene, page.id, {
-      format: 'png',
+      background: options.background,
+      dpi: options.dpi,
+      fileName: options.fileName,
+      format,
+      quality: options.quality,
+      scale: options.scale,
+      strictAssets: options.strictAssets,
     });
     return {
       dataUrl: bytesToDataUrl(result.data, result.mimeType),

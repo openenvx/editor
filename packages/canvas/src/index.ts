@@ -376,11 +376,9 @@ export {
   CanvasDocumentExportServiceId,
   type CanvasDocumentExportService,
   type CanvasExportDimensions,
-  type CanvasExportFallback,
   type CanvasExportFormat,
   type CanvasExportOptions,
   type CanvasExportResult,
-  type CanvasPreviewSvgSerializer,
 } from './export/canvas-document-export-service';
 export { bytesToDataUrl, downloadBytes } from './export/bytes-to-data-url';
 export type { PageResizeService } from './page-resize/page-resize-types';

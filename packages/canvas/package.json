@@ -9,6 +9,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./document-export": "./src/export/canvas-document-export-service.ts",
+    "./export": "./src/export/browser/index.ts",
+    "./export/node": "./src/export/node/index.ts",
     "./export-bytes": "./src/export/bytes-to-data-url.ts",
     "./export-layers": "./src/export-layers.ts",
     "./registry": "./src/plugin/canvas-registry-service.ts",
@@ -28,13 +30,13 @@
   "dependencies": {
     "@openenvx/core": "workspace:*",
     "@openenvx/variables": "workspace:*",
-    "@xmazu/openenvxee-extensions": "workspace:*",
     "@tiptap/extension-color": "^3.27.3",
     "@tiptap/extension-font-family": "^3.27.3",
     "@tiptap/extension-text-style": "^3.27.3",
     "@tiptap/pm": "^3.27.3",
     "@tiptap/react": "^3.27.3",
     "@tiptap/starter-kit": "^3.27.3",
+    "@xmazu/openenvxee-extensions": "workspace:*",
     "konva": "^10.3.0",
     "lucide-react": "1.24.0",
     "react-konva": "^19.2.5",
@@ -53,10 +55,22 @@
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"
   },
+  "optionalDependencies": {
+    "@napi-rs/canvas": "^1.0.9",
+    "pdf-lib": "^1.17.1"
+  },
   "peerDependencies": {
     "@openenvx/core": ">=0.1.11",
     "react": ">=18",
     "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "@napi-rs/canvas": {
+      "optional": true
+    },
+    "pdf-lib": {
+      "optional": true
+    }
   },
   "repository": {
     "type": "git",

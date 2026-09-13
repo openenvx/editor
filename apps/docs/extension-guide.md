@@ -13,7 +13,7 @@ Under-the-hood map: [Architecture.md](../../Architecture.md) · [docs/architectu
 
 The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@openenvx/core/schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
 
-Backend services depend on `@openenvx/core/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Cloud `export-service` (openenvx-cloud) imports overlapping leaf schemas (`paddingSchema`, `layerStyleShadowSchema`, …) into its Render IR request schema while keeping Render-IR-specific document shapes local.
+Backend services depend on `@openenvx/core/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Node canvas raster/PDF export uses `@openenvx/canvas/export/node` against the same Scene JSON.
 
 ## OSS vs enterprise shell
 
@@ -326,7 +326,7 @@ registerCanvasContribution(
 );
 ```
 
-Raster/PDF/SVG export is server-side (openenvx-cloud `export-service`); there is no in-browser SVG serializer registry to override.
+Canvas raster export: `@openenvx/canvas/export` (browser PNG/JPG) or `@openenvx/canvas/export/node` (Node PNG/JPG/PDF). `CanvasDocumentExportService` is registered by `CanvasPlugin` for `canvas.exportImage`.
 
 ## Generic layer handles
 

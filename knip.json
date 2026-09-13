@@ -32,6 +32,8 @@
     "packages/canvas": {
       "entry": [
         "src/index.ts!",
+        "src/export/browser/index.ts!",
+        "src/export/node/index.ts!",
         "src/export-layers.ts!",
         "src/plugin/canvas-plugin.ts!"
       ],
