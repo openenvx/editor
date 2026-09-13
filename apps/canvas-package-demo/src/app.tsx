@@ -23,7 +23,7 @@ export function App() {
 
   const exportPage = useCallback(
     async (format: ExportFormat) => {
-      const coreScene = scene as CoreScene;
+      const coreScene = scene as unknown as CoreScene;
       const page = getActivePage(coreScene);
       setExporting(format);
       setExportError(null);

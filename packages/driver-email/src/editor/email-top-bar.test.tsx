@@ -5,7 +5,6 @@ import { cleanup } from '@testing-library/react';
 import { createEmailDemoScene } from '../create-email-demo-scene';
 import { DEFAULT_EMAIL_LAYOUT } from '../default-email-layout';
 import { EmailBlocksPlugin } from '../plugin/email-blocks-plugin';
-import { createEmailWorkbench } from '../test/email-editor-harness';
 
 afterEach(cleanup);
 
@@ -14,16 +13,21 @@ describe('EmailTopBar contribution', () => {
     expect(DEFAULT_EMAIL_LAYOUT.topBar).toBe(true);
   });
 
-  it('does not contribute top bar actions by default', async () => {
-    const { api, dispose } = await createEmailWorkbench();
+  it('does not contribute top bar actions without EmailBlocksPlugin', async () => {
+    const controller = new WorkbenchController({
+      initialScene: createEmailDemoScene(),
+      layout: DEFAULT_EMAIL_LAYOUT,
+      plugins: [],
+    });
+    await controller.start();
     try {
-      expect(api.getSnapshot().topBarItems).toEqual([]);
+      expect(controller.api.getSnapshot().topBarItems).toEqual([]);
     } finally {
-      dispose();
+      controller.dispose();
     }
   });
 
-  it('contributes email top bar actions when the plugin opts in', async () => {
+  it('contributes email top bar actions when EmailBlocksPlugin is active', async () => {
     const controller = new WorkbenchController({
       initialScene: createEmailDemoScene(),
       layout: DEFAULT_EMAIL_LAYOUT,

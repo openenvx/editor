@@ -24,6 +24,7 @@
       "dependencies": {
         "@openenvx/canvas": "workspace:*",
         "@openenvx/canvas-studio": "workspace:*",
+        "@openenvx/core": "workspace:*",
         "react": "19.2.7",
         "react-dom": "19.2.7",
       },
@@ -74,7 +75,6 @@
       "name": "@openenvx/canvas",
       "version": "0.1.11",
       "dependencies": {
-        "@napi-rs/canvas": "^1.0.9",
         "@openenvx/core": "workspace:*",
         "@openenvx/variables": "workspace:*",
         "@tiptap/extension-color": "^3.27.3",
@@ -86,7 +86,6 @@
         "@xmazu/openenvxee-extensions": "workspace:*",
         "konva": "^10.3.0",
         "lucide-react": "1.24.0",
-        "pdf-lib": "^1.17.1",
         "react-konva": "^19.2.5",
         "zod": "4.4.3",
       },
@@ -103,11 +102,21 @@
         "typescript": "catalog:dev",
         "vitest": "catalog:testing",
       },
+      "optionalDependencies": {
+        "@napi-rs/canvas": "^1.0.9",
+        "pdf-lib": "^1.17.1",
+      },
       "peerDependencies": {
+        "@napi-rs/canvas": "*",
         "@openenvx/core": ">=0.1.11",
+        "pdf-lib": "*",
         "react": ">=18",
         "react-dom": ">=18",
       },
+      "optionalPeers": [
+        "@napi-rs/canvas",
+        "pdf-lib",
+      ],
     },
     "packages/canvas-studio": {
       "name": "@openenvx/canvas-studio",
