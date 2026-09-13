@@ -3,11 +3,14 @@ import { createContext, useContext, type ReactNode } from 'react';
 
 import type { BlockSortDraft } from './block-dnd';
 import type { RichTextAlign } from './rich-text-align';
+import type { RichTextBoundary, RichTextCaret } from './rich-text-boundary';
 
 /** Inline edit target - `dataPath` is `html` for plain blocks or a dotted slot path. */
 export interface BlockEditTarget {
   hostId: string;
   dataPath: string;
+  /** Caret placement when the TipTap instance mounts. */
+  caret?: RichTextCaret;
 }
 
 /**
@@ -36,13 +39,18 @@ export interface BlockEditorContextValue {
   setImageOverride: (target: BlockImageTarget | null) => void;
   onSelect: (id: string) => void;
   onHoverLayer: (id: string | null) => void;
-  onStartEdit: (hostId: string, dataPath: string) => void;
+  onStartEdit: (
+    hostId: string,
+    dataPath: string,
+    caret?: RichTextCaret
+  ) => void;
   onCommitEdit: (
     hostId: string,
     dataPath: string,
     html: string,
     align?: RichTextAlign
   ) => void;
+  onBoundary?: (intent: RichTextBoundary) => boolean;
   onDuplicate: (id: string) => void;
   onRemove: (id: string) => void;
   /** Upload file via AssetService and write ref to layer fieldPath. */

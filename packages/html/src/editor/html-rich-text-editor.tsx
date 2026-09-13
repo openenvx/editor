@@ -28,6 +28,11 @@ import {
   readEditorTextAlign,
   type RichTextAlign,
 } from './rich-text-align';
+import {
+  readRichTextBoundaryFromKey,
+  type RichTextBoundary,
+  type RichTextCaret,
+} from './rich-text-boundary';
 import { createRichTextEditorExtensions } from './rich-text-editor-extensions';
 import type { ResolvedRichTextToolbar } from './rich-text-toolbar';
 import { useVariableChipLabels } from './use-variable-chip-labels';
@@ -102,7 +107,14 @@ export interface HtmlRichTextEditorProps {
   align?: RichTextAlign;
   /** Bubble-menu sections; defaults show block type + align. */
   toolbar?: ResolvedRichTextToolbar;
+  /** Caret placement on mount. Omit to keep click-to-edit select-all. */
+  caret?: RichTextCaret;
   onCommit: (html: string, align?: RichTextAlign) => void;
+  /**
+   * Caret-at-boundary intents (Enter / Backspace / arrows). Return true when
+   * the pane handled the key so ProseMirror should not.
+   */
+  onBoundary?: (intent: RichTextBoundary) => boolean;
   /** Register inline insert handler while this editor is mounted. */
   bindTextInsert?: (insert: ((text: string) => void) | null) => void;
 }
@@ -119,7 +131,9 @@ export function HtmlRichTextEditor({
   html,
   align,
   toolbar = DEFAULT_TOOLBAR,
+  caret,
   onCommit,
+  onBoundary,
   bindTextInsert,
 }: HtmlRichTextEditorProps) {
   const { executeCommand } = useWorkbenchContext();
@@ -133,6 +147,8 @@ export function HtmlRichTextEditor({
     missingTip: '',
   });
   const editorRef = useRef<Editor | null>(null);
+  const onBoundaryRef = useRef(onBoundary);
+  onBoundaryRef.current = onBoundary;
   const suggestRef = useRef<VariableSuggestAnchor | null>(null);
   const suggestDismissedRef = useRef(false);
   const highlightRef = useRef(0);
@@ -238,6 +254,16 @@ export function HtmlRichTextEditor({
           return true;
         }
 
+        const activeEditor = editorRef.current;
+        const handleBoundary = onBoundaryRef.current;
+        if (activeEditor && handleBoundary) {
+          const intent = readRichTextBoundaryFromKey(activeEditor, event);
+          if (intent && handleBoundary(intent)) {
+            event.preventDefault();
+            return true;
+          }
+        }
+
         if (event.key.length === 1 && !event.metaKey && !event.ctrlKey) {
           suggestDismissedRef.current = false;
         }
@@ -259,10 +285,12 @@ export function HtmlRichTextEditor({
       );
     },
     onCreate: ({ editor: activeEditor }) => {
-      const chain = activeEditor
-        .chain()
-        .selectAll()
-        .focus(undefined, { scrollIntoView: false });
+      const chain = activeEditor.chain();
+      if (caret === 'start' || caret === 'end') {
+        chain.focus(caret, { scrollIntoView: false });
+      } else {
+        chain.selectAll().focus(undefined, { scrollIntoView: false });
+      }
       const seed = syncAlign ? parseRichTextAlign(align) : null;
       if (seed) {
         chain.setTextAlign(seed);

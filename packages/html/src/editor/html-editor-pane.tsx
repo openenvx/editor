@@ -10,7 +10,6 @@ import {
 } from '@dnd-kit/core';
 import {
   AssetServiceId,
-  ContextKeyServiceId,
   getActivePage,
   RichTextInsertServiceId,
 } from '@openenvx/core';
@@ -37,7 +36,6 @@ import {
 } from '../block-registry';
 import { getPageRootId } from '../tree/block-tree';
 import { blockCollisionDetection, type BlockSortDraft } from './block-dnd';
-import type { BlockEditTarget } from './block-editor-context';
 import { BlockTreeRenderer } from './block-tree-renderer';
 import {
   applyHtmlDragEnd,
@@ -45,10 +43,7 @@ import {
   applyHtmlDragStart,
 } from './html-editor-drag';
 import { resolveStageClickAction } from './resolve-stage-click-selection';
-import {
-  alignDataPathFromHtmlPath,
-  type RichTextAlign,
-} from './rich-text-align';
+import { useBlockTextFlow } from './use-block-text-flow';
 import { useHtmlPreviewChrome } from './use-html-preview-chrome';
 import { useVariableChipLabels } from './use-variable-chip-labels';
 
@@ -65,9 +60,12 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     api.getService(BlockRegistryServiceId) ?? defaultBlockRegistry;
   const assets = api.getService(AssetServiceId);
   const canReplaceImage = typeof assets?.upload === 'function';
-  const [editingTarget, setEditingTarget] = useState<BlockEditTarget | null>(
-    null
-  );
+  const { editingTarget, onStartEdit, onCommitEdit, onBoundary } =
+    useBlockTextFlow({
+      prefix: 'html',
+      textBlockType: 'html.text',
+      registry,
+    });
   const [sortDraft, setSortDraft] = useState<BlockSortDraft | null>(null);
   const sortDraftRef = useRef<BlockSortDraft | null>(null);
   const richTextInsertRef = useRef<((text: string) => void) | null>(null);
@@ -179,34 +177,6 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
       api.selectLayers([]);
     },
     [api, editingTarget, scene, selection]
-  );
-
-  const handleStartEdit = useCallback(
-    (hostId: string, dataPath: string) => {
-      api
-        .getService(ContextKeyServiceId)
-        ?.setContext('editor.editingText', true);
-      setEditingTarget({ hostId, dataPath });
-    },
-    [api]
-  );
-
-  const handleCommitEdit = useCallback(
-    (hostId: string, dataPath: string, html: string, align?: RichTextAlign) => {
-      if (align !== undefined) {
-        api.updateProperties(hostId, {
-          [dataPath]: html,
-          [alignDataPathFromHtmlPath(dataPath)]: align,
-        });
-      } else {
-        api.updateProperty(hostId, dataPath, html);
-      }
-      api
-        .getService(ContextKeyServiceId)
-        ?.setContext('editor.editingText', false);
-      setEditingTarget(null);
-    },
-    [api]
   );
 
   const handleDuplicate = useCallback(
@@ -349,13 +319,14 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
                   editingTarget={editingTarget}
                   hoveredLayerId={hoveredLayerId}
                   layers={page.layers}
-                  onCommitEdit={handleCommitEdit}
+                  onBoundary={onBoundary}
+                  onCommitEdit={onCommitEdit}
                   onDuplicate={handleDuplicate}
                   onHoverLayer={handleHoverLayer}
                   onRemove={handleRemove}
                   onReplaceImage={handleReplaceImage}
                   onSelect={handleSelect}
-                  onStartEdit={handleStartEdit}
+                  onStartEdit={onStartEdit}
                   registry={registry}
                   resolveAssetUrl={resolveAssetUrl}
                   scene={scene}

@@ -38,6 +38,12 @@ export {
 } from './editor/block-dnd';
 export { BlockPalettePanel } from './editor/block-palette-panel';
 export { BlockTreeRenderer } from './editor/block-tree-renderer';
+export { useBlockTextFlow } from './editor/use-block-text-flow';
+export type { BlockEditTarget } from './editor/block-editor-context';
+export type {
+  RichTextBoundary,
+  RichTextCaret,
+} from './editor/rich-text-boundary';
 export {
   applyHtmlDragEnd,
   applyHtmlDragOver,
@@ -103,6 +109,10 @@ export {
   removeById,
   updateBlockData,
 } from './tree/block-tree';
+export {
+  findAdjacentTextBlockId,
+  isRichTextBlock,
+} from './tree/text-block-navigation';
 export { flattenReactChildren } from './tree/flatten-react-children';
 export { resolveInsertParentId } from './tree/resolve-insert-parent-id';
 export {

@@ -28,6 +28,21 @@ Do **not** call the artboard “canvas” (that word is reserved for Konva / `@o
 
 Page-root props still show in the Inspector when the root is selected (via artboard click or the Layers tree). The root simply has no floating selection menu on the artboard.
 
+## Inline text keyboard
+
+TipTap mounts in at most one block at a time (`editingTarget` in `useBlockTextFlow`). Keys at the caret boundary raise a `RichTextBoundary` intent; the pane resolves it into existing `*.insertBlock` / `*.removeBlock` commands. Slot paths (`slots.*.data.html`) do not participate.
+
+| Key | When | Result |
+| --- | --- | --- |
+| Enter | Caret at end of a top-level paragraph | Insert a sibling text block after this one and move the caret into it. |
+| Shift+Enter | Anywhere | Hard break in place (StarterKit default). |
+| Backspace | Document is empty | Remove the block (skipped when it is the only child of its parent) and put the caret at the end of the previous text block. |
+| ArrowUp | Caret at document start | Caret to the end of the previous editable text block. |
+| ArrowDown | Caret at document end | Caret to the start of the next editable text block. |
+| Escape | While editing | Commit HTML and exit inline edit. |
+
+`{{` variable suggest still wins Enter / ArrowUp / ArrowDown when its menu is open. Enter inside a list, blockquote, or code block stays in-document.
+
 ## Why the root has no BlockChrome
 
 Nested blocks need a chrome box for outline, hover, drag, and the selection pill. The page root _is_ the frame - wrapping it in chrome would fight layout (full-bleed backgrounds, email columns, product roots). Selection for page props is therefore artboard-driven, not chrome-driven.

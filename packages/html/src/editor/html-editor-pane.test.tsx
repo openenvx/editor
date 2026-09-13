@@ -192,6 +192,35 @@ describe('HtmlEditorPane', () => {
     }
   });
 
+  it('inserts a sibling text block when Enter is pressed at the end of a heading', async () => {
+    const { api, dispose } = await createHtmlWorkbench();
+    try {
+      renderWithWorkbench(api, <HtmlEditorPane />);
+      fireEvent.click(screen.getByText('Below the hero'));
+
+      const editable = await waitFor(() => {
+        const node = document.querySelector('[contenteditable="true"]');
+        expect(node).toBeTruthy();
+        return node as HTMLElement;
+      });
+      fireEvent.keyDown(editable, { key: 'ArrowRight' });
+      fireEvent.keyDown(editable, { key: 'Enter' });
+
+      await waitFor(() => {
+        const root = api.getSnapshot().scene.pages[0]!.layers[0]!;
+        const children = (
+          root.data as { children: { type: string }[] }
+        ).children;
+        const headingIndex = children.findIndex(
+          (child) => child.type === 'html.heading'
+        );
+        expect(children[headingIndex + 1]?.type).toBe('html.text');
+      });
+    } finally {
+      dispose();
+    }
+  });
+
   it('clears selection when clicking the stage outside the artboard', async () => {
     const { api, dispose } = await createHtmlWorkbench();
     try {

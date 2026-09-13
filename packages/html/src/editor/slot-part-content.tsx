@@ -12,6 +12,7 @@ import {
 } from 'react';
 
 import type { BlockRegistry } from '../block-registry';
+import { isRichTextBlock } from '../tree/text-block-navigation';
 import { useBlockEditor } from './block-editor-context';
 import { withDisplayRichTextHtml } from './display-rich-text-html';
 import { dataTransferHasFiles, firstImageFile } from './image-file-drop';
@@ -26,10 +27,6 @@ import { parseRichTextAlign } from './rich-text-align';
 import { resolveSlotRichTextToolbar } from './rich-text-toolbar';
 
 import styles from './html-editor-pane.module.css';
-
-function isRichTextBlock(registry: BlockRegistry, type: string): boolean {
-  return registry.get(type)?.fields.html?.kind === 'richText';
-}
 
 function layerDataRecord(layer: Layer): Record<string, unknown> {
   return typeof layer.data === 'object' && layer.data !== null

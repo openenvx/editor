@@ -27,13 +27,12 @@ import {
   blockCollisionDetection,
   BlockTreeRenderer,
   getPageRootId,
-  alignDataPathFromHtmlPath,
   resolveStageClickAction,
+  useBlockTextFlow,
   useHtmlPreviewChrome,
   type BlockRegistry,
   type BlockSortDraft,
   type HtmlDevicePreset,
-  type RichTextAlign,
   useVariableChipLabels,
 } from '@openenvx/html';
 import {
@@ -55,7 +54,6 @@ import {
 } from '../block-registry';
 import { ensureEmailDocumentFont } from '../render/email-document-font';
 import { renderEmailDocument } from '../render/render-email-document';
-import type { BlockEditTarget } from './block-edit-target';
 import { resolveEmailFrameWidth } from './email-device-preview';
 import {
   EmailEditorModeServiceId,
@@ -111,9 +109,12 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   );
   const registry: BlockRegistry =
     api.getService(EmailBlockRegistryServiceId) ?? emailBlockRegistry;
-  const [editingTarget, setEditingTarget] = useState<BlockEditTarget | null>(
-    null
-  );
+  const { editingTarget, onStartEdit, onCommitEdit, onBoundary, clearEditing } =
+    useBlockTextFlow({
+      prefix: 'email',
+      textBlockType: 'email.text',
+      registry,
+    });
   const [sortDraft, setSortDraft] = useState<BlockSortDraft | null>(null);
   const sortDraftRef = useRef<BlockSortDraft | null>(null);
   const richTextInsertRef = useRef<((text: string) => void) | null>(null);
@@ -255,34 +256,6 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     [api, editingTarget, scene, selection]
   );
 
-  const handleStartEdit = useCallback(
-    (hostId: string, dataPath: string) => {
-      api
-        .getService(ContextKeyServiceId)
-        ?.setContext('editor.editingText', true);
-      setEditingTarget({ hostId, dataPath });
-    },
-    [api]
-  );
-
-  const handleCommitEdit = useCallback(
-    (hostId: string, dataPath: string, html: string, align?: RichTextAlign) => {
-      if (align !== undefined) {
-        api.updateProperties(hostId, {
-          [dataPath]: html,
-          [alignDataPathFromHtmlPath(dataPath)]: align,
-        });
-      } else {
-        api.updateProperty(hostId, dataPath, html);
-      }
-      api
-        .getService(ContextKeyServiceId)
-        ?.setContext('editor.editingText', false);
-      setEditingTarget(null);
-    },
-    [api]
-  );
-
   const handleDuplicate = useCallback(
     (id: string) => {
       void executeCommand('email.duplicateBlock', { id });
@@ -381,13 +354,10 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
 
   useEffect(() => {
     if (isReadOnly && editingTarget) {
-      api
-        .getService(ContextKeyServiceId)
-        ?.setContext('editor.editingText', false);
-      setEditingTarget(null);
+      clearEditing();
       clearDrag();
     }
-  }, [api, clearDrag, editingTarget, isReadOnly]);
+  }, [clearDrag, clearEditing, editingTarget, isReadOnly]);
 
   useEffect(() => {
     if (!needsRenderedHtml || !scene || !activePageId) {
@@ -463,12 +433,13 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
         editingTarget={editingTarget}
         hoveredLayerId={hoveredLayerId}
         layers={page.layers}
-        onCommitEdit={handleCommitEdit}
+        onBoundary={onBoundary}
+        onCommitEdit={onCommitEdit}
         onDuplicate={handleDuplicate}
         onHoverLayer={handleHoverLayer}
         onRemove={handleRemove}
         onSelect={handleSelect}
-        onStartEdit={handleStartEdit}
+        onStartEdit={onStartEdit}
         registry={registry}
         scene={scene}
         selectedId={selectedId}

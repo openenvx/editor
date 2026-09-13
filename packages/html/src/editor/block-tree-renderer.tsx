@@ -29,6 +29,7 @@ import {
 
 import type { BlockRegistry } from '../block-registry';
 import { getBlockChildren } from '../tree/block-tree';
+import { isRichTextBlock } from '../tree/text-block-navigation';
 import { BlockChrome } from './block-chrome';
 import { useBlockChromeHostProps } from './block-chrome-host-context';
 import {
@@ -54,6 +55,7 @@ import {
   resolveImageFieldsInData,
 } from './primary-image-field';
 import { parseRichTextAlign, type RichTextAlign } from './rich-text-align';
+import type { RichTextBoundary } from './rich-text-boundary';
 import { resolveRichTextToolbar } from './rich-text-toolbar';
 import { buildSlotNodes } from './slot-part-content';
 import { useTableRowChildListDropTarget } from './table-row-drop-target';
@@ -61,10 +63,6 @@ import { useTableRowChildListDropTarget } from './table-row-drop-target';
 import styles from './html-editor-pane.module.css';
 
 export type { BlockSortDraft };
-
-function isRichTextBlock(registry: BlockRegistry, type: string): boolean {
-  return registry.get(type)?.fields.html?.kind === 'richText';
-}
 
 function layerDataRecord(layer: Layer): Record<string, unknown> {
   return typeof layer.data === 'object' && layer.data !== null
@@ -253,6 +251,8 @@ function BlockContentInner({
     onSelect,
     onStartEdit,
     onCommitEdit,
+    onBoundary,
+    editingTarget,
     resolveAssetUrl,
     scene,
     bindRichTextInsert,
@@ -326,7 +326,9 @@ function BlockContentInner({
                   toolbar.align ? parseRichTextAlign(data.align) : undefined
                 }
                 bindTextInsert={bindRichTextInsert}
+                caret={editingTarget?.caret}
                 html={String(data.html ?? '')}
+                onBoundary={onBoundary}
                 onCommit={handleCommit}
                 toolbar={toolbar}
               />
@@ -572,6 +574,7 @@ export const BlockTreeRenderer = memo(
     onHoverLayer,
     onStartEdit,
     onCommitEdit,
+    onBoundary,
     onDuplicate,
     onRemove,
     onReplaceImage,
@@ -596,6 +599,7 @@ export const BlockTreeRenderer = memo(
       html: string,
       align?: RichTextAlign
     ) => void;
+    onBoundary?: (intent: RichTextBoundary) => boolean;
     onDuplicate: (id: string) => void;
     onRemove: (id: string) => void;
     onReplaceImage?: (
@@ -632,6 +636,7 @@ export const BlockTreeRenderer = memo(
           onHoverLayer: onHoverLayer ?? (() => {}),
           onStartEdit,
           onCommitEdit,
+          onBoundary,
           onDuplicate,
           onRemove,
           onReplaceImage: onReplaceImage ?? (() => {}),
