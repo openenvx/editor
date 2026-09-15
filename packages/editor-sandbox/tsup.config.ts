@@ -41,7 +41,10 @@ const hostConfig = createLibraryConfig({
 
 const canvasWidgetConfig = createLibraryConfig({
   tsconfig: 'tsconfig.canvas-widget.json',
-  entry: ['src/canvas-widget/index.ts'],
+  entry: [
+    'src/canvas-widget/**/*.{ts,tsx}',
+    '!src/canvas-widget/**/*.test.{ts,tsx}',
+  ],
   outDir: 'dist/canvas-widget',
   clean: false,
   external: [

@@ -73,11 +73,13 @@
         "src/protocol/index.ts!",
         "src/host/index.ts!",
         "src/host/quickjs.worker.ts!",
-        "src/canvas-widget/index.ts!"
+        "src/canvas-widget/index.ts!",
+        "build-dts.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts"
+        "!src/**/*.test.ts",
+        "build-dts.ts"
       ]
     },
     "packages/agent": {

@@ -72,7 +72,7 @@
     "./openenvx": "./src/openenvx.d.ts"
   },
   "scripts": {
-    "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/host/ dist/host/",
+    "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/host/ dist/host/ && node ./build-dts.ts",
     "prepack": "bun run build",
     "test": "vitest run",
     "check-types": "tsc --noEmit && tsc --noEmit -p tsconfig.host.json && tsc --noEmit -p tsconfig.canvas-widget.json",
