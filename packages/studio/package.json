@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/studio",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "OpenEnvx workbench shell - host surface for composable editor products",
   "license": "MPL-2.0",
   "type": "module",
