@@ -68,12 +68,34 @@ jobs:
             exit 0
           fi
           BUMP="${{ inputs.bump }}"
-          if git tag -l 'v[0-9]*' | grep -q .; then
-            RAW=$(bunx git-cliff --bump "$BUMP" --bumped-version)
-            VERSION="${RAW#v}"
-          else
-            VERSION=$(bun -e "console.log(require('./packages/core/package.json').version)")
-          fi
+          VERSION=$(bun -e "
+            const { execSync } = require('node:child_process');
+            const bump = process.argv[1];
+            const bumpSemver = (version, kind) => {
+              const [maj, min, patch] = version.split('.').map(Number);
+              if (kind === 'major') return \`\${maj + 1}.0.0\`;
+              if (kind === 'minor') return \`\${maj}.\${min + 1}.0\`;
+              return \`\${maj}.\${min}.\${patch + 1}\`;
+            };
+            const latestTag = execSync(\"git tag -l 'v[0-9]*' --sort=-v:refname\", { encoding: 'utf8' })
+              .trim()
+              .split(/\\n/)
+              .filter(Boolean)[0];
+            if (!latestTag) {
+              console.log(require('./packages/core/package.json').version);
+              process.exit(0);
+            }
+            const latestVersion = latestTag.replace(/^v/, '');
+            let raw = execSync(\`bunx git-cliff --bump \${bump} --bumped-version\`, { encoding: 'utf8' }).trim();
+            let version = raw.replace(/^v/, '');
+            if (version === latestVersion) {
+              version = bumpSemver(latestVersion, bump);
+              console.error(
+                \`git-cliff reported no unreleased commits (stayed at \${latestVersion}); manual release bump -> \${version}\`,
+              );
+            }
+            console.log(version);
+          " "$BUMP")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Next version: $VERSION"
 

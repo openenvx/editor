@@ -54,7 +54,9 @@ Releases are **manual** via GitHub Actions - not on every push to `main`.
    - `npm publish --access public --provenance` for all five packages
    - create a GitHub Release with git-cliff release notes
 
-If publish fails, re-run with **skip_bump** enabled to retry the same `package.json` version.
+If publish fails **before** npm accepted that version, re-run with **skip_bump** to retry the same version.
+
+If npm already has that version (or you tagged `vX.Y.Z` with no new commits on `main`), a normal run bumps from the latest tag. When git-cliff reports no unreleased commits, the workflow still increments semver for the chosen bump so you do not republish an existing version.
 
 Workflow: [`.github/workflows/release.yml`](.github/workflows/release.yml).
 
