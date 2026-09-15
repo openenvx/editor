@@ -79,11 +79,10 @@
       "name": "@openenvx/canvas-driver",
       "version": "0.1.3",
       "dependencies": {
-        "@openenvx/editor-sandbox": "workspace:*",
         "@openenvx/variables": "workspace:*",
         "@tiptap/extension-color": "^3.27.3",
         "@tiptap/extension-font-family": "^3.27.3",
-        "@tiptap/extension-text-style": "^3.27.3",
+        "@tiptap/extension-text-style": "^3.31.3",
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
@@ -114,6 +113,7 @@
       "peerDependencies": {
         "@napi-rs/canvas": "*",
         "@openenvx/core": ">=0.1.3",
+        "@openenvx/editor-sandbox": ">=0.7.0",
         "@openenvx/studio": ">=0.1.3",
         "pdf-lib": "*",
         "react": ">=18",
@@ -121,6 +121,7 @@
       },
       "optionalPeers": [
         "@napi-rs/canvas",
+        "@openenvx/editor-sandbox",
         "pdf-lib",
       ],
     },
@@ -241,7 +242,7 @@
         "@tiptap/extension-color": "^3.27.3",
         "@tiptap/extension-font-family": "^3.27.3",
         "@tiptap/extension-text-align": "3.27.4",
-        "@tiptap/extension-text-style": "^3.27.3",
+        "@tiptap/extension-text-style": "^3.31.3",
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
@@ -1096,7 +1097,7 @@
 
     "@tiptap/extension-text-align": ["@tiptap/extension-text-align@3.27.4", "", { "peerDependencies": { "@tiptap/core": "3.27.4" } }, "sha512-ArfL7GLOXCSmrmiBiaWwAf7RPHXDdxLGPru29qKDLQDthjXcNOdlwlPBbolRu7mXwlSmaYpqWGrG75/AEat3mw=="],
 
-    "@tiptap/extension-text-style": ["@tiptap/extension-text-style@3.29.2", "", { "peerDependencies": { "@tiptap/core": "3.29.2" } }, "sha512-aQad9V9ROaEi3hE4g5z9wQ6lv5FSnzlnWFMVJxRjNlwXgm7H0fymxb4rGfca+pAwYkiRwpKYh1LatpJw2ECQAA=="],
+    "@tiptap/extension-text-style": ["@tiptap/extension-text-style@3.31.3", "", { "peerDependencies": { "@tiptap/core": "3.31.3" } }, "sha512-wgjWWrjZwRZHiaDTQPX2am1y/4ePgRgGWF/2MOfSb7g4d5229p4aVtbT1JT7wu9z8OC482pEqcTlhdvgftvW7A=="],
 
     "@tiptap/extension-underline": ["@tiptap/extension-underline@3.27.4", "", { "peerDependencies": { "@tiptap/core": "3.27.4" } }, "sha512-nRJGvRyEXDtINlHTW+C2oWcL3vmX1URVxAPpkD3Zwn5Rb/vEeOU/pk/w97I0iid816MR4iVbvl1XhbUVegK9gQ=="],
 
