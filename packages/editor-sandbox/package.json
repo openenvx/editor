@@ -72,7 +72,7 @@
     "./openenvx": "./src/openenvx.d.ts"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/host/ dist/host/",
     "prepack": "bun run build",
     "test": "vitest run",
     "check-types": "tsc --noEmit && tsc --noEmit -p tsconfig.host.json && tsc --noEmit -p tsconfig.canvas-widget.json",
@@ -82,7 +82,7 @@
     "openenvx-manifest": "./src/cli/openenvx-manifest.ts"
   },
   "dependencies": {
-    "@openenvx/canvas": "workspace:*",
+    "@openenvx/canvas-driver": "workspace:*",
     "@openenvx/core": "workspace:*",
     "clsx": "2.1.1",
     "preact": "^10.26.5",

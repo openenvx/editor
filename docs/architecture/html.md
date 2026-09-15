@@ -1,12 +1,12 @@
 # HTML block editor
 
-**Audience:** Contributors and integrators. Package: `@openenvx/html` (+ product re-exports in `@openenvx/html-studio`).
+**Audience:** Contributors and integrators. Package: `@openenvx/html-driver` (engine + `./studio` drop-in + `./runtime`).
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
 ## Role
 
-Puck-style block editor for pages with `page.layout === 'html'`. Same core/headless/workbench stack as canvas; **no** `@openenvx/canvas` dependency.
+Puck-style block editor for pages with `page.layout === 'html'`. Same core/headless/workbench stack as canvas; **no** `@openenvx/canvas-driver` dependency.
 
 ## What html owns
 
@@ -43,7 +43,7 @@ Inspector fields for slot parts use paths like `slots.headline.0.data.html`.
 
 ## Product host
 
-`@openenvx/html-studio` (published) re-exports core + html + workbench shell surface for product hosts, or use `@openenvx/html` + `@openenvx/workbench` directly in the monorepo for HMR.
+External hosts use `@openenvx/html-driver/studio` + `@openenvx/studio` (drop-in `HtmlEditor` or composable `WorkbenchShell`). In the monorepo, import `@openenvx/html-driver` + `@openenvx/workbench` directly for HMR.
 
 ## What does **not** belong in html
 

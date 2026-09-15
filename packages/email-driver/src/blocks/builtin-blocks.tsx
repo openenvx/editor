@@ -1,0 +1,529 @@
+import { sanitizeHtml, sanitizeUrl } from '@openenvx/core';
+import type { BlockConfig } from '@openenvx/html-driver';
+import {
+  Button,
+  Column,
+  Container,
+  Heading,
+  Hr,
+  Img,
+  Section,
+  Text,
+} from '@react-email/components';
+import type { CSSProperties } from 'react';
+
+import {
+  emailFontStack,
+  emailHeadingStyle,
+} from '../render/email-document-font';
+import { imageLinkBlock } from './image-link';
+
+const EMAIL_WIDTH = 600;
+
+function num(value: unknown, fallback: number): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    const pxMatch = trimmed.match(/^(-?\d+(?:\.\d+)?)px$/i);
+    if (pxMatch) {
+      return Number(pxMatch[1]);
+    }
+    const asNumber = Number(trimmed);
+    if (Number.isFinite(asNumber)) {
+      return asNumber;
+    }
+  }
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function optionalNum(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  const n = Number(value);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+export const rootBlock: BlockConfig = {
+  type: 'email.root',
+  label: 'Email',
+  fields: {
+    background: { kind: 'color', label: 'Background' },
+    preheader: { kind: 'text', label: 'Preheader' },
+    paddingX: { kind: 'number', label: 'Padding X (px)' },
+    paddingY: { kind: 'number', label: 'Padding Y (px)' },
+    maxWidth: { kind: 'number', label: 'Max width (px)' },
+  },
+  defaultData: {
+    background: '#f6f9fc',
+    preheader: '',
+    paddingX: 16,
+    paddingY: 32,
+    maxWidth: EMAIL_WIDTH,
+    children: [],
+  },
+  acceptsChildren: true,
+  palette: false,
+  treeIcon: 'file',
+  render: ({ data, children }) => {
+    const paddingX = num(data.paddingX, 16);
+    const paddingY = num(data.paddingY, 32);
+    const maxWidth = num(data.maxWidth, EMAIL_WIDTH);
+    const fontFamily = emailFontStack();
+    return (
+      <Section
+        style={{
+          background: String(data.background ?? '#f6f9fc'),
+          width: '100%',
+          minHeight: 480,
+          paddingTop: paddingY,
+          paddingBottom: paddingY,
+          paddingLeft: paddingX,
+          paddingRight: paddingX,
+          fontFamily,
+          fontSize: 16,
+        }}
+      >
+        <Container
+          style={{
+            margin: '0 auto',
+            maxWidth,
+            width: '100%',
+            fontFamily,
+            fontSize: 16,
+          }}
+        >
+          {children}
+        </Container>
+      </Section>
+    );
+  },
+};
+
+export const sectionBlock: BlockConfig = {
+  type: 'email.section',
+  label: 'Section',
+  fields: {
+    background: { kind: 'color', label: 'Background' },
+    paddingX: { kind: 'number', label: 'Padding X (px)' },
+    paddingY: { kind: 'number', label: 'Padding Y (px)' },
+    marginBottom: { kind: 'number', label: 'Margin bottom (px)' },
+    borderRadius: { kind: 'number', label: 'Radius (px)' },
+    align: { kind: 'align', label: 'Align' },
+    /** Classic email: `0` kills td line-height strut above inline icons. */
+    fontSize: { kind: 'number', label: 'Font size (px)' },
+    lineHeight: { kind: 'text', label: 'Line height' },
+  },
+  defaultData: {
+    background: 'transparent',
+    paddingX: 24,
+    paddingY: 24,
+    marginBottom: 0,
+    borderRadius: 0,
+    align: 'left',
+    children: [],
+  },
+  acceptsChildren: true,
+  render: ({ data, children }) => {
+    const paddingX = num(data.paddingX, 24);
+    const paddingY = num(data.paddingY, 24);
+    const marginBottom = num(data.marginBottom, 0);
+    const borderRadius = num(data.borderRadius, 0);
+    const fontSize = optionalNum(data.fontSize);
+    const lineHeightRaw = data.lineHeight;
+    const lineHeight =
+      lineHeightRaw === undefined ||
+      lineHeightRaw === null ||
+      lineHeightRaw === ''
+        ? undefined
+        : String(lineHeightRaw);
+    return (
+      <Section
+        style={{
+          background: String(data.background ?? 'transparent'),
+          paddingTop: paddingY,
+          paddingBottom: paddingY,
+          paddingLeft: paddingX,
+          paddingRight: paddingX,
+          marginBottom: marginBottom > 0 ? marginBottom : undefined,
+          borderRadius: borderRadius > 0 ? borderRadius : undefined,
+          textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
+          fontSize,
+          lineHeight,
+        }}
+      >
+        {children}
+      </Section>
+    );
+  },
+};
+
+/** React-Email `<Row>` - table row; children should be `email.column`. */
+export const rowBlock: BlockConfig = {
+  type: 'email.row',
+  label: 'Row',
+  fields: {},
+  defaultData: { children: [] },
+  acceptsChildren: true,
+  childContainerHost: 'table-row',
+  insertLineAxis: 'vertical',
+  treeIcon: 'layout',
+  render: ({ children, containerRef, containerClassName }) => (
+    <table
+      align="center"
+      border={0}
+      cellPadding={0}
+      cellSpacing={0}
+      role="presentation"
+      width="100%"
+      style={{ width: '100%' }}
+    >
+      <tbody style={{ width: '100%' }}>
+        <tr
+          ref={containerRef}
+          className={containerClassName}
+          style={{ width: '100%' }}
+        >
+          {children}
+        </tr>
+      </tbody>
+    </table>
+  ),
+};
+
+/** React-Email `<Column>` - table cell inside a Row. */
+export const columnBlock: BlockConfig = {
+  type: 'email.column',
+  label: 'Column',
+  /** Must not wrap `<td>` in a layout box (breaks `<tr>` → `<td>`). */
+  chromeDisplay: 'contents',
+  fields: {
+    width: { kind: 'text', label: 'Width' },
+    align: {
+      kind: 'segmented',
+      label: 'Align',
+      options: [
+        { label: 'Left', value: 'left' },
+        { label: 'Center', value: 'center' },
+        { label: 'Right', value: 'right' },
+      ],
+    },
+    verticalAlign: {
+      kind: 'segmented',
+      label: 'Vertical align',
+      options: [
+        { label: 'Top', value: 'top' },
+        { label: 'Middle', value: 'middle' },
+        { label: 'Bottom', value: 'bottom' },
+      ],
+    },
+    paddingX: { kind: 'number', label: 'Padding X (px)' },
+    paddingY: { kind: 'number', label: 'Padding Y (px)' },
+  },
+  defaultData: {
+    width: '50%',
+    align: 'left',
+    verticalAlign: 'top',
+    paddingX: 0,
+    paddingY: 0,
+    children: [],
+  },
+  acceptsChildren: true,
+  treeIcon: 'layout',
+  render: ({ data, children, hostProps }) => {
+    const paddingX = num(data.paddingX, 0);
+    const paddingY = num(data.paddingY, 0);
+    const width = String(data.width ?? '').trim();
+    const verticalAlign = String(data.verticalAlign ?? 'top');
+    const align = String(data.align ?? 'left') as 'left' | 'center' | 'right';
+    const {
+      ref: hostRef,
+      className: hostClassName,
+      style: hostStyle,
+      ...hostEvents
+    } = hostProps ?? {};
+    return (
+      <Column
+        {...hostEvents}
+        className={hostClassName}
+        ref={hostRef}
+        align={align}
+        style={{
+          width: width || undefined,
+          verticalAlign,
+          paddingLeft: paddingX,
+          paddingRight: paddingX,
+          paddingTop: paddingY,
+          paddingBottom: paddingY,
+          ...hostStyle,
+        }}
+      >
+        {children}
+      </Column>
+    );
+  },
+};
+
+export const headingBlock: BlockConfig = {
+  type: 'email.heading',
+  label: 'Heading',
+  fields: {
+    html: { kind: 'richText', label: 'Text' },
+    level: {
+      kind: 'segmented',
+      label: 'Level',
+      options: [
+        { label: 'H1', value: '1' },
+        { label: 'H2', value: '2' },
+        { label: 'H3', value: '3' },
+      ],
+    },
+    color: { kind: 'color', label: 'Color' },
+    align: { kind: 'align', label: 'Align' },
+    marginBottom: { kind: 'number', label: 'Margin bottom (px)' },
+  },
+  defaultData: {
+    html: 'Heading',
+    level: '2',
+    color: '#111827',
+    align: 'left',
+    marginBottom: 12,
+  },
+  render: ({ data, children }) => {
+    const level = Number(data.level ?? 2) as 1 | 2 | 3;
+    const heading = emailHeadingStyle(level);
+    const marginBottom = num(data.marginBottom, 12);
+    const style: CSSProperties = {
+      color: String(data.color ?? '#111827'),
+      textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
+      margin: `0 0 ${marginBottom}px`,
+      fontFamily: emailFontStack(),
+      fontSize: heading.fontSize,
+      fontWeight: heading.fontWeight,
+      lineHeight: heading.lineHeight,
+    };
+    if (children) {
+      // Edit mode: div keeps text-align without nesting TipTap inside <p>/<h*>.
+      return <div style={style}>{children}</div>;
+    }
+    return (
+      <Heading
+        as={`h${level}`}
+        dangerouslySetInnerHTML={{
+          __html: sanitizeHtml(String(data.html ?? '')),
+        }}
+        style={style}
+      />
+    );
+  },
+};
+
+export const textBlock: BlockConfig = {
+  type: 'email.text',
+  label: 'Text',
+  fields: {
+    html: { kind: 'richText', label: 'Text' },
+    color: { kind: 'color', label: 'Color' },
+    align: { kind: 'align', label: 'Align' },
+    fontSize: { kind: 'number', label: 'Font size (px)' },
+    marginTop: { kind: 'number', label: 'Margin top (px)' },
+    marginBottom: { kind: 'number', label: 'Margin bottom (px)' },
+    maxWidth: { kind: 'number', label: 'Max width (px)' },
+  },
+  defaultData: {
+    html: 'Paragraph text',
+    color: '#374151',
+    align: 'left',
+    fontSize: 14,
+    marginTop: 0,
+    marginBottom: 16,
+  },
+  render: ({ data, children }) => {
+    const fontSize = num(data.fontSize, 14);
+    const marginTop = num(data.marginTop, 0);
+    const marginBottom = num(data.marginBottom, 16);
+    const maxWidth = optionalNum(data.maxWidth);
+    const style: CSSProperties = {
+      color: String(data.color ?? '#374151'),
+      textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
+      marginTop,
+      marginBottom,
+      marginLeft: maxWidth ? 'auto' : 0,
+      marginRight: maxWidth ? 'auto' : 0,
+      maxWidth: maxWidth ?? undefined,
+      lineHeight: '1.5',
+      fontSize,
+      fontFamily: emailFontStack(),
+      fontWeight: 400,
+    };
+    if (children) {
+      return <div style={style}>{children}</div>;
+    }
+    return (
+      <Text
+        dangerouslySetInnerHTML={{
+          __html: sanitizeHtml(String(data.html ?? '')),
+        }}
+        style={style}
+      />
+    );
+  },
+};
+
+export const buttonBlock: BlockConfig = {
+  type: 'email.button',
+  label: 'Button',
+  fields: {
+    label: { kind: 'text', label: 'Label' },
+    href: { kind: 'text', label: 'Link' },
+    background: { kind: 'color', label: 'Background' },
+    color: { kind: 'color', label: 'Text color' },
+    align: { kind: 'align', label: 'Align' },
+    paddingX: { kind: 'number', label: 'Padding X (px)' },
+    paddingY: { kind: 'number', label: 'Padding Y (px)' },
+    borderRadius: { kind: 'number', label: 'Radius (px)' },
+    fontSize: { kind: 'number', label: 'Font size (px)' },
+  },
+  defaultData: {
+    label: 'Get started',
+    href: 'https://example.com',
+    background: '#111827',
+    color: '#ffffff',
+    align: 'left',
+    paddingX: 20,
+    paddingY: 12,
+    borderRadius: 4,
+    fontSize: 14,
+  },
+  render: ({ data }) => {
+    const paddingX = num(data.paddingX, 20);
+    const paddingY = num(data.paddingY, 12);
+    const borderRadius = num(data.borderRadius, 4);
+    const fontSize = num(data.fontSize, 14);
+    return (
+      <Section
+        style={{
+          textAlign: (data.align as CSSProperties['textAlign']) ?? 'left',
+        }}
+      >
+        <Button
+          href={sanitizeUrl(String(data.href ?? '#'), { fallback: '#' })}
+          style={{
+            background: String(data.background ?? '#111827'),
+            color: String(data.color ?? '#ffffff'),
+            padding: `${paddingY}px ${paddingX}px`,
+            borderRadius,
+            fontFamily: emailFontStack(),
+            fontWeight: 600,
+            fontSize,
+            lineHeight: '24px',
+            textDecoration: 'none',
+          }}
+        >
+          {String(data.label ?? 'Button')}
+        </Button>
+      </Section>
+    );
+  },
+};
+
+export const imageBlock: BlockConfig = {
+  type: 'email.image',
+  label: 'Image',
+  fields: {
+    src: { kind: 'image', label: 'Image' },
+    alt: { kind: 'text', label: 'Alt' },
+    width: { kind: 'number', label: 'Width (px)' },
+    height: { kind: 'number', label: 'Height (px)' },
+    borderRadius: { kind: 'number', label: 'Radius (px)' },
+    marginBottom: { kind: 'number', label: 'Margin bottom (px)' },
+    align: { kind: 'align', label: 'Align' },
+  },
+  defaultData: {
+    src: 'https://placehold.co/600x200',
+    alt: 'Placeholder',
+    width: 600,
+    align: 'left',
+  },
+  render: ({ data }) => {
+    const height = Number(data.height);
+    const hasHeight = Number.isFinite(height) && height > 0;
+    const borderRadius = Number(data.borderRadius);
+    const hasRadius = Number.isFinite(borderRadius) && borderRadius > 0;
+    const marginBottom = optionalNum(data.marginBottom);
+    const align = String(data.align ?? 'left');
+    return (
+      <Img
+        alt={String(data.alt ?? '')}
+        height={hasHeight ? height : undefined}
+        src={sanitizeUrl(String(data.src ?? ''), { allowDataImage: true })}
+        style={{
+          display: 'block',
+          maxWidth: '100%',
+          height: hasHeight ? height : 'auto',
+          marginTop: 0,
+          marginBottom: marginBottom ?? (hasHeight ? 0 : 16),
+          marginLeft: align === 'center' || align === 'right' ? 'auto' : 0,
+          marginRight: align === 'center' ? 'auto' : 0,
+          borderRadius: hasRadius ? borderRadius : undefined,
+          objectFit: hasHeight ? 'cover' : undefined,
+        }}
+        width={num(data.width, EMAIL_WIDTH)}
+      />
+    );
+  },
+};
+
+export const dividerBlock: BlockConfig = {
+  type: 'email.divider',
+  label: 'Divider',
+  fields: {
+    color: { kind: 'color', label: 'Color' },
+  },
+  defaultData: { color: '#e5e7eb' },
+  render: ({ data }) => (
+    <Hr
+      style={{
+        borderColor: String(data.color ?? '#e5e7eb'),
+        borderTopWidth: 1,
+        margin: '16px 0',
+      }}
+    />
+  ),
+};
+
+export const spacerBlock: BlockConfig = {
+  type: 'email.spacer',
+  label: 'Spacer',
+  fields: {
+    height: { kind: 'number', label: 'Height (px)' },
+  },
+  defaultData: { height: 24 },
+  render: ({ data }) => (
+    <Section
+      style={{
+        height: Number(data.height ?? 24),
+        lineHeight: `${Number(data.height ?? 24)}px`,
+      }}
+    >
+      &nbsp;
+    </Section>
+  ),
+};
+
+export const builtinEmailBlocks: BlockConfig[] = [
+  rootBlock,
+  sectionBlock,
+  rowBlock,
+  columnBlock,
+  headingBlock,
+  textBlock,
+  buttonBlock,
+  imageBlock,
+  imageLinkBlock,
+  dividerBlock,
+  spacerBlock,
+];

@@ -2,10 +2,22 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignoreExportsUsedInFile": true,
   "ignoreBinaries": ["const", "gh"],
+  "ignoreIssues": {
+    "packages/editor-sandbox/src/host/quickjs-isolate-engine.ts": ["exports"],
+    "packages/editor-sandbox/src/host/quickjs-runtime.ts": ["exports"],
+    "packages/editor-sandbox/src/host/sandbox-extension-controller.ts": ["exports"],
+    "packages/email-driver/src/templates/index.ts": ["exports"],
+    "packages/email-driver/src/templates/jsx/index.ts": ["exports"],
+    "packages/html-driver/src/editor/floating-pill/index.ts": ["exports", "types"],
+    "packages/variables/src/variable-edit-dialog.tsx": ["exports"],
+    "packages/workbench/src/primitives/input.tsx": ["exports", "types"],
+    "packages/workbench/src/context/workbench-context.tsx": ["types"]
+  },
   "ignoreDependencies": [
     "eslint-plugin-github",
     "eslint-plugin-sonarjs",
-    "oxlint-plugin-react-doctor"
+    "oxlint-plugin-react-doctor",
+    "@typescript/typescript6"
   ],
   "workspaces": {
     ".": {
@@ -22,24 +34,37 @@
         "src/schema/index.ts!",
         "src/preview/index.ts!",
         "src/react/workbench-context.tsx!",
-        "src/plugins/scene-plugin.ts!"
+        "src/plugins/scene-plugin.ts!",
+        "verify-pack.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts"
+        "!src/**/*.test.ts",
+        "verify-pack.ts"
       ]
     },
-    "packages/canvas": {
+    "packages/canvas-driver": {
+      "ignoreDependencies": [
+        "@openenvx/editor-sandbox"
+      ],
       "entry": [
         "src/index.ts!",
+        "src/studio/index.ts!",
+        "src/publish-runtime.ts!",
         "src/export/browser/index.ts!",
         "src/export/node/index.ts!",
         "src/export-layers.ts!",
-        "src/plugin/canvas-plugin.ts!"
+        "src/plugin/canvas-plugin.ts!",
+        "tsup.publish.config.ts!",
+        "build-dts.ts!",
+        "verify-pack.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts"
+        "!src/**/*.test.ts",
+        "tsup.publish.config.ts",
+        "build-dts.ts",
+        "verify-pack.ts"
       ]
     },
     "packages/editor-sandbox": {
@@ -93,14 +118,22 @@
     },
     "packages/studio": {
       "entry": [
-        "src/index.ts!"
+        "src/index.ts!",
+        "tsup.config.ts!",
+        "build-dts.ts!",
+        "verify-pack.ts!"
       ],
       "project": [
-        "src/**/*.{ts,tsx}"
+        "src/**/*.{ts,tsx}",
+        "tsup.config.ts",
+        "build-dts.ts",
+        "verify-pack.ts"
       ],
       "ignoreDependencies": [
-        "@ai-sdk/react",
         "@dnd-kit/core",
+        "@dnd-kit/sortable",
+        "@dnd-kit/utilities",
+        "@radix-ui/react-dialog",
         "@radix-ui/react-dropdown-menu",
         "@radix-ui/react-popover",
         "@radix-ui/react-select",
@@ -108,187 +141,62 @@
         "@radix-ui/react-switch",
         "@radix-ui/react-tabs",
         "@radix-ui/react-tooltip",
-        "@tiptap/pm",
-        "@tiptap/react",
-        "@tiptap/starter-kit",
-        "ai",
+        "@tanstack/react-virtual",
         "clsx",
         "cmdk",
         "i18next",
-        "konva",
         "lucide-react",
-        "quickjs-emscripten",
         "react-colorful",
         "react-i18next",
-        "react-konva",
         "zod",
-        "@openenvx/canvas",
         "@openenvx/core",
         "@openenvx/workbench"
       ]
     },
-    "packages/html-studio": {
+    "packages/html-driver": {
+      "ignoreDependencies": [
+        "@openenvx/workbench"
+      ],
       "entry": [
         "src/index.ts!",
         "src/runtime.ts!",
-        "tsup.config.ts!",
+        "src/studio/index.ts!",
+        "src/publish-runtime.ts!",
+        "src/plugin/html-blocks-plugin.ts!",
+        "tsup.publish.config.ts!",
         "build-dts.ts!",
         "verify-pack.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "tsup.config.ts",
-        "build-dts.ts",
-        "verify-pack.ts"
-      ],
-      "ignoreDependencies": [
-        "@dnd-kit/core",
-        "@dnd-kit/sortable",
-        "@radix-ui/react-dialog",
-        "@radix-ui/react-dropdown-menu",
-        "@radix-ui/react-popover",
-        "@radix-ui/react-select",
-        "@radix-ui/react-slot",
-        "@radix-ui/react-switch",
-        "@radix-ui/react-tabs",
-        "@radix-ui/react-tooltip",
-        "@tanstack/react-virtual",
-        "@tiptap/extension-color",
-        "@tiptap/extension-font-family",
-        "@tiptap/extension-text-align",
-        "@tiptap/extension-text-style",
-        "@tiptap/pm",
-        "@tiptap/react",
-        "@tiptap/starter-kit",
-        "clsx",
-        "cmdk",
-        "i18next",
-        "lucide-react",
-        "quickjs-emscripten",
-        "react-colorful",
-        "react-i18next",
-        "zod",
-        "@openenvx/core",
-        "@openenvx/workbench",
-        "@openenvx/editor-sandbox"
-      ]
-    },
-    "packages/html": {
-      "entry": [
-        "src/index.ts!",
-        "src/runtime.ts!",
-        "src/plugin/html-blocks-plugin.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
         "!src/**/*.test.ts",
-        "!src/**/*.test.tsx"
+        "!src/**/*.test.tsx",
+        "tsup.publish.config.ts",
+        "build-dts.ts",
+        "verify-pack.ts"
       ]
     },
-    "packages/driver-email": {
+    "packages/email-driver": {
+      "ignoreDependencies": [
+        "@openenvx/workbench"
+      ],
       "entry": [
         "src/index.ts!",
         "src/runtime.ts!",
-        "src/plugin/email-blocks-plugin.ts!"
+        "src/studio/index.ts!",
+        "src/publish-runtime.ts!",
+        "src/plugin/email-blocks-plugin.ts!",
+        "tsup.publish.config.ts!",
+        "build-dts.ts!",
+        "verify-pack.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
         "!src/**/*.test.ts",
-        "!src/**/*.test.tsx"
-      ]
-    },
-    "packages/email-studio": {
-      "entry": [
-        "src/index.ts!",
-        "src/runtime.ts!",
-        "tsup.config.ts!",
-        "build-dts.ts!",
-        "verify-pack.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "tsup.config.ts",
+        "!src/**/*.test.tsx",
+        "tsup.publish.config.ts",
         "build-dts.ts",
         "verify-pack.ts"
-      ],
-      "ignoreDependencies": [
-        "@dnd-kit/core",
-        "@dnd-kit/sortable",
-        "@dnd-kit/utilities",
-        "@radix-ui/react-dialog",
-        "@radix-ui/react-dropdown-menu",
-        "@radix-ui/react-popover",
-        "@radix-ui/react-select",
-        "@radix-ui/react-slot",
-        "@radix-ui/react-tabs",
-        "@radix-ui/react-tooltip",
-        "@react-email/components",
-        "@react-email/render",
-        "@tanstack/react-virtual",
-        "@codemirror/commands",
-        "@codemirror/lang-html",
-        "@codemirror/language",
-        "@codemirror/search",
-        "@codemirror/state",
-        "@codemirror/view",
-        "@tiptap/extension-color",
-        "@tiptap/extension-font-family",
-        "@tiptap/extension-text-align",
-        "@tiptap/extension-text-style",
-        "@tiptap/pm",
-        "@tiptap/react",
-        "@tiptap/starter-kit",
-        "clsx",
-        "cmdk",
-        "i18next",
-        "lucide-react",
-        "react-colorful",
-        "react-i18next",
-        "zod",
-        "@openenvx/editor-sandbox"
-      ]
-    },
-    "packages/canvas-studio": {
-      "entry": [
-        "src/index.ts!",
-        "src/runtime.ts!",
-        "tsup.config.ts!",
-        "build-dts.ts!",
-        "verify-pack.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "tsup.config.ts",
-        "build-dts.ts",
-        "verify-pack.ts"
-      ],
-      "ignoreDependencies": [
-        "@dnd-kit/core",
-        "@dnd-kit/sortable",
-        "@dnd-kit/utilities",
-        "@radix-ui/react-dialog",
-        "@radix-ui/react-dropdown-menu",
-        "@radix-ui/react-popover",
-        "@radix-ui/react-select",
-        "@radix-ui/react-slot",
-        "@radix-ui/react-tabs",
-        "@radix-ui/react-tooltip",
-        "@tanstack/react-virtual",
-        "@tiptap/extension-color",
-        "@tiptap/extension-font-family",
-        "@tiptap/extension-text-style",
-        "@tiptap/pm",
-        "@tiptap/react",
-        "@tiptap/starter-kit",
-        "clsx",
-        "cmdk",
-        "i18next",
-        "konva",
-        "lucide-react",
-        "react-colorful",
-        "react-i18next",
-        "react-konva",
-        "zod"
       ]
     },
     "apps/demo-playground": {

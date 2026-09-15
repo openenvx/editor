@@ -12,7 +12,6 @@
     "strictNullChecks": true,
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
-    "baseUrl": ".",
     "paths": {
       "@openenvx/core": ["../core/src/index.ts"],
       "@openenvx/core/schema": ["../core/src/schema/index.ts"]

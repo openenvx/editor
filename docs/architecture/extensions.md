@@ -53,7 +53,7 @@ Product studios (`createHtmlSandboxExtensionHost`, canvas equivalents) bind engi
 | Host runtime (QuickJS, `SandboxExtensionHost`, panel-tree → contributions) | `@openenvx/editor-sandbox/host` |
 | Workbench shell (renders contributions only) | `@openenvx/workbench` |
 | Scene / controller | `@openenvx/core` |
-| Canvas/HTML widget face mapping | `@openenvx/canvas`, `@openenvx/html` (import `./protocol` types only) |
+| Canvas/HTML widget face mapping | `@openenvx/canvas-driver`, `@openenvx/html-driver` (import `./protocol` types only) |
 | Internal OOP plugins | `core` / product plugins |
 
 **Boundary:** Extension authors use `@openenvx/editor-sandbox`. Hosts opt in via `@openenvx/editor-sandbox/host` on `mountExternalHosts`. `@openenvx/workbench` and `@openenvx/core` have no sandbox runtime coupling.

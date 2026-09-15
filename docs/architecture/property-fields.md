@@ -12,7 +12,7 @@ Inspector and sidebar form fields are **descriptors** (`PropertyFieldDescriptor`
 
 - `PropertyPaneContribution` + `createPropertyPane()` (`@openenvx/core`)
 - `PropertyBuilder` on `LayerDefinition.properties()` (`@openenvx/core`)
-- HTML `BlockConfig.fields` → mapped to the same descriptors in `@openenvx/html`
+- HTML `BlockConfig.fields` → mapped to the same descriptors in `@openenvx/html-driver`
 
 Types and JSDoc source of truth: `packages/core/src/builders/property-builder.ts`, `packages/core/src/builders/field-config.ts`.
 
@@ -77,7 +77,7 @@ Register custom kinds with `registerFieldRenderer` (`@openenvx/core`); defaults 
 | `slotList` | Full-width part layers | HTML slot parts |
 | `border` / `cornerRadius` / `padding` / `shadow` | Scrub + popup | Canvas style |
 
-HTML `FieldDef` in `@openenvx/html` supports a subset; map advanced kinds via custom property panes or layer `properties()`.
+HTML `FieldDef` in `@openenvx/html-driver` supports a subset; map advanced kinds via custom property panes or layer `properties()`.
 
 ## Pane layout (`PropertyPaneBuilder`)
 

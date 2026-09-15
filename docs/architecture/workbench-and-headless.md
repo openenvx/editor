@@ -132,7 +132,7 @@ PlaygroundShell
 └── Inspector / sidebars       ← app-owned React UI
 ```
 
-Most product apps skip this and use `WorkbenchShell` from studio / html-studio.
+Most product apps skip this and use `WorkbenchShell` from `@openenvx/studio` or a driver `./studio` preset.
 
 ## Related
 

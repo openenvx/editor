@@ -11,9 +11,9 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@openenvx/canvas": "workspace:*",
-    "@openenvx/canvas-studio": "workspace:*",
+    "@openenvx/canvas-driver": "workspace:*",
     "@openenvx/core": "workspace:*",
+    "@openenvx/studio": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },

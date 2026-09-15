@@ -1,4 +1,4 @@
-import { fitCanvasTextLayerToContent } from '@openenvx/canvas/fit-text-layer-to-content';
+import { fitCanvasTextLayerToContent } from '@openenvx/canvas-driver/fit-text-layer-to-content';
 import { createDefaultTransform, type Layer } from '@openenvx/core/schema';
 import type { RenderNode } from '@openenvx/editor-sandbox/protocol';
 

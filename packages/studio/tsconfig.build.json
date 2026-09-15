@@ -1,0 +1,5 @@
+{
+  "extends": ["./tsconfig.json", "@openenvx/typescript-config/publish.json"],
+  "include": ["src", "../typescript-config/css-modules.d.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}

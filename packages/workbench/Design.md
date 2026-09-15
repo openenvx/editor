@@ -11,7 +11,7 @@ Designing the `@openenvx/workbench` React UI for canvas/flow editor authors on *
 **Dark surface references:** Henry / ai.work, Metaview, Linear - soft-edged dark modules, near-black canvas, tonal layering, restrained functional accents  
 **Secondary reference:** Framer / Artboard Studio editor screens (Refero) - three-column canvas layout patterns
 
-**Status (v5):** Dark theme retinted to the warm nocturnal palette. Light theme, type scale, density, radii, and layout metrics unchanged. Every workbench CSS module is token-driven - palette changes land in [`tokens.css`](src/theme/tokens.css) alone; `canvas`, `html`, `driver-email`, and `agent` inherit it.
+**Status (v5):** Dark theme retinted to the warm nocturnal palette. Light theme, type scale, density, radii, and layout metrics unchanged. Every workbench CSS module is token-driven - palette changes land in [`tokens.css`](src/theme/tokens.css) alone; `canvas`, `html`, `email-driver`, and `agent` inherit it.
 
 ---
 
@@ -80,7 +80,7 @@ Reject:
 
 All tokens live in [`src/theme/tokens.css`](src/theme/tokens.css). The file defines two built-in scopes - `[data-owb-theme="light"]` (default) and `[data-owb-theme="dark"]` - plus a shared `[data-owb-theme]` layer for theme-agnostic type, spacing, radius, metrics, and material.
 
-Every workbench CSS module should resolve colour, radius, and metrics from these variables when a token exists. Prefer tokens over literals; a few layout sizes (activity icon pill, tooltip min-height, label stack gap) stay as module literals when they are one-offs. Downstream packages (`canvas`, `html`, `driver-email`, `agent`) read the same variables for shared chrome and canvas-facing colours.
+Every workbench CSS module should resolve colour, radius, and metrics from these variables when a token exists. Prefer tokens over literals; a few layout sizes (activity icon pill, tooltip min-height, label stack gap) stay as module literals when they are one-offs. Downstream packages (`canvas`, `html`, `email-driver`, `agent`) read the same variables for shared chrome and canvas-facing colours.
 
 ### Surfaces
 
@@ -114,7 +114,7 @@ Light chrome is grey and controls sit **lighter** than the panel; dark chrome is
 | `--wb-tooltip` | `rgb(30 30 30 / 94%)` | `rgb(48 46 43 / 94%)` | Tooltip pill - inverse in light, elevated in dark |
 | `--wb-tooltip-shadow` | drop shadow | drop shadow | Tooltip elevation |
 
-**Canvas-facing tokens stay Konva-safe hex / classic `rgba(r, g, b, a)`.** `--wb-selection`, `--wb-selection-muted`, `--wb-smart-guide`, `--wb-page-margin`, `--wb-grid`, `--wb-foreground`, and the `--wb-artboard*` set are read with `getComputedStyle` and handed to Konva by [`useCanvasThemeColors`](../canvas/src/use-canvas-theme-colors.ts). Do not express those in modern `rgb(… / α)`, `oklch`, or `oklab` - Konva's colour parser returns NaN.
+**Canvas-facing tokens stay Konva-safe hex / classic `rgba(r, g, b, a)`.** `--wb-selection`, `--wb-selection-muted`, `--wb-smart-guide`, `--wb-page-margin`, `--wb-grid`, `--wb-foreground`, and the `--wb-artboard*` set are read with `getComputedStyle` and handed to Konva by [`useCanvasThemeColors`](../canvas-driver/src/use-canvas-theme-colors.ts). Do not express those in modern `rgb(… / α)`, `oklch`, or `oklab` - Konva's colour parser returns NaN.
 
 ### Type scale
 

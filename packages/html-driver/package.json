@@ -1,0 +1,102 @@
+{
+  "name": "@openenvx/html-driver",
+  "version": "0.1.3",
+  "description": "HTML block editor for OpenEnvx flow/website pages",
+  "license": "MPL-2.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./studio": "./src/studio/index.ts",
+    "./runtime": "./src/publish-runtime.ts",
+    "./theme.css": "./dist/studio.css"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsup && tsup --config tsup.publish.config.ts && node ./build-dts.ts",
+    "build:debug": "STUDIO_SOURCEMAP=1 bun run build",
+    "prepack": "bun run build",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "check-types": "tsc --noEmit",
+    "verify-pack": "bun run build && bun run ./verify-pack.ts"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "6.3.1",
+    "@dnd-kit/sortable": "8.0.0",
+    "@openenvx/variables": "workspace:*",
+    "@openenvx/editor-sandbox": "workspace:*",
+    "@tiptap/core": "^3.27.3",
+    "@tiptap/extension-color": "^3.27.3",
+    "@tiptap/extension-font-family": "^3.27.3",
+    "@tiptap/extension-text-align": "3.27.4",
+    "@tiptap/extension-text-style": "^3.27.3",
+    "@tiptap/pm": "^3.27.3",
+    "@tiptap/react": "^3.27.3",
+    "@tiptap/starter-kit": "^3.27.3",
+    "lucide-react": "1.24.0"
+  },
+  "peerDependencies": {
+    "@openenvx/core": ">=0.1.3",
+    "@openenvx/studio": ">=0.1.3",
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@openenvx/core": "workspace:*",
+    "@openenvx/typescript-config": "workspace:*",
+    "@typescript/typescript6": "catalog:dev",
+    "@openenvx/workbench": "workspace:*",
+    "@testing-library/react": "16.3.2",
+    "@types/react": "^19.2.3",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "@vitest/coverage-v8": "catalog:testing",
+    "jsdom": "29.1.1",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "tsup": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:testing"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./studio": {
+        "types": "./dist/studio.d.ts",
+        "import": "./dist/studio.js",
+        "default": "./dist/studio.js"
+      },
+      "./runtime": {
+        "types": "./dist/runtime.d.ts",
+        "import": "./dist/runtime.js",
+        "default": "./dist/runtime.js"
+      },
+      "./theme.css": {
+        "import": "./dist/studio.css",
+        "default": "./dist/studio.css"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openenvx/editor.git",
+    "directory": "packages/html-driver"
+  },
+  "bugs": {
+    "url": "https://github.com/openenvx/editor/issues"
+  },
+  "homepage": "https://github.com/openenvx/editor/tree/main/packages/html-driver"
+}

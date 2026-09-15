@@ -1,97 +1,110 @@
 # Studio & products
 
-**Audience:** Contributors and integrators. Packages: `@openenvx/canvas-studio`, `@openenvx/canvas-studio`, `@openenvx/html-studio`, `@openenvx/email-studio`, and the apps that consume them.
+**Audience:** Contributors and integrators. Packages: `@openenvx/core`, `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, `@openenvx/email-driver`, and the apps that consume them.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
-## Why fat bundles exist
+## Composable publish stack
 
-Host product apps (dashboard Studio, embed host, demos) should not wire every private workspace package by hand. Studio packages:
+Host product apps install a shared shell plus only the artboard engines they need:
 
-1. Expose a curated host surface to mount and run the editor
-2. Inline private deps into published `dist/` where applicable
-3. Ship a default plugin list + sandbox factory helpers
+| Package | Role |
+| --- | --- |
+| `@openenvx/core` | Scene, `Plugin`, runtime, contributions |
+| `@openenvx/studio` | `WorkbenchShell`, chrome defaults, `./theme.css` |
+| `@openenvx/canvas-driver` | Canvas engine (`.`) + `./studio` drop-in + `./runtime` |
+| `@openenvx/html-driver` | HTML engine (`.`) + `./studio` drop-in + `./runtime` |
+| `@openenvx/email-driver` | Email engine (`.`) + `./studio` drop-in + `./runtime` |
 
-Publishing details: [PUBLISHING.md](../../PUBLISHING.md). Public MPL-2.0 drop-ins: `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-studio`. The extension SDK is MPL-2.0 licensed but may use a restricted registry. `@openenvx/canvas-studio` remains a private product integration.
+**Hard rules:**
 
-## `@openenvx/canvas-studio` (canvas product - published)
+- `@openenvx/studio` never imports canvas/html/email.
+- Artboard `.` and `./runtime` never import studio/workbench.
+- Connection happens in the host or on each artboard's `./studio` preset.
 
-Public npm drop-in for open-source canvas editor hosts. Inlines private core/canvas/workbench into minified ESM:
+Publishing details: [PUBLISHING.md](../../PUBLISHING.md).
+
+## `@openenvx/studio`
+
+Published workbench host surface. Inlines private `@openenvx/workbench` into minified ESM; peers `@openenvx/core`.
 
 ```ts
-import { CanvasEditor, type Scene } from '@openenvx/canvas-studio';
-import { createCanvasScene } from '@openenvx/canvas-studio/runtime';
-import '@openenvx/canvas-studio/theme.css';
-import '@openenvx/canvas-studio/fonts.css';
+import {
+  WorkbenchShell,
+  registerDefaultWorkbenchBundle,
+} from '@openenvx/studio';
+import '@openenvx/studio/theme.css';
+```
+
+## `@openenvx/canvas-driver/studio`
+
+Drop-in canvas editor:
+
+```ts
+import { CanvasEditor, type Scene } from '@openenvx/canvas-driver/studio';
+import { createCanvasScene } from '@openenvx/canvas-driver/runtime';
+import '@openenvx/studio/theme.css';
+import '@openenvx/canvas-driver/theme.css';
+import '@openenvx/canvas-driver/fonts.css';
 
 <CanvasEditor onChange={save} theme="dark" />
 ```
 
-`CanvasEditor` defaults `initialScene` to `createCanvasScene()` when omitted. Headless scene factory is `@openenvx/canvas-studio/runtime`. In-browser export for npm hosts: `useCanvasApi().exportImage()`. Monorepo / custom hosts may import `@openenvx/canvas/export` (browser PNG/JPG) or `@openenvx/canvas/export/node` (Node PNG/JPG/PDF) from workspace `@openenvx/canvas` — not bundled in the published studio tarball.
-
-Monorepo HMR stays on `@openenvx/canvas` + `@openenvx/workbench` (`apps/canvas-demo`). The published bundle is exercised by `apps/canvas-package-demo` (`bun run dev:canvas-package`).
-
-## `@openenvx/canvas-studio` (canvas product - proprietary host allowlist)
-
-Unpublished fat bundle source in `packages/studio`. Curated host allowlist: `WorkbenchShell`, `DEFAULT_STUDIO_PLUGINS`, `createSandboxExtensionHost`, layout/property helpers. External product hosts that need the full allowlist install the GitHub Packages build when published from product repos.
+Composable host:
 
 ```ts
-import { VariablesPlugin } from '@openenvx/variables';
-
-export const DEFAULT_STUDIO_PLUGINS = [
-  new CanvasPlugin(),
-  new VariablesPlugin(),
-];
+import { WorkbenchShell } from '@openenvx/studio';
+import {
+  defaultCanvasStudio,
+  createCanvasSandboxExtensionHost,
+} from '@openenvx/canvas-driver/studio';
 ```
 
-`createSandboxExtensionHost(options)` wires canvas widget click binding + `WIDGET_LAYER_TYPE` so **workbench never imports canvas**; studio is the seam.
+Monorepo HMR stays on `@openenvx/canvas-driver` + `@openenvx/workbench`. Published bundle is exercised by `apps/canvas-package-demo` (`bun run dev:canvas-package`).
 
-## `@openenvx/html-studio` (HTML product - published)
+## `@openenvx/html-driver/studio`
 
-Public npm bundle for HTML block editor hosts. Inlines private core/html/workbench into minified ESM. Drop-in `HtmlEditor` plus host composition API for product apps (Snapvelo-style plugin hosts):
+Drop-in HTML block editor:
 
 ```ts
-import { HtmlEditor } from '@openenvx/html-studio';
-import { createHtmlScene, renderBlockDocument } from '@openenvx/html-studio/runtime';
-import '@openenvx/html-studio/theme.css';
+import { HtmlEditor } from '@openenvx/html-driver/studio';
+import { createHtmlScene, renderBlockDocument } from '@openenvx/html-driver/runtime';
+import '@openenvx/studio/theme.css';
+import '@openenvx/html-driver/theme.css';
 
 <HtmlEditor onChange={save} theme="dark" />
 ```
 
-Product hosts compose custom plugins:
+Composable host:
 
 ```ts
+import { WorkbenchShell } from '@openenvx/studio';
 import {
-  DEFAULT_HTML_STUDIO_PLUGINS,
-  WorkbenchShell,
-} from '@openenvx/html-studio';
+  defaultHtmlStudio,
+  createHtmlSandboxExtensionHost,
+} from '@openenvx/html-driver/studio';
 
-const PLUGINS = [...DEFAULT_HTML_STUDIO_PLUGINS, new MyEventPagePlugin()];
+const PLUGINS = [...defaultHtmlStudio.plugins, new MyEventPagePlugin()];
 ```
 
-Subpaths:
+Monorepo HMR stays on `@openenvx/html-driver` + `@openenvx/workbench`. Published bundle is exercised by `apps/html-package-demo` (`bun run dev:html-package`).
 
-- `.` - `HtmlEditor` + host surface (`WorkbenchShell`, plugins, authoring API)
-- `./runtime` - Worker-safe `renderBlockDocument` + block registry (no TipTap / DnD / shell)
-- `./theme.css` - compiled workbench tokens + editor CSS
+## `@openenvx/email-driver/studio`
 
-Monorepo HMR stays on `@openenvx/html` + `@openenvx/workbench` (`apps/html-demo`). The published bundle is exercised by `apps/html-package-demo` (`bun run dev:html-package`).
-
-## `@openenvx/email-studio` (email product - published)
-
-Public npm bundle for open-source email editor hosts. Inlines private core/html/driver-email/workbench into minified ESM (no source maps; CSS modules compiled into one file; public `.d.ts` does not leak the internal scene schema). Narrow API - no plugin authoring surface:
+Drop-in email editor:
 
 ```ts
-import { EmailEditor, type Scene } from '@openenvx/email-studio';
-import { createEmailScene, renderEmailHtml } from '@openenvx/email-studio/runtime';
-import '@openenvx/email-studio/theme.css';
+import { EmailEditor, type Scene } from '@openenvx/email-driver/studio';
+import { createEmailScene, renderEmailHtml } from '@openenvx/email-driver/runtime';
+import '@openenvx/studio/theme.css';
+import '@openenvx/email-driver/theme.css';
 
 <EmailEditor onChange={save} theme="dark" />
 ```
 
-`EmailEditor` defaults `initialScene` to `createEmailScene()` when omitted. Chrome is the product **top bar** (Editor / HTML / Preview, undo/redo, device presets, save) plus a floating **bottom** insert toolbar (`editorToolbars: true`). The top-center preview toolbar is hidden when the top bar is on. Headless HTML export is `@openenvx/email-studio/runtime` so Node/SSR does not load the shell.
+Headless HTML export is `@openenvx/email-driver/runtime` so Node/SSR does not load the shell.
 
-Monorepo HMR stays on `@openenvx/driver-email` + `@openenvx/workbench` (`apps/email-demo`). The published bundle is exercised by `apps/email-package-demo` (`bun run dev:email-package`).
+Monorepo HMR stays on `@openenvx/email-driver` + `@openenvx/workbench` (`packages/email-driver`). Published bundle is exercised by `apps/email-package-demo` (`bun run dev:email-package`).
 
 ## What hosts must not do
 
@@ -100,20 +113,17 @@ Per AGENTS.md product-host rules:
 - Do **not** mount React panel views from the product host for form/settings - declare `ViewContribution` with `buildProperties` / `emptyMessage` / `when`
 - Do **not** import shell-internal `ViewPane` / `PropertyContentRenderer`
 - Use `registerViewPanel` only for non-form surfaces
-- Embed **policy/data API** stays in editor-core; embed **product panels** (e.g. Embed Options) live in the product host repo, not canvas Inspector contributions
+- Embed **policy/data API** stays in editor-core; embed **product panels** live in the product host repo
 
 ## Demo apps (monorepo)
 
-| App                        | Role                                       |
-| -------------------------- | ------------------------------------------ |
-| `apps/canvas-demo`         | Canvas + workbench HMR + sandbox demos     |
-| `apps/canvas-package-demo` | Published `@openenvx/canvas-studio` bundle |
-| `apps/demo-playground`     | Composable / custom shell patterns         |
-| `apps/html-demo`           | HTML + workbench HMR + sandbox demos       |
-| `apps/html-package-demo`   | Published `@openenvx/html-studio` bundle   |
-| `apps/email-demo`          | Email driver + workbench (HMR)             |
-| `apps/email-package-demo`  | Published `@openenvx/email-studio` bundle  |
-| `apps/docs`                | Extension guide and contracts              |
+| App | Role |
+| --- | --- |
+| `apps/canvas-package-demo` | Published `@openenvx/canvas-driver/studio` bundle |
+| `apps/html-package-demo` | Published `@openenvx/html-driver/studio` bundle |
+| `apps/email-package-demo` | Published `@openenvx/email-driver/studio` bundle |
+| `apps/demo-playground` | Composable / custom shell patterns |
+| `apps/docs` | Extension guide and contracts |
 
 ## Related
 

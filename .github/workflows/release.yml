@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       bump:
-        description: Semver bump for the studio trio
+        description: Semver bump for published editor packages
         required: true
         default: patch
         type: choice
@@ -13,7 +13,7 @@ on:
           - minor
           - major
       skip_bump:
-        description: Skip version/changelog/tag and publish the current studio versions (retry a failed publish)
+        description: Skip version/changelog/tag and publish the current package versions (retry a failed publish)
         required: false
         default: false
         type: boolean
@@ -59,7 +59,7 @@ jobs:
         id: version
         run: |
           if [ "${{ inputs.skip_bump }}" = "true" ]; then
-            VERSION=$(bun -e "console.log(require('./packages/html-studio/package.json').version)")
+            VERSION=$(bun -e "console.log(require('./packages/core/package.json').version)")
             echo "version=$VERSION" >> "$GITHUB_OUTPUT"
             echo "Publishing package.json version (skip_bump): $VERSION"
             exit 0
@@ -69,17 +69,16 @@ jobs:
             RAW=$(bunx git-cliff --bump "$BUMP" --bumped-version)
             VERSION="${RAW#v}"
           else
-            # No tags: publish the version already in package.json (do not bump again).
-            VERSION=$(bun -e "console.log(require('./packages/html-studio/package.json').version)")
+            VERSION=$(bun -e "console.log(require('./packages/core/package.json').version)")
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Next version: $VERSION"
 
-      - name: Bump studio package versions
+      - name: Bump published package versions
         if: ${{ !inputs.skip_bump }}
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          for pkg in packages/html-studio packages/email-studio packages/canvas-studio; do
+          for pkg in packages/core packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
             bun -e "
               const fs = require('node:fs');
               const path = process.argv[1];
@@ -97,20 +96,17 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           bunx git-cliff --tag "v$VERSION" -o CHANGELOG.md
 
-      - name: Build studio packages
+      - name: Build published packages
         run: |
-          bun run build --filter=@openenvx/html-studio --filter=@openenvx/email-studio --filter=@openenvx/canvas-studio
+          bun run build --filter=@openenvx/core --filter=@openenvx/studio --filter=@openenvx/canvas-driver --filter=@openenvx/html-driver --filter=@openenvx/email-driver
 
       - name: Verify publish tarballs
-        run: |
-          bun run verify-pack:html-studio
-          bun run verify-pack:email-studio
-          bun run verify-pack:canvas-studio
+        run: bun run verify-pack
 
       - name: Verify package repository metadata
         run: |
           EXPECTED="git+https://github.com/${{ github.repository }}.git"
-          for pkg in packages/html-studio packages/email-studio packages/canvas-studio; do
+          for pkg in packages/core packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
             REPO_URL=$(bun -e "console.log(require('./$pkg/package.json').repository.url)")
             if [ "$REPO_URL" != "$EXPECTED" ]; then
               echo "ERROR: $pkg repository.url is '$REPO_URL', expected '$EXPECTED'"
@@ -126,16 +122,11 @@ jobs:
           export NODE_AUTH_TOKEN
           if [ -z "${NODE_AUTH_TOKEN}" ]; then
             echo "ERROR: GitHub secret NPM_TOKEN is missing or empty for this repository."
-            echo "If the secret is org-wide, open GitHub → Organization settings → Secrets → NPM_TOKEN"
-            echo "and ensure openenvx/editor is in Repository access. A repo secret with the same name overrides the org secret."
             exit 1
           fi
-          # Granular publish tokens (especially bypass-2FA) cannot call identity endpoints like whoami.
-          # npm publish is the real auth check for CI tokens.
           printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > "${HOME}/.npmrc"
-          for pkg in packages/html-studio packages/email-studio packages/canvas-studio; do
+          for pkg in packages/core packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
             echo "Publishing $pkg"
-            # `./` is required: npm treats `packages/foo` as github:packages/foo (EALLOWGIT).
             npm publish --access public --provenance --ignore-scripts "./$pkg"
           done
 
@@ -145,7 +136,7 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md packages/html-studio/package.json packages/email-studio/package.json packages/canvas-studio/package.json
+          git add CHANGELOG.md packages/core/package.json packages/studio/package.json packages/canvas-driver/package.json packages/html-driver/package.json packages/email-driver/package.json
           git commit -m "chore(release): v$VERSION"
           git tag "v$VERSION"
           git push

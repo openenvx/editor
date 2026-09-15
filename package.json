@@ -12,7 +12,7 @@
     "prepare": "husky",
     "build": "turbo run build",
     "test": "turbo run test -- --run",
-    "bench": "turbo run bench --filter=@openenvx/core --filter=@openenvx/canvas",
+    "bench": "turbo run bench --filter=@openenvx/core --filter=@openenvx/canvas-driver",
     "lint": "turbo run lint",
     "check": "ultracite check && knip",
     "check-types": "turbo run check-types --filter='!./apps/*'",
@@ -20,17 +20,19 @@
     "knip": "knip",
     "fix": "ultracite fix",
     "changelog": "git-cliff --unreleased",
-    "verify-pack": "bun run verify-pack:html-studio && bun run verify-pack:email-studio && bun run verify-pack:canvas-studio",
-    "verify-pack:html-studio": "bun run build --filter=@openenvx/html-studio && bun packages/html-studio/verify-pack.ts",
-    "verify-pack:email-studio": "bun run build --filter=@openenvx/email-studio && bun packages/email-studio/verify-pack.ts",
-    "verify-pack:canvas-studio": "bun run build --filter=@openenvx/canvas-studio && bun packages/canvas-studio/verify-pack.ts",
+    "verify-pack": "bun run verify-pack:core && bun run verify-pack:studio && bun run verify-pack:canvas && bun run verify-pack:html && bun run verify-pack:email",
+    "verify-pack:core": "bun run build --filter=@openenvx/core && bun packages/core/verify-pack.ts",
+    "verify-pack:studio": "bun run build --filter=@openenvx/studio && bun packages/studio/verify-pack.ts",
+    "verify-pack:canvas": "bun run build --filter=@openenvx/canvas-driver && bun packages/canvas-driver/verify-pack.ts",
+    "verify-pack:html": "bun run build --filter=@openenvx/html-driver && bun packages/html-driver/verify-pack.ts",
+    "verify-pack:email": "bun run build --filter=@openenvx/email-driver && bun packages/email-driver/verify-pack.ts",
     "dev:playground": "turbo run dev --filter=demo-playground",
     "dev:canvas": "turbo run dev --filter=@openenvxee/canvas-demo",
     "dev:html": "turbo run dev --filter=@openenvxee/html-demo",
     "dev:email": "turbo run dev --filter=@openenvxee/email-demo",
-    "dev:email-package": "bun run build --filter=@openenvx/email-studio && turbo run dev --filter=@openenvxee/email-package-demo",
-    "dev:canvas-package": "bun run build --filter=@openenvx/canvas-studio && turbo run dev --filter=@openenvxee/canvas-package-demo",
-    "dev:html-package": "bun run build --filter=@openenvx/html-studio && turbo run dev --filter=@openenvxee/html-package-demo"
+    "dev:email-package": "bun run build --filter=@openenvx/studio --filter=@openenvx/email-driver && turbo run dev --filter=@openenvxee/email-package-demo",
+    "dev:canvas-package": "bun run build --filter=@openenvx/studio --filter=@openenvx/canvas-driver && turbo run dev --filter=@openenvxee/canvas-package-demo",
+    "dev:html-package": "bun run build --filter=@openenvx/studio --filter=@openenvx/html-driver && turbo run dev --filter=@openenvxee/html-package-demo"
   },
   "devDependencies": {
     "eslint-plugin-github": "6.1.2",
@@ -47,6 +49,7 @@
   },
   "catalogs": {
     "dev": {
+      "@typescript/typescript6": "^6.0.2",
       "typescript": "^7.0.2",
       "tsup": "^8.5.0"
     },

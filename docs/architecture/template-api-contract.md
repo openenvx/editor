@@ -29,7 +29,7 @@ Separate from named-layer modifications: a per-scene catalog `scene.variables` a
 | Email export | `renderEmailHtml(scene, { variables?: Record<string, string> })` |
 | Editor catalog UI | Opt-in `@openenvx/variables` `VariablesPlugin` (secondary sidebar + create/edit dialog); TipTap chips/suggest via `@openenvx/variables/tiptap` in html/email/canvas rich text |
 
-Bannerbear `Modification[]` and inline tokens can coexist on the same scene. Compose `VariablesPlugin` per product (`canvas-studio`, `email-studio`) — not a workbench default.
+Bannerbear `Modification[]` and inline tokens can coexist on the same scene. Compose `VariablesPlugin` per product (`canvas-driver/studio`, `email-driver/studio`) — not a workbench default.
 
 ## TemplateManifest
 
@@ -90,9 +90,9 @@ Unknown `name` values are skipped (no error from `applyModifications`). Prefer v
 2. For each modification, find the first layer whose trimmed `name` matches.
 3. Apply field mutations as above.
 4. **Auto-fit and image-fit are layout/render-time**, not applied inside `applyModifications`:
-   - Text shrink: when `data.autoFit === 'shrink'`, renderers call `fitFontSize(measureFn, boxHeight, minFontSize, fontSize)` so content stays inside the fixed transform box (`packages/canvas/src/fit-font-size.ts`).
-   - Text box grow (editor / preview): after injecting copy, call `applyModificationsWithTextFit` from `@openenvx/canvas` (or `fitSceneCanvasTextToContent` on an already-resolved scene) so `transform.height` matches the wrapped content at the template width. Skips `autoFit: 'shrink'` and curved text. Pure `applyModifications` alone does not remasure.
-   - Image: `data.fit` is `cover | contain | fill` with optional `data.focalPoint: { x, y }` in 0..1 (`packages/canvas/src/image-fit.ts`). Absent `fit` = legacy stretch (`fill`).
+   - Text shrink: when `data.autoFit === 'shrink'`, renderers call `fitFontSize(measureFn, boxHeight, minFontSize, fontSize)` so content stays inside the fixed transform box (`packages/canvas-driver/src/fit-font-size.ts`).
+   - Text box grow (editor / preview): after injecting copy, call `applyModificationsWithTextFit` from `@openenvx/canvas-driver` (or `fitSceneCanvasTextToContent` on an already-resolved scene) so `transform.height` matches the wrapped content at the template width. Skips `autoFit: 'shrink'` and curved text. Pure `applyModifications` alone does not remasure.
+   - Image: `data.fit` is `cover | contain | fill` with optional `data.focalPoint: { x, y }` in 0..1 (`packages/canvas-driver/src/image-fit.ts`). Absent `fit` = legacy stretch (`fill`).
 5. Export/render the resolved scene with the same fit algorithms so canvas preview and server output match. For server render of non-shrink text, remasure with `applyModificationsWithTextFit` (or equivalent) before rasterizing if the box should hug injected copy.
 
 ## Cloud API sketch
@@ -120,7 +120,7 @@ Server steps:
 3. If `validateTemplateNames(scene).duplicates.length > 0` → `400` with duplicate names.
 4. Reject unknown modification names (recommended) or skip them.
 5. `const resolved = applyModificationsWithTextFit(scene, modifications)` (or `applyModifications` then `fitSceneCanvasTextToContent` when you need the pure schema step separately).
-6. Render resolved scene with `exportCanvasDocument` from `@openenvx/canvas/export/node`. Honor shrink-to-fit and image fit during rasterization.
+6. Render resolved scene with `exportCanvasDocument` from `@openenvx/canvas-driver/export/node`. Honor shrink-to-fit and image fit during rasterization.
 
 ## End-to-end example
 

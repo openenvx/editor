@@ -1,8 +1,9 @@
-import { EmailEditor, type Scene } from '@openenvx/email-studio';
-import { renderEmailHtml } from '@openenvx/email-studio/runtime';
+import { renderEmailHtml } from '@openenvx/email-driver/runtime';
+import { EmailEditor, type Scene } from '@openenvx/email-driver/studio';
 import { useCallback } from 'react';
 
-import '@openenvx/email-studio/theme.css';
+import '@openenvx/email-driver/theme.css';
+import '@openenvx/studio/theme.css';
 
 export function App() {
   const onChange = useCallback((scene: Scene) => {

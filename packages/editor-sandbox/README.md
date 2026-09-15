@@ -29,7 +29,7 @@ export const demo = defineCanvasComponent({
 | `./canvas` / `./html` / `./panel` | Element vocabulary |
 | `./vite` | `bundleWidgetSources()` for isolates |
 
-Hosts wire sandbox via `WorkbenchShell` `mountExternalHosts` and `mountSandboxExtensions` from `./host`. Product bundles (`@openenvx/html-studio`, `@openenvx/canvas-studio`) re-export helpers such as `createHtmlSandboxExtensionHost`.
+Hosts wire sandbox via `WorkbenchShell` `mountExternalHosts` and `mountSandboxExtensions` from `./host`. Artboard `./studio` packages export helpers such as `createHtmlSandboxExtensionHost` and `createCanvasSandboxExtensionHost`.
 
 ## License
 

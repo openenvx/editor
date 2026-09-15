@@ -1,0 +1,13 @@
+{
+  "extends": "@openenvx/typescript-config/base.json",
+  "include": ["src", "../typescript-config/css-modules.d.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "strictNullChecks": true,
+    "paths": {
+      "@openenvx/editor-sandbox/host": ["../editor-sandbox/src/host/index.ts"],
+      "@openenvx/workbench": ["../workbench/src/index.ts"]
+    }
+  }
+}

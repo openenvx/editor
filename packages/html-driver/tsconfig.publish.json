@@ -1,0 +1,16 @@
+{
+  "extends": ["./tsconfig.json", "@openenvx/typescript-config/publish.json"],
+  "compilerOptions": {
+    "paths": {
+      "@openenvx/core": ["../core/src/index.ts"],
+      "@openenvx/core/schema": ["../core/src/schema/index.ts"],
+      "@openenvx/editor-sandbox/host": ["../editor-sandbox/src/host/index.ts"],
+      "@openenvx/editor-sandbox/protocol": ["../editor-sandbox/src/protocol/index.ts"],
+      "@openenvx/studio": ["../studio/src/index.ts"],
+      "@openenvx/variables": ["../variables/src/index.ts"],
+      "@openenvx/workbench": ["../workbench/src/index.ts"]
+    }
+  },
+  "include": ["src", "../typescript-config/css-modules.d.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}

@@ -6,14 +6,46 @@
   "license": "MPL-2.0",
   "exports": {
     "./base.json": "./base.json",
+    "./publish.json": "./publish.json",
     "./css-modules.d.ts": "./css-modules.d.ts",
     "./tsup.library": {
       "types": "./tsup.library.d.ts",
       "import": "./tsup.library.js",
       "default": "./tsup.library.js"
+    },
+    "./tsup-artboard-publish": {
+      "import": "./tsup-artboard-publish.js",
+      "default": "./tsup-artboard-publish.js"
+    },
+    "./studio-publish": {
+      "types": "./studio-publish.d.ts",
+      "import": "./studio-publish.js",
+      "default": "./studio-publish.js"
+    },
+    "./css-modules-esbuild": {
+      "import": "./css-modules-esbuild.js",
+      "default": "./css-modules-esbuild.js"
+    },
+    "./publish-paths": {
+      "import": "./publish-paths.js",
+      "default": "./publish-paths.js"
+    },
+    "./build-dts": {
+      "types": "./build-dts.d.ts",
+      "import": "./build-dts.js",
+      "default": "./build-dts.js"
+    },
+    "./verify-pack": {
+      "types": "./verify-pack.d.ts",
+      "import": "./verify-pack.js",
+      "default": "./verify-pack.js"
     }
   },
   "dependencies": {
+    "esbuild": "^0.25.0",
+    "lightningcss": "^1.32.0",
+    "rollup": "^4.57.0",
+    "rollup-plugin-dts": "^6.5.1",
     "tsup": "catalog:dev"
   }
 }

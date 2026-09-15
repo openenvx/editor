@@ -11,7 +11,9 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@openenvx/email-studio": "workspace:*",
+    "@openenvx/core": "workspace:*",
+    "@openenvx/email-driver": "workspace:*",
+    "@openenvx/studio": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },

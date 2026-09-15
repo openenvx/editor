@@ -18,15 +18,16 @@ OpenEnvx is an open-source foundation for canvas, HTML, and email editors. It gi
 
 ## Quick start
 
-For the fastest path, install a published editor:
+For the fastest path, install the studio shell plus an artboard package:
 
 ```bash
-npm install @openenvx/html-studio react react-dom
+npm install @openenvx/core @openenvx/studio @openenvx/html-driver react react-dom
 ```
 
 ```tsx
-import { HtmlEditor } from '@openenvx/html-studio';
-import '@openenvx/html-studio/theme.css';
+import { HtmlEditor } from '@openenvx/html-driver/studio';
+import '@openenvx/studio/theme.css';
+import '@openenvx/html-driver/theme.css';
 
 export function App() {
   return (
@@ -37,66 +38,28 @@ export function App() {
 }
 ```
 
-Other ready-made editors:
+Other drop-in editors:
 
-- [`@openenvx/canvas-studio`](packages/canvas-studio/README.md) - absolute-positioned canvas documents.
-- [`@openenvx/email-studio`](packages/email-studio/README.md) - responsive, email-safe block documents.
+- `@openenvx/canvas-driver/studio` - absolute-positioned canvas documents.
+- `@openenvx/email-driver/studio` - responsive, email-safe block documents.
 
-Each editor includes a `runtime` entry point for headless scene creation or rendering. See the package README for the complete public API.
+Each artboard package includes a `./runtime` entry point for headless scene creation or rendering. See [PUBLISHING.md](PUBLISHING.md) for the complete public API.
 
 ## Choose your integration
 
 | Goal | Start with |
 | --- | --- |
-| Drop in a complete editor | `@openenvx/canvas-studio`, `@openenvx/html-studio`, or `@openenvx/email-studio` |
-| Build a custom editor shell | `@openenvx/core` plus `@openenvx/canvas` or `@openenvx/html` |
-| Render or automate documents | A package's `runtime` entry point |
-| Add trusted in-process features | The plugin and contribution APIs |
+| Drop in a complete editor | `@openenvx/studio` + `@openenvx/canvas-driver/studio`, `@openenvx/html-driver/studio`, or `@openenvx/email-driver/studio` |
+| Build a custom editor shell | `@openenvx/core` + `@openenvx/studio` + `@openenvx/canvas-driver` or `@openenvx/html-driver` |
+| Render or automate documents | An artboard package's `./runtime` entry point |
+| Add trusted in-process features | The plugin and contribution APIs on `@openenvx/core` |
 | Build isolated widgets or panels | [`@openenvx/editor-sandbox`](packages/editor-sandbox/README.md) |
 
 ## Repository layout
 
 ```text
 packages/   reusable libraries and published editor packages
-apps/       demos, package smoke tests, and documentation
-docs/       architecture and integration guides
+apps/       demos and documentation
 ```
 
-The published MPL-2.0 packages are the supported external entry points. Some lower-level workspace packages and product-specific integrations remain private while their APIs settle; the package catalog documents the boundary.
-
-## Explore the docs
-
-- [Architecture hub](Architecture.md) - package tiers, boundaries, and contribution flow.
-- [Architecture chapters](docs/architecture/README.md) - runtime, workbench, canvas, HTML, email, extensions, and APIs.
-- [Package and API guide](docs/architecture/packages-and-api.md) - what to import and what is intentionally internal.
-- [Extension authoring](apps/docs/README.md) - trusted plugins and sandbox extensions.
-- [Publishing guide](PUBLISHING.md) - package contents and maintainer release workflow.
-- [Feature matrix](FEATURES.md) - current capabilities and roadmap.
-
-## Development
-
-Requirements: Node.js 24+ and Bun 1.3+.
-
-```bash
-bun install
-bun run dev:playground
-```
-
-Useful checks:
-
-```bash
-bun run check
-bun run check-types
-bun run test
-bun run build
-```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
-
-## Community
-
-Bug reports and feature discussions belong in [GitHub Issues](https://github.com/openenvx/openenvx/issues). Please include the package, reproduction steps, expected behavior, and the smallest relevant scene or code sample.
-
-## License
-
-OpenEnvx Editor is licensed under [Mozilla Public License 2.0](LICENSE) (MPL-2.0). Published npm packages and the extension SDK use the same license; private workspace packages (`packages/studio`, `packages/agent`) are proprietary.
+See [Architecture.md](Architecture.md) for package boundaries and contribution flow.

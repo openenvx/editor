@@ -1,7 +1,9 @@
-import { HtmlEditor, type Scene } from '@openenvx/html-studio';
+import type { Scene } from '@openenvx/core/schema';
+import { HtmlEditor } from '@openenvx/html-driver/studio';
 import { useCallback } from 'react';
 
-import '@openenvx/html-studio/theme.css';
+import '@openenvx/html-driver/theme.css';
+import '@openenvx/studio/theme.css';
 
 export function App() {
   const onChange = useCallback((scene: Scene) => {

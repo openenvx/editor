@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project are documented here.
-Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
+Published npm packages (`@openenvx/core`, `@openenvx/studio`, `@openenvx/html-driver`, `@openenvx/email-driver`, `@openenvx/canvas-driver`) share one version per GitHub Release.
 
 ## [0.1.3] - 2026-09-13
 
@@ -43,7 +43,7 @@ These changes significantly improve the functionality and usability of variable 
 - Introduced new export capabilities for canvas, allowing users to export documents in PNG and JPG formats directly from the editor.
 - Added support for exporting to PDF in Node environments, enhancing the versatility of the canvas package.
 - Updated the `CanvasEditor` and related components to integrate the new export features, improving user experience.
-- Revised documentation to reflect changes in export options and clarified the usage of the `@openenvx/canvas/export` module.
+- Revised documentation to reflect changes in export options and clarified the usage of the `@openenvx/canvas-driver/export` module.
 - Removed outdated references to cloud export services, streamlining the documentation for clarity.
 
 These enhancements significantly improve the export functionality and usability of the canvas editing environment.
@@ -211,7 +211,7 @@ chore(deps-dev): bump the dev-dependencies group across 1 directory with 4 updat
 
 - Refactor canvas architecture and update dependencies
 
-- Updated the canvas architecture to improve the integration between `@openenvx/canvas` and `@openenvx/headless`, including the introduction of `CanvasHostProvider` for better context management.
+- Updated the canvas architecture to improve the integration between `@openenvx/canvas-driver` and `@openenvx/headless`, including the introduction of `CanvasHostProvider` for better context management.
 - Removed the `AbsoluteEditorPane` and related contributions, streamlining the editor pane structure.
 - Updated TypeScript dependency to `catalog:dev` across multiple package.json files.
 - Enhanced documentation in `extension-guide.md` to clarify the roles of OSS and enterprise packages.
@@ -511,9 +511,9 @@ These changes significantly improve the media management experience within the a
 - Introduce HTML demo application and enhance canvas architecture
 
 - Added a new HTML demo application to showcase the HTML block editor capabilities, including a dedicated index.html and main.tsx for rendering.
-- Updated the canvas architecture to support HTML-specific features, including the introduction of `@openenvx/html` and `@xmazu/openenvxee-html-studio` packages.
+- Updated the canvas architecture to support HTML-specific features, including the introduction of `@openenvx/html-driver` and `@xmazu/openenvxee-html-studio` packages.
 - Enhanced the agent workflow documentation to clarify git usage and pre-commit checks.
-- Refactored page rules and presets, moving related logic from `@openenvx/schema` to `@openenvx/canvas`, improving modularity and maintainability.
+- Refactored page rules and presets, moving related logic from `@openenvx/schema` to `@openenvx/canvas-driver`, improving modularity and maintainability.
 - Updated various components and tests to reflect the new architecture and ensure compatibility with the HTML demo.
 
 These changes significantly enhance the framework's capabilities for HTML editing and improve the overall development experience within the OpenEnvx ecosystem.
@@ -590,7 +590,7 @@ These changes significantly improve the reliability and maintainability of the H
 
 - Implement named slots for composite HTML blocks
 
-- Introduced named slots in `@openenvx/html` blocks, allowing real nested part layers to remain invisible in the Layers tree.
+- Introduced named slots in `@openenvx/html-driver` blocks, allowing real nested part layers to remain invisible in the Layers tree.
 - Updated `HtmlEditorPane` to support inline editing of slot parts and generated inspector fields for better usability.
 - Enhanced the HTML block layout editor to accommodate composite blocks with named slots, improving the visual block tree and drag-and-drop functionality.
 - Added built-in composite blocks like `html.hero` and `html.button` to streamline block creation.
@@ -834,7 +834,7 @@ These changes improve user experience by providing visual feedback during handle
 
 - Introduce email block editor and related architecture
 
-- Added a new package `@openenvx/driver-email` for the email block editor, including components for rendering and managing email blocks.
+- Added a new package `@openenvx/email-driver` for the email block editor, including components for rendering and managing email blocks.
 - Implemented the `EmailBlocksPlugin` and `EmailEditorPane` for editing email layouts, utilizing React-Email for rendering.
 - Created a demo application `apps/email-demo` to showcase the email block editor functionality.
 - Updated architecture documentation to include the new email driver, detailing its role and integration with existing components.
@@ -897,7 +897,7 @@ These updates streamline the layout management across different editors, providi
 
 - Introduce Snapvelo event page demo application
 
-- Added a new demo application for Snapvelo, showcasing an event page design using the `@openenvx/html` framework.
+- Added a new demo application for Snapvelo, showcasing an event page design using the `@openenvx/html-driver` framework.
 - Implemented core components including event hero, logo, and gallery blocks, enhancing the visual layout and interactivity.
 - Created a structured scene generation function to seed the event page with predefined layers and properties.
 - Developed a dedicated plugin for Snapvelo event page integration, allowing for easy registration of custom blocks.
@@ -946,7 +946,7 @@ These changes improve clarity and usability for developers working with the Open
 
 - Renamed `CanvasBasicsPlugin` to `CanvasPlugin` across the codebase to better reflect its functionality, which now includes both engine and workbench chrome features.
 - Updated all relevant documentation, including architecture and extension guides, to reference the new `CanvasPlugin` name and its capabilities.
-- Removed references to the deprecated `@openenvx/canvas-pro` package, consolidating canvas features under `@openenvx/canvas`.
+- Removed references to the deprecated `@openenvx/canvas-pro` package, consolidating canvas features under `@openenvx/canvas-driver`.
 - Adjusted import paths and examples in demo applications to utilize the new plugin structure, enhancing clarity for developers.
 
 These changes streamline the plugin architecture and improve the overall consistency of the OpenEnvx framework.
@@ -978,11 +978,11 @@ These changes improve the flexibility and clarity of property field configuratio
 
 These modifications enhance the usability of the HTML editor while ensuring a cleaner codebase.
 
-- Introduce @openenvx/email package and demo application
+- Introduce @openenvx/email-driver package and demo application
 
-- Added the @openenvx/email package, which includes a drop-in EmailEditor component, createEmailScene function, and renderEmailHtml for headless exports.
+- Added the @openenvx/email-driver package, which includes a drop-in EmailEditor component, createEmailScene function, and renderEmailHtml for headless exports.
 - Updated documentation to reflect the new email product host bundle and its usage.
-- Introduced a demo application for @openenvx/email, showcasing its functionality and integration.
+- Introduced a demo application for @openenvx/email-driver, showcasing its functionality and integration.
 - Enhanced the architecture documentation to include the new email package and its components.
 
 These changes expand the OpenEnvx framework's capabilities by providing a dedicated email editing solution, improving usability for developers and end-users.

@@ -25,7 +25,7 @@
 | Comments product | Own implementation (async review pins); **not** Liveblocks Comments |
 | Sync model | **Whole-scene sync** - room holds scene JSON; local `SceneStore.apply` pushes; remote updates apply via controlled replace/apply |
 | Portability | DI ports + adapters (`CollaborationPort`, `CommentPort`); Liveblocks = collab adapter only |
-| Editor coverage | Ports editor-agnostic; first product wire = email (`driver-email` / email host) |
+| Editor coverage | Ports editor-agnostic; first product wire = email (`email-driver` / email host) |
 | Pricing intent | Pay Liveblocks for presence + storage/collab minutes only; comments stay on our backend |
 
 ## Open (decide when picking up)

@@ -11,7 +11,9 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@openenvx/html-studio": "workspace:*",
+    "@openenvx/core": "workspace:*",
+    "@openenvx/html-driver": "workspace:*",
+    "@openenvx/studio": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },

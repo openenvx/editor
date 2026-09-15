@@ -5,7 +5,6 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "strictNullChecks": true,
-    "baseUrl": ".",
     "paths": {
       "@openenvx/core": ["../core/src/index.ts"],
       "@openenvx/core/react": ["../core/src/react/workbench-context.tsx"],

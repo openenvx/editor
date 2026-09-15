@@ -3,9 +3,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM"],
-    "strictNullChecks": true,
-    "baseUrl": ".",
-    "paths": {}
+    "strictNullChecks": true
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/schema/generate-json-schema.ts"]

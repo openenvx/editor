@@ -1,7 +1,7 @@
 # HTML editor: on-canvas image replace (design)
 
 **Status:** Implemented 2026-08-04 (pill + drop/click; slot faces; gallery via `html.image` slots)  
-**Package:** `@openenvx/html` (generic); Snapvelo demo consumes it  
+**Package:** `@openenvx/html-driver` (generic); Snapvelo demo consumes it  
 **Related:** Snapvelo event-page demo; `AssetService.upload`
 
 ## Goal
@@ -53,7 +53,7 @@ file (picker or drop)
 
 | Piece | Where |
 | --- | --- |
-| Primary-field helper | `packages/html/src/editor/` |
+| Primary-field helper | `packages/html-driver/src/editor/` |
 | Pill action | `block-selection-menu.tsx` + `BlockChrome` |
 | Drop / click overlay | HTML editor chrome around selected block / slot image face |
 | Asset wiring | `HtmlEditorPane` / block editor context via existing DI `AssetServiceId` |

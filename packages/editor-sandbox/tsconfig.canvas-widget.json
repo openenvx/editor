@@ -4,14 +4,13 @@
   "exclude": ["src/canvas-widget/**/*.test.ts"],
   "compilerOptions": {
     "strictNullChecks": true,
-    "baseUrl": ".",
     "paths": {
       "@openenvx/core": ["../core/src/index.ts"],
       "@openenvx/core/schema": ["../core/src/schema/index.ts"],
-      "@openenvx/canvas/fit-text-layer-to-content": [
-        "../canvas/src/fit-text-layer-to-content.ts"
+      "@openenvx/canvas-driver/fit-text-layer-to-content": [
+        "../canvas-driver/src/fit-text-layer-to-content.ts"
       ],
-      "@openenvx/editor-sandbox/protocol": ["src/protocol/index.ts"]
+      "@openenvx/editor-sandbox/protocol": ["./src/protocol/index.ts"]
     }
   }
 }

@@ -14,45 +14,44 @@ Scene JSON (@openenvx/core/schema)
         ▼
 EditorRuntime + PluginManager + WorkbenchController (@openenvx/core)
         │
-        ├── domain engines: canvas / html / drivers
+        ├── domain engines: canvas / html / email
         │
         ▼
-WorkbenchShell (@openenvx/workbench)
+WorkbenchShell (@openenvx/studio)
         │
-        ├── canvas studio  (@openenvx/canvas-studio)
-        ├── html studio    (@openenvx/html-studio)
-        └── email studio  (@openenvx/email-studio)
+        ├── canvas ./studio  (@openenvx/canvas-driver/studio)
+        ├── html ./studio    (@openenvx/html-driver/studio)
+        └── email ./studio   (@openenvx/email-driver/studio)
 ```
 
 | Layer | Job |
 | --- | --- |
 | **Schema** | Canonical Scene / EditorState / SceneSnapshot |
-| **Core** | Plugin host, commands, layers, DI, scene store, workbench runtime (contributions, layout, property host, external host mounts) |
+| **Core** | Plugin host, commands, layers, DI, scene store, workbench runtime |
 | **Domain** | Canvas Konva engine, HTML block editor, or email driver (pick one surface per page via `page.layout`) |
-| **Shell** | React chrome that renders contribution descriptors |
-| **Product** | Fat bundles that re-export the stack hosts actually import |
+| **Shell** | React chrome that renders contribution descriptors (`@openenvx/studio`) |
+| **Product** | Artboard `./studio` presets that wire shell + engine |
 
 ## Choose a client tier
 
 | You want… | Use |
 | --- | --- |
-| Stage only, own state | `schema` + `canvas` (`CanvasStage`) |
-| Full editor, custom UI | `core` + `canvas` / `html` / `driver-email` |
-| Full canvas product | `@openenvx/canvas-studio` |
-| HTML block product | `@openenvx/html-studio` (published) or `@openenvx/html` + workbench (monorepo HMR) |
-| Email block editor | `@openenvx/driver-email` + workbench (`apps/email-demo`) |
-| Untrusted parent panels | `plugin-protocol` + embed host (never main-world JS) |
+| Stage only, own state | `@openenvx/core/schema` + `@openenvx/canvas-driver` (`CanvasStage`) |
+| Full editor, custom UI | `@openenvx/core` + `@openenvx/studio` + `canvas` / `html` / `email` |
+| Full canvas product | `@openenvx/studio` + `@openenvx/canvas-driver/studio` |
+| HTML block product | `@openenvx/studio` + `@openenvx/html-driver/studio` |
+| Email block editor | `@openenvx/studio` + `@openenvx/email-driver/studio` |
 | Untrusted scripts / widgets | Sandbox QuickJS Worker path (never main-world JS) |
 
 ## Two editor surfaces, one workbench
 
 `page.layout` is a provider-defined string. Built-ins:
 
-| `page.layout` | Engine package           | Editor pane                    |
-| ------------- | ------------------------ | ------------------------------ |
-| `'absolute'`  | `@openenvx/canvas`       | `CanvasEditor` via canvas host |
-| `'html'`      | `@openenvx/html`         | `HtmlEditorPane`               |
-| `'email'`     | `@openenvx/driver-email` | `EmailEditorPane`              |
+| `page.layout` | Engine package            | Editor pane                    |
+| ------------- | ------------------------- | ------------------------------ |
+| `'absolute'`  | `@openenvx/canvas-driver` | `CanvasEditor` via canvas host |
+| `'html'`      | `@openenvx/html-driver`   | `HtmlEditorPane`               |
+| `'email'`     | `@openenvx/email-driver`  | `EmailEditorPane`              |
 
 Scene-generic chrome (Pages, Layers, dirty status, Inspector container) lives in workbench defaults. Canvas-only chrome (zoom, transform panes, floating toolbar) is registered by `CanvasPlugin`. HTML and email each own a Blocks activity sidebar.
 
@@ -64,7 +63,7 @@ Trusted code mutates the scene through **commands** on the shared command servic
 
 1. [Runtime & core](runtime-and-core.md) - host primitives
 2. [Workbench & headless](workbench-and-headless.md) - UI contribution system
-3. [Canvas](canvas.md) / [HTML](html.md) / [Email driver](driver-email.md) - domain engines
+3. [Canvas](canvas.md) / [HTML](html.md) / [Email driver](email-driver.md) - domain engines
 4. [Studio & products](studio-and-products.md) - what apps import
 5. [Extensions](extensions.md) - trust boundaries summary
 6. [Packages & public API](packages-and-api.md) - exports and stability

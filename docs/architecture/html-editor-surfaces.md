@@ -1,8 +1,8 @@
 # HTML / email editor surfaces
 
-**Audience:** Engineers and agents talking about click targets, selection, and layout chrome in `@openenvx/html` and `@openenvx/driver-email`.
+**Audience:** Engineers and agents talking about click targets, selection, and layout chrome in `@openenvx/html-driver` and `@openenvx/email-driver`.
 
-Hub: [html.md](html.md) · [driver-email.md](driver-email.md).
+Hub: [html.md](html.md) · [email-driver.md](email-driver.md).
 
 ## Naming (use these words)
 
@@ -15,7 +15,7 @@ Hub: [html.md](html.md) · [driver-email.md](driver-email.md).
 | **Page root** | Top-level `*.root` layer (`html.root`, `email.root`, `snapvelo.root`, …) | Scene layer for page-level props (background, theme tokens, max width). Rendered **without** `BlockChrome` (no outline / selection pill). |
 | **Block** | Nested layer under the root | Selectable via `BlockChrome` (`[data-layer-id]`). |
 
-Do **not** call the artboard “canvas” (that word is reserved for Konva / `@openenvx/canvas`). Prefer **stage** for empty chrome around the page, **artboard** for the page card itself.
+Do **not** call the artboard “canvas” (that word is reserved for Konva / `@openenvx/canvas-driver`). Prefer **stage** for empty chrome around the page, **artboard** for the page card itself.
 
 ## Selection rules
 

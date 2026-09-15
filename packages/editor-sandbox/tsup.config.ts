@@ -1,7 +1,6 @@
 import { createLibraryConfig } from '@openenvx/typescript-config/tsup.library';
 
 const authorConfig = createLibraryConfig({
-  dts: true,
   tsconfig: 'tsconfig.json',
   entry: [
     'src/**/*.{ts,tsx}',
@@ -25,9 +24,11 @@ const authorConfig = createLibraryConfig({
 });
 
 const hostConfig = createLibraryConfig({
-  dts: true,
   tsconfig: 'tsconfig.host.json',
   entry: ['src/host/**/*.{ts,tsx}', '!src/host/**/*.test.{ts,tsx}'],
+  // tsconfig.host.json roots at src/host; mirror package exports under dist/host/.
+  outDir: 'dist/host',
+  clean: false,
   external: [
     '@openenvx/core',
     'quickjs-emscripten',
@@ -39,13 +40,14 @@ const hostConfig = createLibraryConfig({
 });
 
 const canvasWidgetConfig = createLibraryConfig({
-  dts: true,
   tsconfig: 'tsconfig.canvas-widget.json',
   entry: ['src/canvas-widget/index.ts'],
+  outDir: 'dist/canvas-widget',
+  clean: false,
   external: [
     '@openenvx/core',
     '@openenvx/core/schema',
-    '@openenvx/canvas/fit-text-layer-to-content',
+    '@openenvx/canvas-driver/fit-text-layer-to-content',
     '@openenvx/editor-sandbox/protocol',
   ],
 });

@@ -1,13 +1,14 @@
-import { CanvasEditor, type Scene } from '@openenvx/canvas-studio';
-import { createCanvasScene } from '@openenvx/canvas-studio/runtime';
-import { exportCanvasDocument } from '@openenvx/canvas/export';
-import { downloadBytes } from '@openenvx/canvas/export-bytes';
+import { exportCanvasDocument } from '@openenvx/canvas-driver/export';
+import { downloadBytes } from '@openenvx/canvas-driver/export-bytes';
+import { createCanvasScene } from '@openenvx/canvas-driver/runtime';
+import { CanvasEditor, type Scene } from '@openenvx/canvas-driver/studio';
 import { getActivePage } from '@openenvx/core';
 import type { Scene as CoreScene } from '@openenvx/core/schema';
 import { useCallback, useMemo, useState } from 'react';
 
-import '@openenvx/canvas-studio/theme.css';
-import '@openenvx/canvas-studio/fonts.css';
+import '@openenvx/canvas-driver/fonts.css';
+import '@openenvx/canvas-driver/theme.css';
+import '@openenvx/studio/theme.css';
 
 type ExportFormat = 'png' | 'jpg';
 
@@ -52,7 +53,7 @@ export function App() {
     <div className="canvas-package-demo">
       <header className="canvas-package-demo-bar">
         <span className="canvas-package-demo-label">
-          @openenvx/canvas-studio
+          @openenvx/canvas-driver/studio
         </span>
         <div className="canvas-package-demo-actions">
           {exportError ? (

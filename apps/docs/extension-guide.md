@@ -13,17 +13,17 @@ Under-the-hood map: [Architecture.md](../../Architecture.md) · [docs/architectu
 
 The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@openenvx/core/schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
 
-Backend services depend on `@openenvx/core/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Node canvas raster/PDF export uses `@openenvx/canvas/export/node` against the same Scene JSON.
+Backend services depend on `@openenvx/core/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Node canvas raster/PDF export uses `@openenvx/canvas-driver/export/node` against the same Scene JSON.
 
 ## OSS vs enterprise shell
 
 | Package | Responsibility |
 | --- | --- |
-| `@openenvx/canvas` | Canvas engine: layers, commands, Konva renderers, `CanvasEditor` |
+| `@openenvx/canvas-driver` | Canvas engine: layers, commands, Konva renderers, `CanvasEditor` |
 | `@openenvx/core` | Workbench runtime: `WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()` |
 | `@openenvx/core` | Editor host: `EditorRuntime`, `PluginManager`, `registerContribution()` |
 | Your app / `demo-playground` | Wire canvas to workbench via `CanvasHostProvider` + app-owned toolbar/sidebars |
-| `@openenvx/canvas` | Full canvas editor: `CanvasPlugin` (engine + workbench chrome), toolbar, palette, editor pane registration |
+| `@openenvx/canvas-driver` | Full canvas editor: `CanvasPlugin` (engine + workbench chrome), toolbar, palette, editor pane registration |
 
 Load `CanvasPlugin` for the full canvas editor. For a minimal custom shell, compose workbench contributions yourself (see `apps/demo-playground`).
 
@@ -66,10 +66,10 @@ Plugin contributions register through `PluginContext.register()`, which routes t
 
 ### Wiring canvas in a workbench app
 
-`@openenvx/canvas` does not depend on `@openenvx/core`. The app bridges them:
+`@openenvx/canvas-driver` does not depend on `@openenvx/core`. The app bridges them:
 
 ```tsx
-import { CanvasHostProvider, CanvasEditor } from '@openenvx/canvas';
+import { CanvasHostProvider, CanvasEditor } from '@openenvx/canvas-driver';
 import { useWorkbenchContext } from '@openenvx/core/react';
 
 // Provide CanvasHostApi from workbench, then mount CanvasEditor.
@@ -294,7 +294,7 @@ Cloud / render API contract for named-layer modifications: [template-api-contrac
 Register canvas contributions from a plugin `activate()` hook:
 
 ```ts
-import { registerCanvasContribution } from '@openenvx/canvas';
+import { registerCanvasContribution } from '@openenvx/canvas-driver';
 
 registerCanvasContribution(ctx, [
   new MyCanvasRendererContribution(),
@@ -314,7 +314,7 @@ registerCanvasContribution(ctx, [
 OSS builtins register first. Enterprise plugins activate later and can **override** a per-kind renderer or interaction:
 
 ```ts
-import { registerCanvasContribution } from '@openenvx/canvas';
+import { registerCanvasContribution } from '@openenvx/canvas-driver';
 
 registerCanvasContribution(
   ctx,
@@ -326,7 +326,7 @@ registerCanvasContribution(
 );
 ```
 
-Canvas raster export: `@openenvx/canvas/export` (browser PNG/JPG) or `@openenvx/canvas/export/node` (Node PNG/JPG/PDF). `CanvasDocumentExportService` is registered by `CanvasPlugin` for `canvas.exportImage`.
+Canvas raster export: `@openenvx/canvas-driver/export` (browser PNG/JPG) or `@openenvx/canvas-driver/export/node` (Node PNG/JPG/PDF). `CanvasDocumentExportService` is registered by `CanvasPlugin` for `canvas.exportImage`.
 
 ## Generic layer handles
 
@@ -377,13 +377,13 @@ Layer definitions can forward unknown data through `renderPreview` (passthrough 
 
 ## Stage interaction service (optional)
 
-OSS `@openenvx/canvas` does not include snapping or design-tool overlays. Optional stage behavior is registered as a **service** - no React components in the extension API.
+OSS `@openenvx/canvas-driver` does not include snapping or design-tool overlays. Optional stage behavior is registered as a **service** - no React components in the extension API.
 
 ```ts
 import {
   type CanvasStageInteractionService,
   CanvasStageInteractionServiceId,
-} from '@openenvx/canvas';
+} from '@openenvx/canvas-driver';
 import { SingletonServiceContribution } from '@openenvx/core';
 
 export class MyStageInteraction implements CanvasStageInteractionService {
@@ -413,12 +413,12 @@ The stage controller resolves the service via `useCanvasStageInteraction()` insi
 
 ## HTML composite blocks (named slots)
 
-`@openenvx/html` blocks can declare named **slots** - real nested part layers that stay invisible to the Layers tree.
+`@openenvx/html-driver` blocks can declare named **slots** - real nested part layers that stay invisible to the Layers tree.
 
 Parts live under `data.slots`, not `data.children`. Core's tree walk only descends `data.children`, so a slotted block appears as one atomic row, cannot be dropped into, and cannot expose parts for independent delete/drag.
 
 ```ts
-import type { BlockConfig } from '@openenvx/html';
+import type { BlockConfig } from '@openenvx/html-driver';
 
 export const featureBlock: BlockConfig = {
   type: 'html.feature',
@@ -452,4 +452,4 @@ export const featureBlock: BlockConfig = {
 - Optional single slots get a `visible` toggle (`slots.<name>.0.visible`).
 - Clicking a part selects the **host** block; double-click text parts edits inline via dotted-path `updateProperty`.
 
-See `html.hero` / `html.button` in `packages/html/src/blocks/` for the shipping reference.
+See `html.hero` / `html.button` in `packages/html-driver/src/blocks/` for the shipping reference.

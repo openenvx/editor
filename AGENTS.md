@@ -13,7 +13,7 @@ Instructions for coding agents working in the OpenEnvx monorepo.
 
 When using thermos skills (thermo-nuclear review, thermo-nuclear code-quality review, or similar) to review code, go beyond bugs and style.
 
-**Architecture docs check (required):** Before scoring the diff, read [Architecture.md](Architecture.md) and the relevant chapters under [docs/architecture/](docs/architecture/overview.md) (pick by what the change touches - e.g. workbench → `workbench-and-headless.md`, canvas → `canvas.md`, html/email → `html.md` / `driver-email.md`, packages/exports → `packages-and-api.md`). Verify the change **follows** those docs: package tiers, placement cheat sheet, contribution flow, public API boundaries, and hard rules (canvas not in `core`, host sidebars via contributions, etc.). Flag drifts from the written architecture as first-class findings, not nits. Also use [Plugin-boundaries.md](Plugin-boundaries.md) when the diff touches embed/sandbox/external plugins.
+**Architecture docs check (required):** Before scoring the diff, read [Architecture.md](Architecture.md) and the relevant chapters under [docs/architecture/](docs/architecture/overview.md) (pick by what the change touches - e.g. workbench → `workbench-and-headless.md`, canvas → `canvas.md`, html/email → `html.md` / `email-driver.md`, packages/exports → `packages-and-api.md`). Verify the change **follows** those docs: package tiers, placement cheat sheet, contribution flow, public API boundaries, and hard rules (canvas not in `core`, host sidebars via contributions, etc.). Flag drifts from the written architecture as first-class findings, not nits. Also use [Plugin-boundaries.md](Plugin-boundaries.md) when the diff touches embed/sandbox/external plugins.
 
 **Especially** look for:
 
@@ -46,7 +46,7 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | [apps/docs/extension-guide.md](apps/docs/extension-guide.md) | Internal OOP plugin author API |
 | [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) | Sandbox widgets/plugins + embed panels |
 | [docs/architecture/property-fields.md](docs/architecture/property-fields.md) | Inspector `PropertyFieldDescriptor`, field kinds, `layout` |
-| [packages/canvas/README.md](packages/canvas/README.md) | Canvas install and `CanvasPlugin` |
+| [packages/canvas-driver/README.md](packages/canvas-driver/README.md) | Canvas install and `CanvasPlugin` |
 | [packages/workbench/Design.md](packages/workbench/Design.md) | Workbench **visual design** tokens only (not API docs) |
 
 Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before placing new code. Read **Plugin-boundaries.md** when touching embed/sandbox/external plugins. Update **FEATURES.md** when adding or removing a user-facing editor capability. When unsure, load the global **openenvx** skill (`~/.cursor/skills/openenvx`).
@@ -62,18 +62,18 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 | Put it here | Examples |
 | --- | --- |
 | `@openenvx/core` | Scene (`./schema`), preview IR (`./preview`), `Command`, `Plugin`, `EditorRuntime`, `WorkbenchController`, workbench contributions, `./react` |
-| `@openenvx/canvas` | Konva stage, interactions, layer renderers, `CanvasPlugin`, `CanvasEditor`, `CanvasHostProvider` |
+| `@openenvx/canvas-driver` | Konva stage, interactions, layer renderers, `CanvasPlugin`, `CanvasEditor`, `CanvasHostProvider` |
 | `@openenvx/editor-sandbox` | Sandbox author SDK (`./protocol`, element subpaths, `defineExtension`, Vite) + host runtime (`./host`) + canvas widget face bridge (`./canvas-widget`) |
 
 ### Canvas rule (non-negotiable)
 
-**All canvas rendering and interactions go in `@openenvx/canvas`.** Never add canvas implementations to `core`.
+**All canvas rendering and interactions go in `@openenvx/canvas-driver`.** Never add canvas implementations to `core`.
 
 | Do | Don't |
 | --- | --- |
-| Add a Konva renderer in `packages/canvas/src/renderers/` | Add canvas renderer types to `core` |
+| Add a Konva renderer in `packages/canvas-driver/src/renderers/` | Add canvas renderer types to `core` |
 | Register renderers via `registerCanvasContribution()` | Hardcode preview `kind` switches in app shell |
-| Use `CanvasEditor` + `CanvasHostProvider` in the app shell | Put workbench-aware editor pane wiring in `@openenvx/canvas` |
+| Use `CanvasEditor` + `CanvasHostProvider` in the app shell | Put workbench-aware editor pane wiring in `@openenvx/canvas-driver` |
 | Use `CanvasPlugin` for built-in canvas features | Create app-only canvas plugins without registering contributions |
 
 ## Licensing / publishing intent
@@ -83,9 +83,11 @@ Internal workspace libraries (`core`, `canvas`, `workbench`, `agent`, …) are *
 Published packages:
 
 - **`@openenvx/editor-sandbox`** - published sandbox SDK: `./protocol`, `./host`, `./canvas-widget`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts opt in via **`@openenvx/editor-sandbox/host`** on `mountExternalHosts`; canvas faces map via **`@openenvx/editor-sandbox/canvas-widget`** (`applyWidgetFace`).
-- **`@openenvx/html-studio`** - published HTML editor (public npm, MPL-2.0). Drop-in `HtmlEditor` + host composition API + `./runtime` (`renderBlockDocument`); inlines private core/html/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/email-studio`** - published email editor (public npm, MPL-2.0). Drop-in `EmailEditor` + `createEmailScene` + `renderEmailHtml`; inlines private core/html/driver-email/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/canvas-studio`** - published canvas editor (public npm, MPL-2.0). Drop-in `CanvasEditor` + `createCanvasScene`; inlines private core/canvas/workbench into minified `dist/`. Subpaths: `.`, `./runtime`, `./theme.css`, `./fonts.css`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/core`** - published foundation (public npm, MPL-2.0). Scene, plugin host, workbench controller. Subpaths: `.`, `./schema`, `./preview`, `./react`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/studio`** - published workbench shell (public npm, MPL-2.0). `WorkbenchShell` host allowlist + `./theme.css`. Peers `@openenvx/core`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/html-driver`** - published HTML engine (public npm, MPL-2.0). Drop-in `@openenvx/html-driver/studio` (`HtmlEditor`) + `./runtime` (`renderBlockDocument`). See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/email-driver`** - published email engine (public npm, MPL-2.0). Drop-in `@openenvx/email-driver/studio` (`EmailEditor`) + `./runtime` (`renderEmailHtml`). Source: `packages/email-driver`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/canvas-driver`** - published canvas engine (public npm, MPL-2.0). Drop-in `@openenvx/canvas-driver/studio` (`CanvasEditor`) + `./runtime` (`createCanvasScene`). See [PUBLISHING.md](PUBLISHING.md).
 
 ## Host sidebar panels (product hosts)
 
@@ -146,12 +148,12 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) for every commi
 | `chore` | Tooling, deps, repo hygiene (not `chore(release)` - reserved for the release workflow) |
 | `ci` | CI / GitHub Actions |
 
-**Scope** (optional but preferred): package or area - e.g. `canvas`, `html-studio`, `workbench`, `extensions`, `release`.
+**Scope** (optional but preferred): package or area - e.g. `canvas-driver`, `html-driver`, `studio`, `workbench`, `extensions`, `release`.
 
 **Examples:**
 
 ```
-feat(html-studio): add theme prop to HtmlEditor
+feat(html-driver): add theme prop to HtmlEditor
 fix(canvas): correct snap guide offset at high zoom
 refactor(core): extract property path resolver
 docs: document MPL-2.0 license
@@ -203,13 +205,13 @@ Details: [docs/architecture/workbench-and-headless.md](docs/architecture/workben
 
 | Task | Where |
 | --- | --- |
-| Add canvas layer type | `packages/canvas/src/layers/` + register in `CanvasPlugin` |
+| Add canvas layer type | `packages/canvas-driver/src/layers/` + register in `CanvasPlugin` |
 | Add custom preview `kind` | Canvas contribution class + `registerCanvasContribution(ctx, …)` |
 | Add shell UI chrome | `apps/demo-playground/src/` or your own app |
 | Wire canvas editor to workbench | App shell: `CanvasHostProvider` + `AbsoluteEditorPane` (see `apps/demo-playground`) |
 | Add generic plugin contribution | `packages/core` contribution + `ctx.register()` |
 | Add workbench UI contribution | `@openenvx/core` + `ctx.registerWorkbench()` via `WorkbenchPlugin` |
-| Add flow layer type | `packages/canvas/src/layers/` |
+| Add flow layer type | `packages/canvas-driver/src/layers/` |
 
 ## Commands
 
@@ -227,7 +229,7 @@ bun run changelog     # preview unreleased changelog (git-cliff)
 
 ## Publishing
 
-Only `@openenvx/html-studio`, `@openenvx/email-studio`, and `@openenvx/canvas-studio` are published via the GitHub Actions **Release** workflow (see [PUBLISHING.md](PUBLISHING.md)). `@openenvx/editor-sandbox` may publish separately when released.
+`@openenvx/core`, `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, and `@openenvx/email-driver` are published via the GitHub Actions **Release** workflow (see [PUBLISHING.md](PUBLISHING.md)). `@openenvx/editor-sandbox` may publish separately when released.
 
 ## Before you finish
 

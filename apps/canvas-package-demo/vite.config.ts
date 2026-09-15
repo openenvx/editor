@@ -8,7 +8,7 @@ const monorepoRoot = path.resolve(import.meta.dirname, '../..');
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    exclude: ['@openenvx/canvas-studio'],
+    exclude: ['@openenvx/canvas-driver/studio', '@openenvx/studio'],
   },
   server: {
     fs: { allow: [monorepoRoot] },

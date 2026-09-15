@@ -1,0 +1,16 @@
+{
+  "extends": "@openenvx/typescript-config/base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "paths": {
+      "@openenvx/studio": ["../studio/src/index.ts"],
+      "@openenvx/editor-sandbox/host": ["../editor-sandbox/src/host/index.ts"],
+      "@openenvx/editor-sandbox/protocol": ["../editor-sandbox/src/protocol/index.ts"],
+      "@openenvx/editor-sandbox/canvas-widget": ["../editor-sandbox/src/canvas-widget/index.ts"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}
