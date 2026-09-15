@@ -74,6 +74,7 @@
         "src/host/index.ts!",
         "src/host/quickjs.worker.ts!",
         "src/canvas-widget/index.ts!",
+        "src/openenvx-ambient.ts!",
         "build-dts.ts!"
       ],
       "project": [

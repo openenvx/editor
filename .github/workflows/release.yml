@@ -30,6 +30,9 @@ jobs:
   release:
     name: Version, publish, and release
     runs-on: ubuntu-latest
+    # Release commits are machine-made; the dev pre-commit hook must not gate them.
+    env:
+      HUSKY: '0'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -99,6 +102,12 @@ jobs:
       - name: Build published packages
         run: |
           bun run build --filter=@openenvx/core --filter=@openenvx/studio --filter=@openenvx/canvas-driver --filter=@openenvx/html-driver --filter=@openenvx/email-driver
+
+      - name: Lint and type check
+        run: bun run check && bun run check-types
+
+      - name: Test
+        run: bun run test
 
       - name: Verify publish tarballs
         run: bun run verify-pack
