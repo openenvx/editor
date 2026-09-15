@@ -21,7 +21,7 @@ extensions (protocol subpath)
 
 Hard rules:
 
-- **Canvas never imports workbench.** Artboard `./studio` wires canvas into sandbox via `createCanvasSandboxExtensionHost`.
+- **Canvas never imports workbench.** `./studio/sandbox-host` wires canvas into sandbox via `createCanvasSandboxExtensionHost` (optional; needs `@openenvx/editor-sandbox`).
 - **HTML never depends on `@openenvx/canvas-driver`.**
 - **Email** (`@openenvx/email-driver`) may depend on `@openenvx/html-driver` for shared block machinery; engine entries must not depend on workbench.
 - **Hosts prefer `@openenvx/studio` + artboard `./studio`**, not a hand-wired private stack (unless custom shell - see `apps/demo-playground`).
@@ -60,7 +60,7 @@ Hard rules:
 
 **`@openenvx/studio`** - `WorkbenchShell`, chrome defaults, `SandboxExtensionHost`, `./theme.css`. No artboard plugins.
 
-**`@openenvx/canvas-driver`** - `.`: engine API. `./studio`: `CanvasEditor`, `defaultCanvasStudio`, `createCanvasSandboxExtensionHost`. `./runtime`: `createCanvasScene`, opaque `Scene`. `./export`, `./fonts.css`, `./theme.css`.
+**`@openenvx/canvas-driver`** - `.`: engine API. `./studio`: `CanvasEditor`, `defaultCanvasStudio`. `./studio/sandbox-host`: `createCanvasSandboxExtensionHost`. `./runtime`: `createCanvasScene`, opaque `Scene`. `./export`, `./fonts.css`, `./theme.css`.
 
 **`@openenvx/html-driver`** - `.`: engine API. `./studio`: `HtmlEditor`, `defaultHtmlStudio`, `createHtmlSandboxExtensionHost`. `./runtime`: `createHtmlScene`, `renderBlockDocument`, block registry.
 

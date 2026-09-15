@@ -12,6 +12,7 @@ import { createCssModuleCompiler } from './css-modules-esbuild.js';
  * @param {string} options.packageRoot
  * @param {string} options.studioEntry
  * @param {string} options.runtimeEntry
+ * @param {Record<string, string>} [options.extraEntries]
  * @param {RegExp} options.inlineOpenenvx
  * @param {string} [options.packageLabel]
  * @param {boolean} [options.sandboxWorker]
@@ -63,6 +64,7 @@ export function createArtboardPublishConfig(options) {
     entry: {
       studio: options.studioEntry,
       runtime: options.runtimeEntry,
+      ...options.extraEntries,
     },
     format: ['esm'],
     dts: false,

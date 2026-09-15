@@ -12,6 +12,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./studio": "./src/studio/index.ts",
+    "./studio/sandbox-host": "./src/studio/create-canvas-sandbox-extension-host.ts",
     "./runtime": "./src/publish-runtime.ts",
     "./document-export": "./src/export/canvas-document-export-service.ts",
     "./export": "./src/export/browser/index.ts",
@@ -103,6 +104,11 @@
         "types": "./dist/studio.d.ts",
         "import": "./dist/studio.js",
         "default": "./dist/studio.js"
+      },
+      "./studio/sandbox-host": {
+        "types": "./dist/studio-sandbox-host.d.ts",
+        "import": "./dist/studio-sandbox-host.js",
+        "default": "./dist/studio-sandbox-host.js"
       },
       "./runtime": {
         "types": "./dist/runtime.d.ts",

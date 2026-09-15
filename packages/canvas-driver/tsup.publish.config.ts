@@ -13,6 +13,9 @@ export default createArtboardPublishConfig({
   packageLabel: 'canvas',
   studioEntry: 'src/studio/index.ts',
   runtimeEntry: 'src/publish-runtime.ts',
+  extraEntries: {
+    'studio-sandbox-host': 'src/studio/create-canvas-sandbox-extension-host.ts',
+  },
   inlineOpenenvx: /^@openenvx\/variables$/,
   afterCss: async () => {
     await copyCanvasFonts(path.join(packageRoot, 'dist'), packagesRoot);

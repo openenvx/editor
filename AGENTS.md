@@ -223,7 +223,7 @@ bun run dev:playground
 bun run fix           # auto-fix lint/format (ultracite)
 bun run check         # lint (ultracite) + knip
 bun run check-types   # tsc --noEmit across packages (excl. apps)
-bun run precommit     # ultracite + knip + check-types for packages dirty vs HEAD (excl. apps)
+bun run precommit     # ultracite + knip + check-types for packages dirty vs HEAD (excl. apps); also runs via Husky pre-commit after `bun install`
 bun run changelog     # preview unreleased changelog (git-cliff)
 ```
 

@@ -64,7 +64,8 @@ Author how-to (under `docs/architecture/`):
 | `@openenvx/variables` | Opt-in `VariablesPlugin` (catalog sidebar + edit dialog); `./tiptap` chip/suggest helpers |
 | `@openenvx/workbench` | `WorkbenchShell`, field renderers, layout chrome (`mountExternalHosts` seam only) — workspace-private; published via `@openenvx/studio` |
 | `@openenvx/studio` | Published workbench host allowlist (`WorkbenchShell`, chrome defaults, sandbox host re-exports) |
-| `@openenvx/canvas-driver` `./studio` | Drop-in `CanvasEditor`, `defaultCanvasStudio`, `createCanvasSandboxExtensionHost` |
+| `@openenvx/canvas-driver` `./studio` | Drop-in `CanvasEditor`, `defaultCanvasStudio` |
+| `@openenvx/canvas-driver` `./studio/sandbox-host` | `createCanvasSandboxExtensionHost` (requires `@openenvx/editor-sandbox`) |
 | `@openenvx/html-driver` `./studio` | Drop-in `HtmlEditor`, `defaultHtmlStudio`, `createHtmlSandboxExtensionHost` |
 | `@openenvx/email-driver` `./studio` | Drop-in `EmailEditor`, `defaultEmailStudio` |
 | `@openenvx/editor-sandbox` | Sandbox author SDK + host (`./protocol`, `./host`, `/canvas`, `/html`, `/panel`, Vite) |

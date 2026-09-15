@@ -54,10 +54,8 @@ Composable host:
 
 ```ts
 import { WorkbenchShell } from '@openenvx/studio';
-import {
-  defaultCanvasStudio,
-  createCanvasSandboxExtensionHost,
-} from '@openenvx/canvas-driver/studio';
+import { defaultCanvasStudio } from '@openenvx/canvas-driver/studio';
+import { createCanvasSandboxExtensionHost } from '@openenvx/canvas-driver/studio/sandbox-host';
 ```
 
 Monorepo HMR stays on `@openenvx/canvas-driver` + `@openenvx/workbench`. Published bundle is exercised by `apps/canvas-package-demo` (`bun run dev:canvas-package`).

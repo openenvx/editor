@@ -19,6 +19,15 @@ bun run dev:playground
 
 The repository requires Node.js 24+ and Bun 1.3+. Published packages are built from their package directories; workspace packages resolve TypeScript source during development.
 
+### Git hooks (Husky)
+
+`bun install` runs the `prepare` script and wires [Husky](https://typicode.github.io/husky/) (`core.hooksPath` → `.husky/_`). The **pre-commit** hook runs:
+
+1. `bun run fix` (Ultracite auto-fix) and stages updated tracked files
+2. `bun run precommit` (lint/knip, typecheck, and build for packages changed since `HEAD`, excluding `apps/*`)
+
+To commit without hooks: `HUSKY=0 git commit …`. CI still runs the full `build` and `test` gates on push.
+
 ## Making a change
 
 - Put code in the package that owns the behavior. Start with [Architecture.md](Architecture.md).

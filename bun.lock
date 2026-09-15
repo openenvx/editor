@@ -79,7 +79,6 @@
       "name": "@openenvx/canvas-driver",
       "version": "0.1.3",
       "dependencies": {
-        "@openenvx/editor-sandbox": "workspace:*",
         "@openenvx/variables": "workspace:*",
         "@tiptap/extension-color": "^3.27.3",
         "@tiptap/extension-font-family": "^3.27.3",
@@ -114,6 +113,7 @@
       "peerDependencies": {
         "@napi-rs/canvas": "*",
         "@openenvx/core": ">=0.1.3",
+        "@openenvx/editor-sandbox": ">=0.7.0",
         "@openenvx/studio": ">=0.1.3",
         "pdf-lib": "*",
         "react": ">=18",
@@ -121,6 +121,7 @@
       },
       "optionalPeers": [
         "@napi-rs/canvas",
+        "@openenvx/editor-sandbox",
         "pdf-lib",
       ],
     },
