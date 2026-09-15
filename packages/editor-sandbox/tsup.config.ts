@@ -9,7 +9,7 @@ const authorConfig = createLibraryConfig({
     '!src/**/*.test.{ts,tsx}',
     '!src/**/*.d.ts',
     '!src/cli/**',
-    '!src/openenvx.d.ts',
+    '!src/openenvx-ambient.ts',
     '!src/vite/**',
   ],
   external: [

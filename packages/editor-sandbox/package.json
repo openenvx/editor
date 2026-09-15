@@ -6,8 +6,7 @@
   "type": "module",
   "files": [
     "dist",
-    "src/vite",
-    "src/openenvx.d.ts"
+    "src/vite"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -69,7 +68,9 @@
     },
     "./vite": "./src/vite/bundle-widget-sources-plugin.ts",
     "./vite/client": "./src/vite/client.d.ts",
-    "./openenvx": "./src/openenvx.d.ts"
+    "./openenvx": {
+      "types": "./dist/openenvx.d.ts"
+    }
   },
   "scripts": {
     "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/host/ dist/host/ && node ./build-dts.ts",

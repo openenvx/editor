@@ -13,6 +13,7 @@ await runBuildDts({
     ['src/panel.ts', 'dist/panel.d.ts'],
     ['src/jsx-runtime.ts', 'dist/jsx-runtime.d.ts'],
     ['src/jsx-dev-runtime.ts', 'dist/jsx-dev-runtime.d.ts'],
+    ['src/openenvx-ambient.ts', 'dist/openenvx.d.ts'],
   ],
 });
 

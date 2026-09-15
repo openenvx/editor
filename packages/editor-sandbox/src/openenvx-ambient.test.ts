@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import type { SandboxHostMethod } from './protocol';
@@ -29,10 +29,21 @@ const WIDGET_API = [
   'WidgetFaceRenderResult',
 ];
 
+const packageRoot = path.resolve(import.meta.dirname, '..');
+const ambientDts = path.join(packageRoot, 'dist/openenvx.d.ts');
+
+function readAmbientDts(): string {
+  if (!existsSync(ambientDts)) {
+    throw new Error(
+      `Missing ${ambientDts}. Run build for @openenvx/editor-sandbox first (turbo test depends on ^build).`
+    );
+  }
+  return readFileSync(ambientDts, 'utf-8');
+}
+
 describe('openenvx ambient vs SandboxHostMethod', () => {
-  it('documents every host method name in openenvx.d.ts', () => {
-    const dir = import.meta.dirname;
-    const ambient = readFileSync(path.join(dir, 'openenvx.d.ts'), 'utf-8');
+  it('documents every host method name in dist/openenvx.d.ts', () => {
+    const ambient = readAmbientDts();
     for (const method of HOST_METHODS) {
       if (method === 'postToUI') {
         // Exposed as ui.postMessage → call('postToUI')
@@ -44,13 +55,9 @@ describe('openenvx ambient vs SandboxHostMethod', () => {
   });
 
   it('documents widget register/render contract symbols', () => {
-    const dir = import.meta.dirname;
-    const ambient = readFileSync(path.join(dir, 'openenvx.d.ts'), 'utf-8');
+    const ambient = readAmbientDts();
     const bootstrap = readFileSync(
-      path.resolve(
-        dir,
-        './host/sandbox-bootstrap-source.ts'
-      ),
+      path.join(import.meta.dirname, 'host/sandbox-bootstrap-source.ts'),
       'utf-8'
     );
     for (const symbol of WIDGET_API) {
