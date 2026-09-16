@@ -81,11 +81,11 @@ await createVerifyPack({
       fail('missing ./studio export');
     }
     const peers = pkg.peerDependencies as Record<string, string> | undefined;
-    if (!peers?.['@openenvx/studio/core']) {
-      fail('missing @openenvx/studio/core peer');
-    }
     if (!peers?.['@openenvx/studio']) {
       fail('missing @openenvx/studio peer');
+    }
+    if (peers?.['@openenvx/studio/core']) {
+      fail('must not peer @openenvx/studio/core (use @openenvx/studio)');
     }
   },
 }).run();
