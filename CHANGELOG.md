@@ -3,6 +3,22 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.2.2] - 2026-09-16
+
+### Other
+
+- Update canvas and email drivers to use new workbench structure
+
+- Replaced references to `@openenvx/canvas-driver/studio` and `@openenvx/email-driver/studio` with `@openenvx/canvas-driver` and `@openenvx/email-driver`, respectively, to align with the new composable architecture.
+- Updated documentation and examples to reflect the new usage patterns, including the introduction of `default*Workbench` for each driver.
+- Enhanced the build process by consolidating entry points and improving type declaration generation, ensuring a more streamlined development experience.
+
+- Enhance CanvasRichTextEditor tests with cleanup and mocking
+
+- Added cleanup after each test to ensure a clean state.
+- Mocked the BubbleMenu component from @tiptap/react/menus to simplify testing.
+- Updated imports to include necessary testing utilities and types for improved test structure.
+
 ## [0.2.1] - 2026-09-16
 
 ### Other
@@ -17,6 +33,8 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 
 - Removed the check for the presence of `@openenvx/studio/core` as a peer dependency and added a new validation to ensure it is not included, enforcing the use of `@openenvx/studio` instead.
 - This change clarifies the intended package structure and improves error handling during the verification process.
+
+- V0.2.1
 
 ## [0.2.0] - 2026-09-16
 
