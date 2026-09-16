@@ -9,7 +9,7 @@
     "packages/email-driver/src/templates/index.ts": ["exports"],
     "packages/email-driver/src/templates/jsx/index.ts": ["exports"],
     "packages/html-driver/src/editor/floating-pill/index.ts": ["exports", "types"],
-    "packages/variables/src/variable-edit-dialog.tsx": ["exports"],
+    "packages/studio/src/plugins/variables/variable-edit-dialog.tsx": ["exports"],
     "packages/studio/src/primitives/input.tsx": ["exports", "types"],
     "packages/studio/src/context/workbench-context.tsx": ["types"],
     "packages/studio/src/workbench-barrel.ts": ["exports"],
@@ -84,16 +84,6 @@
         "!src/**/*.test.ts"
       ]
     },
-    "packages/variables": {
-      "entry": [
-        "src/index.ts!",
-        "src/tiptap/index.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts"
-      ]
-    },
     "packages/studio": {
       "entry": [
         "src/index.ts!",
@@ -122,7 +112,7 @@
       ],
       "ignore": [
         "src/primitives/combobox.tsx",
-        "src/version-history/**",
+        "src/plugins/version-history/**",
         "src/layout/editor-layout-styles.ts",
         "src/layout/local-storage-workbench-layout-store.ts",
         "src/primitives/confirm-dialog.tsx"

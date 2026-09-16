@@ -1,4 +1,4 @@
-import { VariablesPlugin } from '@openenvx/variables';
+import { VariablesPlugin } from '@openenvx/studio/plugins/variables';
 
 import { DEFAULT_CANVAS_LAYOUT } from './default-canvas-layout';
 import { CanvasPlugin } from './plugin/canvas-plugin';

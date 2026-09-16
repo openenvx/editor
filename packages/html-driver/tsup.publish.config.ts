@@ -6,6 +6,6 @@ export default createArtboardPublishConfig({
   packageRoot,
   packageLabel: 'html',
   indexEntry: 'src/publish.ts',
-  inlineOpenenvx: /^@openenvx\/variables$/,
+  inlineOpenenvx: /^@openenvx\/studio\/plugins\/variables/,
   sandboxWorker: true,
 });

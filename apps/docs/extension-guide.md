@@ -152,7 +152,7 @@ Resolution matches Spring `@Primary` / `@Order`: primary beats non-primary; amon
 **List presentation** - flat catalogs (variables, scripts-like panels) use the same `TreeDataProvider` API with `presentation: 'list'` on the view declaration:
 
 ```ts
-import { VariablesPlugin } from '@openenvx/variables';
+import { VariablesPlugin } from '@openenvx/studio/plugins/variables';
 
 // Product hosts compose the built-in catalog plugin — do not reimplement.
 const plugins = [new CanvasPlugin(), new VariablesPlugin()];

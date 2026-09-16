@@ -18,7 +18,6 @@ const forbiddenShellSegments = new Set([
   'shell',
   'theme',
   'views',
-  'version-history',
   'i18n',
   'plugins',
   'test',

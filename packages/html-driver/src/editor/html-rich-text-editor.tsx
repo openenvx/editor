@@ -1,13 +1,13 @@
 import {
-  useWorkbenchContext,
-  useWorkbenchContextSelector,
-} from '@openenvx/studio/react';
-import {
   useVariableChipLabels,
   useVariableRichTextSuggest,
   VariableSuggestMenu,
-} from '@openenvx/variables';
-import { isRichTextBlurInsideVariableChrome } from '@openenvx/variables/tiptap';
+} from '@openenvx/studio/plugins/variables';
+import { isRichTextBlurInsideVariableChrome } from '@openenvx/studio/plugins/variables/tiptap';
+import {
+  useWorkbenchContext,
+  useWorkbenchContextSelector,
+} from '@openenvx/studio/react';
 import type { Editor } from '@tiptap/react';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';

@@ -19,7 +19,11 @@
     "./schema/scene.schema.json": "./scene.schema.json",
     "./preview": "./src/core/preview/index.ts",
     "./react": "./src/core/react/workbench-context.tsx",
-    "./internal": "./src/workbench-barrel.ts"
+    "./internal": "./src/workbench-barrel.ts",
+    "./plugins": "./src/plugins/index.ts",
+    "./plugins/variables": "./src/plugins/variables/index.ts",
+    "./plugins/variables/tiptap": "./src/plugins/variables/tiptap/index.ts",
+    "./plugins/version-history": "./src/plugins/version-history/index.ts"
   },
   "scripts": {
     "generate:json-schema": "bun run src/core/schema/generate-json-schema.ts",
@@ -55,7 +59,10 @@
     "react-colorful": "^5.7.0",
     "react-i18next": "^17.0.8",
     "uqr": "^0.1.3",
-    "zod": "4.4.3"
+    "zod": "4.4.3",
+    "@tiptap/core": "^3.27.3",
+    "@tiptap/pm": "^3.27.3",
+    "@tiptap/react": "^3.27.3"
   },
   "peerDependencies": {
     "react": ">=18",

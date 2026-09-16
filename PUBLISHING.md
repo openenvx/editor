@@ -15,7 +15,7 @@ Maintainer reference for building and publishing packages that leave this reposi
 | `@openenvx/email-driver` | npmjs (`registry.npmjs.org`, public) | Email block engine (`.`) + drop-in `./studio` (`EmailEditor`) + headless `./runtime` + `./theme.css` |
 | `@openenvx/editor-sandbox` | GitHub Packages (`npm.pkg.github.com`, restricted) | Sandbox author SDK - **not** part of the automated npm release workflow |
 
-Monorepo HMR stays on workspace `src/` exports. Private packages (`workbench`, `variables`, `agent`) are inlined into `@openenvx/studio` or artboard `./studio` bundles.
+Monorepo HMR stays on workspace `src/` exports. Built-in workbench plugins under `studio/src/plugins/*` (e.g. `variables`) are inlined into published artboard bundles; private packages (`workbench`, `agent`) are inlined into `@openenvx/studio` where applicable.
 
 Canvas raster/PDF export lives in `@openenvx/canvas-driver` (`./export` for browser PNG/JPG, `./export/node` for Node PNG/JPG/PDF). It is **not** bundled into `./studio`.
 

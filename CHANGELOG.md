@@ -140,7 +140,7 @@ These changes significantly improve the usability and flexibility of the canvas 
 
 - Introduce VariablesPlugin and enhance variable management in canvas
 
-- Added a new `@openenvx/variables` package, introducing the `VariablesPlugin` for managing variables within the canvas and email editors.
+- Added a new `@openenvx/studio/plugins/variables` package, introducing the `VariablesPlugin` for managing variables within the canvas and email editors.
 - Integrated variable support into the rich text editor, allowing users to insert and manage variables seamlessly.
 - Updated the canvas and email plugins to utilize the new `VariablesPlugin`, enhancing the editing experience with variable suggestions and management dialogs.
 - Removed the obsolete `FEATURES.md` file to streamline documentation.

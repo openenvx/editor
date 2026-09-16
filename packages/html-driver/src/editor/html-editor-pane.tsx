@@ -14,11 +14,11 @@ import {
   RichTextInsertServiceId,
 } from '@openenvx/studio/core';
 import type { EditorPaneHostProps } from '@openenvx/studio/core';
+import { useVariableChipLabels } from '@openenvx/studio/plugins/variables';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/studio/react';
-import { useVariableChipLabels } from '@openenvx/variables';
 import {
   memo,
   useCallback,

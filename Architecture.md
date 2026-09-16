@@ -61,7 +61,7 @@ Author how-to (under `docs/architecture/`):
 | `@openenvx/canvas-driver` | Konva stage, layers, renderers, `CanvasPlugin`, `CanvasEditor` |
 | `@openenvx/html-driver` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |
 | `@openenvx/email-driver` | Email blocks, `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument`, `renderEmailHtml` |
-| `@openenvx/variables` | Opt-in `VariablesPlugin` (catalog sidebar + edit dialog); `./tiptap` chip/suggest helpers |
+| `@openenvx/studio/plugins/variables` | Opt-in `VariablesPlugin` (catalog sidebar + edit dialog); `./tiptap` chip/suggest helpers |
 | `@openenvx/studio` | Published shell (`.`: `WorkbenchShell`, `./theme.css`) + headless subpaths (`/core`, `/schema`, `/preview`, `/react`) |
 | `@openenvx/studio/internal` | Workspace-only full shell barrel (primitives, renderers) for monorepo plugins |
 | `@openenvx/canvas-driver` | npm: demo surface on `.` + CSS; workspace `.` is full engine (`exportCanvasDocument`, `CanvasPlugin`, …) |

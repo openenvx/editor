@@ -11,7 +11,12 @@
       "@openenvx/editor-sandbox/protocol": ["../editor-sandbox/src/protocol/index.ts"],
       "@openenvx/editor-sandbox/canvas-widget": ["../editor-sandbox/src/canvas-widget/index.ts"],
       "@openenvx/studio": ["../studio/src/index.ts"],
-      "@openenvx/variables": ["../variables/src/index.ts"]
+      "@openenvx/studio/plugins/variables": [
+        "../studio/src/plugins/variables/index.ts"
+      ],
+      "@openenvx/studio/plugins/variables/tiptap": [
+        "../studio/src/plugins/variables/tiptap/index.ts"
+      ]
     }
   },
   "include": ["src", "../typescript-config/css-modules.d.ts"],

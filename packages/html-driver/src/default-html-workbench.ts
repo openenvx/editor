@@ -1,4 +1,4 @@
-import { VariablesPlugin } from '@openenvx/variables';
+import { VariablesPlugin } from '@openenvx/studio/plugins/variables';
 
 import { DEFAULT_HTML_LAYOUT } from './default-html-layout';
 import { HtmlBlocksPlugin } from './plugin/html-blocks-plugin';

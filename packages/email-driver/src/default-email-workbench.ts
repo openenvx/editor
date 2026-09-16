@@ -1,4 +1,4 @@
-import { VariablesPlugin } from '@openenvx/variables';
+import { VariablesPlugin } from '@openenvx/studio/plugins/variables';
 
 import { DEFAULT_EMAIL_LAYOUT } from './default-email-layout';
 import { EmailBlocksPlugin } from './plugin/email-blocks-plugin';

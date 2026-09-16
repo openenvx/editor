@@ -46,7 +46,7 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 **Dialogs** - plugins register modal bodies with `ctx.registerDialog(id, Component)`; commands and services open them via `DialogService` / `api.openDialog(id, payload?)`. The shell mounts a single `DialogHost` (no per-feature `*DialogHost` in product hosts). One active dialog at a time - a new `open` replaces the current. Built-in `api.showConfirm({ title, description, confirmLabel?, cancelLabel? })` opens `workbench.confirm` and resolves `Promise<boolean>`. Confirm dialogs resolve via `api.resolveDialogConfirm(confirmed)` (shell-internal; do not reach into `DialogService` from React). Dialog components implement `WorkbenchDialogProps<TPayload>` (`open`, `payload`, `onClose`).
 
 ```ts
-import { VariablesPlugin } from '@openenvx/variables';
+import { VariablesPlugin } from '@openenvx/studio/plugins/variables';
 
 // Compose into product plugin lists — not auto-injected by workbench.
 const plugins = [new CanvasPlugin(), new VariablesPlugin()];

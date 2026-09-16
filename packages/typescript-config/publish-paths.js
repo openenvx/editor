@@ -25,7 +25,12 @@ export function createPublishPaths(options = {}) {
       `${packagesRoot}/editor-sandbox/src/canvas-widget/index.ts`,
     ],
     '@openenvx/studio': [`${packagesRoot}/studio/src/index.ts`],
-    '@openenvx/variables': [`${packagesRoot}/variables/src/index.ts`],
+    '@openenvx/studio/plugins/variables': [
+      `${packagesRoot}/studio/src/plugins/variables/index.ts`,
+    ],
+    '@openenvx/studio/plugins/variables/tiptap': [
+      `${packagesRoot}/studio/src/plugins/variables/tiptap/index.ts`,
+    ],
     '@openenvx/workbench': [`${packagesRoot}/workbench/src/index.ts`],
     ...options.extra,
   };

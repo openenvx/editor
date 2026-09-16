@@ -47,7 +47,7 @@ Hard rules:
 | `@openenvx/html-driver` | yes | HTML blocks + published `.` preset surface | `.`, `./theme.css` |
 | `@openenvx/email-driver` | yes | Email blocks + published `.` preset surface | `.`, `./theme.css` |
 | `@openenvx/editor-sandbox` | yes | Author SDK | `.`, `./protocol`, `./host`, … |
-| `@openenvx/variables` | workspace | Variables plugin | `.`, `./tiptap` |
+| `@openenvx/studio/plugins/variables` | workspace | Variables plugin | `.`, `./tiptap` |
 | `@openenvx/agent` | workspace | Agent chat sidebar | `.`, `./schemas` |
 
 ## Public API by package
@@ -68,7 +68,7 @@ Hard rules:
 
 **`@openenvx/studio/internal`** - workspace-only shell barrel; npm hosts use `@openenvx/studio` + driver `./workbench` or `.`.
 
-**`@openenvx/variables`** - `VariablesPlugin`; included in `default*Workbench.plugins`.
+**`@openenvx/studio/plugins/variables`** - `VariablesPlugin`; included in `default*Workbench.plugins`.
 
 ## Stability rules (pre-1.0)
 

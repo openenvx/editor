@@ -40,7 +40,7 @@ Hosts load `new EmailBlocksPlugin()` (+ optional `new VariablesPlugin()`). Demo:
 - Konva / absolute layout
 - ESP sending / delivery
 
-Template **variables** (`scene.variables`, `{{{key}}}` tokens, `applyTemplateVariables`) live in `@openenvx/studio/schema` + opt-in `@openenvx/variables` (`VariablesPlugin` sidebar, TipTap chips/suggest) — compose into canvas/email studios; see template contract below.
+Template **variables** (`scene.variables`, `{{{key}}}` tokens, `applyTemplateVariables`) live in `@openenvx/studio/schema` + opt-in `@openenvx/studio/plugins/variables` (`VariablesPlugin` sidebar, TipTap chips/suggest) — compose into canvas/email studios; see template contract below.
 
 ## Related
 

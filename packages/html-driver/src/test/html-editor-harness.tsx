@@ -8,8 +8,8 @@ import {
   WorkbenchController,
   type WorkbenchApi,
 } from '@openenvx/studio/core';
+import { VariablesPlugin } from '@openenvx/studio/plugins/variables';
 import { WorkbenchProvider } from '@openenvx/studio/react';
-import { VariablesPlugin } from '@openenvx/variables';
 import { render } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
 import { vi } from 'vitest';

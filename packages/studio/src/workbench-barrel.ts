@@ -144,10 +144,10 @@ export {
   VERSION_HISTORY_PANEL_COMPONENT_ID,
   VERSION_HISTORY_PLUGIN_ID,
   type VersionHistoryPluginOptions,
-} from './version-history/version-history-plugin';
-export { VersionHistoryPanel } from './version-history/version-history-panel';
+} from './plugins/version-history/version-history-plugin';
+export { VersionHistoryPanel } from './plugins/version-history/version-history-panel';
 export {
   RestoreVersionCommand,
   VERSION_HISTORY_RESTORE_COMMAND_ID,
   type RestoreVersionArgs,
-} from './version-history/restore-version-command';
+} from './plugins/version-history/restore-version-command';

@@ -5,11 +5,11 @@ import {
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
-import { useWorkbenchContext } from '../context/workbench-context';
-import { useMountEffect } from '../hooks/use-mount-effect';
-import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
-import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
-import { cn } from '../lib/cn';
+import { useWorkbenchContext } from '../../context/workbench-context';
+import { useMountEffect } from '../../hooks/use-mount-effect';
+import { useWorkbenchContextSelector } from '../../hooks/use-workbench-selector';
+import { useWorkbenchTranslation } from '../../i18n/use-workbench-translation';
+import { cn } from '../../lib/cn';
 import { VERSION_HISTORY_RESTORE_COMMAND_ID } from './restore-version-command';
 
 import styles from './version-history-panel.module.css';

@@ -6,5 +6,5 @@ export default createArtboardPublishConfig({
   packageRoot,
   packageLabel: 'email',
   indexEntry: 'src/publish.ts',
-  inlineOpenenvx: /^@openenvx\/(variables|html-driver)$/,
+  inlineOpenenvx: /^@openenvx\/(studio\/plugins\/variables|html-driver)$/,
 });
