@@ -1,5 +1,9 @@
-import { Command, createServiceId, Emitter } from '@openenvx/core';
-import type { CommandContext, ContextKeyService, Event } from '@openenvx/core';
+import { Command, createServiceId, Emitter } from '@openenvx/studio/core';
+import type {
+  CommandContext,
+  ContextKeyService,
+  Event,
+} from '@openenvx/studio/core';
 
 export type EmailEditorMode = 'edit' | 'html' | 'preview';
 

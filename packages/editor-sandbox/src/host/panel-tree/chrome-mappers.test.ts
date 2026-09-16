@@ -7,7 +7,7 @@ import {
   createMenuBuilder,
   createStatusBarBuilder,
   createToolbarBuilder,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import { mapPluginTreeToMenu } from './map-plugin-tree-to-menu';
 import { mapPluginTreeToPalette } from './map-plugin-tree-to-palette';
 import { mapPluginTreeToStatusBar } from './map-plugin-tree-to-status-bar';

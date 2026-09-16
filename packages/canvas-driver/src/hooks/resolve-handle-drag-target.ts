@@ -1,5 +1,5 @@
-import type { Layer as SceneLayer } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
+import type { Layer as SceneLayer } from '@openenvx/studio/core';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import type Konva from 'konva';
 import type { RefObject } from 'react';
 
@@ -14,7 +14,7 @@ interface FlattenedLayerEntry {
 interface HandleDragRef {
   anchor: string;
   layerId: string;
-  originTransform: import('@openenvx/core/schema').Transform;
+  originTransform: import('@openenvx/studio/schema').Transform;
 }
 
 export interface ResolvedHandleDragTarget {

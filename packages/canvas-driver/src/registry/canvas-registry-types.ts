@@ -1,4 +1,4 @@
-import type { Transform } from '@openenvx/core/schema';
+import type { Transform } from '@openenvx/studio/schema';
 
 import type { CanvasOverlayPrimitive } from '../stage/canvas-overlay-primitives';
 

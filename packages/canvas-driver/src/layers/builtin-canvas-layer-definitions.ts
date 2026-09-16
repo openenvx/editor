@@ -1,4 +1,4 @@
-import { LayerDefinition, OpenEnvxWidgetLayer } from '@openenvx/core';
+import { LayerDefinition, OpenEnvxWidgetLayer } from '@openenvx/studio/core';
 
 import { CanvasCircleLayer } from './canvas-circle-layer';
 import { CanvasGroupLayer } from './canvas-group-layer';

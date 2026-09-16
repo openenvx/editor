@@ -34,9 +34,9 @@ Author how-to (under `docs/architecture/`):
 | Tier | Packages | Who |
 | --- | --- | --- |
 | **Rendering-only** | `schema`, `canvas` | Embed `CanvasStage` in a custom React app with own state. No plugin host. |
-| **Editor backbone** | `core`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers, workbench controller) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
-| **Workbench UI** | `workbench` | React shell (`WorkbenchShell`); currently workspace-private. |
-| **Published product** | `core`, `studio`, `canvas`, `html`, `email`, `extensions` | Composable editor stack + sandbox author SDK |
+| **Editor backbone** | `@openenvx/studio/core`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers, workbench controller) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
+| **Workbench UI** | `@openenvx/studio` | React shell (`WorkbenchShell`). |
+| **Published product** | `studio`, `canvas`, `html`, `email`, `extensions` | Composable editor stack + sandbox author SDK |
 | **HTML editor** | `html` (published) | Puck-style block editor + drop-in `@openenvx/html-driver/studio` |
 | **Email editor** | `email` (published, `packages/email-driver`) | React-Email block editor + drop-in `@openenvx/email-driver/studio` |
 | **Canvas editor** | `canvas` (published) | Konva canvas editor + drop-in `@openenvx/canvas-driver/studio` |
@@ -47,23 +47,23 @@ Author how-to (under `docs/architecture/`):
 
 | Tier | Packages | License / publish | Responsibility |
 | --- | --- | --- | --- |
-| Foundation | `core` (`./schema`, `./preview`) | Published npm, MPL-2.0 | Scene model (Zod + JSON Schema), plugin host primitives |
+| Foundation | `@openenvx/studio` (`/core`, `/schema`, `/preview`) | Published npm, MPL-2.0 | Scene model (Zod + JSON Schema), plugin host primitives |
 | Sandbox extensions | `editor-sandbox` (`@openenvx/editor-sandbox`, `./protocol`, `./host`) | Published package, MPL-2.0 | Author SDK, protocol validators, optional QuickJS host runtime |
-| Product libs | `workbench`, `variables`, `agent` | Workspace-private | React shell, variables plugin, agent |
+| Product libs | `variables`, `agent` | Workspace-private | Variables plugin, agent |
 | Published product | `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, `@openenvx/email-driver` | Public npm, MPL-2.0 | Composable shell + artboard engines for open-source hosts |
 
 ## Placement cheat sheet
 
 | Put it here | Examples |
 | --- | --- |
-| `@openenvx/core` (`./schema`) | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
-| `@openenvx/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry`, `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context |
+| `@openenvx/studio/core` (`./schema`) | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
+| `@openenvx/studio/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry`, `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context |
 | `@openenvx/canvas-driver` | Konva stage, layers, renderers, `CanvasPlugin`, `CanvasEditor` |
 | `@openenvx/html-driver` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |
 | `@openenvx/email-driver` | Email blocks, `EmailBlocksPlugin`, `EmailEditorPane`, `renderEmailDocument`, `renderEmailHtml` |
 | `@openenvx/variables` | Opt-in `VariablesPlugin` (catalog sidebar + edit dialog); `./tiptap` chip/suggest helpers |
-| `@openenvx/workbench` | `WorkbenchShell`, field renderers, layout chrome (`mountExternalHosts` seam only) — workspace-private; published via `@openenvx/studio` |
-| `@openenvx/studio` | Published workbench host allowlist (`WorkbenchShell`, chrome defaults, sandbox host re-exports) |
+| `@openenvx/studio` | Published shell (`.`: `WorkbenchShell`, `./theme.css`) + headless subpaths (`/core`, `/schema`, `/preview`, `/react`) |
+| `@openenvx/studio/internal` | Workspace-only full shell barrel (primitives, renderers) for monorepo plugins |
 | `@openenvx/canvas-driver` `./studio` | Drop-in `CanvasEditor`, `defaultCanvasStudio` |
 | `@openenvx/canvas-driver` `./studio/sandbox-host` | `createCanvasSandboxExtensionHost` (requires `@openenvx/editor-sandbox`) |
 | `@openenvx/html-driver` `./studio` | Drop-in `HtmlEditor`, `defaultHtmlStudio`, `createHtmlSandboxExtensionHost` |
@@ -104,7 +104,7 @@ flowchart TB
 
 1. `WorkbenchShell` injects default chrome (Pages/Layers + dirty status) plus Inspector / field plugins.
 2. Domain plugins (`CanvasPlugin`, `HtmlBlocksPlugin`, …) register via core + domain registries and workbench contributions.
-3. `WorkbenchController` (in `@openenvx/core`) assembles core + workbench registries into `WorkbenchState`.
+3. `WorkbenchController` (in `@openenvx/studio/core`) assembles core + workbench registries into `WorkbenchState`.
 
 External hosts (sandbox / embed) mount **off** `PluginManager` via `ExternalHostMount` - see [Extensions](docs/architecture/extensions.md) and [Plugin-boundaries.md](Plugin-boundaries.md).
 

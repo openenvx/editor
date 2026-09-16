@@ -7,8 +7,8 @@ import {
   WorkbenchPlugin,
   type CommandContext,
   type WorkbenchPluginContext,
-} from '@openenvx/core';
-import { sceneVariables } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import { sceneVariables } from '@openenvx/studio/schema';
 
 import {
   VARIABLES_CONTAINER_ID,

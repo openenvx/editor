@@ -1,4 +1,4 @@
-import type { CornerRadius, Padding } from '@openenvx/core/schema';
+import type { CornerRadius, Padding } from '@openenvx/studio/schema';
 
 const DEFAULT_CORNER_RADIUS: CornerRadius = {
   topLeft: 0,

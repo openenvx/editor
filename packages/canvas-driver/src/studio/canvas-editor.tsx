@@ -1,5 +1,6 @@
-import type { Scene as CoreScene } from '@openenvx/core/schema';
 import { WorkbenchShell } from '@openenvx/studio';
+import type { Plugin } from '@openenvx/studio/core';
+import type { Scene as CoreScene } from '@openenvx/studio/schema';
 import { useMemo } from 'react';
 
 import { createCanvasDemoScene } from '../plugin/canvas-plugin';
@@ -15,6 +16,8 @@ export interface CanvasEditorProps {
   className?: string;
   editorTitle?: string;
   locale?: string;
+  /** Extra workbench plugins merged after the default canvas studio plugins. */
+  plugins?: Plugin[];
 }
 
 export function CanvasEditor({
@@ -24,10 +27,16 @@ export function CanvasEditor({
   className,
   editorTitle,
   locale,
+  plugins: extraPlugins,
 }: CanvasEditorProps) {
   const scene = useMemo(
     () => initialScene ?? (createCanvasDemoScene() as unknown as Scene),
     [initialScene]
+  );
+
+  const plugins = useMemo(
+    () => [...defaultCanvasStudio.plugins, ...(extraPlugins ?? [])],
+    [extraPlugins]
   );
 
   const shellClassName = ['openenvx-canvas-editor', className]
@@ -50,7 +59,7 @@ export function CanvasEditor({
             }
           : undefined
       }
-      plugins={defaultCanvasStudio.plugins}
+      plugins={plugins}
       theme={theme}
     />
   );

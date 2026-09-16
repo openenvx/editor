@@ -1,5 +1,5 @@
-import { Command, ContextKeyServiceId } from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
+import { Command, ContextKeyServiceId } from '@openenvx/studio/core';
+import type { CommandContext } from '@openenvx/studio/core';
 
 import { EMAIL_BLOCKS_SHEET_OPEN_KEY } from '../contributions/email-patterns-sidebar';
 import {

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
-import { createDefaultTransform } from '@openenvx/core/schema';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { describe, expect, it, vi } from 'vitest';
 

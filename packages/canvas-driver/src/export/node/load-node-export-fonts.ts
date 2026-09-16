@@ -1,5 +1,5 @@
 import { GlobalFonts } from '@napi-rs/canvas';
-import type { FontDescriptor } from '@openenvx/core';
+import type { FontDescriptor } from '@openenvx/studio/core';
 
 import { canvasFontService } from '../../fonts/canvas-font-service';
 import {

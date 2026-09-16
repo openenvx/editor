@@ -1,10 +1,10 @@
-import type { EditorViewportApi } from '@openenvx/core';
+import type { EditorViewportApi } from '@openenvx/studio/core';
 import {
   canEditLayerData,
   canSelectLayer,
   isTypingTarget,
-} from '@openenvx/core';
-import type { Page } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { Page } from '@openenvx/studio/schema';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useCanvasHost } from '../canvas-host-context';

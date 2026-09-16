@@ -1,5 +1,5 @@
-import { DialogServiceId, WorkbenchNavigationServiceId } from '@openenvx/core';
-import { normalizeScene } from '@openenvx/core/schema';
+import { DialogServiceId, WorkbenchNavigationServiceId } from '@openenvx/studio/core';
+import { normalizeScene } from '@openenvx/studio/schema';
 import { describe, expect, it, vi } from 'vitest';
 
 import { VARIABLES_EDIT_DIALOG_ID } from './constants';

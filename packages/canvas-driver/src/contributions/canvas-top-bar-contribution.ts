@@ -2,7 +2,7 @@ import {
   TopBarContribution,
   type CommandContext,
   type TopBarBuilder,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 
 import {
   WORKBENCH_OPEN_COMMAND_ID,

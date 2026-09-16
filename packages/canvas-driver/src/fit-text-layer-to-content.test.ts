@@ -1,4 +1,4 @@
-import { createDefaultTransform, normalizeScene } from '@openenvx/core/schema';
+import { createDefaultTransform, normalizeScene } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

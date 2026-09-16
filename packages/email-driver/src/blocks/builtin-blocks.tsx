@@ -1,5 +1,5 @@
-import { sanitizeHtml, sanitizeUrl } from '@openenvx/core';
 import type { BlockConfig } from '@openenvx/html-driver';
+import { sanitizeHtml, sanitizeUrl } from '@openenvx/studio/core';
 import {
   Button,
   Column,

@@ -1,4 +1,4 @@
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import type Konva from 'konva';
 
 import type {
@@ -58,7 +58,7 @@ function toLiveTransform(
     y: number;
   },
   opacity: number
-): import('@openenvx/core/schema').Transform {
+): import('@openenvx/studio/schema').Transform {
   return {
     height: box.height,
     opacity,

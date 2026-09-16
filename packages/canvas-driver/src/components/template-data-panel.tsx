@@ -1,13 +1,17 @@
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/core/react';
-import type { Modification, Scene, TemplateField } from '@openenvx/core/schema';
+} from '@openenvx/studio/react';
+import type {
+  Modification,
+  Scene,
+  TemplateField,
+} from '@openenvx/studio/schema';
 import {
   createEmptyScene,
   extractTemplateManifest,
   validateTemplateNames,
-} from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 import { applyModificationsWithTextFit } from '../fit-text-layer-to-content';

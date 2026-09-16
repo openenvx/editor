@@ -9,18 +9,18 @@ This is **not** how to write sandbox widgets, sandbox plugins, or embed panels. 
 
 Under-the-hood map: [Architecture.md](../../Architecture.md) · [docs/architecture/](../../docs/architecture/overview.md). Trust model: [Plugin-boundaries.md](../../Plugin-boundaries.md).
 
-## Scene document (`@openenvx/core/schema`)
+## Scene document (`@openenvx/studio/schema`)
 
-The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@openenvx/core/schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
+The Scene JSON format is Zod-authored. Use `validateScene` / `normalizeScene` at runtime, and `@openenvx/studio/schema/scene.schema.json` for LLM structured output or non-TS SDKs. Content (`Scene`) is separate from editor UI state (`EditorState`); persist both via `SceneSnapshot` when needed.
 
-Backend services depend on `@openenvx/core/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Node canvas raster/PDF export uses `@openenvx/canvas-driver/export/node` against the same Scene JSON.
+Backend services depend on `@openenvx/studio/schema` too instead of re-declaring shapes: `apps/agent-service` validates the `scene` in each chat request's `sceneContext` (editor selection travels alongside it, not inside it). Node canvas raster/PDF export uses `@openenvx/canvas-driver/export/node` against the same Scene JSON.
 
 ## OSS vs enterprise shell
 
 | Package | Responsibility |
 | --- | --- |
 | `@openenvx/canvas-driver` | Canvas engine: layers, commands, Konva renderers, `CanvasEditor` |
-| `@openenvx/core` | Editor host: `EditorRuntime`, `PluginManager`, `registerContribution()`, workbench runtime (`WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()`) |
+| `@openenvx/studio/core` | Editor host: `EditorRuntime`, `PluginManager`, `registerContribution()`, workbench runtime (`WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()`) |
 | Your app / `demo-playground` | Wire canvas to workbench via `CanvasHostProvider` + app-owned toolbar/sidebars |
 | `@openenvx/canvas-driver` | Full canvas editor: `CanvasPlugin` (engine + workbench chrome), toolbar, palette, editor pane registration |
 
@@ -37,7 +37,7 @@ import {
   SceneStore,
   EditorService,
   registerContribution,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 
 const scene = new SceneStore(initialScene);
 const editor = new EditorService();
@@ -45,7 +45,7 @@ const runtime = new EditorRuntime(scene, editor);
 const manager = new PluginManager(runtime);
 
 // Register workbench-specific services on runtime.services before activating plugins.
-// See bootstrapWorkbenchServices() in @openenvx/core for the headless defaults.
+// See bootstrapWorkbenchServices() in @openenvx/studio/core for the headless defaults.
 
 await manager.activateCorePlugins();
 for (const plugin of plugins) {
@@ -69,7 +69,7 @@ Plugin contributions register through `PluginContext.register()`, which routes t
 
 ```tsx
 import { CanvasHostProvider, CanvasEditor } from '@openenvx/canvas-driver';
-import { useWorkbenchContext } from '@openenvx/core/react';
+import { useWorkbenchContext } from '@openenvx/studio/react';
 
 // Provide CanvasHostApi from workbench, then mount CanvasEditor.
 // See apps/demo-playground/src/components/absolute-editor-pane.tsx
@@ -78,7 +78,7 @@ import { useWorkbenchContext } from '@openenvx/core/react';
 Workbench UI contributions use `WorkbenchPlugin` and `ctx.registerWorkbench()`:
 
 ```ts
-import { WorkbenchPlugin } from '@openenvx/core';
+import { WorkbenchPlugin } from '@openenvx/studio/core';
 
 class MyWorkbenchPlugin extends WorkbenchPlugin {
   readonly id = 'my.workbench';
@@ -102,7 +102,7 @@ import {
   ViewContainerContribution,
   ViewContribution,
   WorkbenchPlugin,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 
 class MyView extends ViewContribution {
   readonly id = 'my.view';
@@ -380,7 +380,7 @@ import {
   type CanvasStageInteractionService,
   CanvasStageInteractionServiceId,
 } from '@openenvx/canvas-driver';
-import { SingletonServiceContribution } from '@openenvx/core';
+import { SingletonServiceContribution } from '@openenvx/studio/core';
 
 export class MyStageInteraction implements CanvasStageInteractionService {
   adjustDrag(input) {

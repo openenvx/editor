@@ -4,7 +4,7 @@ import {
   escapeHtml,
   LayerDefinition,
   sanitizeHtml,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import type {
   CommandContext,
   FontService,
@@ -12,13 +12,13 @@ import type {
   LayerPreviewContext,
   Page,
   PropertySectionDescriptor,
-} from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@openenvx/core/preview';
+} from '@openenvx/studio/core';
+import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 import {
   clampTextCurve,
   createDefaultTransform,
   MAX_TEXT_CURVE,
-} from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';

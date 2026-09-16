@@ -2,7 +2,7 @@ import {
   resolveVariableChipPresentation,
   VARIABLE_TOKEN_CAPTURE_RE,
   type TemplateVariable,
-} from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
 import { Extension } from '@tiptap/core';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { Plugin, PluginKey } from '@tiptap/pm/state';

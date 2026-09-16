@@ -1,10 +1,10 @@
-import { ContextKeyServiceId, getActivePage } from '@openenvx/core';
+import type { BlockRegistry } from '@openenvx/html-driver';
+import { getPageRootId, resolveInsertParentId } from '@openenvx/html-driver';
+import { ContextKeyServiceId, getActivePage } from '@openenvx/studio/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/core/react';
-import type { BlockRegistry } from '@openenvx/html-driver';
-import { getPageRootId, resolveInsertParentId } from '@openenvx/html-driver';
+} from '@openenvx/studio/react';
 import { memo, useCallback, useMemo, useState } from 'react';
 
 import {

@@ -1,5 +1,5 @@
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
-import type { Transform } from '@openenvx/core/schema';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import type { Transform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 
 import type {

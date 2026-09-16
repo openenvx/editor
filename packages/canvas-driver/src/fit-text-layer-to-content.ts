@@ -1,11 +1,15 @@
-import { findLayerById, mapLayers, MIN_LAYER_SIZE } from '@openenvx/core';
+import {
+  findLayerById,
+  mapLayers,
+  MIN_LAYER_SIZE,
+} from '@openenvx/studio/core';
 import {
   applyModifications,
   type Layer,
   type Modification,
   type Scene,
   type Transform,
-} from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
 
 import {
   isCurvedText,

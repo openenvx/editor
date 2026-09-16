@@ -30,7 +30,7 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 
 | Path | Contents |
 | --- | --- |
-| `packages/*` | Libraries (`core`, `canvas`, `workbench`, published `*-studio`, …) |
+| `packages/*` | Libraries (`studio`, `canvas-driver`, published drivers, …) |
 | `apps/*` | Demos (`demo-playground`, `*-demo`, `*-package-demo`), `agent-service` |
 
 ## Documentation map
@@ -47,21 +47,21 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | [apps/docs/sandbox-extension-guide.md](apps/docs/sandbox-extension-guide.md) | Sandbox widgets/plugins + embed panels |
 | [docs/architecture/property-fields.md](docs/architecture/property-fields.md) | Inspector `PropertyFieldDescriptor`, field kinds, `layout` |
 | [packages/canvas-driver/README.md](packages/canvas-driver/README.md) | Canvas install and `CanvasPlugin` |
-| [packages/workbench/Design.md](packages/workbench/Design.md) | Workbench **visual design** tokens only (not API docs) |
+| [packages/studio/Design.md](packages/studio/Design.md) | Workbench **visual design** tokens only (not API docs) |
 
 Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before placing new code. Read **Plugin-boundaries.md** when touching embed/sandbox/external plugins. Update **FEATURES.md** when adding or removing a user-facing editor capability. When unsure, load the global **openenvx** skill (`~/.cursor/skills/openenvx`).
 
 ### Documentation vs design reference
 
 - **`docs/architecture/*.md`** and package READMEs - **authoritative API and behavior** for agents and integrators. Add or update a chapter when you introduce or change a public descriptor, contribution, or host contract.
-- **[packages/workbench/Design.md](packages/workbench/Design.md)** - **editor shell look-and-feel** (colors, density, component visuals). Do **not** put API tables, prop reference, or integration guides there; link to `docs/architecture/` instead.
-- **JSDoc** - Public types in `@openenvx/core` and other libraries should document non-obvious fields on interfaces (especially contribution and descriptor props). Keep JSDoc in sync when you change the type; mirror substantive behavior in architecture docs when authors need narrative context.
+- **[packages/studio/Design.md](packages/studio/Design.md)** - **editor shell look-and-feel** (colors, density, component visuals). Do **not** put API tables, prop reference, or integration guides there; link to `docs/architecture/` instead.
+- **JSDoc** - Public types in `@openenvx/studio/core` and other libraries should document non-obvious fields on interfaces (especially contribution and descriptor props). Keep JSDoc in sync when you change the type; mirror substantive behavior in architecture docs when authors need narrative context.
 
 ## Package placement (hard rules)
 
 | Put it here | Examples |
 | --- | --- |
-| `@openenvx/core` | Scene (`./schema`), preview IR (`./preview`), `Command`, `Plugin`, `EditorRuntime`, `WorkbenchController`, workbench contributions, `./react` |
+| `@openenvx/studio/core` | Scene (`./schema`), preview IR (`./preview`), `Command`, `Plugin`, `EditorRuntime`, `WorkbenchController`, workbench contributions, `./react` |
 | `@openenvx/canvas-driver` | Konva stage, interactions, layer renderers, `CanvasPlugin`, `CanvasEditor`, `CanvasHostProvider` |
 | `@openenvx/editor-sandbox` | Sandbox author SDK (`./protocol`, element subpaths, `defineExtension`, Vite) + host runtime (`./host`) + canvas widget face bridge (`./canvas-widget`) |
 
@@ -83,8 +83,7 @@ Internal workspace libraries (`core`, `canvas`, `workbench`, `agent`, …) are *
 Published packages:
 
 - **`@openenvx/editor-sandbox`** - published sandbox SDK: `./protocol`, `./host`, `./canvas-widget`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts opt in via **`@openenvx/editor-sandbox/host`** on `mountExternalHosts`; canvas faces map via **`@openenvx/editor-sandbox/canvas-widget`** (`applyWidgetFace`).
-- **`@openenvx/core`** - published foundation (public npm, MPL-2.0). Scene, plugin host, workbench controller. Subpaths: `.`, `./schema`, `./preview`, `./react`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/studio`** - published workbench shell (public npm, MPL-2.0). `WorkbenchShell` host allowlist + `./theme.css`. Peers `@openenvx/core`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/studio`** - published editor studio (public npm, MPL-2.0). `.` + `./theme.css` (shell), `./core`, `./schema`, `./preview`, `./react` (headless). See [PUBLISHING.md](PUBLISHING.md).
 - **`@openenvx/html-driver`** - published HTML engine (public npm, MPL-2.0). Drop-in `@openenvx/html-driver/studio` (`HtmlEditor`) + `./runtime` (`renderBlockDocument`). See [PUBLISHING.md](PUBLISHING.md).
 - **`@openenvx/email-driver`** - published email engine (public npm, MPL-2.0). Drop-in `@openenvx/email-driver/studio` (`EmailEditor`) + `./runtime` (`renderEmailHtml`). Source: `packages/email-driver`. See [PUBLISHING.md](PUBLISHING.md).
 - **`@openenvx/canvas-driver`** - published canvas engine (public npm, MPL-2.0). Drop-in `@openenvx/canvas-driver/studio` (`CanvasEditor`) + `./runtime` (`createCanvasScene`). See [PUBLISHING.md](PUBLISHING.md).
@@ -209,8 +208,8 @@ Details: [docs/architecture/workbench-and-headless.md](docs/architecture/workben
 | Add custom preview `kind` | Canvas contribution class + `registerCanvasContribution(ctx, …)` |
 | Add shell UI chrome | `apps/demo-playground/src/` or your own app |
 | Wire canvas editor to workbench | App shell: `CanvasHostProvider` + `AbsoluteEditorPane` (see `apps/demo-playground`) |
-| Add generic plugin contribution | `packages/core` contribution + `ctx.register()` |
-| Add workbench UI contribution | `@openenvx/core` + `ctx.registerWorkbench()` via `WorkbenchPlugin` |
+| Add generic plugin contribution | `packages/studio` contribution + `ctx.register()` |
+| Add workbench UI contribution | `@openenvx/studio/core` + `ctx.registerWorkbench()` via `WorkbenchPlugin` |
 | Add flow layer type | `packages/canvas-driver/src/layers/` |
 
 ## Commands
@@ -229,7 +228,7 @@ bun run changelog     # preview unreleased changelog (git-cliff)
 
 ## Publishing
 
-`@openenvx/core`, `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, and `@openenvx/email-driver` are published via the GitHub Actions **Release** workflow (see [PUBLISHING.md](PUBLISHING.md)). `@openenvx/editor-sandbox` may publish separately when released.
+`@openenvx/studio/core`, `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, and `@openenvx/email-driver` are published via the GitHub Actions **Release** workflow (see [PUBLISHING.md](PUBLISHING.md)). `@openenvx/editor-sandbox` may publish separately when released.
 
 ## Before you finish
 
@@ -242,10 +241,10 @@ If either command fails, fix the reported errors, then re-run both until they pa
 
 Also verify:
 
-- [ ] No new canvas code under `packages/core`
+- [ ] No new canvas code under `packages/studio/src/core`
 - [ ] New files use kebab-case
 - [ ] No `I`-prefixed interface or type alias names
 - [ ] No backward-compat shims for removed APIs
 - [ ] Architecture or extension docs updated if you changed package boundaries or plugin APIs
-- [ ] Public descriptor/contribution types have JSDoc when props are non-obvious; API behavior belongs in `docs/architecture/`, not `packages/workbench/Design.md`
+- [ ] Public descriptor/contribution types have JSDoc when props are non-obvious; API behavior belongs in `docs/architecture/`, not `packages/studio/Design.md`
 - [ ] [FEATURES.md](FEATURES.md) updated if you added, removed, or materially changed a user-facing editor capability

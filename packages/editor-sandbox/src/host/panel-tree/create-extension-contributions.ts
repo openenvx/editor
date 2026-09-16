@@ -8,7 +8,7 @@ import {
   type PropertyPaneDescriptor,
   type ViewContainerLocation,
   type WorkbenchContribution,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 
 import {
   validateExtensionManifest,

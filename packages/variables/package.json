@@ -16,8 +16,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@openenvx/core": "workspace:*",
-    "@openenvx/workbench": "workspace:*",
+    "@openenvx/studio": "workspace:*",
     "@tiptap/core": "^3.27.3",
     "@tiptap/pm": "^3.27.3",
     "@tiptap/react": "^3.27.3",

@@ -1,4 +1,4 @@
-import { findLayerById, updateLayerInTree } from '@openenvx/core';
+import { findLayerById, updateLayerInTree } from '@openenvx/studio/core';
 
 import type { SandboxHostSurface } from './sandbox-host-surface';
 

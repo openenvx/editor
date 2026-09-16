@@ -1,4 +1,4 @@
-import type { Scene } from '@openenvx/core/schema';
+import type { Scene } from '@openenvx/studio/schema';
 import { createContext, useContext, type ReactNode } from 'react';
 
 import type { BlockSortDraft } from './block-dnd';

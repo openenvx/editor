@@ -1,5 +1,5 @@
-import { Command } from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
+import { Command } from '@openenvx/studio/core';
+import type { CommandContext } from '@openenvx/studio/core';
 
 import { CanvasGridSettingsServiceId } from '../canvas-service-tokens';
 

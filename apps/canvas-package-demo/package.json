@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@openenvx/canvas-driver": "workspace:*",
-    "@openenvx/core": "workspace:*",
     "@openenvx/studio": "workspace:*",
     "react": "19.2.7",
     "react-dom": "19.2.7"

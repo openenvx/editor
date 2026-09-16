@@ -1,6 +1,6 @@
-import { WorkbenchProvider } from '@openenvx/core/react';
-import { normalizeScene } from '@openenvx/core/schema';
-import { createMockWorkbenchApi } from '@openenvx/workbench';
+import { WorkbenchProvider } from '@openenvx/studio/react';
+import { normalizeScene } from '@openenvx/studio/schema';
+import { createMockWorkbenchApi } from '@openenvx/studio/internal';
 import { render, waitFor } from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import { describe, expect, it } from 'vitest';

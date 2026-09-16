@@ -30,7 +30,7 @@ const hostConfig = createLibraryConfig({
   outDir: 'dist/host',
   clean: false,
   external: [
-    '@openenvx/core',
+    '@openenvx/studio/core',
     'quickjs-emscripten',
     'react',
     'react-dom',
@@ -48,8 +48,8 @@ const canvasWidgetConfig = createLibraryConfig({
   outDir: 'dist/canvas-widget',
   clean: false,
   external: [
-    '@openenvx/core',
-    '@openenvx/core/schema',
+    '@openenvx/studio/core',
+    '@openenvx/studio/schema',
     '@openenvx/canvas-driver/fit-text-layer-to-content',
     '@openenvx/editor-sandbox/protocol',
   ],

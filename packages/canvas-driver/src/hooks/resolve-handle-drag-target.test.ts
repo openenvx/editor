@@ -1,6 +1,6 @@
-import type { Layer as SceneLayer } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
-import { createDefaultTransform } from '@openenvx/core/schema';
+import type { Layer as SceneLayer } from '@openenvx/studio/core';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { describe, expect, it } from 'vitest';
 

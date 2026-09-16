@@ -1,4 +1,4 @@
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import type { ComponentType } from 'react';
 
 import { PlaceholderPreviewRenderer } from './placeholder-preview-renderer';

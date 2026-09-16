@@ -218,8 +218,8 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 | Preact element vocabulary (`/canvas` `/html` `/panel`) | `@openenvx/editor-sandbox` (published) |
 | Widget authoring (`defineExtension`, expand, Vite packaging) | `@openenvx/editor-sandbox` (published) |
 | Tree → builder mappers, manifest → contributions, `SandboxExtensionHost`, `SandboxHostSurface`, `mountSandboxExtensions` | `@openenvx/editor-sandbox/host` |
-| `EmbedPanelHost`, `SandboxExtensionHost`, `PluginPanel`, postMessage transport, command gate, sandbox runtime | `@openenvx/workbench` |
-| Internal OOP plugins + builders | `@openenvx/core`, product plugins (`CanvasPlugin`, …) |
+| `EmbedPanelHost`, `SandboxExtensionHost`, `PluginPanel`, postMessage transport, command gate, sandbox runtime | `@openenvx/studio/internal` |
+| Internal OOP plugins + builders | `@openenvx/studio/core`, product plugins (`CanvasPlugin`, …) |
 
 ## Related
 

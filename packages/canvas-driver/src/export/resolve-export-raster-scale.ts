@@ -1,8 +1,8 @@
 import {
   resolvePageDpi,
   resolvePagePixelDimensions,
-} from '@openenvx/core/schema';
-import type { Page } from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
+import type { Page } from '@openenvx/studio/schema';
 
 import type { CanvasExportOptions } from './canvas-document-export-service';
 

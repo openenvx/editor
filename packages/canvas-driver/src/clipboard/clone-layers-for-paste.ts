@@ -1,6 +1,6 @@
-import { cloneLayerTree, createLayerId } from '@openenvx/core';
-import type { Layer } from '@openenvx/core/schema';
-import { createDefaultTransform } from '@openenvx/core/schema';
+import { cloneLayerTree, createLayerId } from '@openenvx/studio/core';
+import type { Layer } from '@openenvx/studio/schema';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 
 export { createLayerId };
 

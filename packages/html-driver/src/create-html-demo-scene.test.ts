@@ -1,4 +1,4 @@
-import { SCHEMA_VERSION } from '@openenvx/core/schema';
+import { SCHEMA_VERSION } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { createHtmlDemoScene } from './create-html-demo-scene';

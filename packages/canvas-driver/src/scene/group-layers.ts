@@ -1,6 +1,6 @@
-import type { Layer, Transform } from '@openenvx/core';
-import { getLayerChildren } from '@openenvx/core';
-import { createDefaultTransform } from '@openenvx/core/schema';
+import type { Layer, Transform } from '@openenvx/studio/core';
+import { getLayerChildren } from '@openenvx/studio/core';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 
 import {
   CANVAS_GROUP_LAYER_TYPE,

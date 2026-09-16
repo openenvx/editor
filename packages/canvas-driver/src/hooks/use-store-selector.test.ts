@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
-import { useStoreSelector } from '@openenvx/core/react';
+import { useStoreSelector } from '@openenvx/studio/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { ExternalStore } from '@openenvx/core';
+import type { ExternalStore } from '@openenvx/studio/core';
 
 interface TestState {
   count: number;

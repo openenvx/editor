@@ -1,7 +1,7 @@
 /**
  * Headless HTML export - no WorkbenchShell, TipTap, or component CSS.
  */
-import type { Scene as CoreScene } from '@openenvx/core/schema';
+import type { Scene as CoreScene } from '@openenvx/studio/schema';
 
 import { createEmailDemoScene } from './create-email-demo-scene';
 import {

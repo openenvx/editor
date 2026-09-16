@@ -1,12 +1,12 @@
-import { createPropertyBuilder, LayerDefinition } from '@openenvx/core';
+import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio/core';
 import type {
   CommandContext,
   Layer,
   LayerPreviewContext,
   Page,
   PropertySectionDescriptor,
-} from '@openenvx/core';
-import { createDefaultTransform } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 import { getImagePastePreview } from '../clipboard/image-paste-preview';

@@ -1,5 +1,5 @@
-import { ContextKeyServiceId, getActivePage } from '@openenvx/core';
-import { useWorkbenchContext } from '@openenvx/core/react';
+import { ContextKeyServiceId, getActivePage } from '@openenvx/studio/core';
+import { useWorkbenchContext } from '@openenvx/studio/react';
 import { useCallback, useRef, useState } from 'react';
 
 import type { BlockRegistry } from '../block-registry';

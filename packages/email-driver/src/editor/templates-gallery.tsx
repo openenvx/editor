@@ -1,8 +1,8 @@
-import { ContextKeyServiceId } from '@openenvx/core';
+import { ContextKeyServiceId } from '@openenvx/studio/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/core/react';
+} from '@openenvx/studio/react';
 import { memo, useCallback, useState } from 'react';
 
 import { EMAIL_TEMPLATES_SHEET_OPEN_KEY } from '../contributions/email-templates-sidebar';

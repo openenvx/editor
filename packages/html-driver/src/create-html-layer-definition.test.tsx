@@ -1,4 +1,4 @@
-import { normalizeScene } from '@openenvx/core/schema';
+import { normalizeScene } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import type { BlockConfig, FieldDef } from './block-config';

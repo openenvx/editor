@@ -1,7 +1,7 @@
 import {
   formatVariableToken,
   type TemplateVariable,
-} from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { memo, useCallback, useEffect, useRef } from 'react';
 

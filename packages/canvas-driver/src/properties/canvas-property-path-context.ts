@@ -5,17 +5,17 @@ import {
   getLayerWriteMode,
   isLayerShownInLayers,
   createPropertyHostContext,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import type {
   PropertyValuePath,
   PropertyHostContext,
   PropertyPathContextOptions,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import {
   resolvePageBleedMm,
   resolvePageSafeMm,
   type Transform,
-} from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
 
 export interface CanvasPropertyPathContextOptions extends PropertyPathContextOptions {
   updateLayerTransform: (

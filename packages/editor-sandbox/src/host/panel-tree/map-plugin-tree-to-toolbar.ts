@@ -4,7 +4,7 @@ import {
   type ToolbarBuilder,
   type ToolbarItemDescriptor,
   type ToolbarPlacement,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 
 import type { PluginNode } from '../../protocol';
 import {

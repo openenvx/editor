@@ -1,10 +1,10 @@
-import { clampTransformSize, MIN_LAYER_SIZE } from '@openenvx/core';
-import type { Transform } from '@openenvx/core/schema';
+import { clampTransformSize, MIN_LAYER_SIZE } from '@openenvx/studio/core';
+import type { Transform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 
 export const ROTATER_ANCHOR = 'rotater';
 
-export { MIN_LAYER_SIZE, clampTransformSize } from '@openenvx/core';
+export { MIN_LAYER_SIZE, clampTransformSize } from '@openenvx/studio/core';
 
 function rotationDegreesToRadians(degrees: number): number {
   return (degrees * Math.PI) / 180;

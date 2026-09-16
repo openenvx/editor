@@ -62,7 +62,7 @@ jobs:
         id: version
         run: |
           if [ "${{ inputs.skip_bump }}" = "true" ]; then
-            VERSION=$(bun -e "console.log(require('./packages/core/package.json').version)")
+            VERSION=$(bun -e "console.log(require('./packages/studio/package.json').version)")
             echo "version=$VERSION" >> "$GITHUB_OUTPUT"
             echo "Publishing package.json version (skip_bump): $VERSION"
             exit 0
@@ -82,7 +82,7 @@ jobs:
               .split(/\\n/)
               .filter(Boolean)[0];
             if (!latestTag) {
-              console.log(require('./packages/core/package.json').version);
+              console.log(require('./packages/studio/package.json').version);
               process.exit(0);
             }
             const latestVersion = latestTag.replace(/^v/, '');
@@ -103,7 +103,7 @@ jobs:
         if: ${{ !inputs.skip_bump }}
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          for pkg in packages/core packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
+          for pkg in packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
             bun -e "
               const fs = require('node:fs');
               const path = process.argv[1];
@@ -123,7 +123,7 @@ jobs:
 
       - name: Build published packages
         run: |
-          bun run build --filter=@openenvx/core --filter=@openenvx/studio --filter=@openenvx/canvas-driver --filter=@openenvx/html-driver --filter=@openenvx/email-driver
+          bun run build --filter=@openenvx/studio --filter=@openenvx/canvas-driver --filter=@openenvx/html-driver --filter=@openenvx/email-driver
 
       - name: Lint and type check
         run: bun run check && bun run check-types
@@ -137,7 +137,7 @@ jobs:
       - name: Verify package repository metadata
         run: |
           EXPECTED="git+https://github.com/${{ github.repository }}.git"
-          for pkg in packages/core packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
+          for pkg in packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
             REPO_URL=$(bun -e "console.log(require('./$pkg/package.json').repository.url)")
             if [ "$REPO_URL" != "$EXPECTED" ]; then
               echo "ERROR: $pkg repository.url is '$REPO_URL', expected '$EXPECTED'"
@@ -156,7 +156,7 @@ jobs:
             exit 1
           fi
           printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > "${HOME}/.npmrc"
-          for pkg in packages/core packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
+          for pkg in packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
             echo "Publishing $pkg"
             npm publish --access public --provenance --ignore-scripts "./$pkg"
           done
@@ -167,7 +167,7 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md packages/core/package.json packages/studio/package.json packages/canvas-driver/package.json packages/html-driver/package.json packages/email-driver/package.json
+          git add CHANGELOG.md packages/studio/package.json packages/canvas-driver/package.json packages/html-driver/package.json packages/email-driver/package.json
           git commit -m "chore(release): v$VERSION"
           git tag "v$VERSION"
           git push

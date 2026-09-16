@@ -1,10 +1,10 @@
+import type { RenderNode } from '@openenvx/editor-sandbox/protocol';
+import { validateWidgetTree } from '@openenvx/editor-sandbox/protocol';
 import {
   createDefaultTransform,
   type Layer,
   type OpenEnvxWidgetData,
-} from '@openenvx/core/schema';
-import type { RenderNode } from '@openenvx/editor-sandbox/protocol';
-import { validateWidgetTree } from '@openenvx/editor-sandbox/protocol';
+} from '@openenvx/studio/schema';
 
 import { mapWidgetTreeToLayers } from './map-widget-tree-to-layers';
 

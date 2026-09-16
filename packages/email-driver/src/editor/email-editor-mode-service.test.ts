@@ -2,7 +2,7 @@ import {
   createContextKeyService,
   InstantiationService,
   type CommandContext,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import { describe, expect, it } from 'vitest';
 
 import {

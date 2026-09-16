@@ -6,6 +6,11 @@
     "strictNullChecks": true,
     "paths": {
       "@openenvx/studio": ["../studio/src/index.ts"],
+      "@openenvx/studio/core": ["../studio/src/core/index.ts"],
+      "@openenvx/studio/schema": ["../studio/src/core/schema/index.ts"],
+      "@openenvx/studio/preview": ["../studio/src/core/preview/index.ts"],
+      "@openenvx/studio/react": ["../studio/src/core/react/workbench-context.tsx"],
+      "@openenvx/studio/internal": ["../studio/src/workbench-barrel.ts"],
       "@openenvx/editor-sandbox/host": ["../editor-sandbox/src/host/index.ts"],
       "@openenvx/editor-sandbox/protocol": ["../editor-sandbox/src/protocol/index.ts"],
       "@openenvx/editor-sandbox/canvas-widget": ["../editor-sandbox/src/canvas-widget/index.ts"]

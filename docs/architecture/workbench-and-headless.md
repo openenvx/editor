@@ -1,6 +1,6 @@
 # Workbench & headless
 
-**Audience:** Contributors and integrators. "Headless" is the UI-agnostic controller/contribution layer that lives inside `@openenvx/core`; "workbench" is the React shell package `@openenvx/workbench`.
+**Audience:** Contributors and integrators. "Headless" is the UI-agnostic controller/contribution layer that lives inside `@openenvx/studio/core`; "workbench" is the React shell package `@openenvx/studio/internal`.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -8,12 +8,12 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 
 | Package | Responsibility |
 | --- | --- |
-| `@openenvx/core` (headless layer) | Runtime: `WorkbenchController`, state, contributions, builders, property host context, `ExternalHostMount` |
-| `@openenvx/workbench` | React shell: `WorkbenchShell`, field/status renderers, default chrome plugins, sandbox/embed host adapters |
+| `@openenvx/studio/core` (headless layer) | Runtime: `WorkbenchController`, state, contributions, builders, property host context, `ExternalHostMount` |
+| `@openenvx/studio/internal` | React shell: `WorkbenchShell`, field/status renderers, default chrome plugins, sandbox/embed host adapters |
 
-The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx/core` (`.` and `./react`). Workbench is the first-party React consumer.
+The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx/studio/core` (`.` and `./react`). Workbench is the first-party React consumer.
 
-## What the headless layer (in `@openenvx/core`) owns
+## What the headless layer (in `@openenvx/studio/core`) owns
 
 - `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` - owns `EditorRuntime`, injects it into `PluginManager`
 - `bootstrapWorkbenchServices()` - headless DI services on the runtime
@@ -24,13 +24,13 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 - Builders: `MenuBuilder`, `ToolbarBuilder`, `TopBarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `SidebarHeaderBuilder`, `PropertyPaneBuilder`
 - `WorkbenchLayout` (independent `activityBar` / `primarySidebar` / `secondarySidebar`), `ShellUiService`, `DEFAULT_WORKBENCH_LAYOUT`
 - Optional `WorkbenchLayoutStore` for persisted visibility + container locations
-- `WorkbenchProvider`, `useWorkbenchContext` (from `@openenvx/core/react`)
+- `WorkbenchProvider`, `useWorkbenchContext` (from `@openenvx/studio/react`)
 - `createPropertyHostContext`, `PropertyPathResolver`, `LayerPropertiesPaneFactory`, `PropertyPath`
 - External hosts (not PluginManager): `ExternalHostMount`, `SandboxHostSurface`, `EmbedPanelHostSurface`, `mountSandboxHost` / `mountEmbedPanelHost`
 
 ## What workbench owns
 
-- **WorkbenchShell** - React chrome; resolves default plugins via `resolveWorkbenchPlugins()` (ordered catalog in `packages/workbench/src/plugins/resolve-workbench-plugins.ts`); optional `onSceneChange` for content persistence; optional `mountExternalHosts` mounts sandbox/embed after start
+- **WorkbenchShell** - React chrome; resolves default plugins via `resolveWorkbenchPlugins()` (ordered catalog in `packages/studio/src/plugins/resolve-workbench-plugins.ts`); optional `onSceneChange` for content persistence; optional `mountExternalHosts` mounts sandbox/embed after start
 - `DefaultWorkbenchChromePlugin` - scene-generic Pages + Layers sidebar, dirty Saved/Unsaved status
 - Default inspector container + field renderer plugins
 - `SandboxExtensionHost` / `mountSandboxExtensions`, `EmbedPanelHost` / `mountEmbedPanel`
@@ -126,7 +126,7 @@ Isolates / `panel:*` parents never see the surfaces. This is DI isolation, not r
 
 ```text
 PlaygroundShell
-├── WorkbenchProvider          ← @openenvx/core/react
+├── WorkbenchProvider          ← @openenvx/studio/react
 ├── EditorPaneHost             ← app-owned: CanvasHostProvider + CanvasEditor
 ├── PlaygroundToolbar          ← app-owned
 └── Inspector / sidebars       ← app-owned React UI
@@ -136,6 +136,6 @@ Most product apps skip this and use `WorkbenchShell` from `@openenvx/studio` or 
 
 ## Related
 
-- Visual shell design notes (tokens only): [packages/workbench/Design.md](../../packages/workbench/Design.md)
+- Visual shell design notes (tokens only): [packages/studio/Design.md](../../packages/studio/Design.md)
 - Property field API: [property-fields.md](property-fields.md)
 - Extension trust: [Plugin-boundaries.md](../../Plugin-boundaries.md)

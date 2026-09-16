@@ -1,14 +1,14 @@
 import {
-  SimpleServiceContribution,
-  WorkbenchPlugin,
-  TextBlockInsertServiceId,
-} from '@openenvx/core';
-import type { WorkbenchPluginContext } from '@openenvx/core';
-import {
   createBlockCommands,
   createHtmlLayerDefinition,
   registerHtmlPreviewChrome,
 } from '@openenvx/html-driver';
+import {
+  SimpleServiceContribution,
+  WorkbenchPlugin,
+  TextBlockInsertServiceId,
+} from '@openenvx/studio/core';
+import type { WorkbenchPluginContext } from '@openenvx/studio/core';
 
 import {
   emailBlockRegistry,

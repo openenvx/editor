@@ -1,5 +1,5 @@
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
-import type { FocalPoint, ImageFit } from '@openenvx/core/schema';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import type { FocalPoint, ImageFit } from '@openenvx/studio/schema';
 
 type ImageView = Extract<LayerPreviewDescriptor, { kind: 'image' }>;
 

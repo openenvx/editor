@@ -1,7 +1,7 @@
 import {
   formatVariableToken,
   type TemplateVariable,
-} from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
 import type { Editor } from '@tiptap/react';
 
 export interface VariableSuggestAnchor {

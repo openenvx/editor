@@ -1,4 +1,8 @@
-import { SCHEMA_VERSION, type Layer, type Scene } from '@openenvx/core/schema';
+import {
+  SCHEMA_VERSION,
+  type Layer,
+  type Scene,
+} from '@openenvx/studio/schema';
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import {

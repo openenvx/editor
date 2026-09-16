@@ -1,5 +1,5 @@
-import type { Scene } from '@openenvx/core/schema';
 import { HtmlEditor } from '@openenvx/html-driver/studio';
+import type { Scene } from '@openenvx/studio/schema';
 import { useCallback } from 'react';
 
 import '@openenvx/html-driver/theme.css';

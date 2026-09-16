@@ -5,10 +5,10 @@ import {
   cloneLayerTree,
   findLayerById,
   localize,
-} from '@openenvx/core';
-import type { CommandContext, Layer } from '@openenvx/core';
-import type { SceneComponent } from '@openenvx/core/schema';
-import { createDefaultTransform } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { CommandContext, Layer } from '@openenvx/studio/core';
+import type { SceneComponent } from '@openenvx/studio/schema';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 
 import { createGroupFromLayers } from '../scene/group-layers';
 

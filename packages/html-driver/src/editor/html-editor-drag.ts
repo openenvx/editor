@@ -4,9 +4,9 @@ import {
   isLayerDescendant,
   isLayerLocked,
   isLayerVisible,
-} from '@openenvx/core';
-import type { Selection } from '@openenvx/core';
-import type { Layer, Scene } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { Selection } from '@openenvx/studio/core';
+import type { Layer, Scene } from '@openenvx/studio/schema';
 import type { MutableRefObject } from 'react';
 
 import type { BlockRegistry } from '../block-registry';

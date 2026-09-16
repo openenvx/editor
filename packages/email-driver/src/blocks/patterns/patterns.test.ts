@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { BlockRegistry, createBlock } from '@openenvx/html-driver';
-import type { Page } from '@openenvx/core/schema';
+import type { Page } from '@openenvx/studio/schema';
 
 import { builtinEmailBlocks } from '../builtin-blocks';
 import { renderEmailDocument } from '../../render/render-email-document';

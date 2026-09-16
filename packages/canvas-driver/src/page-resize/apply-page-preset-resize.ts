@@ -1,5 +1,5 @@
-import { getActivePage, localize } from '@openenvx/core';
-import type { CommandContext, Scene } from '@openenvx/core';
+import { getActivePage, localize } from '@openenvx/studio/core';
+import type { CommandContext, Scene } from '@openenvx/studio/core';
 
 import { resolvePagePreset } from '../page-presets';
 import { resizeAbsolutePage } from './scale-page-content';

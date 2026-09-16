@@ -1,5 +1,5 @@
-import { getLayerChildren, isLayerVisible } from '@openenvx/core';
-import type { Layer, Page } from '@openenvx/core/schema';
+import { getLayerChildren, isLayerVisible } from '@openenvx/studio/core';
+import type { Layer, Page } from '@openenvx/studio/schema';
 import {
   createElement,
   Fragment,

@@ -1,4 +1,4 @@
-import { createEmptyScene } from '@openenvx/core/schema';
+import { createEmptyScene } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { createEmailDemoScene } from '../create-email-demo-scene';

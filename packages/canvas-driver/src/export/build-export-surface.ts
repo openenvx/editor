@@ -1,6 +1,6 @@
-import { getLayerChildrenForScene } from '@openenvx/core';
-import type { Layer, LayerRegistry, Scene } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
+import { getLayerChildrenForScene } from '@openenvx/studio/core';
+import type { Layer, LayerRegistry, Scene } from '@openenvx/studio/core';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
 

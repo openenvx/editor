@@ -8,8 +8,8 @@ import {
   type Page,
   type PropertySectionDescriptor,
   type ServiceId,
-} from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@openenvx/core/preview';
+} from '@openenvx/studio/core';
+import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 
 import type { BlockConfig, FieldDef, SlotDef } from './block-config';
 import { BlockRegistryServiceId, type BlockRegistry } from './block-registry';

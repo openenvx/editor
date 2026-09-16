@@ -2,7 +2,7 @@ import {
   createMenuBuilder,
   type MenuBuilder,
   type MenuItemDescriptor,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 
 import type { PluginNode } from '../../protocol';
 import { asString, isAllowedCommand, pluginNodes } from './plugin-tree-helpers';

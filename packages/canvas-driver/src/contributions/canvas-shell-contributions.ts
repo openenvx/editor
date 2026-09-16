@@ -6,7 +6,7 @@ import {
   type StatusBarBuilder,
   type ToolbarBuilder,
   type CommandContext,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 
 import { CANVAS_GRID_SIZE_PRESETS } from '../commands/canvas-grid-commands';
 

@@ -3,7 +3,7 @@ import {
   escapeHtml,
   sanitizeHtml,
   sanitizeUrl,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 
 export interface EmailPasteLayerSpec {
   type: string;

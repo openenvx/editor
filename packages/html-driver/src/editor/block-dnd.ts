@@ -3,8 +3,8 @@ import {
   pointerWithin,
   type CollisionDetection,
 } from '@dnd-kit/core';
-import { isLayerVisible } from '@openenvx/core';
-import type { Layer } from '@openenvx/core/schema';
+import { isLayerVisible } from '@openenvx/studio/core';
+import type { Layer } from '@openenvx/studio/schema';
 
 /** True when every visible child hugs content (e.g. email.imageLink row). */
 export function childrenUseInlineChrome(

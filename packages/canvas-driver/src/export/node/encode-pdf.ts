@@ -1,5 +1,5 @@
-import { computePageExportDimensions } from '@openenvx/core/schema';
-import type { Page } from '@openenvx/core/schema';
+import { computePageExportDimensions } from '@openenvx/studio/schema';
+import type { Page } from '@openenvx/studio/schema';
 import { PDFDocument } from 'pdf-lib';
 
 export async function encodePngBytesToPdf(

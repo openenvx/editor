@@ -4,9 +4,9 @@
  * source of truth during a corner/edge bake - otherwise bake + Transformer
  * fight and the box jumps.
  */
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
-import { createDefaultTransform } from '@openenvx/core/schema';
-import type { Transform } from '@openenvx/core/schema';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import { createDefaultTransform } from '@openenvx/studio/schema';
+import type { Transform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 
 import { refreshTransformer } from '../canvas-transformer-utils';

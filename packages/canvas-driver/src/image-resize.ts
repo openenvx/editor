@@ -1,4 +1,4 @@
-import { MIN_LAYER_SIZE } from '@openenvx/core';
+import { MIN_LAYER_SIZE } from '@openenvx/studio/core';
 
 import { constrainTransformerBox } from './geometry';
 import type { TransformerBox } from './geometry';

@@ -1,5 +1,5 @@
-import { hasChildLayers,getNestedValue,setNestedValue } from '@openenvx/core';
-import type { Layer } from '@openenvx/core/schema';
+import { hasChildLayers,getNestedValue,setNestedValue } from '@openenvx/studio/core';
+import type { Layer } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { BlockRegistryServiceId } from '../block-registry';

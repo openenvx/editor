@@ -1,5 +1,5 @@
-import { isLayerVisible } from '@openenvx/core';
-import type { Layer } from '@openenvx/core/schema';
+import { isLayerVisible } from '@openenvx/studio/core';
+import type { Layer } from '@openenvx/studio/schema';
 
 import type { BlockSortDraft } from './block-dnd';
 

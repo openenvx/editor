@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createDefaultTransform, normalizeScene } from '@openenvx/core/schema';
+import { createDefaultTransform, normalizeScene } from '@openenvx/studio/schema';
 
 import { createCanvasPropertyHostContext } from './canvas-property-path-context';
 

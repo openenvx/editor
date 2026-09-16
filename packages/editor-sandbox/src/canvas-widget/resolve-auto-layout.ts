@@ -1,6 +1,6 @@
 import { fitCanvasTextLayerToContent } from '@openenvx/canvas-driver/fit-text-layer-to-content';
-import { createDefaultTransform, type Layer } from '@openenvx/core/schema';
 import type { RenderNode } from '@openenvx/editor-sandbox/protocol';
+import { createDefaultTransform, type Layer } from '@openenvx/studio/schema';
 
 export type StackDirection = 'horizontal' | 'vertical';
 export type StackAlign = 'start' | 'center' | 'end' | 'stretch';

@@ -1,9 +1,9 @@
-import type { Layer } from '@openenvx/core';
 import { applyWidgetFace } from '@openenvx/editor-sandbox/canvas-widget';
 import {
   SandboxExtensionHost,
   type SandboxExtensionHostOptions,
 } from '@openenvx/editor-sandbox/host';
+import type { Layer } from '@openenvx/studio/core';
 
 import { setOpenEnvxWidgetClickHandler } from '../interactions/widget-click-handler';
 

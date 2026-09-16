@@ -1,6 +1,6 @@
-import { Command, updateLayerInTree } from '@openenvx/core';
-import type { CommandContext, Layer } from '@openenvx/core';
-import type { OpenEnvxWidgetData } from '@openenvx/core/schema';
+import { Command, updateLayerInTree } from '@openenvx/studio/core';
+import type { CommandContext, Layer } from '@openenvx/studio/core';
+import type { OpenEnvxWidgetData } from '@openenvx/studio/schema';
 
 import { WIDGET_LAYER_TYPE } from '../layers/openenvx-widget-layer';
 

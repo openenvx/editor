@@ -1,13 +1,13 @@
-import {
-  createDefaultTransform,
-  type Layer,
-  type Transform,
-} from '@openenvx/core/schema';
 import type {
   RenderChild,
   RenderNode,
 } from '@openenvx/editor-sandbox/protocol';
 import { WIDGET_LAYER_ESCAPE_TYPES } from '@openenvx/editor-sandbox/protocol';
+import {
+  createDefaultTransform,
+  type Layer,
+  type Transform,
+} from '@openenvx/studio/schema';
 
 import { readLayoutIntent, resolveAutoLayout } from './resolve-auto-layout';
 

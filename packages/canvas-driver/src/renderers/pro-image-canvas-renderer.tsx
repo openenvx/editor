@@ -1,5 +1,5 @@
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
-import type { FocalPoint, ImageFit } from '@openenvx/core/schema';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import type { FocalPoint, ImageFit } from '@openenvx/studio/schema';
 import { memo } from 'react';
 import { Image as KonvaImage, Rect } from 'react-konva';
 

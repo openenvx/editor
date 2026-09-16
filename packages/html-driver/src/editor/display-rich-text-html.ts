@@ -1,7 +1,7 @@
 import {
   wrapVariableTokensForDisplay,
   type TemplateVariable,
-} from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
 
 export function withDisplayRichTextHtml(
   data: Record<string, unknown>,

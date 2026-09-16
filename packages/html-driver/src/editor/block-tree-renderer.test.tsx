@@ -1,5 +1,5 @@
 import { DndContext } from '@dnd-kit/core';
-import type { WorkbenchApi } from '@openenvx/core';
+import type { WorkbenchApi } from '@openenvx/studio/core';
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

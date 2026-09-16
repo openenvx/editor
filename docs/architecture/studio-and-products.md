@@ -1,6 +1,6 @@
 # Studio & products
 
-**Audience:** Contributors and integrators. Packages: `@openenvx/core`, `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, `@openenvx/email-driver`, and the apps that consume them.
+**Audience:** Contributors and integrators. Packages: `@openenvx/studio/core`, `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, `@openenvx/email-driver`, and the apps that consume them.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -10,7 +10,7 @@ Host product apps install a shared shell plus only the artboard engines they nee
 
 | Package | Role |
 | --- | --- |
-| `@openenvx/core` | Scene, `Plugin`, runtime, contributions |
+| `@openenvx/studio/core` | Scene, `Plugin`, runtime, contributions |
 | `@openenvx/studio` | `WorkbenchShell`, chrome defaults, `./theme.css` |
 | `@openenvx/canvas-driver` | Canvas engine (`.`) + `./studio` drop-in + `./runtime` |
 | `@openenvx/html-driver` | HTML engine (`.`) + `./studio` drop-in + `./runtime` |
@@ -26,7 +26,7 @@ Publishing details: [PUBLISHING.md](../../PUBLISHING.md).
 
 ## `@openenvx/studio`
 
-Published workbench host surface. Inlines private `@openenvx/workbench` into minified ESM; peers `@openenvx/core`.
+Published workbench host surface. Inlines private `@openenvx/studio/internal` into minified ESM; peers `@openenvx/studio/core`.
 
 ```ts
 import {
@@ -58,7 +58,7 @@ import { defaultCanvasStudio } from '@openenvx/canvas-driver/studio';
 import { createCanvasSandboxExtensionHost } from '@openenvx/canvas-driver/studio/sandbox-host';
 ```
 
-Monorepo HMR stays on `@openenvx/canvas-driver` + `@openenvx/workbench`. Published bundle is exercised by `apps/canvas-package-demo` (`bun run dev:canvas-package`).
+Monorepo HMR stays on `@openenvx/canvas-driver` + `@openenvx/studio/internal`. Published bundle is exercised by `apps/canvas-package-demo` (`bun run dev:canvas-package`).
 
 ## `@openenvx/html-driver/studio`
 
@@ -85,7 +85,7 @@ import {
 const PLUGINS = [...defaultHtmlStudio.plugins, new MyEventPagePlugin()];
 ```
 
-Monorepo HMR stays on `@openenvx/html-driver` + `@openenvx/workbench`. Published bundle is exercised by `apps/html-package-demo` (`bun run dev:html-package`).
+Monorepo HMR stays on `@openenvx/html-driver` + `@openenvx/studio/internal`. Published bundle is exercised by `apps/html-package-demo` (`bun run dev:html-package`).
 
 ## `@openenvx/email-driver/studio`
 
@@ -102,7 +102,7 @@ import '@openenvx/email-driver/theme.css';
 
 Headless HTML export is `@openenvx/email-driver/runtime` so Node/SSR does not load the shell.
 
-Monorepo HMR stays on `@openenvx/email-driver` + `@openenvx/workbench` (`packages/email-driver`). Published bundle is exercised by `apps/email-package-demo` (`bun run dev:email-package`).
+Monorepo HMR stays on `@openenvx/email-driver` + `@openenvx/studio/internal` (`packages/email-driver`). Published bundle is exercised by `apps/email-package-demo` (`bun run dev:email-package`).
 
 ## What hosts must not do
 

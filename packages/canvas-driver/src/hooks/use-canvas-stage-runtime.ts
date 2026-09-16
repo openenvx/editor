@@ -1,6 +1,6 @@
-import type { Layer as SceneLayer } from '@openenvx/core';
-import { canTransformLayer, getLayerChildren } from '@openenvx/core';
-import { useStoreSelector } from '@openenvx/core/react';
+import type { Layer as SceneLayer } from '@openenvx/studio/core';
+import { canTransformLayer, getLayerChildren } from '@openenvx/studio/core';
+import { useStoreSelector } from '@openenvx/studio/react';
 import type Konva from 'konva';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';

@@ -12,12 +12,12 @@ import {
   AssetServiceId,
   getActivePage,
   RichTextInsertServiceId,
-} from '@openenvx/core';
-import type { EditorPaneHostProps } from '@openenvx/core';
+} from '@openenvx/studio/core';
+import type { EditorPaneHostProps } from '@openenvx/studio/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/core/react';
+} from '@openenvx/studio/react';
 import { useVariableChipLabels } from '@openenvx/variables';
 import {
   memo,

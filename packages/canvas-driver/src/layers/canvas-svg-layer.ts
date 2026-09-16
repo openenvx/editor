@@ -1,13 +1,13 @@
-import { createPropertyBuilder, LayerDefinition } from '@openenvx/core';
+import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio/core';
 import type {
   CommandContext,
   Layer,
   LayerPreviewContext,
   Page,
   PropertySectionDescriptor,
-} from '@openenvx/core';
-import { createLayerPreviewBuilder } from '@openenvx/core/preview';
-import { createDefaultTransform } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 const DEFAULT_SVG =

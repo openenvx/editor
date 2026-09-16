@@ -1,5 +1,5 @@
-import { computePageExportDimensions } from '@openenvx/core/schema';
-import type { Page, Scene } from '@openenvx/core/schema';
+import { computePageExportDimensions } from '@openenvx/studio/schema';
+import type { Page, Scene } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';

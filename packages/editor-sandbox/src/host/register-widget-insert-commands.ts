@@ -2,12 +2,12 @@ import {
   Command,
   getActivePage,
   insertLayerIntoContainer,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import {
   createDefaultTransform,
   type Layer,
   type Page,
-} from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
 
 import type {
   ExtensionManifest,

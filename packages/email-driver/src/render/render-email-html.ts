@@ -1,6 +1,6 @@
-import type { Scene } from '@openenvx/core/schema';
-import { applyTemplateVariables } from '@openenvx/core/schema';
 import { BlockRegistry } from '@openenvx/html-driver/runtime';
+import type { Scene } from '@openenvx/studio/schema';
+import { applyTemplateVariables } from '@openenvx/studio/schema';
 
 import { allEmailBlocks } from '../blocks/all-email-blocks';
 import { renderEmailDocument } from './render-email-document';

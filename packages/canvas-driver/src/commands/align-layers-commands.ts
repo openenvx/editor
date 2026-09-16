@@ -4,9 +4,9 @@ import {
   getActivePage,
   localize,
   updateLayerInTree,
-} from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
-import type { Transform } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { CommandContext } from '@openenvx/studio/core';
+import type { Transform } from '@openenvx/studio/schema';
 
 import { alignTransforms, distributeHorizontally } from '../layer-align/align';
 

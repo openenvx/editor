@@ -7,13 +7,13 @@ import {
   getActivePage,
   localize,
   updateLayerInTree,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import type {
   CommandContext,
   FontDescriptor,
   FontService,
-} from '@openenvx/core';
-import type { Transform } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { Transform } from '@openenvx/studio/schema';
 
 import {
   CanvasCommandRequestServiceId,

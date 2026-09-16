@@ -13,8 +13,8 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "paths": {
-      "@openenvx/core": ["../core/src/index.ts"],
-      "@openenvx/core/schema": ["../core/src/schema/index.ts"]
+      "@openenvx/studio/core": ["../studio/src/core/index.ts"],
+      "@openenvx/studio/schema": ["../studio/src/core/schema/index.ts"]
     }
   }
 }

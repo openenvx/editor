@@ -1,4 +1,4 @@
-import { SCHEMA_VERSION, type Scene } from '@openenvx/core/schema';
+import { SCHEMA_VERSION, type Scene } from '@openenvx/studio/schema';
 
 export function createHtmlDemoScene(): Scene {
   return {

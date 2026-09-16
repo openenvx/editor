@@ -3,8 +3,8 @@ import {
   canSelectLayer,
   Command,
   ShortcutContribution,
-} from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
+} from '@openenvx/studio/core';
+import type { CommandContext } from '@openenvx/studio/core';
 
 import {
   canExecuteCanvasClipboard,

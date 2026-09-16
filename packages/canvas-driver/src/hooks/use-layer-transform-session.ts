@@ -1,6 +1,6 @@
-import type { Layer as SceneLayer } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
-import type { Transform } from '@openenvx/core/schema';
+import type { Layer as SceneLayer } from '@openenvx/studio/core';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import type { Transform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';

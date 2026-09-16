@@ -1,9 +1,9 @@
-import { getActivePage } from '@openenvx/core';
+import { getPageRootId, resolveInsertParentId } from '@openenvx/html-driver';
+import { getActivePage } from '@openenvx/studio/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/core/react';
-import { getPageRootId, resolveInsertParentId } from '@openenvx/html-driver';
+} from '@openenvx/studio/react';
 import { memo, useCallback } from 'react';
 
 import {

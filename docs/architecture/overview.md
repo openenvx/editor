@@ -9,10 +9,10 @@ Hub: [Architecture.md](../../Architecture.md).
 ## Mental model
 
 ```text
-Scene JSON (@openenvx/core/schema)
+Scene JSON (@openenvx/studio/schema)
         │
         ▼
-EditorRuntime + PluginManager + WorkbenchController (@openenvx/core)
+EditorRuntime + PluginManager + WorkbenchController (@openenvx/studio/core)
         │
         ├── domain engines: canvas / html / email
         │
@@ -36,8 +36,8 @@ WorkbenchShell (@openenvx/studio)
 
 | You want… | Use |
 | --- | --- |
-| Stage only, own state | `@openenvx/core/schema` + `@openenvx/canvas-driver` (`CanvasStage`) |
-| Full editor, custom UI | `@openenvx/core` + `@openenvx/studio` + `canvas` / `html` / `email` |
+| Stage only, own state | `@openenvx/studio/schema` + `@openenvx/canvas-driver` (`CanvasStage`) |
+| Full editor, custom UI | `@openenvx/studio/core` + `@openenvx/studio` + `canvas` / `html` / `email` |
 | Full canvas product | `@openenvx/studio` + `@openenvx/canvas-driver/studio` |
 | HTML block product | `@openenvx/studio` + `@openenvx/html-driver/studio` |
 | Email block editor | `@openenvx/studio` + `@openenvx/email-driver/studio` |

@@ -1,5 +1,5 @@
-import type { Layer as SceneLayer } from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
+import type { Layer as SceneLayer } from '@openenvx/studio/core';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 
 import type {
   CanvasLayerInteractionRegistration,

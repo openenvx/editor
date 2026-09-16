@@ -1,5 +1,5 @@
-import type { Layer } from '@openenvx/core';
-import { createDefaultTransform } from '@openenvx/core/schema';
+import type { Layer } from '@openenvx/studio/core';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

@@ -1,6 +1,6 @@
-import type { LayerRegistry } from '@openenvx/core';
-import { createDefaultTransform } from '@openenvx/core/schema';
-import type { Scene } from '@openenvx/core/schema';
+import type { LayerRegistry } from '@openenvx/studio/core';
+import { createDefaultTransform } from '@openenvx/studio/schema';
+import type { Scene } from '@openenvx/studio/schema';
 import Konva from 'konva';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';

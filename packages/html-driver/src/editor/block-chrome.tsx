@@ -1,5 +1,5 @@
-import { isTypingTarget } from '@openenvx/core';
-import type { Layer } from '@openenvx/core/schema';
+import { isTypingTarget } from '@openenvx/studio/core';
+import type { Layer } from '@openenvx/studio/schema';
 import {
   useCallback,
   useState,

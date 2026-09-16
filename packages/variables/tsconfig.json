@@ -6,10 +6,10 @@
     "jsx": "react-jsx",
     "strictNullChecks": true,
     "paths": {
-      "@openenvx/core": ["../core/src/index.ts"],
-      "@openenvx/core/react": ["../core/src/react/workbench-context.tsx"],
-      "@openenvx/core/schema": ["../core/src/schema/index.ts"],
-      "@openenvx/workbench": ["../workbench/src/index.ts"]
+      "@openenvx/studio/core": ["../studio/src/core/index.ts"],
+      "@openenvx/studio/react": ["../studio/src/core/react/workbench-context.tsx"],
+      "@openenvx/studio/schema": ["../studio/src/core/schema/index.ts"],
+      "@openenvx/studio/internal": ["../studio/src/workbench-barrel.ts"]
     }
   }
 }

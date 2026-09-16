@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/core/schema';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { flattenStageLayers } from '../flatten-layer-surface';

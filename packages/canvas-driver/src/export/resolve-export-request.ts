@@ -1,5 +1,5 @@
-import { resolvePageBackground } from '@openenvx/core/schema';
-import type { Page, Scene } from '@openenvx/core/schema';
+import { resolvePageBackground } from '@openenvx/studio/schema';
+import type { Page, Scene } from '@openenvx/studio/schema';
 
 import type {
   CanvasExportFormat,

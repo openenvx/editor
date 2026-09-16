@@ -1,5 +1,5 @@
-import type { Scene as CoreScene } from '@openenvx/core/schema';
 import { WorkbenchShell } from '@openenvx/studio';
+import type { Scene as CoreScene } from '@openenvx/studio/schema';
 import { useMemo } from 'react';
 
 import { createHtmlDemoScene } from '../create-html-demo-scene';

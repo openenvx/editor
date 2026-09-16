@@ -1,4 +1,4 @@
-import type { Transform } from '@openenvx/core/schema';
+import type { Transform } from '@openenvx/studio/schema';
 
 import type { CanvasInteractionMode } from '../interactions/canvas-interaction-mode';
 

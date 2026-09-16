@@ -3,9 +3,9 @@ import {
   InstantiationService,
   SceneStore,
   WorkbenchEventService,
-} from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
-import { createDefaultTransform, normalizeScene } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { CommandContext } from '@openenvx/studio/core';
+import { createDefaultTransform, normalizeScene } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

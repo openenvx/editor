@@ -1,5 +1,5 @@
-import { createServiceId, Emitter } from '@openenvx/core';
-import type { ContextKeyService, Event } from '@openenvx/core';
+import { createServiceId, Emitter } from '@openenvx/studio/core';
+import type { ContextKeyService, Event } from '@openenvx/studio/core';
 
 import {
   clampHtmlZoom,

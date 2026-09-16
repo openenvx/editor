@@ -1,5 +1,8 @@
-import type { PropertyPathContextOptions, WorkbenchApi } from '@openenvx/core';
-import type { Transform } from '@openenvx/core/schema';
+import type {
+  PropertyPathContextOptions,
+  WorkbenchApi,
+} from '@openenvx/studio/core';
+import type { Transform } from '@openenvx/studio/schema';
 
 import { resolveTextBoxFitPropertyUpdate } from '../fit-text-layer-to-content';
 import { createCanvasPropertyHostContext } from './canvas-property-path-context';

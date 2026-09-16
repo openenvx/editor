@@ -3,10 +3,10 @@ import {
   canTransformLayer,
   type ExternalStore,
   type Layer as SceneLayer,
-} from '@openenvx/core';
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
-import { createDefaultTransform } from '@openenvx/core/schema';
-import type { Transform } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import { createDefaultTransform } from '@openenvx/studio/schema';
+import type { Transform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import type { RefObject } from 'react';
 

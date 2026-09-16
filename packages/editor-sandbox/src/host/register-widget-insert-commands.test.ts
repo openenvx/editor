@@ -1,6 +1,6 @@
-import { Command } from '@openenvx/core';
+import { Command } from '@openenvx/studio/core';
 import type { ExtensionManifest } from '../protocol';
-import { createDefaultTransform } from '@openenvx/core/schema';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { extensionBlockStore } from './panel-tree/extension-block-store';

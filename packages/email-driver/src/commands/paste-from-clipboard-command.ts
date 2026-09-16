@@ -1,6 +1,3 @@
-import { Command } from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
-import type { Layer } from '@openenvx/core/schema';
 import {
   createBlock,
   findBlock,
@@ -9,6 +6,9 @@ import {
   mapPageLayers,
   type BlockRegistry,
 } from '@openenvx/html-driver';
+import { Command } from '@openenvx/studio/core';
+import type { CommandContext } from '@openenvx/studio/core';
+import type { Layer } from '@openenvx/studio/schema';
 
 import { EmailBlockRegistryServiceId } from '../block-registry';
 import {

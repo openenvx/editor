@@ -1,5 +1,5 @@
-import { Command, isLayoutRootLayer } from '@openenvx/core';
-import type { CommandContext, ServiceId } from '@openenvx/core';
+import { Command, isLayoutRootLayer } from '@openenvx/studio/core';
+import type { CommandContext, ServiceId } from '@openenvx/studio/core';
 
 import type { BlockRegistry } from '../block-registry';
 import {

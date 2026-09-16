@@ -1,5 +1,5 @@
-import { Command, EditorViewportServiceId } from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
+import { Command, EditorViewportServiceId } from '@openenvx/studio/core';
+import type { CommandContext } from '@openenvx/studio/core';
 
 function getViewport(ctx: CommandContext) {
   if (!ctx.services.has(EditorViewportServiceId)) {

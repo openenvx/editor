@@ -1,4 +1,4 @@
-import type { LayerPreviewDescriptor } from '@openenvx/core/preview';
+import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 
 import type { LayerPreviewRendererHostProps } from '../../contributions/layer-preview-renderer-contribution';
 

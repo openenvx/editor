@@ -1,5 +1,5 @@
-import { LocalizationServiceId } from '@openenvx/core';
-import { useWorkbenchContext } from '@openenvx/core/react';
+import { LocalizationServiceId } from '@openenvx/studio/core';
+import { useWorkbenchContext } from '@openenvx/studio/react';
 import { useMemo } from 'react';
 
 const DEFAULT_MISSING_TIP =

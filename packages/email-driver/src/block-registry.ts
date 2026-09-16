@@ -1,5 +1,5 @@
-import { createServiceId } from '@openenvx/core';
 import { BlockRegistry } from '@openenvx/html-driver';
+import { createServiceId } from '@openenvx/studio/core';
 
 /** Shared catalog for the email driver (plugin, commands, palette, pane). */
 export const emailBlockRegistry = new BlockRegistry();

@@ -1,4 +1,4 @@
-import { createServiceId } from '@openenvx/core';
+import { createServiceId } from '@openenvx/studio/core';
 
 import type { BlockConfig } from './block-config';
 

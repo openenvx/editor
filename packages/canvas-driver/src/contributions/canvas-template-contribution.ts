@@ -1,4 +1,7 @@
-import { ViewContainerContribution, ViewContribution } from '@openenvx/core';
+import {
+  ViewContainerContribution,
+  ViewContribution,
+} from '@openenvx/studio/core';
 
 export const TEMPLATE_DATA_CONTAINER_ID = 'canvas.template';
 export const TEMPLATE_DATA_VIEW_ID = 'canvas.template.panel';

@@ -1,21 +1,21 @@
 import {
-  useWorkbenchContext,
-  useWorkbenchContextSelector,
-} from '@openenvx/core/react';
-import {
-  nextVariableKey,
-  sceneVariables,
-  validateVariableKeyForCatalog,
-  type TemplateVariable,
-} from '@openenvx/core/schema';
-import {
   Button,
   Input,
   ModalDialog,
   PropertyFieldRow,
   useWorkbenchTranslation,
   type WorkbenchDialogProps,
-} from '@openenvx/workbench';
+} from '@openenvx/studio/internal';
+import {
+  useWorkbenchContext,
+  useWorkbenchContextSelector,
+} from '@openenvx/studio/react';
+import {
+  nextVariableKey,
+  sceneVariables,
+  validateVariableKeyForCatalog,
+  type TemplateVariable,
+} from '@openenvx/studio/schema';
 import {
   memo,
   useCallback,

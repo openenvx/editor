@@ -1,5 +1,3 @@
-import type { CommandContext } from '@openenvx/core';
-import { plainTextToHtml } from '@openenvx/core/schema';
 import {
   createBlock,
   getPageRootId,
@@ -7,6 +5,8 @@ import {
   mapPageLayers,
   resolveInsertParentId,
 } from '@openenvx/html-driver';
+import type { CommandContext } from '@openenvx/studio/core';
+import { plainTextToHtml } from '@openenvx/studio/schema';
 
 import {
   emailBlockRegistry,

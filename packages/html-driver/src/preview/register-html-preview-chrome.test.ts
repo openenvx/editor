@@ -1,7 +1,7 @@
 import {
   createContextKeyService,
   SimpleServiceContribution,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { HtmlPreviewChromeServiceImpl } from './html-preview-chrome-service';

@@ -5,9 +5,9 @@ import {
   findLayerById,
   localize,
   updateLayerInTree,
-} from '@openenvx/core';
-import type { CommandContext, Layer } from '@openenvx/core';
-import { createDefaultTransform } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { CommandContext, Layer } from '@openenvx/studio/core';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 
 import { CanvasClipboardServiceId } from '../canvas-service-tokens';
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';

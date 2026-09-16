@@ -1,5 +1,5 @@
-import type { CommandContext } from '@openenvx/core';
-import { normalizeScene } from '@openenvx/core/schema';
+import type { CommandContext } from '@openenvx/studio/core';
+import { normalizeScene } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { VariablesTreeProvider } from './variables-tree-provider';

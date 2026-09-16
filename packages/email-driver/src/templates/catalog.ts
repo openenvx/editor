@@ -1,4 +1,4 @@
-import type { Scene } from '@openenvx/core/schema';
+import type { Scene } from '@openenvx/studio/schema';
 
 import { createBarebonesActivationScene } from './scenes/barebones-activation';
 import { createBarebonesFeatureAnnouncementScene } from './scenes/barebones-feature-announcement';

@@ -1,5 +1,5 @@
-import { Command, getActivePage, localize } from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
+import { Command, getActivePage, localize } from '@openenvx/studio/core';
+import type { CommandContext } from '@openenvx/studio/core';
 
 import { CanvasGroupLayer } from '../layers/canvas-group-layer';
 import {

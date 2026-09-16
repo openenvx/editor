@@ -1,4 +1,4 @@
-import { createToolbarBuilder } from '@openenvx/core';
+import { createToolbarBuilder } from '@openenvx/studio/core';
 import { describe, expect, it } from 'vitest';
 
 import { EmailToolbarContribution } from './email-toolbar-contribution';

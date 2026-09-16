@@ -1,4 +1,4 @@
-import { createContextKeyService } from '@openenvx/core';
+import { createContextKeyService } from '@openenvx/studio/core';
 import { describe, expect, it } from 'vitest';
 
 import { HTML_ZOOM_MAX, HTML_ZOOM_MIN } from '../editor/html-device-preview';

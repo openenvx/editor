@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project are documented here.
-Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
+Published npm packages (`@openenvx/studio/core`, `@openenvx/studio`, `@openenvx/html-driver`, `@openenvx/email-driver`, `@openenvx/canvas-driver`) share one version per GitHub Release.
 
 ## [0.2.0] - 2026-09-16
 
@@ -128,7 +128,7 @@ These enhancements significantly improve the export functionality and usability 
 
 - Update package dependencies and improve type handling
 
-- Added `@openenvx/core` as a dependency in multiple package configurations to enhance functionality across the project.
+- Added `@openenvx/studio/core` as a dependency in multiple package configurations to enhance functionality across the project.
 - Simplified the build scripts in various package demos by removing unnecessary directory changes, streamlining the build process.
 - Improved type handling in the canvas package by refining type assertions in the `App` component, enhancing type safety and clarity.
 - Introduced optional dependencies for `@napi-rs/canvas` and `pdf-lib`, allowing for more flexible package management.
@@ -565,7 +565,7 @@ These changes improve the usability and organization of the canvas demo, alignin
 - Update @xmazu/openenvxee-studio to version 0.1.8 and enhance plugin authoring capabilities
 
 - Updated the version of @xmazu/openenvxee-studio to 0.1.8 in package.json and bun.lock.
-- Re-exported `@openenvx/core` and `@openenvx/headless` in the studio package to facilitate plugin authoring without requiring private workspace packages.
+- Re-exported `@openenvx/studio/core` and `@openenvx/headless` in the studio package to facilitate plugin authoring without requiring private workspace packages.
 - Updated documentation to reflect the new re-exports and their roles in plugin development.
 
 These changes improve the usability of the studio package for host applications, streamlining the plugin development process.
@@ -1033,7 +1033,7 @@ These changes streamline the plugin architecture and improve the overall consist
 
 - Update package references and documentation for core schema
 
-- Removed references to deprecated `@xmazu/openenvxee-schema` and consolidated schema imports under `@openenvx/core/schema`.
+- Removed references to deprecated `@xmazu/openenvxee-schema` and consolidated schema imports under `@openenvx/studio/schema`.
 - Updated documentation across multiple files to reflect the new package structure, including changes in architecture and features.
 - Adjusted import paths in the agent service and demo applications to utilize the new schema organization, enhancing clarity and consistency.
 - Streamlined the overall codebase by eliminating unnecessary package dependencies, improving maintainability.

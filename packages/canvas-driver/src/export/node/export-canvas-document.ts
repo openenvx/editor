@@ -1,4 +1,4 @@
-import type { Scene } from '@openenvx/core/schema';
+import type { Scene } from '@openenvx/studio/schema';
 
 import type {
   CanvasExportOptions,

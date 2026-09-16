@@ -1,4 +1,4 @@
-import { createServiceId } from '@openenvx/core';
+import { createServiceId } from '@openenvx/studio/core';
 
 import type { CanvasClipboardService } from './clipboard/canvas-clipboard-service';
 import type { CanvasCommandRequestService } from './commands/canvas-command-request-service';

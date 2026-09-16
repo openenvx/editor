@@ -1,16 +1,16 @@
-import { createPropertyBuilder, LayerDefinition } from '@openenvx/core';
+import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio/core';
 import type {
   CommandContext,
   Layer,
   LayerPreviewContext,
   Page,
   PropertySectionDescriptor,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import {
   createLayerPreviewBuilder,
   encodeQrToSvg,
-} from '@openenvx/core/preview';
-import { createDefaultTransform } from '@openenvx/core/schema';
+} from '@openenvx/studio/preview';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 export const canvasQrSchema = z.object({

@@ -10,7 +10,7 @@ Companion to [Architecture.md](../../Architecture.md). This tracks intentional f
 
 ## Phase 2 - Done
 
-- Merged `@openenvx/headless`, `@openenvx/core/schema`, and `@openenvx/core/preview` into private **`@openenvx/core`** (`./schema`, `./preview`, `.`, `./react`)
+- Merged `@openenvx/headless`, `@openenvx/studio/schema`, and `@openenvx/studio/preview` into private **`@openenvx/studio/core`** (`./schema`, `./preview`, `.`, `./react`)
 - Deleted separate workspace packages; monorepo imports updated
 
 ## Phase 3 - Enterprise editor + React host plugin API
@@ -26,4 +26,4 @@ Companion to [Architecture.md](../../Architecture.md). This tracks intentional f
 
 ## Publish note
 
-When cutting a release: publish `@openenvx/core`, `@openenvx/studio`, `@openenvx/html-driver`, `@openenvx/email-driver`, and `@openenvx/canvas-driver`. Bump product repos in the same window.
+When cutting a release: publish `@openenvx/studio/core`, `@openenvx/studio`, `@openenvx/html-driver`, `@openenvx/email-driver`, and `@openenvx/canvas-driver`. Bump product repos in the same window.

@@ -9,18 +9,6 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core';
 import {
-  ContextKeyServiceId,
-  getActivePage,
-  isTypingTarget,
-  RichTextInsertServiceId,
-} from '@openenvx/core';
-import type { EditorPaneHostProps } from '@openenvx/core';
-import {
-  useWorkbenchContext,
-  useWorkbenchContextSelector,
-} from '@openenvx/core/react';
-import { applyTemplateVariablesForPreview } from '@openenvx/core/schema';
-import {
   applyHtmlDragEnd,
   applyHtmlDragOver,
   applyHtmlDragStart,
@@ -35,6 +23,18 @@ import {
   type HtmlDevicePreset,
   useVariableChipLabels,
 } from '@openenvx/html-driver';
+import {
+  ContextKeyServiceId,
+  getActivePage,
+  isTypingTarget,
+  RichTextInsertServiceId,
+} from '@openenvx/studio/core';
+import type { EditorPaneHostProps } from '@openenvx/studio/core';
+import {
+  useWorkbenchContext,
+  useWorkbenchContextSelector,
+} from '@openenvx/studio/react';
+import { applyTemplateVariablesForPreview } from '@openenvx/studio/schema';
 import {
   memo,
   useCallback,

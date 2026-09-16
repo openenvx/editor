@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createDefaultTransform } from '@openenvx/core/schema';
+import { createDefaultTransform } from '@openenvx/studio/schema';
 
 import { alignTransforms, distributeHorizontally } from './align';
 

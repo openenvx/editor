@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createCommandPaletteBuilder } from '@openenvx/core';
+import { createCommandPaletteBuilder } from '@openenvx/studio/core';
 import { createManifestContributions } from './create-manifest-contributions';
 import { n } from './test-node';
 

@@ -3,14 +3,14 @@ import {
   isContainerLayer,
   mapLayers,
   MIN_LAYER_SIZE,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import type {
   ContainerLayoutModel,
   Layer,
   Page,
   Transform,
-} from '@openenvx/core';
-import type { LayerStyle } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { LayerStyle } from '@openenvx/studio/schema';
 
 import { getDefaultPageDimensions } from '../page-presets';
 import { measureRichTextHeight } from '../rich-text-layout';

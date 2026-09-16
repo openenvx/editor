@@ -1,5 +1,5 @@
-import { createServiceId } from '@openenvx/core';
-import type { LengthUnit, Scene } from '@openenvx/core/schema';
+import { createServiceId } from '@openenvx/studio/core';
+import type { LengthUnit, Scene } from '@openenvx/studio/schema';
 
 export type CanvasExportFormat = 'png' | 'jpg' | 'pdf';
 

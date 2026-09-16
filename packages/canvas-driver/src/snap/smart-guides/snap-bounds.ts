@@ -1,4 +1,4 @@
-import type { Transform } from '@openenvx/core/schema';
+import type { Transform } from '@openenvx/studio/schema';
 
 import { getLayerBounds } from '../../align';
 import type { SnapBounds } from './types';

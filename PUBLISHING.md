@@ -8,7 +8,7 @@ Maintainer reference for building and publishing packages that leave this reposi
 
 | Package | Registry | What ships |
 | --- | --- | --- |
-| `@openenvx/core` | npmjs (`registry.npmjs.org`, public) | Scene model, plugin host, workbench controller (`./schema`, `./preview`, `.`, `./react`) |
+| `@openenvx/studio/core` | npmjs (`registry.npmjs.org`, public) | Scene model, plugin host, workbench controller (`./schema`, `./preview`, `.`, `./react`) |
 | `@openenvx/studio` | npmjs (`registry.npmjs.org`, public) | Workbench shell host surface + `./theme.css` |
 | `@openenvx/canvas-driver` | npmjs (`registry.npmjs.org`, public) | Canvas engine (`.`) + drop-in `./studio` (`CanvasEditor`) + headless `./runtime` + `./theme.css` + `./fonts.css` |
 | `@openenvx/html-driver` | npmjs (`registry.npmjs.org`, public) | HTML block engine (`.`) + drop-in `./studio` (`HtmlEditor`) + headless `./runtime` + `./theme.css` |
@@ -73,7 +73,7 @@ Runs build + tarball checks for all published packages.
 ### Drop-in editor (canvas example)
 
 ```bash
-npm install @openenvx/core @openenvx/studio @openenvx/canvas-driver react react-dom
+npm install @openenvx/studio/core @openenvx/studio @openenvx/canvas-driver react react-dom
 ```
 
 ```tsx

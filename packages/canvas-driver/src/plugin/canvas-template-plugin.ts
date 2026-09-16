@@ -1,5 +1,5 @@
-import { WorkbenchPlugin } from '@openenvx/core';
-import type { WorkbenchPluginContext } from '@openenvx/core';
+import { WorkbenchPlugin } from '@openenvx/studio/core';
+import type { WorkbenchPluginContext } from '@openenvx/studio/core';
 
 import { TemplateDataPanel } from '../components/template-data-panel';
 import {

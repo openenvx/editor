@@ -1,5 +1,5 @@
-import { useWorkbenchContextSelector } from '@openenvx/core/react';
-import type { TemplateVariable } from '@openenvx/core/schema';
+import { useWorkbenchContextSelector } from '@openenvx/studio/react';
+import type { TemplateVariable } from '@openenvx/studio/schema';
 import type { Editor } from '@tiptap/react';
 import { useCallback, useRef, useState, type RefObject } from 'react';
 

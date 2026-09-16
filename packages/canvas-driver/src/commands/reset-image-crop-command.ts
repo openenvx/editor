@@ -1,5 +1,5 @@
-import { Command, localize, updateLayerInTree } from '@openenvx/core';
-import type { CommandContext } from '@openenvx/core';
+import { Command, localize, updateLayerInTree } from '@openenvx/studio/core';
+import type { CommandContext } from '@openenvx/studio/core';
 
 import { hasActiveCrop, readImageCrop } from '../crop/normalized-crop';
 

@@ -1,4 +1,4 @@
-import type { FontDescriptor } from '@openenvx/core';
+import type { FontDescriptor } from '@openenvx/studio/core';
 
 import googleFontsCatalog from './google-fonts-catalog.json';
 

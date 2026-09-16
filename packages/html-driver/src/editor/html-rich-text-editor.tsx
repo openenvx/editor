@@ -1,7 +1,7 @@
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/core/react';
+} from '@openenvx/studio/react';
 import {
   useVariableChipLabels,
   useVariableRichTextSuggest,

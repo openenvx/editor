@@ -21,7 +21,7 @@ OpenEnvx is an open-source foundation for canvas, HTML, and email editors. It gi
 For the fastest path, install the studio shell plus an artboard package:
 
 ```bash
-npm install @openenvx/core @openenvx/studio @openenvx/html-driver react react-dom
+npm install @openenvx/studio/core @openenvx/studio @openenvx/html-driver react react-dom
 ```
 
 ```tsx
@@ -50,9 +50,9 @@ Each artboard package includes a `./runtime` entry point for headless scene crea
 | Goal | Start with |
 | --- | --- |
 | Drop in a complete editor | `@openenvx/studio` + `@openenvx/canvas-driver/studio`, `@openenvx/html-driver/studio`, or `@openenvx/email-driver/studio` |
-| Build a custom editor shell | `@openenvx/core` + `@openenvx/studio` + `@openenvx/canvas-driver` or `@openenvx/html-driver` |
+| Build a custom editor shell | `@openenvx/studio/core` + `@openenvx/studio` + `@openenvx/canvas-driver` or `@openenvx/html-driver` |
 | Render or automate documents | An artboard package's `./runtime` entry point |
-| Add trusted in-process features | The plugin and contribution APIs on `@openenvx/core` |
+| Add trusted in-process features | The plugin and contribution APIs on `@openenvx/studio/core` |
 | Build isolated widgets or panels | [`@openenvx/editor-sandbox`](packages/editor-sandbox/README.md) |
 
 ## Repository layout

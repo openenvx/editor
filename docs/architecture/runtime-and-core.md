@@ -1,6 +1,6 @@
 # Runtime & core
 
-**Audience:** Contributors and integrators. Package: `@openenvx/core` (+ the scene schema exposed through its `./schema` entry point).
+**Audience:** Contributors and integrators. Package: `@openenvx/studio/core` (+ the scene schema exposed through its `./schema` entry point).
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -17,7 +17,7 @@ Plugin host primitives and the editor runtime. **No** canvas types, Konva, workb
 | `PropertyBuilder` | Layer property field/section descriptors (`LayerDefinition.properties()`) |
 | `Registry<K, V>` | Keyed runtime registrations (distinct from static contributions and DI services) |
 
-## Scene document (`@openenvx/core/schema`)
+## Scene document (`@openenvx/studio/schema`)
 
 Canonical content Scene JSON is Zod v4 (`sceneSchemaLenient` / `sceneSchemaCanonical`). Defaults, `validateScene` / `normalizeScene`, and published `scene.schema.json` come from that schema.
 
@@ -39,7 +39,7 @@ import {
   PluginManager,
   SceneStore,
   EditorService,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 
 const scene = new SceneStore(initialScene);
 const editor = new EditorService();

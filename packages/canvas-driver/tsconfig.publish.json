@@ -2,16 +2,16 @@
   "extends": ["./tsconfig.json", "@openenvx/typescript-config/publish.json"],
   "compilerOptions": {
     "paths": {
-      "@openenvx/core": ["../core/src/index.ts"],
-      "@openenvx/core/react": ["../core/src/react/workbench-context.tsx"],
-      "@openenvx/core/schema": ["../core/src/schema/index.ts"],
-      "@openenvx/core/preview": ["../core/src/preview/index.ts"],
+      "@openenvx/studio/core": ["../studio/src/core/index.ts"],
+      "@openenvx/studio/react": ["../studio/src/core/react/workbench-context.tsx"],
+      "@openenvx/studio/schema": ["../studio/src/core/schema/index.ts"],
+      "@openenvx/studio/preview": ["../studio/src/core/preview/index.ts"],
+      "@openenvx/studio/internal": ["../studio/src/workbench-barrel.ts"],
       "@openenvx/editor-sandbox/host": ["../editor-sandbox/src/host/index.ts"],
       "@openenvx/editor-sandbox/protocol": ["../editor-sandbox/src/protocol/index.ts"],
       "@openenvx/editor-sandbox/canvas-widget": ["../editor-sandbox/src/canvas-widget/index.ts"],
       "@openenvx/studio": ["../studio/src/index.ts"],
-      "@openenvx/variables": ["../variables/src/index.ts"],
-      "@openenvx/workbench": ["../workbench/src/index.ts"]
+      "@openenvx/variables": ["../variables/src/index.ts"]
     }
   },
   "include": ["src", "../typescript-config/css-modules.d.ts"],

@@ -7,11 +7,11 @@
       "outputs": ["dist/**"]
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["build", "^build"],
       "outputs": []
     },
     "test:coverage": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["build", "^build"],
       "outputs": []
     },
     "dev": {

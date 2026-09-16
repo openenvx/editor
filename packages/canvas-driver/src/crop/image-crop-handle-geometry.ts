@@ -1,4 +1,4 @@
-import type { Transform } from '@openenvx/core/schema';
+import type { Transform } from '@openenvx/studio/schema';
 
 import type { HandleDescriptor } from '../contributions/canvas-layer-interaction-contribution';
 import { IMAGE_EDGE_ANCHORS, type ImageEdgeAnchor } from '../image-resize';

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Layer } from '@openenvx/core/schema';
+import type { Layer } from '@openenvx/studio/schema';
 
 import {
   cloneBlockWithNewIds,

@@ -1,4 +1,4 @@
-import { normalizeScene } from '@openenvx/core/schema';
+import { normalizeScene } from '@openenvx/studio/schema';
 
 export function createRectExportScene() {
   return normalizeScene({

@@ -4,7 +4,7 @@ import type {
   SceneTransaction,
   WorkbenchApi,
   WorkbenchContributionDisposable,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 
 import type { SandboxHostSurface } from './sandbox-host-surface';
 

@@ -1,4 +1,4 @@
-import type { Page } from '@openenvx/core/schema';
+import type { Page } from '@openenvx/studio/schema';
 
 import { getPageRootId } from '../tree/block-tree';
 

@@ -1,4 +1,4 @@
-import { WorkbenchController } from '@openenvx/core';
+import { WorkbenchController } from '@openenvx/studio/core';
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup } from '@testing-library/react';
 

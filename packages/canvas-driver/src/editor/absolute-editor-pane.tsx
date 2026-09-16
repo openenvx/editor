@@ -4,11 +4,11 @@ import {
   type Scene,
   type Selection,
   type EditorPaneHostProps,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
-} from '@openenvx/core/react';
+} from '@openenvx/studio/react';
 import { memo, useCallback, useMemo } from 'react';
 
 import { CanvasHostProvider } from '../canvas-host-context';

@@ -12,8 +12,8 @@ import {
   isLayerLocked,
   isLayerVisible,
   WIDGET_LAYER_TYPE,
-} from '@openenvx/core';
-import type { Layer, Scene } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { Layer, Scene } from '@openenvx/studio/schema';
 import {
   memo,
   Suspense,

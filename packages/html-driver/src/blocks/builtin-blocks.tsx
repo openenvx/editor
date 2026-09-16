@@ -1,4 +1,4 @@
-import { sanitizeHtml } from '@openenvx/core';
+import { sanitizeHtml } from '@openenvx/studio/core';
 
 import type { BlockConfig } from '../block-config';
 import { buttonBlock } from './button-block';

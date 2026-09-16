@@ -7,8 +7,8 @@ import {
   type Selection,
   WorkbenchController,
   type WorkbenchApi,
-} from '@openenvx/core';
-import { WorkbenchProvider } from '@openenvx/core/react';
+} from '@openenvx/studio/core';
+import { WorkbenchProvider } from '@openenvx/studio/react';
 import { VariablesPlugin } from '@openenvx/variables';
 import { render } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';

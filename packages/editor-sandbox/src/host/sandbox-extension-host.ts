@@ -3,9 +3,9 @@ import {
   findLayerById,
   updateLayerInTree,
   walkLayers,
-} from '@openenvx/core';
-import type { WorkbenchApi } from '@openenvx/core';
-import type { Layer, Scene } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { WorkbenchApi } from '@openenvx/studio/core';
+import type { Layer, Scene } from '@openenvx/studio/schema';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 

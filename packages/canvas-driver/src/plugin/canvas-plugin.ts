@@ -8,14 +8,14 @@ import {
   Plugin,
   SimpleServiceContribution,
   SingletonServiceContribution,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import type {
   CommandContext,
   Layer,
   PluginContext,
   WorkbenchPluginContext,
-} from '@openenvx/core';
-import { normalizeScene } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import { normalizeScene } from '@openenvx/studio/schema';
 
 import { AbsolutePageRules } from '../absolute-page-rules';
 import {

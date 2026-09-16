@@ -2,13 +2,13 @@ import {
   TreeDataProvider,
   type CommandContext,
   type TreeItem,
-} from '@openenvx/core';
+} from '@openenvx/studio/core';
 import {
   formatVariableToken,
   reorderVariablesInScene,
   sceneVariables,
   type TemplateVariable,
-} from '@openenvx/core/schema';
+} from '@openenvx/studio/schema';
 
 export class VariablesTreeProvider extends TreeDataProvider<TemplateVariable> {
   getRootChildren(ctx: CommandContext): TemplateVariable[] {

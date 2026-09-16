@@ -1,5 +1,5 @@
-import { canEditLayerData, isLayerVisible } from '@openenvx/core';
-import type { Layer } from '@openenvx/core/schema';
+import { canEditLayerData, isLayerVisible } from '@openenvx/studio/core';
+import type { Layer } from '@openenvx/studio/schema';
 import {
   Fragment,
   Suspense,

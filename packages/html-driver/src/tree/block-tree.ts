@@ -5,8 +5,8 @@ import {
   isLayerDescendant,
   removeLayerFromTree,
   updateLayerInTree,
-} from '@openenvx/core';
-import type { Layer, Page, Scene } from '@openenvx/core/schema';
+} from '@openenvx/studio/core';
+import type { Layer, Page, Scene } from '@openenvx/studio/schema';
 
 export function findBlock(
   layers: Layer[],
