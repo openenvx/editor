@@ -1,11 +1,19 @@
 import { WorkbenchProvider } from '@openenvx/studio/react';
 import { normalizeScene } from '@openenvx/studio/schema';
 import { createMockWorkbenchApi } from '@openenvx/studio/internal';
-import { render, waitFor } from '@testing-library/react';
-import type { ComponentProps } from 'react';
-import { describe, expect, it } from 'vitest';
+import { cleanup, render, waitFor } from '@testing-library/react';
+import type { ComponentProps, ReactNode } from 'react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { CanvasRichTextEditor } from './canvas-rich-text-editor';
+
+vi.mock('@tiptap/react/menus', () => ({
+  BubbleMenu: ({ children }: { children?: ReactNode }) => children ?? null,
+}));
+
+afterEach(() => {
+  cleanup();
+});
 
 function renderRichTextEditor(
   props: Omit<ComponentProps<typeof CanvasRichTextEditor>, 'onCommit'> & {
