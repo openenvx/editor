@@ -1,7 +1,22 @@
 # Changelog
 
 All notable changes to this project are documented here.
-Published npm packages (`@openenvx/studio/core`, `@openenvx/studio`, `@openenvx/html-driver`, `@openenvx/email-driver`, `@openenvx/canvas-driver`) share one version per GitHub Release.
+Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
+
+## [0.2.1] - 2026-09-16
+
+### Other
+
+- Transition from @openenvx/core to @openenvx/studio
+
+- Updated references throughout the codebase to replace `@openenvx/core` with `@openenvx/studio` and its submodules, enhancing clarity and consistency in package usage.
+- Adjusted documentation, package configurations, and import paths to reflect the new structure, ensuring a cohesive development experience.
+- Improved the build process and CI workflows to align with the updated package organization, streamlining the release and development processes.
+
+- Update peer dependency validation in verify-pack.ts
+
+- Removed the check for the presence of `@openenvx/studio/core` as a peer dependency and added a new validation to ensure it is not included, enforcing the use of `@openenvx/studio` instead.
+- This change clarifies the intended package structure and improves error handling during the verification process.
 
 ## [0.2.0] - 2026-09-16
 
@@ -12,6 +27,8 @@ Published npm packages (`@openenvx/studio/core`, `@openenvx/studio`, `@openenvx/
 - Updated the release workflow in `release.yml` to improve version bumping logic, ensuring that manual bumps are handled correctly when no unreleased commits are detected.
 - Clarified the publishing instructions in `PUBLISHING.md`, specifying the behavior when a publish fails and how to handle version retries.
 - These changes streamline the release process and improve documentation clarity for contributors.
+
+- V0.2.0
 
 ## [0.1.4] - 2026-09-15
 
@@ -128,7 +145,7 @@ These enhancements significantly improve the export functionality and usability 
 
 - Update package dependencies and improve type handling
 
-- Added `@openenvx/studio/core` as a dependency in multiple package configurations to enhance functionality across the project.
+- Added `@openenvx/core` as a dependency in multiple package configurations to enhance functionality across the project.
 - Simplified the build scripts in various package demos by removing unnecessary directory changes, streamlining the build process.
 - Improved type handling in the canvas package by refining type assertions in the `App` component, enhancing type safety and clarity.
 - Introduced optional dependencies for `@napi-rs/canvas` and `pdf-lib`, allowing for more flexible package management.
@@ -565,7 +582,7 @@ These changes improve the usability and organization of the canvas demo, alignin
 - Update @xmazu/openenvxee-studio to version 0.1.8 and enhance plugin authoring capabilities
 
 - Updated the version of @xmazu/openenvxee-studio to 0.1.8 in package.json and bun.lock.
-- Re-exported `@openenvx/studio/core` and `@openenvx/headless` in the studio package to facilitate plugin authoring without requiring private workspace packages.
+- Re-exported `@openenvx/core` and `@openenvx/headless` in the studio package to facilitate plugin authoring without requiring private workspace packages.
 - Updated documentation to reflect the new re-exports and their roles in plugin development.
 
 These changes improve the usability of the studio package for host applications, streamlining the plugin development process.
@@ -1033,7 +1050,7 @@ These changes streamline the plugin architecture and improve the overall consist
 
 - Update package references and documentation for core schema
 
-- Removed references to deprecated `@xmazu/openenvxee-schema` and consolidated schema imports under `@openenvx/studio/schema`.
+- Removed references to deprecated `@xmazu/openenvxee-schema` and consolidated schema imports under `@openenvx/core/schema`.
 - Updated documentation across multiple files to reflect the new package structure, including changes in architecture and features.
 - Adjusted import paths in the agent service and demo applications to utilize the new schema organization, enhancing clarity and consistency.
 - Streamlined the overall codebase by eliminating unnecessary package dependencies, improving maintainability.
