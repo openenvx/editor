@@ -5,15 +5,16 @@
   "license": "MPL-2.0",
   "type": "module",
   "files": [
-    "dist"
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/theme.css",
+    "dist/sandbox-worker.js"
   ],
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./studio": "./src/studio/index.ts",
-    "./runtime": "./src/publish-runtime.ts",
-    "./theme.css": "./dist/studio.css"
+    "./theme.css": "./dist/theme.css"
   },
   "scripts": {
     "build": "rm -rf dist && tsup && tsup --config tsup.publish.config.ts && node ./build-dts.ts",
@@ -72,21 +73,14 @@
         "import": "./dist/index.js",
         "default": "./dist/index.js"
       },
-      "./studio": {
-        "types": "./dist/studio.d.ts",
-        "import": "./dist/studio.js",
-        "default": "./dist/studio.js"
-      },
-      "./runtime": {
-        "types": "./dist/runtime.d.ts",
-        "import": "./dist/runtime.js",
-        "default": "./dist/runtime.js"
-      },
       "./theme.css": {
-        "import": "./dist/studio.css",
-        "default": "./dist/studio.css"
+        "import": "./dist/theme.css",
+        "default": "./dist/theme.css"
       }
-    }
+    },
+    "sideEffects": [
+      "./dist/index.js"
+    ]
   },
   "repository": {
     "type": "git",

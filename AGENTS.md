@@ -84,9 +84,9 @@ Published packages:
 
 - **`@openenvx/editor-sandbox`** - published sandbox SDK: `./protocol`, `./host`, `./canvas-widget`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts opt in via **`@openenvx/editor-sandbox/host`** on `mountExternalHosts`; canvas faces map via **`@openenvx/editor-sandbox/canvas-widget`** (`applyWidgetFace`).
 - **`@openenvx/studio`** - published editor studio (public npm, MPL-2.0). `.` + `./theme.css` (shell), `./core`, `./schema`, `./preview`, `./react` (headless). See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/html-driver`** - published HTML engine (public npm, MPL-2.0). Drop-in `@openenvx/html-driver/studio` (`HtmlEditor`) + `./runtime` (`renderBlockDocument`). See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/email-driver`** - published email engine (public npm, MPL-2.0). Drop-in `@openenvx/email-driver/studio` (`EmailEditor`) + `./runtime` (`renderEmailHtml`). Source: `packages/email-driver`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/canvas-driver`** - published canvas engine (public npm, MPL-2.0). Drop-in `@openenvx/canvas-driver/studio` (`CanvasEditor`) + `./runtime` (`createCanvasScene`). See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/html-driver`** - published HTML engine (public npm, MPL-2.0). `.` + `./theme.css` (artboard editor CSS; shell is `@openenvx/studio/theme.css`). See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/email-driver`** - published email engine (public npm, MPL-2.0). `.` + `./theme.css`. Source: `packages/email-driver`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/canvas-driver`** - published canvas engine (public npm, MPL-2.0). `.` + `./theme.css` + `./fonts.css`. See [PUBLISHING.md](PUBLISHING.md).
 
 ## Host sidebar panels (product hosts)
 

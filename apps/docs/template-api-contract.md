@@ -106,7 +106,7 @@ Server steps:
 3. If `validateTemplateNames(scene).duplicates.length > 0` → `400` with duplicate names.
 4. Reject unknown modification names (recommended) or skip them.
 5. `const resolved = applyModificationsWithTextFit(scene, modifications)` (or `applyModifications` then `fitSceneCanvasTextToContent` when you need the pure schema step separately).
-6. Render resolved scene with `exportCanvasDocument` from `@openenvx/canvas-driver/export/node`. Honor shrink-to-fit and image fit during rasterization.
+6. Render resolved scene with `exportCanvasDocumentNode` from `@openenvx/canvas-driver`. Honor shrink-to-fit and image fit during rasterization.
 
 ## End-to-end example
 

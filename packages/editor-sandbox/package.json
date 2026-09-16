@@ -83,7 +83,6 @@
     "openenvx-manifest": "./src/cli/openenvx-manifest.ts"
   },
   "dependencies": {
-    "@openenvx/canvas-driver": "workspace:*",
     "clsx": "2.1.1",
     "preact": "^10.26.5",
     "quickjs-emscripten": "0.32.0"

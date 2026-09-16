@@ -1,4 +1,4 @@
-import { BlockRegistry } from '@openenvx/html-driver/runtime';
+import { BlockRegistry } from '@openenvx/html-driver';
 import type { Scene } from '@openenvx/studio/schema';
 import { applyTemplateVariables } from '@openenvx/studio/schema';
 

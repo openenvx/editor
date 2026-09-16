@@ -1,4 +1,4 @@
-import { flattenReactChildren } from '@openenvx/html-driver/runtime';
+import { flattenReactChildren } from '@openenvx/html-driver';
 import { Column, Row, Section } from '@react-email/components';
 
 import { defineEmailPattern } from './define-email-pattern';

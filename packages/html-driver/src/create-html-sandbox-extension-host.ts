@@ -4,8 +4,8 @@ import {
 } from '@openenvx/editor-sandbox/host';
 import type { Layer } from '@openenvx/studio/core';
 
-import { setOpenEnvxHtmlWidgetClickHandler } from '../editor/html-widget-click-handler';
-import { applyHtmlWidgetFace } from '../widgets/map-widget-tree-to-html-layers';
+import { setOpenEnvxHtmlWidgetClickHandler } from './editor/html-widget-click-handler';
+import { applyHtmlWidgetFace } from './widgets/map-widget-tree-to-html-layers';
 
 /** Sandbox host wired for HTML widget faces. */
 export function createHtmlSandboxExtensionHost(

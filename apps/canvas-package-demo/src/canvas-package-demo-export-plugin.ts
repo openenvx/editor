@@ -1,5 +1,4 @@
-import { exportCanvasDocument } from '@openenvx/canvas-driver/export';
-import { downloadBytes } from '@openenvx/canvas-driver/export-bytes';
+import { downloadBytes, exportCanvasDocument } from '@openenvx/canvas-driver';
 import {
   Command,
   getActivePage,

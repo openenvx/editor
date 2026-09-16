@@ -42,11 +42,9 @@
       ],
       "entry": [
         "src/index.ts!",
-        "src/studio/index.ts!",
+        "src/publish.ts!",
         "src/publish-runtime.ts!",
-        "src/export/browser/index.ts!",
-        "src/export/node/index.ts!",
-        "src/export-layers.ts!",
+        "src/create-canvas-sandbox-extension-host.ts!",
         "src/plugin/canvas-plugin.ts!",
         "tsup.publish.config.ts!",
         "build-dts.ts!",
@@ -134,7 +132,7 @@
       "entry": [
         "src/index.ts!",
         "src/runtime.ts!",
-        "src/studio/index.ts!",
+        "src/publish.ts!",
         "src/publish-runtime.ts!",
         "src/plugin/html-blocks-plugin.ts!",
         "tsup.publish.config.ts!",
@@ -154,7 +152,7 @@
       "entry": [
         "src/index.ts!",
         "src/runtime.ts!",
-        "src/studio/index.ts!",
+        "src/publish.ts!",
         "src/publish-runtime.ts!",
         "src/plugin/email-blocks-plugin.ts!",
         "tsup.publish.config.ts!",

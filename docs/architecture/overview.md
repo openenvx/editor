@@ -19,9 +19,9 @@ EditorRuntime + PluginManager + WorkbenchController (@openenvx/studio/core)
         ▼
 WorkbenchShell (@openenvx/studio)
         │
-        ├── canvas ./studio  (@openenvx/canvas-driver/studio)
-        ├── html ./studio    (@openenvx/html-driver/studio)
-        └── email ./studio   (@openenvx/email-driver/studio)
+        ├── canvas workbench  (@openenvx/canvas-driver)
+        ├── html workbench    (@openenvx/html-driver)
+        └── email workbench   (@openenvx/email-driver)
 ```
 
 | Layer | Job |
@@ -30,7 +30,7 @@ WorkbenchShell (@openenvx/studio)
 | **Core** | Plugin host, commands, layers, DI, scene store, workbench runtime |
 | **Domain** | Canvas Konva engine, HTML block editor, or email driver (pick one surface per page via `page.layout`) |
 | **Shell** | React chrome that renders contribution descriptors (`@openenvx/studio`) |
-| **Product** | Artboard `./studio` presets that wire shell + engine |
+| **Product** | Host app wires shell + driver `default*Workbench` |
 
 ## Choose a client tier
 
@@ -38,9 +38,9 @@ WorkbenchShell (@openenvx/studio)
 | --- | --- |
 | Stage only, own state | `@openenvx/studio/schema` + `@openenvx/canvas-driver` (`CanvasStage`) |
 | Full editor, custom UI | `@openenvx/studio/core` + `@openenvx/studio` + `canvas` / `html` / `email` |
-| Full canvas product | `@openenvx/studio` + `@openenvx/canvas-driver/studio` |
-| HTML block product | `@openenvx/studio` + `@openenvx/html-driver/studio` |
-| Email block editor | `@openenvx/studio` + `@openenvx/email-driver/studio` |
+| Full canvas product | `@openenvx/studio` + `@openenvx/canvas-driver` |
+| HTML block product | `@openenvx/studio` + `@openenvx/html-driver` |
+| Email block editor | `@openenvx/studio` + `@openenvx/email-driver` |
 | Untrusted scripts / widgets | Sandbox QuickJS Worker path (never main-world JS) |
 
 ## Two editor surfaces, one workbench

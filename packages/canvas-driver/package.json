@@ -5,28 +5,18 @@
   "license": "MPL-2.0",
   "type": "module",
   "files": [
-    "dist"
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/theme.css",
+    "dist/fonts.css"
   ],
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./studio": "./src/studio/index.ts",
-    "./studio/sandbox-host": "./src/studio/create-canvas-sandbox-extension-host.ts",
-    "./runtime": "./src/publish-runtime.ts",
-    "./document-export": "./src/export/canvas-document-export-service.ts",
-    "./export": "./src/export/browser/index.ts",
     "./export/node": "./src/export/node/index.ts",
-    "./export-bytes": "./src/export/bytes-to-data-url.ts",
-    "./export-layers": "./src/export-layers.ts",
-    "./registry": "./src/plugin/canvas-registry-service.ts",
-    "./contributions/layer-preview-renderer-contribution": "./src/contributions/layer-preview-renderer-contribution.ts",
-    "./artboard-offset": "./src/artboard-offset.ts",
-    "./fit-text-layer-to-content": "./src/fit-text-layer-to-content.ts",
-    "./rich-text-layout": "./src/rich-text-layout.ts",
-    "./rich-text-typography": "./src/rich-text-typography.ts",
     "./fonts.css": "./src/fonts/fonts.css",
-    "./theme.css": "./dist/studio.css"
+    "./theme.css": "./dist/theme.css"
   },
   "scripts": {
     "build": "rm -rf dist && tsup && tsup --config tsup.publish.config.ts && node ./build-dts.ts && rsync -a --include='*/' --include='*.css' --exclude='*' src/ dist/ && cp src/fonts/fonts.css dist/fonts.css",
@@ -98,71 +88,15 @@
         "import": "./dist/index.js",
         "default": "./dist/index.js"
       },
-      "./studio": {
-        "types": "./dist/studio.d.ts",
-        "import": "./dist/studio.js",
-        "default": "./dist/studio.js"
-      },
-      "./studio/sandbox-host": {
-        "types": "./dist/studio-sandbox-host.d.ts",
-        "import": "./dist/studio-sandbox-host.js",
-        "default": "./dist/studio-sandbox-host.js"
-      },
-      "./runtime": {
-        "types": "./dist/runtime.d.ts",
-        "import": "./dist/runtime.js",
-        "default": "./dist/runtime.js"
-      },
-      "./document-export": {
-        "import": "./dist/export/canvas-document-export-service.js",
-        "default": "./dist/export/canvas-document-export-service.js"
-      },
-      "./export": {
-        "import": "./dist/export/browser/index.js",
-        "default": "./dist/export/browser/index.js"
-      },
-      "./export/node": {
-        "import": "./dist/export/node/index.js",
-        "default": "./dist/export/node/index.js"
-      },
-      "./export-bytes": {
-        "import": "./dist/export/bytes-to-data-url.js",
-        "default": "./dist/export/bytes-to-data-url.js"
-      },
-      "./export-layers": {
-        "import": "./dist/export-layers.js",
-        "default": "./dist/export-layers.js"
-      },
-      "./registry": {
-        "import": "./dist/plugin/canvas-registry-service.js",
-        "default": "./dist/plugin/canvas-registry-service.js"
-      },
-      "./contributions/layer-preview-renderer-contribution": {
-        "import": "./dist/contributions/layer-preview-renderer-contribution.js",
-        "default": "./dist/contributions/layer-preview-renderer-contribution.js"
-      },
-      "./artboard-offset": {
-        "import": "./dist/artboard-offset.js",
-        "default": "./dist/artboard-offset.js"
-      },
-      "./fit-text-layer-to-content": {
-        "import": "./dist/fit-text-layer-to-content.js",
-        "default": "./dist/fit-text-layer-to-content.js"
-      },
-      "./rich-text-layout": {
-        "import": "./dist/rich-text-layout.js",
-        "default": "./dist/rich-text-layout.js"
-      },
-      "./rich-text-typography": {
-        "import": "./dist/rich-text-typography.js",
-        "default": "./dist/rich-text-typography.js"
-      },
       "./fonts.css": "./dist/fonts.css",
       "./theme.css": {
-        "import": "./dist/studio.css",
-        "default": "./dist/studio.css"
+        "import": "./dist/theme.css",
+        "default": "./dist/theme.css"
       }
-    }
+    },
+    "sideEffects": [
+      "./dist/index.js"
+    ]
   },
   "repository": {
     "type": "git",

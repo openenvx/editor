@@ -50,7 +50,6 @@ const canvasWidgetConfig = createLibraryConfig({
   external: [
     '@openenvx/studio/core',
     '@openenvx/studio/schema',
-    '@openenvx/canvas-driver/fit-text-layer-to-content',
     '@openenvx/editor-sandbox/protocol',
   ],
 });

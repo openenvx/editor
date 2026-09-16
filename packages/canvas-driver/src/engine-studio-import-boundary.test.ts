@@ -10,9 +10,6 @@ function collectEngineTsFiles(dir: string, relative = ''): string[] {
   for (const entry of entries) {
     const rel = relative ? `${relative}/${entry.name}` : entry.name;
     if (entry.isDirectory()) {
-      if (rel === 'studio' || rel.startsWith('studio/')) {
-        continue;
-      }
       files.push(...collectEngineTsFiles(path.join(dir, entry.name), rel));
       continue;
     }

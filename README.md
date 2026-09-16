@@ -25,33 +25,40 @@ npm install @openenvx/studio/core @openenvx/studio @openenvx/html-driver react r
 ```
 
 ```tsx
-import { HtmlEditor } from '@openenvx/html-driver/studio';
-import '@openenvx/studio/theme.css';
+import { createHtmlScene, defaultHtmlWorkbench } from '@openenvx/html-driver';
+import { WorkbenchShell } from '@openenvx/studio';
 import '@openenvx/html-driver/theme.css';
+import '@openenvx/studio/theme.css';
 
 export function App() {
   return (
     <div style={{ height: '100vh' }}>
-      <HtmlEditor onChange={(scene) => console.log(scene)} />
+      <WorkbenchShell
+        editorUri="openenvx://html/editor"
+        initialScene={createHtmlScene()}
+        layout={defaultHtmlWorkbench.layout}
+        plugins={defaultHtmlWorkbench.plugins}
+        onSceneChange={(scene) => console.log(scene)}
+      />
     </div>
   );
 }
 ```
 
-Other drop-in editors:
+Other artboard drivers:
 
-- `@openenvx/canvas-driver/studio` - absolute-positioned canvas documents.
-- `@openenvx/email-driver/studio` - responsive, email-safe block documents.
+- `@openenvx/canvas-driver` — `defaultCanvasWorkbench` (absolute-positioned canvas).
+- `@openenvx/email-driver` — `defaultEmailWorkbench` (responsive, email-safe blocks).
 
-Each artboard package includes a `./runtime` entry point for headless scene creation or rendering. See [PUBLISHING.md](PUBLISHING.md) for the complete public API.
+Each artboard package exposes headless helpers on the same `.` entry (e.g. `createHtmlScene`, `renderEmailHtml`). See [PUBLISHING.md](PUBLISHING.md) for the complete public API.
 
 ## Choose your integration
 
 | Goal | Start with |
 | --- | --- |
-| Drop in a complete editor | `@openenvx/studio` + `@openenvx/canvas-driver/studio`, `@openenvx/html-driver/studio`, or `@openenvx/email-driver/studio` |
+| Full product editor | `@openenvx/studio` + driver `default*Workbench` (npm package root) |
 | Build a custom editor shell | `@openenvx/studio/core` + `@openenvx/studio` + `@openenvx/canvas-driver` or `@openenvx/html-driver` |
-| Render or automate documents | An artboard package's `./runtime` entry point |
+| Render or automate documents | Artboard package root (e.g. `renderEmailHtml`, `exportCanvasDocument`) |
 | Add trusted in-process features | The plugin and contribution APIs on `@openenvx/studio/core` |
 | Build isolated widgets or panels | [`@openenvx/editor-sandbox`](packages/editor-sandbox/README.md) |
 

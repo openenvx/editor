@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createEmailScene, renderEmailHtml } from './publish-runtime';
+import { createEmailScene, renderEmailHtml } from './publish';
 
 vi.mock('./render/render-email-html', () => ({
   renderEmailHtml: async () => '<html>Welcome</html>',

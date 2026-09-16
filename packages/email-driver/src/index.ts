@@ -48,6 +48,10 @@ export { EmailTopBarContribution } from './contributions/email-top-bar-contribut
 export { createEmailDemoScene } from './create-email-demo-scene';
 export { createEmailDemoScene as createEmailScene } from './create-email-demo-scene';
 export { DEFAULT_EMAIL_LAYOUT } from './default-email-layout';
+export {
+  DEFAULT_EMAIL_WORKBENCH_PLUGINS,
+  defaultEmailWorkbench,
+} from './default-email-workbench';
 export { EmailBlockPalettePanel } from './editor/block-palette-panel';
 export { EmailPatternBlocksGallery } from './editor/pattern-blocks-gallery';
 export { EmailTemplatesGallery } from './editor/templates-gallery';

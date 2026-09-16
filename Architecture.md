@@ -37,9 +37,9 @@ Author how-to (under `docs/architecture/`):
 | **Editor backbone** | `@openenvx/studio/core`, optional `canvas` / `html`, `driver-*`, plugins | Full editor runtime (scene, commands, layers, workbench controller) with a **custom UI shell**. See `apps/demo-playground` / `apps/html-demo`. |
 | **Workbench UI** | `@openenvx/studio` | React shell (`WorkbenchShell`). |
 | **Published product** | `studio`, `canvas`, `html`, `email`, `extensions` | Composable editor stack + sandbox author SDK |
-| **HTML editor** | `html` (published) | Puck-style block editor + drop-in `@openenvx/html-driver/studio` |
-| **Email editor** | `email` (published, `packages/email-driver`) | React-Email block editor + drop-in `@openenvx/email-driver/studio` |
-| **Canvas editor** | `canvas` (published) | Konva canvas editor + drop-in `@openenvx/canvas-driver/studio` |
+| **HTML editor** | `html` (published) | Puck-style block editor; host `@openenvx/studio` + `defaultHtmlWorkbench` |
+| **Email editor** | `email` (published, `packages/email-driver`) | React-Email block editor; host `@openenvx/studio` + `defaultEmailWorkbench` |
+| **Canvas editor** | `canvas` (published) | Konva canvas editor; host `@openenvx/studio` + `defaultCanvasWorkbench` |
 
 **Hard rules:** All canvas code lives in `@openenvx/canvas-driver` (not `core`). HTML block editing lives in `@openenvx/html-driver`. Email block editing lives in `@openenvx/email-driver`. Untrusted extension code never runs in the editor main world.
 
@@ -64,10 +64,9 @@ Author how-to (under `docs/architecture/`):
 | `@openenvx/variables` | Opt-in `VariablesPlugin` (catalog sidebar + edit dialog); `./tiptap` chip/suggest helpers |
 | `@openenvx/studio` | Published shell (`.`: `WorkbenchShell`, `./theme.css`) + headless subpaths (`/core`, `/schema`, `/preview`, `/react`) |
 | `@openenvx/studio/internal` | Workspace-only full shell barrel (primitives, renderers) for monorepo plugins |
-| `@openenvx/canvas-driver` `./studio` | Drop-in `CanvasEditor`, `defaultCanvasStudio` |
-| `@openenvx/canvas-driver` `./studio/sandbox-host` | `createCanvasSandboxExtensionHost` (requires `@openenvx/editor-sandbox`) |
-| `@openenvx/html-driver` `./studio` | Drop-in `HtmlEditor`, `defaultHtmlStudio`, `createHtmlSandboxExtensionHost` |
-| `@openenvx/email-driver` `./studio` | Drop-in `EmailEditor`, `defaultEmailStudio` |
+| `@openenvx/canvas-driver` | npm: demo surface on `.` + CSS; workspace `.` is full engine (`exportCanvasDocument`, `CanvasPlugin`, …) |
+| `@openenvx/html-driver` `.` (npm) | `defaultHtmlWorkbench`, `createHtmlScene` |
+| `@openenvx/email-driver` `.` (npm) | `defaultEmailWorkbench`, `createEmailScene`, `renderEmailHtml` |
 | `@openenvx/editor-sandbox` | Sandbox author SDK + host (`./protocol`, `./host`, `/canvas`, `/html`, `/panel`, Vite) |
 
 ## Contribution flow (sketch)

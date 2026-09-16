@@ -70,34 +70,29 @@ Runs build + tarball checks for all published packages.
 
 ## Package notes
 
-### Drop-in editor (canvas example)
+### Product host (canvas example)
 
 ```bash
 npm install @openenvx/studio/core @openenvx/studio @openenvx/canvas-driver react react-dom
 ```
 
 ```tsx
-import { CanvasEditor } from '@openenvx/canvas-driver/studio';
+import { WorkbenchShell } from '@openenvx/studio';
+import {
+  createCanvasScene,
+  defaultCanvasWorkbench,
+} from '@openenvx/canvas-driver';
 import '@openenvx/studio/theme.css';
 import '@openenvx/canvas-driver/theme.css';
 import '@openenvx/canvas-driver/fonts.css';
 ```
 
-### Composable host
-
-```tsx
-import { WorkbenchShell } from '@openenvx/studio';
-import { defaultCanvasStudio } from '@openenvx/canvas-driver/studio';
-import { defaultHtmlStudio } from '@openenvx/html-driver/studio';
-import '@openenvx/studio/theme.css';
-```
-
-### Headless runtime
+### Headless helpers (same package entry)
 
 ```ts
-import { createCanvasScene } from '@openenvx/canvas-driver/runtime';
-import { renderBlockDocument } from '@openenvx/html-driver/runtime';
-import { renderEmailHtml } from '@openenvx/email-driver/runtime';
+import { createCanvasScene } from '@openenvx/canvas-driver';
+import { createHtmlScene, renderBlockDocument } from '@openenvx/html-driver';
+import { createEmailScene, renderEmailHtml } from '@openenvx/email-driver';
 ```
 
 ### `@openenvx/editor-sandbox`

@@ -1,6 +1,8 @@
-import { fitCanvasTextLayerToContent } from '@openenvx/canvas-driver/fit-text-layer-to-content';
 import type { RenderNode } from '@openenvx/editor-sandbox/protocol';
 import { createDefaultTransform, type Layer } from '@openenvx/studio/schema';
+
+// ponytail: leaf import — main barrel pulls editor-sandbox (cycle)
+import { fitCanvasTextLayerToContent } from '../../../canvas-driver/src/fit-text-layer-to-content';
 
 export type StackDirection = 'horizontal' | 'vertical';
 export type StackAlign = 'start' | 'center' | 'end' | 'stretch';

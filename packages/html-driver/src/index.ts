@@ -18,12 +18,20 @@ export {
   createBlockCommands,
   type BlockCommandSetOptions,
 } from './commands/create-block-commands';
-export { createHtmlDemoScene } from './create-html-demo-scene';
+export {
+  createHtmlDemoScene,
+  createHtmlDemoScene as createHtmlScene,
+} from './create-html-demo-scene';
 export {
   createHtmlLayerDefinition,
   type CreateHtmlLayerDefinitionOptions,
 } from './create-html-layer-definition';
 export { DEFAULT_HTML_LAYOUT } from './default-html-layout';
+export {
+  DEFAULT_HTML_WORKBENCH_PLUGINS,
+  defaultHtmlWorkbench,
+} from './default-html-workbench';
+export { createHtmlSandboxExtensionHost } from './create-html-sandbox-extension-host';
 export { HtmlContextMenu } from './contributions/html-context-menu';
 export {
   HTML_BLOCKS_CONTAINER_ID,

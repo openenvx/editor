@@ -5,7 +5,6 @@ const packageRoot = import.meta.dirname;
 export default createArtboardPublishConfig({
   packageRoot,
   packageLabel: 'email',
-  studioEntry: 'src/studio/index.ts',
-  runtimeEntry: 'src/publish-runtime.ts',
+  indexEntry: 'src/publish.ts',
   inlineOpenenvx: /^@openenvx\/(variables|html-driver)$/,
 });

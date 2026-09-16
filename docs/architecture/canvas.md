@@ -25,7 +25,7 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 ### Override hooks
 
 - Per-kind override of renderers / interactions / preview via `{ override: true }`
-- Headless raster export: `@openenvx/canvas-driver/export` (browser PNG/JPG), `@openenvx/canvas-driver/export/node` (Node PNG/JPG/PDF); `canvas.exportImage` via `CanvasDocumentExportService`
+- Headless raster export: `exportCanvasDocument` / `exportCanvasDocumentNode` from `@openenvx/canvas-driver` (browser PNG/JPG vs Node PNG/JPG/PDF); `canvas.exportImage` via `CanvasDocumentExportService`
 - Generic layer handles on `CanvasLayerInteractionContribution` (`providesHandles`, `layoutHandles`, `onHandleDrag*`)
 - Optional `dataPatch` on `canvas.updateLayerTransform` (merges into `layer.data`)
 
@@ -38,7 +38,7 @@ App shell (or studio) provides:
 1. `WorkbenchProvider` / `WorkbenchShell`
 2. `CanvasHostProvider` around the editor region
 3. Editor pane that mounts `CanvasEditor` for `page.layout === 'absolute'` (registered by `CanvasPlugin`)
-4. Plugins: `CanvasPlugin` (or `defaultCanvasStudio` from `@openenvx/canvas-driver/studio`); optional `CanvasTemplatePlugin`, agent, product plugins
+4. Plugins: `CanvasPlugin` (or `defaultCanvasWorkbench` from `@openenvx/canvas-driver`); optional `CanvasTemplatePlugin`, agent, product plugins
 
 See `apps/canvas-demo` / `apps/demo-playground` and [studio-and-products.md](studio-and-products.md).
 

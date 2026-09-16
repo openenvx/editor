@@ -4,13 +4,13 @@
 import type { Scene as CoreScene } from '@openenvx/studio/schema';
 
 import { createEmailDemoScene } from './create-email-demo-scene';
+import type { Scene } from './opaque-scene';
 import {
   renderEmailHtml as renderEmailHtmlImpl,
   type RenderEmailHtmlOptions,
 } from './render/render-email-html';
-import type { Scene } from './studio/scene';
 
-export type { Scene } from './studio/scene';
+export type { Scene } from './opaque-scene';
 export type { RenderEmailHtmlOptions };
 
 export function createEmailScene(): Scene {

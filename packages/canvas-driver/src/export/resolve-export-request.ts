@@ -30,7 +30,7 @@ export function resolveExportBackground(
 export function assertBrowserExportFormat(format: CanvasExportFormat): void {
   if (format === 'pdf') {
     throw new Error(
-      `Format "${format}" is not supported in the browser. Import @openenvx/canvas-driver/export/node for PDF export.`
+      `Format "${format}" is not supported in the browser. Use exportCanvasDocumentNode from @openenvx/canvas-driver/export/node in Node for PDF export.`
     );
   }
 }

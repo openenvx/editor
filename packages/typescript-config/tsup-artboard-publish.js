@@ -10,13 +10,12 @@ import { createCssModuleCompiler } from './css-modules-esbuild.js';
 /**
  * @param {object} options
  * @param {string} options.packageRoot
- * @param {string} options.studioEntry
- * @param {string} options.runtimeEntry
- * @param {Record<string, string>} [options.extraEntries]
+ * @param {string} options.indexEntry
  * @param {RegExp} options.inlineOpenenvx
  * @param {string} [options.packageLabel]
  * @param {boolean} [options.sandboxWorker]
  * @param {() => Promise<void>} [options.afterCss]
+ * @param {boolean} [options.importFontsCss]
  */
 export function createArtboardPublishConfig(options) {
   const packageRoot = options.packageRoot;
@@ -62,9 +61,7 @@ export function createArtboardPublishConfig(options) {
 
   return defineConfig({
     entry: {
-      studio: options.studioEntry,
-      runtime: options.runtimeEntry,
-      ...options.extraEntries,
+      index: options.indexEntry,
     },
     format: ['esm'],
     dts: false,
@@ -98,7 +95,7 @@ export function createArtboardPublishConfig(options) {
           `${options.packageLabel ?? 'artboard'} publish build produced no CSS`
         );
       }
-      await writeFile(path.join(distRoot, 'studio.css'), css);
+      await writeFile(path.join(distRoot, 'theme.css'), css);
       if (options.sandboxWorker) {
         await buildSandboxWorker();
       }
@@ -106,12 +103,16 @@ export function createArtboardPublishConfig(options) {
         await options.afterCss();
       }
 
-      const studioJsPath = path.join(distRoot, 'studio.js');
-      const studioJs = await readFile(studioJsPath, 'utf-8');
-      if (!studioJs.startsWith('"use client"')) {
+      const indexJsPath = path.join(distRoot, 'index.js');
+      const indexJs = await readFile(indexJsPath, 'utf-8');
+      if (!indexJs.startsWith('"use client"')) {
+        const cssImports = ['import "./theme.css";'];
+        if (options.importFontsCss) {
+          cssImports.push('import "./fonts.css";');
+        }
         await writeFile(
-          studioJsPath,
-          `"use client";\nimport "./studio.css";\n${studioJs}`
+          indexJsPath,
+          `"use client";\n${cssImports.join('\n')}\n${indexJs}`
         );
       }
     },

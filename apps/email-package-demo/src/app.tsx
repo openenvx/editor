@@ -1,12 +1,20 @@
-import { renderEmailHtml } from '@openenvx/email-driver/runtime';
-import { EmailEditor, type Scene } from '@openenvx/email-driver/studio';
-import { useCallback } from 'react';
+import {
+  createEmailScene,
+  defaultEmailWorkbench,
+  renderEmailHtml,
+} from '@openenvx/email-driver';
+import { WorkbenchShell } from '@openenvx/studio';
+import type { Scene } from '@openenvx/studio/schema';
+import { useCallback, useMemo } from 'react';
 
 import '@openenvx/email-driver/theme.css';
 import '@openenvx/studio/theme.css';
 
 export function App() {
-  const onChange = useCallback((scene: Scene) => {
+  const initialScene = useMemo(() => createEmailScene(), []);
+  const plugins = useMemo(() => defaultEmailWorkbench.plugins, []);
+
+  const onSceneChange = useCallback((scene: Scene) => {
     void renderEmailHtml(scene).then((html) => {
       console.log('[email-package-demo] HTML length:', html.length);
     });
@@ -14,10 +22,14 @@ export function App() {
 
   return (
     <div className="email-package-demo">
-      <EmailEditor
+      <WorkbenchShell
         className="email-package-demo-editor openenvx-email-editor"
         editorTitle="Welcome email"
-        onChange={onChange}
+        editorUri="openenvx://email/editor"
+        initialScene={initialScene}
+        layout={defaultEmailWorkbench.layout}
+        onSceneChange={onSceneChange}
+        plugins={plugins}
         theme="dark"
       />
       <style>{`

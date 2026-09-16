@@ -5,7 +5,7 @@ import {
 } from '@openenvx/editor-sandbox/host';
 import type { Layer } from '@openenvx/studio/core';
 
-import { setOpenEnvxWidgetClickHandler } from '../interactions/widget-click-handler';
+import { setOpenEnvxWidgetClickHandler } from './interactions/widget-click-handler';
 
 /** Sandbox host wired for canvas widget faces. */
 export function createCanvasSandboxExtensionHost(

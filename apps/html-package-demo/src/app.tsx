@@ -1,22 +1,30 @@
-import { HtmlEditor } from '@openenvx/html-driver/studio';
+import { createHtmlScene, defaultHtmlWorkbench } from '@openenvx/html-driver';
+import { WorkbenchShell } from '@openenvx/studio';
 import type { Scene } from '@openenvx/studio/schema';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import '@openenvx/html-driver/theme.css';
 import '@openenvx/studio/theme.css';
 
 export function App() {
-  const onChange = useCallback((scene: Scene) => {
+  const initialScene = useMemo(() => createHtmlScene(), []);
+  const plugins = useMemo(() => defaultHtmlWorkbench.plugins, []);
+
+  const onSceneChange = useCallback((scene: Scene) => {
     const rootLayers = scene.pages[0]?.layers.length ?? 0;
     console.log('[html-package-demo] root layers:', rootLayers);
   }, []);
 
   return (
     <div className="html-package-demo">
-      <HtmlEditor
+      <WorkbenchShell
         className="html-package-demo-editor openenvx-html-editor"
         editorTitle="Block page"
-        onChange={onChange}
+        editorUri="openenvx://html/editor"
+        initialScene={initialScene}
+        layout={defaultHtmlWorkbench.layout}
+        onSceneChange={onSceneChange}
+        plugins={plugins}
         theme="dark"
       />
       <style>{`
