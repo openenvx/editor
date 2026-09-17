@@ -8,10 +8,3 @@ export abstract class ToolbarContribution extends WorkbenchContribution {
 
   abstract contribute(builder: ToolbarBuilder, ctx: CommandContext): void;
 }
-
-export type {
-  ToolbarCommandItemDescriptor,
-  ToolbarDropdownItemDescriptor,
-  ToolbarItemDescriptor,
-  ToolbarSeparatorItemDescriptor,
-} from '../builders/toolbar-builder';

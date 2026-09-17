@@ -9,15 +9,3 @@ export abstract class TopBarContribution extends WorkbenchContribution {
 
   abstract contribute(builder: TopBarBuilder, ctx: CommandContext): void;
 }
-
-export type {
-  TopBarCommandItemDescriptor,
-  TopBarDropdownItemDescriptor,
-  TopBarGroupItemDescriptor,
-  TopBarItemDescriptor,
-  TopBarPlacement,
-  TopBarSeparatorItemDescriptor,
-  TopBarStatusItemDescriptor,
-  TopBarTitleBinding,
-  TopBarTitleItemDescriptor,
-} from '../builders/top-bar-builder';

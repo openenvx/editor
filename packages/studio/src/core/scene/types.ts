@@ -10,7 +10,6 @@ export type {
   PageLayout,
   Scene,
   SceneAsset,
-  SceneSnapshot as SchemaSceneSnapshot,
   Selection,
   Transform,
 } from '@openenvx/studio/schema';
