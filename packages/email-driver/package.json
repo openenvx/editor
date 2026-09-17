@@ -12,17 +12,24 @@
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./theme.css": "./dist/theme.css"
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./theme.css": {
+      "import": "./dist/theme.css",
+      "default": "./dist/theme.css"
+    }
   },
   "scripts": {
-    "build": "rm -rf dist && tsup && tsup --config tsup.publish.config.ts && node ./build-dts.ts",
+    "build": "rm -rf dist && rolldown -c rolldown.publish.config.ts && node ./build-dts.ts",
     "build:debug": "STUDIO_SOURCEMAP=1 bun run build",
     "prepack": "bun run build",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "check-types": "tsc --noEmit",
-    "verify-pack": "bun run build && bun run ./verify-pack.ts"
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@codemirror/commands": "^6.11.0",
@@ -53,31 +60,20 @@
     "jsdom": "29.1.1",
     "react": "19.2.7",
     "react-dom": "19.2.7",
-    "tsup": "catalog:dev",
+    "lightningcss": "^1.32.0",
+    "rolldown": "catalog:dev",
+    "rollup": "catalog:dev",
+    "rollup-plugin-dts": "catalog:dev",
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org",
-    "main": "./dist/index.js",
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "import": "./dist/index.js",
-        "default": "./dist/index.js"
-      },
-      "./theme.css": {
-        "import": "./dist/theme.css",
-        "default": "./dist/theme.css"
-      }
-    },
-    "sideEffects": [
-      "./dist/index.js"
-    ]
+    "registry": "https://registry.npmjs.org"
   },
+  "sideEffects": [
+    "./dist/index.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/openenvx/editor.git",

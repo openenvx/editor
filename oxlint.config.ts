@@ -8,8 +8,6 @@ export default defineConfig({
     ...core.ignorePatterns,
     '**/routeTree.gen.ts',
     '**/routes/__root.tsx',
-    'packages/typescript-config/tsup.library.d.ts',
-    'packages/typescript-config/tsup.library.js',
   ],
   rules: {
     'class-methods-use-this': 'off',

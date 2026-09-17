@@ -223,6 +223,7 @@ bun run fix           # auto-fix lint/format (ultracite)
 bun run check         # lint (ultracite) + knip
 bun run check-types   # tsc --noEmit across packages (excl. apps)
 bun run precommit     # ultracite + knip + check-types for packages dirty vs HEAD (excl. apps); also runs via Husky pre-commit after `bun install`
+bun run smoke-next-consumer  # pack studio + canvas-driver; Next + Vite production builds (release CI)
 bun run changelog     # preview unreleased changelog (git-cliff)
 ```
 
@@ -236,8 +237,9 @@ After all code changes for the task are done, **always** run these from the repo
 
 1. `bun run fix` - apply Ultracite auto-fixes
 2. `bun run precommit` - `check` (ultracite + knip) + Turbo `check-types` for packages changed vs `HEAD` (and their dependents), excluding `apps/*`. Full-repo gate is `bun run build && bun run test` (what CI runs).
+3. When you change **published** package build output, `exports`, or consumer-facing bundling (`packages/studio`, `packages/*-driver`, release workflow): run `bun run smoke-next-consumer` and fix failures before stopping. `packages/studio/smoke-next-consumer.ts` is typechecked via `tsconfig.smoke.json` as part of `@openenvx/studio` `check-types` (Node APIs only — no `import from 'bun'`).
 
-If either command fails, fix the reported errors, then re-run both until they pass. Do not leave lint, format, knip, build, or test failures unresolved.
+If any command fails, fix the reported errors, then re-run until they pass. Do not leave lint, format, knip, build, test, or consumer-smoke failures unresolved.
 
 Also verify:
 

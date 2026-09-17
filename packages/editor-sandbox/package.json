@@ -73,11 +73,10 @@
     }
   },
   "scripts": {
-    "build": "tsup && rsync -a --include='*/' --include='*.css' --exclude='*' src/host/ dist/host/ && node ./build-dts.ts",
+    "build": "rm -rf dist && rolldown -c && rsync -a --include='*/' --include='*.css' --exclude='*' src/host/ dist/host/ && node ./build-dts.ts",
     "prepack": "bun run build",
     "test": "vitest run",
     "check-types": "tsc --noEmit && tsc --noEmit -p tsconfig.host.json && tsc --noEmit -p tsconfig.canvas-widget.json",
-    "verify-pack": "bun run build && bun run ./verify-pack.ts",
     "openenvx-manifest": "bun run ./src/cli/openenvx-manifest.ts"
   },
   "bin": {
@@ -100,7 +99,10 @@
     "jsdom": "29.1.1",
     "react": "19.2.7",
     "react-dom": "19.2.7",
-    "tsup": "catalog:dev",
+    "lightningcss": "^1.32.0",
+    "rolldown": "catalog:dev",
+    "rollup": "catalog:dev",
+    "rollup-plugin-dts": "catalog:dev",
     "typescript": "catalog:dev",
     "vite": "8.1.3",
     "vitest": "catalog:testing"

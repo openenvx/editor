@@ -54,7 +54,7 @@ Hard rules:
 
 ### Published
 
-**`@openenvx/studio`** - `.`: `WorkbenchShell` + `./theme.css`. `./core`, `./schema`, `./preview`, `./react`: plugin host, scene store, workbench controller, contributions. `./internal` (workspace only): full shell barrel for monorepo plugins. No artboard plugins on `.`. **npm `dist/`** ships browser-bundled ESM (third-party deps inlined); integrators do not mirror Studio’s `dependencies` in the host app.
+**`@openenvx/studio`** - `.`: `WorkbenchShell` + `./theme.css`. `./core`, `./schema`, `./preview`, `./react`: plugin host, scene store, workbench controller, contributions. `./internal` (workspace only): full shell barrel for monorepo plugins. No artboard plugins on `.`. **npm `dist/`** is built with [Rolldown](https://rolldown.rs/): browser-bundled ESM with third-party deps inlined; integrators do not mirror Studio’s `dependencies` in the host app.
 
 **`@openenvx/canvas-driver`** - npm `.` + `./theme.css` + `./fonts.css` (artboard editor surface; not the workbench shell). Published `.` bundles engine deps; peers: `@openenvx/studio`, `react`, `react-dom`. Workspace `.` (`src/index.ts`) is the full engine API; Node PDF uses `exportCanvasDocumentNode`. Hosts also import `@openenvx/studio/theme.css`.
 

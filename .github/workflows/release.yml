@@ -133,8 +133,8 @@ jobs:
       - name: Test
         run: bun run test
 
-      - name: Verify publish tarballs
-        run: bun run verify-pack
+      - name: Smoke Next and Vite consumers
+        run: bun run smoke-next-consumer
 
       - name: Verify package repository metadata
         run: |
@@ -181,7 +181,27 @@ jobs:
               continue
             fi
             echo "Publishing $pkg ($NAME@$VERSION)"
-            npm publish --access public --provenance --ignore-scripts "./$pkg"
+            bun -e "
+              const fs = require('node:fs');
+              const file = \`./\${process.argv[1]}/package.json\`;
+              const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+              const strip = (value) => {
+                if (!value || typeof value !== 'object' || Array.isArray(value)) return value;
+                if ('development' in value) {
+                  const { development: _, ...rest } = value;
+                  return rest;
+                }
+                const out = {};
+                for (const [key, child] of Object.entries(value)) {
+                  out[key] = strip(child);
+                }
+                return out;
+              };
+              if (pkg.exports) pkg.exports = strip(pkg.exports);
+              fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + '\\n');
+            " "$pkg"
+            npm publish --access public --provenance "./$pkg"
+            git checkout -- "$pkg/package.json"
           done
 
       - name: Create GitHub Release

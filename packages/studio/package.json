@@ -12,13 +12,42 @@
   "module": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./theme.css": "./src/theme/tokens.css",
-    "./core": "./src/core/index.ts",
-    "./schema": "./src/core/schema/index.ts",
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./theme.css": {
+      "development": "./src/theme/tokens.css",
+      "import": "./dist/index.css",
+      "default": "./dist/index.css"
+    },
+    "./core": {
+      "development": "./src/core/index.ts",
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js",
+      "default": "./dist/core/index.js"
+    },
+    "./schema": {
+      "development": "./src/core/schema/index.ts",
+      "types": "./dist/core/schema/index.d.ts",
+      "import": "./dist/core/schema/index.js",
+      "default": "./dist/core/schema/index.js"
+    },
     "./schema/scene.schema.json": "./scene.schema.json",
-    "./preview": "./src/core/preview/index.ts",
-    "./react": "./src/core/react/workbench-context.tsx",
+    "./preview": {
+      "development": "./src/core/preview/index.ts",
+      "types": "./dist/core/preview/index.d.ts",
+      "import": "./dist/core/preview/index.js",
+      "default": "./dist/core/preview/index.js"
+    },
+    "./react": {
+      "development": "./src/core/react/workbench-context.tsx",
+      "types": "./dist/core/react/workbench-context.d.ts",
+      "import": "./dist/core/react/workbench-context.js",
+      "default": "./dist/core/react/workbench-context.js"
+    },
     "./internal": "./src/workbench-barrel.ts",
     "./plugins": "./src/plugins/index.ts",
     "./plugins/variables": "./src/plugins/variables/index.ts",
@@ -27,13 +56,13 @@
   },
   "scripts": {
     "generate:json-schema": "bun run src/core/schema/generate-json-schema.ts",
-    "build": "rm -rf dist && tsup --config tsup.core.publish.config.ts && tsup --config tsup.shell.config.ts && node ./build-dts.ts",
+    "build": "rm -rf dist && rolldown -c rolldown.core.publish.config.ts && rolldown -c rolldown.shell.config.ts && node ./build-dts.ts",
     "build:debug": "STUDIO_SOURCEMAP=1 bun run build",
     "prepack": "bun run build",
     "test": "vitest run",
     "bench": "vitest bench --run src/core",
-    "check-types": "tsc --noEmit",
-    "verify-pack": "bun run build && bun run ./verify-pack.ts"
+    "check-types": "tsc --noEmit && tsc --noEmit -p tsconfig.smoke.json",
+    "smoke-next-consumer": "bun ./smoke-next-consumer.ts"
   },
   "sideEffects": [
     "./dist/index.js",
@@ -84,49 +113,17 @@
     "jsdom": "29.1.1",
     "react": "19.2.7",
     "react-dom": "19.2.7",
-    "tsup": "catalog:dev",
+    "lightningcss": "^1.32.0",
+    "rolldown": "catalog:dev",
+    "rollup": "catalog:dev",
+    "rollup-plugin-dts": "catalog:dev",
+    "@types/node": "^22.10.5",
     "typescript": "catalog:dev",
     "vitest": "catalog:testing"
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org",
-    "main": "./dist/index.js",
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "bun": "./dist/index.js",
-        "import": "./dist/index.js",
-        "default": "./dist/index.js"
-      },
-      "./theme.css": {
-        "import": "./dist/index.css",
-        "default": "./dist/index.css"
-      },
-      "./core": {
-        "types": "./dist/core/index.d.ts",
-        "import": "./dist/core/index.js",
-        "default": "./dist/core/index.js"
-      },
-      "./schema": {
-        "types": "./dist/core/schema/index.d.ts",
-        "import": "./dist/core/schema/index.js",
-        "default": "./dist/core/schema/index.js"
-      },
-      "./schema/scene.schema.json": "./scene.schema.json",
-      "./preview": {
-        "types": "./dist/core/preview/index.d.ts",
-        "import": "./dist/core/preview/index.js",
-        "default": "./dist/core/preview/index.js"
-      },
-      "./react": {
-        "types": "./dist/core/react/workbench-context.d.ts",
-        "import": "./dist/core/react/workbench-context.js",
-        "default": "./dist/core/react/workbench-context.js"
-      }
-    }
+    "registry": "https://registry.npmjs.org"
   },
   "repository": {
     "type": "git",

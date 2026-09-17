@@ -46,34 +46,42 @@
         "src/publish-runtime.ts!",
         "src/create-canvas-sandbox-extension-host.ts!",
         "src/plugin/canvas-plugin.ts!",
-        "tsup.publish.config.ts!",
+        "rolldown.publish.config.ts!",
+        "css-modules-plugin.ts!",
         "build-dts.ts!",
-        "verify-pack.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
         "!src/**/*.test.ts",
-        "tsup.publish.config.ts",
+        "rolldown.publish.config.ts",
+        "css-modules-plugin.ts",
         "build-dts.ts",
-        "verify-pack.ts"
       ]
     },
     "packages/editor-sandbox": {
       "entry": [
+        "rolldown.config.ts!",
+        "css-modules-plugin.ts!",
         "src/index.ts!",
+        "src/html.ts!",
+        "src/panel.ts!",
+        "src/canvas.ts!",
+        "src/jsx-runtime.ts!",
+        "src/jsx-dev-runtime.ts!",
+        "src/elements/index.ts!",
         "src/protocol/index.ts!",
         "src/host/index.ts!",
         "src/host/quickjs.worker.ts!",
         "src/canvas-widget/index.ts!",
         "src/openenvx-ambient.ts!",
         "build-dts.ts!",
-        "verify-pack.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
         "!src/**/*.test.ts",
+        "rolldown.config.ts",
+        "css-modules-plugin.ts",
         "build-dts.ts",
-        "verify-pack.ts"
       ]
     },
     "packages/agent": {
@@ -95,20 +103,21 @@
         "src/core/react/workbench-context.tsx!",
         "src/core/plugins/scene-plugin.ts!",
         "src/workbench-barrel.ts!",
-        "tsup.shell.config.ts!",
-        "tsup.core.publish.config.ts!",
+        "rolldown.shell.config.ts!",
+        "rolldown.core.publish.config.ts!",
+        "css-modules-plugin.ts!",
         "build-dts.ts!",
-        "verify-pack.ts!"
+        "smoke-next-consumer.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
         "!src/**/*.test.ts",
         "!src/**/*.test.tsx",
-        "tsup.shell.config.ts",
-        "tsup.core.publish.config.ts",
-        "verify-next-consumer.ts",
+        "rolldown.shell.config.ts",
+        "rolldown.core.publish.config.ts",
+        "css-modules-plugin.ts",
         "build-dts.ts",
-        "verify-pack.ts"
+        "smoke-next-consumer.ts"
       ],
       "ignoreDependencies": [
         "zod"
@@ -128,17 +137,17 @@
         "src/publish.ts!",
         "src/publish-runtime.ts!",
         "src/plugin/html-blocks-plugin.ts!",
-        "tsup.publish.config.ts!",
+        "rolldown.publish.config.ts!",
+        "css-modules-plugin.ts!",
         "build-dts.ts!",
-        "verify-pack.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
         "!src/**/*.test.ts",
         "!src/**/*.test.tsx",
-        "tsup.publish.config.ts",
+        "rolldown.publish.config.ts",
+        "css-modules-plugin.ts",
         "build-dts.ts",
-        "verify-pack.ts"
       ]
     },
     "packages/email-driver": {
@@ -148,17 +157,17 @@
         "src/publish.ts!",
         "src/publish-runtime.ts!",
         "src/plugin/email-blocks-plugin.ts!",
-        "tsup.publish.config.ts!",
+        "rolldown.publish.config.ts!",
+        "css-modules-plugin.ts!",
         "build-dts.ts!",
-        "verify-pack.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
         "!src/**/*.test.ts",
         "!src/**/*.test.tsx",
-        "tsup.publish.config.ts",
+        "rolldown.publish.config.ts",
+        "css-modules-plugin.ts",
         "build-dts.ts",
-        "verify-pack.ts"
       ]
     },
     "apps/demo-playground": {

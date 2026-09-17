@@ -23,6 +23,8 @@ Everything else stays workspace-private and resolves from `src/` during local de
 
 **Hard rule:** published packages must **never** ship an `exports` `development` condition pointing at `src/`. Published tarballs are `files: ["dist"]` only.
 
+**Monorepo vs npm:** published packages declare `exports` with a `development` condition (→ `src/`) for workspace apps (`customConditions: ["development"]` in `@openenvx/typescript-config/base.json`) and `import`/`types` → `dist/` for production. The Release workflow strips `development` from `package.json` immediately before `npm publish`, then restores the file from git.
+
 ## License
 
 OpenEnvx Editor is [Mozilla Public License 2.0](LICENSE) (MPL-2.0). Published npm packages and `@openenvx/editor-sandbox` declare `MPL-2.0` in `package.json`. Private product packages (`packages/agent`) remain proprietary (`UNLICENSED`).
@@ -49,7 +51,7 @@ Releases are **manual** via GitHub Actions - not on every push to `main`.
    - compute the next semver (from the latest `v*` tag, or bump from current `package.json` when no tags exist)
    - set the same version on `studio`, `canvas-driver`, `html-driver`, `email-driver`, and `editor-sandbox` `package.json` files
    - update `CHANGELOG.md`
-   - build and run `verify-pack` on each published package
+   - build published packages (`bun run build` via Turbo)
    - commit `chore(release): vX.Y.Z`, tag `vX.Y.Z`, and push
    - `npm publish --access public --provenance` for all five npm packages
    - create a GitHub Release with git-cliff release notes
@@ -65,10 +67,12 @@ Workflow: [`.github/workflows/release.yml`](.github/workflows/release.yml).
 ### Verify before release
 
 ```bash
-bun run verify-pack
+bun run build --filter=@openenvx/studio --filter=@openenvx/canvas-driver --filter=@openenvx/html-driver --filter=@openenvx/email-driver --filter=@openenvx/editor-sandbox
+bun run check && bun run check-types && bun run test
+bun run smoke-next-consumer
 ```
 
-Runs build + tarball checks for all published packages.
+`smoke-next-consumer` packs `@openenvx/studio` and `@openenvx/canvas-driver`, strips `development` from `exports` (same as publish), installs them into a throwaway app, and runs **Next.js** and **Vite** production builds with a real `WorkbenchShell` + canvas setup. It does **not** set `transpilePackages`.
 
 ## Package notes
 
@@ -78,7 +82,7 @@ Runs build + tarball checks for all published packages.
 npm install @openenvx/studio @openenvx/canvas-driver react react-dom
 ```
 
-Published `dist/` JS bundles third-party dependencies (Zod, DnD, Konva, TipTap, etc.). Host apps only need **peer** packages: `react`, `react-dom`, and for drivers `@openenvx/studio`. Use `transpilePackages: ['@openenvx/studio', '@openenvx/canvas-driver']` in Next.js when applicable.
+Published `dist/` JS is built with **[Rolldown](https://rolldown.rs/)**: third-party dependencies are inlined into the shipped bundles (Zod, DnD, Konva, TipTap, etc.). Host apps only need **peer** packages: `react`, `react-dom`, and for drivers `@openenvx/studio`. **`transpilePackages` is usually unnecessary** — CI smoke builds with plain `next build`. Add it only if your Next version errors on prebuilt ESM or `"use client"` boundaries.
 
 ```tsx
 import { WorkbenchShell } from '@openenvx/studio';

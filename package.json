@@ -20,12 +20,7 @@
     "knip": "knip",
     "fix": "ultracite fix",
     "changelog": "git-cliff --unreleased",
-    "verify-pack": "bun run verify-pack:studio && bun run verify-pack:canvas && bun run verify-pack:html && bun run verify-pack:email && bun run verify-pack:editor-sandbox",
-    "verify-pack:studio": "bun run build --filter=@openenvx/studio && bun packages/studio/verify-pack.ts",
-    "verify-pack:canvas": "bun run build --filter=@openenvx/canvas-driver && bun packages/canvas-driver/verify-pack.ts",
-    "verify-pack:html": "bun run build --filter=@openenvx/html-driver && bun packages/html-driver/verify-pack.ts",
-    "verify-pack:email": "bun run build --filter=@openenvx/email-driver && bun packages/email-driver/verify-pack.ts",
-    "verify-pack:editor-sandbox": "bun run build --filter=@openenvx/editor-sandbox && bun packages/editor-sandbox/verify-pack.ts",
+    "smoke-next-consumer": "bun run --filter=@openenvx/studio smoke-next-consumer",
     "dev:playground": "turbo run dev --filter=demo-playground",
     "dev:canvas": "turbo run dev --filter=@openenvxee/canvas-demo",
     "dev:html": "turbo run dev --filter=@openenvxee/html-demo",
@@ -50,8 +45,10 @@
   "catalogs": {
     "dev": {
       "@typescript/typescript6": "^6.0.2",
-      "typescript": "^7.0.2",
-      "tsup": "^8.5.0"
+      "rolldown": "~1.2.7",
+      "rollup": "^4.57.0",
+      "rollup-plugin-dts": "^6.5.1",
+      "typescript": "^7.0.2"
     },
     "testing": {
       "vitest": "^4.1.10",
