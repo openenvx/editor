@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/canvas-driver",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Canvas editor for OpenEnvx absolute layout pages",
   "license": "MPL-2.0",
   "type": "module",

@@ -3,6 +3,16 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.2.3] - 2026-09-17
+
+### Other
+
+- Update package references to use new plugin structure
+
+- Replaced all instances of `@openenvx/variables` with `@openenvx/studio/plugins/variables` across the codebase to align with the new plugin architecture.
+- Updated documentation and examples to reflect the new package structure, ensuring consistency in usage.
+- Enhanced build configurations and type declarations to support the updated plugin organization, improving the development experience.
+
 ## [0.2.2] - 2026-09-16
 
 ### Other
@@ -18,6 +28,8 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Added cleanup after each test to ensure a clean state.
 - Mocked the BubbleMenu component from @tiptap/react/menus to simplify testing.
 - Updated imports to include necessary testing utilities and types for improved test structure.
+
+- V0.2.2
 
 ## [0.2.1] - 2026-09-16
 
@@ -140,7 +152,7 @@ These changes significantly improve the usability and flexibility of the canvas 
 
 - Introduce VariablesPlugin and enhance variable management in canvas
 
-- Added a new `@openenvx/studio/plugins/variables` package, introducing the `VariablesPlugin` for managing variables within the canvas and email editors.
+- Added a new `@openenvx/variables` package, introducing the `VariablesPlugin` for managing variables within the canvas and email editors.
 - Integrated variable support into the rich text editor, allowing users to insert and manage variables seamlessly.
 - Updated the canvas and email plugins to utilize the new `VariablesPlugin`, enhancing the editing experience with variable suggestions and management dialogs.
 - Removed the obsolete `FEATURES.md` file to streamline documentation.
