@@ -147,22 +147,6 @@ jobs:
             fi
           done
 
-      - name: Publish to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          NODE_AUTH_TOKEN="$(printf '%s' "${NODE_AUTH_TOKEN}" | tr -d '[:space:]')"
-          export NODE_AUTH_TOKEN
-          if [ -z "${NODE_AUTH_TOKEN}" ]; then
-            echo "ERROR: GitHub secret NPM_TOKEN is missing or empty for this repository."
-            exit 1
-          fi
-          printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > "${HOME}/.npmrc"
-          for pkg in $PUBLISHED_PACKAGES; do
-            echo "Publishing $pkg"
-            npm publish --access public --provenance --ignore-scripts "./$pkg"
-          done
-
       - name: Commit version bump and tag
         if: ${{ !inputs.skip_bump }}
         run: |
@@ -177,6 +161,28 @@ jobs:
           git tag "v$VERSION"
           git push
           git push origin "v$VERSION"
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          NODE_AUTH_TOKEN="$(printf '%s' "${NODE_AUTH_TOKEN}" | tr -d '[:space:]')"
+          export NODE_AUTH_TOKEN
+          if [ -z "${NODE_AUTH_TOKEN}" ]; then
+            echo "ERROR: GitHub secret NPM_TOKEN is missing or empty for this repository."
+            exit 1
+          fi
+          printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > "${HOME}/.npmrc"
+          for pkg in $PUBLISHED_PACKAGES; do
+            NAME=$(bun -e "console.log(require('./$pkg/package.json').name)")
+            VERSION=$(bun -e "console.log(require('./$pkg/package.json').version)")
+            if npm view "${NAME}@${VERSION}" version >/dev/null 2>&1; then
+              echo "Skipping $NAME@$VERSION (already on npm)"
+              continue
+            fi
+            echo "Publishing $pkg ($NAME@$VERSION)"
+            npm publish --access public --provenance --ignore-scripts "./$pkg"
+          done
 
       - name: Create GitHub Release
         env:

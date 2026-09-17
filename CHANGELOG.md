@@ -3,6 +3,18 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.3.0] - 2026-09-17
+
+### Other
+
+- Update publishing workflow and package configurations
+
+- Adjusted the publishing process to include `@openenvx/editor-sandbox` in the automated release workflow, ensuring it is published alongside other packages.
+- Updated `PUBLISHING.md` to reflect the new publishing structure and clarified the versioning strategy for public npm packages.
+- Enhanced `package.json` scripts for `@openenvx/editor-sandbox` to include a new `verify-pack` command, improving package validation.
+- Added `verify-pack.ts` for `@openenvx/editor-sandbox` to enforce build checks and sourcemap restrictions.
+- Updated documentation in `AGENTS.md` to clarify the usage of `@openenvx/studio/core` as a subpath of `@openenvx/studio`.
+
 ## [0.2.3] - 2026-09-17
 
 ### Other
@@ -12,6 +24,8 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Replaced all instances of `@openenvx/variables` with `@openenvx/studio/plugins/variables` across the codebase to align with the new plugin architecture.
 - Updated documentation and examples to reflect the new package structure, ensuring consistency in usage.
 - Enhanced build configurations and type declarations to support the updated plugin organization, improving the development experience.
+
+- V0.2.3
 
 ## [0.2.2] - 2026-09-16
 
@@ -61,130 +75,6 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - V0.2.0
 
 ## [0.1.4] - 2026-09-15
-
-### Other
-
-- Rename and restructure sandbox extension package
-
-- Renamed `@xmazu/openenvxee-extensions` to `@openenvx/editor-sandbox`, consolidating the sandbox author SDK and host runtime functionalities.
-- Moved QuickJS host runtime and canvas widget face bridge to the new `@openenvx/editor-sandbox`, enhancing modularity and clarity in package responsibilities.
-- Updated documentation and references throughout the codebase to reflect the new package name and structure, ensuring consistency across all related files.
-
-These changes improve the organization of the sandbox extension functionalities and streamline the development experience.
-
-- Update package dependencies and versions
-
-- Updated `eslint-plugin-github` and `eslint-plugin-sonarjs` to their latest versions for improved linting capabilities.
-- Upgraded various dependencies including `knip`, `oxfmt`, `oxlint`, `oxlint-plugin-react-doctor`, and `turbo` to enhance performance and compatibility.
-- Bumped the version of `@openenvx/canvas-studio`, `@openenvx/email-studio`, and `@openenvx/html-studio` packages to 0.1.3 for consistency.
-- Updated TypeScript version in development dependencies to 7.0.2 for better type support.
-- Added new `@nodelib` packages to improve filesystem operations.
-
-These changes ensure the project is using the latest tools and libraries, enhancing overall development experience and maintainability.
-
-- Rename and restructure canvas and email packages
-
-- Renamed `@openenvx/canvas-studio` to `@openenvx/canvas-driver` and `@openenvx/email-studio` to `@openenvx/email-driver`, consolidating the canvas and email functionalities under new package names for clarity and consistency.
-- Updated all relevant documentation and references throughout the codebase to reflect the new package names and structures, ensuring a cohesive development experience.
-- Adjusted package dependencies and build scripts to accommodate the new package names, enhancing modularity and maintainability.
-
-These changes improve the organization of the canvas and email functionalities within the OpenEnvx ecosystem.
-
-- Add build-dts script and update build process
-
-- Introduced a new `build-dts.ts` script to generate TypeScript declaration files for various package entries, enhancing type support across the project.
-- Updated the build script in `package.json` to include the execution of `build-dts.ts`, ensuring declaration files are generated during the build process.
-- Modified the canvas widget entry configuration in `tsup.config.ts` to include all TypeScript files while excluding test files, improving build accuracy.
-
-These changes enhance type safety and streamline the build process for the editor sandbox package.
-
-- Update canvas-driver package structure and documentation
-
-- Refactored the `@openenvx/canvas-driver` package to separate the `createCanvasSandboxExtensionHost` functionality into its own module under `./studio/sandbox-host`, enhancing modularity.
-- Updated related documentation across various files to reflect the new structure and clarify the usage of the sandbox host.
-- Improved the build configuration to include the new sandbox host entry, ensuring proper type declaration generation and exports.
-
-These changes streamline the canvas driver's architecture and improve clarity in the documentation.
-
-- Add openenvx ambient type definitions and update build process
-
-- Introduced a new `openenvx-ambient.ts` file containing type definitions for the OpenEnvx host bridge and related interfaces, enhancing type safety and clarity in the editor sandbox.
-- Updated the `build-dts.ts` script to include the new ambient type definitions in the build process, ensuring proper TypeScript declaration generation.
-- Modified the `package.json` to reference the new `dist/openenvx.d.ts` file for type declarations, improving the package's type support.
-- Adjusted the test file to read from the generated declaration file, ensuring consistency and accuracy in tests.
-
-These changes enhance type support and improve the overall structure of the editor sandbox package.
-
-- Update CI workflows and add linting steps
-
-- Added linting and type checking steps to the CI workflows in `ci.yml` and `release.yml`, ensuring code quality and type safety during the build process.
-- Included the new `openenvx-ambient.ts` file in the `knip.json` configuration for type definitions, enhancing type support across the project.
-- Updated the version of `@openenvx/core` in `package.json` to `0.1.3-dummy.0`, reflecting a dummy version for testing purposes.
-
-These changes improve the CI process and enhance type safety in the project.
-
-- Bump package versions to 0.1.4 for canvas, core, email, html, and studio drivers
-
-- Updated the version of `@openenvx/canvas-driver`, `@openenvx/core`, `@openenvx/email-driver`, `@openenvx/html-driver`, and `@openenvx/studio` packages to `0.1.4`, ensuring consistency across the project.
-- This version bump reflects ongoing development and prepares the packages for upcoming features and improvements.
-
-## [0.1.3] - 2026-09-13
-
-### Other
-
-- Enhance rich text editing and block navigation in HTML editor
-
-- Improved the rich text editing experience by implementing keyboard shortcuts for inserting sibling text blocks and handling boundary intents (Enter, Backspace, Arrow keys).
-- Introduced a new `useBlockTextFlow` hook to manage text editing state and interactions, streamlining the editing process in both HTML and email editors.
-- Added functionality to navigate between adjacent text blocks, enhancing user experience when editing rich text content.
-- Updated related tests to ensure proper functionality of new features and maintain code reliability.
-
-These changes significantly enhance the usability and functionality of the rich text editor within the HTML editing environment.
-
-- Enhance canvas layout and top bar functionality
-
-- Introduced a new `CanvasMarginsSettings` service to manage visibility of page margins, allowing users to toggle margins in the canvas editor.
-- Updated the `CanvasPlugin` to optionally register a top bar via `CanvasTopBarContribution`, improving the user interface for canvas operations.
-- Enhanced the default canvas layout to include the top bar and editor toolbars, streamlining the editing experience.
-- Refactored the `CanvasEditor` to integrate margin settings and updated related components to support the new functionality.
-
-These changes significantly improve the usability and flexibility of the canvas editing environment.
-
-- Introduce VariablesPlugin and enhance variable management in canvas
-
-- Added a new `@openenvx/variables` package, introducing the `VariablesPlugin` for managing variables within the canvas and email editors.
-- Integrated variable support into the rich text editor, allowing users to insert and manage variables seamlessly.
-- Updated the canvas and email plugins to utilize the new `VariablesPlugin`, enhancing the editing experience with variable suggestions and management dialogs.
-- Removed the obsolete `FEATURES.md` file to streamline documentation.
-
-These changes significantly improve the functionality and usability of variable management across the OpenEnvx platform.
-
-- Remove obsolete FEATURES.md file
-
-- Deleted the `FEATURES.md` file to streamline documentation and eliminate outdated content. This change helps maintain clarity and focus on current features and enhancements within the OpenEnvx platform.
-
-- Enhance canvas export functionality and update documentation
-
-- Introduced new export capabilities for canvas, allowing users to export documents in PNG and JPG formats directly from the editor.
-- Added support for exporting to PDF in Node environments, enhancing the versatility of the canvas package.
-- Updated the `CanvasEditor` and related components to integrate the new export features, improving user experience.
-- Revised documentation to reflect changes in export options and clarified the usage of the `@openenvx/canvas/export` module.
-- Removed outdated references to cloud export services, streamlining the documentation for clarity.
-
-These enhancements significantly improve the export functionality and usability of the canvas editing environment.
-
-- Update package dependencies and improve type handling
-
-- Added `@openenvx/core` as a dependency in multiple package configurations to enhance functionality across the project.
-- Simplified the build scripts in various package demos by removing unnecessary directory changes, streamlining the build process.
-- Improved type handling in the canvas package by refining type assertions in the `App` component, enhancing type safety and clarity.
-- Introduced optional dependencies for `@napi-rs/canvas` and `pdf-lib`, allowing for more flexible package management.
-
-These changes enhance the overall structure and type safety of the project, improving developer experience and maintainability.
-
-- V0.1.3
-
-## [0.1.2] - 2026-08-30
 
 ### Bug Fixes
 
@@ -1282,6 +1172,122 @@ These changes enhance the reliability and maintainability of the BlockTreeRender
 These changes enhance the documentation and improve the security of the publishing process.
 
 - V0.1.2
+
+- Enhance rich text editing and block navigation in HTML editor
+
+- Improved the rich text editing experience by implementing keyboard shortcuts for inserting sibling text blocks and handling boundary intents (Enter, Backspace, Arrow keys).
+- Introduced a new `useBlockTextFlow` hook to manage text editing state and interactions, streamlining the editing process in both HTML and email editors.
+- Added functionality to navigate between adjacent text blocks, enhancing user experience when editing rich text content.
+- Updated related tests to ensure proper functionality of new features and maintain code reliability.
+
+These changes significantly enhance the usability and functionality of the rich text editor within the HTML editing environment.
+
+- Enhance canvas layout and top bar functionality
+
+- Introduced a new `CanvasMarginsSettings` service to manage visibility of page margins, allowing users to toggle margins in the canvas editor.
+- Updated the `CanvasPlugin` to optionally register a top bar via `CanvasTopBarContribution`, improving the user interface for canvas operations.
+- Enhanced the default canvas layout to include the top bar and editor toolbars, streamlining the editing experience.
+- Refactored the `CanvasEditor` to integrate margin settings and updated related components to support the new functionality.
+
+These changes significantly improve the usability and flexibility of the canvas editing environment.
+
+- Introduce VariablesPlugin and enhance variable management in canvas
+
+- Added a new `@openenvx/variables` package, introducing the `VariablesPlugin` for managing variables within the canvas and email editors.
+- Integrated variable support into the rich text editor, allowing users to insert and manage variables seamlessly.
+- Updated the canvas and email plugins to utilize the new `VariablesPlugin`, enhancing the editing experience with variable suggestions and management dialogs.
+- Removed the obsolete `FEATURES.md` file to streamline documentation.
+
+These changes significantly improve the functionality and usability of variable management across the OpenEnvx platform.
+
+- Remove obsolete FEATURES.md file
+
+- Deleted the `FEATURES.md` file to streamline documentation and eliminate outdated content. This change helps maintain clarity and focus on current features and enhancements within the OpenEnvx platform.
+
+- Enhance canvas export functionality and update documentation
+
+- Introduced new export capabilities for canvas, allowing users to export documents in PNG and JPG formats directly from the editor.
+- Added support for exporting to PDF in Node environments, enhancing the versatility of the canvas package.
+- Updated the `CanvasEditor` and related components to integrate the new export features, improving user experience.
+- Revised documentation to reflect changes in export options and clarified the usage of the `@openenvx/canvas/export` module.
+- Removed outdated references to cloud export services, streamlining the documentation for clarity.
+
+These enhancements significantly improve the export functionality and usability of the canvas editing environment.
+
+- Update package dependencies and improve type handling
+
+- Added `@openenvx/core` as a dependency in multiple package configurations to enhance functionality across the project.
+- Simplified the build scripts in various package demos by removing unnecessary directory changes, streamlining the build process.
+- Improved type handling in the canvas package by refining type assertions in the `App` component, enhancing type safety and clarity.
+- Introduced optional dependencies for `@napi-rs/canvas` and `pdf-lib`, allowing for more flexible package management.
+
+These changes enhance the overall structure and type safety of the project, improving developer experience and maintainability.
+
+- V0.1.3
+
+- Rename and restructure sandbox extension package
+
+- Renamed `@xmazu/openenvxee-extensions` to `@openenvx/editor-sandbox`, consolidating the sandbox author SDK and host runtime functionalities.
+- Moved QuickJS host runtime and canvas widget face bridge to the new `@openenvx/editor-sandbox`, enhancing modularity and clarity in package responsibilities.
+- Updated documentation and references throughout the codebase to reflect the new package name and structure, ensuring consistency across all related files.
+
+These changes improve the organization of the sandbox extension functionalities and streamline the development experience.
+
+- Update package dependencies and versions
+
+- Updated `eslint-plugin-github` and `eslint-plugin-sonarjs` to their latest versions for improved linting capabilities.
+- Upgraded various dependencies including `knip`, `oxfmt`, `oxlint`, `oxlint-plugin-react-doctor`, and `turbo` to enhance performance and compatibility.
+- Bumped the version of `@openenvx/canvas-studio`, `@openenvx/email-studio`, and `@openenvx/html-studio` packages to 0.1.3 for consistency.
+- Updated TypeScript version in development dependencies to 7.0.2 for better type support.
+- Added new `@nodelib` packages to improve filesystem operations.
+
+These changes ensure the project is using the latest tools and libraries, enhancing overall development experience and maintainability.
+
+- Rename and restructure canvas and email packages
+
+- Renamed `@openenvx/canvas-studio` to `@openenvx/canvas-driver` and `@openenvx/email-studio` to `@openenvx/email-driver`, consolidating the canvas and email functionalities under new package names for clarity and consistency.
+- Updated all relevant documentation and references throughout the codebase to reflect the new package names and structures, ensuring a cohesive development experience.
+- Adjusted package dependencies and build scripts to accommodate the new package names, enhancing modularity and maintainability.
+
+These changes improve the organization of the canvas and email functionalities within the OpenEnvx ecosystem.
+
+- Add build-dts script and update build process
+
+- Introduced a new `build-dts.ts` script to generate TypeScript declaration files for various package entries, enhancing type support across the project.
+- Updated the build script in `package.json` to include the execution of `build-dts.ts`, ensuring declaration files are generated during the build process.
+- Modified the canvas widget entry configuration in `tsup.config.ts` to include all TypeScript files while excluding test files, improving build accuracy.
+
+These changes enhance type safety and streamline the build process for the editor sandbox package.
+
+- Update canvas-driver package structure and documentation
+
+- Refactored the `@openenvx/canvas-driver` package to separate the `createCanvasSandboxExtensionHost` functionality into its own module under `./studio/sandbox-host`, enhancing modularity.
+- Updated related documentation across various files to reflect the new structure and clarify the usage of the sandbox host.
+- Improved the build configuration to include the new sandbox host entry, ensuring proper type declaration generation and exports.
+
+These changes streamline the canvas driver's architecture and improve clarity in the documentation.
+
+- Add openenvx ambient type definitions and update build process
+
+- Introduced a new `openenvx-ambient.ts` file containing type definitions for the OpenEnvx host bridge and related interfaces, enhancing type safety and clarity in the editor sandbox.
+- Updated the `build-dts.ts` script to include the new ambient type definitions in the build process, ensuring proper TypeScript declaration generation.
+- Modified the `package.json` to reference the new `dist/openenvx.d.ts` file for type declarations, improving the package's type support.
+- Adjusted the test file to read from the generated declaration file, ensuring consistency and accuracy in tests.
+
+These changes enhance type support and improve the overall structure of the editor sandbox package.
+
+- Update CI workflows and add linting steps
+
+- Added linting and type checking steps to the CI workflows in `ci.yml` and `release.yml`, ensuring code quality and type safety during the build process.
+- Included the new `openenvx-ambient.ts` file in the `knip.json` configuration for type definitions, enhancing type support across the project.
+- Updated the version of `@openenvx/core` in `package.json` to `0.1.3-dummy.0`, reflecting a dummy version for testing purposes.
+
+These changes improve the CI process and enhance type safety in the project.
+
+- Bump package versions to 0.1.4 for canvas, core, email, html, and studio drivers
+
+- Updated the version of `@openenvx/canvas-driver`, `@openenvx/core`, `@openenvx/email-driver`, `@openenvx/html-driver`, and `@openenvx/studio` packages to `0.1.4`, ensuring consistency across the project.
+- This version bump reflects ongoing development and prepares the packages for upcoming features and improvements.
 
 
 ### Refactor

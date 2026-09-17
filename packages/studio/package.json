@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/studio",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "OpenEnvx editor studio - workbench shell and headless runtime",
   "license": "MPL-2.0",
   "type": "module",
