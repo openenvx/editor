@@ -33,6 +33,8 @@ jobs:
     # Release commits are machine-made; the dev pre-commit hook must not gate them.
     env:
       HUSKY: '0'
+      PUBLISHED_PACKAGES: >-
+        packages/studio packages/canvas-driver packages/html-driver packages/email-driver packages/editor-sandbox
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -103,7 +105,7 @@ jobs:
         if: ${{ !inputs.skip_bump }}
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          for pkg in packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
+          for pkg in $PUBLISHED_PACKAGES; do
             bun -e "
               const fs = require('node:fs');
               const path = process.argv[1];
@@ -123,7 +125,7 @@ jobs:
 
       - name: Build published packages
         run: |
-          bun run build --filter=@openenvx/studio --filter=@openenvx/canvas-driver --filter=@openenvx/html-driver --filter=@openenvx/email-driver
+          bun run build --filter=@openenvx/studio --filter=@openenvx/canvas-driver --filter=@openenvx/html-driver --filter=@openenvx/email-driver --filter=@openenvx/editor-sandbox
 
       - name: Lint and type check
         run: bun run check && bun run check-types
@@ -137,7 +139,7 @@ jobs:
       - name: Verify package repository metadata
         run: |
           EXPECTED="git+https://github.com/${{ github.repository }}.git"
-          for pkg in packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
+          for pkg in $PUBLISHED_PACKAGES; do
             REPO_URL=$(bun -e "console.log(require('./$pkg/package.json').repository.url)")
             if [ "$REPO_URL" != "$EXPECTED" ]; then
               echo "ERROR: $pkg repository.url is '$REPO_URL', expected '$EXPECTED'"
@@ -156,7 +158,7 @@ jobs:
             exit 1
           fi
           printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > "${HOME}/.npmrc"
-          for pkg in packages/studio packages/canvas-driver packages/html-driver packages/email-driver; do
+          for pkg in $PUBLISHED_PACKAGES; do
             echo "Publishing $pkg"
             npm publish --access public --provenance --ignore-scripts "./$pkg"
           done
@@ -167,7 +169,10 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md packages/studio/package.json packages/canvas-driver/package.json packages/html-driver/package.json packages/email-driver/package.json
+          git add CHANGELOG.md
+          for pkg in $PUBLISHED_PACKAGES; do
+            git add "$pkg/package.json"
+          done
           git commit -m "chore(release): v$VERSION"
           git tag "v$VERSION"
           git push

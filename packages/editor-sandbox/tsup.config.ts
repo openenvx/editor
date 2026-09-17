@@ -1,6 +1,7 @@
 import { createLibraryConfig } from '@openenvx/typescript-config/tsup.library';
 
 const authorConfig = createLibraryConfig({
+  sourcemap: false,
   tsconfig: 'tsconfig.json',
   entry: [
     'src/**/*.{ts,tsx}',
@@ -24,6 +25,7 @@ const authorConfig = createLibraryConfig({
 });
 
 const hostConfig = createLibraryConfig({
+  sourcemap: false,
   tsconfig: 'tsconfig.host.json',
   entry: ['src/host/**/*.{ts,tsx}', '!src/host/**/*.test.{ts,tsx}'],
   // tsconfig.host.json roots at src/host; mirror package exports under dist/host/.
@@ -40,6 +42,7 @@ const hostConfig = createLibraryConfig({
 });
 
 const canvasWidgetConfig = createLibraryConfig({
+  sourcemap: false,
   tsconfig: 'tsconfig.canvas-widget.json',
   entry: [
     'src/canvas-widget/**/*.{ts,tsx}',

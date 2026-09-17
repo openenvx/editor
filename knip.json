@@ -66,12 +66,14 @@
         "src/host/quickjs.worker.ts!",
         "src/canvas-widget/index.ts!",
         "src/openenvx-ambient.ts!",
-        "build-dts.ts!"
+        "build-dts.ts!",
+        "verify-pack.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
         "!src/**/*.test.ts",
-        "build-dts.ts"
+        "build-dts.ts",
+        "verify-pack.ts"
       ]
     },
     "packages/agent": {

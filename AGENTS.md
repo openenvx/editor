@@ -228,7 +228,7 @@ bun run changelog     # preview unreleased changelog (git-cliff)
 
 ## Publishing
 
-`@openenvx/studio/core`, `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, and `@openenvx/email-driver` are published via the GitHub Actions **Release** workflow (see [PUBLISHING.md](PUBLISHING.md)). `@openenvx/editor-sandbox` may publish separately when released.
+`@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, `@openenvx/email-driver`, and `@openenvx/editor-sandbox` are published via the GitHub Actions **Release** workflow (see [PUBLISHING.md](PUBLISHING.md)). Headless/runtime imports use `@openenvx/studio/core` as a subpath of `@openenvx/studio`.
 
 ## Before you finish
 
