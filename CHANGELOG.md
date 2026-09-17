@@ -3,6 +3,19 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.3.3] - 2026-09-17
+
+### Other
+
+- Update canvas-driver and editor-sandbox packages for improved build process
+
+- Upgraded `canvas-driver` and `editor-sandbox` to version 0.3.2, enhancing compatibility and performance.
+- Replaced `tsup` with `rolldown` for building, streamlining the build configuration and improving output management.
+- Introduced new CSS modules plugin for better handling of styles in both packages.
+- Updated `PUBLISHING.md` to clarify the publishing process and package structure.
+- Added `smoke-next-consumer` command to validate integration with Next.js and Vite builds.
+- Removed outdated configurations and scripts to simplify the codebase.
+
 ## [0.3.2] - 2026-09-17
 
 ### Other
@@ -21,6 +34,8 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Removed unused type exports from `toolbar-contribution.ts` and `top-bar-contribution.ts`, simplifying the codebase.
 - Cleaned up `index.ts` by removing unnecessary exports related to property field schema.
 - Adjusted `types.ts` to eliminate an unused import, improving overall code quality.
+
+- V0.3.2
 
 ## [0.3.1] - 2026-09-17
 

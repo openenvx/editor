@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/editor-sandbox",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "OpenEnvx sandbox extension SDK - protocol, Preact author API, QuickJS host runtime",
   "license": "MPL-2.0",
   "type": "module",
