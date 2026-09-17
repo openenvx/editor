@@ -4,6 +4,7 @@ import path from 'node:path';
 
 import * as esbuild from 'esbuild';
 import { defineConfig } from 'rolldown';
+import { esmExternalRequirePlugin } from 'rolldown/plugins';
 
 import { createCssModuleRolldownPlugin } from './css-modules-plugin.ts';
 
@@ -15,6 +16,13 @@ const pkg = JSON.parse(
 ) as { peerDependencies?: Record<string, string> };
 const sourcemap = process.env.STUDIO_SOURCEMAP === '1';
 const inlineOpenenvx = /^@openenvx\/studio\/(plugins\/variables|internal)/;
+
+const esmExternalRequire = [
+  'react',
+  'react-dom',
+  'react/jsx-runtime',
+  'react-dom/client',
+];
 
 const artboardExternals = [
   '@openenvx/core',
@@ -30,9 +38,9 @@ const artboardExternals = [
   '@openenvx/editor-sandbox/host',
   '@openenvx/editor-sandbox/protocol',
   '@openenvx/editor-sandbox/canvas-widget',
-  ...Object.keys(pkg.peerDependencies ?? {}),
-  'react/jsx-runtime',
-  'react-dom/client',
+  ...Object.keys(pkg.peerDependencies ?? {}).filter(
+    (id) => !esmExternalRequire.includes(id)
+  ),
 ];
 
 function bundleExternal(
@@ -59,6 +67,7 @@ export default defineConfig({
   tsconfig: 'tsconfig.publish.json',
   external: bundleExternal(artboardExternals, (id) => inlineOpenenvx.test(id)),
   plugins: [
+    esmExternalRequirePlugin({ external: esmExternalRequire }),
     plugin,
     {
       name: 'html-publish-post',

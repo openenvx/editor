@@ -94,6 +94,21 @@ async function packPackage(relPath: string) {
   return dest;
 }
 
+async function assertNoRuntimeRequireStub(packageDir: string) {
+  const distDir = path.join(packageDir, 'dist');
+  const files = await readdir(distDir, { recursive: true });
+  const jsFiles = files.filter(
+    (name: string | Buffer): name is string =>
+      typeof name === 'string' && name.endsWith('.js')
+  );
+  for (const rel of jsFiles) {
+    const content = await readFile(path.join(distDir, rel), 'utf-8');
+    if (content.includes(`doesn't expose the \`require\` function`)) {
+      fail(`rolldown require stub in ${rel} (breaks Next/Turbopack)`);
+    }
+  }
+}
+
 async function assertNoBareImports(
   packageDir: string,
   dependencyNames: string[]
@@ -139,7 +154,9 @@ async function patchInstalledPackages(workDir: string, names: string[]) {
     const deps = Object.keys(
       (raw.dependencies as Record<string, string> | undefined) ?? {}
     );
-    await assertNoBareImports(path.dirname(pkgPath), deps);
+    const packageDir = path.dirname(pkgPath);
+    await assertNoBareImports(packageDir, deps);
+    await assertNoRuntimeRequireStub(packageDir);
   }
 }
 

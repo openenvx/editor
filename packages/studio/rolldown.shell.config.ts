@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { defineConfig } from 'rolldown';
+import { esmExternalRequirePlugin } from 'rolldown/plugins';
 
 import { createCssModuleRolldownPlugin } from './css-modules-plugin.ts';
 
@@ -9,11 +10,14 @@ const packageRoot = import.meta.dirname;
 const distRoot = path.join(packageRoot, 'dist');
 const sourcemap = process.env.STUDIO_SOURCEMAP === '1';
 
-const shellExternals = [
+const esmExternalRequire = [
   'react',
   'react-dom',
   'react/jsx-runtime',
   'react-dom/client',
+];
+
+const shellExternals = [
   '@openenvx/studio',
   '@openenvx/studio/core',
   '@openenvx/studio/schema',
@@ -41,6 +45,7 @@ export default defineConfig({
   tsconfig: 'tsconfig.build.json',
   external: bundleExternal(shellExternals),
   plugins: [
+    esmExternalRequirePlugin({ external: esmExternalRequire }),
     plugin,
     {
       name: 'studio-shell-post',
