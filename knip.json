@@ -96,7 +96,7 @@
         "src/core/plugins/scene-plugin.ts!",
         "src/workbench-barrel.ts!",
         "tsup.shell.config.ts!",
-        "tsup.core.config.ts!",
+        "tsup.core.publish.config.ts!",
         "build-dts.ts!",
         "verify-pack.ts!"
       ],
@@ -105,7 +105,8 @@
         "!src/**/*.test.ts",
         "!src/**/*.test.tsx",
         "tsup.shell.config.ts",
-        "tsup.core.config.ts",
+        "tsup.core.publish.config.ts",
+        "verify-next-consumer.ts",
         "build-dts.ts",
         "verify-pack.ts"
       ],

@@ -39,6 +39,11 @@
       "types": "./verify-pack.d.ts",
       "import": "./verify-pack.js",
       "default": "./verify-pack.js"
+    },
+    "./publish-externals": {
+      "types": "./publish-externals.d.ts",
+      "import": "./publish-externals.js",
+      "default": "./publish-externals.js"
     }
   },
   "dependencies": {

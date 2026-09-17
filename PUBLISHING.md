@@ -75,8 +75,10 @@ Runs build + tarball checks for all published packages.
 ### Product host (canvas example)
 
 ```bash
-npm install @openenvx/studio/core @openenvx/studio @openenvx/canvas-driver react react-dom
+npm install @openenvx/studio @openenvx/canvas-driver react react-dom
 ```
+
+Published `dist/` JS bundles third-party dependencies (Zod, DnD, Konva, TipTap, etc.). Host apps only need **peer** packages: `react`, `react-dom`, and for drivers `@openenvx/studio`. Use `transpilePackages: ['@openenvx/studio', '@openenvx/canvas-driver']` in Next.js when applicable.
 
 ```tsx
 import { WorkbenchShell } from '@openenvx/studio';

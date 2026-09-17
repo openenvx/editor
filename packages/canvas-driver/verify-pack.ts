@@ -1,3 +1,4 @@
+import { bareImportPattern } from '@openenvx/typescript-config/publish-externals';
 import {
   createVerifyPack,
   fail,
@@ -6,6 +7,14 @@ import {
 const packageRoot = import.meta.dirname;
 const LEAKED_TYPE =
   /CanvasRect|LAYER_WRITE_MODES|WorkbenchShell|createCanvasDemoScene|TemplatePolicy|PluginLayer|Konva/;
+const CANVAS_BARE_IMPORTS = bareImportPattern([
+  'zod',
+  'konva',
+  'react-konva',
+  '@dnd-kit/core',
+  '@tiptap/react',
+  'lucide-react',
+]);
 const INTERNAL_PATH = /package\/dist\/(workbench|runtime|sandbox-host)\./;
 
 await createVerifyPack({
@@ -30,8 +39,8 @@ await createVerifyPack({
     },
     {
       file: 'index.js',
-      maxLines: 600,
-      message: 'dist/index.js does not look minified',
+      mustNotMatch: CANVAS_BARE_IMPORTS,
+      message: 'dist/index.js must bundle driver dependencies',
     },
     {
       file: 'index.js',

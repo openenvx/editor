@@ -1,3 +1,4 @@
+import { bareImportPattern } from '@openenvx/typescript-config/publish-externals';
 import {
   createVerifyPack,
   fail,
@@ -26,8 +27,12 @@ await createVerifyPack({
     },
     {
       file: 'index.js',
-      maxLines: 600,
-      message: 'dist/index.js does not look minified',
+      mustNotMatch: bareImportPattern([
+        '@dnd-kit/core',
+        '@tiptap/react',
+        'lucide-react',
+      ]),
+      message: 'dist/index.js must bundle driver dependencies',
     },
     {
       file: 'theme.css',

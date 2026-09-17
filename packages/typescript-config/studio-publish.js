@@ -5,6 +5,7 @@ import path from 'node:path';
 import { defineConfig } from 'tsup';
 
 import { createCssModuleCompiler } from './css-modules-esbuild.js';
+import { studioShellExternals } from './publish-externals.js';
 
 /**
  * @param {object} options
@@ -35,19 +36,8 @@ export function createStudioPublishConfig(options) {
     clean: false,
     outDir: 'dist',
     tsconfig: 'tsconfig.build.json',
-    external: [
-      '@openenvx/studio/core',
-      '@openenvx/studio/react',
-      '@openenvx/studio/schema',
-      '@openenvx/studio/preview',
-      '@openenvx/editor-sandbox',
-      '@openenvx/editor-sandbox/host',
-      '@openenvx/editor-sandbox/protocol',
-      ...Object.keys(pkg.dependencies ?? {}),
-      ...Object.keys(pkg.peerDependencies ?? {}),
-      'react/jsx-runtime',
-      'react-dom/client',
-    ],
+    noExternal: Object.keys(pkg.dependencies ?? {}),
+    external: studioShellExternals(pkg),
     esbuildPlugins: [compileCssModules()],
     esbuildOptions(esbuildOptions) {
       esbuildOptions.legalComments = 'none';

@@ -6,6 +6,7 @@ import * as esbuild from 'esbuild';
 import { defineConfig } from 'tsup';
 
 import { createCssModuleCompiler } from './css-modules-esbuild.js';
+import { artboardPublishExternals } from './publish-externals.js';
 
 /**
  * @param {object} options
@@ -47,18 +48,6 @@ export function createArtboardPublishConfig(options) {
     });
   }
 
-  const openenvxExternal = [
-    '@openenvx/core',
-    '@openenvx/core/react',
-    '@openenvx/core/schema',
-    '@openenvx/core/preview',
-    '@openenvx/studio',
-    '@openenvx/editor-sandbox',
-    '@openenvx/editor-sandbox/host',
-    '@openenvx/editor-sandbox/protocol',
-    '@openenvx/editor-sandbox/canvas-widget',
-  ];
-
   return defineConfig({
     entry: {
       index: options.indexEntry,
@@ -72,14 +61,11 @@ export function createArtboardPublishConfig(options) {
     clean: false,
     outDir: 'dist',
     tsconfig: 'tsconfig.publish.json',
-    noExternal: [options.inlineOpenenvx],
-    external: [
-      ...openenvxExternal,
+    noExternal: [
+      options.inlineOpenenvx,
       ...Object.keys(pkg.dependencies ?? {}),
-      ...Object.keys(pkg.peerDependencies ?? {}),
-      'react/jsx-runtime',
-      'react-dom/client',
     ],
+    external: artboardPublishExternals(pkg),
     esbuildPlugins: [compileCssModules()],
     esbuildOptions(esbuildOptions) {
       esbuildOptions.legalComments = 'none';

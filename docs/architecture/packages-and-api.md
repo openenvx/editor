@@ -54,13 +54,13 @@ Hard rules:
 
 ### Published
 
-**`@openenvx/studio`** - `.`: `WorkbenchShell` + `./theme.css`. `./core`, `./schema`, `./preview`, `./react`: plugin host, scene store, workbench controller, contributions. `./internal` (workspace only): full shell barrel for monorepo plugins. No artboard plugins on `.`.
+**`@openenvx/studio`** - `.`: `WorkbenchShell` + `./theme.css`. `./core`, `./schema`, `./preview`, `./react`: plugin host, scene store, workbench controller, contributions. `./internal` (workspace only): full shell barrel for monorepo plugins. No artboard plugins on `.`. **npm `dist/`** ships browser-bundled ESM (third-party deps inlined); integrators do not mirror Studio’s `dependencies` in the host app.
 
-**`@openenvx/canvas-driver`** - npm `.` + `./theme.css` + `./fonts.css` (artboard editor surface; not the workbench shell). Workspace `.` (`src/index.ts`) is the full engine API; Node PDF uses `exportCanvasDocumentNode`. Hosts also import `@openenvx/studio/theme.css`.
+**`@openenvx/canvas-driver`** - npm `.` + `./theme.css` + `./fonts.css` (artboard editor surface; not the workbench shell). Published `.` bundles engine deps; peers: `@openenvx/studio`, `react`, `react-dom`. Workspace `.` (`src/index.ts`) is the full engine API; Node PDF uses `exportCanvasDocumentNode`. Hosts also import `@openenvx/studio/theme.css`.
 
-**`@openenvx/html-driver`** - npm `.` + `./theme.css`. Workspace `.` is the full block editor API.
+**`@openenvx/html-driver`** - npm `.` + `./theme.css`. Published `.` bundles block-editor deps. Workspace `.` is the full block editor API.
 
-**`@openenvx/email-driver`** - npm `.` + `./theme.css`. Workspace `.` is the full email editor API.
+**`@openenvx/email-driver`** - npm `.` + `./theme.css`. Published `.` bundles email editor deps (including inlined `@openenvx/html-driver` publish surface). Workspace `.` is the full email editor API.
 
 **`@openenvx/editor-sandbox`** - protocol, host, canvas-widget, element subpaths.
 

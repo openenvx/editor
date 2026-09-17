@@ -27,7 +27,7 @@
   },
   "scripts": {
     "generate:json-schema": "bun run src/core/schema/generate-json-schema.ts",
-    "build": "rm -rf dist && tsup --config tsup.core.config.ts && tsup --config tsup.shell.config.ts && node ./build-dts.ts",
+    "build": "rm -rf dist && tsup --config tsup.core.publish.config.ts && tsup --config tsup.shell.config.ts && node ./build-dts.ts",
     "build:debug": "STUDIO_SOURCEMAP=1 bun run build",
     "prepack": "bun run build",
     "test": "vitest run",

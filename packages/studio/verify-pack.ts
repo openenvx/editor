@@ -1,12 +1,23 @@
+import { bareImportPattern } from '@openenvx/typescript-config/publish-externals';
 import {
   assertDistExport,
   createVerifyPack,
   fail,
   readDist,
 } from '@openenvx/typescript-config/verify-pack';
+import { $ } from 'bun';
 
 const packageRoot = import.meta.dirname;
 const INTERNAL_PATH = /package\/dist\/(workbench|theme)\//;
+const LEAKED_CORE_TREE =
+  /package\/dist\/core\/(layers|properties|builders|scene|workbench)\//;
+const STUDIO_BARE_IMPORTS = bareImportPattern([
+  'zod',
+  'uqr',
+  '@dnd-kit/core',
+  '@dnd-kit/sortable',
+  '@dnd-kit/utilities',
+]);
 
 const REQUIRED_CORE_EXPORTS = [
   'Plugin',
@@ -20,7 +31,7 @@ await createVerifyPack({
   packageRoot,
   packageLabel: 'studio',
   forbidSourcemaps: true,
-  forbidTarballPatterns: [INTERNAL_PATH],
+  forbidTarballPatterns: [INTERNAL_PATH, LEAKED_CORE_TREE],
   requiredTarballPaths: [
     'package/dist/index.js',
     'package/dist/index.css',
@@ -43,8 +54,23 @@ await createVerifyPack({
     },
     {
       file: 'index.js',
-      maxLines: 500,
-      message: 'dist/index.js does not look minified (too many lines)',
+      mustNotMatch: STUDIO_BARE_IMPORTS,
+      message: 'dist/index.js must not leave bare third-party imports',
+    },
+    {
+      file: 'core/index.js',
+      mustNotMatch: STUDIO_BARE_IMPORTS,
+      message: 'dist/core/index.js must not leave bare third-party imports',
+    },
+    {
+      file: 'core/schema/index.js',
+      mustNotMatch: bareImportPattern(['zod']),
+      message: 'dist/core/schema/index.js must bundle zod',
+    },
+    {
+      file: 'core/preview/index.js',
+      mustNotMatch: bareImportPattern(['zod', 'uqr']),
+      message: 'dist/core/preview/index.js must bundle preview deps',
     },
     {
       file: 'index.js',
@@ -86,7 +112,7 @@ await createVerifyPack({
       fail('dist/core/schema/index.d.ts missing Scene');
     }
   },
-  afterPack({ pkg }) {
+  async afterPack({ pkg }) {
     assertDistExport(pkg as Parameters<typeof assertDistExport>[0]);
     const exports = pkg.exports as Record<string, unknown> | undefined;
     if (!exports?.['./theme.css']) {
@@ -112,5 +138,7 @@ await createVerifyPack({
     if (bad.length > 0) {
       fail(`bad runtime deps: ${JSON.stringify(Object.fromEntries(bad))}`);
     }
+
+    await $`bun run ./verify-next-consumer.ts`.cwd(packageRoot);
   },
 }).run();

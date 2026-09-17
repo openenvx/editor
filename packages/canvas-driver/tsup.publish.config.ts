@@ -12,7 +12,7 @@ export default createArtboardPublishConfig({
   packageRoot,
   packageLabel: 'canvas',
   indexEntry: 'src/publish.ts',
-  inlineOpenenvx: /^@openenvx\/studio\/plugins\/variables/,
+  inlineOpenenvx: /^@openenvx\/studio\/(plugins\/variables|internal)/,
   importFontsCss: true,
   afterCss: async () => {
     await copyCanvasFonts(path.join(packageRoot, 'dist'), packagesRoot);
