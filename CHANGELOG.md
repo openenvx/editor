@@ -3,6 +3,16 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.3.4] - 2026-09-17
+
+### Other
+
+- Integrate esmExternalRequirePlugin into rolldown configurations
+
+- Added `esmExternalRequirePlugin` to `rolldown.publish.config.ts` files for canvas, email, and html drivers to ensure proper handling of ESM imports for React dependencies.
+- Updated external dependency management to filter out specific React packages from peer dependencies, enhancing compatibility with Next.js and Turbopack.
+- Introduced a new function in `smoke-next-consumer.ts` to assert the absence of runtime require stubs, improving validation for published packages.
+
 ## [0.3.3] - 2026-09-17
 
 ### Other
@@ -15,6 +25,8 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Updated `PUBLISHING.md` to clarify the publishing process and package structure.
 - Added `smoke-next-consumer` command to validate integration with Next.js and Vite builds.
 - Removed outdated configurations and scripts to simplify the codebase.
+
+- V0.3.3
 
 ## [0.3.2] - 2026-09-17
 
