@@ -3,6 +3,22 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.3.5] - 2026-09-18
+
+### Other
+
+- Update CSS imports and publishing configurations for studio package
+
+- Replaced `theme.css` with `styles.css` in multiple files to ensure proper styling integration with Next.js and Turbopack.
+- Updated `package.json` to reflect new CSS file structure, including `theme.css`, `shell.css`, and `styles.css`.
+- Enhanced rolldown configuration to copy and manage CSS files correctly during the build process.
+- Added assertions in `smoke-next-consumer.ts` to validate the presence of design tokens and compiled CSS modules in the Next.js build output.
+
+- Improve CSS module validation in smoke-next-consumer
+
+- Replaced the static CSS marker with a function to dynamically check for compiled shell CSS modules in the `assertStudioStylesBundle` and `assertNextBuildIncludesWorkbenchCss` functions.
+- Updated comments to clarify the purpose of the new validation logic for CSS modules.
+
 ## [0.3.4] - 2026-09-17
 
 ### Other
@@ -12,6 +28,8 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Added `esmExternalRequirePlugin` to `rolldown.publish.config.ts` files for canvas, email, and html drivers to ensure proper handling of ESM imports for React dependencies.
 - Updated external dependency management to filter out specific React packages from peer dependencies, enhancing compatibility with Next.js and Turbopack.
 - Introduced a new function in `smoke-next-consumer.ts` to assert the absence of runtime require stubs, improving validation for published packages.
+
+- V0.3.4
 
 ## [0.3.3] - 2026-09-17
 
