@@ -94,8 +94,10 @@ async function packPackage(relPath: string) {
   return dest;
 }
 
-/** Stable hashed class from studio shell publish CSS (see dist/index.css). */
-const STUDIO_SHELL_CSS_MARKER = 'e_FqDc5q_chrome';
+/** Studio publish CSS modules use `e_[hash]_[local]`; hash is path-dependent (see css-modules-plugin). */
+function includesCompiledShellCssModules(css: string): boolean {
+  return /\.e_[A-Za-z0-9]+_chrome\b/.test(css);
+}
 
 function studioDistPath(workDir: string, file: string) {
   return path.join(
@@ -120,7 +122,7 @@ async function assertStudioStylesBundle(workDir: string) {
   if (!styles.includes('--wb-text-xs')) {
     fail('@openenvx/studio dist/styles.css is missing design tokens');
   }
-  if (!styles.includes(STUDIO_SHELL_CSS_MARKER)) {
+  if (!includesCompiledShellCssModules(styles)) {
     fail(
       '@openenvx/studio dist/styles.css is missing compiled shell CSS modules'
     );
@@ -146,7 +148,7 @@ async function assertNextBuildIncludesWorkbenchCss(workDir: string) {
       if (content.includes('--wb-text-xs')) {
         hasTokens = true;
       }
-      if (content.includes(STUDIO_SHELL_CSS_MARKER)) {
+      if (includesCompiledShellCssModules(content)) {
         hasShellModules = true;
       }
     }
