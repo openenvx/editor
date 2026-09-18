@@ -90,10 +90,12 @@ import {
   createCanvasScene,
   defaultCanvasWorkbench,
 } from '@openenvx/canvas-driver';
-import '@openenvx/studio/theme.css';
+import '@openenvx/studio/styles.css';
 import '@openenvx/canvas-driver/theme.css';
 import '@openenvx/canvas-driver/fonts.css';
 ```
+
+**Next.js (required):** import those three lines from **`app/layout.tsx`** (or one global CSS file imported only from the root layout). Use **`@openenvx/studio/styles.css`** (tokens + compiled CSS-module rules). Do **not** rely on `import './index.css'` inside `@openenvx/studio` — Turbopack often skips that side effect for `node_modules` client bundles, so `theme.css` alone leaves the workbench unstyled. Subpaths: `./theme.css` (tokens only), `./shell.css` (module CSS only), `./styles.css` (both).
 
 ### Headless helpers (same package entry)
 

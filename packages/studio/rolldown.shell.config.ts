@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { copyFile, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { defineConfig } from 'rolldown';
@@ -54,7 +54,15 @@ export default defineConfig({
         if (css.trim().length === 0) {
           throw new Error('studio publish build produced no CSS');
         }
+        const tokensPath = path.join(packageRoot, 'src/theme/tokens.css');
+        const tokens = await readFile(tokensPath, 'utf-8');
         await writeFile(path.join(distRoot, 'index.css'), css);
+        await copyFile(tokensPath, path.join(distRoot, 'theme.css'));
+        await copyFile(
+          path.join(distRoot, 'index.css'),
+          path.join(distRoot, 'shell.css')
+        );
+        await writeFile(path.join(distRoot, 'styles.css'), `${tokens}\n${css}`);
 
         const indexJsPath = path.join(distRoot, 'index.js');
         const indexJs = await readFile(indexJsPath, 'utf-8');

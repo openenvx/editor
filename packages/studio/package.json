@@ -20,8 +20,16 @@
     },
     "./theme.css": {
       "development": "./src/theme/tokens.css",
-      "import": "./dist/index.css",
-      "default": "./dist/index.css"
+      "import": "./dist/theme.css",
+      "default": "./dist/theme.css"
+    },
+    "./shell.css": {
+      "import": "./dist/shell.css",
+      "default": "./dist/shell.css"
+    },
+    "./styles.css": {
+      "import": "./dist/styles.css",
+      "default": "./dist/styles.css"
     },
     "./core": {
       "development": "./src/core/index.ts",
@@ -67,6 +75,9 @@
   "sideEffects": [
     "./dist/index.js",
     "./dist/index.css",
+    "./dist/theme.css",
+    "./dist/shell.css",
+    "./dist/styles.css",
     "**/*.css"
   ],
   "dependencies": {

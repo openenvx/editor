@@ -33,7 +33,7 @@ import {
   WorkbenchShell,
   registerDefaultWorkbenchBundle,
 } from '@openenvx/studio';
-import '@openenvx/studio/theme.css';
+import '@openenvx/studio/styles.css';
 ```
 
 ## Canvas product host
@@ -42,7 +42,7 @@ import '@openenvx/studio/theme.css';
 import { WorkbenchShell } from '@openenvx/studio';
 import { createCanvasScene, defaultCanvasWorkbench } from '@openenvx/canvas-driver';
 // Sandbox: import { createCanvasSandboxExtensionHost } from '@openenvx/canvas-driver/src/create-canvas-sandbox-extension-host';
-import '@openenvx/studio/theme.css';
+import '@openenvx/studio/styles.css';
 import '@openenvx/canvas-driver/theme.css';
 import '@openenvx/canvas-driver/fonts.css';
 
@@ -63,7 +63,7 @@ Published npm: `@openenvx/canvas-driver` (minified `.` entry). Monorepo HMR uses
 import { WorkbenchShell } from '@openenvx/studio';
 import { defaultHtmlWorkbench } from '@openenvx/html-driver';
 import { createHtmlScene } from '@openenvx/html-driver';
-import '@openenvx/studio/theme.css';
+import '@openenvx/studio/styles.css';
 
 const plugins = [...defaultHtmlWorkbench.plugins, new MyEventPagePlugin()];
 ```
@@ -76,7 +76,7 @@ Published npm: `@openenvx/html-driver`. `apps/html-package-demo` (`bun run dev:h
 import { WorkbenchShell } from '@openenvx/studio';
 import { defaultEmailWorkbench } from '@openenvx/email-driver';
 import { createEmailScene } from '@openenvx/email-driver';
-import '@openenvx/studio/theme.css';
+import '@openenvx/studio/styles.css';
 ```
 
 Headless HTML export is `renderEmailHtml` from `@openenvx/email-driver` so Node/SSR can skip shell CSS. `apps/email-package-demo` (`bun run dev:email-package`).

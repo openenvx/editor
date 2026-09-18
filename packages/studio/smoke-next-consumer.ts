@@ -94,6 +94,75 @@ async function packPackage(relPath: string) {
   return dest;
 }
 
+/** Stable hashed class from studio shell publish CSS (see dist/index.css). */
+const STUDIO_SHELL_CSS_MARKER = 'e_FqDc5q_chrome';
+
+function studioDistPath(workDir: string, file: string) {
+  return path.join(
+    workDir,
+    'node_modules',
+    '@openenvx',
+    'studio',
+    'dist',
+    file
+  );
+}
+
+async function assertStudioThemeTokens(workDir: string) {
+  const theme = await readFile(studioDistPath(workDir, 'theme.css'), 'utf-8');
+  if (!theme.includes('--wb-text-xs')) {
+    fail('@openenvx/studio dist/theme.css is missing design tokens');
+  }
+}
+
+async function assertStudioStylesBundle(workDir: string) {
+  const styles = await readFile(studioDistPath(workDir, 'styles.css'), 'utf-8');
+  if (!styles.includes('--wb-text-xs')) {
+    fail('@openenvx/studio dist/styles.css is missing design tokens');
+  }
+  if (!styles.includes(STUDIO_SHELL_CSS_MARKER)) {
+    fail(
+      '@openenvx/studio dist/styles.css is missing compiled shell CSS modules'
+    );
+  }
+}
+
+async function assertNextBuildIncludesWorkbenchCss(workDir: string) {
+  let hasTokens = false;
+  let hasShellModules = false;
+
+  async function walkCssFiles(dir: string) {
+    const entries = await readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        await walkCssFiles(fullPath);
+        continue;
+      }
+      if (!entry.name.endsWith('.css')) {
+        continue;
+      }
+      const content = await readFile(fullPath, 'utf-8');
+      if (content.includes('--wb-text-xs')) {
+        hasTokens = true;
+      }
+      if (content.includes(STUDIO_SHELL_CSS_MARKER)) {
+        hasShellModules = true;
+      }
+    }
+  }
+
+  await walkCssFiles(path.join(workDir, '.next'));
+  if (!hasTokens) {
+    fail('next build output has no studio design tokens in emitted CSS');
+  }
+  if (!hasShellModules) {
+    fail(
+      'next build output has no studio shell CSS modules — import @openenvx/studio/styles.css from the root layout'
+    );
+  }
+}
+
 async function assertNoRuntimeRequireStub(packageDir: string) {
   const distDir = path.join(packageDir, 'dist');
   const files = await readdir(distDir, { recursive: true });
@@ -279,7 +348,9 @@ export default nextConfig;
   await mkdir(path.join(workDir, 'app'), { recursive: true });
   await writeFile(
     path.join(workDir, 'app/layout.tsx'),
-    `export default function RootLayout({
+    `import './openenvx-styles.css';
+
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -304,6 +375,13 @@ export default function Page() {
   await writeFile(
     path.join(workDir, 'app/editor-smoke.tsx'),
     editorSmokeSource
+  );
+  await writeFile(
+    path.join(workDir, 'app/openenvx-styles.css'),
+    `@import '@openenvx/studio/styles.css';
+@import '@openenvx/canvas-driver/theme.css';
+@import '@openenvx/canvas-driver/fonts.css';
+`
   );
 
   await writeFile(
@@ -342,8 +420,11 @@ createRoot(document.querySelector('#root')!).render(
     '@openenvx/studio',
     '@openenvx/canvas-driver',
   ]);
+  await assertStudioThemeTokens(workDir);
+  await assertStudioStylesBundle(workDir);
 
   await runCommand('bun', ['run', 'build:next'], workDir);
+  await assertNextBuildIncludesWorkbenchCss(workDir);
   const buildId = await readFile(
     path.join(workDir, '.next', 'BUILD_ID'),
     'utf-8'
