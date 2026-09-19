@@ -11,3 +11,4 @@ export {
 } from './export/canvas-document-export-service';
 export { exportCanvasDocument } from './export/browser/export-canvas-document';
 export { createCanvasScene, type Scene } from './publish-runtime';
+export { getDefaultPageDimensions } from './page-presets';
