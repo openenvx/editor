@@ -3,6 +3,38 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.3.6] - 2026-09-19
+
+### Other
+
+- Enhance variable handling and text measurement in canvas export
+
+- Replaced the initial scene creation in the demo app with a new variable template demo scene for improved variable handling.
+- Updated the canvas export command to include optional variable substitution for layer data, allowing for dynamic content rendering.
+- Introduced a new utility to measure rich text content size, enhancing text layout capabilities.
+- Implemented a mechanism to remap layer surfaces for variable previews, ensuring accurate rendering in the editor.
+- Added tests to validate variable substitution and text measurement functionality in various scenarios.
+
+- Add default page dimensions export to canvas driver
+
+- Introduced `getDefaultPageDimensions` export in `publish.ts` to provide standardized page dimensions for canvas applications.
+
+- Update dependencies and improve UI components
+
+- Bumped version of multiple packages to 0.3.5 for canvas-driver, editor-sandbox, email-driver, html-driver, and studio.
+- Added `@tabler/icons-react` as a dependency across several packages, replacing `lucide-react` icons for a more consistent icon set.
+- Updated the template API contract to remove the optional `label` field from `scene.variables`.
+- Enhanced the rich text bubble menu and block selection menu to utilize Tabler icons instead of Lucide icons.
+- Introduced theme settings menu item in top bar contributions for canvas and email drivers.
+- Refactored variable handling in the studio package to remove the `label` field from variable definitions, streamlining the API.
+
+- Update theme tokens and improve UI consistency
+
+- Adjusted background colors in the canvas demo and various CSS modules to align with the new Codex theme specifications.
+- Updated design tokens in `tokens.css` for both light and dark themes to ensure consistency across components.
+- Refined styles for sidebars, popovers, and menus to enhance visual coherence and usability.
+- Introduced a new test suite for validating theme token integrity against the Codex design system.
+
 ## [0.3.5] - 2026-09-18
 
 ### Other
@@ -18,6 +50,8 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 
 - Replaced the static CSS marker with a function to dynamically check for compiled shell CSS modules in the `assertStudioStylesBundle` and `assertNextBuildIncludesWorkbenchCss` functions.
 - Updated comments to clarify the purpose of the new validation logic for CSS modules.
+
+- V0.3.5
 
 ## [0.3.4] - 2026-09-17
 
