@@ -15,10 +15,9 @@
   min-height: 0;
 }
 
-/* Tree rows are full-bleed bars, so the section body drops its side inset. */
 .treeBody {
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: var(--wb-space-1);
+  padding-right: var(--wb-space-1);
 }
 
 .treeItem {
@@ -29,7 +28,7 @@
   width: 100%;
   padding: 0 var(--wb-space-2);
   border: none;
-  border-radius: 0;
+  border-radius: var(--wb-radius-md);
   background: transparent;
   text-align: left;
   font-size: var(--wb-text-sm);

@@ -13,8 +13,8 @@
 }
 
 .row {
-  padding: 0 var(--wb-space-4);
-  border-radius: 0;
+  padding: 0 var(--wb-space-2);
+  border-radius: var(--wb-radius-md);
   background: transparent;
   box-shadow: none;
 }

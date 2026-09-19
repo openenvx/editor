@@ -103,8 +103,8 @@
 }
 
 .iconButton:hover:not(:disabled) {
-  background: var(--wb-accent);
-  color: var(--wb-accent-foreground);
+  background: var(--wb-hover-overlay);
+  color: var(--wb-foreground);
 }
 
 .iconButton:disabled {
@@ -279,8 +279,8 @@
 }
 
 .menuItem:hover:not(:disabled) {
-  background: var(--wb-accent);
-  color: var(--wb-accent-foreground);
+  background: var(--wb-menu-highlight);
+  color: var(--wb-menu-highlight-foreground);
 }
 
 .menuItem:disabled {

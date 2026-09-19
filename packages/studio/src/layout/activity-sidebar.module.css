@@ -25,8 +25,7 @@
   gap: var(--wb-space-3);
   width: var(--wb-activity-bar-width);
   padding: var(--wb-space-3) var(--wb-space-1);
-  border-right: var(--wb-hairline);
-  background: var(--wb-background);
+  background: var(--wb-sidebar-surface);
 }
 
 .activityDropdown {
@@ -74,8 +73,8 @@
 
 .activityItemActive .activityIconWrap,
 .activityItemActive:hover .activityIconWrap {
-  background: color-mix(in srgb, var(--wb-selection) 14%, transparent);
-  color: var(--wb-selection);
+  background: var(--wb-sidebar-segment-active);
+  color: var(--wb-foreground);
 }
 
 .activityItemActive .activityLabel {
@@ -119,8 +118,8 @@
   flex-direction: column;
   width: var(--wb-sidebar-width);
   min-height: 0;
-  background: var(--wb-sidebar-surface);
-  backdrop-filter: var(--wb-surface-blur);
+  background: var(--wb-card);
+  border-right: 1px solid var(--wb-surface-divider);
   animation: slideInLeft var(--wb-duration) var(--wb-ease-out);
 }
 

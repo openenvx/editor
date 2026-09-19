@@ -5,7 +5,13 @@
   gap: var(--wb-space-1);
   height: 44px;
   padding: 0 var(--wb-space-2) 0 var(--wb-space-3);
-  border-bottom: var(--wb-hairline);
+  background-image: linear-gradient(
+    var(--wb-surface-divider),
+    var(--wb-surface-divider)
+  );
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: 100% 1px;
 }
 
 .titleArea {
@@ -43,9 +49,9 @@
 .title {
   flex: 1;
   overflow: hidden;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: var(--wb-text-sm);
+  font-weight: 500;
+  letter-spacing: normal;
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;

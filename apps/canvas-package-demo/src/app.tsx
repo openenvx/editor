@@ -37,7 +37,7 @@ export function App() {
           height: 100%;
           display: flex;
           flex-direction: column;
-          background: #0a0a0a;
+          background: #101010;
         }
         .canvas-package-demo-editor { flex: 1; min-height: 0; }
       `}</style>

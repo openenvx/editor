@@ -24,8 +24,14 @@
 .topBar {
   flex-shrink: 0;
   height: var(--wb-topbar-height);
-  border-bottom: var(--wb-hairline);
-  background: var(--wb-background);
+  background-image: linear-gradient(
+    var(--wb-surface-divider),
+    var(--wb-surface-divider)
+  );
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: 100% 1px;
+  background-color: var(--wb-background);
 }
 
 .body {
@@ -40,8 +46,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--wb-sidebar-surface);
-  backdrop-filter: var(--wb-surface-blur);
+  background: transparent;
 }
 
 .editor {
@@ -51,14 +56,13 @@
   display: flex;
   flex-direction: column;
   background: var(--wb-card);
-  box-shadow: inset 0.5px 0 0 var(--wb-seam-line);
 }
 
 .secondarySidebar {
   flex-shrink: 0;
   width: var(--wb-secondary-sidebar-width);
-  border-left: var(--wb-hairline);
-  background: var(--wb-background);
+  border-left: 1px solid var(--wb-surface-divider);
+  background: var(--wb-card);
   min-height: 0;
   overflow: auto;
   animation: slideInRight var(--wb-duration) var(--wb-ease-out);
@@ -81,6 +85,6 @@
   flex: 1;
   min-width: 0;
   min-height: 0;
-  border-left: var(--wb-hairline);
+  box-shadow: inset 0.5px 0 0 var(--wb-surface-divider);
   background: var(--wb-background);
 }

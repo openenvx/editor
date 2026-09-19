@@ -62,32 +62,39 @@
 [data-owb-theme='light'] {
   color-scheme: light;
 
-  --wb-background: #fcfcfc;
-  --wb-canvas-field: #ececec;
+  /* Synara DEFAULT_THEME_STATE Codex light (buildThemeCssVariables). */
+  --wb-background: #ffffff;
+  --wb-canvas-field: #ffffff;
   --wb-card: #ffffff;
-  --wb-popover: #ffffff;
-  --wb-property-popover: #ffffff;
-  --wb-menu: rgb(255 255 255 / 92%);
-  --wb-popup-header: #f5f5f5;
-  --wb-muted: rgba(0, 0, 0, 0.04);
-  --wb-border: rgba(0, 0, 0, 0.05);
-  --wb-input-fill: rgba(0, 0, 0, 0.06);
+  --wb-popover: rgb(255, 255, 255);
+  --wb-popover-foreground: #0d0d0d;
+  --wb-property-popover: rgb(255, 255, 255);
+  --wb-menu: rgba(255, 255, 255, 0.96);
+  --wb-popup-header: rgba(13, 13, 13, 0.04);
+  --wb-muted: rgba(13, 13, 13, 0.04);
+  --wb-border: rgba(13, 13, 13, 0.069);
+  --wb-input-fill: rgb(255, 255, 255);
   --wb-seam-line: rgba(0, 0, 0, 0.05);
-  --wb-chrome-button: rgba(0, 0, 0, 0.04);
+  --wb-surface-divider: color-mix(in srgb, var(--wb-border) 60%, transparent);
+  --wb-chrome-button: rgba(13, 13, 13, 0.03);
   --wb-sidebar-segment-active: #ffffff;
-  --wb-sidebar-surface: color-mix(in srgb, var(--wb-card) 38%, transparent);
-  --wb-sidebar-row-selected: rgba(0, 0, 0, 0.04);
-  --wb-sidebar-row-hovered: rgba(0, 0, 0, 0.04);
+  /* Synara light sidebar is 38% white over macOS vibrancy. Web has no
+     desktop behind the rail, so mix against a Finder-gray plate. */
+  --wb-sidebar-surface: color-mix(in srgb, #ffffff 38%, #e0e0e0);
+  --wb-sidebar-row-selected: rgba(13, 13, 13, 0.03);
+  --wb-sidebar-row-hovered: rgba(13, 13, 13, 0.03);
 
-  --wb-foreground: rgba(0, 0, 0, 0.88);
-  --wb-muted-foreground: rgba(0, 0, 0, 0.55);
+  --wb-foreground: #0d0d0d;
+  --wb-muted-foreground: rgba(13, 13, 13, 0.598);
 
-  --wb-primary: #171717;
+  --wb-primary: #0d0d0d;
   --wb-primary-foreground: #ffffff;
-  --wb-focus: rgba(0, 0, 0, 0.4);
-  --wb-menu-highlight: rgba(0, 0, 0, 0.06);
-  --wb-menu-highlight-foreground: rgba(0, 0, 0, 0.88);
-  --wb-destructive: #dc2626;
+  --wb-accent: #e8f2fa;
+  --wb-accent-foreground: #0d0d0d;
+  --wb-focus: #0169cc;
+  --wb-menu-highlight: rgba(13, 13, 13, 0.03);
+  --wb-menu-highlight-foreground: #0d0d0d;
+  --wb-destructive: #e02e2a;
 
   --wb-selection: #3b82f6;
   --wb-selection-muted: rgba(59, 130, 246, 0.5);
@@ -103,10 +110,10 @@
   --wb-tooltip-border: transparent;
   --wb-tooltip-shadow: none;
 
-  --wb-hover-overlay: rgba(0, 0, 0, 0.04);
-  --wb-active-overlay: rgba(0, 0, 0, 0.06);
-  --wb-divider-color: rgba(0, 0, 0, 0.05);
-  --wb-border-subtle: rgba(0, 0, 0, 0.05);
+  --wb-hover-overlay: rgba(13, 13, 13, 0.03);
+  --wb-active-overlay: rgba(13, 13, 13, 0.059);
+  --wb-divider-color: var(--wb-surface-divider);
+  --wb-border-subtle: rgba(13, 13, 13, 0.06);
   --wb-backdrop-overlay: rgba(10, 10, 10, 0.4);
 
   /* Flat chrome - hairlines only, no lit controls */
@@ -116,7 +123,7 @@
   --wb-shadow-md: 0 0 0 1px var(--wb-border);
   --wb-shadow-float: 0 0 0 1px var(--wb-border);
   --wb-shadow-control: 0 0 0 1px var(--wb-border);
-  --wb-shadow-control-hover: 0 0 0 1px rgba(0, 0, 0, 0.12);
+  --wb-shadow-control-hover: 0 0 0 1px rgba(13, 13, 13, 0.059);
   --wb-shadow-control-focus: 0 0 0 1px var(--wb-focus);
   --wb-shadow-focus: 0 0 0 1px var(--wb-focus);
   --wb-shadow-artboard: 0 0 0 1px var(--wb-artboard-border);
@@ -124,43 +131,46 @@
   --wb-hairline: 1px solid var(--wb-border);
   --wb-divider: 1px solid var(--wb-border);
 
-  --wb-scrollbar-thumb: rgba(0, 0, 0, 0.25);
-  --wb-scrollbar-thumb-hover: rgba(0, 0, 0, 0.4);
+  --wb-scrollbar-thumb: rgba(13, 13, 13, 0.06);
+  --wb-scrollbar-thumb-hover: rgba(13, 13, 13, 0.069);
 }
 
 [data-owb-theme='dark'] {
   color-scheme: dark;
 
-  --wb-background: #0e0e0e;
-  --wb-canvas-field: #0a0a0a;
-  --wb-card: color-mix(in srgb, var(--wb-background) 99%, white);
-  --wb-popover: color-mix(in srgb, var(--wb-background) 99%, white);
-  --wb-property-popover: color-mix(in srgb, var(--wb-background) 99%, white);
-  --wb-menu: color-mix(in srgb, var(--wb-popover) 92%, transparent);
-  --wb-popup-header: #0f0f0f;
-  --wb-muted: rgba(255, 255, 255, 0.04);
-  --wb-border: rgba(255, 255, 255, 0.04);
-  --wb-input-fill: rgba(255, 255, 255, 0.05);
+  /* Synara DEFAULT_THEME_STATE Codex dark (buildThemeCssVariables). */
+  --wb-background: #101010;
+  --wb-canvas-field: #101010;
+  --wb-card: #131313;
+  --wb-popover: rgb(23, 23, 23);
+  --wb-popover-foreground: #fcfcfc;
+  --wb-property-popover: rgb(23, 23, 23);
+  --wb-menu: rgba(23, 23, 23, 0.96);
+  --wb-popup-header: #121212;
+  --wb-muted: rgba(252, 252, 252, 0.026);
+  --wb-border: rgba(252, 252, 252, 0.072);
+  --wb-input-fill: rgb(23, 23, 23);
   --wb-seam-line: rgba(255, 255, 255, 0.05);
-  --wb-chrome-button: rgba(255, 255, 255, 0.04);
-  --wb-sidebar-segment-active: rgba(255, 255, 255, 0.04);
-  --wb-sidebar-surface: color-mix(
-    in srgb,
-    color-mix(in srgb, var(--wb-card) 80%, #000000) 72%,
-    transparent
-  );
-  --wb-sidebar-row-selected: rgba(255, 255, 255, 0.04);
-  --wb-sidebar-row-hovered: rgba(255, 255, 255, 0.04);
+  --wb-surface-divider: color-mix(in srgb, var(--wb-border) 60%, transparent);
+  --wb-chrome-button: rgba(252, 252, 252, 0.026);
+  --wb-sidebar-segment-active: rgba(252, 252, 252, 0.026);
+  /* Synara dark glass: #111111 mixed 80% toward black (skip the extra
+     72% transparent, which vanished into --wb-background on web). */
+  --wb-sidebar-surface: color-mix(in srgb, #111111 80%, #000000);
+  --wb-sidebar-row-selected: rgba(252, 252, 252, 0.026);
+  --wb-sidebar-row-hovered: rgba(252, 252, 252, 0.039);
 
-  --wb-foreground: #f5f5f5;
-  --wb-muted-foreground: rgba(255, 255, 255, 0.55);
+  --wb-foreground: #fcfcfc;
+  --wb-muted-foreground: rgba(252, 252, 252, 0.58);
 
-  --wb-primary: #f5f5f5;
-  --wb-primary-foreground: #171717;
-  --wb-focus: rgba(255, 255, 255, 0.4);
-  --wb-menu-highlight: rgba(255, 255, 255, 0.06);
-  --wb-menu-highlight-foreground: #f5f5f5;
-  --wb-destructive: #f87171;
+  --wb-primary: #fcfcfc;
+  --wb-primary-foreground: #111111;
+  --wb-accent: #000f1d;
+  --wb-accent-foreground: #fcfcfc;
+  --wb-focus: rgba(51, 134, 214, 0.63);
+  --wb-menu-highlight: rgba(252, 252, 252, 0.039);
+  --wb-menu-highlight-foreground: #fcfcfc;
+  --wb-destructive: #e02e2a;
 
   --wb-selection: #3b82f6;
   --wb-selection-muted: rgba(59, 130, 246, 0.5);
@@ -172,14 +182,14 @@
   --wb-artboard-shadow-color: rgba(0, 0, 0, 0.45);
 
   --wb-tooltip: rgba(15, 15, 15, 0.94);
-  --wb-tooltip-foreground: rgba(245, 245, 245, 0.92);
+  --wb-tooltip-foreground: rgba(252, 252, 252, 0.92);
   --wb-tooltip-border: var(--wb-border);
   --wb-tooltip-shadow: none;
 
-  --wb-hover-overlay: rgba(255, 255, 255, 0.04);
-  --wb-active-overlay: rgba(255, 255, 255, 0.06);
-  --wb-divider-color: rgba(255, 255, 255, 0.04);
-  --wb-border-subtle: rgba(255, 255, 255, 0.04);
+  --wb-hover-overlay: rgba(252, 252, 252, 0.039);
+  --wb-active-overlay: rgba(252, 252, 252, 0.029);
+  --wb-divider-color: var(--wb-surface-divider);
+  --wb-border-subtle: rgba(252, 252, 252, 0.046);
   --wb-backdrop-overlay: rgba(0, 0, 0, 0.72);
 
   --wb-shadow-xs: 0 0 0 1px var(--wb-border);
@@ -188,7 +198,7 @@
   --wb-shadow-md: 0 0 0 1px var(--wb-border);
   --wb-shadow-float: 0 0 0 1px var(--wb-border);
   --wb-shadow-control: 0 0 0 1px var(--wb-border);
-  --wb-shadow-control-hover: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --wb-shadow-control-hover: 0 0 0 1px rgba(252, 252, 252, 0.118);
   --wb-shadow-control-focus: 0 0 0 1px var(--wb-focus);
   --wb-shadow-focus: 0 0 0 1px var(--wb-focus);
   --wb-shadow-artboard: 0 0 0 1px var(--wb-artboard-border);
@@ -196,8 +206,8 @@
   --wb-hairline: 1px solid var(--wb-border);
   --wb-divider: 1px solid var(--wb-border);
 
-  --wb-scrollbar-thumb: rgba(255, 255, 255, 0.22);
-  --wb-scrollbar-thumb-hover: rgba(255, 255, 255, 0.35);
+  --wb-scrollbar-thumb: rgba(252, 252, 252, 0.046);
+  --wb-scrollbar-thumb-hover: rgba(252, 252, 252, 0.072);
 }
 
 [data-owb-theme],

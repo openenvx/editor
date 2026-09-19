@@ -6,35 +6,40 @@ Product role lives in [Architecture.md](../../Architecture.md) and [docs/archite
 
 ## Look
 
-Light and dark. Near-white / near-black canvas, 4% ink hairlines, system UI at 12px with normal tracking, frosted sidebar rail, opaque inset editor stage, flat controls. No drop shadows on chrome. Rows 1.75rem. Top bar 46px.
+1:1 with Synara's default **Codex** pack (`DEFAULT_THEME_STATE` in [synara `theme.logic.ts`](https://github.com/Emanuele-web04/synara)). White / charcoal desktop chrome, 12px system UI, frosted sidebar, opaque inset stage, 5% content seam, 28px rounded rows, flat controls, no drop shadows.
 
-Reject Inter, Geist, Cal Sans as loaded families, warm cream dark type, lit inset-highlight controls, 11px Figma density, solid blue menu-row fills, Lucide, Radix.
+Reject Inter, Geist, Cal Sans as loaded families, warm cream dark type, lit inset-highlight controls, 11px Figma density, solid blue chrome fills, Lucide, Radix.
 
 ## Tokens
 
-Source of truth: [`src/theme/tokens.css`](src/theme/tokens.css). Scopes: `[data-owb-theme="light"]` (default) and `[data-owb-theme="dark"]`. Theme switching via `ThemeProvider` / `data-owb-theme` on the shell root.
+Source of truth: [`src/theme/tokens.css`](src/theme/tokens.css). Values are the Synara `buildThemeCssVariables` output for Codex light/dark (macOS translucent sidebar). Scopes: `[data-owb-theme="light"]` (default) and `[data-owb-theme="dark"]`. Theme switching via `ThemeProvider` / `data-owb-theme` on the shell root.
 
 | Token | Light | Dark | Role |
 | --- | --- | --- | --- |
-| `--wb-background` | `#fcfcfc` | `#0e0e0e` | Panel chrome, activity bar |
-| `--wb-canvas-field` | `#ececec` | `#0a0a0a` | Infinite workspace (darker than chrome) |
-| `--wb-card` | `#ffffff` | `#0f0f0f` | Inset stage, inspector, elevated surfaces |
-| `--wb-popover` / `--wb-menu` | white / 92% | `#0f0f0f` / 92% | Menus, popovers (translucent + blur) |
-| `--wb-border` | `rgba(0,0,0,0.05)` | `rgba(255,255,255,0.04)` | Hairlines |
-| `--wb-muted` | `rgba(0,0,0,0.04)` | `rgba(255,255,255,0.04)` | Hover, selected rows, fills |
-| `--wb-input-fill` | `rgba(0,0,0,0.06)` | `rgba(255,255,255,0.05)` | Inputs, dense fields |
-| `--wb-seam-line` | `rgba(0,0,0,0.05)` | `rgba(255,255,255,0.05)` | Inset content seam |
-| `--wb-sidebar-surface` | card glass | charcoal glass ~72% | Frosted rail |
+| `--wb-background` | `#ffffff` | `#101010` | Window under-surface |
+| `--wb-canvas-field` | `#ffffff` | `#101010` | Infinite workspace |
+| `--wb-card` | `#ffffff` | `#131313` | Inset stage, inspector |
+| `--wb-popover` / `--wb-menu` | opaque white / 96% | `rgb(23,23,23)` / 96% | Menus, popovers |
+| `--wb-border` | `rgba(13,13,13,0.069)` | `rgba(252,252,252,0.072)` | Hairlines |
+| `--wb-muted` | `rgba(13,13,13,0.04)` | `rgba(252,252,252,0.026)` | Wells, segmented tracks |
+| `--wb-hover-overlay` | `rgba(13,13,13,0.03)` | `rgba(252,252,252,0.039)` | Row / icon hover |
+| `--wb-sidebar-row-selected` | `rgba(13,13,13,0.03)` | `rgba(252,252,252,0.026)` | Selected sidebar row |
+| `--wb-input-fill` | `rgb(255,255,255)` | `rgb(23,23,23)` | Inputs |
+| `--wb-seam-line` | `rgba(0,0,0,0.05)` | `rgba(255,255,255,0.05)` | Sidebar ↔ stage inset seam |
+| `--wb-surface-divider` | 60% of border | 60% of border | Internal header / pane splits |
+| `--wb-sidebar-surface` | 38% white on `#e0e0e0` | `#111111` 80% toward black | Activity bar only (opaque stand-in for Synara vibrancy) |
 | `--wb-surface-blur` | `blur(4px) saturate(130%)` | same | Backdrop on sidebar / menus |
 | `--wb-font` | `-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif` | same | All UI copy |
 | `--wb-text-sm` | `12px` | same | Workhorse UI size |
 | `--wb-layer-row-height` / `--wb-menu-item-height` / `--wb-control-height` | `28px` (`1.75rem`) | same | Lists, menus, controls |
 | `--wb-topbar-height` | `46px` | same | Title / top bar |
 | `--wb-radius-lg` | `0.625rem` | same | Controls, panels |
-| `--wb-foreground` | `rgba(0,0,0,0.88)` | `#f5f5f5` | Primary text (Konva-safe) |
-| `--wb-muted-foreground` | `rgba(0,0,0,0.55)` | `rgba(255,255,255,0.55)` | Labels, metadata |
-| `--wb-primary` | `#171717` | `#f5f5f5` | Primary button fill |
-| `--wb-focus` | `rgba(0,0,0,0.4)` | `rgba(255,255,255,0.4)` | Keyboard focus ring (neutral, no blue glow) |
+| `--wb-radius-md` | `8px` | same | Sidebar rows |
+| `--wb-foreground` | `#0d0d0d` | `#fcfcfc` | Primary text |
+| `--wb-muted-foreground` | `rgba(13,13,13,0.598)` | `rgba(252,252,252,0.58)` | Labels, metadata |
+| `--wb-primary` | `#0d0d0d` | `#fcfcfc` | Primary button fill |
+| `--wb-focus` | `#0169cc` | `rgba(51,134,214,0.63)` | Keyboard focus ring |
+| `--wb-destructive` | `#e02e2a` | `#e02e2a` | Destructive |
 
 Canvas-facing tokens (`--wb-selection`, `--wb-artboard`, etc.) stay Konva-safe hex / classic `rgba`. Blue selection handles are **artboard only**, not chrome CTAs.
 
@@ -48,10 +53,11 @@ Monospace for code paths: `var(--wb-font-mono)`.
 
 Three columns: activity + layers rail | canvas stage | inspector.
 
-- Sidebars: `--wb-sidebar-surface` + `--wb-surface-blur`, 28px rows, 4% hover, selected = `--wb-muted`
-- Editor / inspector inset: `--wb-card` with `inset 0.5px 0 0 var(--wb-seam-line)`
+- Activity bar: `--wb-sidebar-surface` (gray / charcoal), selected icon = `--wb-sidebar-segment-active`
+- Layers + inspector: `--wb-card`, 1px `--wb-surface-divider` against the artboard, 28px `rounded-md` rows
+- Inspector / headers: `--wb-surface-divider` (not the outer seam)
 - Top bar: 46px, flat `chrome` / `ghost` controls, 12px
-- Menus: translucent fill, hairline border, no drop shadow
+- Menus: 96% fill, hairline border, no drop shadow
 - Floating canvas toolbar: compact pill on the artboard (not a full-width chrome row)
 
 Contribution-driven layout only — hosts declare views and toolbars; the shell renders.
