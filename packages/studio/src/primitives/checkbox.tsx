@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react';
+import { IconCheck } from '@tabler/icons-react';
 import type { ButtonHTMLAttributes } from 'react';
 
 import { cn } from '../lib/cn';
@@ -38,11 +38,11 @@ export function Checkbox({
       {...props}
     >
       {checked ? (
-        <Check
+        <IconCheck
           aria-hidden
           className={styles.indicator}
           size={12}
-          strokeWidth={3}
+          stroke={3}
         />
       ) : null}
     </button>

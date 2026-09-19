@@ -398,7 +398,6 @@ export interface TemplateVariable {
   id: string;
   /** Token id - `[A-Za-z][A-Za-z0-9_]*`. */
   key: string;
-  label?: string;
   /** Editor preview / default render value. */
   sample?: string;
 }

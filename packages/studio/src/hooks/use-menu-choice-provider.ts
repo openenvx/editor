@@ -1,6 +1,7 @@
 import {
   LocalizationServiceId,
   MenuChoiceRegistryId,
+  ThemeServiceId,
 } from '@openenvx/studio/core';
 import type { MenuChoiceProvider } from '@openenvx/studio/core';
 import { useEffect, useReducer } from 'react';
@@ -29,6 +30,11 @@ export function useMenuChoiceProvider(
     const localization = api.getService(LocalizationServiceId);
     if (localization) {
       disposables.push(localization.onDidChangeLocale(() => rerender()));
+    }
+
+    const theme = api.getService(ThemeServiceId);
+    if (theme) {
+      disposables.push(theme.onDidChangeTheme(() => rerender()));
     }
 
     return () => {

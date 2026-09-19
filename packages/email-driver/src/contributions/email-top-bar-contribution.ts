@@ -1,5 +1,6 @@
 import {
   TopBarContribution,
+  WORKBENCH_THEME_SETTINGS_MENU_ITEM,
   type CommandContext,
   type TopBarBuilder,
   type TopBarCommandItemDescriptor,
@@ -141,6 +142,7 @@ export class EmailTopBarContribution extends TopBarContribution {
             commandId: WORKBENCH_TOGGLE_COMMAND_PALETTE_COMMAND_ID,
             label: 'Command palette',
           },
+          WORKBENCH_THEME_SETTINGS_MENU_ITEM,
         ],
         priority: 40,
         variant: 'menu',

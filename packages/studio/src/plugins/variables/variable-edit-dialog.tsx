@@ -42,7 +42,6 @@ export const VariableEditDialog = memo(
     const { t } = useWorkbenchTranslation();
     const titleId = useId();
     const [keyDraft, setKeyDraft] = useState('');
-    const [labelDraft, setLabelDraft] = useState('');
     const [sampleDraft, setSampleDraft] = useState('');
     const [error, setError] = useState<string | null>(null);
 
@@ -53,11 +52,9 @@ export const VariableEditDialog = memo(
       const existingVariables = scene ? sceneVariables(scene) : [];
       if (payload.mode === 'edit') {
         setKeyDraft(payload.variable.key);
-        setLabelDraft(payload.variable.label ?? '');
         setSampleDraft(payload.variable.sample ?? '');
       } else {
         setKeyDraft(nextVariableKey(existingVariables));
-        setLabelDraft('');
         setSampleDraft('');
       }
       setError(null);
@@ -86,7 +83,6 @@ export const VariableEditDialog = memo(
       }
       const patch = {
         key,
-        label: labelDraft.trim() || undefined,
         sample: sampleDraft,
       };
       if (payload.mode === 'create') {
@@ -98,16 +94,7 @@ export const VariableEditDialog = memo(
         });
       }
       onClose();
-    }, [
-      executeCommand,
-      keyDraft,
-      labelDraft,
-      onClose,
-      payload,
-      sampleDraft,
-      scene,
-      t,
-    ]);
+    }, [executeCommand, keyDraft, onClose, payload, sampleDraft, scene, t]);
 
     const handleDelete = useCallback(async () => {
       if (payload?.mode !== 'edit') {
@@ -187,17 +174,6 @@ export const VariableEditDialog = memo(
               }}
               placeholder={t('variables.renamePrompt')}
               value={keyDraft}
-            />
-          </PropertyFieldRow>
-          <PropertyFieldRow
-            htmlFor="variable-label"
-            label={t('variables.labelLabel')}
-          >
-            <Input
-              id="variable-label"
-              onChange={(event) => setLabelDraft(event.target.value)}
-              placeholder={t('variables.labelPlaceholder')}
-              value={labelDraft}
             />
           </PropertyFieldRow>
           <PropertyFieldRow

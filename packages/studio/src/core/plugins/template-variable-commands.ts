@@ -64,7 +64,6 @@ function canResolveVariableInsertTarget(ctx: CommandContext): boolean {
 
 export interface AddVariableArgs {
   key?: string;
-  label?: string;
   sample?: string;
 }
 
@@ -92,7 +91,6 @@ export class AddVariableCommand extends Command {
     const variable: TemplateVariable = {
       id: createVariableId(),
       key,
-      label: patch.label?.trim() || undefined,
       sample: patch.sample,
     };
     ctx.scene.apply({
@@ -105,7 +103,6 @@ export class AddVariableCommand extends Command {
 export interface UpdateVariableArgs {
   id: string;
   key?: string;
-  label?: string;
   sample?: string;
 }
 
@@ -142,7 +139,6 @@ export class UpdateVariableCommand extends Command {
       apply: (scene) => {
         const next = updateVariableInScene(scene, patch.id, {
           key: patch.key,
-          label: patch.label,
           sample: patch.sample,
         });
         return next ?? scene;

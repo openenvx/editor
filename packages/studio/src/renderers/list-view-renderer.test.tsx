@@ -69,6 +69,32 @@ describe('ListViewRenderer', () => {
     expect(screen.getByRole('button', { name: /^add$/i })).toBeTruthy();
   });
 
+  it('renders variable key in the list', () => {
+    renderListView({
+      content: {
+        items: [
+          {
+            actions: [
+              {
+                commandId: 'catalog.edit',
+                icon: 'pencil',
+                label: 'Edit item',
+              },
+            ],
+            depth: 0,
+            hasChildren: false,
+            id: 'item-1',
+            label: 'name',
+            source: { id: 'item-1' },
+          },
+        ],
+        kind: 'list',
+      },
+    });
+
+    expect(screen.getByText('name')).toBeTruthy();
+  });
+
   it('fires add and row action commands', () => {
     const { executeCommand } = renderListView();
 

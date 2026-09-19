@@ -1,4 +1,4 @@
-import { Minus, Plus } from 'lucide-react';
+import { IconMinus, IconPlus } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 
 import { cn } from '../lib/cn';
@@ -86,7 +86,7 @@ export function StepperField({
                   onClick={() => adjust(-step)}
                   type="button"
                 >
-                  <Minus size={12} />
+                  <IconMinus size={12} stroke={1.5} />
                 </button>
                 <button
                   aria-label={`Increase ${label}`}
@@ -94,7 +94,7 @@ export function StepperField({
                   onClick={() => adjust(step)}
                   type="button"
                 >
-                  <Plus size={12} />
+                  <IconPlus size={12} stroke={1.5} />
                 </button>
               </div>
             </div>
@@ -124,7 +124,7 @@ export function StepperField({
           onClick={() => adjust(-step)}
           type="button"
         >
-          <Minus size={12} />
+          <IconMinus size={12} stroke={1.5} />
         </button>
         <button
           aria-label={`Increase ${label}`}
@@ -132,7 +132,7 @@ export function StepperField({
           onClick={() => adjust(step)}
           type="button"
         >
-          <Plus size={12} />
+          <IconPlus size={12} stroke={1.5} />
         </button>
       </div>
     </div>

@@ -2,7 +2,7 @@ import {
   formatVariableToken,
   type TemplateVariable,
 } from '@openenvx/studio/schema';
-import { MoreHorizontal, Plus } from 'lucide-react';
+import { IconDots, IconPlus } from '@tabler/icons-react';
 import { memo, useCallback, useEffect, useRef } from 'react';
 
 import type { VariableSuggestAnchor } from './tiptap/variable-suggest-state';
@@ -90,7 +90,7 @@ export const VariableSuggestMenu = memo(
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => onEdit(variable.id)}
                   >
-                    <MoreHorizontal size={14} />
+                    <IconDots size={14} stroke={1.5} />
                   </button>
                 ) : null}
               </div>
@@ -104,7 +104,7 @@ export const VariableSuggestMenu = memo(
             onMouseDown={(event) => event.preventDefault()}
             onClick={onCreate}
           >
-            <Plus aria-hidden size={14} />
+            <IconPlus aria-hidden size={14} stroke={1.5} />
             {createLabel}
           </button>
         ) : null}

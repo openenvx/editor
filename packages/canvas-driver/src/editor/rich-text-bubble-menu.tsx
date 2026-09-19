@@ -1,5 +1,10 @@
+import {
+  IconBold,
+  IconItalic,
+  IconStrikethrough,
+  IconUnderline,
+} from '@tabler/icons-react';
 import type { Editor } from '@tiptap/react';
-import { Bold, Italic, Strikethrough, Underline } from 'lucide-react';
 import { type ReactNode, useSyncExternalStore } from 'react';
 
 import { RICH_TEXT_FONT_FAMILY_OPTIONS } from './rich-text-editor-extensions';
@@ -73,28 +78,28 @@ export function RichTextBubbleMenuToolbar({ editor }: { editor: Editor }) {
         label="Bold"
         onPress={() => editor.chain().focus().toggleBold().run()}
       >
-        <Bold size={14} />
+        <IconBold size={14} stroke={1.5} />
       </FormatButton>
       <FormatButton
         active={editor.isActive('italic')}
         label="Italic"
         onPress={() => editor.chain().focus().toggleItalic().run()}
       >
-        <Italic size={14} />
+        <IconItalic size={14} stroke={1.5} />
       </FormatButton>
       <FormatButton
         active={editor.isActive('underline')}
         label="Underline"
         onPress={() => editor.chain().focus().toggleUnderline().run()}
       >
-        <Underline size={14} />
+        <IconUnderline size={14} stroke={1.5} />
       </FormatButton>
       <FormatButton
         active={editor.isActive('strike')}
         label="Strikethrough"
         onPress={() => editor.chain().focus().toggleStrike().run()}
       >
-        <Strikethrough size={14} />
+        <IconStrikethrough size={14} stroke={1.5} />
       </FormatButton>
       <label className={styles.formatButton} title="Text color">
         <input

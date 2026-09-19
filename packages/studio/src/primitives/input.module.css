@@ -4,10 +4,10 @@
   padding: 0 var(--wb-control-padding-x);
   border: none;
   border-radius: var(--wb-radius-control);
-  background: var(--wb-muted);
+  background: var(--wb-input-fill);
   color: var(--wb-foreground);
   font-size: var(--wb-text-sm);
-  box-shadow: var(--wb-shadow-control);
+  box-shadow: var(--wb-shadow-xs);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

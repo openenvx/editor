@@ -1,10 +1,10 @@
 import { IconRegistryId } from '@openenvx/studio/core';
-import type { LucideIcon } from 'lucide-react';
-import { Layers } from 'lucide-react';
+import type { Icon } from '@tabler/icons-react';
+import { IconLayersLinked } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
-import { LUCIDE_GLYPHS } from './lucide-glyphs';
+import { TABLER_GLYPHS } from './tabler-glyphs';
 
 export interface WorkbenchIconProps {
   id?: string;
@@ -16,12 +16,12 @@ export interface WorkbenchIconProps {
 function resolveGlyph(
   registry: { resolve: (id: string) => unknown } | undefined,
   id: string
-): LucideIcon | undefined {
-  const fromRegistry = registry?.resolve(id) as LucideIcon | null | undefined;
+): Icon | undefined {
+  const fromRegistry = registry?.resolve(id) as Icon | null | undefined;
   if (fromRegistry) {
     return fromRegistry;
   }
-  return LUCIDE_GLYPHS[id];
+  return TABLER_GLYPHS[id];
 }
 
 export function WorkbenchIcon({
@@ -33,10 +33,12 @@ export function WorkbenchIcon({
   const { api } = useWorkbenchContext();
   const registry = api.getService(IconRegistryId);
   const resolvedId = id ?? fallbackId;
-  const Icon =
+  const IconComponent =
     resolveGlyph(registry, resolvedId) ??
     resolveGlyph(registry, fallbackId) ??
-    LUCIDE_GLYPHS[fallbackId] ??
-    Layers;
-  return <Icon aria-hidden className={className} size={size} />;
+    TABLER_GLYPHS[fallbackId] ??
+    IconLayersLinked;
+  return (
+    <IconComponent aria-hidden className={className} size={size} stroke={1.5} />
+  );
 }

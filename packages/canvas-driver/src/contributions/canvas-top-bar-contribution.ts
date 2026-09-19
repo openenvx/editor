@@ -1,5 +1,6 @@
 import {
   TopBarContribution,
+  WORKBENCH_THEME_SETTINGS_MENU_ITEM,
   type CommandContext,
   type TopBarBuilder,
 } from '@openenvx/studio/core';
@@ -62,6 +63,7 @@ export class CanvasTopBarContribution extends TopBarContribution {
             commandId: WORKBENCH_TOGGLE_COMMAND_PALETTE_COMMAND_ID,
             label: 'Command palette',
           },
+          WORKBENCH_THEME_SETTINGS_MENU_ITEM,
         ],
         priority: 30,
         variant: 'menu',

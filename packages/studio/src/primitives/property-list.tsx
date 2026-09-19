@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { IconPlus } from '@tabler/icons-react';
 import type {
   ButtonHTMLAttributes,
   CSSProperties,
@@ -120,7 +120,7 @@ export function PropertyListAdd({
       variant="ghost"
       {...props}
     >
-      <Plus aria-hidden size={12} />
+      <IconPlus aria-hidden size={12} stroke={1.5} />
       {children}
     </Button>
   );

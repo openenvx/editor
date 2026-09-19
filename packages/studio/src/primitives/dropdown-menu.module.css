@@ -10,10 +10,11 @@
   flex-direction: column;
   min-width: 180px;
   padding: var(--wb-space-1);
+  border: var(--wb-hairline);
   border-radius: var(--wb-radius-md);
   background: var(--wb-menu);
   backdrop-filter: var(--wb-surface-blur);
-  box-shadow: var(--wb-shadow-float);
+  box-shadow: none;
   font-family: var(--wb-font);
 }
 
@@ -45,6 +46,7 @@
   user-select: none;
 }
 
+/* Highlighted rows: quiet 4% fill. */
 .item[data-highlighted],
 .item:hover:not(:disabled):not([data-disabled]) {
   background: var(--wb-menu-highlight);
@@ -105,13 +107,4 @@
   justify-content: center;
   width: 12px;
   margin-right: 2px;
-}
-
-/* Highlighted rows are a solid blue bar: everything inside inherits its text. */
-.item[data-highlighted] .shortcut,
-.item[data-highlighted] .subTriggerIcon,
-.item:hover:not(:disabled):not([data-disabled]) .shortcut,
-.item:hover:not(:disabled):not([data-disabled]) .subTriggerIcon {
-  color: inherit;
-  opacity: 0.75;
 }

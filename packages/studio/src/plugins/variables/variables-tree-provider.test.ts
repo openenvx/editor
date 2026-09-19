@@ -21,7 +21,7 @@ describe('VariablesTreeProvider', () => {
     const provider = new VariablesTreeProvider();
     const scene = normalizeScene({
       pages: [{ id: 'p1', name: 'Canvas', layout: 'absolute', layers: [] }],
-      variables: [{ id: 'v1', key: 'name', label: 'Recipient name' }],
+      variables: [{ id: 'v1', key: 'name' }],
     });
     const ctx = createCtx(scene);
 
@@ -31,8 +31,7 @@ describe('VariablesTreeProvider', () => {
     const item = provider.getTreeItem(roots[0]!, ctx);
     expect(item).toMatchObject({
       id: 'v1',
-      label: '{{{name}}}',
-      description: 'Recipient name',
+      label: 'name',
       actions: [
         {
           commandId: 'variables.edit',

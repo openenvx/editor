@@ -1,6 +1,7 @@
 import type { DescriptorItemBase } from './descriptor-builder';
+import type { RadioGroupMenuItemDescriptor } from './menu-builder';
 
-export interface ShellDropdownMenuItemDescriptor {
+export interface ShellDropdownCommandMenuItemDescriptor {
   kind?: 'command';
   commandId: string;
   args?: unknown;
@@ -8,6 +9,16 @@ export interface ShellDropdownMenuItemDescriptor {
   labelKey?: string;
   when?: string;
   shortcut?: string;
+}
+
+export type ShellDropdownMenuItemDescriptor =
+  | ShellDropdownCommandMenuItemDescriptor
+  | RadioGroupMenuItemDescriptor;
+
+export function isShellDropdownCommandMenuItem(
+  item: ShellDropdownMenuItemDescriptor
+): item is ShellDropdownCommandMenuItemDescriptor {
+  return item.kind === undefined || item.kind === 'command';
 }
 
 export interface ShellDropdownItemBase extends DescriptorItemBase {

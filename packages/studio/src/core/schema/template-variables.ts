@@ -220,7 +220,7 @@ export function addVariableToScene(
 export function updateVariableInScene(
   scene: Scene,
   id: string,
-  patch: { key?: string; label?: string; sample?: string }
+  patch: { key?: string; sample?: string }
 ): Scene | null {
   const variables = [...sceneVariables(scene)];
   const index = variables.findIndex((entry) => entry.id === id);
@@ -236,10 +236,6 @@ export function updateVariableInScene(
   const nextVariable: TemplateVariable = {
     ...current,
     key: nextKey,
-    label:
-      patch.label !== undefined
-        ? patch.label.trim() || undefined
-        : current.label,
     sample: patch.sample !== undefined ? patch.sample : current.sample,
   };
   variables[index] = nextVariable;

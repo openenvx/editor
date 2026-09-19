@@ -2,8 +2,11 @@ import type {
   ShellDropdownMenuItemDescriptor,
   ToolbarPlacement,
 } from '@openenvx/studio/core';
-import { isToolbarTopPlacement } from '@openenvx/studio/core';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  isShellDropdownCommandMenuItem,
+  isToolbarTopPlacement,
+} from '@openenvx/studio/core';
+import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
@@ -125,7 +128,7 @@ export const ShellDropdownControl = memo(
 
     const groups = useMemo(
       () => [
-        items.map((item) => ({
+        items.filter(isShellDropdownCommandMenuItem).map((item) => ({
           disabled: !(commandStates?.[item.commandId]?.canExecute ?? true),
           id: `${id}-${item.commandId}`,
           label: item.labelKey
@@ -145,7 +148,7 @@ export const ShellDropdownControl = memo(
     const openUp =
       variant === 'statusBar' ||
       (placement !== undefined && !isToolbarTopPlacement(placement));
-    const Chevron = openUp ? ChevronUp : ChevronDown;
+    const Chevron = openUp ? IconChevronUp : IconChevronDown;
 
     return (
       <DropdownMenu

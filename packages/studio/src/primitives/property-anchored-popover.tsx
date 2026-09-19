@@ -1,9 +1,9 @@
-import { Slot } from '@radix-ui/react-slot';
-import { useRef } from 'react';
-import type { ReactNode } from 'react';
+import { useRef, cloneElement } from 'react';
+import type { ReactElement, ReactNode, Ref } from 'react';
 
 import { usePropertyPopoverPanel } from '../context/property-popover-context';
 import { usePropertyPopoverAnchor } from '../hooks/use-property-popover-anchor';
+import { mergeRefs } from '../lib/merge-refs';
 import {
   Popover,
   PopoverAnchor,
@@ -40,8 +40,11 @@ export function PropertyAnchoredPopover({
   if (anchorRect) {
     lastAnchorRef.current = anchorRect;
   }
-  // Keep last rect so Radix Presence can play exit while Root.open is false.
   const displayAnchor = anchorRect ?? lastAnchorRef.current;
+
+  const triggerElement = trigger as ReactElement<{
+    ref?: Ref<HTMLElement>;
+  }>;
 
   return (
     <Popover
@@ -50,7 +53,15 @@ export function PropertyAnchoredPopover({
       open={open}
     >
       <PopoverTrigger>
-        <Slot ref={triggerRef}>{trigger}</Slot>
+        {
+          // eslint-disable-next-line react/no-clone-element -- merge trigger ref for anchor math
+          cloneElement(triggerElement, {
+            ref: mergeRefs(
+              triggerRef,
+              triggerElement.props.ref as Ref<HTMLElement> | undefined
+            ),
+          })
+        }
       </PopoverTrigger>
       {displayAnchor ? (
         <PopoverAnchor

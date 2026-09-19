@@ -5,7 +5,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import type { ViewDescriptor, ViewTreeItem } from '@openenvx/studio/core';
-import { GripVertical } from 'lucide-react';
+import { IconGripVertical } from '@tabler/icons-react';
 import { memo, useCallback, useMemo } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
@@ -25,15 +25,16 @@ import {
 import styles from './list-view-renderer.module.css';
 
 function ListRowLabel({ item }: { item: ViewTreeItem }) {
-  const labelClass = item.label.startsWith('{{{')
-    ? cn(styles.label, styles.labelMono)
-    : styles.label;
+  const labelClass =
+    item.label.startsWith('{{{') || /^[A-Za-z][A-Za-z0-9_]*$/.test(item.label)
+      ? cn(styles.label, styles.labelMono)
+      : styles.label;
 
   return (
-    <div>
+    <div className={styles.labelStack}>
       <span className={labelClass}>{item.label}</span>
       {item.description ? (
-        <p className={styles.description}>{item.description}</p>
+        <span className={styles.description}>{item.description}</span>
       ) : null}
     </div>
   );
@@ -89,7 +90,7 @@ function ListRow({
             {...attributes}
             {...listeners}
           >
-            <GripVertical size={14} />
+            <IconGripVertical size={14} stroke={1.5} />
           </button>
         ) : undefined
       }

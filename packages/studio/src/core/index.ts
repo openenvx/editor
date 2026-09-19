@@ -252,6 +252,11 @@ export {
   MenuChoiceRegistryImpl,
   type MenuChoiceRegistry,
 } from './menu/menu-choice-registry';
+export {
+  WORKBENCH_LOCALE_MENU_CHOICE_PROVIDER_ID,
+  WORKBENCH_THEME_MENU_CHOICE_PROVIDER_ID,
+} from './menu/workbench-menu-choice-ids';
+export { WORKBENCH_THEME_SETTINGS_MENU_ITEM } from './menu/workbench-settings-menu-items';
 
 export {
   AssetServiceId,

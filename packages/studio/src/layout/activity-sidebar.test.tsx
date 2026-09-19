@@ -4,7 +4,7 @@ import {
   MutableMenuChoiceProvider,
 } from '@openenvx/studio/core';
 import type { ViewContainerDescriptor } from '@openenvx/studio/core';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -108,7 +108,7 @@ describe('ActivitySidebar dropdown', () => {
     renderActivitySidebar();
 
     await user.click(screen.getByRole('button', { name: 'File' }));
-    expect(screen.getByRole('menu')).toBeTruthy();
+    await screen.findByRole('menu');
 
     fireEvent.pointerDown(document.body, { button: 0 });
     expect(screen.queryByRole('menu')).toBeNull();
@@ -119,12 +119,14 @@ describe('ActivitySidebar dropdown', () => {
     renderActivitySidebar();
 
     await user.click(screen.getByRole('button', { name: 'File' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Theme' }));
-    expect(screen.getByRole('menuitemradio', { name: 'Light' })).toBeTruthy();
+    await user.click(await screen.findByRole('menuitem', { name: 'Theme' }));
+    await screen.findByRole('menuitemradio', { name: 'Light' });
 
     await user.click(screen.getByRole('menuitem', { name: 'Language' }));
-    expect(screen.queryByRole('menuitemradio', { name: 'Light' })).toBeNull();
-    expect(screen.getByRole('menuitemradio', { name: 'English' })).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitemradio', { name: 'Light' })).toBeNull();
+    });
+    await screen.findByRole('menuitemradio', { name: 'English' });
   });
 
   it('closes the file menu when clicking another activity item', async () => {
@@ -133,7 +135,7 @@ describe('ActivitySidebar dropdown', () => {
 
     const layersButton = screen.getByRole('button', { name: 'Layers' });
     await user.click(screen.getByRole('button', { name: 'File' }));
-    expect(screen.getByRole('menu')).toBeTruthy();
+    await screen.findByRole('menu');
 
     fireEvent.click(layersButton);
     expect(screen.queryByRole('menu')).toBeNull();

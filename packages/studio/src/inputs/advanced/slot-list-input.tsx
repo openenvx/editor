@@ -1,5 +1,5 @@
 import type { Layer, SlotListFieldConfig } from '@openenvx/studio/core';
-import { Trash2 } from 'lucide-react';
+import { IconTrash } from '@tabler/icons-react';
 
 import { IconButton } from '../../primitives/icon-button';
 import { PropertyFieldRow } from '../../primitives/property-field-row';
@@ -66,7 +66,7 @@ export function SlotListInput({
                 );
               }}
             >
-              <Trash2 size={12} />
+              <IconTrash size={12} stroke={1.5} />
             </IconButton>
           }
           key={row.id}

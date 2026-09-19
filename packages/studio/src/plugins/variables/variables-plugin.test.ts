@@ -8,7 +8,7 @@ import { CreateVariableCommand, EditVariableCommand } from './variables-plugin';
 function createCommandContext(sceneOverrides: Record<string, unknown> = {}) {
   const scene = normalizeScene({
     pages: [{ id: 'p1', name: 'Page', layout: 'absolute', layers: [] }],
-    variables: [{ id: 'var-1', key: 'name', label: 'Name' }],
+    variables: [{ id: 'var-1', key: 'name' }],
     ...sceneOverrides,
   });
   const open = vi.fn();

@@ -2,7 +2,7 @@ import {
   VersionHistoryProviderId,
   type DocumentVersion,
 } from '@openenvx/studio/core';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
@@ -99,9 +99,19 @@ function AutosaveGroup({
         type="button"
       >
         {open ? (
-          <ChevronDown aria-hidden className={styles.chevron} size={14} />
+          <IconChevronDown
+            aria-hidden
+            className={styles.chevron}
+            size={14}
+            stroke={1.5}
+          />
         ) : (
-          <ChevronRight aria-hidden className={styles.chevron} size={14} />
+          <IconChevronRight
+            aria-hidden
+            className={styles.chevron}
+            size={14}
+            stroke={1.5}
+          />
         )}
         {t('versionHistory.autosaveGroup', { count: versions.length })}
       </button>

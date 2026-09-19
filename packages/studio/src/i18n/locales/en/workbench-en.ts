@@ -111,8 +111,6 @@ export default {
   'variables.edit': 'Edit variable',
   'variables.save': 'Save',
   'variables.keyLabel': 'Key',
-  'variables.labelLabel': 'Label',
-  'variables.labelPlaceholder': 'Display name (optional)',
   'variables.invalidKey':
     'Use letters, numbers, and underscores. Must start with a letter.',
   'variables.duplicateKey': 'A variable with this key already exists.',

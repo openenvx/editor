@@ -111,8 +111,6 @@ export default {
   'variables.edit': 'Edytuj zmienną',
   'variables.save': 'Zapisz',
   'variables.keyLabel': 'Klucz',
-  'variables.labelLabel': 'Etykieta',
-  'variables.labelPlaceholder': 'Nazwa wyświetlana (opcjonalnie)',
   'variables.invalidKey':
     'Użyj liter, cyfr i podkreślników. Musi zaczynać się od litery.',
   'variables.duplicateKey': 'Zmienna o tym kluczu już istnieje.',

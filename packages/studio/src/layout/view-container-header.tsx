@@ -2,7 +2,7 @@ import type {
   SidebarHeaderDescriptor,
   ViewContainerLocation,
 } from '@openenvx/studio/core';
-import { ChevronDown, MoreHorizontal } from 'lucide-react';
+import { IconChevronDown, IconDots } from '@tabler/icons-react';
 import { useMemo } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
@@ -45,7 +45,7 @@ export function ViewContainerMoveMenu({
           aria-label={t('view.containerMenu')}
           className={styles.actionButton}
         >
-          <MoreHorizontal aria-hidden size={14} />
+          <IconDots aria-hidden size={14} stroke={1.5} />
         </IconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side="bottom">
@@ -112,10 +112,11 @@ export function ViewContainerHeader({
                 type="button"
               >
                 <span className={styles.title}>{displayTitle}</span>
-                <ChevronDown
+                <IconChevronDown
                   aria-hidden
                   className={styles.titleChevron}
                   size={12}
+                  stroke={1.5}
                 />
               </button>
             </DropdownMenuTrigger>

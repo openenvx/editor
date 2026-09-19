@@ -8,16 +8,23 @@ import {
   type TopBarItemDescriptor,
   type TopBarPlacement,
   type TopBarStatusItemDescriptor,
+  type MenuItemDescriptor,
   type TopBarTitleItemDescriptor,
 } from '@openenvx/studio/core';
-import { Check } from 'lucide-react';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { IconCheck } from '@tabler/icons-react';
+import { memo, useMemo } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useContextKeysRevision } from '../hooks/use-context-key';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { WorkbenchIcon } from '../icons/workbench-icon';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '../primitives/dropdown-menu';
+import { DropdownMenuRenderer } from './dropdown-menu-renderer';
 import { ShellDropdownControl } from './shell-dropdown-control';
 
 import styles from './top-bar-renderer.module.css';
@@ -217,72 +224,25 @@ function TopBarGroup({ item }: { item: TopBarGroupItemDescriptor }) {
 }
 
 function TopBarMenuDropdown({ item }: { item: TopBarDropdownItemDescriptor }) {
-  const { executeCommand } = useWorkbenchContext();
-  const commandStates = useWorkbenchContextSelector(
-    (state) => state.commandStates
-  );
   const { t } = useWorkbenchTranslation();
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!menuRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('pointerdown', handlePointerDown);
-    return () => {
-      document.removeEventListener('pointerdown', handlePointerDown);
-    };
-  }, [open]);
+  const menuLabel = item.labelKey ? t(item.labelKey) : item.label;
 
   if (item.variant === 'menu') {
     return (
-      <div className={styles.menuWrap} ref={menuRef}>
-        <button
-          aria-expanded={open}
-          aria-haspopup="menu"
-          aria-label={item.label ?? 'More actions'}
-          className={styles.iconButton}
-          type="button"
-          onClick={() => setOpen((value) => !value)}
-        >
-          {item.icon ? <WorkbenchIcon id={item.icon} size={14} /> : item.label}
-        </button>
-        {open ? (
-          <div className={styles.menuContent} role="menu">
-            {item.items.map((menuItem) => {
-              const canExecute = resolveCommandCanExecute(
-                commandStates,
-                menuItem.commandId,
-                'icon'
-              );
-              const label = menuItem.labelKey
-                ? t(menuItem.labelKey)
-                : menuItem.label;
-              return (
-                <button
-                  className={styles.menuItem}
-                  disabled={!canExecute}
-                  key={`${menuItem.commandId}-${label}`}
-                  role="menuitem"
-                  type="button"
-                  onClick={() => {
-                    setOpen(false);
-                    void executeCommand(menuItem.commandId, menuItem.args);
-                  }}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-        ) : null}
-      </div>
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger>
+          <button
+            aria-label={menuLabel ?? 'More actions'}
+            className={styles.iconButton}
+            type="button"
+          >
+            {item.icon ? <WorkbenchIcon id={item.icon} size={14} /> : menuLabel}
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuRenderer items={item.items as MenuItemDescriptor[]} />
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   }
 
@@ -321,7 +281,12 @@ function TopBarStatus({ item }: { item: TopBarStatusItemDescriptor }) {
   return (
     <span className={styles.status}>
       {item.icon === 'check' ? (
-        <Check aria-hidden className={styles.statusIcon} size={12} />
+        <IconCheck
+          aria-hidden
+          className={styles.statusIcon}
+          size={12}
+          stroke={2}
+        />
       ) : item.icon ? (
         <WorkbenchIcon id={item.icon} size={12} />
       ) : null}

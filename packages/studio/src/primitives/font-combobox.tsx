@@ -1,5 +1,5 @@
+import { IconCheck, IconChevronDown } from '@tabler/icons-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Check, ChevronDown } from 'lucide-react';
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 
@@ -140,7 +140,12 @@ export function FontCombobox({
             type="button"
           >
             <span className={styles.value}>{displayLabel}</span>
-            <ChevronDown aria-hidden className={styles.chevron} size={14} />
+            <IconChevronDown
+              aria-hidden
+              className={styles.chevron}
+              size={14}
+              stroke={1.5}
+            />
           </button>
         }
       >
@@ -180,7 +185,7 @@ export function FontCombobox({
                       }}
                       value={option.label}
                     >
-                      <Check
+                      <IconCheck
                         aria-hidden
                         className={cn(
                           styles.itemCheck,

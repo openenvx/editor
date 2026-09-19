@@ -1,4 +1,5 @@
-import * as SheetPrimitive from '@radix-ui/react-dialog';
+import { Dialog } from '@base-ui/react/dialog';
+import { mergeProps } from '@base-ui/react/merge-props';
 import type { ComponentProps, ComponentPropsWithoutRef } from 'react';
 
 import { useThemeScope } from '../context/theme-context';
@@ -10,30 +11,29 @@ import styles from './sheet.module.css';
 
 export type SheetSide = 'left' | 'right';
 
-/** Sheet root (`@radix-ui/react-dialog`). */
-export function Sheet(props: SheetPrimitive.DialogProps) {
-  return <SheetPrimitive.Root {...props} />;
+export function Sheet(props: ComponentProps<typeof Dialog.Root>) {
+  return <Dialog.Root {...props} />;
 }
 
 export function SheetTrigger(
-  props: ComponentPropsWithoutRef<typeof SheetPrimitive.Trigger>
+  props: ComponentPropsWithoutRef<typeof Dialog.Trigger>
 ) {
-  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
+  return <Dialog.Trigger data-slot="sheet-trigger" {...props} />;
 }
 
 export function SheetClose(
-  props: ComponentPropsWithoutRef<typeof SheetPrimitive.Close>
+  props: ComponentPropsWithoutRef<typeof Dialog.Close>
 ) {
-  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
+  return <Dialog.Close data-slot="sheet-close" {...props} />;
 }
 
 function SheetOverlay({
   className,
   ...props
-}: ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>) {
+}: ComponentPropsWithoutRef<typeof Dialog.Backdrop>) {
   const themeScope = useThemeScope();
   return (
-    <SheetPrimitive.Overlay
+    <Dialog.Backdrop
       {...props}
       {...themeScope}
       className={cn(styles.overlay, className)}
@@ -48,38 +48,44 @@ export function SheetContent({
   side = 'right',
   showCloseButton = true,
   ...props
-}: ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & {
+}: ComponentPropsWithoutRef<typeof Dialog.Popup> & {
   side?: SheetSide;
   showCloseButton?: boolean;
 }) {
   const themeScope = useThemeScope();
   return (
-    <SheetPrimitive.Portal>
+    <Dialog.Portal>
       <SheetOverlay />
-      <SheetPrimitive.Content
-        {...props}
-        {...themeScope}
-        className={cn(styles.content, className)}
-        data-side={side}
-        data-slot="sheet-content"
-      >
-        {children}
-        {showCloseButton ? (
-          <SheetPrimitive.Close asChild data-slot="sheet-close">
-            <Button
-              aria-label="Close"
-              className={styles.close}
-              size="icon"
-              type="button"
-              variant="ghost"
-            >
-              <WorkbenchIcon id="x" size={14} />
-              <span className={styles.srOnly}>Close</span>
-            </Button>
-          </SheetPrimitive.Close>
-        ) : null}
-      </SheetPrimitive.Content>
-    </SheetPrimitive.Portal>
+      <Dialog.Viewport>
+        <Dialog.Popup
+          {...props}
+          {...themeScope}
+          className={cn(styles.content, className)}
+          data-side={side}
+          data-slot="sheet-content"
+        >
+          {children}
+          {showCloseButton ? (
+            <Dialog.Close
+              render={(closeProps) => (
+                <Button
+                  {...mergeProps(closeProps, {
+                    'aria-label': 'Close',
+                    className: styles.close,
+                    size: 'icon',
+                    type: 'button',
+                    variant: 'ghost',
+                  })}
+                >
+                  <WorkbenchIcon id="x" size={14} />
+                  <span className={styles.srOnly}>Close</span>
+                </Button>
+              )}
+            />
+          ) : null}
+        </Dialog.Popup>
+      </Dialog.Viewport>
+    </Dialog.Portal>
   );
 }
 
@@ -106,9 +112,9 @@ export function SheetFooter({ className, ...props }: ComponentProps<'div'>) {
 export function SheetTitle({
   className,
   ...props
-}: ComponentPropsWithoutRef<typeof SheetPrimitive.Title>) {
+}: ComponentPropsWithoutRef<typeof Dialog.Title>) {
   return (
-    <SheetPrimitive.Title
+    <Dialog.Title
       {...props}
       className={cn(styles.title, className)}
       data-slot="sheet-title"
@@ -119,9 +125,9 @@ export function SheetTitle({
 export function SheetDescription({
   className,
   ...props
-}: ComponentPropsWithoutRef<typeof SheetPrimitive.Description>) {
+}: ComponentPropsWithoutRef<typeof Dialog.Description>) {
   return (
-    <SheetPrimitive.Description
+    <Dialog.Description
       {...props}
       className={cn(styles.description, className)}
       data-slot="sheet-description"

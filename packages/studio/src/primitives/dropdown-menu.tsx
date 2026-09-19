@@ -1,6 +1,7 @@
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { Check, ChevronRight } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { Menu } from '@base-ui/react/menu';
+import { mergeProps } from '@base-ui/react/merge-props';
+import { IconCheck, IconChevronRight } from '@tabler/icons-react';
+import { cloneElement, useCallback, useState } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 
 import { useThemeScope } from '../context/theme-context';
@@ -11,7 +12,6 @@ import styles from './dropdown-menu.module.css';
 import overlaySurface from './overlay-surface.module.css';
 
 const SIDE_OFFSET = 4;
-/** Negative offset overlaps the submenu onto the parent panel. */
 const SUB_OFFSET = -4;
 
 export interface DropdownMenuProps {
@@ -42,13 +42,9 @@ export function DropdownMenu({
   );
 
   return (
-    <DropdownMenuPrimitive.Root
-      modal={modal}
-      onOpenChange={handleOpenChange}
-      open={open}
-    >
+    <Menu.Root modal={modal} onOpenChange={handleOpenChange} open={open}>
       {children}
-    </DropdownMenuPrimitive.Root>
+    </Menu.Root>
   );
 }
 
@@ -67,18 +63,30 @@ export function DropdownMenuTrigger({
   className,
 }: DropdownMenuTriggerProps) {
   return (
-    <DropdownMenuPrimitive.Trigger
-      asChild
-      className={cn(styles.root, className)}
-    >
-      {children}
-    </DropdownMenuPrimitive.Trigger>
+    <Menu.Trigger
+      render={(props) =>
+        // Base UI trigger must merge props onto the child (asChild). Child props first so
+        // trigger refs/handlers from `props` win — mergeProps(props, child) drops trigger ref.
+        // eslint-disable-next-line react/no-clone-element -- headless trigger composition
+        cloneElement(
+          children,
+          mergeProps(children.props, props, {
+            className: cn(
+              styles.root,
+              className,
+              props.className,
+              children.props.className
+            ),
+          })
+        )
+      }
+    />
   );
 }
 
 export interface DropdownMenuContentProps {
   children: ReactNode;
-  align?: 'start' | 'end';
+  align?: 'start' | 'end' | 'center';
   side?: 'top' | 'bottom' | 'left' | 'right';
   className?: string;
 }
@@ -92,18 +100,16 @@ export function DropdownMenuContent({
   const themeScope = useThemeScope();
 
   return (
-    <DropdownMenuPrimitive.Portal>
-      <DropdownMenuPrimitive.Content
-        {...themeScope}
-        align={align}
-        className={cn(styles.content, overlaySurface.surface, className)}
-        onCloseAutoFocus={(event) => event.preventDefault()}
-        side={side}
-        sideOffset={SIDE_OFFSET}
-      >
-        {children}
-      </DropdownMenuPrimitive.Content>
-    </DropdownMenuPrimitive.Portal>
+    <Menu.Portal>
+      <Menu.Positioner align={align} side={side} sideOffset={SIDE_OFFSET}>
+        <Menu.Popup
+          {...themeScope}
+          className={cn(styles.content, overlaySurface.surface, className)}
+        >
+          {children}
+        </Menu.Popup>
+      </Menu.Positioner>
+    </Menu.Portal>
   );
 }
 
@@ -123,21 +129,21 @@ export function DropdownMenuItem({
   className,
 }: DropdownMenuItemProps) {
   return (
-    <DropdownMenuPrimitive.Item
+    <Menu.Item
       className={cn(styles.item, className)}
       disabled={disabled}
-      onSelect={() => onSelect?.()}
+      onClick={() => onSelect?.()}
     >
       <span className={styles.itemLabel}>{children}</span>
       {shortcut ? (
         <span className={styles.shortcut}>{formatShortcut(shortcut)}</span>
       ) : null}
-    </DropdownMenuPrimitive.Item>
+    </Menu.Item>
   );
 }
 
 export function DropdownMenuSeparator() {
-  return <DropdownMenuPrimitive.Separator className={styles.separator} />;
+  return <div aria-hidden className={styles.separator} role="separator" />;
 }
 
 export interface DropdownMenuSubProps {
@@ -145,7 +151,7 @@ export interface DropdownMenuSubProps {
 }
 
 export function DropdownMenuSub({ children }: DropdownMenuSubProps) {
-  return <DropdownMenuPrimitive.Sub>{children}</DropdownMenuPrimitive.Sub>;
+  return <Menu.SubmenuRoot>{children}</Menu.SubmenuRoot>;
 }
 
 export interface DropdownMenuSubTriggerProps {
@@ -158,12 +164,17 @@ export function DropdownMenuSubTrigger({
   className,
 }: DropdownMenuSubTriggerProps) {
   return (
-    <DropdownMenuPrimitive.SubTrigger
+    <Menu.SubmenuTrigger
       className={cn(styles.item, styles.subTrigger, className)}
     >
       <span className={styles.itemLabel}>{children}</span>
-      <ChevronRight aria-hidden className={styles.subTriggerIcon} size={14} />
-    </DropdownMenuPrimitive.SubTrigger>
+      <IconChevronRight
+        aria-hidden
+        className={styles.subTriggerIcon}
+        size={14}
+        stroke={1.5}
+      />
+    </Menu.SubmenuTrigger>
   );
 }
 
@@ -179,13 +190,16 @@ export function DropdownMenuSubContent({
   const themeScope = useThemeScope();
 
   return (
-    <DropdownMenuPrimitive.SubContent
-      {...themeScope}
-      className={cn(styles.subContent, overlaySurface.surface, className)}
-      sideOffset={SUB_OFFSET}
-    >
-      {children}
-    </DropdownMenuPrimitive.SubContent>
+    <Menu.Portal>
+      <Menu.Positioner align="start" side="inline-end" sideOffset={SUB_OFFSET}>
+        <Menu.Popup
+          {...themeScope}
+          className={cn(styles.subContent, overlaySurface.surface, className)}
+        >
+          {children}
+        </Menu.Popup>
+      </Menu.Positioner>
+    </Menu.Portal>
   );
 }
 
@@ -201,12 +215,9 @@ export function DropdownMenuRadioGroup({
   children,
 }: DropdownMenuRadioGroupProps) {
   return (
-    <DropdownMenuPrimitive.RadioGroup
-      onValueChange={onValueChange}
-      value={value}
-    >
+    <Menu.RadioGroup onValueChange={onValueChange} value={value}>
       {children}
-    </DropdownMenuPrimitive.RadioGroup>
+    </Menu.RadioGroup>
   );
 }
 
@@ -222,17 +233,14 @@ export function DropdownMenuRadioItem({
   className,
 }: DropdownMenuRadioItemProps) {
   return (
-    <DropdownMenuPrimitive.RadioItem
-      className={cn(styles.item, className)}
-      value={value}
-    >
+    <Menu.RadioItem className={cn(styles.item, className)} value={value}>
       <span className={styles.itemIndicator}>
-        <DropdownMenuPrimitive.ItemIndicator>
-          <Check aria-hidden size={11} strokeWidth={2.5} />
-        </DropdownMenuPrimitive.ItemIndicator>
+        <Menu.RadioItemIndicator>
+          <IconCheck aria-hidden size={11} stroke={2.5} />
+        </Menu.RadioItemIndicator>
       </span>
       <span className={styles.itemLabel}>{children}</span>
-    </DropdownMenuPrimitive.RadioItem>
+    </Menu.RadioItem>
   );
 }
 

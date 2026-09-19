@@ -4,7 +4,13 @@ import type {
   ViewDescriptor,
   ViewTreeItem,
 } from '@openenvx/studio/core';
-import { ChevronDown, Eye, EyeOff, Lock, LockOpen } from 'lucide-react';
+import {
+  IconChevronDown,
+  IconEye,
+  IconEyeOff,
+  IconLock,
+  IconLockOpen,
+} from '@tabler/icons-react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useWorkbenchContext } from '../context/workbench-context';
@@ -32,7 +38,7 @@ const EMPTY_ID_SET = new Set<string>();
 
 function TreeToggleChevron({ isCollapsed }: { isCollapsed: boolean }) {
   return (
-    <ChevronDown
+    <IconChevronDown
       aria-hidden
       className={
         isCollapsed
@@ -40,6 +46,7 @@ function TreeToggleChevron({ isCollapsed }: { isCollapsed: boolean }) {
           : styles.treeChevron
       }
       size={14}
+      stroke={1.5}
     />
   );
 }
@@ -68,7 +75,7 @@ function LockButton({
   if (!item.lockedCommandId) {
     return null;
   }
-  const Icon = item.locked ? Lock : LockOpen;
+  const Icon = item.locked ? IconLock : IconLockOpen;
   const tooltip =
     item.tooltip ?? (item.locked ? t('layer.unlock') : t('layer.lock'));
   return (
@@ -87,7 +94,12 @@ function LockButton({
         }}
         type="button"
       >
-        <Icon aria-hidden className={styles.treeItemTrailing} size={12} />
+        <Icon
+          aria-hidden
+          className={styles.treeItemTrailing}
+          size={12}
+          stroke={1.5}
+        />
       </button>
     </Tooltip>
   );
@@ -107,7 +119,7 @@ function VisibilityButton({
     return null;
   }
   const isVisible = item.visible !== false;
-  const Icon = isVisible ? Eye : EyeOff;
+  const Icon = isVisible ? IconEye : IconEyeOff;
   const tooltip = isVisible ? t('layer.hide') : t('layer.show');
   return (
     <Tooltip content={tooltip} side="top" align="center">
@@ -125,7 +137,12 @@ function VisibilityButton({
         }}
         type="button"
       >
-        <Icon aria-hidden className={styles.treeItemTrailing} size={12} />
+        <Icon
+          aria-hidden
+          className={styles.treeItemTrailing}
+          size={12}
+          stroke={1.5}
+        />
       </button>
     </Tooltip>
   );

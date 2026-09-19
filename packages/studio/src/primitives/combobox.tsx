@@ -1,4 +1,4 @@
-import { Check, ChevronDown } from 'lucide-react';
+import { IconCheck, IconChevronDown } from '@tabler/icons-react';
 import { useId, useMemo, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 
@@ -79,7 +79,12 @@ export function Combobox({
                 ? renderValue(selectedOption)
                 : (selectedOption?.label ?? t('combobox.select'))}
             </span>
-            <ChevronDown aria-hidden className={styles.chevron} size={14} />
+            <IconChevronDown
+              aria-hidden
+              className={styles.chevron}
+              size={14}
+              stroke={1.5}
+            />
           </button>
         </PopoverTrigger>
         <PopoverContent
@@ -105,7 +110,7 @@ export function Combobox({
                       style={optionStyle?.(option)}
                       value={option.label}
                     >
-                      <Check
+                      <IconCheck
                         aria-hidden
                         className={cn(
                           styles.itemCheck,

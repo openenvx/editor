@@ -1,4 +1,4 @@
-import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { Tabs as TabsPrimitive } from '@base-ui/react/tabs';
 import type { ComponentPropsWithoutRef, ElementRef } from 'react';
 import { forwardRef } from 'react';
 
@@ -18,29 +18,31 @@ export const TabsList = forwardRef<
     {...props}
   />
 ));
-TabsList.displayName = TabsPrimitive.List.displayName;
+TabsList.displayName = 'TabsList';
 
 export const TabsTrigger = forwardRef<
-  ElementRef<typeof TabsPrimitive.Trigger>,
-  ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
+  ElementRef<typeof TabsPrimitive.Tab>,
+  ComponentPropsWithoutRef<typeof TabsPrimitive.Tab>
 >(({ className, ...props }, ref) => (
-  <TabsPrimitive.Trigger
+  <TabsPrimitive.Tab
     className={cn(styles.trigger, className)}
     ref={ref}
     {...props}
   />
 ));
-TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+TabsTrigger.displayName = 'TabsTrigger';
 
 export const TabsContent = forwardRef<
-  ElementRef<typeof TabsPrimitive.Content>,
-  ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+  ElementRef<typeof TabsPrimitive.Panel>,
+  ComponentPropsWithoutRef<typeof TabsPrimitive.Panel> & {
+    forceMount?: boolean;
+  }
 >(({ className, forceMount, ...props }, ref) => (
-  <TabsPrimitive.Content
+  <TabsPrimitive.Panel
     className={cn(styles.content, className)}
-    forceMount={forceMount}
+    keepMounted={forceMount}
     ref={ref}
     {...props}
   />
 ));
-TabsContent.displayName = TabsPrimitive.Content.displayName;
+TabsContent.displayName = 'TabsContent';

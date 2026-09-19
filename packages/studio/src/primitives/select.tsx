@@ -1,5 +1,5 @@
-import * as SelectPrimitive from '@radix-ui/react-select';
-import { ChevronDown } from 'lucide-react';
+import { Select as SelectPrimitive } from '@base-ui/react/select';
+import { IconChevronDown } from '@tabler/icons-react';
 import { useState } from 'react';
 
 import { useThemeScope } from '../context/theme-context';
@@ -38,7 +38,11 @@ export function Select({
   return (
     <SelectPrimitive.Root
       onOpenChange={setOpen}
-      onValueChange={onChange}
+      onValueChange={(next) => {
+        if (next !== null) {
+          onChange(next);
+        }
+      }}
       open={open}
       value={value}
     >
@@ -47,45 +51,48 @@ export function Select({
           <span className={styles.label}>
             <SelectPrimitive.Value />
           </span>
-          <SelectPrimitive.Icon asChild>
-            <ChevronDown aria-hidden className={styles.chevron} size={14} />
+          <SelectPrimitive.Icon>
+            <IconChevronDown
+              aria-hidden
+              className={styles.chevron}
+              size={14}
+              stroke={1.5}
+            />
           </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
         <SelectPrimitive.Portal>
-          <SelectPrimitive.Content
-            {...themeScope}
+          <SelectPrimitive.Positioner
             align="start"
-            avoidCollisions
-            className={cn(
-              menuStyles.content,
-              styles.panel,
-              overlaySurface.surface
-            )}
             collisionPadding={COLLISION_PADDING}
-            onCloseAutoFocus={(event) => event.preventDefault()}
-            onPointerDownOutside={() => setOpen(false)}
-            position="popper"
             side="bottom"
             sideOffset={SIDE_OFFSET}
-            sticky="partial"
           >
-            <SelectPrimitive.Viewport className={styles.viewport}>
-              {options.map((option) => (
-                <SelectPrimitive.Item
-                  className={cn(
-                    menuStyles.item,
-                    option.value === value ? styles.optionSelected : undefined
-                  )}
-                  key={option.value}
-                  value={option.value}
-                >
-                  <SelectPrimitive.ItemText>
-                    {option.label}
-                  </SelectPrimitive.ItemText>
-                </SelectPrimitive.Item>
-              ))}
-            </SelectPrimitive.Viewport>
-          </SelectPrimitive.Content>
+            <SelectPrimitive.Popup
+              {...themeScope}
+              className={cn(
+                menuStyles.content,
+                styles.panel,
+                overlaySurface.surface
+              )}
+            >
+              <SelectPrimitive.List className={styles.viewport}>
+                {options.map((option) => (
+                  <SelectPrimitive.Item
+                    className={cn(
+                      menuStyles.item,
+                      option.value === value ? styles.optionSelected : undefined
+                    )}
+                    key={option.value}
+                    value={option.value}
+                  >
+                    <SelectPrimitive.ItemText>
+                      {option.label}
+                    </SelectPrimitive.ItemText>
+                  </SelectPrimitive.Item>
+                ))}
+              </SelectPrimitive.List>
+            </SelectPrimitive.Popup>
+          </SelectPrimitive.Positioner>
         </SelectPrimitive.Portal>
       </div>
     </SelectPrimitive.Root>

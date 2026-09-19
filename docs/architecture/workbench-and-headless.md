@@ -136,6 +136,6 @@ Most product apps skip this and use `WorkbenchShell` from `@openenvx/studio` or 
 
 ## Related
 
-- Visual shell design notes (tokens only): [packages/studio/Design.md](../../packages/studio/Design.md)
+- Visual shell design notes (tokens, Base UI primitives, Tabler icons): [packages/studio/Design.md](../../packages/studio/Design.md)
 - Property field API: [property-fields.md](property-fields.md)
 - Extension trust: [Plugin-boundaries.md](../../Plugin-boundaries.md)

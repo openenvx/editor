@@ -47,24 +47,25 @@
 }
 
 .outline:hover:not(:disabled) {
+  background: var(--wb-muted);
   opacity: 1;
-  box-shadow: var(--wb-shadow-sm);
 }
 
 .chrome {
   height: var(--wb-control-height);
   padding: 0 var(--wb-space-3);
+  border: var(--wb-hairline);
   border-radius: var(--wb-radius-control);
   background: var(--wb-chrome-button);
   color: var(--wb-foreground);
-  box-shadow: var(--wb-shadow-sm);
+  box-shadow: none;
   font-size: var(--wb-text-sm);
   font-weight: 400;
 }
 
 .chrome:hover:not(:disabled) {
+  background: var(--wb-muted);
   opacity: 1;
-  box-shadow: 0 0 0 1px var(--wb-border-subtle);
 }
 
 .icon {

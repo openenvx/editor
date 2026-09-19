@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { WorkbenchProvider } from '../context/workbench-context';
 import { createMockWorkbenchApi } from '../test/mock-workbench-context';
-import { LUCIDE_GLYPHS } from './lucide-glyphs';
+import { TABLER_GLYPHS } from './tabler-glyphs';
 import { WorkbenchIcon } from './workbench-icon';
 
 afterEach(cleanup);
@@ -19,7 +19,7 @@ describe('WorkbenchIcon', () => {
     );
 
     expect(container.querySelector('svg')).toBeTruthy();
-    expect(LUCIDE_GLYPHS.layers).toBeDefined();
+    expect(TABLER_GLYPHS.layers).toBeDefined();
   });
 
   it('prefers registry overrides over bundled defaults', () => {

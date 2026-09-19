@@ -4,7 +4,6 @@ import {
   type TreeItem,
 } from '@openenvx/studio/core';
 import {
-  formatVariableToken,
   reorderVariablesInScene,
   sceneVariables,
   type TemplateVariable,
@@ -28,9 +27,8 @@ export class VariablesTreeProvider extends TreeDataProvider<TemplateVariable> {
           label: 'Edit variable',
         },
       ],
-      description: variable.label,
       id: variable.id,
-      label: formatVariableToken(variable.key),
+      label: variable.key,
     };
   }
 

@@ -181,6 +181,8 @@ export {
   type TopBarPlacement,
 } from './builders/top-bar-builder';
 export {
+  isShellDropdownCommandMenuItem,
+  type ShellDropdownCommandMenuItemDescriptor,
   type ShellDropdownItemBase,
   type ShellDropdownMenuItemDescriptor,
 } from './builders/shell-dropdown';

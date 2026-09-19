@@ -119,7 +119,8 @@
   flex-direction: column;
   width: var(--wb-sidebar-width);
   min-height: 0;
-  background: var(--wb-background);
+  background: var(--wb-sidebar-surface);
+  backdrop-filter: var(--wb-surface-blur);
   animation: slideInLeft var(--wb-duration) var(--wb-ease-out);
 }
 

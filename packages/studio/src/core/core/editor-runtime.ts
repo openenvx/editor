@@ -5,6 +5,7 @@ import {
   MenuChoiceRegistryImpl,
   MenuChoiceRegistryId,
 } from '../menu/menu-choice-registry';
+import { WorkbenchThemeMenuChoiceProvider } from '../menu/workbench-theme-menu-choice-provider';
 import { DisposableStore } from '../runtime/emitter';
 import { InstantiationService } from '../runtime/instantiation-service';
 import type { CommandContext } from '../runtime/types';
@@ -75,11 +76,14 @@ export class EditorRuntime {
       LocalizationServiceId,
       new LocalizationServiceImpl()
     );
-    this.services.registerInstance(
-      MenuChoiceRegistryId,
-      new MenuChoiceRegistryImpl()
+    const localization = this.services.get(LocalizationServiceId);
+    const menuChoiceRegistry = new MenuChoiceRegistryImpl();
+    const themeService = new ThemeServiceImpl();
+    this.services.registerInstance(MenuChoiceRegistryId, menuChoiceRegistry);
+    this.services.registerInstance(ThemeServiceId, themeService);
+    menuChoiceRegistry.register(
+      new WorkbenchThemeMenuChoiceProvider(themeService, localization)
     );
-    this.services.registerInstance(ThemeServiceId, new ThemeServiceImpl());
     this.services.registerInstance(IconRegistryId, new IconRegistryImpl());
     this.services.registerInstance(
       DocumentHostServiceId,
@@ -89,7 +93,6 @@ export class EditorRuntime {
       RichTextInsertServiceId,
       new RichTextInsertServiceImpl()
     );
-    const localization = this.services.get(LocalizationServiceId);
     this.disposables.add(
       localization.onDidChangeLocale((locale) => {
         this.events.emit(WorkbenchEvents.DidChangeLocale, locale);

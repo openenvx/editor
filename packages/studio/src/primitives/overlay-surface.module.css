@@ -54,16 +54,7 @@
 }
 
 .surface {
-  transform-origin: var(
-    --radix-popover-content-transform-origin,
-    var(
-      --radix-dropdown-menu-content-transform-origin,
-      var(
-        --radix-select-content-transform-origin,
-        var(--radix-tooltip-content-transform-origin, center)
-      )
-    )
-  );
+  transform-origin: center;
 }
 
 /* animate-in + fade-in-0 + zoom-in-95 */

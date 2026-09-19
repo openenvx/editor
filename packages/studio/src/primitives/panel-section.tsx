@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react';
+import { IconChevronDown } from '@tabler/icons-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -79,7 +79,12 @@ export function PanelSection({
         >
           {iconNode}
           <span className={styles.title}>{title}</span>
-          <ChevronDown aria-hidden className={styles.chevron} size={14} />
+          <IconChevronDown
+            aria-hidden
+            className={styles.chevron}
+            size={14}
+            stroke={1.5}
+          />
         </button>
         {switchControl}
       </div>

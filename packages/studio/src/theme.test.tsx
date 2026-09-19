@@ -3,7 +3,7 @@ import {
   MenuChoiceRegistryImpl,
   MutableMenuChoiceProvider,
 } from '@openenvx/studio/core';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -102,7 +102,7 @@ describe('portal theme propagation', () => {
     );
 
     await user.click(screen.getByRole('button', { name: 'Open' }));
-    const menu = screen.getByRole('menu');
+    const menu = await screen.findByRole('menu');
     expect(menu.dataset.owbTheme).toBe('dark');
   });
 });
@@ -141,7 +141,7 @@ describe('DropdownMenu dismiss', () => {
     );
 
     await user.click(screen.getByRole('button', { name: 'Open' }));
-    expect(screen.getByRole('menu')).toBeTruthy();
+    await screen.findByRole('menu');
 
     fireEvent.pointerDown(document.body, { button: 0 });
     expect(screen.queryByRole('menu')).toBeNull();
@@ -210,12 +210,14 @@ describe('DropdownMenu submenus', () => {
     );
 
     await user.click(screen.getByRole('button', { name: 'Menu' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Theme' }));
-    expect(screen.getByRole('menuitemradio', { name: 'Light' })).toBeTruthy();
+    await user.click(await screen.findByRole('menuitem', { name: 'Theme' }));
+    await screen.findByRole('menuitemradio', { name: 'Light' });
 
     await user.click(screen.getByRole('menuitem', { name: 'Language' }));
-    expect(screen.queryByRole('menuitemradio', { name: 'Light' })).toBeNull();
-    expect(screen.getByRole('menuitemradio', { name: 'English' })).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitemradio', { name: 'Light' })).toBeNull();
+    });
+    await screen.findByRole('menuitemradio', { name: 'English' });
   });
 });
 
@@ -265,8 +267,8 @@ describe('DropdownMenuRenderer theme menu', () => {
     );
 
     await user.click(screen.getByRole('button', { name: 'Menu' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Theme' }));
-    expect(screen.getByRole('menuitemradio', { name: 'Light' })).toBeTruthy();
-    expect(screen.getByRole('menuitemradio', { name: 'Dark' })).toBeTruthy();
+    await user.click(await screen.findByRole('menuitem', { name: 'Theme' }));
+    await screen.findByRole('menuitemradio', { name: 'Light' });
+    await screen.findByRole('menuitemradio', { name: 'Dark' });
   });
 });

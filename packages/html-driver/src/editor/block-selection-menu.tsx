@@ -1,4 +1,9 @@
-import { Copy, GripVertical, ImageIcon, Trash2 } from 'lucide-react';
+import {
+  IconCopy,
+  IconGripVertical,
+  IconPhoto,
+  IconTrash,
+} from '@tabler/icons-react';
 import {
   memo,
   useLayoutEffect,
@@ -173,7 +178,7 @@ export const BlockSelectionMenu = memo(
             aria-label="Move"
             className={`${styles.selectionMenuButton} ${styles.selectionMenuDragHandle}`}
           >
-            <GripVertical size={14} strokeWidth={1.75} />
+            <IconGripVertical size={14} stroke={1.75} />
           </button>
         ) : null}
         <span className={styles.selectionMenuLabel}>{label}</span>
@@ -188,7 +193,7 @@ export const BlockSelectionMenu = memo(
               type="button"
               onClick={() => fileInputRef.current?.click()}
             >
-              <ImageIcon size={14} strokeWidth={1.75} />
+              <IconPhoto size={14} stroke={1.75} />
             </button>
             <input
               ref={fileInputRef}
@@ -206,7 +211,7 @@ export const BlockSelectionMenu = memo(
             type="button"
             onClick={onDuplicate}
           >
-            <Copy size={14} strokeWidth={1.75} />
+            <IconCopy size={14} stroke={1.75} />
           </button>
         ) : null}
         {canRemove ? (
@@ -216,7 +221,7 @@ export const BlockSelectionMenu = memo(
             type="button"
             onClick={onRemove}
           >
-            <Trash2 size={14} strokeWidth={1.75} />
+            <IconTrash size={14} stroke={1.75} />
           </button>
         ) : null}
       </div>,

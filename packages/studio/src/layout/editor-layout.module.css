@@ -37,11 +37,11 @@
 .primarySidebar {
   flex-shrink: 0;
   width: auto;
-  border-right: var(--wb-hairline);
-  background: var(--wb-background);
   min-height: 0;
   display: flex;
   flex-direction: column;
+  background: var(--wb-sidebar-surface);
+  backdrop-filter: var(--wb-surface-blur);
 }
 
 .editor {
@@ -50,7 +50,8 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--wb-canvas-field);
+  background: var(--wb-card);
+  box-shadow: inset 0.5px 0 0 var(--wb-seam-line);
 }
 
 .secondarySidebar {

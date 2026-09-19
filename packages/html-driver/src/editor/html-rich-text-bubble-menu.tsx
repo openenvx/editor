@@ -1,23 +1,22 @@
+import {
+  IconAlignCenter,
+  IconAlignLeft,
+  IconAlignRight,
+  IconBold,
+  IconChevronDown,
+  IconCode,
+  IconHighlight,
+  IconItalic,
+  IconLink,
+  IconList,
+  IconListNumbers,
+  IconPilcrow,
+  IconQuote,
+  IconStrikethrough,
+  IconUnderline,
+} from '@tabler/icons-react';
 import type { Editor } from '@tiptap/react';
 import { useEditorState } from '@tiptap/react';
-import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  Bold,
-  ChevronDown,
-  Code,
-  Code2,
-  Highlighter,
-  Italic,
-  Link as LinkIcon,
-  List,
-  ListOrdered,
-  Pilcrow,
-  Quote,
-  Strikethrough,
-  Underline,
-} from 'lucide-react';
 import {
   type FormEvent,
   type MouseEvent as ReactMouseEvent,
@@ -69,15 +68,31 @@ const BLOCK_OPTIONS: {
   label: string;
   icon: ReactNode;
 }[] = [
-  { format: 'paragraph', label: 'Text', icon: <Pilcrow size={14} /> },
-  { format: 'bulletList', label: 'Bullet List', icon: <List size={14} /> },
+  {
+    format: 'paragraph',
+    label: 'Text',
+    icon: <IconPilcrow size={14} stroke={1.5} />,
+  },
+  {
+    format: 'bulletList',
+    label: 'Bullet List',
+    icon: <IconList size={14} stroke={1.5} />,
+  },
   {
     format: 'orderedList',
     label: 'Numbered List',
-    icon: <ListOrdered size={14} />,
+    icon: <IconListNumbers size={14} stroke={1.5} />,
   },
-  { format: 'blockquote', label: 'Quote', icon: <Quote size={14} /> },
-  { format: 'codeBlock', label: 'Code', icon: <Code2 size={14} /> },
+  {
+    format: 'blockquote',
+    label: 'Quote',
+    icon: <IconQuote size={14} stroke={1.5} />,
+  },
+  {
+    format: 'codeBlock',
+    label: 'Code',
+    icon: <IconCode size={14} stroke={1.5} />,
+  },
 ];
 
 function FormatButton({
@@ -268,7 +283,7 @@ export function HtmlRichTextBubbleMenuToolbar({
               type="button"
             >
               <span>{currentBlock.label}</span>
-              <ChevronDown size={14} />
+              <IconChevronDown size={14} stroke={1.5} />
             </button>
           ) : null}
           {showLink ? (
@@ -281,7 +296,7 @@ export function HtmlRichTextBubbleMenuToolbar({
                 setLinkOpen((open) => !open);
               }}
             >
-              <LinkIcon size={14} />
+              <IconLink size={14} stroke={1.5} />
             </FormatButton>
           ) : null}
           {showBlockType && blockMenuOpen ? (
@@ -352,28 +367,28 @@ export function HtmlRichTextBubbleMenuToolbar({
           label="Bold"
           onPress={() => editor.chain().focus().toggleBold().run()}
         >
-          <Bold size={14} />
+          <IconBold size={14} stroke={1.5} />
         </FormatButton>
         <FormatButton
           active={state.italic}
           label="Italic"
           onPress={() => editor.chain().focus().toggleItalic().run()}
         >
-          <Italic size={14} />
+          <IconItalic size={14} stroke={1.5} />
         </FormatButton>
         <FormatButton
           active={state.underline}
           label="Underline"
           onPress={() => editor.chain().focus().toggleUnderline().run()}
         >
-          <Underline size={14} />
+          <IconUnderline size={14} stroke={1.5} />
         </FormatButton>
         <FormatButton
           active={state.strike}
           label="Strikethrough"
           onPress={() => editor.chain().focus().toggleStrike().run()}
         >
-          <Strikethrough size={14} />
+          <IconStrikethrough size={14} stroke={1.5} />
         </FormatButton>
         {showCode ? (
           <FormatButton
@@ -381,14 +396,14 @@ export function HtmlRichTextBubbleMenuToolbar({
             label="Inline code"
             onPress={() => editor.chain().focus().toggleCode().run()}
           >
-            <Code size={14} />
+            <IconCode size={14} stroke={1.5} />
           </FormatButton>
         ) : null}
         <label
           className={`${styles.formatButton} ${styles.colorSwatch}`}
           title="Text color"
         >
-          <Highlighter size={14} />
+          <IconHighlight size={14} stroke={1.5} />
           <input
             aria-label="Text color"
             onChange={(event) => {
@@ -411,7 +426,7 @@ export function HtmlRichTextBubbleMenuToolbar({
               label="Align left"
               onPress={() => editor.chain().focus().setTextAlign('left').run()}
             >
-              <AlignLeft size={14} />
+              <IconAlignLeft size={14} stroke={1.5} />
             </FormatButton>
             <FormatButton
               active={state.alignCenter}
@@ -420,14 +435,14 @@ export function HtmlRichTextBubbleMenuToolbar({
                 editor.chain().focus().setTextAlign('center').run()
               }
             >
-              <AlignCenter size={14} />
+              <IconAlignCenter size={14} stroke={1.5} />
             </FormatButton>
             <FormatButton
               active={state.alignRight}
               label="Align right"
               onPress={() => editor.chain().focus().setTextAlign('right').run()}
             >
-              <AlignRight size={14} />
+              <IconAlignRight size={14} stroke={1.5} />
             </FormatButton>
           </div>
         </>

@@ -77,7 +77,7 @@ describe('ViewContainerHeader', () => {
       screen.getByRole('button', { name: 'Gilded Hour Pass' })
     );
     expect(
-      screen.getByRole('menuitem', { name: 'Save document' })
+      await screen.findByRole('menuitem', { name: 'Save document' })
     ).toBeTruthy();
   });
 });

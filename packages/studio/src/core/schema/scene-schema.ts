@@ -395,10 +395,6 @@ function build(o: typeof z.object) {
       .string()
       .regex(/^[A-Za-z][A-Za-z0-9_]*$/, 'Invalid variable key')
       .describe('Token key used in {{{key}}} syntax.'),
-    label: z
-      .string()
-      .optional()
-      .describe('Display label in the variables panel.'),
     sample: z
       .string()
       .optional()
