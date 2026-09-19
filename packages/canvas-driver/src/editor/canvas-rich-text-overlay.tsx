@@ -107,12 +107,19 @@ export const CanvasRichTextOverlay = memo(
         richTextView.letterSpacing ?? DEFAULT_RICH_TEXT_LETTER_SPACING;
       const bounds = getLayerScreenBounds(transform, viewport, artboardOffset);
 
+      const storedHtml =
+        typeof layer.data === 'object' &&
+        layer.data !== null &&
+        typeof (layer.data as { html?: unknown }).html === 'string'
+          ? (layer.data as { html: string }).html
+          : richTextView.html;
+
       return {
         align,
         fill,
         fontFamily,
         fontSize,
-        html: richTextView.html,
+        html: storedHtml,
         layer,
         layerStyle: getLayerScreenStyle(bounds),
         letterSpacing,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { measureRichTextContentSize } from './rich-text-content-measure';
 import {
   layoutRichText,
   measureRichTextHeight,
@@ -173,5 +174,23 @@ describe('rich-text-layout', () => {
       width: 400,
     });
     expect(positioned.length).toBeGreaterThan(0);
+  });
+
+  it('measureRichTextContentSize keeps Engineer on one line at hug width', () => {
+    const html = '<p>Engineer</p>';
+    const { width } = measureRichTextContentSize({
+      fontFamily: 'Inter, sans-serif',
+      fontSize: 28,
+      html,
+    });
+    const spans = layoutRichText({
+      align: 'center',
+      fontFamily: 'Inter, sans-serif',
+      fontSize: 28,
+      html,
+      width,
+    });
+    const lineCount = new Set(spans.map((span) => Math.round(span.y))).size;
+    expect(lineCount).toBe(1);
   });
 });

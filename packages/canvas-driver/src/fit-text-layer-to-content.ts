@@ -16,9 +16,9 @@ import {
   layoutCurvedText,
   stripHtmlToPlainText,
 } from './rich-text-arc';
+import { measureRichTextContentSize } from './rich-text-content-measure';
 import {
   measurePlainTextWidth,
-  measureRichTextContentSize,
   measureRichTextHeight,
 } from './rich-text-layout';
 import {
@@ -32,6 +32,7 @@ const CANVAS_TEXT_TYPE = 'canvas.text';
 /** Layer data keys that remasure the text box (and keep horizontal center when curved). */
 export const TEXT_BOX_FIT_KEYS = new Set([
   'align',
+  'autoFit',
   'curve',
   'fontFamily',
   'fontSize',
@@ -45,7 +46,7 @@ export type FitTextLayerMode = 'height' | 'box';
 interface CanvasTextDataLike {
   html?: unknown;
   align?: 'left' | 'center' | 'right';
-  autoFit?: 'none' | 'shrink';
+  autoFit?: 'none' | 'shrink' | 'hug';
   curve?: number;
   fontFamily?: string;
   fontSize?: number;
@@ -76,6 +77,19 @@ function readTextData(layer: Layer): CanvasTextDataLike | null {
     return null;
   }
   return layer.data as CanvasTextDataLike;
+}
+
+function resolveFitMode(
+  data: CanvasTextDataLike,
+  options: FitTextLayerOptions
+): FitTextLayerMode {
+  if (options.mode) {
+    return options.mode;
+  }
+  if (data.autoFit === 'hug') {
+    return 'box';
+  }
+  return 'height';
 }
 
 /**
@@ -167,7 +181,7 @@ export function fitCanvasTextLayerToContent(
     const centerX = transform.x + transform.width / 2;
     x = centerX - width / 2;
   } else {
-    const mode = options.mode ?? 'height';
+    const mode = resolveFitMode(data, options);
 
     if (mode === 'box') {
       const size = measureRichTextContentSize({
@@ -217,7 +231,10 @@ export function fitCanvasTextLayerToContent(
   };
 }
 
-/** Walk the scene and remasure every eligible `canvas.text` layer (height mode). */
+/**
+ * Remasure every eligible `canvas.text` layer: `shrink` skipped, `hug` → box,
+ * default / `none` → height (curved text keeps horizontal center).
+ */
 export function fitSceneCanvasTextToContent(scene: Scene): Scene {
   return {
     ...scene,

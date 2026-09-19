@@ -53,13 +53,13 @@ export { computeArtboardOffset, type ArtboardOffset } from './artboard-offset';
 export { useContainerSize, type ContainerSize } from './use-container-size';
 export {
   layoutRichText,
-  measureRichTextContentSize,
   measureRichTextHeight,
   parseRichTextHtml,
   type PositionedSpan,
   type RichTextStyle,
   type StyledSpan,
 } from './rich-text-layout';
+export { measureRichTextContentSize } from './rich-text-content-measure';
 export {
   DEFAULT_RICH_TEXT_FILL,
   DEFAULT_RICH_TEXT_FONT_FAMILY,

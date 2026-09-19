@@ -4,5 +4,10 @@ export {
   defaultCanvasWorkbench,
 } from './default-canvas-workbench';
 export { downloadBytes } from './export/bytes-to-data-url';
+export {
+  type CanvasExportFormat,
+  type CanvasExportOptions,
+  type CanvasExportResult,
+} from './export/canvas-document-export-service';
 export { exportCanvasDocument } from './export/browser/export-canvas-document';
 export { createCanvasScene, type Scene } from './publish-runtime';

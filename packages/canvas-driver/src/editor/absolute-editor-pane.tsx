@@ -187,6 +187,7 @@ const AbsoluteEditorPaneInner = memo(
         onZoomChange={onZoomChange}
         page={page}
         primaryLayerId={selection.primaryLayerId}
+        scene={scene}
         selectedLayerIds={selection.selectedLayerIds}
         stageInteraction={stageInteraction}
       />

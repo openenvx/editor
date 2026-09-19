@@ -12,6 +12,7 @@ import type {
 import type { ExportImageLoader } from './draw-preview-to-konva';
 import { encodeStageToBytes, mimeTypeForFormat } from './encode-stage-bytes';
 import { renderExportStage } from './render-export-stage';
+import { resolveCanvasExportScene } from './resolve-canvas-export-scene';
 import {
   resolveExportRasterScale,
   resolveExportStageDimensions,
@@ -66,10 +67,11 @@ function assertAssetsLoaded(
 export async function exportRenderEncode(
   input: ExportRenderEncodeInput
 ): Promise<{ stage: Konva.Stage; result: CanvasExportResult }> {
-  const page = findExportPage(input.scene, input.pageId);
+  const scene = resolveCanvasExportScene(input.scene, input.options);
+  const page = findExportPage(scene, input.pageId);
   const { widthPx, heightPx } = resolveExportStageDimensions(page);
   const registry = createCanvasLayerRegistry();
-  const surface = buildExportSurface(input.scene, input.pageId, registry);
+  const surface = buildExportSurface(scene, input.pageId, registry);
   await input.ensureFonts(surface);
 
   const missingImageSrcs: string[] = [];
@@ -82,7 +84,7 @@ export async function exportRenderEncode(
     ),
     pageId: input.pageId,
     registry,
-    scene: input.scene,
+    scene,
     widthPx,
   });
   assertAssetsLoaded(missingImageSrcs, input.strictAssets ?? false);

@@ -36,7 +36,7 @@ import {
 
 export const canvasTextSchema = z.object({
   align: z.enum(['left', 'center', 'right']).optional(),
-  autoFit: z.enum(['none', 'shrink']).optional(),
+  autoFit: z.enum(['none', 'shrink', 'hug']).optional(),
   curve: z.preprocess(
     (value) => (typeof value === 'number' ? clampTextCurve(value) : value),
     z.number().min(-MAX_TEXT_CURVE).max(MAX_TEXT_CURVE).optional()
@@ -164,6 +164,7 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
           [
             { label: 'None', value: 'none' },
             { label: 'Shrink to fit', value: 'shrink' },
+            { label: 'Hug content', value: 'hug' },
           ],
           'Auto-fit'
         )

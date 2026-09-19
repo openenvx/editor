@@ -12,6 +12,13 @@ export interface CanvasExportOptions {
   fileName?: string;
   /** When true, export throws if any image asset fails to load. Defaults to false in browser, true in Node. */
   strictAssets?: boolean;
+  /**
+   * Values for `{{{key}}}` tokens in layer data strings. Unknown keys stay as tokens.
+   * Omit only when the raster should show raw tokens; for WYSIWYG with editor sample
+   * preview, pass the same map you would use for `applyTemplateVariables` (e.g.
+   * `buildSampleVariableValues(scene)` from `@openenvx/studio/schema`).
+   */
+  variables?: Record<string, string>;
 }
 
 export interface CanvasExportDimensions {

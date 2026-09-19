@@ -424,6 +424,7 @@ export class ExportImageCommand extends Command {
             quality?: number;
             scale?: number;
             strictAssets?: boolean;
+            variables?: Record<string, string>;
           })
         : {};
     const format = options.format === 'jpg' ? 'jpg' : 'png';
@@ -435,6 +436,7 @@ export class ExportImageCommand extends Command {
       quality: options.quality,
       scale: options.scale,
       strictAssets: options.strictAssets,
+      variables: options.variables,
     });
     return {
       dataUrl: bytesToDataUrl(result.data, result.mimeType),

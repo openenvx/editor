@@ -27,6 +27,7 @@ Separate from named-layer modifications: a per-scene catalog `scene.variables` a
 | Substitute at render | `applyTemplateVariables(scene, values)` - HTML-escapes values; unknown keys stay as tokens |
 | Editor preview | `applyTemplateVariablesForPreview(scene)` uses each variable's `sample` |
 | Email export | `renderEmailHtml(scene, { variables?: Record<string, string> })` |
+| Canvas export | `exportCanvasDocument(scene, pageId, { format, variables?: Record<string, string> })` (browser PNG/JPG; Node PNG/JPG/PDF via `@openenvx/canvas-driver/export/node`). Substitutes `{{{key}}}` then remasures eligible `canvas.text` layers (`autoFit: 'hug'` hugs the box to glyphs at fixed x/y; `none` keeps width and remasures height). Skips `autoFit: 'shrink'`. `align` is text-align inside the transform box. |
 | Editor catalog UI | Opt-in `@openenvx/studio/plugins/variables` `VariablesPlugin` (secondary sidebar + create/edit dialog); TipTap chips/suggest via `@openenvx/studio/plugins/variables/tiptap` in html/email/canvas rich text |
 
 Bannerbear `Modification[]` and inline tokens can coexist on the same scene. Compose `VariablesPlugin` per product (`canvas-driver/studio`, `email-driver/studio`) — not a workbench default.

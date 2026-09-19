@@ -8,6 +8,7 @@ import {
   type TopBarBuilder,
   type WorkbenchPluginContext,
 } from '@openenvx/studio/core';
+import { buildSampleVariableValues } from '@openenvx/studio/schema';
 
 type ExportFormat = 'png' | 'jpg';
 
@@ -22,7 +23,10 @@ abstract class DownloadCanvasExportCommand extends Command {
     const page = getActivePage(scene);
     const format = this.format;
     try {
-      const result = await exportCanvasDocument(scene, page.id, { format });
+      const result = await exportCanvasDocument(scene, page.id, {
+        format,
+        variables: buildSampleVariableValues(scene),
+      });
       const extension = format === 'jpg' ? 'jpg' : 'png';
       downloadBytes(
         result.data,

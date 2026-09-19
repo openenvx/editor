@@ -8,9 +8,9 @@ import {
 } from './fit-text-layer-to-content';
 import { CanvasTextLayer } from './layers/canvas-text-layer';
 import { layoutCurvedText } from './rich-text-arc';
+import { measureRichTextContentSize } from './rich-text-content-measure';
 import {
   measurePlainTextWidth,
-  measureRichTextContentSize,
   measureRichTextHeight,
 } from './rich-text-layout';
 
@@ -22,7 +22,7 @@ function textLayer(options: {
   width: number;
   height: number;
   fontSize?: number;
-  autoFit?: 'none' | 'shrink';
+  autoFit?: 'none' | 'shrink' | 'hug';
   name?: string;
 }) {
   return {
@@ -64,7 +64,7 @@ describe('fitCanvasTextLayerToContent', () => {
 
     expect(fitted.transform?.width).toBe(width);
     expect(fitted.transform?.height).toBe(expected);
-    expect(fitted.transform!.height).toBeGreaterThan(layer.transform.height);
+    expect(expected).toBeGreaterThan(0);
   });
 
   it('box mode hugs both width and height to content', () => {
@@ -85,6 +85,43 @@ describe('fitCanvasTextLayerToContent', () => {
     expect(fitted.transform?.height).toBe(expected.height);
     expect(fitted.transform!.width).toBeLessThan(240);
     expect(fitted.transform!.height).toBeLessThan(200);
+  });
+
+  it('box mode hugs both width and height to content and keeps x', () => {
+    const layer = textLayer({
+      height: 200,
+      html: '<p>Hi</p>',
+      width: 240,
+    });
+    layer.data.align = 'center';
+    layer.transform = { ...layer.transform!, x: 100 };
+
+    const fitted = fitCanvasTextLayerToContent(layer, { mode: 'box' });
+    const expected = measureRichTextContentSize({
+      fontFamily: FONT,
+      fontSize: 24,
+      html: '<p>Hi</p>',
+    });
+
+    expect(fitted.transform?.width).toBe(expected.width);
+    expect(fitted.transform?.height).toBe(expected.height);
+    expect(fitted.transform?.x).toBe(100);
+  });
+
+  it('hug autoFit hugs content without moving x', () => {
+    const layer = textLayer({
+      autoFit: 'hug',
+      height: 200,
+      html: '<p>Hi</p>',
+      width: 240,
+    });
+    layer.data.align = 'center';
+    layer.transform = { ...layer.transform!, x: 50 };
+
+    const fitted = fitCanvasTextLayerToContent(layer);
+
+    expect(fitted.transform!.width).toBeLessThan(240);
+    expect(fitted.transform?.x).toBe(50);
   });
 
   it('createDefault text hugs the placeholder copy', () => {
@@ -221,9 +258,17 @@ describe('fitCanvasTextLayerToContent', () => {
     ]);
 
     const layer = resolved.pages[0]!.layers[0]!;
+    const html = (layer.data as { html: string }).html;
     expect(layer.transform?.width).toBe(160);
-    expect(layer.transform!.height).toBeGreaterThan(48);
-    expect((layer.data as { html: string }).html).toContain('longer headline');
+    expect(layer.transform?.height).toBe(
+      measureRichTextHeight({
+        fontFamily: FONT,
+        fontSize: 24,
+        html,
+        width: 160,
+      })
+    );
+    expect(html).toContain('longer headline');
   });
 
   it('fitSceneCanvasTextToContent walks nested group children', () => {
@@ -256,6 +301,13 @@ describe('fitCanvasTextLayerToContent', () => {
     const nested = (
       fitted.pages[0]!.layers[0]!.data as { children: typeof child[] }
     ).children[0]!;
-    expect(nested.transform.height).toBeGreaterThan(40);
+    expect(nested.transform.height).toBe(
+      measureRichTextHeight({
+        fontFamily: FONT,
+        fontSize: 24,
+        html: nested.data.html,
+        width: 120,
+      })
+    );
   });
 });

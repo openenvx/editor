@@ -151,7 +151,7 @@ export interface CanvasQrData {
   margin?: number;
 }
 
-export type TextAutoFit = 'none' | 'shrink';
+export type TextAutoFit = 'none' | 'shrink' | 'hug';
 
 /** Slider / schema range for `CanvasTextData.curve` (unitless power, not degrees). */
 export const MAX_TEXT_CURVE = 100;
@@ -176,6 +176,8 @@ export interface CanvasTextData {
   /**
    * When `shrink`, font size scales down (to `minFontSize`) so text stays
    * inside the fixed transform box. `fontSize` is the maximum / starting size.
+   * When `hug`, transform width/height follow the glyphs; `x`/`y` stay put.
+   * Use `align` for text-align inside the box, not to move the box on the artboard.
    */
   autoFit?: TextAutoFit;
   /** Minimum font size used by shrink-to-fit. Defaults to 8. */

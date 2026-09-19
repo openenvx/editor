@@ -34,7 +34,7 @@ export interface RichTextKonvaProps {
   lineHeight?: number;
   letterSpacing?: number;
   fontLoadRevision?: number;
-  autoFit?: 'none' | 'shrink';
+  autoFit?: 'none' | 'shrink' | 'hug';
   minFontSize?: number;
 }
 

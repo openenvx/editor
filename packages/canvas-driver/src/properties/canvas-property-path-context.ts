@@ -17,6 +17,11 @@ import {
   type Transform,
 } from '@openenvx/studio/schema';
 
+import {
+  type CanvasTextDisplayTransformCache,
+  resolveCanvasTextDisplayTransform,
+} from '../canvas-text-display-transform';
+
 export interface CanvasPropertyPathContextOptions extends PropertyPathContextOptions {
   updateLayerTransform: (
     layerId: string,
@@ -52,6 +57,10 @@ export function createCanvasPropertyHostContext(
     ? findLayerById(scene, selectedLayerId)
     : null;
   const activePage = getActivePage(scene, activePageId ?? undefined);
+  const textDisplayTransformCache: CanvasTextDisplayTransformCache = {
+    scene: null,
+    fitted: null,
+  };
 
   return {
     layerData: base.layerData,
@@ -78,7 +87,14 @@ export function createCanvasPropertyHostContext(
 
       if (path.startsWith('selection.layer.transform.')) {
         const key = path.slice('selection.layer.transform.'.length);
-        const transform = primaryLayer?.transform;
+        if (!selectedLayerId) {
+          return 0;
+        }
+        const transform = resolveCanvasTextDisplayTransform(
+          scene,
+          selectedLayerId,
+          textDisplayTransformCache
+        );
         if (!transform) {
           return 0;
         }

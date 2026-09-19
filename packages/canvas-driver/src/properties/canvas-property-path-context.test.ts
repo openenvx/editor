@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createDefaultTransform, normalizeScene } from '@openenvx/studio/schema';
+import {
+  createDefaultTransform,
+  formatVariableToken,
+  normalizeScene,
+} from '@openenvx/studio/schema';
 
 import { createCanvasPropertyHostContext } from './canvas-property-path-context';
 
@@ -42,6 +46,55 @@ function createSceneWithLayer() {
 }
 
 describe('createCanvasPropertyHostContext', () => {
+  it('readPath returns preview-fitted width for canvas.text with variables', () => {
+    const token = formatVariableToken('title');
+    const scene = normalizeScene({
+      variables: [{ id: 'v1', key: 'title', sample: 'Engineer' }],
+      pages: [
+        {
+          id: 'page-1',
+          layout: 'absolute',
+          width: 800,
+          height: 600,
+          layers: [
+            {
+              id: 'text-1',
+              type: 'canvas.text',
+              data: {
+                align: 'center',
+                autoFit: 'hug',
+                html: `<p>${token}</p>`,
+              },
+              transform: {
+                ...createDefaultTransform(),
+                x: 150,
+                y: 200,
+                width: 500,
+                height: 64,
+              },
+            },
+          ],
+        },
+      ],
+      selection: {
+        activePageId: 'page-1',
+        selectedLayerIds: ['text-1'],
+        primaryLayerId: 'text-1',
+      },
+    });
+    const ctx = createCanvasPropertyHostContext({
+      scene,
+      selectedLayerId: 'text-1',
+      layerData: null,
+      updateProperty: vi.fn(),
+      executeCommand: vi.fn(),
+      updateLayerTransform: vi.fn(),
+    });
+
+    expect(ctx.readPath('selection.layer.transform.width')).toBeLessThan(500);
+    expect(ctx.readPath('selection.layer.transform.x')).toBe(150);
+  });
+
   it('readPath returns transform values for the selected layer', () => {
     const scene = createSceneWithLayer();
     const ctx = createCanvasPropertyHostContext({

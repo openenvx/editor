@@ -1,19 +1,17 @@
-import {
-  createCanvasScene,
-  defaultCanvasWorkbench,
-} from '@openenvx/canvas-driver';
+import { defaultCanvasWorkbench } from '@openenvx/canvas-driver';
 import { WorkbenchShell } from '@openenvx/studio';
 import type { Scene as CoreScene } from '@openenvx/studio/schema';
 import { useMemo } from 'react';
 
 import { canvasPackageDemoExportPlugin } from './canvas-package-demo-export-plugin';
+import { createVariableTemplateDemoScene } from './create-variable-template-demo-scene';
 
 import '@openenvx/canvas-driver/fonts.css';
 import '@openenvx/canvas-driver/theme.css';
 import '@openenvx/studio/theme.css';
 
 export function App() {
-  const initialScene = useMemo(() => createCanvasScene(), []);
+  const initialScene = useMemo(() => createVariableTemplateDemoScene(), []);
   const plugins = useMemo(
     () => [...defaultCanvasWorkbench.plugins, canvasPackageDemoExportPlugin],
     []

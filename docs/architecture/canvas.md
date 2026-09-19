@@ -25,7 +25,7 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 ### Override hooks
 
 - Per-kind override of renderers / interactions / preview via `{ override: true }`
-- Headless raster export: `exportCanvasDocument` / `exportCanvasDocumentNode` from `@openenvx/canvas-driver` (browser PNG/JPG vs Node PNG/JPG/PDF); `canvas.exportImage` via `CanvasDocumentExportService`
+- Headless raster export: `exportCanvasDocument` / `exportCanvasDocumentNode` from `@openenvx/canvas-driver` (browser PNG/JPG vs Node PNG/JPG/PDF); optional `variables` on `CanvasExportOptions` for `{{{key}}}` substitution, then text remasure (`autoFit: 'hug'` hugs at fixed x/y; `align` is in-box only). Export always runs remasure from stored copy even when `variables` is omitted; editor/inspector match via `prepareCanvasSceneForRender` preview mode. `canvas.text` **Hug content** auto-fit in the inspector. Published types `CanvasExportOptions`, `CanvasExportResult`, `CanvasExportFormat`; `canvas.exportImage` via `CanvasDocumentExportService`
 - Generic layer handles on `CanvasLayerInteractionContribution` (`providesHandles`, `layoutHandles`, `onHandleDrag*`)
 - Optional `dataPatch` on `canvas.updateLayerTransform` (merges into `layer.data`)
 

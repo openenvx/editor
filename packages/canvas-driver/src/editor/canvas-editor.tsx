@@ -4,7 +4,7 @@ import {
   canSelectLayer,
   isTypingTarget,
 } from '@openenvx/studio/core';
-import type { Page } from '@openenvx/studio/schema';
+import type { Page, Scene } from '@openenvx/studio/schema';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useCanvasHost } from '../canvas-host-context';
@@ -53,11 +53,14 @@ import { useCanvasFontPreload } from '../use-canvas-font-preload';
 import { useContainerSize } from '../use-container-size';
 import { ViewportController } from '../viewport';
 import { CanvasRichTextOverlay } from './canvas-rich-text-overlay';
+import { useDisplayLayerSurface } from './use-display-layer-surface';
 
 import styles from './canvas-editor.module.css';
 
 export interface CanvasEditorProps {
   layerSurface: CanvasLayerSurfaceItem[];
+  /** Workbench scene for variable preview + hug remasure (stored tokens stay in the store). */
+  scene?: Scene;
   artboardWidth: number;
   artboardHeight: number;
   page: Page;
@@ -121,6 +124,7 @@ function createViewportApi(
 export const CanvasEditor = memo(
   ({
     layerSurface,
+    scene,
     artboardWidth,
     artboardHeight,
     page,
@@ -359,30 +363,38 @@ export const CanvasEditor = memo(
       [layerSurface]
     );
 
-    const overlayLayers = useMemo(
-      () =>
-        flattenStageLayers(layerSurface).flatMap((item) => {
-          const interaction = canvasLayerInteractions.find(
-            (entry) => entry.kind === item.view.kind
-          );
-          return interaction?.usesEditOverlay
-            ? [
-                {
-                  absoluteTransform: item.absoluteTransform,
-                  layer: item.layer,
-                  view: item.view,
-                },
-              ]
-            : [];
-        }),
-      [canvasLayerInteractions, layerSurface]
-    );
-
     const fontFamilies = useMemo(
       () => collectCanvasFontFamilies(flatLayerSurface),
       [flatLayerSurface]
     );
     const fontLoadRevision = useCanvasFontPreload(fontFamilies);
+
+    const displayLayerSurface = useDisplayLayerSurface(
+      layerSurface,
+      scene,
+      fontLoadRevision
+    );
+
+    const overlayLayers = useMemo(
+      () =>
+        flattenStageLayers(displayLayerSurface).flatMap((item) => {
+          const interaction = canvasLayerInteractions.find(
+            (entry) => entry.kind === item.view.kind
+          );
+          if (!interaction?.usesEditOverlay) {
+            return [];
+          }
+          const storeItem = findLayerSurfaceItem(layerSurface, item.layer.id);
+          return [
+            {
+              absoluteTransform: item.absoluteTransform,
+              layer: storeItem?.layer ?? item.layer,
+              view: item.view,
+            },
+          ];
+        }),
+      [canvasLayerInteractions, displayLayerSurface, layerSurface]
+    );
 
     const viewportState = viewport.getViewport();
 
@@ -620,7 +632,7 @@ export const CanvasEditor = memo(
               fontLoadRevision={fontLoadRevision}
               gridSize={gridSettings.size}
               hoveredLayerId={hoveredLayerId}
-              layers={layerSurface}
+              layers={displayLayerSurface}
               onHoverLayer={onHoverLayer}
               onLayerDoubleClick={handleLayerDoubleClick}
               onSelectLayer={handleSelectLayer}

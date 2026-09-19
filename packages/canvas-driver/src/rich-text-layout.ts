@@ -229,7 +229,10 @@ function measureRichTextWidth(
   const letterSpacingWidth = letterSpacing * text.length;
 
   if (typeof document === 'undefined') {
-    return letterSpacingWidth;
+    // ponytail: approximate glyph width in Node export; upgrade: shared canvas measureText backend.
+    return (
+      text.length * fontSize * (style.bold ? 0.62 : 0.6) + letterSpacingWidth
+    );
   }
   if (
     typeof navigator !== 'undefined' &&
@@ -729,23 +732,50 @@ export function measureRichTextHeight(options: {
 /** Probe width large enough that only explicit newlines wrap. */
 const INTRINSIC_WIDTH_PROBE = 100_000;
 
-/**
- * Natural content size: width is the longest unwrapped line, height is the
- * laid-out height at that width (or at `maxWidth` when the line is longer).
- */
-export function measureRichTextContentSize(options: {
+/** Avoid last-glyph wrap when Konva layout is slightly wider than canvas measureText. */
+export const RICH_TEXT_HUG_WIDTH_PAD = 2;
+
+export function measureRichTextIntrinsicContentWidth(options: {
   html: string;
   fontSize: number;
   fontFamily: string;
-  align?: 'left' | 'center' | 'right';
   lineHeightMultiplier?: number;
   letterSpacing?: number;
-  maxWidth?: number;
-}): { width: number; height: number } {
+}): number {
   const lineHeightMultiplier =
     options.lineHeightMultiplier ?? RICH_TEXT_LINE_HEIGHT_MULTIPLIER;
   const letterSpacing =
     options.letterSpacing ?? DEFAULT_RICH_TEXT_LETTER_SPACING;
+  const lineHeight = getRichTextLineHeight(
+    options.fontSize,
+    lineHeightMultiplier
+  );
+
+  if (isRichTextDomMeasurementAvailable() && options.html.trim()) {
+    const root = mountRichTextMeasurementRoot(
+      {
+        align: 'left',
+        fontFamily: options.fontFamily,
+        fontSize: options.fontSize,
+        letterSpacing,
+        lineHeight,
+        width: INTRINSIC_WIDTH_PROBE,
+      },
+      options.html
+    );
+
+    try {
+      const rootRect = root.getBoundingClientRect();
+      const measurements = measureRichTextCharactersFromHtml(root, rootRect);
+      if (measurements && measurements.length > 0) {
+        return Math.max(
+          ...measurements.map((measurement) => measurement.right)
+        );
+      }
+    } finally {
+      root.remove();
+    }
+  }
 
   const spans = layoutRichText({
     align: 'left',
@@ -776,22 +806,7 @@ export function measureRichTextContentSize(options: {
     contentWidth = options.fontSize;
   }
 
-  let width = Math.ceil(contentWidth);
-  if (options.maxWidth !== undefined) {
-    width = Math.min(width, Math.max(1, options.maxWidth));
-  }
-
-  const height = measureRichTextHeight({
-    align: options.align,
-    fontFamily: options.fontFamily,
-    fontSize: options.fontSize,
-    html: options.html,
-    letterSpacing,
-    lineHeightMultiplier,
-    width,
-  });
-
-  return { height, width };
+  return contentWidth;
 }
 
 export function layoutRichText(options: {

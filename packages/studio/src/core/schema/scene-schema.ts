@@ -167,10 +167,10 @@ function build(o: typeof z.object) {
   const canvasTextData = o({
     align: z.enum(['left', 'center', 'right']).optional(),
     autoFit: z
-      .enum(['none', 'shrink'])
+      .enum(['none', 'shrink', 'hug'])
       .optional()
       .describe(
-        'When shrink, font size scales down so text stays inside the fixed box.'
+        'When shrink, font size scales down so text stays inside the fixed box. When hug, the box follows the glyphs; x/y stay fixed (align is in-box text-align only).'
       ),
     curve: z.preprocess(
       (value) => (typeof value === 'number' ? clampTextCurve(value) : value),
