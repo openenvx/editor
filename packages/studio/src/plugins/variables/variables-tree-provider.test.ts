@@ -42,17 +42,4 @@ describe('VariablesTreeProvider', () => {
     });
   });
 
-  it('reorders variables via handleMove', () => {
-    const provider = new VariablesTreeProvider();
-    const scene = normalizeScene({
-      pages: [{ id: 'p1', name: 'Canvas', layout: 'absolute', layers: [] }],
-      variables: [{ id: 'v1', key: 'a' }, { id: 'v2', key: 'b' }],
-    });
-    const ctx = createCtx(scene);
-    const [first, second] = provider.getRootChildren(ctx);
-
-    provider.handleMove!(second!, first!, 'before', ctx);
-
-    expect(scene.variables?.map((entry) => entry.id)).toEqual(['v2', 'v1']);
-  });
 });

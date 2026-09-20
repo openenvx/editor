@@ -5,10 +5,54 @@
 }
 
 .row {
-  padding: var(--wb-space-2);
   border-radius: var(--wb-radius-md);
+}
+
+.rowCard {
+  padding: var(--wb-space-2);
   background: var(--wb-muted);
   box-shadow: var(--wb-shadow-control);
+}
+
+.rowPlain {
+  padding: 0 var(--wb-space-4);
+  background: transparent;
+  box-shadow: none;
+}
+
+.rowPlainSurface {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wb-space-1);
+  min-height: var(--wb-layer-row-height);
+  padding: 0 var(--wb-space-3);
+  border-radius: var(--wb-radius-md);
+  background: transparent;
+  transition: background var(--wb-duration-fast) ease;
+}
+
+.rowPlainSurface .rowHeaderNoBody {
+  flex: 1;
+  align-items: center;
+  min-height: var(--wb-layer-row-height);
+}
+
+.rowPlainSurface .rowLabel {
+  color: var(--wb-muted-foreground);
+  font-weight: 400;
+  transition: color var(--wb-duration-fast) ease;
+}
+
+.rowPlainSurface:hover .rowLabel {
+  color: var(--wb-foreground);
+}
+
+.rowPlainSurface:hover {
+  background: var(--wb-sidebar-row-hovered);
+}
+
+.rowPlainSurfaceClickable {
+  cursor: pointer;
 }
 
 .rowDragging {

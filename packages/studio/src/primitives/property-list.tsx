@@ -27,6 +27,8 @@ export interface PropertyListRowProps {
   actions?: ReactNode;
   children?: ReactNode;
   className?: string;
+  /** Sidebar-style row: horizontal inset, hover fill only (no card chrome). */
+  plain?: boolean;
   dragging?: boolean;
   rowRef?: Ref<HTMLDivElement>;
   rowStyle?: CSSProperties;
@@ -39,66 +41,97 @@ export function PropertyListRow({
   actions,
   children,
   className,
+  plain = false,
   dragging,
   rowRef,
   rowStyle,
   onRowClick,
 }: PropertyListRowProps) {
   const hasHeader = leading || label || actions;
+  const rowClickProps = onRowClick
+    ? {
+        onClick: onRowClick,
+        onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onRowClick();
+          }
+        },
+        role: 'button' as const,
+        tabIndex: 0,
+      }
+    : {};
+
+  const header = hasHeader ? (
+    <div
+      className={cn(
+        styles.rowHeader,
+        !children && styles.rowHeaderNoBody,
+        !plain && onRowClick && styles.rowHeaderClickable
+      )}
+      {...(!plain ? rowClickProps : {})}
+    >
+      {leading ? (
+        <div
+          className={styles.rowLeading}
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+          {leading}
+        </div>
+      ) : null}
+      {label ? (
+        typeof label === 'string' ? (
+          <span className={styles.rowLabel}>{label}</span>
+        ) : (
+          <div className={styles.rowLabel}>{label}</div>
+        )
+      ) : null}
+      {actions ? (
+        <div
+          className={styles.rowActions}
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+          {actions}
+        </div>
+      ) : null}
+    </div>
+  ) : null;
+
+  const body = children ? (
+    <div className={styles.rowBody}>{children}</div>
+  ) : null;
+
+  const content = (
+    <>
+      {header}
+      {body}
+    </>
+  );
 
   return (
     <div
-      className={cn(styles.row, dragging && styles.rowDragging, className)}
+      className={cn(
+        styles.row,
+        plain ? styles.rowPlain : styles.rowCard,
+        dragging && styles.rowDragging,
+        className
+      )}
       ref={rowRef}
       style={rowStyle}
     >
-      {hasHeader ? (
+      {plain ? (
         <div
           className={cn(
-            styles.rowHeader,
-            !children && styles.rowHeaderNoBody,
-            onRowClick && styles.rowHeaderClickable
+            styles.rowPlainSurface,
+            onRowClick && styles.rowPlainSurfaceClickable
           )}
-          {...(onRowClick
-            ? {
-                onClick: onRowClick,
-                onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    onRowClick();
-                  }
-                },
-                role: 'button' as const,
-                tabIndex: 0,
-              }
-            : {})}
+          {...(plain ? rowClickProps : {})}
         >
-          {leading ? (
-            <div
-              className={styles.rowLeading}
-              onPointerDown={(event) => event.stopPropagation()}
-            >
-              {leading}
-            </div>
-          ) : null}
-          {label ? (
-            typeof label === 'string' ? (
-              <span className={styles.rowLabel}>{label}</span>
-            ) : (
-              <div className={styles.rowLabel}>{label}</div>
-            )
-          ) : null}
-          {actions ? (
-            <div
-              className={styles.rowActions}
-              onPointerDown={(event) => event.stopPropagation()}
-            >
-              {actions}
-            </div>
-          ) : null}
+          {content}
         </div>
-      ) : null}
-      {children ? <div className={styles.rowBody}>{children}</div> : null}
+      ) : (
+        content
+      )}
     </div>
   );
 }

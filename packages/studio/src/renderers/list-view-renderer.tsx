@@ -67,6 +67,7 @@ function ListRow({
 
   return (
     <PropertyListRow
+      plain
       actions={item.actions?.map((action) => (
         <button
           aria-label={action.label}
@@ -187,9 +188,11 @@ function ListViewBody({
         list
       )}
       {view.addCommandId ? (
-        <PropertyListAdd className={styles.add} onClick={handleAdd}>
-          {addLabel}
-        </PropertyListAdd>
+        <div className={styles.addRow}>
+          <PropertyListAdd className={styles.add} onClick={handleAdd}>
+            {addLabel}
+          </PropertyListAdd>
+        </div>
       ) : null}
     </div>
   );
