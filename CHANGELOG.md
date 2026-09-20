@@ -3,6 +3,19 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.3.7] - 2026-09-20
+
+### Other
+
+- Introduce canvas-next-demo application with React integration
+
+- Added a new demo application `canvas-next-demo` showcasing integration with `@openenvx/canvas-driver` and `@openenvx/studio`.
+- Implemented essential files including `next.config.ts`, `package.json`, and TypeScript configurations for the demo.
+- Created components for the canvas editor and layout, utilizing React hooks for state management.
+- Updated various package configurations to include necessary dependencies like `react-reconciler`, `scheduler`, and `use-sync-external-store`.
+- Enhanced Vite configuration to support ESM imports and resolve React runtime aliases for better compatibility with Next.js.
+- Added tests to validate the publishing bundle and ensure compliance with React's ESM import requirements.
+
 ## [0.3.6] - 2026-09-19
 
 ### Other
@@ -34,6 +47,8 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Updated design tokens in `tokens.css` for both light and dark themes to ensure consistency across components.
 - Refined styles for sidebars, popovers, and menus to enhance visual coherence and usability.
 - Introduced a new test suite for validating theme token integrity against the Codex design system.
+
+- V0.3.6
 
 ## [0.3.5] - 2026-09-18
 
