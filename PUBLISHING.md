@@ -74,6 +74,8 @@ bun run smoke-next-consumer
 
 `smoke-next-consumer` packs `@openenvx/studio` and `@openenvx/canvas-driver`, strips `development` from `exports` (same as publish), installs them into a throwaway app, and runs **Next.js** and **Vite** production builds with a real `WorkbenchShell` + canvas setup. It does **not** set `transpilePackages`.
 
+For a checked-in reference app (App Router, global CSS imports, no `transpilePackages`), see [`apps/canvas-next-demo`](apps/canvas-next-demo). Run `bun run dev:canvas-next` from the repo root after `bun install`. The demo uses `workspace:*` links, forces **`dist/`** resolution (not `exports.development` → `src/`, which would make Next compile CSS modules from source), and a small `webpack` `resolve.modules` tweak so bare `react-reconciler` / `scheduler` / `use-sync-external-store` imports from published-style `dist/` resolve from the app’s `node_modules` (npm consumers hoist those automatically). Declare `react-reconciler`, `scheduler`, and `use-sync-external-store` next to `react` if your installer does not hoist them.
+
 ## Package notes
 
 ### Product host (canvas example)
@@ -82,7 +84,11 @@ bun run smoke-next-consumer
 npm install @openenvx/studio @openenvx/canvas-driver react react-dom
 ```
 
-Published `dist/` JS is built with **[Rolldown](https://rolldown.rs/)**: third-party dependencies are inlined into the shipped bundles (Zod, DnD, Konva, TipTap, etc.). Host apps only need **peer** packages: `react`, `react-dom`, and for drivers `@openenvx/studio`. **`transpilePackages` is usually unnecessary** — CI smoke builds with plain `next build`. Add it only if your Next version errors on prebuilt ESM or `"use client"` boundaries.
+Published `dist/` JS is built with **[Rolldown](https://rolldown.rs/)**: third-party dependencies are inlined into the shipped bundles (Zod, DnD, Konva, TipTap, etc.). Host apps only need **peer** packages: `react`, `react-dom`, and for drivers `@openenvx/studio`.
+
+Published bundles must **ESM-import** the host React stack (`react`, `react-dom`, `react/jsx-runtime`, `react-reconciler`, `scheduler`, `use-sync-external-store`) — never inline those runtimes. Next.js 16 aliases `react*` to `next/dist/compiled/react*` and pairs a **development** React with a **development** reconciler. Inlining production `react-reconciler` into `dist/` (Rolldown minify) and then running `next dev` mixes those builds and breaks hooks (`dispatcher.getOwner is not a function`).
+
+**`transpilePackages` is usually unnecessary** — CI smoke builds with Next 16 and plain `next build`. Do not add `@openenvx/studio` or `@openenvx/*-driver` to `transpilePackages` unless a specific Next version forces it.
 
 ```tsx
 import { WorkbenchShell } from '@openenvx/studio';

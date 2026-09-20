@@ -100,7 +100,9 @@
   },
   "peerDependencies": {
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "scheduler": ">=0.23.0",
+    "use-sync-external-store": ">=1.2.0"
   },
   "peerDependenciesMeta": {
     "react": {

@@ -13,5 +13,7 @@ export default defineConfig({
     '**/__tests__/**',
     '**/CHANGELOG.md',
     '**/routeTree.gen.ts',
+    // Next.js rewrites this file on build/dev; quote style must not fail precommit.
+    '**/next-env.d.ts',
   ],
 });

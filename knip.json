@@ -38,7 +38,8 @@
     },
     "packages/canvas-driver": {
       "ignoreDependencies": [
-        "@openenvx/editor-sandbox"
+        "@openenvx/editor-sandbox",
+        "react-reconciler"
       ],
       "entry": [
         "src/index.ts!",
@@ -107,7 +108,9 @@
         "rolldown.core.publish.config.ts!",
         "css-modules-plugin.ts!",
         "build-dts.ts!",
-        "smoke-next-consumer.ts!"
+        "smoke-next-consumer.ts!",
+        "assert-publish-bundle.ts!",
+        "rolldown-react-esm-externals.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
@@ -117,7 +120,9 @@
         "rolldown.core.publish.config.ts",
         "css-modules-plugin.ts",
         "build-dts.ts",
-        "smoke-next-consumer.ts"
+        "smoke-next-consumer.ts",
+        "assert-publish-bundle.ts",
+        "rolldown-react-esm-externals.ts"
       ],
       "ignoreDependencies": [
         "zod"
@@ -223,14 +228,73 @@
         "src/**/*.{ts,tsx}"
       ]
     },
+    "apps/canvas-package-demo": {
+      "entry": [
+        "src/main.tsx",
+        "src/app.tsx",
+        "index.html",
+        "vite.config.ts"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "vite.config.ts",
+        "../host-react-runtime-vite-aliases.ts"
+      ],
+      "ignoreDependencies": [
+        "react-reconciler",
+        "scheduler",
+        "use-sync-external-store"
+      ]
+    },
+    "apps/html-package-demo": {
+      "entry": [
+        "src/main.tsx",
+        "src/app.tsx",
+        "index.html",
+        "vite.config.ts"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "vite.config.ts",
+        "../host-react-runtime-vite-aliases.ts"
+      ],
+      "ignoreDependencies": [
+        "react-reconciler",
+        "scheduler",
+        "use-sync-external-store"
+      ]
+    },
     "apps/email-package-demo": {
       "entry": [
         "src/main.tsx",
         "src/app.tsx",
-        "index.html"
+        "index.html",
+        "vite.config.ts"
       ],
       "project": [
-        "src/**/*.{ts,tsx}"
+        "src/**/*.{ts,tsx}",
+        "vite.config.ts",
+        "../host-react-runtime-vite-aliases.ts"
+      ],
+      "ignoreDependencies": [
+        "react-reconciler",
+        "scheduler",
+        "use-sync-external-store"
+      ]
+    },
+    "apps/canvas-next-demo": {
+      "entry": [
+        "app/layout.tsx",
+        "app/page.tsx",
+        "next.config.ts"
+      ],
+      "project": [
+        "app/**/*.{ts,tsx}"
+      ],
+      "ignoreDependencies": [
+        "react-reconciler",
+        "scheduler",
+        "use-sync-external-store"
       ]
     }
   }

@@ -6,7 +6,13 @@ import * as esbuild from 'esbuild';
 import { defineConfig } from 'rolldown';
 import { esmExternalRequirePlugin } from 'rolldown/plugins';
 
-import { createCssModuleRolldownPlugin } from './css-modules-plugin.ts';
+import { assertPublishBundle } from '../studio/assert-publish-bundle';
+import {
+  isHostReactRuntimePackageExternal,
+  isReactEsmExternalId,
+  reactEsmExternals,
+} from '../studio/rolldown-react-esm-externals';
+import { createCssModuleRolldownPlugin } from './css-modules-plugin';
 
 const packageRoot = import.meta.dirname;
 const packagesRoot = path.resolve(packageRoot, '..');
@@ -16,13 +22,6 @@ const pkg = JSON.parse(
 ) as { peerDependencies?: Record<string, string> };
 const sourcemap = process.env.STUDIO_SOURCEMAP === '1';
 const inlineOpenenvx = /^@openenvx\/studio\/(plugins\/variables|internal)/;
-
-const esmExternalRequire = [
-  'react',
-  'react-dom',
-  'react/jsx-runtime',
-  'react-dom/client',
-];
 
 const artboardExternals = [
   '@openenvx/core',
@@ -39,7 +38,7 @@ const artboardExternals = [
   '@openenvx/editor-sandbox/protocol',
   '@openenvx/editor-sandbox/canvas-widget',
   ...Object.keys(pkg.peerDependencies ?? {}).filter(
-    (id) => !esmExternalRequire.includes(id)
+    (id) => !isReactEsmExternalId(id)
   ),
 ];
 
@@ -50,6 +49,9 @@ function bundleExternal(
   return (id: string) => {
     if (forceBundle?.(id)) {
       return false;
+    }
+    if (isHostReactRuntimePackageExternal(id)) {
+      return true;
     }
     return externalIds.some((e) => id === e || id.startsWith(`${e}/`));
   };
@@ -67,7 +69,7 @@ export default defineConfig({
   tsconfig: 'tsconfig.publish.json',
   external: bundleExternal(artboardExternals, (id) => inlineOpenenvx.test(id)),
   plugins: [
-    esmExternalRequirePlugin({ external: esmExternalRequire }),
+    esmExternalRequirePlugin({ external: reactEsmExternals }),
     plugin,
     {
       name: 'html-publish-post',
@@ -103,6 +105,7 @@ export default defineConfig({
             `"use client";\nimport "./theme.css";\n${indexJs}`
           );
         }
+        await assertPublishBundle(distRoot);
       },
     },
   ],

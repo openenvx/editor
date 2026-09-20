@@ -15,6 +15,8 @@ import {
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
+import { isReactEsmExternalId } from './rolldown-react-esm-externals';
+
 const packageRoot = import.meta.dirname;
 const repoRoot = path.resolve(packageRoot, '../..');
 
@@ -224,7 +226,7 @@ async function patchInstalledPackages(workDir: string, names: string[]) {
     );
     const deps = Object.keys(
       (raw.dependencies as Record<string, string> | undefined) ?? {}
-    );
+    ).filter((id) => !isReactEsmExternalId(id));
     const packageDir = path.dirname(pkgPath);
     await assertNoBareImports(packageDir, deps);
     await assertNoRuntimeRequireStub(packageDir);
@@ -279,8 +281,11 @@ try {
   const baseDeps = {
     '@openenvx/canvas-driver': `file:${canvasTgz}`,
     '@openenvx/studio': `file:${studioTgz}`,
-    react: '19.2.7',
-    'react-dom': '19.2.7',
+    react: '19.2.3',
+    'react-dom': '19.2.3',
+    'react-reconciler': '0.33.0',
+    scheduler: '0.27.0',
+    'use-sync-external-store': '1.6.0',
   };
 
   await writeFile(
@@ -296,7 +301,7 @@ try {
         },
         dependencies: {
           ...baseDeps,
-          next: '15.5.4',
+          next: '16.3.0',
         },
         devDependencies: {
           '@types/node': '22.10.5',

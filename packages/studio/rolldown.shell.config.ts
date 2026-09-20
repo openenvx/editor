@@ -4,18 +4,16 @@ import path from 'node:path';
 import { defineConfig } from 'rolldown';
 import { esmExternalRequirePlugin } from 'rolldown/plugins';
 
-import { createCssModuleRolldownPlugin } from './css-modules-plugin.ts';
+import { assertPublishBundle } from './assert-publish-bundle';
+import { createCssModuleRolldownPlugin } from './css-modules-plugin';
+import {
+  isHostReactRuntimePackageExternal,
+  reactEsmExternals,
+} from './rolldown-react-esm-externals';
 
 const packageRoot = import.meta.dirname;
 const distRoot = path.join(packageRoot, 'dist');
 const sourcemap = process.env.STUDIO_SOURCEMAP === '1';
-
-const esmExternalRequire = [
-  'react',
-  'react-dom',
-  'react/jsx-runtime',
-  'react-dom/client',
-];
 
 const shellExternals = [
   '@openenvx/studio',
@@ -43,9 +41,10 @@ export default defineConfig({
   platform: 'browser',
   treeshake: true,
   tsconfig: 'tsconfig.build.json',
-  external: bundleExternal(shellExternals),
+  external: (id) =>
+    bundleExternal(shellExternals)(id) || isHostReactRuntimePackageExternal(id),
   plugins: [
-    esmExternalRequirePlugin({ external: esmExternalRequire }),
+    esmExternalRequirePlugin({ external: reactEsmExternals }),
     plugin,
     {
       name: 'studio-shell-post',
@@ -72,6 +71,7 @@ export default defineConfig({
             `"use client";\nimport "./index.css";\n${indexJs}`
           );
         }
+        await assertPublishBundle(distRoot);
       },
     },
   ],

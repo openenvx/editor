@@ -49,6 +49,7 @@
     "@tiptap/starter-kit": "^3.27.3",
     "konva": "^10.3.0",
     "react-konva": "^19.2.5",
+    "react-reconciler": "0.33.0",
     "zod": "4.4.3"
   },
   "devDependencies": {

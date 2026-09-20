@@ -1,0 +1,9 @@
+@import '@openenvx/studio/styles.css';
+@import '@openenvx/canvas-driver/theme.css';
+@import '@openenvx/canvas-driver/fonts.css';
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
