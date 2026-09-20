@@ -2,19 +2,20 @@
   width: 100%;
   height: var(--wb-control-height);
   padding: 0 var(--wb-control-padding-x);
-  border: none;
-  border-radius: var(--wb-radius-control);
+  border: 1px solid var(--wb-border);
+  border-radius: var(--wb-radius-lg);
   background: var(--wb-input-fill);
   color: var(--wb-foreground);
   font-size: var(--wb-text-sm);
-  box-shadow: var(--wb-shadow-xs);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  transition: border-color var(--wb-duration-fast) var(--wb-ease-out);
 }
 
 .root:focus-visible {
   outline: none;
+  border-color: var(--wb-focus);
   box-shadow: var(--wb-shadow-control-focus);
 }
 

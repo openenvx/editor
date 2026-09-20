@@ -22,7 +22,7 @@
   border-radius: var(--wb-radius-sm);
   background: transparent;
   color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
   font-weight: 500;
   cursor: pointer;
   transition:

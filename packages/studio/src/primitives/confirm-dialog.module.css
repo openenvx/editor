@@ -10,9 +10,10 @@
 
 .dialog {
   background: var(--wb-popover);
-  border-radius: var(--wb-radius-md);
-  box-shadow: var(--wb-shadow-float);
-  padding: var(--wb-space-4);
+  border: var(--wb-hairline);
+  border-radius: var(--wb-radius-dialog);
+  box-shadow: var(--wb-shadow-dialog);
+  padding: var(--wb-space-5);
   min-width: 280px;
   max-width: 90vw;
 }

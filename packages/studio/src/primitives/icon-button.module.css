@@ -19,13 +19,11 @@
   width: 24px;
   height: 24px;
   border-radius: var(--wb-radius-sm);
-  background: var(--wb-muted);
-  box-shadow: var(--wb-shadow-xs);
+  background: transparent;
 }
 
 .sm:hover:not(:disabled) {
-  background: var(--wb-muted);
-  box-shadow: var(--wb-shadow-sm);
+  background: var(--wb-hover-overlay);
 }
 
 .root:hover:not(:disabled) {

@@ -3,14 +3,15 @@
   align-items: center;
   width: 100%;
   height: var(--wb-control-height);
-  border-radius: var(--wb-radius-control);
-  background: var(--wb-muted);
-  box-shadow: var(--wb-shadow-control);
+  border: 1px solid var(--wb-border);
+  border-radius: var(--wb-radius-lg);
+  background: var(--wb-input-fill);
   overflow: hidden;
 }
 
 .root:focus-within,
 .root[data-scrubbing] {
+  border-color: var(--wb-focus);
   box-shadow: var(--wb-shadow-control-focus);
 }
 
@@ -63,7 +64,7 @@
 .compact {
   height: 24px;
   background: transparent;
-  box-shadow: none;
+  border-color: transparent;
 }
 
 .compact:focus-within,

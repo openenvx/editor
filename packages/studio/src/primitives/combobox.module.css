@@ -15,17 +15,16 @@
   width: 100%;
   height: var(--wb-icon-button-size);
   padding: var(--wb-space-1) 10px;
-  border: none;
-  border-radius: var(--wb-radius-control);
-  background: var(--wb-muted);
+  border: 1px solid var(--wb-border);
+  border-radius: var(--wb-radius-lg);
+  background: var(--wb-input-fill);
   color: var(--wb-foreground);
   font-size: var(--wb-text-sm);
-  box-shadow: var(--wb-shadow-control);
   cursor: pointer;
 }
 
 .trigger:hover {
-  box-shadow: var(--wb-shadow-control-hover);
+  background: var(--wb-hover-overlay);
 }
 
 .trigger:focus-visible {

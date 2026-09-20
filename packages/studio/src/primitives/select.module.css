@@ -11,28 +11,32 @@
   width: 100%;
   height: var(--wb-control-height);
   padding: 0 var(--wb-control-padding-x);
-  border: none;
-  border-radius: var(--wb-radius-control);
-  background: var(--wb-muted);
+  border: 1px solid var(--wb-border);
+  border-radius: var(--wb-radius-lg);
+  background: var(--wb-input-fill);
   color: var(--wb-foreground);
   font-size: var(--wb-text-sm);
   line-height: 1;
-  box-shadow: var(--wb-shadow-control);
   cursor: pointer;
+  transition:
+    background-color var(--wb-duration-fast) var(--wb-ease-out),
+    border-color var(--wb-duration-fast) var(--wb-ease-out);
 }
 
 .trigger:hover {
-  box-shadow: var(--wb-shadow-control-hover);
+  background: var(--wb-hover-overlay);
 }
 
 .trigger:focus-visible {
   outline: none;
+  border-color: var(--wb-focus);
   box-shadow: var(--wb-shadow-control-focus);
 }
 
 .chevron {
   flex-shrink: 0;
   color: var(--wb-muted-foreground);
+  opacity: 0.5;
 }
 
 .optionSelected {

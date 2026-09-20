@@ -11,10 +11,10 @@
   min-width: 180px;
   padding: var(--wb-space-1);
   border: var(--wb-hairline);
-  border-radius: var(--wb-radius-md);
+  border-radius: var(--wb-radius-popup);
   background: var(--wb-menu);
-  backdrop-filter: var(--wb-surface-blur);
-  box-shadow: none;
+  backdrop-filter: var(--wb-popup-blur);
+  box-shadow: var(--wb-shadow-popup);
   font-family: var(--wb-font);
 }
 
@@ -32,7 +32,7 @@
   min-height: var(--wb-menu-item-height);
   padding: 0 var(--wb-space-2);
   border: none;
-  border-radius: var(--wb-radius-sm);
+  border-radius: var(--wb-radius-lg);
   background: transparent;
   color: var(--wb-foreground);
   font-size: var(--wb-text-sm);

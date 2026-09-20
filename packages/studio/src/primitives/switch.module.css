@@ -1,29 +1,29 @@
-/* shadcn Switch grammar - primary track, contrasting thumb, inset ring */
+/* Synara accent switch: blue track when on, white thumb. */
 .root {
+  --wb-switch-thumb: 16px;
   position: relative;
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  width: 32px;
-  height: 18px;
-  padding: 0;
-  border: 1px solid transparent;
+  width: calc(var(--wb-switch-thumb) * 2);
+  height: calc(var(--wb-switch-thumb) + 4px);
+  padding: 1px;
+  border: 1px solid var(--wb-switch-track-border);
   border-radius: var(--wb-radius-full);
-  background: var(--wb-muted);
-  box-shadow: var(--wb-shadow-control);
+  background: var(--wb-switch-track);
   cursor: pointer;
   outline: none;
   transition:
-    background 0.15s ease,
-    box-shadow 0.15s ease;
+    background-color 200ms ease,
+    border-color 200ms ease;
 }
 
 .root:hover:not(:disabled) {
-  box-shadow: var(--wb-shadow-control-hover);
+  border-color: var(--wb-switch-track-border-hover);
 }
 
 .root:focus-visible {
-  box-shadow: var(--wb-shadow-control-focus);
+  box-shadow: var(--wb-shadow-focus);
 }
 
 .root:disabled {
@@ -32,29 +32,22 @@
 }
 
 .checked {
-  background: var(--wb-primary);
-  box-shadow: none;
-}
-
-.checked:hover:not(:disabled) {
-  opacity: 0.92;
+  border-color: var(--wb-focus);
+  background: var(--wb-focus);
 }
 
 .thumb {
   display: block;
-  width: 14px;
-  height: 14px;
+  width: var(--wb-switch-thumb);
+  height: var(--wb-switch-thumb);
   border-radius: var(--wb-radius-full);
-  background: var(--wb-foreground);
-  box-shadow: var(--wb-shadow-sm);
-  transform: translateX(2px);
-  transition:
-    transform 0.15s ease,
-    background 0.15s ease;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+  transform: translateX(0);
+  transition: transform 200ms ease-out;
   pointer-events: none;
 }
 
 .checked .thumb {
-  background: var(--wb-primary-foreground);
-  transform: translateX(16px);
+  transform: translateX(calc(var(--wb-switch-thumb) - 4px));
 }

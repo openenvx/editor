@@ -71,7 +71,7 @@
 }
 
 .label {
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
   font-weight: 500;
   color: var(--wb-muted-foreground);
 }
@@ -83,7 +83,7 @@
 .description {
   margin: var(--wb-space-1) 0 0;
   color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
   line-height: 1.35;
 }
 
@@ -94,7 +94,7 @@
 .blockLabel {
   display: block;
   margin-bottom: var(--wb-space-1);
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
   font-weight: 500;
   color: var(--wb-muted-foreground);
 }

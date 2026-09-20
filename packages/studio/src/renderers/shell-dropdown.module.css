@@ -8,43 +8,55 @@
   min-width: 44px;
   height: var(--wb-icon-button-size);
   padding: 0 8px;
-  border: none;
-  border-radius: var(--wb-radius-control);
-  background: var(--wb-muted);
+  border: 1px solid var(--wb-border);
+  border-radius: var(--wb-radius-lg);
+  background: var(--wb-input-fill);
   color: var(--wb-foreground);
-  font-family: var(--wb-font-mono);
-  font-size: var(--wb-text-xs);
+  font-family: var(--wb-font);
+  font-size: var(--wb-text-sm);
+  font-variant-numeric: tabular-nums;
   line-height: 1;
-  box-shadow: var(--wb-shadow-xs);
   cursor: pointer;
 }
 
 .trigger:hover,
 .trigger[data-state='open'] {
-  background: var(--wb-active-overlay);
-  box-shadow: var(--wb-shadow-sm);
+  background: var(--wb-hover-overlay);
 }
 
 .statusTrigger {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  height: 20px;
-  padding: 0 var(--wb-space-1);
-  border: none;
-  border-radius: var(--wb-radius-sm);
+  gap: 6px;
+  height: var(--wb-control-height);
+  padding: 0 var(--wb-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--wb-radius-md);
   background: transparent;
   color: var(--wb-muted-foreground);
-  font-family: var(--wb-font-mono);
-  font-size: var(--wb-text-xs);
+  font-family: var(--wb-font);
+  font-size: var(--wb-text-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  line-height: 1;
   cursor: pointer;
+  transition:
+    color var(--wb-duration-fast) var(--wb-ease-out),
+    background-color var(--wb-duration-fast) var(--wb-ease-out);
 }
 
-.statusTrigger:hover {
+.statusTrigger:hover,
+.statusTrigger[data-state='open'],
+.statusTrigger[data-popup-open] {
   color: var(--wb-foreground);
   background: var(--wb-hover-overlay);
 }
 
+.statusTrigger:focus-visible {
+  outline: none;
+  box-shadow: var(--wb-shadow-focus);
+}
+
 .chevron {
-  opacity: 0.7;
+  opacity: 0.5;
 }

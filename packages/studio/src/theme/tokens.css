@@ -18,11 +18,13 @@
   --wb-space-5: 20px;
   --wb-space-6: 24px;
 
-  /* Radius - 0.625rem control scale */
+  /* Radius - Synara rounded-lg / rounded-2xl / rounded-3xl */
   --wb-radius-sm: 6px;
-  --wb-radius-control: 8px;
+  --wb-radius-control: 10px;
   --wb-radius-md: 8px;
   --wb-radius-lg: 10px;
+  --wb-radius-popup: 16px;
+  --wb-radius-dialog: 24px;
   --wb-radius-full: 9999px;
 
   /* Control sizes - 1.75rem rows */
@@ -34,6 +36,7 @@
 
   /* Layout */
   --wb-topbar-height: 46px;
+  --wb-status-bar-height: 32px;
   --wb-activity-bar-width: 56px;
   --wb-sidebar-width: 240px;
   --wb-secondary-sidebar-width: 280px;
@@ -41,6 +44,7 @@
 
   /* Material - frosted sidebar / menus */
   --wb-surface-blur: blur(4px) saturate(130%);
+  --wb-popup-blur: blur(40px) saturate(150%);
 
   /* Motion */
   --wb-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -69,7 +73,7 @@
   --wb-popover: rgb(255, 255, 255);
   --wb-popover-foreground: #0d0d0d;
   --wb-property-popover: rgb(255, 255, 255);
-  --wb-menu: rgba(255, 255, 255, 0.96);
+  --wb-menu: rgba(255, 255, 255, 0.7);
   --wb-popup-header: rgba(13, 13, 13, 0.04);
   --wb-muted: rgba(13, 13, 13, 0.04);
   --wb-border: rgba(13, 13, 13, 0.069);
@@ -89,6 +93,7 @@
 
   --wb-primary: #0d0d0d;
   --wb-primary-foreground: #ffffff;
+  --wb-primary-hover: color-mix(in srgb, var(--wb-primary) 90%, transparent);
   --wb-accent: #e8f2fa;
   --wb-accent-foreground: #0d0d0d;
   --wb-focus: #0169cc;
@@ -112,6 +117,21 @@
 
   --wb-hover-overlay: rgba(13, 13, 13, 0.03);
   --wb-active-overlay: rgba(13, 13, 13, 0.059);
+  --wb-switch-track: color-mix(
+    in srgb,
+    var(--wb-foreground) 20%,
+    var(--wb-input-fill)
+  );
+  --wb-switch-track-border: color-mix(
+    in srgb,
+    var(--wb-foreground) 14%,
+    transparent
+  );
+  --wb-switch-track-border-hover: color-mix(
+    in srgb,
+    var(--wb-foreground) 22%,
+    transparent
+  );
   --wb-divider-color: var(--wb-surface-divider);
   --wb-border-subtle: rgba(13, 13, 13, 0.06);
   --wb-backdrop-overlay: rgba(10, 10, 10, 0.4);
@@ -127,6 +147,9 @@
   --wb-shadow-control-focus: 0 0 0 1px var(--wb-focus);
   --wb-shadow-focus: 0 0 0 1px var(--wb-focus);
   --wb-shadow-artboard: 0 0 0 1px var(--wb-artboard-border);
+  --wb-shadow-popup: 0 4px 18px -6px
+    color-mix(in srgb, var(--wb-foreground) 7%, transparent);
+  --wb-shadow-dialog: 0 16px 50px -12px rgba(0, 0, 0, 0.34);
 
   --wb-hairline: 1px solid var(--wb-border);
   --wb-divider: 1px solid var(--wb-border);
@@ -145,7 +168,7 @@
   --wb-popover: rgb(23, 23, 23);
   --wb-popover-foreground: #fcfcfc;
   --wb-property-popover: rgb(23, 23, 23);
-  --wb-menu: rgba(23, 23, 23, 0.96);
+  --wb-menu: rgba(23, 23, 23, 0.7);
   --wb-popup-header: #121212;
   --wb-muted: rgba(252, 252, 252, 0.026);
   --wb-border: rgba(252, 252, 252, 0.072);
@@ -165,6 +188,7 @@
 
   --wb-primary: #fcfcfc;
   --wb-primary-foreground: #111111;
+  --wb-primary-hover: color-mix(in srgb, var(--wb-primary) 90%, transparent);
   --wb-accent: #000f1d;
   --wb-accent-foreground: #fcfcfc;
   --wb-focus: rgba(51, 134, 214, 0.63);
@@ -188,6 +212,21 @@
 
   --wb-hover-overlay: rgba(252, 252, 252, 0.039);
   --wb-active-overlay: rgba(252, 252, 252, 0.029);
+  --wb-switch-track: color-mix(
+    in srgb,
+    var(--wb-foreground) 20%,
+    var(--wb-input-fill)
+  );
+  --wb-switch-track-border: color-mix(
+    in srgb,
+    var(--wb-foreground) 14%,
+    transparent
+  );
+  --wb-switch-track-border-hover: color-mix(
+    in srgb,
+    var(--wb-foreground) 22%,
+    transparent
+  );
   --wb-divider-color: var(--wb-surface-divider);
   --wb-border-subtle: rgba(252, 252, 252, 0.046);
   --wb-backdrop-overlay: rgba(0, 0, 0, 0.72);
@@ -202,6 +241,8 @@
   --wb-shadow-control-focus: 0 0 0 1px var(--wb-focus);
   --wb-shadow-focus: 0 0 0 1px var(--wb-focus);
   --wb-shadow-artboard: 0 0 0 1px var(--wb-artboard-border);
+  --wb-shadow-popup: 0 6px 24px -10px rgba(0, 0, 0, 0.3);
+  --wb-shadow-dialog: 0 16px 50px -12px rgba(0, 0, 0, 0.7);
 
   --wb-hairline: 1px solid var(--wb-border);
   --wb-divider: 1px solid var(--wb-border);

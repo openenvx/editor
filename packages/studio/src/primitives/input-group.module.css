@@ -15,13 +15,16 @@
   min-width: 0;
   height: var(--wb-control-height);
   padding: 0 var(--wb-space-1) 0 var(--wb-space-2);
-  background: var(--wb-muted);
-  border-radius: var(--wb-radius-control);
-  box-shadow: var(--wb-shadow-control);
-  transition: box-shadow var(--wb-duration-fast) ease;
+  background: var(--wb-input-fill);
+  border: 1px solid var(--wb-border);
+  border-radius: var(--wb-radius-lg);
+  transition:
+    border-color var(--wb-duration-fast) var(--wb-ease-out),
+    box-shadow var(--wb-duration-fast) ease;
 }
 
 .cell:focus-within {
+  border-color: var(--wb-focus);
   box-shadow: var(--wb-shadow-control-focus);
 }
 
@@ -31,7 +34,7 @@
 
 .label {
   flex-shrink: 0;
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
   font-weight: 500;
   color: var(--wb-muted-foreground);
 }

@@ -70,8 +70,16 @@
 
 .statusBar {
   flex-shrink: 0;
-  border-top: var(--wb-hairline);
-  background: var(--wb-background);
+  height: calc(var(--wb-status-bar-height) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background-color: var(--wb-background);
+  background-image: linear-gradient(
+    var(--wb-surface-divider),
+    var(--wb-surface-divider)
+  );
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 100% 1px;
 }
 
 .editorSplit {

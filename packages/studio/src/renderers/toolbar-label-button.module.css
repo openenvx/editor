@@ -8,8 +8,8 @@
   border-radius: var(--wb-radius-control);
   background: transparent;
   color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-xs);
-  font-weight: 500;
+  font-size: var(--wb-text-sm);
+  font-weight: 400;
   cursor: pointer;
   transition:
     background 0.12s ease,
@@ -17,6 +17,7 @@
 }
 
 .button:hover:not(:disabled) {
+  background: var(--wb-hover-overlay);
   color: var(--wb-foreground);
 }
 

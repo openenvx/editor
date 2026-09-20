@@ -6,10 +6,10 @@
   min-height: 22px;
   padding: var(--wb-space-1) 6px;
   border: 1px solid var(--wb-tooltip-border);
-  border-radius: var(--wb-radius-sm);
+  border-radius: var(--wb-radius-lg);
   background: var(--wb-tooltip);
-  backdrop-filter: var(--wb-surface-blur);
-  box-shadow: var(--wb-tooltip-shadow);
+  backdrop-filter: var(--wb-popup-blur);
+  box-shadow: var(--wb-shadow-popup);
   font-family: var(--wb-font);
   font-size: var(--wb-text-sm);
   font-weight: 400;

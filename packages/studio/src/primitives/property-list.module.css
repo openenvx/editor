@@ -42,7 +42,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
   font-weight: 500;
   color: var(--wb-muted-foreground);
 }

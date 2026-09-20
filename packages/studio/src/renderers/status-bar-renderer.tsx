@@ -68,7 +68,7 @@ export const StatusBarRenderer = memo(
     };
 
     return (
-      <div className={styles.bar}>
+      <div aria-label="Status" className={styles.bar}>
         <div className={styles.left}>{leftItems.map(renderItem)}</div>
         <div className={styles.right}>{rightItems.map(renderItem)}</div>
       </div>

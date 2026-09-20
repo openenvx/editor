@@ -71,7 +71,7 @@
   display: none;
   align-items: center;
   gap: var(--wb-space-1);
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
   color: var(--wb-muted-foreground);
 }
 
@@ -133,8 +133,8 @@
   border-radius: var(--wb-radius-control);
   background: transparent;
   color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-xs);
-  font-weight: 500;
+  font-size: var(--wb-text-sm);
+  font-weight: 400;
   cursor: pointer;
   transition:
     background 0.12s ease,
@@ -142,6 +142,7 @@
 }
 
 .labelButton:hover:not(:disabled) {
+  background: var(--wb-hover-overlay);
   color: var(--wb-foreground);
 }
 
@@ -166,15 +167,14 @@
   border-radius: var(--wb-radius-control);
   background: var(--wb-primary);
   color: var(--wb-primary-foreground);
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
   font-weight: 500;
   cursor: pointer;
-  box-shadow: var(--wb-shadow-xs);
-  transition: opacity 0.12s ease;
+  transition: background-color 0.12s ease;
 }
 
 .primaryButton:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--wb-primary-hover);
 }
 
 .primaryButton:disabled {
@@ -221,7 +221,7 @@
   border-radius: var(--wb-radius-sm);
   background: transparent;
   color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
   font-weight: 500;
   cursor: pointer;
   transition:
@@ -257,10 +257,11 @@
   min-width: 160px;
   padding: var(--wb-space-1);
   border: var(--wb-hairline);
-  border-radius: var(--wb-radius-md);
-  background: var(--wb-popover);
+  border-radius: var(--wb-radius-popup);
+  background: var(--wb-menu);
+  backdrop-filter: var(--wb-popup-blur);
   color: var(--wb-popover-foreground);
-  box-shadow: var(--wb-shadow-md);
+  box-shadow: var(--wb-shadow-popup);
 }
 
 .menuItem {
@@ -270,7 +271,7 @@
   min-height: var(--wb-menu-item-height);
   padding: 0 var(--wb-space-2);
   border: none;
-  border-radius: var(--wb-radius-sm);
+  border-radius: var(--wb-radius-lg);
   background: transparent;
   color: inherit;
   font-size: var(--wb-text-sm);

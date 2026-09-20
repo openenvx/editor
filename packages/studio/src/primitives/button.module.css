@@ -5,18 +5,22 @@
   gap: var(--wb-space-2);
   height: var(--wb-control-height);
   padding: 0 var(--wb-space-3);
-  border: none;
-  border-radius: var(--wb-radius-control);
+  border: 1px solid transparent;
+  border-radius: var(--wb-radius-lg);
   background: var(--wb-primary);
   color: var(--wb-primary-foreground);
   font-size: var(--wb-text-sm);
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.12s ease;
+  transition:
+    background-color var(--wb-duration-fast) var(--wb-ease-out),
+    color var(--wb-duration-fast) var(--wb-ease-out),
+    border-color var(--wb-duration-fast) var(--wb-ease-out),
+    opacity var(--wb-duration-fast) var(--wb-ease-out);
 }
 
 .root:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--wb-primary-hover);
 }
 
 .root:focus-visible {
@@ -35,37 +39,32 @@
 }
 
 .ghost:hover:not(:disabled) {
-  background: transparent;
+  background: var(--wb-hover-overlay);
   color: var(--wb-foreground);
-  opacity: 1;
 }
 
 .outline {
   background: transparent;
   color: var(--wb-foreground);
-  box-shadow: var(--wb-shadow-xs);
+  border-color: var(--wb-border);
 }
 
 .outline:hover:not(:disabled) {
-  background: var(--wb-muted);
-  opacity: 1;
+  background: var(--wb-hover-overlay);
 }
 
 .chrome {
   height: var(--wb-control-height);
   padding: 0 var(--wb-space-3);
-  border: var(--wb-hairline);
-  border-radius: var(--wb-radius-control);
-  background: var(--wb-chrome-button);
-  color: var(--wb-foreground);
-  box-shadow: none;
-  font-size: var(--wb-text-sm);
+  border-color: transparent;
+  background: transparent;
+  color: var(--wb-muted-foreground);
   font-weight: 400;
 }
 
 .chrome:hover:not(:disabled) {
-  background: var(--wb-muted);
-  opacity: 1;
+  background: var(--wb-hover-overlay);
+  color: var(--wb-foreground);
 }
 
 .icon {
@@ -77,5 +76,5 @@
 .sm {
   height: var(--wb-control-height);
   padding: 0 var(--wb-space-3);
-  font-size: var(--wb-text-xs);
+  font-size: var(--wb-text-sm);
 }

@@ -12,9 +12,10 @@
 .panel {
   width: min(480px, 92vw);
   overflow: hidden;
-  border-radius: var(--wb-radius-lg);
+  border: var(--wb-hairline);
+  border-radius: var(--wb-radius-popup);
   background: var(--wb-popover);
-  box-shadow: var(--wb-shadow-float);
+  box-shadow: var(--wb-shadow-dialog);
   color: var(--wb-foreground);
   font-family: var(--wb-font);
 }
@@ -28,11 +29,9 @@
 .command :global([cmdk-input-wrapper]) {
   margin: var(--wb-space-2);
   padding: 0 var(--wb-space-3);
-  border: none;
-  border-bottom: none;
-  border-radius: var(--wb-radius-control);
-  background: var(--wb-muted);
-  box-shadow: var(--wb-shadow-xs);
+  border: 1px solid var(--wb-border);
+  border-radius: var(--wb-radius-lg);
+  background: var(--wb-input-fill);
 }
 
 .searchInput {
