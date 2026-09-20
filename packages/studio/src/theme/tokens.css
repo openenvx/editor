@@ -68,7 +68,7 @@
 
   /* Synara DEFAULT_THEME_STATE Codex light (buildThemeCssVariables). */
   --wb-background: #ffffff;
-  --wb-canvas-field: #ffffff;
+  --wb-canvas-field: rgba(13, 13, 13, 0.03);
   --wb-card: #ffffff;
   --wb-popover: rgb(255, 255, 255);
   --wb-popover-foreground: #0d0d0d;

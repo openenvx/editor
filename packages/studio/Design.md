@@ -17,7 +17,7 @@ Source of truth: [`src/theme/tokens.css`](src/theme/tokens.css). Values are the 
 | Token | Light | Dark | Role |
 | --- | --- | --- | --- |
 | `--wb-background` | `#ffffff` | `#101010` | Window under-surface |
-| `--wb-canvas-field` | `#ffffff` | `#101010` | Infinite workspace |
+| `--wb-canvas-field` | `rgba(13,13,13,0.03)` | `#101010` | Infinite workspace |
 | `--wb-card` | `#ffffff` | `#131313` | Inset stage, inspector |
 | `--wb-popover` / `--wb-menu` | opaque white / 70% | `rgb(23,23,23)` / 70% | Property popovers opaque; menus frosted |
 | `--wb-border` | `rgba(13,13,13,0.069)` | `rgba(252,252,252,0.072)` | Hairlines |
