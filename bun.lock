@@ -104,12 +104,12 @@
     },
     "packages/canvas-driver": {
       "name": "@openenvx/canvas-driver",
-      "version": "0.3.5",
+      "version": "0.3.7",
       "dependencies": {
         "@tabler/icons-react": "^3.44.0",
         "@tiptap/extension-color": "^3.27.3",
         "@tiptap/extension-font-family": "^3.27.3",
-        "@tiptap/extension-text-style": "^3.27.3",
+        "@tiptap/extension-text-style": "^3.31.3",
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
@@ -155,7 +155,7 @@
     },
     "packages/editor-sandbox": {
       "name": "@openenvx/editor-sandbox",
-      "version": "0.3.5",
+      "version": "0.3.7",
       "bin": {
         "openenvx-manifest": "./src/cli/openenvx-manifest.ts",
       },
@@ -200,7 +200,7 @@
     },
     "packages/email-driver": {
       "name": "@openenvx/email-driver",
-      "version": "0.3.5",
+      "version": "0.3.7",
       "dependencies": {
         "@codemirror/commands": "^6.11.0",
         "@codemirror/lang-html": "^6.4.12",
@@ -240,7 +240,7 @@
     },
     "packages/html-driver": {
       "name": "@openenvx/html-driver",
-      "version": "0.3.5",
+      "version": "0.3.7",
       "dependencies": {
         "@dnd-kit/core": "6.3.1",
         "@dnd-kit/sortable": "8.0.0",
@@ -250,7 +250,7 @@
         "@tiptap/extension-color": "^3.27.3",
         "@tiptap/extension-font-family": "^3.27.3",
         "@tiptap/extension-text-align": "3.27.4",
-        "@tiptap/extension-text-style": "^3.27.3",
+        "@tiptap/extension-text-style": "^3.31.3",
         "@tiptap/pm": "^3.27.3",
         "@tiptap/react": "^3.27.3",
         "@tiptap/starter-kit": "^3.27.3",
@@ -283,7 +283,7 @@
     },
     "packages/studio": {
       "name": "@openenvx/studio",
-      "version": "0.3.5",
+      "version": "0.3.7",
       "dependencies": {
         "@base-ui/react": "^1.5.0",
         "@dnd-kit/core": "6.3.1",
@@ -1080,7 +1080,7 @@
 
     "@tiptap/extension-text-align": ["@tiptap/extension-text-align@3.27.4", "", { "peerDependencies": { "@tiptap/core": "3.27.4" } }, "sha512-ArfL7GLOXCSmrmiBiaWwAf7RPHXDdxLGPru29qKDLQDthjXcNOdlwlPBbolRu7mXwlSmaYpqWGrG75/AEat3mw=="],
 
-    "@tiptap/extension-text-style": ["@tiptap/extension-text-style@3.29.2", "", { "peerDependencies": { "@tiptap/core": "3.29.2" } }, "sha512-aQad9V9ROaEi3hE4g5z9wQ6lv5FSnzlnWFMVJxRjNlwXgm7H0fymxb4rGfca+pAwYkiRwpKYh1LatpJw2ECQAA=="],
+    "@tiptap/extension-text-style": ["@tiptap/extension-text-style@3.31.3", "", { "peerDependencies": { "@tiptap/core": "3.31.3" } }, "sha512-wgjWWrjZwRZHiaDTQPX2am1y/4ePgRgGWF/2MOfSb7g4d5229p4aVtbT1JT7wu9z8OC482pEqcTlhdvgftvW7A=="],
 
     "@tiptap/extension-underline": ["@tiptap/extension-underline@3.27.4", "", { "peerDependencies": { "@tiptap/core": "3.27.4" } }, "sha512-nRJGvRyEXDtINlHTW+C2oWcL3vmX1URVxAPpkD3Zwn5Rb/vEeOU/pk/w97I0iid816MR4iVbvl1XhbUVegK9gQ=="],
 
