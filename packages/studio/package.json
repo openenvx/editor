@@ -88,7 +88,7 @@
     "@tabler/icons-react": "^3.44.0",
     "@tanstack/react-virtual": "^3.13.12",
     "@tiptap/core": "^3.27.3",
-    "@tiptap/pm": "^3.27.3",
+    "@tiptap/pm": "^3.31.3",
     "@tiptap/react": "^3.27.3",
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
