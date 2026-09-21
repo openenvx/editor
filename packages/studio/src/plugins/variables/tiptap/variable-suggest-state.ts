@@ -76,6 +76,6 @@ export function isRichTextBlurInsideVariableChrome(
   return Boolean(
     related.closest('[data-openenvx-rich-text-bubble]') ||
     related.closest('[data-openenvx-variable-suggest]') ||
-    related.closest('[data-openenvx-variable-dialog]')
+    related.closest('[data-openenvx-dialog]')
   );
 }

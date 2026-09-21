@@ -1,5 +1,6 @@
 import { Command } from '../contributions/command';
 import type { CommandContext } from '../runtime/types';
+import { WorkbenchEvents } from '../runtime/workbench-events';
 import { findLayerById, updateLayerByIdInScene } from '../scene/layer-tree';
 import {
   addVariableToScene,
@@ -267,4 +268,33 @@ export class InsertVariableCommand extends Command {
       : undefined;
     textBlockInsert?.insert(ctx, token);
   }
+}
+
+const addVariableCommand = new AddVariableCommand();
+const updateVariableCommand = new UpdateVariableCommand();
+const removeVariableCommand = new RemoveVariableCommand();
+
+/** Runs a scene variable command and emits {@link WorkbenchEvents.DidExecuteCommand}. */
+export async function executeSceneVariableCommand(
+  ctx: CommandContext,
+  commandId:
+    | 'scene.addVariable'
+    | 'scene.updateVariable'
+    | 'scene.removeVariable',
+  args?: unknown
+): Promise<void> {
+  const command =
+    commandId === 'scene.addVariable'
+      ? addVariableCommand
+      : commandId === 'scene.updateVariable'
+        ? updateVariableCommand
+        : removeVariableCommand;
+  if (command.canExecute && !command.canExecute(ctx, args)) {
+    return;
+  }
+  const result = await command.execute(ctx, args);
+  ctx.events.emit(WorkbenchEvents.DidExecuteCommand, {
+    commandId,
+    result,
+  });
 }

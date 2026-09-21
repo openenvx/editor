@@ -77,16 +77,8 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
       id,
     }));
 
-  const dialogs = ctx.providerRegistries.dialogRegistry
-    .entries()
-    .map(([id, Component]) => ({
-      Component,
-      id,
-    }));
-
   return {
     activeDialog: ctx.dialogService.getActive(),
-    dialogs,
     fieldRenderers,
     properties,
     scene,

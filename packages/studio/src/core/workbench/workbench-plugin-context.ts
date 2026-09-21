@@ -38,10 +38,6 @@ export interface WorkbenchPluginContext extends PluginContext {
     componentId: string,
     component: unknown
   ): WorkbenchContributionDisposable;
-  registerDialog(
-    id: string,
-    component: unknown
-  ): WorkbenchContributionDisposable;
 }
 
 export interface CreateWorkbenchPluginContextOptions {
@@ -145,16 +141,6 @@ export function createWorkbenchPluginContext(
       return track({
         dispose: () => {
           providerRegistries.viewPanelRegistry.unregister(componentId);
-          onContributionsChanged?.();
-        },
-      });
-    },
-    registerDialog(id, component) {
-      providerRegistries.dialogRegistry.register(id, component);
-      onContributionsChanged?.();
-      return track({
-        dispose: () => {
-          providerRegistries.dialogRegistry.unregister(id);
           onContributionsChanged?.();
         },
       });

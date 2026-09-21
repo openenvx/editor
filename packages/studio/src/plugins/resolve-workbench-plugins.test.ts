@@ -2,10 +2,6 @@ import { Plugin } from '@openenvx/studio/core';
 import { describe, expect, it } from 'vitest';
 
 import {
-  DEFAULT_DIALOGS_PLUGIN_ID,
-  DefaultDialogsPlugin,
-} from '../dialogs/default-dialogs-plugin';
-import {
   DEFAULT_FIELDS_PLUGIN_ID,
   DefaultWorkbenchFieldsPlugin,
 } from '../fields/default-fields-plugin';
@@ -44,18 +40,13 @@ describe('resolveWorkbenchPlugins', () => {
     const resolved = resolveWorkbenchPlugins([
       new DefaultWorkbenchChromePlugin(),
       new DefaultWorkbenchFieldsPlugin(),
-      new DefaultDialogsPlugin(),
     ]);
 
     expect(resolved.map((plugin) => plugin.id)).toEqual([
       DEFAULT_FIELDS_PLUGIN_ID,
-      DEFAULT_DIALOGS_PLUGIN_ID,
       ...DEFAULT_WORKBENCH_PLUGIN_SPECS.toSorted((a, b) => a.order - b.order)
         .map((spec) => spec.id)
-        .filter(
-          (id) =>
-            id !== DEFAULT_FIELDS_PLUGIN_ID && id !== DEFAULT_DIALOGS_PLUGIN_ID
-        ),
+        .filter((id) => id !== DEFAULT_FIELDS_PLUGIN_ID),
     ]);
   });
 

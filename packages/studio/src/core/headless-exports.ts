@@ -20,6 +20,9 @@ export {
 export { PropertyPath } from './properties/property-path';
 export {
   createPropertyHostContext,
+  readLayerDataAtKey,
+  SELECTION_LAYER_DATA_PATH_PREFIX,
+  writeLayerDataAtKey,
   type PropertyPathContextOptions,
 } from './properties/property-path-context';
 export {
@@ -58,10 +61,12 @@ export {
   type DialogService,
 } from './workbench/dialog-service';
 export {
-  WORKBENCH_CONFIRM_DIALOG_ID,
   type ActiveDialog,
   type ConfirmDialogOptions,
-  type DialogRegistration,
+  type FormDialogExtraAction,
+  type FormDialogPayload,
+  type FormDialogResult,
+  type ShowFormOptions,
 } from './workbench/dialog-registrations';
 export {
   RichTextInsertServiceId,

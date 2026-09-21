@@ -4,7 +4,7 @@ import {
   isLayerShownInLayers,
   type Scene,
 } from '../backbone';
-import { getNestedValue } from '../utils/nested-value';
+import { getNestedValue, setNestedValue } from '../utils/nested-value';
 import type { PropertyHostContext } from './property-path-resolver';
 import type { PropertyValuePath } from './property-value-path';
 
@@ -19,6 +19,35 @@ type TemplatePolicyKey = (typeof TEMPLATE_POLICY_KEYS)[number];
 
 function isTemplatePolicyKey(key: string): key is TemplatePolicyKey {
   return (TEMPLATE_POLICY_KEYS as readonly string[]).includes(key);
+}
+
+export const SELECTION_LAYER_DATA_PATH_PREFIX = 'selection.layer.data.';
+
+export function readLayerDataAtKey(
+  layerData: Record<string, unknown> | null,
+  key: string
+): unknown {
+  if (!layerData) {
+    return undefined;
+  }
+  if (key.includes('.')) {
+    return getNestedValue(layerData, key);
+  }
+  return layerData[key];
+}
+
+export function writeLayerDataAtKey(
+  layerData: Record<string, unknown>,
+  key: string,
+  value: unknown
+): Record<string, unknown> {
+  const next = { ...layerData };
+  if (key.includes('.')) {
+    setNestedValue(next, key, value);
+  } else {
+    next[key] = value;
+  }
+  return next;
 }
 
 export interface PropertyPathContextOptions {
@@ -154,15 +183,9 @@ function readPropertyPath(
     layerData: Record<string, unknown> | null;
   }
 ): unknown {
-  if (path.startsWith('selection.layer.data.')) {
-    const key = path.slice('selection.layer.data.'.length);
-    if (!ctx.layerData) {
-      return undefined;
-    }
-    if (key.includes('.')) {
-      return getNestedValue(ctx.layerData, key);
-    }
-    return ctx.layerData[key];
+  if (path.startsWith(SELECTION_LAYER_DATA_PATH_PREFIX)) {
+    const key = path.slice(SELECTION_LAYER_DATA_PATH_PREFIX.length);
+    return readLayerDataAtKey(ctx.layerData, key);
   }
 
   if (path.startsWith('command.')) {

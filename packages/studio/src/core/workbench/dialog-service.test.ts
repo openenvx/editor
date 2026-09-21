@@ -1,18 +1,25 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { WORKBENCH_CONFIRM_DIALOG_ID } from './dialog-registrations';
 import { DialogServiceImpl } from './dialog-service';
 
+async function flushAsyncValidation(): Promise<void> {
+  await Promise.resolve();
+  await Promise.resolve();
+}
+
 describe('DialogServiceImpl', () => {
-  it('opens and closes the active dialog', () => {
+  it('opens and closes the active confirm dialog', () => {
     const service = new DialogServiceImpl();
     const listener = vi.fn();
     service.subscribe(listener);
 
-    service.open('openenvx.variables.edit', { mode: 'create' });
+    void service.showConfirm({
+      description: 'Cannot undo.',
+      title: 'Delete?',
+    });
     expect(service.getActive()).toEqual({
-      id: 'openenvx.variables.edit',
-      payload: { mode: 'create' },
+      kind: 'confirm',
+      payload: { description: 'Cannot undo.', title: 'Delete?' },
     });
     expect(listener).toHaveBeenCalledTimes(1);
 
@@ -21,24 +28,23 @@ describe('DialogServiceImpl', () => {
     expect(listener).toHaveBeenCalledTimes(2);
   });
 
-  it('replaces the active dialog when opening another', () => {
+  it('replaces the active dialog when opening another confirm', async () => {
     const service = new DialogServiceImpl();
 
-    service.open('first', { n: 1 });
-    service.open('second', { n: 2 });
+    const first = service.showConfirm({
+      description: 'First',
+      title: 'First',
+    });
+    void service.showConfirm({
+      description: 'Second',
+      title: 'Second',
+    });
 
-    expect(service.getActive()).toEqual({ id: 'second', payload: { n: 2 } });
-  });
-
-  it('closes only when id matches', () => {
-    const service = new DialogServiceImpl();
-    service.open('first');
-
-    service.close('other');
-    expect(service.getActive()).toEqual({ id: 'first' });
-
-    service.close('first');
-    expect(service.getActive()).toBeNull();
+    await expect(first).resolves.toBe(false);
+    expect(service.getActive()).toEqual({
+      kind: 'confirm',
+      payload: { description: 'Second', title: 'Second' },
+    });
   });
 
   it('resolves showConfirm with true or false', async () => {
@@ -48,10 +54,7 @@ describe('DialogServiceImpl', () => {
       title: 'Delete?',
       description: 'Cannot undo.',
     });
-    expect(service.getActive()).toEqual({
-      id: WORKBENCH_CONFIRM_DIALOG_ID,
-      payload: { title: 'Delete?', description: 'Cannot undo.' },
-    });
+    expect(service.getActive()?.kind).toBe('confirm');
 
     service.resolveConfirm(true);
     await expect(pending).resolves.toBe(true);
@@ -65,37 +68,143 @@ describe('DialogServiceImpl', () => {
     await expect(cancelled).resolves.toBe(false);
   });
 
-  it('rejects a pending confirm when opening a new confirm', async () => {
-    const service = new DialogServiceImpl();
-
-    const first = service.showConfirm({
-      title: 'First',
-      description: 'First prompt',
-    });
-    const second = service.showConfirm({
-      title: 'Second',
-      description: 'Second prompt',
-    });
-
-    await expect(first).resolves.toBe(false);
-    service.resolveConfirm(true);
-    await expect(second).resolves.toBe(true);
-    expect(service.getActive()).toBeNull();
-  });
-
-  it('rejects a pending confirm when opening another dialog', async () => {
+  it('rejects a pending confirm when opening a form', async () => {
     const service = new DialogServiceImpl();
 
     const pending = service.showConfirm({
       title: 'Delete?',
       description: 'Cannot undo.',
     });
-    service.open('openenvx.variables.edit', { mode: 'create' });
+    void service.showForm({
+      nodes: [],
+      title: 'Edit',
+      values: {},
+    });
 
     await expect(pending).resolves.toBe(false);
-    expect(service.getActive()).toEqual({
-      id: 'openenvx.variables.edit',
-      payload: { mode: 'create' },
+    expect(service.getActive()?.kind).toBe('form');
+  });
+
+  it('resolves showForm on submit', async () => {
+    const service = new DialogServiceImpl();
+
+    const pending = service.showForm({
+      nodes: [],
+      title: 'Edit',
+      values: { key: 'name' },
     });
+    expect(service.getActive()).toEqual({
+      kind: 'form',
+      payload: {
+        nodes: [],
+        title: 'Edit',
+        values: { key: 'name' },
+      },
+    });
+
+    service.resolveForm({ action: 'submit', values: { key: 'email' } });
+    await expect(pending).resolves.toEqual({
+      action: 'submit',
+      values: { key: 'email' },
+    });
+  });
+
+  it('keeps form open when validate returns an error', async () => {
+    const service = new DialogServiceImpl();
+
+    const pending = service.showForm({
+      nodes: [],
+      title: 'Edit',
+      validate: (values) =>
+        String(values.key ?? '').trim() ? null : 'Invalid key',
+      values: { key: '' },
+    });
+
+    service.resolveForm({ action: 'submit', values: { key: '' } });
+    await flushAsyncValidation();
+    const active = service.getActive();
+    expect(active?.kind).toBe('form');
+    expect(active?.kind === 'form' ? active.payload.error : undefined).toBe(
+      'Invalid key'
+    );
+
+    service.resolveForm({ action: 'submit', values: { key: 'ok' } });
+    await expect(pending).resolves.toEqual({
+      action: 'submit',
+      values: { key: 'ok' },
+    });
+  });
+
+  it('resolves extra actions', async () => {
+    const service = new DialogServiceImpl();
+
+    const pending = service.showForm({
+      extraActions: [{ id: 'delete', label: 'Delete' }],
+      nodes: [],
+      title: 'Edit',
+      values: { key: 'a' },
+    });
+
+    service.resolveForm({ action: 'delete', values: { key: 'a' } });
+    await expect(pending).resolves.toEqual({
+      action: 'delete',
+      values: { key: 'a' },
+    });
+  });
+
+  it('does not run validate for extra actions', async () => {
+    const service = new DialogServiceImpl();
+    const validate = vi.fn(() => 'blocked');
+
+    const pending = service.showForm({
+      extraActions: [{ id: 'delete', label: 'Delete' }],
+      nodes: [],
+      title: 'Edit',
+      validate,
+      values: { key: '' },
+    });
+
+    service.resolveForm({ action: 'delete', values: { key: '' } });
+    await expect(pending).resolves.toEqual({
+      action: 'delete',
+      values: { key: '' },
+    });
+    expect(validate).not.toHaveBeenCalled();
+  });
+
+  it('resolves showForm with undefined when closed', async () => {
+    const service = new DialogServiceImpl();
+
+    const pending = service.showForm({
+      nodes: [],
+      title: 'Edit',
+      values: {},
+    });
+    service.close();
+    await expect(pending).resolves.toBeUndefined();
+  });
+
+  it('rejects validate throws with an error message', async () => {
+    const service = new DialogServiceImpl();
+
+    const pending = service.showForm({
+      nodes: [],
+      title: 'Edit',
+      validate: () => {
+        throw new Error('boom');
+      },
+      values: {},
+    });
+
+    service.resolveForm({ action: 'submit', values: {} });
+    await flushAsyncValidation();
+    const active = service.getActive();
+    expect(active?.kind).toBe('form');
+    expect(active?.kind === 'form' ? active.payload.error : undefined).toBe(
+      'Validation failed'
+    );
+
+    service.close();
+    await expect(pending).resolves.toBeUndefined();
   });
 });

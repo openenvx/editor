@@ -18,7 +18,7 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 - `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` - owns `EditorRuntime`, injects it into `PluginManager`
 - `bootstrapWorkbenchServices()` - headless DI services on the runtime
 - `WorkbenchPlugin` + `ctx.registerWorkbench()` - UI contribution registration
-- Provider registries: `registerTreeDataProvider`, `registerFieldRenderer`, `registerStatusBarItemRenderer`, `registerEditorPane`, `registerDialog`
+- Provider registries: `registerTreeDataProvider`, `registerFieldRenderer`, `registerStatusBarItemRenderer`, `registerEditorPane`, `registerViewPanel`
 - View content kinds: `tree` (explorer), `list` (flat catalogs with row actions + optional reorder), `properties` (inspector forms), `component` (custom React panels), `welcome` (empty state)
 - Contribution points: Toolbar, CommandPalette, ViewContainer, View, ContextMenu, StatusBar, SidebarHeader, Overlay, PropertyPane, TopBar
 - Builders: `MenuBuilder`, `ToolbarBuilder`, `TopBarBuilder`, `CommandPaletteBuilder`, `StatusBarBuilder`, `SidebarHeaderBuilder`, `PropertyPaneBuilder`
@@ -43,21 +43,39 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 
 **List views** - declare `presentation: 'list'` on the view and register a `TreeDataProvider`. Optional `addCommandId` / `addLabel` render a footer add button; `TreeItem.actions` render per-row icon buttons. Reorder uses the same `handleMove` / `canMove` hooks as explorer trees.
 
-**Dialogs** - plugins register modal bodies with `ctx.registerDialog(id, Component)`; commands and services open them via `DialogService` / `api.openDialog(id, payload?)`. The shell mounts a single `DialogHost` (no per-feature `*DialogHost` in product hosts). One active dialog at a time - a new `open` replaces the current. Built-in `api.showConfirm({ title, description, confirmLabel?, cancelLabel? })` opens `workbench.confirm` and resolves `Promise<boolean>`. Confirm dialogs resolve via `api.resolveDialogConfirm(confirmed)` (shell-internal; do not reach into `DialogService` from React). Dialog components implement `WorkbenchDialogProps<TPayload>` (`open`, `payload`, `onClose`).
+**Dialogs** - same host rule as sidebars: declare intent via headless APIs; the shell renders. `WorkbenchShell` mounts a single `DialogHost` (no per-feature `*DialogHost` in product hosts). One active dialog at a time — a new `showConfirm` / `showForm` replaces the current.
+
+| API | Use |
+| --- | --- |
+| `api.showConfirm({ title, description, confirmLabel?, cancelLabel? })` | `Promise<boolean>` — cancel / backdrop / Escape → `false` |
+| `api.showForm({ title, nodes, values, submitLabel?, cancelLabel?, extraActions?, validate? })` | `Promise<FormDialogResult \| undefined>` — `nodes` from `createPropertyPane(...).build().nodes` (same field kinds as the inspector); cancel → `undefined` |
+| `DialogService` | Same methods on `ctx.services.get(DialogServiceId)` inside commands |
+
+Shell-internal (React only): `api.resolveDialogConfirm(confirmed)`, `api.resolveDialogForm(result)`, `api.patchDialogFormPayload(patch)`. `extraActions` may include nested `confirm` options; the form renderer shows a local confirm overlay without stacking `DialogService` entries. Only the **first** `extraActions` entry is rendered (left footer). `validate` runs on **submit** only, not on extra actions. Form fields use the same `PropertyPath.layerData` paths as the inspector; `command.*` paths and scene-only `when` keys are not supported in form dialogs.
 
 ```ts
-import { VariablesPlugin } from '@openenvx/studio/plugins/variables';
+import { DialogServiceId } from '@openenvx/studio/core';
 
-// Compose into product plugin lists — not auto-injected by workbench.
-const plugins = [new CanvasPlugin(), new VariablesPlugin()];
-
-ctx.services
-  .get(DialogServiceId)
-  ?.open('openenvx.variables.edit', { mode: 'create' });
 const ok = await api.showConfirm({
   title: 'Delete?',
   description: 'Cannot undo.',
 });
+
+const result = await ctx.services.get(DialogServiceId)?.showForm({
+  title: 'Create variable',
+  nodes: createPropertyPane('variables.edit', 'Variable')
+    .row(
+      'Key',
+      { key: 'key', kind: 'text', label: 'Key' },
+      PropertyPath.layerData('key')
+    )
+    .build().nodes,
+  values: { key: 'name', sample: '' },
+  validate: (values) => (values.key ? null : 'Key required'),
+});
+if (result?.action === 'submit') {
+  // apply values
+}
 ```
 
 ## Layout defaults

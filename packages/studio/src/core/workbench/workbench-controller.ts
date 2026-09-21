@@ -54,7 +54,12 @@ import type { WorkbenchContribution } from '../workbench-contributions/workbench
 import { EditorService } from '../workbench/editor-service';
 import type { EditorInput } from '../workbench/editor-service';
 import { bootstrapWorkbenchServices } from './bootstrap-workbench-services';
-import type { ConfirmDialogOptions } from './dialog-registrations';
+import type {
+  ConfirmDialogOptions,
+  FormDialogPayload,
+  FormDialogResult,
+  ShowFormOptions,
+} from './dialog-registrations';
 import { DialogServiceImpl, DialogServiceId } from './dialog-service';
 import { ShellUiServiceId } from './shell-ui-service-id';
 import { ViewLocationService } from './view-location-service';
@@ -113,7 +118,6 @@ export class WorkbenchController {
     fieldRendererRegistry: new Registry<string, unknown>('overwrite'),
     statusBarItemRendererRegistry: new Registry<string, unknown>('overwrite'),
     viewPanelRegistry: new Registry<string, unknown>('overwrite'),
-    dialogRegistry: new Registry<string, unknown>('overwrite'),
     viewProviderRegistry: new ViewProviderRegistryImpl(),
   };
   private readonly pluginDisposables = new Map<
@@ -330,10 +334,12 @@ export class WorkbenchController {
         }
       },
       isEditorDebug: () => this.diagnostics.isEnabled(),
-      openDialog: (id, payload) => this.openDialog(id, payload),
-      closeDialog: (id) => this.closeDialog(id),
+      closeDialog: () => this.closeDialog(),
       showConfirm: (options) => this.showConfirm(options),
       resolveDialogConfirm: (confirmed) => this.resolveDialogConfirm(confirmed),
+      showForm: (options) => this.showForm(options),
+      resolveDialogForm: (result) => this.resolveDialogForm(result),
+      patchDialogFormPayload: (patch) => this.patchDialogFormPayload(patch),
     };
   }
 
@@ -810,12 +816,8 @@ export class WorkbenchController {
     provider.handleMove?.(source, target, position, ctx);
   }
 
-  openDialog(id: string, payload?: unknown): void {
-    this.dialogService.open(id, payload);
-  }
-
-  closeDialog(id?: string): void {
-    this.dialogService.close(id);
+  closeDialog(): void {
+    this.dialogService.close();
   }
 
   showConfirm(options: ConfirmDialogOptions): Promise<boolean> {
@@ -824,6 +826,18 @@ export class WorkbenchController {
 
   resolveDialogConfirm(confirmed: boolean): void {
     this.dialogService.resolveConfirm(confirmed);
+  }
+
+  showForm(options: ShowFormOptions): Promise<FormDialogResult | undefined> {
+    return this.dialogService.showForm(options);
+  }
+
+  resolveDialogForm(result: FormDialogResult | undefined): void {
+    this.dialogService.resolveForm(result);
+  }
+
+  patchDialogFormPayload(patch: Partial<FormDialogPayload>): void {
+    this.dialogService.patchFormPayload(patch);
   }
 
   undo(): boolean {
@@ -918,7 +932,6 @@ export class WorkbenchController {
       commandStates: commands.commandStates,
       contextKeys: chrome.contextKeys,
       contextMenu: chrome.contextMenu,
-      dialogs: scene.dialogs,
       editor: editor.editor,
       editorPaneKind: editor.editorPaneKind,
       editorPanes: editor.editorPanes,

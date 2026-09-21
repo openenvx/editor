@@ -157,10 +157,7 @@ import { VariablesPlugin } from '@openenvx/studio/plugins/variables';
 // Product hosts compose the built-in catalog plugin — do not reimplement.
 const plugins = [new CanvasPlugin(), new VariablesPlugin()];
 
-// Commands: variables.create / variables.edit; dialog id openenvx.variables.edit
-ctx.services
-  .get(DialogServiceId)
-  ?.open('openenvx.variables.edit', { mode: 'create' });
+// Commands: variables.create / variables.edit (built-in form dialog via showForm)
 
 // Simple confirms use the built-in workbench dialog:
 const ok = await api.showConfirm({

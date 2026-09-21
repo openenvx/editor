@@ -112,7 +112,7 @@ export { ConfirmDialog } from './primitives/confirm-dialog';
 export { Input } from './primitives/input';
 export { ModalDialog } from './primitives/modal-dialog';
 export { PropertyFieldRow } from './primitives/property-field-row';
-export { DialogHost, type WorkbenchDialogProps } from './renderers/dialog-host';
+export { DialogHost } from './renderers/dialog-host';
 export {
   Sheet,
   SheetClose,

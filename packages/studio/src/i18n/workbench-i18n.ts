@@ -8,15 +8,17 @@ import workbenchPl from './locales/pl/workbench-pl';
 
 export const WORKBENCH_I18N_NAMESPACE = 'workbench';
 
-const WORKBENCH_KEY_PREFIX = 'workbench.';
+export const WORKBENCH_I18N_KEY_PREFIX = 'workbench.';
+
+export const WORKBENCH_I18N_SOURCE_ID = 'openenvx.workbench';
 
 function toWorkbenchNamespaceMessages(
   bundle: Record<string, string>
 ): Record<string, string> {
   const messages: Record<string, string> = {};
   for (const [key, value] of Object.entries(bundle)) {
-    if (key.startsWith(WORKBENCH_KEY_PREFIX)) {
-      messages[key.slice(WORKBENCH_KEY_PREFIX.length)] = value;
+    if (key.startsWith(WORKBENCH_I18N_KEY_PREFIX)) {
+      messages[key.slice(WORKBENCH_I18N_KEY_PREFIX.length)] = value;
     }
   }
   return messages;
@@ -68,8 +70,24 @@ export function registerDefaultWorkbenchBundle(
 ): Record<string, string> {
   return Object.fromEntries(
     Object.entries(messages).map(([key, value]) => [
-      `${WORKBENCH_KEY_PREFIX}${key}`,
+      `${WORKBENCH_I18N_KEY_PREFIX}${key}`,
       value,
     ])
+  );
+}
+
+/** Register default workbench UI strings on the headless localization service. */
+export function registerWorkbenchLocalizationBundles(
+  service: LocalizationService
+): void {
+  service.registerBundle(
+    WORKBENCH_I18N_SOURCE_ID,
+    'en',
+    registerDefaultWorkbenchBundle(workbenchEn)
+  );
+  service.registerBundle(
+    WORKBENCH_I18N_SOURCE_ID,
+    'pl',
+    registerDefaultWorkbenchBundle(workbenchPl)
   );
 }

@@ -13,7 +13,7 @@ import type {
   FieldRendererRegistration,
   ViewPanelRegistration,
 } from '../workbench/panel-registrations';
-import type { ActiveDialog, DialogRegistration } from './dialog-registrations';
+import type { ActiveDialog } from './dialog-registrations';
 import type { EditorPaneRegistration } from './editor-pane-host-props';
 import type { StatusBarItemRendererRegistration } from './status-bar-item-renderer-registration';
 import type { WorkbenchLayout } from './workbench-layout';
@@ -36,7 +36,6 @@ export interface SceneSlice {
   viewContainers: ViewContainerDescriptor[];
   fieldRenderers: FieldRendererRegistration[];
   viewPanels: ViewPanelRegistration[];
-  dialogs: DialogRegistration[];
   activeDialog: ActiveDialog | null;
 }
 

@@ -66,6 +66,7 @@ export function ModalDialog({
         aria-labelledby={titleId}
         aria-modal="true"
         className={cn(styles.dialog, overlaySurface.surface, contentClassName)}
+        data-openenvx-dialog=""
         data-state={state}
         role="dialog"
         {...dialogProps}

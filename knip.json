@@ -9,7 +9,6 @@
     "packages/email-driver/src/templates/index.ts": ["exports"],
     "packages/email-driver/src/templates/jsx/index.ts": ["exports"],
     "packages/html-driver/src/editor/floating-pill/index.ts": ["exports", "types"],
-    "packages/studio/src/plugins/variables/variable-edit-dialog.tsx": ["exports"],
     "packages/studio/src/primitives/input.tsx": ["exports", "types"],
     "packages/studio/src/context/workbench-context.tsx": ["types"],
     "packages/studio/src/workbench-barrel.ts": ["exports"],

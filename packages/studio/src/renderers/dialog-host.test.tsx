@@ -1,91 +1,92 @@
-import { cleanup, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+// @vitest-environment jsdom
+import type { WorkbenchApi, WorkbenchState } from '@openenvx/studio/core';
+import { render, screen } from '@testing-library/react';
+import { I18nextProvider } from 'react-i18next';
+import { describe, expect, it, vi } from 'vitest';
 
 import { WorkbenchProvider } from '../context/workbench-context';
-import { createMockWorkbenchApi } from '../test/mock-workbench-context';
-import { DialogHost, type WorkbenchDialogProps } from './dialog-host';
+import { workbenchI18n } from '../i18n/workbench-i18n';
+import { DialogHost } from './dialog-host';
 
-afterEach(cleanup);
+function renderHost(activeDialog: WorkbenchState['activeDialog']) {
+  const closeDialog = vi.fn();
+  const state = {
+    activeDialog,
+    fieldRenderers: [],
+    revision: 1,
+  } as WorkbenchState;
+  const api = {
+    closeDialog,
+    getSnapshot: () => state,
+    patchDialogFormPayload: vi.fn(),
+    resolveDialogForm: vi.fn(),
+    subscribe: (listener: (next: WorkbenchState) => void) => {
+      listener(state);
+      return () => {};
+    },
+  } as WorkbenchApi;
 
-function TestDialog({ open, payload, onClose }: WorkbenchDialogProps<{ label: string }>) {
-  if (!open || !payload) {
-    return null;
-  }
-  return (
-    <div>
-      <p>{payload.label}</p>
-      <button onClick={onClose} type="button">
-        Close
-      </button>
-    </div>
+  render(
+    <WorkbenchProvider api={api}>
+      <I18nextProvider i18n={workbenchI18n}>
+        <DialogHost />
+      </I18nextProvider>
+    </WorkbenchProvider>
   );
+
+  return { closeDialog };
 }
 
 describe('DialogHost', () => {
-  it('renders the registered dialog component for the active dialog', () => {
-    const { api } = createMockWorkbenchApi({
-      activeDialog: { id: 'test.dialog', payload: { label: 'Hello dialog' } },
-      dialogs: [{ id: 'test.dialog', Component: TestDialog }],
+  it('renders confirm dialog content', () => {
+    renderHost({
+      kind: 'confirm',
+      payload: {
+        description: 'Cannot undo.',
+        title: 'Delete?',
+      },
     });
 
-    render(
-      <WorkbenchProvider api={api}>
-        <DialogHost />
-      </WorkbenchProvider>
-    );
+    expect(screen.getByText('Delete?')).toBeTruthy();
+    expect(screen.getByText('Cannot undo.')).toBeTruthy();
+  });
 
-    expect(screen.getByText('Hello dialog')).toBeTruthy();
+  it('renders form dialog title', () => {
+    renderHost({
+      kind: 'form',
+      payload: {
+        nodes: [],
+        title: 'Create variable',
+        values: {},
+      },
+    });
+
+    expect(screen.getByText('Create variable')).toBeTruthy();
   });
 
   it('renders nothing when no dialog is active', () => {
-    const { api } = createMockWorkbenchApi({
-      dialogs: [{ id: 'test.dialog', Component: TestDialog }],
-    });
-
     const { container } = render(
-      <WorkbenchProvider api={api}>
+      <WorkbenchProvider
+        api={
+          {
+            closeDialog: vi.fn(),
+            getSnapshot: () =>
+              ({ activeDialog: null, fieldRenderers: [], revision: 1 }) as WorkbenchState,
+            subscribe: (listener: (next: WorkbenchState) => void) => {
+              listener({
+                activeDialog: null,
+                fieldRenderers: [],
+                revision: 1,
+              } as WorkbenchState);
+              return () => {};
+            },
+          } as WorkbenchApi
+        }
+      >
         <DialogHost />
       </WorkbenchProvider>
     );
 
-    expect(container.firstChild).toBeNull();
-  });
-
-  it('closes via workbench api', () => {
-    const closeDialog = vi.fn();
-    const { api } = createMockWorkbenchApi({
-      activeDialog: { id: 'test.dialog', payload: { label: 'Close me' } },
-      dialogs: [{ id: 'test.dialog', Component: TestDialog }],
-    });
-    api.closeDialog = closeDialog;
-
-    render(
-      <WorkbenchProvider api={api}>
-        <DialogHost />
-      </WorkbenchProvider>
-    );
-
-    screen.getByRole('button', { name: 'Close' }).click();
-    expect(closeDialog).toHaveBeenCalledWith('test.dialog');
-  });
-
-  it('closes when the active dialog id is not registered', async () => {
-    const closeDialog = vi.fn();
-    const { api } = createMockWorkbenchApi({
-      activeDialog: { id: 'missing.dialog', payload: { label: 'Ghost' } },
-      dialogs: [{ id: 'test.dialog', Component: TestDialog }],
-    });
-    api.closeDialog = closeDialog;
-
-    const { container } = render(
-      <WorkbenchProvider api={api}>
-        <DialogHost />
-      </WorkbenchProvider>
-    );
-
-    await vi.waitFor(() => {
-      expect(closeDialog).toHaveBeenCalledWith('missing.dialog');
-    });
-    expect(container.firstChild).toBeNull();
+    expect(container.textContent).toBe('');
   });
 });

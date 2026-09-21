@@ -1,35 +1,26 @@
-import { WORKBENCH_CONFIRM_DIALOG_ID } from '@openenvx/studio/core';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+// @vitest-environment jsdom
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { WorkbenchProvider } from '../context/workbench-context';
-import { createMockWorkbenchApi } from '../test/mock-workbench-context';
 import { ConfirmWorkbenchDialog } from './confirm-workbench-dialog';
 
-afterEach(cleanup);
-
 describe('ConfirmWorkbenchDialog', () => {
-  it('resolves confirm via workbench api', () => {
+  it('resolves confirm true and closes on cancel', () => {
     const resolveDialogConfirm = vi.fn();
-    const { api } = createMockWorkbenchApi({
-      activeDialog: {
-        id: WORKBENCH_CONFIRM_DIALOG_ID,
-        payload: {
-          title: 'Delete?',
-          description: 'Cannot undo.',
-        },
-      },
-    });
-    api.resolveDialogConfirm = resolveDialogConfirm;
+    const onClose = vi.fn();
+    const api = { resolveDialogConfirm };
 
     render(
-      <WorkbenchProvider api={api}>
+      <WorkbenchProvider api={api as never}>
         <ConfirmWorkbenchDialog
-          onClose={vi.fn()}
+          onClose={onClose}
           open
           payload={{
-            title: 'Delete?',
+            cancelLabel: 'Cancel',
+            confirmLabel: 'Confirm',
             description: 'Cannot undo.',
+            title: 'Delete?',
           }}
         />
       </WorkbenchProvider>
@@ -39,6 +30,6 @@ describe('ConfirmWorkbenchDialog', () => {
     expect(resolveDialogConfirm).toHaveBeenCalledWith(true);
 
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
-    expect(resolveDialogConfirm).toHaveBeenCalledWith(false);
+    expect(onClose).toHaveBeenCalled();
   });
 });

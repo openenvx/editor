@@ -4,7 +4,11 @@ import { useEffect } from 'react';
 import { I18nextProvider } from 'react-i18next';
 
 import { useWorkbenchContext } from '../context/workbench-context';
-import { syncWorkbenchI18nFromService, workbenchI18n } from './workbench-i18n';
+import {
+  registerWorkbenchLocalizationBundles,
+  syncWorkbenchI18nFromService,
+  workbenchI18n,
+} from './workbench-i18n';
 
 export interface WorkbenchI18nProviderProps {
   locale?: string;
@@ -25,6 +29,7 @@ export function WorkbenchI18nProvider({
       return;
     }
 
+    registerWorkbenchLocalizationBundles(service);
     service.setFallbackLocale(fallbackLocale);
     service.setLocale(locale);
     syncWorkbenchI18nFromService(service);

@@ -66,6 +66,7 @@ export default {
   'workbench.list.reorder': 'Reorder',
   'confirm.confirm': 'Confirm',
   'confirm.cancel': 'Cancel',
+  'form.submit': 'Save',
   'combobox.search': 'Search…',
   'combobox.noResults': 'No results.',
   'combobox.select': 'Select…',

@@ -66,6 +66,7 @@ export default {
   'workbench.list.reorder': 'Zmień kolejność',
   'confirm.confirm': 'Potwierdź',
   'confirm.cancel': 'Anuluj',
+  'form.submit': 'Zapisz',
   'combobox.search': 'Szukaj…',
   'combobox.noResults': 'Brak wyników.',
   'combobox.select': 'Wybierz…',

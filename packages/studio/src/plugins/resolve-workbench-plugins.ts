@@ -1,10 +1,6 @@
 import type { Plugin } from '@openenvx/studio/core';
 
 import {
-  DEFAULT_DIALOGS_PLUGIN_ID,
-  DefaultDialogsPlugin,
-} from '../dialogs/default-dialogs-plugin';
-import {
   DEFAULT_FIELDS_PLUGIN_ID,
   DefaultWorkbenchFieldsPlugin,
 } from '../fields/default-fields-plugin';
@@ -32,18 +28,13 @@ export const DEFAULT_WORKBENCH_PLUGIN_SPECS: readonly WorkbenchDefaultPluginSpec
       create: () => new DefaultWorkbenchFieldsPlugin(),
     },
     {
-      id: DEFAULT_DIALOGS_PLUGIN_ID,
-      order: 10,
-      create: () => new DefaultDialogsPlugin(),
-    },
-    {
       id: DEFAULT_INSPECTOR_PLUGIN_ID,
-      order: 20,
+      order: 10,
       create: () => new DefaultInspectorContainerPlugin(),
     },
     {
       id: DEFAULT_WORKBENCH_CHROME_PLUGIN_ID,
-      order: 30,
+      order: 20,
       create: () => new DefaultWorkbenchChromePlugin(),
     },
   ];

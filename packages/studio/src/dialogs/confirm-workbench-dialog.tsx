@@ -5,25 +5,23 @@ import { useWorkbenchContext } from '../context/workbench-context';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
 import { Button } from '../primitives/button';
 import { ModalDialog } from '../primitives/modal-dialog';
-import type { WorkbenchDialogProps } from '../renderers/dialog-host';
 
 import styles from '../primitives/confirm-dialog.module.css';
+
+export interface ConfirmWorkbenchDialogProps {
+  open: boolean;
+  payload: ConfirmDialogOptions;
+  onClose: () => void;
+}
 
 export function ConfirmWorkbenchDialog({
   open,
   payload,
-}: WorkbenchDialogProps<ConfirmDialogOptions>) {
+  onClose,
+}: ConfirmWorkbenchDialogProps) {
   const { api } = useWorkbenchContext();
   const { t } = useWorkbenchTranslation();
   const titleId = useId();
-
-  if (!payload) {
-    return null;
-  }
-
-  const handleCancel = () => {
-    api.resolveDialogConfirm(false);
-  };
 
   const handleConfirm = () => {
     api.resolveDialogConfirm(true);
@@ -32,14 +30,14 @@ export function ConfirmWorkbenchDialog({
   return (
     <ModalDialog
       contentClassName={styles.dialog}
-      onClose={handleCancel}
+      onClose={onClose}
       open={open}
       title={payload.title}
       titleId={titleId}
     >
       <p className={styles.description}>{payload.description}</p>
       <div className={styles.actions}>
-        <Button onClick={handleCancel} size="sm" variant="outline">
+        <Button onClick={onClose} size="sm" variant="outline">
           {payload.cancelLabel ?? t('confirm.cancel')}
         </Button>
         <Button onClick={handleConfirm} size="sm">

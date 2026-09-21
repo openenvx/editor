@@ -29,7 +29,9 @@ import type { EditorInput, EditorService } from '../workbench/editor-service';
 import type {
   ActiveDialog,
   ConfirmDialogOptions,
-  DialogRegistration,
+  FormDialogPayload,
+  FormDialogResult,
+  ShowFormOptions,
 } from './dialog-registrations';
 import type { EditorPaneRegistration } from './editor-pane-host-props';
 import type {
@@ -143,7 +145,6 @@ export interface WorkbenchState {
   editorPanes: EditorPaneRegistration[];
   fieldRenderers: FieldRendererRegistration[];
   viewPanels: ViewPanelRegistration[];
-  dialogs: DialogRegistration[];
   activeDialog: ActiveDialog | null;
   editor: EditorInput | null;
   layout: WorkbenchLayout;
@@ -208,11 +209,15 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   revert: () => void;
   serializeScene: () => Scene;
   loadScene: (scene: Scene) => void;
-  openDialog: (id: string, payload?: unknown) => void;
-  closeDialog: (id?: string) => void;
+  closeDialog: () => void;
   showConfirm: (options: ConfirmDialogOptions) => Promise<boolean>;
   /** Resolves a pending {@link showConfirm} dialog. No-op when none is active. */
   resolveDialogConfirm: (confirmed: boolean) => void;
+  showForm: (options: ShowFormOptions) => Promise<FormDialogResult | undefined>;
+  /** Resolves a pending {@link showForm} dialog. No-op when none is active. */
+  resolveDialogForm: (result: FormDialogResult | undefined) => void;
+  /** Patches the active form dialog payload (shell-internal). */
+  patchDialogFormPayload: (patch: Partial<FormDialogPayload>) => void;
   /** Global editor diagnostics (console logs for property when, etc.). */
   setEditorDebug: (enabled: boolean) => void;
   isEditorDebug: () => boolean;

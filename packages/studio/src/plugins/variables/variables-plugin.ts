@@ -10,13 +10,16 @@ import {
 } from '@openenvx/studio/core';
 import { sceneVariables } from '@openenvx/studio/schema';
 
+import { executeSceneVariableCommand } from '../../core/plugins/template-variable-commands';
 import {
   VARIABLES_CONTAINER_ID,
-  VARIABLES_EDIT_DIALOG_ID,
   VARIABLES_PLUGIN_ID,
   VARIABLES_VIEW_ID,
 } from './constants';
-import { VariableEditDialog } from './variable-edit-dialog';
+import {
+  buildVariableFormOptions,
+  VARIABLE_FORM_DELETE_ACTION,
+} from './variable-form';
 import { VariablesTreeProvider } from './variables-tree-provider';
 
 class VariablesViewContainer extends ViewContainerContribution {
@@ -56,6 +59,14 @@ class OpenVariablesPanelCommand extends Command {
   }
 }
 
+function openVariablesPanel(ctx: CommandContext): void {
+  const navigation = ctx.services.get(WorkbenchNavigationServiceId);
+  if (navigation) {
+    navigation.setSecondarySidebarVisible(true);
+    navigation.setActiveContainer('secondary', VARIABLES_CONTAINER_ID);
+  }
+}
+
 export class CreateVariableCommand extends Command {
   readonly id = 'variables.create';
 
@@ -63,14 +74,27 @@ export class CreateVariableCommand extends Command {
     return true;
   }
 
-  execute(ctx: CommandContext): void {
-    const navigation = ctx.services.get(WorkbenchNavigationServiceId);
-    if (navigation) {
-      navigation.setSecondarySidebarVisible(true);
-      navigation.setActiveContainer('secondary', VARIABLES_CONTAINER_ID);
+  async execute(ctx: CommandContext): Promise<void> {
+    openVariablesPanel(ctx);
+    const dialogs = ctx.services.get(DialogServiceId);
+    if (!dialogs) {
+      return;
     }
-    ctx.services.get(DialogServiceId)?.open(VARIABLES_EDIT_DIALOG_ID, {
-      mode: 'create',
+    const result = await dialogs.showForm(
+      buildVariableFormOptions(
+        ctx.services,
+        () => ctx.scene.getScene(),
+        'create'
+      )
+    );
+    if (!result || result.action !== 'submit') {
+      return;
+    }
+    const key = String(result.values.key ?? '').trim();
+    const sample = String(result.values.sample ?? '');
+    await executeSceneVariableCommand(ctx, 'scene.addVariable', {
+      key,
+      sample,
     });
   }
 }
@@ -88,20 +112,48 @@ export class EditVariableCommand extends Command {
     );
   }
 
-  execute(ctx: CommandContext, args?: unknown): void {
+  async execute(ctx: CommandContext, args?: unknown): Promise<void> {
     const patch = args as { id?: string } | undefined;
     if (!patch?.id) {
       return;
     }
-    const variable = sceneVariables(ctx.scene.getScene()).find(
+    const scene = ctx.scene.getScene();
+    const variable = sceneVariables(scene).find(
       (entry) => entry.id === patch.id
     );
     if (!variable) {
       return;
     }
-    ctx.services.get(DialogServiceId)?.open(VARIABLES_EDIT_DIALOG_ID, {
-      mode: 'edit',
-      variable,
+    const dialogs = ctx.services.get(DialogServiceId);
+    if (!dialogs) {
+      return;
+    }
+    const result = await dialogs.showForm(
+      buildVariableFormOptions(
+        ctx.services,
+        () => ctx.scene.getScene(),
+        'edit',
+        variable
+      )
+    );
+    if (!result) {
+      return;
+    }
+    if (result.action === VARIABLE_FORM_DELETE_ACTION) {
+      await executeSceneVariableCommand(ctx, 'scene.removeVariable', {
+        id: variable.id,
+      });
+      return;
+    }
+    if (result.action !== 'submit') {
+      return;
+    }
+    const key = String(result.values.key ?? '').trim();
+    const sample = String(result.values.sample ?? '');
+    await executeSceneVariableCommand(ctx, 'scene.updateVariable', {
+      id: variable.id,
+      key,
+      sample,
     });
   }
 }
@@ -120,6 +172,5 @@ export class VariablesPlugin extends WorkbenchPlugin {
       VARIABLES_VIEW_ID,
       new VariablesTreeProvider()
     );
-    ctx.registerDialog(VARIABLES_EDIT_DIALOG_ID, VariableEditDialog);
   }
 }

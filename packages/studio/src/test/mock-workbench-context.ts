@@ -1,5 +1,9 @@
 import { DEFAULT_WORKBENCH_LAYOUT } from '@openenvx/studio/core';
-import type { WorkbenchApi, WorkbenchState } from '@openenvx/studio/core';
+import type {
+  FormDialogPayload,
+  WorkbenchApi,
+  WorkbenchState,
+} from '@openenvx/studio/core';
 import { normalizeScene } from '@openenvx/studio/schema';
 import { vi } from 'vitest';
 
@@ -47,7 +51,6 @@ export function createMockWorkbenchApi(
     viewContainers: [],
     viewLocations: {},
     viewPanels: [],
-    dialogs: [],
     activeDialog: null,
     ...overrides,
   };
@@ -114,24 +117,26 @@ export function createMockWorkbenchApi(
         listeners.delete(listener);
       };
     },
-    openDialog: (id: string, payload?: unknown) => {
-      state.activeDialog = { id, payload };
-      state.revision += 1;
-      notify();
-    },
-    closeDialog: (id?: string) => {
-      if (!state.activeDialog) {
-        return;
-      }
-      if (id && state.activeDialog.id !== id) {
-        return;
-      }
+    closeDialog: () => {
       state.activeDialog = null;
       state.revision += 1;
       notify();
     },
     showConfirm: vi.fn(async () => true),
     resolveDialogConfirm: vi.fn(),
+    showForm: vi.fn(async () => {}),
+    resolveDialogForm: vi.fn(),
+    patchDialogFormPayload: (patch: Partial<FormDialogPayload>) => {
+      if (state.activeDialog?.kind !== 'form') {
+        return;
+      }
+      state.activeDialog = {
+        kind: 'form',
+        payload: { ...state.activeDialog.payload, ...patch },
+      };
+      state.revision += 1;
+      notify();
+    },
   } as unknown as WorkbenchApi;
 
   return { api, executeCommand, state };
