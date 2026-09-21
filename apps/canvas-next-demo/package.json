@@ -21,10 +21,10 @@
     "use-sync-external-store": "1.6.0"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5",
+    "@types/node": "^26.6.1",
     "@types/react": "^19.2.3",
     "@types/react-dom": "^19.2.3",
     "typescript": "catalog:dev",
-    "vitest": "4.1.10"
+    "vitest": "5.0.1"
   }
 }
