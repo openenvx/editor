@@ -1,4 +1,8 @@
-import type { BlockConfig, BlockRegistry } from '@openenvx/html-driver';
+import {
+  createBlock,
+  type BlockConfig,
+  type BlockRegistry,
+} from '@openenvx/html-driver';
 import { isLayerVisible } from '@openenvx/studio/core';
 import type { Layer } from '@openenvx/studio/schema';
 import { nodeProps } from '@openenvx/studio/schema';
@@ -83,8 +87,13 @@ export function renderPatternThumbnail(
   config: BlockConfig,
   registry: BlockRegistry
 ): ReactNode {
-  const data = structuredClone(config.defaultData);
-  const childNodes = asLayers(data.children)
+  const layer = createBlock(
+    config.type,
+    'pattern-thumbnail',
+    structuredClone(config.defaultData)
+  );
+  const data = nodeProps(layer);
+  const childNodes = (layer.children ?? [])
     .map((child) => renderLayerThumbnail(child, registry))
     .filter((node): node is ReactNode => node !== null && node !== undefined);
   const slots = renderDefaultSlots(data, config, registry);

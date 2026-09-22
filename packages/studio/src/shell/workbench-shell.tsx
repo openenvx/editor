@@ -34,16 +34,16 @@ import { ActivitySidebar } from '../layout/activity-sidebar';
 import { EditorChrome } from '../layout/editor-chrome';
 import { EditorLayout } from '../layout/editor-layout';
 import { resolveWorkbenchPlugins } from '../plugins/resolve-workbench-plugins';
-import { CommandPaletteRenderer } from '../renderers/command-palette-renderer';
-import { CommandSheetHost } from '../renderers/command-sheet-host';
-import { ContextMenuRenderer } from '../renderers/context-menu-renderer';
-import { DialogHost } from '../renderers/dialog-host';
-import { EditorPaneRenderer } from '../renderers/editor-pane-renderer';
-import { OverlayRenderer } from '../renderers/overlay-renderer';
-import { SecondarySidebarRenderer } from '../renderers/secondary-sidebar-renderer';
-import { StatusBarRenderer } from '../renderers/status-bar-renderer';
-import { ToolbarRenderer } from '../renderers/toolbar-renderer';
-import { TopBarRenderer } from '../renderers/top-bar-renderer';
+import { CommandPaletteRenderer } from '../ui/renderers/command-palette-renderer';
+import { CommandSheetHost } from '../ui/renderers/command-sheet-host';
+import { ContextMenuRenderer } from '../ui/renderers/context-menu-renderer';
+import { DialogHost } from '../ui/renderers/dialog-host';
+import { EditorPaneRenderer } from '../ui/renderers/editor-pane-renderer';
+import { OverlayRenderer } from '../ui/renderers/overlay-renderer';
+import { SecondarySidebarRenderer } from '../ui/renderers/secondary-sidebar-renderer';
+import { StatusBarRenderer } from '../ui/renderers/status-bar-renderer';
+import { ToolbarRenderer } from '../ui/renderers/toolbar-renderer';
+import { TopBarRenderer } from '../ui/renderers/top-bar-renderer';
 
 export interface WorkbenchShellProps {
   plugins: Plugin[];

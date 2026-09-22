@@ -14,13 +14,13 @@ import {
   useThemeScope,
 } from './context/theme-context';
 import { WorkbenchProvider } from './context/workbench-context';
-import { Button } from './primitives/button';
+import { Button } from './ui/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from './primitives/dropdown-menu';
-import { DropdownMenuRenderer } from './renderers/dropdown-menu-renderer';
+} from './ui/primitives/dropdown-menu';
+import { DropdownMenuRenderer } from './ui/renderers/dropdown-menu-renderer';
 import { WorkbenchShell } from './shell/workbench-shell';
 import { createMockWorkbenchApi } from './test/mock-workbench-context';
 

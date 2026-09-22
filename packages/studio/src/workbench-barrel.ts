@@ -49,25 +49,25 @@ export {
 export {
   ViewPanelRenderer,
   TreePanelRenderer,
-} from './renderers/view-panel-renderer';
-export { EditorPaneRenderer } from './renderers/editor-pane-renderer';
-export { ContextMenuRenderer } from './renderers/context-menu-renderer';
-export { CommandPaletteRenderer } from './renderers/command-palette-renderer';
-export { OverlayRenderer } from './renderers/overlay-renderer';
-export { StatusBarRenderer } from './renderers/status-bar-renderer';
-export { TopBarRenderer } from './renderers/top-bar-renderer';
+} from './ui/renderers/view-panel-renderer';
+export { EditorPaneRenderer } from './ui/renderers/editor-pane-renderer';
+export { ContextMenuRenderer } from './ui/renderers/context-menu-renderer';
+export { CommandPaletteRenderer } from './ui/renderers/command-palette-renderer';
+export { OverlayRenderer } from './ui/renderers/overlay-renderer';
+export { StatusBarRenderer } from './ui/renderers/status-bar-renderer';
+export { TopBarRenderer } from './ui/renderers/top-bar-renderer';
 export { EditorChrome } from './layout/editor-chrome';
 export type {
   EditorChromeProps,
   EditorChromeToolbars,
 } from './layout/editor-chrome';
-export { ToolbarRenderer } from './renderers/toolbar-renderer';
+export { ToolbarRenderer } from './ui/renderers/toolbar-renderer';
 export { EditorLayout } from './layout/editor-layout';
 export { editorLayoutStyles } from './layout/editor-layout-styles';
 export {
   DefaultWorkbenchFieldsPlugin,
   DEFAULT_FIELDS_PLUGIN_ID,
-} from './fields/default-fields-plugin';
+} from './ui/fields/default-fields-plugin';
 export {
   DefaultInspectorContainerPlugin,
   DEFAULT_INSPECTOR_PLUGIN_ID,
@@ -90,29 +90,29 @@ export {
   WorkbenchSidebarContainer,
   WorkbenchStatusBarContribution,
 } from './views/workbench-chrome-contributions';
-export { SecondarySidebarRenderer } from './renderers/secondary-sidebar-renderer';
-export { Tabs, TabsContent, TabsList, TabsTrigger } from './primitives/tabs';
-export { NumericControl } from './inputs/basic/numeric-control';
-export { TextInput } from './inputs/basic/text-input';
-export { WorkbenchIcon } from './icons/workbench-icon';
+export { SecondarySidebarRenderer } from './ui/renderers/secondary-sidebar-renderer';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/primitives/tabs';
+export { NumericControl } from './ui/inputs/basic/numeric-control';
+export { TextInput } from './ui/inputs/basic/text-input';
+export { WorkbenchIcon } from './ui/icons/workbench-icon';
 export {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroups,
   DropdownMenuTrigger,
-} from './primitives/dropdown-menu';
+} from './ui/primitives/dropdown-menu';
 export { createLocalStorageWorkbenchLayoutStore } from './layout/local-storage-workbench-layout-store';
 export {
   ActivitySidebar,
   type ActivitySidebarProps,
 } from './layout/activity-sidebar';
-export { Button } from './primitives/button';
+export { Button } from './ui/primitives/button';
 export { createMockWorkbenchApi } from './test/mock-workbench-context';
-export { ConfirmDialog } from './primitives/confirm-dialog';
-export { Input } from './primitives/input';
-export { ModalDialog } from './primitives/modal-dialog';
-export { PropertyFieldRow } from './primitives/property-field-row';
-export { DialogHost } from './renderers/dialog-host';
+export { ConfirmDialog } from './ui/primitives/confirm-dialog';
+export { Input } from './ui/primitives/input';
+export { ModalDialog } from './ui/primitives/modal-dialog';
+export { PropertyFieldRow } from './ui/primitives/property-field-row';
+export { DialogHost } from './ui/renderers/dialog-host';
 export {
   Sheet,
   SheetClose,
@@ -123,20 +123,20 @@ export {
   SheetTitle,
   SheetTrigger,
   type SheetSide,
-} from './primitives/sheet';
-export { Select } from './primitives/select';
+} from './ui/primitives/sheet';
+export { Select } from './ui/primitives/select';
 export {
   NumericInput,
   type NumericInputProps,
-} from './primitives/numeric-input';
+} from './ui/primitives/numeric-input';
 export {
   computeScrubValue,
   type ScrubComputeOptions,
-} from './primitives/numeric-scrub';
+} from './ui/primitives/numeric-scrub';
 export {
   ColorPickerPopover,
   type ColorPickerPopoverProps,
-} from './primitives/color-picker';
+} from './ui/primitives/color-picker';
 export {
   VersionHistoryPlugin,
   VERSION_HISTORY_CONTAINER_ID,

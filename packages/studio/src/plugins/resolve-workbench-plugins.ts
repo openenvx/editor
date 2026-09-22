@@ -3,7 +3,7 @@ import type { Plugin } from '@openenvx/studio/core';
 import {
   DEFAULT_FIELDS_PLUGIN_ID,
   DefaultWorkbenchFieldsPlugin,
-} from '../fields/default-fields-plugin';
+} from '../ui/fields/default-fields-plugin';
 import {
   DEFAULT_INSPECTOR_PLUGIN_ID,
   DefaultInspectorContainerPlugin,

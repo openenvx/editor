@@ -9,7 +9,7 @@
     "packages/email-driver/src/templates/index.ts": ["exports"],
     "packages/email-driver/src/templates/jsx/index.ts": ["exports"],
     "packages/html-driver/src/editor/floating-pill/index.ts": ["exports", "types"],
-    "packages/studio/src/primitives/input.tsx": ["exports", "types"],
+    "packages/studio/src/ui/primitives/input.tsx": ["exports", "types"],
     "packages/studio/src/context/workbench-context.tsx": ["types"],
     "packages/studio/src/workbench-barrel.ts": ["exports"],
     "packages/studio/src/context/locale-context.tsx": ["exports", "types"],
@@ -17,8 +17,8 @@
     "packages/studio/src/context/theme-definitions.ts": ["exports"],
     "packages/studio/src/hooks/use-workbench-selector.ts": ["exports"],
     "packages/studio/src/i18n/workbench-i18n.ts": ["exports"],
-    "packages/studio/src/primitives/sheet.tsx": ["exports"],
-    "packages/studio/src/renderers/view-panel-renderer.tsx": ["exports"]
+    "packages/studio/src/ui/primitives/sheet.tsx": ["exports"],
+    "packages/studio/src/ui/renderers/view-panel-renderer.tsx": ["exports"]
   },
   "ignoreDependencies": [
     "eslint-plugin-github",
@@ -141,11 +141,11 @@
         "src/core/schema/types.ts": ["types"]
       },
       "ignore": [
-        "src/primitives/combobox.tsx",
+        "src/ui/primitives/combobox.tsx",
         "src/plugins/version-history/**",
         "src/layout/editor-layout-styles.ts",
         "src/layout/local-storage-workbench-layout-store.ts",
-        "src/primitives/confirm-dialog.tsx"
+        "src/ui/primitives/confirm-dialog.tsx"
       ]
     },
     "packages/html-driver": {

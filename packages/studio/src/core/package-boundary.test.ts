@@ -7,20 +7,15 @@ const studioSrc = path.join(coreRoot, '..');
 
 const forbiddenShellSegments = new Set([
   'context',
-  'dialogs',
-  'fields',
   'hooks',
-  'icons',
-  'inputs',
   'layout',
-  'primitives',
-  'renderers',
   'shell',
   'theme',
   'views',
   'i18n',
   'plugins',
   'test',
+  'ui',
 ]);
 
 function collectTsFiles(dir: string): string[] {

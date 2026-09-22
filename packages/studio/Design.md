@@ -70,7 +70,7 @@ Contribution-driven layout only — hosts declare views and toolbars; the shell 
 
 ## Components
 
-Kit lives in [`src/primitives`](src/primitives) on **Base UI** headless primitives + **CSS modules**. Icons: **`@tabler/icons-react`** only (`WorkbenchIcon` + glyph map).
+Kit lives in [`src/ui/primitives`](src/ui/primitives) on **Base UI** headless primitives + **CSS modules**. Icons: **`@tabler/icons-react`** only (`WorkbenchIcon` + glyph map).
 
 | Role | Treatment |
 | --- | --- |
@@ -92,9 +92,9 @@ Command palette uses `cmdk`, same 16px frosted/opaque popup language as Synara's
 | [`src/shell/workbench-shell.tsx`](src/shell/workbench-shell.tsx) | Shell root, theme scope |
 | [`src/layout/editor-layout.tsx`](src/layout/editor-layout.tsx) | Three-column grid |
 | [`src/layout/activity-sidebar.tsx`](src/layout/activity-sidebar.tsx) | Activity + primary sidebar |
-| [`src/renderers/secondary-sidebar-renderer.tsx`](src/renderers/secondary-sidebar-renderer.tsx) | Inspector rail |
-| [`src/renderers/top-bar-renderer.tsx`](src/renderers/top-bar-renderer.tsx) | Top bar |
-| [`src/renderers/status-bar-renderer.tsx`](src/renderers/status-bar-renderer.tsx) | Stage status footer |
+| [`src/ui/renderers/secondary-sidebar-renderer.tsx`](src/ui/renderers/secondary-sidebar-renderer.tsx) | Inspector rail |
+| [`src/ui/renderers/top-bar-renderer.tsx`](src/ui/renderers/top-bar-renderer.tsx) | Top bar |
+| [`src/ui/renderers/status-bar-renderer.tsx`](src/ui/renderers/status-bar-renderer.tsx) | Stage status footer |
 | [`src/context/theme-context.tsx`](src/context/theme-context.tsx) | Theme provider |
 
 ## Do not

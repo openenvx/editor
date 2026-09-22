@@ -23,16 +23,16 @@ import {
 } from '../hooks/use-sortable-container-order';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
-import { WorkbenchIcon } from '../icons/workbench-icon';
 import { cn } from '../lib/cn';
+import { WorkbenchIcon } from '../ui/icons/workbench-icon';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '../primitives/dropdown-menu';
-import { ContextMenuRenderer } from '../renderers/context-menu-renderer';
-import { DropdownMenuRenderer } from '../renderers/dropdown-menu-renderer';
-import { ViewContainerViews } from '../renderers/view-container-views';
+} from '../ui/primitives/dropdown-menu';
+import { ContextMenuRenderer } from '../ui/renderers/context-menu-renderer';
+import { DropdownMenuRenderer } from '../ui/renderers/dropdown-menu-renderer';
+import { ViewContainerViews } from '../ui/renderers/view-container-views';
 import { ViewContainerHeader } from './view-container-header';
 
 import styles from './activity-sidebar.module.css';

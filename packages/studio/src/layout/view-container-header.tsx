@@ -8,15 +8,15 @@ import { useMemo } from 'react';
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';
 import { useWorkbenchTranslation } from '../i18n/use-workbench-translation';
-import { WorkbenchIcon } from '../icons/workbench-icon';
+import { WorkbenchIcon } from '../ui/icons/workbench-icon';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../primitives/dropdown-menu';
-import { IconButton } from '../primitives/icon-button';
-import { DropdownMenuRenderer } from '../renderers/dropdown-menu-renderer';
+} from '../ui/primitives/dropdown-menu';
+import { IconButton } from '../ui/primitives/icon-button';
+import { DropdownMenuRenderer } from '../ui/renderers/dropdown-menu-renderer';
 
 import styles from './view-container-header.module.css';
 

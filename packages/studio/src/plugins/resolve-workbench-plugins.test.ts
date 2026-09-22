@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_FIELDS_PLUGIN_ID,
   DefaultWorkbenchFieldsPlugin,
-} from '../fields/default-fields-plugin';
+} from '../ui/fields/default-fields-plugin';
 import {
   DEFAULT_WORKBENCH_PLUGIN_SPECS,
   resolveWorkbenchPlugins,
