@@ -6,8 +6,9 @@
     "strictNullChecks": true,
     "jsx": "react-jsx",
     "paths": {
-      "@openenvx/studio/core": ["../studio/src/core/index.ts"],
-      "@openenvx/studio/schema": ["../studio/src/core/schema/index.ts"]
+      "@openenvx/studio": ["../studio/src/index.ts"],
+      "@openenvx/studio/shell": ["../studio/src/shell/index.ts"],
+      "@openenvx/studio/schema": ["../studio/src/schema/index.ts"]
     }
   }
 }

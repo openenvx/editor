@@ -3,12 +3,12 @@ import {
   isContainerLayer,
   mapLayers,
   MIN_LAYER_SIZE,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type {
   ContainerLayoutModel,
   DocumentNode,
   Transform,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type { Artboard, NodeStyle } from '@openenvx/studio/schema';
 import {
   applyNodeTransform,

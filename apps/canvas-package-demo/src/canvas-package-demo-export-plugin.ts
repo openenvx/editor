@@ -7,7 +7,7 @@ import {
   type CommandContext,
   type TopBarBuilder,
   type WorkbenchPluginContext,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import { buildSampleVariableValues } from '@openenvx/studio/schema';
 
 type ExportFormat = 'png' | 'jpg';

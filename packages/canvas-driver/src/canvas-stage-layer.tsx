@@ -1,4 +1,4 @@
-import { canSelectLayer, canTransformLayer } from '@openenvx/studio/core';
+import { canSelectLayer, canTransformLayer } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import { useStoreSelector } from '@openenvx/studio/react';
 import { nodeTransform, type Transform } from '@openenvx/studio/schema';

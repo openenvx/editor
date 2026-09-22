@@ -1,4 +1,4 @@
-import type { Plugin } from '@openenvx/studio/core';
+import type { Plugin } from '#studio';
 
 import {
   DEFAULT_FIELDS_PLUGIN_ID,

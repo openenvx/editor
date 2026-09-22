@@ -1,5 +1,6 @@
-import type { ViewTreeItem } from '@openenvx/studio/core';
 import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
+
+import type { ViewTreeItem } from '#studio';
 
 /**
  * New nestable tree ids start collapsed. Once seen, user expand/collapse is kept

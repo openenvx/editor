@@ -10,7 +10,7 @@ import {
   type StatusBarBuilder,
   type ToolbarBuilder,
   type WorkbenchContribution,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 import {
   validatePluginTree,

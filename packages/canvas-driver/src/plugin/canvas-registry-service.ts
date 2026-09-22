@@ -1,5 +1,5 @@
-import { SimpleServiceContribution } from '@openenvx/studio/core';
-import type { PluginContext } from '@openenvx/studio/core';
+import { SimpleServiceContribution } from '@openenvx/studio';
+import type { PluginContext } from '@openenvx/studio';
 
 import { CanvasRegistriesServiceId } from '../canvas-service-tokens';
 import {

@@ -1,5 +1,5 @@
-import { Command, updateLayerInTree } from '@openenvx/studio/core';
-import type { CommandContext, DocumentNode } from '@openenvx/studio/core';
+import { Command, updateLayerInTree } from '@openenvx/studio';
+import type { CommandContext, DocumentNode } from '@openenvx/studio';
 import type { OpenEnvxWidgetProps } from '@openenvx/studio/schema';
 import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
 

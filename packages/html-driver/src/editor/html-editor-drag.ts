@@ -4,8 +4,8 @@ import {
   isLayerDescendant,
   isLayerLocked,
   isLayerVisible,
-} from '@openenvx/studio/core';
-import type { Selection } from '@openenvx/studio/core';
+} from '@openenvx/studio';
+import type { Selection } from '@openenvx/studio';
 import type { Layer, Scene } from '@openenvx/studio/schema';
 import { nodeProps } from '@openenvx/studio/schema';
 import type { MutableRefObject } from 'react';

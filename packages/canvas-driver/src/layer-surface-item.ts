@@ -1,4 +1,4 @@
-import type { Layer } from '@openenvx/studio/core';
+import type { Layer } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 
 export interface CanvasLayerSurfaceItem {

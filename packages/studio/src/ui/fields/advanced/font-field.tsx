@@ -1,4 +1,4 @@
-import { FontServiceId } from '@openenvx/studio/core';
+import { FontServiceId } from '#studio';
 
 import { useWorkbenchContext } from '../../../context/workbench-context';
 import { FontInput } from '../../inputs/advanced/font-input';

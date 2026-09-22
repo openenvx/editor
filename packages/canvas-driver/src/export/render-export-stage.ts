@@ -1,4 +1,4 @@
-import type { LayerRegistry } from '@openenvx/studio/core';
+import type { LayerRegistry } from '@openenvx/studio';
 import { nodeTransform } from '@openenvx/studio/schema';
 import type { Document } from '@openenvx/studio/schema';
 import Konva from 'konva';

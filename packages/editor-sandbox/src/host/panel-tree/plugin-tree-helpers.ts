@@ -1,4 +1,4 @@
-import type { ShellDropdownMenuItemDescriptor } from '@openenvx/studio/core';
+import type { ShellDropdownMenuItemDescriptor } from '@openenvx/studio';
 
 import type { PluginChild, PluginNode, PluginPropValue } from '../../protocol';
 

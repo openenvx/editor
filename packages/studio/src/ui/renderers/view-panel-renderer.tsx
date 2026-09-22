@@ -1,9 +1,3 @@
-import type {
-  Scene,
-  ViewContainerDescriptor,
-  ViewDescriptor,
-  ViewTreeItem,
-} from '@openenvx/studio/core';
 import {
   IconChevronDown,
   IconEye,
@@ -12,6 +6,13 @@ import {
   IconLockOpen,
 } from '@tabler/icons-react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
+
+import type {
+  Scene,
+  ViewContainerDescriptor,
+  ViewDescriptor,
+  ViewTreeItem,
+} from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { getSelectionExpandIds } from '../../hooks/get-selection-expand-ids';

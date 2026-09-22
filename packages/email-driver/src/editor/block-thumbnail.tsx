@@ -3,7 +3,7 @@ import {
   type BlockConfig,
   type BlockRegistry,
 } from '@openenvx/html-driver';
-import { isLayerVisible } from '@openenvx/studio/core';
+import { isLayerVisible } from '@openenvx/studio';
 import type { Layer } from '@openenvx/studio/schema';
 import { nodeProps } from '@openenvx/studio/schema';
 import { createElement, Fragment, type ReactNode } from 'react';

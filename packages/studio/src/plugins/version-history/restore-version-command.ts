@@ -3,8 +3,8 @@ import {
   Command,
   type CommandContext,
   VersionHistoryProviderId,
-} from '@openenvx/studio/core';
-import { parseValidProjectSnapshot } from '@openenvx/studio/schema';
+} from '#studio';
+import { parseValidProjectSnapshot } from '#studio/schema';
 
 export const VERSION_HISTORY_RESTORE_COMMAND_ID = 'versionHistory.restore';
 

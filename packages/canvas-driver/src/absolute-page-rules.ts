@@ -1,4 +1,4 @@
-import { PageRulesContribution } from '@openenvx/studio/core';
+import { PageRulesContribution } from '@openenvx/studio';
 import type { Artboard, ValidationError } from '@openenvx/studio/schema';
 import { artboardSpaceSize } from '@openenvx/studio/schema';
 

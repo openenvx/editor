@@ -1,6 +1,6 @@
 import { createHtmlScene, defaultHtmlWorkbench } from '@openenvx/html-driver';
-import { WorkbenchShell } from '@openenvx/studio';
 import type { Scene } from '@openenvx/studio/schema';
+import { WorkbenchShell } from '@openenvx/studio/shell';
 import { useCallback, useMemo } from 'react';
 
 import '@openenvx/html-driver/theme.css';

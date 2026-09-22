@@ -1,4 +1,4 @@
-import { createMenuBuilder } from '@openenvx/studio/core';
+import { createMenuBuilder } from '@openenvx/studio';
 import { describe, expect, it } from 'vitest';
 
 import { CanvasContextMenu } from './canvas-context-menu';

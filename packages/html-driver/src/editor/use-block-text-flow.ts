@@ -1,4 +1,4 @@
-import { ContextKeyServiceId, getActiveArtboard } from '@openenvx/studio/core';
+import { ContextKeyServiceId, getActiveArtboard } from '@openenvx/studio';
 import { useWorkbenchContext } from '@openenvx/studio/react';
 import { useCallback, useRef, useState } from 'react';
 

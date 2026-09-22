@@ -1,10 +1,10 @@
-import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio/core';
+import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio';
 import type {
   CommandContext,
   DocumentNode,
   LayerPreviewContext,
   PropertySectionDescriptor,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type { Artboard } from '@openenvx/studio/schema';
 import { createDefaultTransform } from '@openenvx/studio/schema';
 import { z } from 'zod';

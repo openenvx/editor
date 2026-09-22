@@ -4,8 +4,8 @@ import {
   Command,
   findNodeById,
   ShortcutContribution,
-} from '@openenvx/studio/core';
-import type { CommandContext } from '@openenvx/studio/core';
+} from '@openenvx/studio';
+import type { CommandContext } from '@openenvx/studio';
 
 import {
   canExecuteCanvasClipboard,

@@ -1,4 +1,4 @@
-import { WorkbenchController, type WorkbenchApi } from '@openenvx/studio/core';
+import { WorkbenchController, type WorkbenchApi } from '@openenvx/studio';
 import { VariablesPlugin } from '@openenvx/studio/plugins/variables';
 import { WorkbenchProvider } from '@openenvx/studio/react';
 import { render } from '@testing-library/react';

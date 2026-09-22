@@ -1,4 +1,4 @@
-import type { ViewTreeItem } from '@openenvx/studio/core';
+import type { ViewTreeItem } from '#studio';
 import { describe, expect, it } from 'vitest';
 
 import {

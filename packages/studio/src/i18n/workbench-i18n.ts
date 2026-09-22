@@ -1,7 +1,8 @@
-import type { LocalizationService } from '@openenvx/studio/core';
 import { createInstance } from 'i18next';
 import type { i18n } from 'i18next';
 import { initReactI18next } from 'react-i18next';
+
+import type { LocalizationService } from '#studio';
 
 import workbenchEn from './locales/en/workbench-en';
 import workbenchPl from './locales/pl/workbench-pl';

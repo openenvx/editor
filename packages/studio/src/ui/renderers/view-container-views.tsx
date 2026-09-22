@@ -1,10 +1,13 @@
+import type { ComponentType } from 'react';
+import { useCallback, useMemo } from 'react';
+
 import {
   findLayerById,
   createPropertyHostContext,
   ContextKeyServiceId,
   evaluatePropertyLayoutWhen,
   PropertyPathResolver,
-} from '@openenvx/studio/core';
+} from '#studio';
 import type {
   FieldRendererRegistration,
   PropertyHostContext,
@@ -13,9 +16,7 @@ import type {
   ViewDescriptor,
   ViewPanelRegistration,
   WorkbenchApi,
-} from '@openenvx/studio/core';
-import type { ComponentType } from 'react';
-import { useCallback, useMemo } from 'react';
+} from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useContextKeysRevision } from '../../hooks/use-context-key';

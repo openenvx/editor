@@ -5,12 +5,12 @@ import {
   getLayerWriteMode,
   isLayerShownInLayers,
   createPropertyHostContext,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type {
   PropertyValuePath,
   PropertyHostContext,
   PropertyPathContextOptions,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import {
   nodeTransform,
   resolvePageBleedMm,

@@ -1,6 +1,7 @@
-import { LocalizationServiceId } from '@openenvx/studio/core';
-import { useWorkbenchContext } from '@openenvx/studio/react';
 import { useMemo } from 'react';
+
+import { LocalizationServiceId } from '#studio';
+import { useWorkbenchContext } from '#studio/react';
 
 const DEFAULT_MISSING_TIP =
   'Add a fallback value to avoid empty personalization';

@@ -1,9 +1,9 @@
-import type { ContributionBuildContext } from '@openenvx/studio/core';
+import type { ContributionBuildContext } from '@openenvx/studio';
 import {
   createPropertyPane,
   PropertyPaneContribution,
   PropertyPath,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 const ABSOLUTE_LAYER_SELECTED = 'page.layoutAbsolute && scene.layerSelected';
 const ABSOLUTE_PAGE_ONLY = 'page.layoutAbsolute && !scene.layerSelected';

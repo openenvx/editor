@@ -1,8 +1,3 @@
-import type { EditorViewportApi } from '@openenvx/studio/core';
-import {
-  ContextKeyServiceId,
-  EditorViewportServiceId,
-} from '@openenvx/studio/core';
 import {
   createContext,
   useCallback,
@@ -12,6 +7,9 @@ import {
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
+
+import type { EditorViewportApi } from '#studio';
+import { ContextKeyServiceId, EditorViewportServiceId } from '#studio';
 
 import { useWorkbenchContext } from './workbench-context';
 

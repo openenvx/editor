@@ -5,7 +5,7 @@ import {
   isLayerDescendant,
   removeLayerFromTree,
   updateLayerInTree,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type { Artboard, Document, DocumentNode } from '@openenvx/studio/schema';
 import { nodeProps } from '@openenvx/studio/schema';
 

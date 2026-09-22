@@ -1,9 +1,7 @@
-import {
-  VersionHistoryProviderId,
-  type DocumentVersion,
-} from '@openenvx/studio/core';
 import { IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 import { useCallback, useMemo, useState } from 'react';
+
+import { VersionHistoryProviderId, type DocumentVersion } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useMountEffect } from '../../hooks/use-mount-effect';

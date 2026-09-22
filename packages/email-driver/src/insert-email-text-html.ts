@@ -5,7 +5,7 @@ import {
   mapPageLayers,
   resolveInsertParentId,
 } from '@openenvx/html-driver';
-import type { CommandContext } from '@openenvx/studio/core';
+import type { CommandContext } from '@openenvx/studio';
 import { artboardRulesLayout, plainTextToHtml } from '@openenvx/studio/schema';
 
 import {

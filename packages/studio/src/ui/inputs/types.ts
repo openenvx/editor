@@ -1,4 +1,4 @@
-import type { NumericFieldConfig } from '@openenvx/studio/core';
+import type { NumericFieldConfig } from '#studio';
 
 export interface NumericFieldLike {
   numeric?: NumericFieldConfig;

@@ -1,4 +1,4 @@
-import type { WorkbenchApi } from '@openenvx/studio/core';
+import type { WorkbenchApi } from '@openenvx/studio';
 import type { Editor } from '@tiptap/react';
 import { cleanup, fireEvent, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

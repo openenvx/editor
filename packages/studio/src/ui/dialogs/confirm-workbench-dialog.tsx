@@ -1,5 +1,6 @@
-import type { ConfirmDialogOptions } from '@openenvx/studio/core';
 import { useId } from 'react';
+
+import type { ConfirmDialogOptions } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useWorkbenchTranslation } from '../../i18n/use-workbench-translation';

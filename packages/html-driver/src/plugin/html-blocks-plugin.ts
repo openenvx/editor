@@ -5,8 +5,8 @@ import {
   SimpleServiceContribution,
   SingletonServiceContribution,
   WorkbenchPlugin,
-} from '@openenvx/studio/core';
-import type { WorkbenchPluginContext } from '@openenvx/studio/core';
+} from '@openenvx/studio';
+import type { WorkbenchPluginContext } from '@openenvx/studio';
 
 import {
   BlockRegistryServiceId,

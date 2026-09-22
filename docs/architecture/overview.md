@@ -12,12 +12,12 @@ Hub: [Architecture.md](../../Architecture.md).
 Scene JSON (@openenvx/studio/schema)
         │
         ▼
-EditorRuntime + PluginManager + WorkbenchController (@openenvx/studio/core)
+EditorRuntime + PluginManager + WorkbenchController (@openenvx/studio)
         │
         ├── domain engines: canvas / html / email
         │
         ▼
-WorkbenchShell (@openenvx/studio)
+WorkbenchShell (@openenvx/studio/shell)
         │
         ├── canvas workbench  (@openenvx/canvas-driver)
         ├── html workbench    (@openenvx/html-driver)
@@ -37,7 +37,7 @@ WorkbenchShell (@openenvx/studio)
 | You want… | Use |
 | --- | --- |
 | Stage only, own state | `@openenvx/studio/schema` + `@openenvx/canvas-driver` (`CanvasStage`) |
-| Full editor, custom UI | `@openenvx/studio/core` + `@openenvx/studio` + `canvas` / `html` / `email` |
+| Full editor, custom UI | `@openenvx/studio` + `@openenvx/studio` + `canvas` / `html` / `email` |
 | Full canvas product | `@openenvx/studio` + `@openenvx/canvas-driver` |
 | HTML block product | `@openenvx/studio` + `@openenvx/html-driver` |
 | Email block editor | `@openenvx/studio` + `@openenvx/email-driver` |

@@ -4,9 +4,10 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import type { ViewDescriptor, ViewTreeItem } from '@openenvx/studio/core';
 import { IconGripVertical } from '@tabler/icons-react';
 import { memo, useCallback, useMemo } from 'react';
+
+import type { ViewDescriptor, ViewTreeItem } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import {

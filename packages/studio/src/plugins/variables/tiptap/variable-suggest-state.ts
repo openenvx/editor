@@ -1,8 +1,6 @@
-import {
-  formatVariableToken,
-  type TemplateVariable,
-} from '@openenvx/studio/schema';
 import type { Editor } from '@tiptap/react';
+
+import { formatVariableToken, type TemplateVariable } from '#studio/schema';
 
 export interface VariableSuggestAnchor {
   filter: string;

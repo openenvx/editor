@@ -1,5 +1,6 @@
-import type { PropertyFieldDescriptor } from '@openenvx/studio/core';
 import type { ComponentType, ReactNode } from 'react';
+
+import type { PropertyFieldDescriptor } from '#studio';
 
 export interface PropertyFieldRendererProps {
   field: PropertyFieldDescriptor;

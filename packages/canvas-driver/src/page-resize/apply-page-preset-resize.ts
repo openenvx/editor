@@ -1,5 +1,5 @@
-import { getActiveArtboard, localize } from '@openenvx/studio/core';
-import type { CommandContext, Document } from '@openenvx/studio/core';
+import { getActiveArtboard, localize } from '@openenvx/studio';
+import type { CommandContext, Document } from '@openenvx/studio';
 import { artboardRulesLayout } from '@openenvx/studio/schema';
 
 import { resolvePagePreset } from '../page-presets';

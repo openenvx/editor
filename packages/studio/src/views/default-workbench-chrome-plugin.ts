@@ -7,7 +7,7 @@ import {
   type ShellUiService,
   type WorkbenchPluginContext,
   type CommandContext,
-} from '@openenvx/studio/core';
+} from '#studio';
 
 import {
   LayersTreeProvider,

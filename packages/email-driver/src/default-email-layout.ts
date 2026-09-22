@@ -1,7 +1,7 @@
 import {
   DEFAULT_WORKBENCH_LAYOUT,
   type WorkbenchLayout,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 /** Email editor layout - chrome lives in the top bar, not floating artboard toolbars. */
 export const DEFAULT_EMAIL_LAYOUT: WorkbenchLayout = {

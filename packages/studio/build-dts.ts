@@ -33,6 +33,9 @@ async function buildDts(entry: string, outfile: string) {
       if (id.startsWith('@openenvx/')) {
         return true;
       }
+      if (id.startsWith('#')) {
+        return false;
+      }
       return !(id.startsWith('.') || path.isAbsolute(id));
     },
   });
@@ -42,13 +45,10 @@ async function buildDts(entry: string, outfile: string) {
 
 const entries: [string, string][] = [
   ['src/index.ts', 'dist/index.d.ts'],
-  ['src/core/index.ts', 'dist/core/index.d.ts'],
-  ['src/core/schema/index.ts', 'dist/core/schema/index.d.ts'],
-  ['src/core/preview/index.ts', 'dist/core/preview/index.d.ts'],
-  [
-    'src/core/react/workbench-context.tsx',
-    'dist/core/react/workbench-context.d.ts',
-  ],
+  ['src/shell/index.ts', 'dist/shell.d.ts'],
+  ['src/schema/index.ts', 'dist/schema/index.d.ts'],
+  ['src/preview/index.ts', 'dist/preview/index.d.ts'],
+  ['src/react/workbench-context.tsx', 'dist/react/workbench-context.d.ts'],
 ];
 
 for (const [entry, outfile] of entries) {

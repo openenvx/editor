@@ -1,5 +1,6 @@
-import { ContextKeyServiceId } from '@openenvx/studio/core';
 import { useRef, useSyncExternalStore } from 'react';
+
+import { ContextKeyServiceId } from '#studio';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 

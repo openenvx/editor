@@ -1,9 +1,9 @@
-import type { EditorViewportApi } from '@openenvx/studio/core';
+import type { EditorViewportApi } from '@openenvx/studio';
 import {
   canEditLayerData,
   canSelectLayer,
   isTypingTarget,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type { Page, Scene } from '@openenvx/studio/schema';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 

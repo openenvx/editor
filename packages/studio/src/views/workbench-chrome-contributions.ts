@@ -21,8 +21,8 @@ import {
   type TreeSelectOptions,
   type CommandContext,
   type Layer,
-} from '@openenvx/studio/core';
-import type { Page } from '@openenvx/studio/schema';
+} from '#studio';
+import type { Page } from '#studio/schema';
 
 export const WORKBENCH_SIDEBAR_CONTAINER_ID = 'workbench.sidebar';
 export const WORKBENCH_PAGES_VIEW_ID = 'workbench.artboards';

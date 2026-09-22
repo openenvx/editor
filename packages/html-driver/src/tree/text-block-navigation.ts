@@ -1,4 +1,4 @@
-import { canEditLayerData, getLayerChildren } from '@openenvx/studio/core';
+import { canEditLayerData, getLayerChildren } from '@openenvx/studio';
 import type { Layer } from '@openenvx/studio/schema';
 
 import type { BlockRegistry } from '../block-registry';

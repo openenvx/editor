@@ -1,4 +1,4 @@
-import { findNodeById } from '@openenvx/studio/core';
+import { findNodeById } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import type { Document } from '@openenvx/studio/schema';
 import {

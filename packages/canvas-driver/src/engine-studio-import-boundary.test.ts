@@ -32,7 +32,10 @@ describe('canvas engine import boundary', () => {
       const file = path.join(srcRoot, rel);
       const lines = readFileSync(file, 'utf-8').split('\n');
       for (const [index, line] of lines.entries()) {
-        if (/from\s+['"]@openenvx\/studio['"]/.test(line)) {
+        if (
+          /from\s+['"]@openenvx\/studio\/shell['"]/.test(line) ||
+          /import\s+['"]@openenvx\/studio\/shell['"]/.test(line)
+        ) {
           violations.push(`${rel}:${index + 1}`);
         }
       }

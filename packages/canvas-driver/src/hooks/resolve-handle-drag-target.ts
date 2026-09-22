@@ -1,4 +1,4 @@
-import type { Layer as SceneLayer } from '@openenvx/studio/core';
+import type { Layer as SceneLayer } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import type Konva from 'konva';
 import type { RefObject } from 'react';

@@ -29,7 +29,7 @@ const artboardExternals = [
   '@openenvx/core/schema',
   '@openenvx/core/preview',
   '@openenvx/studio',
-  '@openenvx/studio/core',
+  '@openenvx/studio/shell',
   '@openenvx/studio/schema',
   '@openenvx/studio/preview',
   '@openenvx/studio/react',

@@ -3,8 +3,8 @@ import {
   defaultEmailWorkbench,
   renderEmailHtml,
 } from '@openenvx/email-driver';
-import { WorkbenchShell } from '@openenvx/studio';
 import type { Scene as CoreScene } from '@openenvx/studio/schema';
+import { WorkbenchShell } from '@openenvx/studio/shell';
 import { useCallback, useMemo } from 'react';
 
 import '@openenvx/email-driver/theme.css';

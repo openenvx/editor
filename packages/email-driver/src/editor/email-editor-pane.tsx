@@ -28,8 +28,8 @@ import {
   getActiveArtboard,
   isTypingTarget,
   RichTextInsertServiceId,
-} from '@openenvx/studio/core';
-import type { EditorPaneHostProps } from '@openenvx/studio/core';
+} from '@openenvx/studio';
+import type { EditorPaneHostProps } from '@openenvx/studio';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,

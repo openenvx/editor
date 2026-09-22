@@ -1,5 +1,5 @@
-import type { DocumentNode, Transform } from '@openenvx/studio/core';
-import { getLayerChildren } from '@openenvx/studio/core';
+import type { DocumentNode, Transform } from '@openenvx/studio';
+import { getLayerChildren } from '@openenvx/studio';
 import {
   applyNodeTransform,
   artboardSpaceSize,

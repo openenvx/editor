@@ -1,4 +1,4 @@
-import type { RepeaterFieldConfig } from '@openenvx/studio/core';
+import type { RepeaterFieldConfig } from '#studio';
 
 import {
   PropertyList,

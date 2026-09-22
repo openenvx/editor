@@ -1,7 +1,8 @@
-import { IconRegistryId } from '@openenvx/studio/core';
 import type { Icon } from '@tabler/icons-react';
 import { IconLayersLinked } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
+
+import { IconRegistryId } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { TABLER_GLYPHS } from './tabler-glyphs';

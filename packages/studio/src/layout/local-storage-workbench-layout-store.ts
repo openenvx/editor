@@ -1,7 +1,4 @@
-import type {
-  WorkbenchLayoutSnapshot,
-  WorkbenchLayoutStore,
-} from '@openenvx/studio/core';
+import type { WorkbenchLayoutSnapshot, WorkbenchLayoutStore } from '#studio';
 
 /**
  * Trivial localStorage-backed layout store for demos and hosts that want

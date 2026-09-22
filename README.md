@@ -21,12 +21,12 @@ OpenEnvx is an open-source foundation for canvas, HTML, and email editors. It gi
 For the fastest path, install the studio shell plus an artboard package:
 
 ```bash
-npm install @openenvx/studio/core @openenvx/studio @openenvx/html-driver react react-dom
+npm install @openenvx/studio @openenvx/studio @openenvx/html-driver react react-dom
 ```
 
 ```tsx
 import { createHtmlScene, defaultHtmlWorkbench } from '@openenvx/html-driver';
-import { WorkbenchShell } from '@openenvx/studio';
+import { WorkbenchShell } from '@openenvx/studio/shell';
 import '@openenvx/html-driver/theme.css';
 import '@openenvx/studio/theme.css';
 
@@ -57,9 +57,9 @@ Each artboard package exposes headless helpers on the same `.` entry (e.g. `crea
 | Goal | Start with |
 | --- | --- |
 | Full product editor | `@openenvx/studio` + driver `default*Workbench` (npm package root) |
-| Build a custom editor shell | `@openenvx/studio/core` + `@openenvx/studio` + `@openenvx/canvas-driver` or `@openenvx/html-driver` |
+| Build a custom editor shell | `@openenvx/studio` + `@openenvx/studio` + `@openenvx/canvas-driver` or `@openenvx/html-driver` |
 | Render or automate documents | Artboard package root (e.g. `renderEmailHtml`, `exportCanvasDocument`) |
-| Add trusted in-process features | The plugin and contribution APIs on `@openenvx/studio/core` |
+| Add trusted in-process features | The plugin and contribution APIs on `@openenvx/studio` |
 | Build isolated widgets or panels | [`@openenvx/editor-sandbox`](packages/editor-sandbox/README.md) |
 
 ## Repository layout

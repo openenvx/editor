@@ -6,7 +6,7 @@ import {
   PropertyPath,
   createPropertyPane,
   type PropertyPaneDescriptor,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import { mapPluginTreeToPropertyPane } from './map-plugin-tree-to-property-pane';
 
 function serializePane(pane: PropertyPaneDescriptor): unknown {

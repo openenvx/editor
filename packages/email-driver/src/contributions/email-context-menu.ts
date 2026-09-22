@@ -2,7 +2,7 @@ import {
   type ContributionBuildContext,
   ContextMenuContribution,
   type MenuBuilder,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 const EMAIL_LAYER_SELECTED = "page.layout == 'email' && scene.layerSelected";
 

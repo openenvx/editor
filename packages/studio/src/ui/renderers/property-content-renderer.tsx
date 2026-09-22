@@ -1,3 +1,6 @@
+import type { ReactNode } from 'react';
+import { useMemo } from 'react';
+
 import type {
   FieldRendererRegistration,
   PropertyBlockNode,
@@ -9,15 +12,13 @@ import type {
   PropertyRowNode,
   PropertyValuePath,
   PropertyHostContext,
-} from '@openenvx/studio/core';
+} from '#studio';
 import {
   PropertyPath,
   PropertyPathResolver,
   isPropertyLayoutNodeVisible,
   propertyLayoutNodeReactKey,
-} from '@openenvx/studio/core';
-import type { ReactNode } from 'react';
-import { useMemo } from 'react';
+} from '#studio';
 
 import { InputGroup } from '../primitives/input-group';
 import {

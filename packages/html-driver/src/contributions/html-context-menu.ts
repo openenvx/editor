@@ -2,7 +2,7 @@ import {
   type ContributionBuildContext,
   ContextMenuContribution,
   type MenuBuilder,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 export class HtmlContextMenu extends ContextMenuContribution {
   contribute(builder: MenuBuilder, ctx: ContributionBuildContext): void {

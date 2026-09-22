@@ -5,8 +5,9 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "paths": {
-      "@openenvx/studio/core": ["../studio/src/core/index.ts"],
-      "@openenvx/studio/schema": ["../studio/src/core/schema/index.ts"],
+      "@openenvx/studio": ["../studio/src/index.ts"],
+      "@openenvx/studio/shell": ["../studio/src/shell/index.ts"],
+      "@openenvx/studio/schema": ["../studio/src/schema/index.ts"],
       "@openenvx/canvas-driver/fit-text-layer-to-content": [
         "../canvas-driver/src/fit-text-layer-to-content.ts"
       ],

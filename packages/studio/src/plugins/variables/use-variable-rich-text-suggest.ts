@@ -1,7 +1,8 @@
-import { useWorkbenchContextSelector } from '@openenvx/studio/react';
-import type { TemplateVariable } from '@openenvx/studio/schema';
 import type { Editor } from '@tiptap/react';
 import { useCallback, useRef, useState, type RefObject } from 'react';
+
+import { useWorkbenchContextSelector } from '#studio/react';
+import type { TemplateVariable } from '#studio/schema';
 
 import {
   detectVariableSuggest,

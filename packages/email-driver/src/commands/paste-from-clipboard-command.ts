@@ -6,8 +6,8 @@ import {
   mapPageLayers,
   type BlockRegistry,
 } from '@openenvx/html-driver';
-import { Command } from '@openenvx/studio/core';
-import type { CommandContext } from '@openenvx/studio/core';
+import { Command } from '@openenvx/studio';
+import type { CommandContext } from '@openenvx/studio';
 import type { Layer } from '@openenvx/studio/schema';
 import { artboardRulesLayout } from '@openenvx/studio/schema';
 

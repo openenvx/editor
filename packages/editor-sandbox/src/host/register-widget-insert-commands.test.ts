@@ -1,4 +1,4 @@
-import { Command } from '@openenvx/studio/core';
+import { Command } from '@openenvx/studio';
 import type { ExtensionManifest } from '../protocol';
 import {
   normalizeDocument,

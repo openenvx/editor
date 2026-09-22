@@ -1,4 +1,4 @@
-import { MIN_LAYER_SIZE } from '@openenvx/studio/core';
+import { MIN_LAYER_SIZE } from '@openenvx/studio';
 import type { Transform } from '@openenvx/studio/schema';
 
 import type { CanvasTransformBox } from '../contributions/canvas-layer-interaction-contribution';

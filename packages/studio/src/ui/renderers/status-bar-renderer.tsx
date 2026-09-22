@@ -1,11 +1,12 @@
+import { memo, useMemo } from 'react';
+import type { ComponentType } from 'react';
+
 import type {
   StatusBarItemDescriptor,
   StatusBarItemRendererRegistration,
   StatusBarTextItemDescriptor,
-} from '@openenvx/studio/core';
-import { isStatusBarDropdownItem } from '@openenvx/studio/core';
-import { memo, useMemo } from 'react';
-import type { ComponentType } from 'react';
+} from '#studio';
+import { isStatusBarDropdownItem } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { ShellDropdownControl } from './shell-dropdown-control';

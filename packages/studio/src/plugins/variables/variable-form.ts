@@ -3,14 +3,14 @@ import {
   PropertyPath,
   type ShowFormOptions,
   type ServiceContainer,
-} from '@openenvx/studio/core';
+} from '#studio';
 import {
   nextVariableKey,
   documentVariables,
   validateVariableKeyForCatalog,
   type Scene,
   type TemplateVariable,
-} from '@openenvx/studio/schema';
+} from '#studio/schema';
 
 import { localizeWorkbench } from '../../i18n/localize-workbench';
 

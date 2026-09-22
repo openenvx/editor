@@ -1,4 +1,4 @@
-import { ContextKeyServiceId } from '@openenvx/studio/core';
+import { ContextKeyServiceId } from '@openenvx/studio';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,

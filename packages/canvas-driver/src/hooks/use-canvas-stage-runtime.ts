@@ -1,5 +1,5 @@
-import type { Layer as SceneLayer } from '@openenvx/studio/core';
-import { canTransformLayer, getLayerChildren } from '@openenvx/studio/core';
+import type { Layer as SceneLayer } from '@openenvx/studio';
+import { canTransformLayer, getLayerChildren } from '@openenvx/studio';
 import { useStoreSelector } from '@openenvx/studio/react';
 import { nodeTransform } from '@openenvx/studio/schema';
 import type Konva from 'konva';

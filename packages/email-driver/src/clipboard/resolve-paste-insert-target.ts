@@ -1,5 +1,5 @@
 import { BlockRegistry, findBlock, getPageRootId } from '@openenvx/html-driver';
-import { getLayerChildren } from '@openenvx/studio/core';
+import { getLayerChildren } from '@openenvx/studio';
 import type { Layer } from '@openenvx/studio/schema';
 
 import { allEmailBlocks } from '../blocks/all-email-blocks';

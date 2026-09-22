@@ -1,9 +1,9 @@
-import type { Document, ViewDescriptor, ViewTreeItem } from '@openenvx/studio/core';
+import type { Document, ViewDescriptor, ViewTreeItem } from '#studio';
 import { act, renderHook } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { asDocumentNode, normalizeSceneForTest } from '../core/test/document-fixtures';
+import { asDocumentNode, normalizeSceneForTest } from '../test/document-fixtures';
 import { useViewTreeCollapseSeed } from './use-view-tree-collapse-seed';
 import {
   resolveViewHoveredIds,

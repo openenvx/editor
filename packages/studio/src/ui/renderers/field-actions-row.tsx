@@ -1,4 +1,4 @@
-import type { FieldAction } from '@openenvx/studio/core';
+import type { FieldAction } from '#studio';
 
 import { WorkbenchIcon } from '../icons/workbench-icon';
 import { IconButton } from '../primitives/icon-button';

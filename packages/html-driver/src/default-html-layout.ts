@@ -1,7 +1,7 @@
 import {
   DEFAULT_WORKBENCH_LAYOUT,
   type WorkbenchLayout,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 /** Layout defaults for HTML / email hosts (editor overlay toolbars on). */
 export const DEFAULT_HTML_LAYOUT: WorkbenchLayout = {

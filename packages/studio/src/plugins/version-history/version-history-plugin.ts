@@ -6,7 +6,7 @@ import {
   type ViewContainerLocation,
   type VersionHistoryProvider,
   type WorkbenchPluginContext,
-} from '@openenvx/studio/core';
+} from '#studio';
 
 import { RestoreVersionCommand } from './restore-version-command';
 import { VersionHistoryPanel } from './version-history-panel';

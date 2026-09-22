@@ -1,8 +1,6 @@
-import type {
-  ConfirmDialogOptions,
-  FormDialogPayload,
-} from '@openenvx/studio/core';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+
+import type { ConfirmDialogOptions, FormDialogPayload } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useWorkbenchContextSelector } from '../../hooks/use-workbench-selector';

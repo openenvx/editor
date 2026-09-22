@@ -1,5 +1,5 @@
-import { Command } from '@openenvx/studio/core';
-import type { CommandContext } from '@openenvx/studio/core';
+import { Command } from '@openenvx/studio';
+import type { CommandContext } from '@openenvx/studio';
 
 import { CanvasMarginsSettingsServiceId } from '../canvas-service-tokens';
 

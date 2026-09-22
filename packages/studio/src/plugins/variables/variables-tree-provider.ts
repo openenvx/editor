@@ -1,12 +1,5 @@
-import {
-  TreeDataProvider,
-  type CommandContext,
-  type TreeItem,
-} from '@openenvx/studio/core';
-import {
-  documentVariables,
-  type TemplateVariable,
-} from '@openenvx/studio/schema';
+import { TreeDataProvider, type CommandContext, type TreeItem } from '#studio';
+import { documentVariables, type TemplateVariable } from '#studio/schema';
 
 export class VariablesTreeProvider extends TreeDataProvider<TemplateVariable> {
   getRootChildren(ctx: CommandContext): TemplateVariable[] {

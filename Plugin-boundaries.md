@@ -219,7 +219,7 @@ Install / permissions UI, signed `allowedCommands`, origin allowlists, versionin
 | Widget authoring (`defineExtension`, expand, Vite packaging) | `@openenvx/editor-sandbox` (published) |
 | Tree → builder mappers, manifest → contributions, `SandboxExtensionHost`, `SandboxHostSurface`, `mountSandboxExtensions` | `@openenvx/editor-sandbox/host` |
 | `EmbedPanelHost`, `SandboxExtensionHost`, `PluginPanel`, postMessage transport, command gate, sandbox runtime | `@openenvx/studio/internal` |
-| Internal OOP plugins + builders | `@openenvx/studio/core`, product plugins (`CanvasPlugin`, …) |
+| Internal OOP plugins + builders | `@openenvx/studio`, product plugins (`CanvasPlugin`, …) |
 
 ## Related
 

@@ -1,4 +1,4 @@
-import { Plugin } from '@openenvx/studio/core';
+import { Plugin } from '#studio';
 import { describe, expect, it } from 'vitest';
 
 import {

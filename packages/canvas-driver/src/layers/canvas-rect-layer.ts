@@ -2,14 +2,14 @@ import {
   createPropertyBuilder,
   DEFAULT_CORNER_RADIUS,
   LayerDefinition,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type {
   CommandContext,
   CornerRadiusValue,
   DocumentNode,
   LayerPreviewContext,
   PropertySectionDescriptor,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 import type { Artboard } from '@openenvx/studio/schema';
 import { createDefaultTransform } from '@openenvx/studio/schema';

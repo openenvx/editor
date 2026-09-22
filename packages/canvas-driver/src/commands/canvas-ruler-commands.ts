@@ -1,5 +1,5 @@
-import { Command, localize } from '@openenvx/studio/core';
-import type { CommandContext } from '@openenvx/studio/core';
+import { Command, localize } from '@openenvx/studio';
+import type { CommandContext } from '@openenvx/studio';
 import type {
   ArtboardGuide,
   ArtboardGuideOrientation,

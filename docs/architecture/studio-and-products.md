@@ -1,6 +1,6 @@
 # Studio & products
 
-**Audience:** Contributors and integrators. Packages: `@openenvx/studio/core`, `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, `@openenvx/email-driver`, and the apps that consume them.
+**Audience:** Contributors and integrators. Packages: `@openenvx/studio`, `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, `@openenvx/email-driver`, and the apps that consume them.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -8,38 +8,38 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 
 Host product apps install a shared shell plus only the artboard engines they need:
 
-| Package                   | Role                                             |
-| ------------------------- | ------------------------------------------------ |
-| `@openenvx/studio/core`   | Scene, `Plugin`, runtime, contributions          |
-| `@openenvx/studio`        | `WorkbenchShell`, chrome defaults, `./theme.css` |
-| `@openenvx/canvas-driver` | Canvas engine (`.`)                              |
-| `@openenvx/html-driver`   | HTML engine (`.`)                                |
-| `@openenvx/email-driver`  | Email engine (`.`)                               |
+| Package | Role |
+| --- | --- |
+| `@openenvx/studio` | Scene, `Plugin`, runtime, contributions (package root `.`) |
+| `@openenvx/studio/shell` | `WorkbenchShell`, chrome defaults, `./theme.css` / `./styles.css` |
+| `@openenvx/canvas-driver` | Canvas engine (`.`) |
+| `@openenvx/html-driver` | HTML engine (`.`) |
+| `@openenvx/email-driver` | Email engine (`.`) |
 
 **Hard rules:**
 
 - `@openenvx/studio` never imports canvas/html/email.
-- Artboard drivers never import `@openenvx/studio` (shell entry). They export plugins, layout, and property-host helpers only.
-- The host app wires `WorkbenchShell` (`@openenvx/studio`) to each driver's `default*Workbench` (or a custom plugin list).
+- Artboard drivers never import `@openenvx/studio/shell`. They use `@openenvx/studio` + `./schema` / `./preview` / `./react`.
+- The host app wires `WorkbenchShell` (`@openenvx/studio/shell`) to each driver's `default*Workbench` (or a custom plugin list).
 
 Publishing details: [PUBLISHING.md](../../PUBLISHING.md).
 
-## `@openenvx/studio`
+## `@openenvx/studio/shell`
 
-Published workbench host surface. Inlines private `@openenvx/studio/internal` into minified ESM; peers `@openenvx/studio/core`.
+Published workbench host surface. Inlines private `@openenvx/studio/internal` into minified ESM; peers `@openenvx/studio` (headless).
 
 ```ts
 import {
   WorkbenchShell,
   registerDefaultWorkbenchBundle,
-} from '@openenvx/studio';
+} from '@openenvx/studio/shell';
 import '@openenvx/studio/styles.css';
 ```
 
 ## Canvas product host
 
 ```ts
-import { WorkbenchShell } from '@openenvx/studio';
+import { WorkbenchShell } from '@openenvx/studio/shell';
 import { createCanvasScene, defaultCanvasWorkbench } from '@openenvx/canvas-driver';
 // Sandbox: import { createCanvasSandboxExtensionHost } from '@openenvx/canvas-driver/src/create-canvas-sandbox-extension-host';
 import '@openenvx/studio/styles.css';
@@ -60,7 +60,7 @@ Published npm: `@openenvx/canvas-driver` (minified `.` entry). Monorepo HMR uses
 ## HTML product host
 
 ```ts
-import { WorkbenchShell } from '@openenvx/studio';
+import { WorkbenchShell } from '@openenvx/studio/shell';
 import { defaultHtmlWorkbench } from '@openenvx/html-driver';
 import { createHtmlScene } from '@openenvx/html-driver';
 import '@openenvx/studio/styles.css';
@@ -73,7 +73,7 @@ Published npm: `@openenvx/html-driver`. `apps/html-package-demo` (`bun run dev:h
 ## Email product host
 
 ```ts
-import { WorkbenchShell } from '@openenvx/studio';
+import { WorkbenchShell } from '@openenvx/studio/shell';
 import { defaultEmailWorkbench } from '@openenvx/email-driver';
 import { createEmailScene } from '@openenvx/email-driver';
 import '@openenvx/studio/styles.css';

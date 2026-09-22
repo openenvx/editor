@@ -1,12 +1,9 @@
-import { DEFAULT_WORKBENCH_LAYOUT } from '@openenvx/studio/core';
-import type {
-  FormDialogPayload,
-  WorkbenchApi,
-  WorkbenchState,
-} from '@openenvx/studio/core';
 import { vi } from 'vitest';
 
-import { normalizeSceneForTest } from '../core/test/document-fixtures';
+import { DEFAULT_WORKBENCH_LAYOUT } from '#studio';
+import type { FormDialogPayload, WorkbenchApi, WorkbenchState } from '#studio';
+
+import { normalizeSceneForTest } from '../test/document-fixtures';
 
 export function createMockWorkbenchApi(
   overrides: Partial<WorkbenchState> = {}

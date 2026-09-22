@@ -1,6 +1,6 @@
 # Workbench & headless
 
-**Audience:** Contributors and integrators. "Headless" is the UI-agnostic controller/contribution layer that lives inside `@openenvx/studio/core`; "workbench" is the React shell package `@openenvx/studio/internal`.
+**Audience:** Contributors and integrators. "Headless" is the UI-agnostic controller/contribution layer exported from `@openenvx/studio` (`.`); the React shell is `@openenvx/studio/shell` (workspace monorepo: `@openenvx/studio/internal`).
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -8,12 +8,12 @@ Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overvie
 
 | Package | Responsibility |
 | --- | --- |
-| `@openenvx/studio/core` (headless layer) | Runtime: `WorkbenchController`, state, contributions, builders, property host context, `ExternalHostMount` |
-| `@openenvx/studio/internal` | React shell: `WorkbenchShell`, field/status renderers, default chrome plugins, sandbox/embed host adapters |
+| `@openenvx/studio` (headless layer) | Runtime: `WorkbenchController`, state, contributions, builders, property host context, `ExternalHostMount` |
+| `@openenvx/studio/shell` | React shell: `WorkbenchShell`, field/status renderers, default chrome plugins, sandbox/embed host adapters |
 
-The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx/studio/core` (`.` and `./react`). Workbench is the first-party React consumer.
+The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx/studio` (`.` and `./react`). Workbench is the first-party React consumer.
 
-## What the headless layer (in `@openenvx/studio/core`) owns
+## What the headless layer (in `@openenvx/studio`) owns
 
 - `WorkbenchController`, `WorkbenchState`, `WorkbenchApi` - owns `EditorRuntime`, injects it into `PluginManager`
 - `bootstrapWorkbenchServices()` - headless DI services on the runtime
@@ -54,7 +54,7 @@ The headless layer is framework UI-agnostic descriptors, shipped from `@openenvx
 Shell-internal (React only): `api.resolveDialogConfirm(confirmed)`, `api.resolveDialogForm(result)`, `api.patchDialogFormPayload(patch)`. `extraActions` may include nested `confirm` options; the form renderer shows a local confirm overlay without stacking `DialogService` entries. Only the **first** `extraActions` entry is rendered (left footer). `validate` runs on **submit** only, not on extra actions. Form fields use the same `PropertyPath.layerData` paths as the inspector; `command.*` paths and scene-only `when` keys are not supported in form dialogs.
 
 ```ts
-import { DialogServiceId } from '@openenvx/studio/core';
+import { DialogServiceId } from '@openenvx/studio';
 
 const ok = await api.showConfirm({
   title: 'Delete?',

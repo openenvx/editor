@@ -3,7 +3,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useStoreSelector } from '@openenvx/studio/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { ExternalStore } from '@openenvx/studio/core';
+import type { ExternalStore } from '@openenvx/studio';
 
 interface TestState {
   count: number;

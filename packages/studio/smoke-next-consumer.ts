@@ -239,7 +239,7 @@ import {
   createCanvasScene,
   defaultCanvasWorkbench,
 } from '@openenvx/canvas-driver';
-import { WorkbenchShell } from '@openenvx/studio';
+import { WorkbenchShell } from '@openenvx/studio/shell';
 import '@openenvx/canvas-driver/theme.css';
 import '@openenvx/canvas-driver/fonts.css';
 import '@openenvx/studio/theme.css';

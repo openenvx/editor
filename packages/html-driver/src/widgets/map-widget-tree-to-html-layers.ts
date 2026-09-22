@@ -6,7 +6,7 @@ import {
   validateWidgetTree,
   WIDGET_BLOCK_ESCAPE_TYPES,
 } from '@openenvx/editor-sandbox/protocol';
-import { sanitizeHtml } from '@openenvx/studio/core';
+import { sanitizeHtml } from '@openenvx/studio';
 import type { DocumentNode as Layer } from '@openenvx/studio/schema';
 import { nodeProps } from '@openenvx/studio/schema';
 

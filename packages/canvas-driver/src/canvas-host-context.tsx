@@ -1,4 +1,4 @@
-import type { ServiceId } from '@openenvx/studio/core';
+import type { ServiceId } from '@openenvx/studio';
 import { createContext, useContext, type ReactNode } from 'react';
 
 export interface CanvasHostApi {

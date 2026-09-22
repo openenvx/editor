@@ -1,4 +1,4 @@
-import { AssetServiceId } from '@openenvx/studio/core';
+import { AssetServiceId } from '@openenvx/studio';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { builtinBlocks } from '../blocks/builtin-blocks';

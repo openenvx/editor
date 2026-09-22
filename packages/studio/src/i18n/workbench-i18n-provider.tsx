@@ -1,7 +1,8 @@
-import { LocalizationServiceId } from '@openenvx/studio/core';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { I18nextProvider } from 'react-i18next';
+
+import { LocalizationServiceId } from '#studio';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import {

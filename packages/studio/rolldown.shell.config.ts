@@ -10,6 +10,7 @@ import {
   isHostReactRuntimePackageExternal,
   reactEsmExternals,
 } from './rolldown-react-esm-externals';
+import { studioInternalToPublishedPlugin } from './studio-internal-imports';
 
 const packageRoot = import.meta.dirname;
 const distRoot = path.join(packageRoot, 'dist');
@@ -17,7 +18,7 @@ const sourcemap = process.env.STUDIO_SOURCEMAP === '1';
 
 const shellExternals = [
   '@openenvx/studio',
-  '@openenvx/studio/core',
+  '@openenvx/studio/shell',
   '@openenvx/studio/schema',
   '@openenvx/studio/preview',
   '@openenvx/studio/react',
@@ -37,13 +38,14 @@ const { plugin, compiledCss } = createCssModuleRolldownPlugin({
 });
 
 export default defineConfig({
-  input: { index: 'src/index.ts' },
+  input: { shell: 'src/shell/index.ts' },
   platform: 'browser',
   treeshake: true,
   tsconfig: 'tsconfig.build.json',
   external: (id) =>
     bundleExternal(shellExternals)(id) || isHostReactRuntimePackageExternal(id),
   plugins: [
+    studioInternalToPublishedPlugin(),
     esmExternalRequirePlugin({ external: reactEsmExternals }),
     plugin,
     {
@@ -55,23 +57,19 @@ export default defineConfig({
         }
         const tokensPath = path.join(packageRoot, 'src/theme/tokens.css');
         const tokens = await readFile(tokensPath, 'utf-8');
-        await writeFile(path.join(distRoot, 'index.css'), css);
+        await writeFile(path.join(distRoot, 'shell.css'), css);
         await copyFile(tokensPath, path.join(distRoot, 'theme.css'));
-        await copyFile(
-          path.join(distRoot, 'index.css'),
-          path.join(distRoot, 'shell.css')
-        );
         await writeFile(path.join(distRoot, 'styles.css'), `${tokens}\n${css}`);
 
-        const indexJsPath = path.join(distRoot, 'index.js');
-        const indexJs = await readFile(indexJsPath, 'utf-8');
-        if (!indexJs.startsWith('"use client"')) {
+        const shellJsPath = path.join(distRoot, 'shell.js');
+        const shellJs = await readFile(shellJsPath, 'utf-8');
+        if (!shellJs.startsWith('"use client"')) {
           await writeFile(
-            indexJsPath,
-            `"use client";\nimport "./index.css";\n${indexJs}`
+            shellJsPath,
+            `"use client";\nimport "./shell.css";\n${shellJs}`
           );
         }
-        await assertPublishBundle(distRoot);
+        await assertPublishBundle(distRoot, { entry: 'shell.js' });
       },
     },
   ],

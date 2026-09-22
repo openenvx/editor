@@ -2,7 +2,7 @@ import {
   createStatusBarBuilder,
   type StatusBarBuilder,
   type StatusBarItemDescriptor,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 import type { PluginNode } from '../../protocol';
 import {

@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { WorkbenchState } from '@openenvx/studio/core';
+import type { WorkbenchState } from '#studio';
 
 import { WorkbenchProvider } from '../../context/workbench-context';
 import { workbenchI18n } from '../../i18n/workbench-i18n';

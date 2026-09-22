@@ -4,12 +4,8 @@ import {
   normalizePadding,
   uniformCornerRadius,
   uniformPadding,
-} from '@openenvx/studio/core';
-import type {
-  CornerRadiusValue,
-  PaddingValue,
-  ShadowValue,
-} from '@openenvx/studio/core';
+} from '#studio';
+import type { CornerRadiusValue, PaddingValue, ShadowValue } from '#studio';
 
 import { NumericControl } from '../basic/numeric-control';
 import type { NumericFieldLike } from '../types';

@@ -1,4 +1,4 @@
-import type { OverlayDescriptor } from '@openenvx/studio/core';
+import type { OverlayDescriptor } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { usePresence } from '../../hooks/use-presence';

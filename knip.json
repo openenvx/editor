@@ -103,11 +103,12 @@
     "packages/studio": {
       "entry": [
         "src/index.ts!",
-        "src/core/index.ts!",
-        "src/core/schema/index.ts!",
-        "src/core/preview/index.ts!",
-        "src/core/react/workbench-context.tsx!",
-        "src/core/plugins/scene-plugin.ts!",
+        "src/index.ts!",
+        "src/shell/index.ts!",
+        "src/schema/index.ts!",
+        "src/preview/index.ts!",
+        "src/react/workbench-context.tsx!",
+        "src/plugins/scene-plugin.ts!",
         "src/workbench-barrel.ts!",
         "rolldown.shell.config.ts!",
         "rolldown.core.publish.config.ts!",
@@ -133,12 +134,12 @@
         "zod"
       ],
       "ignoreIssues": {
-        "src/core/schema/**": ["duplicates", "exports"],
-        "src/core/scene/**": ["duplicates"],
-        "src/core/scene/layer-tree.ts": ["exports"],
-        "src/core/scene/scene-store.ts": ["types"],
-        "src/core/scene/types.ts": ["types"],
-        "src/core/schema/types.ts": ["types"]
+        "src/schema/**": ["duplicates", "exports"],
+        "src/scene/**": ["duplicates"],
+        "src/scene/layer-tree.ts": ["exports"],
+        "src/scene/scene-store.ts": ["types"],
+        "src/scene/types.ts": ["types"],
+        "src/schema/types.ts": ["types"]
       },
       "ignore": [
         "src/ui/primitives/combobox.tsx",

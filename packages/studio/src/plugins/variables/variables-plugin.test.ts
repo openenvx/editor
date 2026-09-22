@@ -2,14 +2,14 @@ import {
   DialogServiceId,
   LocalizationServiceId,
   WorkbenchNavigationServiceId,
-} from '@openenvx/studio/core';
-import { normalizeScene } from '@openenvx/studio/schema';
+} from '#studio';
+import { normalizeScene } from '#studio/schema';
 import { describe, expect, it, vi } from 'vitest';
 
-import { LocalizationServiceImpl } from '../../core/i18n/localization-service';
+import { LocalizationServiceImpl } from '../../i18n/localization-service';
 import { registerWorkbenchLocalizationBundles } from '../../i18n/workbench-i18n';
-import { InstantiationService } from '../../core/runtime/instantiation-service';
-import { SceneStore } from '../../core/scene/scene-store';
+import { InstantiationService } from '../../runtime/instantiation-service';
+import { SceneStore } from '../../scene/scene-store';
 import { CreateVariableCommand, EditVariableCommand } from './variables-plugin';
 import { VARIABLE_FORM_DELETE_ACTION } from './variable-form';
 

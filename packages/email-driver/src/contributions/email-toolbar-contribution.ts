@@ -2,7 +2,7 @@ import {
   ToolbarContribution,
   type CommandContext,
   type ToolbarBuilder,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import { formatVariableToken } from '@openenvx/studio/schema';
 
 const EMAIL_EDIT_WHEN = "page.layout == 'email' && email.modeEdit";

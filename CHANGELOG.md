@@ -132,7 +132,7 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Updated `PUBLISHING.md` to reflect the new publishing structure and clarified the versioning strategy for public npm packages.
 - Enhanced `package.json` scripts for `@openenvx/editor-sandbox` to include a new `verify-pack` command, improving package validation.
 - Added `verify-pack.ts` for `@openenvx/editor-sandbox` to enforce build checks and sourcemap restrictions.
-- Updated documentation in `AGENTS.md` to clarify the usage of `@openenvx/studio/core` as a subpath of `@openenvx/studio`.
+- Updated documentation in `AGENTS.md` to clarify the usage of `@openenvx/studio` as a subpath of `@openenvx/studio`.
 
 - V0.3.0
 
@@ -178,7 +178,7 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 
 - Update peer dependency validation in verify-pack.ts
 
-- Removed the check for the presence of `@openenvx/studio/core` as a peer dependency and added a new validation to ensure it is not included, enforcing the use of `@openenvx/studio` instead.
+- Removed the check for the presence of `@openenvx/studio` as a peer dependency and added a new validation to ensure it is not included, enforcing the use of `@openenvx/studio` instead.
 - This change clarifies the intended package structure and improves error handling during the verification process.
 
 - V0.2.1

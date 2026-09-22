@@ -12,7 +12,7 @@ import {
   isLayerLocked,
   isLayerVisible,
   WIDGET_LAYER_TYPE,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type { Layer, Scene } from '@openenvx/studio/schema';
 import { nodeProps } from '@openenvx/studio/schema';
 import {

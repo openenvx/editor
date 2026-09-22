@@ -1,4 +1,4 @@
-import type { PluginContext } from '@openenvx/studio/core';
+import type { PluginContext } from '@openenvx/studio';
 
 import {
   CanvasGridSettingsServiceId,

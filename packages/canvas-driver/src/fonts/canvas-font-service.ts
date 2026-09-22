@@ -1,4 +1,4 @@
-import type { FontDescriptor, FontService } from '@openenvx/studio/core';
+import type { FontDescriptor, FontService } from '@openenvx/studio';
 
 import {
   createFeaturedFontCatalog,

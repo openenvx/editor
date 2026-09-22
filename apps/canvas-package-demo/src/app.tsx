@@ -1,6 +1,6 @@
 import { defaultCanvasWorkbench } from '@openenvx/canvas-driver';
-import { WorkbenchShell } from '@openenvx/studio';
 import type { Scene as CoreScene } from '@openenvx/studio/schema';
+import { WorkbenchShell } from '@openenvx/studio/shell';
 import { useMemo } from 'react';
 
 import { canvasPackageDemoExportPlugin } from './canvas-package-demo-export-plugin';

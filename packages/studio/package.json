@@ -4,6 +4,15 @@
   "description": "OpenEnvx editor studio - workbench shell and headless runtime",
   "license": "MPL-2.0",
   "type": "module",
+  "imports": {
+    "#studio": "./src/index.ts",
+    "#studio/schema": "./src/schema/index.ts",
+    "#studio/preview": "./src/preview/index.ts",
+    "#studio/react": "./src/react/workbench-context.tsx",
+    "#studio/shell": "./src/shell/index.ts",
+    "#studio/internal": "./src/workbench-barrel.ts",
+    "#/*": "./src/*"
+  },
   "files": [
     "dist",
     "scene.schema.json"
@@ -31,30 +40,30 @@
       "import": "./dist/styles.css",
       "default": "./dist/styles.css"
     },
-    "./core": {
-      "development": "./src/core/index.ts",
-      "types": "./dist/core/index.d.ts",
-      "import": "./dist/core/index.js",
-      "default": "./dist/core/index.js"
+    "./shell": {
+      "development": "./src/shell/index.ts",
+      "types": "./dist/shell.d.ts",
+      "import": "./dist/shell.js",
+      "default": "./dist/shell.js"
     },
     "./schema": {
-      "development": "./src/core/schema/index.ts",
-      "types": "./dist/core/schema/index.d.ts",
-      "import": "./dist/core/schema/index.js",
-      "default": "./dist/core/schema/index.js"
+      "development": "./src/schema/index.ts",
+      "types": "./dist/schema/index.d.ts",
+      "import": "./dist/schema/index.js",
+      "default": "./dist/schema/index.js"
     },
     "./schema/scene.schema.json": "./scene.schema.json",
     "./preview": {
-      "development": "./src/core/preview/index.ts",
-      "types": "./dist/core/preview/index.d.ts",
-      "import": "./dist/core/preview/index.js",
-      "default": "./dist/core/preview/index.js"
+      "development": "./src/preview/index.ts",
+      "types": "./dist/preview/index.d.ts",
+      "import": "./dist/preview/index.js",
+      "default": "./dist/preview/index.js"
     },
     "./react": {
-      "development": "./src/core/react/workbench-context.tsx",
-      "types": "./dist/core/react/workbench-context.d.ts",
-      "import": "./dist/core/react/workbench-context.js",
-      "default": "./dist/core/react/workbench-context.js"
+      "development": "./src/react/workbench-context.tsx",
+      "types": "./dist/react/workbench-context.d.ts",
+      "import": "./dist/react/workbench-context.js",
+      "default": "./dist/react/workbench-context.js"
     },
     "./internal": "./src/workbench-barrel.ts",
     "./plugins": "./src/plugins/index.ts",
@@ -63,18 +72,17 @@
     "./plugins/version-history": "./src/plugins/version-history/index.ts"
   },
   "scripts": {
-    "generate:json-schema": "bun run src/core/schema/generate-json-schema.ts",
-    "build": "rm -rf dist && rolldown -c rolldown.core.publish.config.ts && rolldown -c rolldown.shell.config.ts && node ./build-dts.ts",
+    "generate:json-schema": "bun run src/schema/generate-json-schema.ts",
+    "build": "bun ./clean-dist.ts && rolldown -c rolldown.core.publish.config.ts && rolldown -c rolldown.shell.config.ts && node ./build-dts.ts",
     "build:debug": "STUDIO_SOURCEMAP=1 bun run build",
     "prepack": "bun run build",
     "test": "vitest run",
-    "bench": "vitest bench --run src/core",
+    "bench": "vitest bench --run src",
     "check-types": "tsc --noEmit && tsc --noEmit -p tsconfig.smoke.json",
     "smoke-next-consumer": "bun ./smoke-next-consumer.ts"
   },
   "sideEffects": [
-    "./dist/index.js",
-    "./dist/index.css",
+    "./dist/shell.js",
     "./dist/theme.css",
     "./dist/shell.css",
     "./dist/styles.css",

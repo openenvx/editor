@@ -1,4 +1,4 @@
-import type { ViewTreeItem } from '@openenvx/studio/core';
+import type { ViewTreeItem } from '#studio';
 
 import styles from './view-panel.module.css';
 

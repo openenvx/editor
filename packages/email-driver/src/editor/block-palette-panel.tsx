@@ -1,5 +1,5 @@
 import { getPageRootId, resolveInsertParentId } from '@openenvx/html-driver';
-import { getActiveArtboard } from '@openenvx/studio/core';
+import { getActiveArtboard } from '@openenvx/studio';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,

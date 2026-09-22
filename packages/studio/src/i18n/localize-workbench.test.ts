@@ -1,4 +1,4 @@
-import { LocalizationServiceImpl } from '@openenvx/studio/core';
+import { LocalizationServiceImpl } from '#studio';
 import { describe, expect, it } from 'vitest';
 
 import { localizeWorkbench } from './localize-workbench';

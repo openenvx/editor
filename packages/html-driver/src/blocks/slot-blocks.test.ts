@@ -1,4 +1,4 @@
-import { hasChildLayers,getNestedValue,setNestedValue } from '@openenvx/studio/core';
+import { hasChildLayers,getNestedValue,setNestedValue } from '@openenvx/studio';
 import type { Layer } from '@openenvx/studio/schema';
 import { nodeProps } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';

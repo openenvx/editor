@@ -1,4 +1,4 @@
-import { findNodeById, mapLayers, MIN_LAYER_SIZE } from '@openenvx/studio/core';
+import { findNodeById, mapLayers, MIN_LAYER_SIZE } from '@openenvx/studio';
 import {
   applyModifications,
   applyNodeTransform,

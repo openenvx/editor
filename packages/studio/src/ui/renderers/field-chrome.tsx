@@ -1,6 +1,7 @@
-import type { PropertyFieldDescriptor } from '@openenvx/studio/core';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+
+import type { PropertyFieldDescriptor } from '#studio';
 
 import { cn } from '../../lib/cn';
 import { WorkbenchIcon } from '../icons/workbench-icon';

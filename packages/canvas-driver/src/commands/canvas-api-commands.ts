@@ -7,12 +7,12 @@ import {
   getActiveArtboard,
   localize,
   updateLayerInTree,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type {
   CommandContext,
   FontDescriptor,
   FontService,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import {
   applyNodeTransform,
   artboardRulesLayout,

@@ -7,16 +7,16 @@ import {
   WorkbenchPlugin,
   type TreeItem,
   type WorkbenchPluginContext,type CommandContext,type Layer
-} from '@openenvx/studio/core';
-import { createDefaultFrame } from '@openenvx/studio/schema';
-import type { Artboard } from '@openenvx/studio/schema';
+} from '#studio';
+import { createDefaultFrame } from '#studio/schema';
+import type { Artboard } from '#studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
   asDocumentNode,
   flowArtboard,
   normalizeSceneForTest,
-} from '../core/test/document-fixtures';
+} from '../test/document-fixtures';
 
 import {
   LayersTreeProvider,

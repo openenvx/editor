@@ -1,4 +1,4 @@
-import type { Layer as SceneLayer } from '@openenvx/studio/core';
+import type { Layer as SceneLayer } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import { nodeTransform } from '@openenvx/studio/schema';
 import type { Transform } from '@openenvx/studio/schema';

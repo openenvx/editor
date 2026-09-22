@@ -1,6 +1,7 @@
-import type { CommandPaletteDescriptor } from '@openenvx/studio/core';
-import { COMMAND_PALETTE_ALL_TAB_ID } from '@openenvx/studio/core';
 import { useCallback, useMemo, useState } from 'react';
+
+import type { CommandPaletteDescriptor } from '#studio';
+import { COMMAND_PALETTE_ALL_TAB_ID } from '#studio';
 
 import { usePresence } from '../../hooks/use-presence';
 import { useWorkbenchTranslation } from '../../i18n/use-workbench-translation';

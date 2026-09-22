@@ -6,7 +6,7 @@ import {
   SceneStore,
   WorkbenchEventService,
   type CommandContext,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import { createDefaultFrame, nodeTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 

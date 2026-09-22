@@ -4,7 +4,7 @@ import {
   type CommandContext,
   type TopBarBuilder,
   type TopBarCommandItemDescriptor,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 import {
   EMAIL_GO_BACK_COMMAND_ID,

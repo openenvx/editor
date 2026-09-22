@@ -1,3 +1,5 @@
+import { memo, useMemo } from 'react';
+
 import {
   ContextKeyServiceId,
   isToolbarDropdownItem,
@@ -5,8 +7,7 @@ import {
   type ToolbarItemDescriptor,
   type ToolbarPlacement,
   type ToolbarSeparatorItemDescriptor,
-} from '@openenvx/studio/core';
-import { memo, useMemo } from 'react';
+} from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useContextKeysRevision } from '../../hooks/use-context-key';

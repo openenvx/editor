@@ -5,7 +5,7 @@ import {
   PluginManager,
   SceneStore,
   SimpleServiceContribution,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import { BlockRegistry, createBlockCommands, findBlock } from '@openenvx/html-driver';
 import { describe, expect, it } from 'vitest';
 

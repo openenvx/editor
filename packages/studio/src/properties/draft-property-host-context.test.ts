@@ -1,4 +1,4 @@
-import { PropertyPath } from '@openenvx/studio/core';
+import { PropertyPath } from '#studio';
 import { describe, expect, it } from 'vitest';
 
 import { createDraftPropertyHostContext } from './draft-property-host-context';

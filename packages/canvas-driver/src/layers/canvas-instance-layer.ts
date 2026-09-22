@@ -1,13 +1,10 @@
-import {
-  CANVAS_INSTANCE_LAYER_TYPE,
-  LayerDefinition,
-} from '@openenvx/studio/core';
+import { CANVAS_INSTANCE_LAYER_TYPE, LayerDefinition } from '@openenvx/studio';
 import type {
   CommandContext,
   DocumentNode,
   LayerPreviewContext,
   PropertySectionDescriptor,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 import type { Artboard } from '@openenvx/studio/schema';
 import {

@@ -1,10 +1,10 @@
-import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio/core';
+import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio';
 import type {
   CommandContext,
   DocumentNode,
   LayerPreviewContext,
   PropertySectionDescriptor,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import {
   createLayerPreviewBuilder,
   encodeQrToSvg,

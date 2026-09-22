@@ -8,13 +8,13 @@ const sourcemap = process.env.STUDIO_SOURCEMAP === '1';
 
 const STUDIO_SUBPATHS = [
   '@openenvx/studio',
-  '@openenvx/studio/core',
+  '@openenvx/studio/shell',
   '@openenvx/studio/schema',
   '@openenvx/studio/preview',
   '@openenvx/studio/react',
 ];
 
-const coreEntryExternals = [
+const headlessEntryExternals = [
   'react',
   'react-dom',
   'react/jsx-runtime',
@@ -37,25 +37,25 @@ const output = {
 
 export default defineConfig([
   {
-    input: { 'core/index': 'src/core/index.ts' },
+    input: { index: 'src/index.ts' },
     platform: 'browser',
     treeshake: true,
     tsconfig: 'tsconfig.build.json',
-    external: bundleExternal(coreEntryExternals),
+    external: bundleExternal(headlessEntryExternals),
     output,
   },
   {
-    input: { 'core/schema/index': 'src/core/schema/index.ts' },
+    input: { 'schema/index': 'src/schema/index.ts' },
     platform: 'browser',
     treeshake: true,
     tsconfig: 'tsconfig.build.json',
-    external: bundleExternal(coreEntryExternals),
+    external: bundleExternal(headlessEntryExternals),
     output,
     plugins: [
       {
         name: 'copy-scene-schema',
         writeBundle: async () => {
-          const schemaDir = path.join(packageRoot, 'dist/core/schema');
+          const schemaDir = path.join(packageRoot, 'dist/schema');
           await mkdir(schemaDir, { recursive: true });
           await copyFile(
             path.join(packageRoot, 'scene.schema.json'),
@@ -66,21 +66,21 @@ export default defineConfig([
     ],
   },
   {
-    input: { 'core/preview/index': 'src/core/preview/index.ts' },
+    input: { 'preview/index': 'src/preview/index.ts' },
     platform: 'browser',
     treeshake: true,
     tsconfig: 'tsconfig.build.json',
-    external: bundleExternal(coreEntryExternals),
+    external: bundleExternal(headlessEntryExternals),
     output,
   },
   {
     input: {
-      'core/react/workbench-context': 'src/core/react/workbench-context.tsx',
+      'react/workbench-context': 'src/react/workbench-context.tsx',
     },
     platform: 'browser',
     treeshake: true,
     tsconfig: 'tsconfig.build.json',
-    external: bundleExternal(coreEntryExternals),
+    external: bundleExternal(headlessEntryExternals),
     output,
   },
 ]);

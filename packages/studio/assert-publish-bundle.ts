@@ -1,4 +1,5 @@
-import { readdir, readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const ROLLDOWN_REQUIRE_STUB = `doesn't expose the \`require\` function`;
@@ -59,24 +60,27 @@ export function validatePublishBundleJs(
   }
 }
 
-async function collectJsFiles(distDir: string): Promise<string[]> {
-  const files = await readdir(distDir, { recursive: true });
-  return files.filter(
-    (name): name is string => typeof name === 'string' && name.endsWith('.js')
-  );
+async function readShellPublishBundle(distDir: string, entry: string) {
+  const entryPath = path.join(distDir, entry);
+  let content = await readFile(entryPath, 'utf-8');
+  const chunkImportRe = /from["']\.\/([^"']+\.js)["']/g;
+  for (const match of content.matchAll(chunkImportRe)) {
+    const chunkPath = path.join(distDir, match[1]);
+    if (existsSync(chunkPath)) {
+      content += `\n${await readFile(chunkPath, 'utf-8')}`;
+    }
+  }
+  return content;
 }
 
 export async function assertPublishBundle(
   distDir: string,
-  options: AssertPublishBundleOptions = {}
+  options: AssertPublishBundleOptions & { entry?: string } = {}
 ): Promise<void> {
-  const jsFiles = await collectJsFiles(distDir);
-  const entry = jsFiles.find(
-    (f) => f === 'index.js' || f.endsWith('/index.js')
-  );
-  if (!entry) {
-    fail(`${distDir}: no index.js in dist`);
-  }
-  const content = await readFile(path.join(distDir, entry), 'utf-8');
+  const entry = options.entry ?? 'index.js';
+  const content =
+    entry === 'shell.js'
+      ? await readShellPublishBundle(distDir, entry)
+      : await readFile(path.join(distDir, entry), 'utf-8');
   validatePublishBundleJs(content, entry, options);
 }

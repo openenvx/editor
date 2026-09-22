@@ -1,4 +1,4 @@
-import { findNodeById } from '@openenvx/studio/core';
+import { findNodeById } from '@openenvx/studio';
 import type { Document, Transform } from '@openenvx/studio/schema';
 import { nodeTransform } from '@openenvx/studio/schema';
 

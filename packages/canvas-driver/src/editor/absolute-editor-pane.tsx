@@ -4,7 +4,7 @@ import {
   type Document,
   type EditorSession,
   type EditorPaneHostProps,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,

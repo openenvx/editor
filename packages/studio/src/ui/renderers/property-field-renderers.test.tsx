@@ -1,4 +1,4 @@
-import type { PropertyFieldDescriptor } from '@openenvx/studio/core';
+import type { PropertyFieldDescriptor } from '#studio';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 

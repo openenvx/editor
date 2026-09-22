@@ -4,16 +4,17 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { Fragment, forwardRef, useCallback, useMemo, useState } from 'react';
+import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
+
 import type {
   PropertyHostContext,
   PropertyPathContextOptions,
   MenuItemDescriptor,
   ViewContainerDescriptor,
   WorkbenchApi,
-} from '@openenvx/studio/core';
-import { mergePrimaryContainerOrder } from '@openenvx/studio/core';
-import { Fragment, forwardRef, useCallback, useMemo, useState } from 'react';
-import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
+} from '#studio';
+import { mergePrimaryContainerOrder } from '#studio';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import {

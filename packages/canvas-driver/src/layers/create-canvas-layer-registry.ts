@@ -1,4 +1,4 @@
-import { LayerRegistry } from '@openenvx/studio/core';
+import { LayerRegistry } from '@openenvx/studio';
 
 import { builtinCanvasLayerDefinitions } from './builtin-canvas-layer-definitions';
 

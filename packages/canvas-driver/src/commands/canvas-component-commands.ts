@@ -6,8 +6,8 @@ import {
   findNodeById,
   localize,
   getLayerChildren,
-} from '@openenvx/studio/core';
-import type { CommandContext, DocumentNode } from '@openenvx/studio/core';
+} from '@openenvx/studio';
+import type { CommandContext, DocumentNode } from '@openenvx/studio';
 import type { DocumentComponent } from '@openenvx/studio/schema';
 import {
   applyNodeTransform,

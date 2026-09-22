@@ -1,5 +1,5 @@
 import type { DocumentNode } from '@openenvx/studio/schema';
-import { getLayerChildren } from '@openenvx/studio/core';
+import { getLayerChildren } from '@openenvx/studio';
 import { nodeTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 

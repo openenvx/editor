@@ -8,13 +8,13 @@ import {
   Plugin,
   SimpleServiceContribution,
   SingletonServiceContribution,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type {
   CommandContext,
   DocumentNode,
   PluginContext,
   WorkbenchPluginContext,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import {
   applyNodeTransform,
   artboardRulesLayout,

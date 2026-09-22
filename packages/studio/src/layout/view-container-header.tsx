@@ -1,9 +1,7 @@
-import type {
-  SidebarHeaderDescriptor,
-  ViewContainerLocation,
-} from '@openenvx/studio/core';
 import { IconChevronDown, IconDots } from '@tabler/icons-react';
 import { useMemo } from 'react';
+
+import type { SidebarHeaderDescriptor, ViewContainerLocation } from '#studio';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 import { useWorkbenchContextSelector } from '../hooks/use-workbench-selector';

@@ -1,7 +1,4 @@
-import {
-  ViewContainerContribution,
-  ViewContribution,
-} from '@openenvx/studio/core';
+import { ViewContainerContribution, ViewContribution } from '@openenvx/studio';
 
 export const EMAIL_ELEMENTS_CONTAINER_ID = 'email.elements';
 export const EMAIL_ELEMENTS_VIEW_ID = 'email.elements.palette';

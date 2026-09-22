@@ -1,6 +1,6 @@
 # Runtime & core
 
-**Audience:** Contributors and integrators. Package: `@openenvx/studio/core` (+ the scene schema exposed through its `./schema` entry point).
+**Audience:** Contributors and integrators. Package: `@openenvx/studio` (+ the scene schema exposed through its `./schema` entry point).
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
@@ -37,7 +37,7 @@ Render pipeline: `DocumentNode` → `NodeCompilerContribution` → `RenderDocume
 
 ## Legacy names
 
-`Scene` / `Page` / `Layer` type aliases remain in `@openenvx/studio/core` scene helpers during driver migration; prefer `Document` / `Artboard` / `DocumentNode` in new code.
+`Scene` / `Page` / `Layer` type aliases remain in `@openenvx/studio` scene helpers during driver migration; prefer `Document` / `Artboard` / `DocumentNode` in new code.
 
 ## Scene document (removed)
 
@@ -51,7 +51,7 @@ import {
   PluginManager,
   SceneStore,
   EditorService,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 const scene = new SceneStore(initialScene);
 const editor = new EditorService();

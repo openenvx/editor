@@ -1,4 +1,4 @@
-import { sanitizeHtml } from '@openenvx/studio/core';
+import { sanitizeHtml } from '@openenvx/studio';
 
 import type { CanvasTextModel } from '../layers/canvas-text-layer';
 import {

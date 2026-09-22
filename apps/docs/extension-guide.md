@@ -20,8 +20,8 @@ Backend services depend on `@openenvx/studio/schema` too instead of re-declaring
 | Package | Responsibility |
 | --- | --- |
 | `@openenvx/canvas-driver` | Canvas engine: layers, commands, Konva renderers, `CanvasEditor` |
-| `@openenvx/studio/core` | Workbench runtime: `WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()` |
-| `@openenvx/studio/core` | Editor host: `EditorRuntime`, `PluginManager`, `registerContribution()` |
+| `@openenvx/studio` | Workbench runtime: `WorkbenchController`, `WorkbenchPlugin`, `registerWorkbench()` |
+| `@openenvx/studio` | Editor host: `EditorRuntime`, `PluginManager`, `registerContribution()` |
 | Your app / `demo-playground` | Wire canvas to workbench via `CanvasHostProvider` + app-owned toolbar/sidebars |
 | `@openenvx/canvas-driver` | Full canvas editor: `CanvasPlugin` (engine + workbench chrome), toolbar, palette, editor pane registration |
 
@@ -29,7 +29,7 @@ Load `CanvasPlugin` for the full canvas editor. For a minimal custom shell, comp
 
 ### Custom editor host (without `WorkbenchController`)
 
-If you build your own shell instead of `@openenvx/studio/core`, compose the core host like this:
+If you build your own shell instead of `@openenvx/studio`, compose the core host like this:
 
 ```ts
 import {
@@ -38,7 +38,7 @@ import {
   SceneStore,
   EditorService,
   registerContribution,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 const scene = new SceneStore(initialScene);
 const editor = new EditorService();
@@ -46,7 +46,7 @@ const runtime = new EditorRuntime(scene, editor);
 const manager = new PluginManager(runtime);
 
 // Register workbench-specific services on runtime.services before activating plugins.
-// See bootstrapWorkbenchServices() in @openenvx/studio/core for the headless defaults.
+// See bootstrapWorkbenchServices() in @openenvx/studio for the headless defaults.
 
 await manager.activateCorePlugins();
 for (const plugin of plugins) {
@@ -66,7 +66,7 @@ Plugin contributions register through `PluginContext.register()`, which routes t
 
 ### Wiring canvas in a workbench app
 
-`@openenvx/canvas-driver` does not depend on `@openenvx/studio/core`. The app bridges them:
+`@openenvx/canvas-driver` does not depend on `@openenvx/studio`. The app bridges them:
 
 ```tsx
 import { CanvasHostProvider, CanvasEditor } from '@openenvx/canvas-driver';
@@ -79,7 +79,7 @@ import { useWorkbenchContext } from '@openenvx/studio/react';
 Workbench UI contributions use `WorkbenchPlugin` and `ctx.registerWorkbench()`:
 
 ```ts
-import { WorkbenchPlugin } from '@openenvx/studio/core';
+import { WorkbenchPlugin } from '@openenvx/studio';
 
 class MyWorkbenchPlugin extends WorkbenchPlugin {
   readonly id = 'my.workbench';
@@ -103,7 +103,7 @@ import {
   ViewContainerContribution,
   ViewContribution,
   WorkbenchPlugin,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 class MyView extends ViewContribution {
   readonly id = 'my.view';
@@ -381,7 +381,7 @@ import {
   type CanvasStageInteractionService,
   CanvasStageInteractionServiceId,
 } from '@openenvx/canvas-driver';
-import { SingletonServiceContribution } from '@openenvx/studio/core';
+import { SingletonServiceContribution } from '@openenvx/studio';
 
 export class MyStageInteraction implements CanvasStageInteractionService {
   adjustDrag(input) {

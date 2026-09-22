@@ -5,8 +5,8 @@ import {
   findNodeById,
   localize,
   updateLayerInTree,
-} from '@openenvx/studio/core';
-import type { CommandContext, DocumentNode } from '@openenvx/studio/core';
+} from '@openenvx/studio';
+import type { CommandContext, DocumentNode } from '@openenvx/studio';
 import {
   applyNodeTransform,
   artboardRulesLayout,

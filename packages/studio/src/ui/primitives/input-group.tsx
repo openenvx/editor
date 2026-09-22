@@ -1,4 +1,4 @@
-import type { PropertyFieldDescriptor } from '@openenvx/studio/core';
+import type { PropertyFieldDescriptor } from '#studio';
 
 import { cn } from '../../lib/cn';
 import { NumericInput } from './numeric-input';

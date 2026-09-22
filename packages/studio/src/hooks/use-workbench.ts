@@ -1,9 +1,7 @@
-import { WorkbenchController } from '@openenvx/studio/core';
-import type {
-  WorkbenchApi,
-  WorkbenchControllerOptions,
-} from '@openenvx/studio/core';
 import { useRef, useState } from 'react';
+
+import { WorkbenchController } from '#studio';
+import type { WorkbenchApi, WorkbenchControllerOptions } from '#studio';
 
 import { useMountEffect } from './use-mount-effect';
 

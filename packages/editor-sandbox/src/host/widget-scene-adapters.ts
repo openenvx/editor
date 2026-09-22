@@ -1,4 +1,4 @@
-import { findNodeById, updateLayerInTree } from '@openenvx/studio/core';
+import { findNodeById, updateLayerInTree } from '@openenvx/studio';
 import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
 
 import type { SandboxHostSurface } from './sandbox-host-surface';

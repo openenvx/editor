@@ -3,8 +3,8 @@ import {
   findNodeById,
   updateLayerInTree,
   walkLayers,
-} from '@openenvx/studio/core';
-import type { WorkbenchApi } from '@openenvx/studio/core';
+} from '@openenvx/studio';
+import type { WorkbenchApi } from '@openenvx/studio';
 import type { Document, DocumentNode } from '@openenvx/studio/schema';
 import { nodeProps } from '@openenvx/studio/schema';
 import { createElement } from 'react';

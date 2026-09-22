@@ -1,7 +1,4 @@
-import {
-  ViewContainerContribution,
-  ViewContribution,
-} from '@openenvx/studio/core';
+import { ViewContainerContribution, ViewContribution } from '@openenvx/studio';
 
 export const HTML_BLOCKS_CONTAINER_ID = 'html.blocks';
 export const HTML_BLOCKS_VIEW_ID = 'html.blocks.palette';

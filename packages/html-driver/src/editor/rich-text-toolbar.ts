@@ -1,4 +1,4 @@
-import { findNodeById, walkNodes } from '@openenvx/studio/core';
+import { findNodeById, walkNodes } from '@openenvx/studio';
 import type { Layer, Scene } from '@openenvx/studio/schema';
 
 import type { RichTextToolbarOptions } from '../block-config';

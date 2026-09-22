@@ -1,5 +1,5 @@
 import { renderBlockTree, type BlockRegistry } from '@openenvx/html-driver';
-import { getLayerChildren } from '@openenvx/studio/core';
+import { getLayerChildren } from '@openenvx/studio';
 import type { DocumentNode, Page } from '@openenvx/studio/schema';
 import { nodeProps } from '@openenvx/studio/schema';
 import { Body, Font, Head, Html, Preview } from '@react-email/components';

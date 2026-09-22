@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import type { WorkbenchApi, WorkbenchState } from '@openenvx/studio/core';
+import type { WorkbenchApi, WorkbenchState } from '#studio';
 import { render, screen } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
 import { describe, expect, it, vi } from 'vitest';

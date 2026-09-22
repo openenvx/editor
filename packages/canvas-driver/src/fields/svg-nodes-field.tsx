@@ -1,4 +1,4 @@
-import type { PropertyFieldDescriptor } from '@openenvx/studio/core';
+import type { PropertyFieldDescriptor } from '@openenvx/studio';
 import { useState, type ReactNode } from 'react';
 
 import {

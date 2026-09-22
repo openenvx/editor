@@ -3,7 +3,7 @@ import {
   WORKBENCH_THEME_SETTINGS_MENU_ITEM,
   type CommandContext,
   type TopBarBuilder,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 import {
   WORKBENCH_OPEN_COMMAND_ID,

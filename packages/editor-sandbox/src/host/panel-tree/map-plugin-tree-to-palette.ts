@@ -2,7 +2,7 @@ import {
   createCommandPaletteBuilder,
   type CommandPaletteBuilder,
   type CommandPaletteContributionBuild,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 import type { PluginNode } from '../../protocol';
 import { asString, isAllowedCommand, pluginNodes } from './plugin-tree-helpers';

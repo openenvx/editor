@@ -1,7 +1,7 @@
 import {
   InstantiationService,
   type AssetService,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import { nodeTransform } from '@openenvx/studio/schema';
 import { testArtboard } from '../test/canvas-document-fixtures';
 import { afterEach, describe, expect, it, vi } from 'vitest';

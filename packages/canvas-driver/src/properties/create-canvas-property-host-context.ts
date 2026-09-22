@@ -1,7 +1,7 @@
 import type {
   PropertyPathContextOptions,
   WorkbenchApi,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import type { Transform } from '@openenvx/studio/schema';
 
 import { resolveTextBoxFitPropertyUpdate } from '../fit-text-layer-to-content';

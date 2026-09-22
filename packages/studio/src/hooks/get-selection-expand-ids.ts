@@ -1,4 +1,4 @@
-import { getActivePage, type Scene } from '@openenvx/studio/core';
+import { getActivePage, type Scene } from '#studio';
 
 import { getLayerAncestorIds } from './get-layer-ancestor-ids';
 

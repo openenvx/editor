@@ -1,4 +1,4 @@
-import { walkLayers, type Page } from '@openenvx/studio/core';
+import { walkLayers, type Page } from '#studio';
 
 /** Ancestor layer ids from root to parent of `layerId` (excludes self). */
 export function getLayerAncestorIds(page: Page, layerId: string): string[] {

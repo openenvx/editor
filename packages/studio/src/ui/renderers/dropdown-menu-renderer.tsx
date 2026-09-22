@@ -1,5 +1,5 @@
-import type { MenuItemDescriptor } from '@openenvx/studio/core';
-import { isCommandMenuItem, isRadioGroupMenuItem } from '@openenvx/studio/core';
+import type { MenuItemDescriptor } from '#studio';
+import { isCommandMenuItem, isRadioGroupMenuItem } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useMenuChoiceProvider } from '../../hooks/use-menu-choice-provider';

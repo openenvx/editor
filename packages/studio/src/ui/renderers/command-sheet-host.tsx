@@ -1,9 +1,7 @@
-import { ContextKeyServiceId } from '@openenvx/studio/core';
-import type {
-  ViewContainerDescriptor,
-  ViewPanelRegistration,
-} from '@openenvx/studio/core';
 import { memo, useCallback, useMemo, type ComponentType } from 'react';
+
+import { ContextKeyServiceId } from '#studio';
+import type { ViewContainerDescriptor, ViewPanelRegistration } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useWorkbenchContextSelector } from '../../hooks/use-workbench-selector';

@@ -3,4 +3,4 @@ export {
   WIDGET_LAYER_TYPE,
   openenvxWidgetSchema,
   type OpenEnvxWidgetModel,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';

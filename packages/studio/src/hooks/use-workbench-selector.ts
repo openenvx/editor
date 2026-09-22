@@ -1,4 +1,4 @@
 export {
   useWorkbenchContextSelector,
   useWorkbenchSelector,
-} from '@openenvx/studio/react';
+} from '#studio/react';

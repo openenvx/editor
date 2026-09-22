@@ -1,4 +1,4 @@
-import { canEditLayerData } from '@openenvx/studio/core';
+import { canEditLayerData } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import type { DocumentNode, Transform } from '@openenvx/studio/schema';
 import {

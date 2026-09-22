@@ -1,5 +1,5 @@
 import type { BlockConfig } from '@openenvx/html-driver';
-import { sanitizeUrl } from '@openenvx/studio/core';
+import { sanitizeUrl } from '@openenvx/studio';
 import { Img, Link } from '@react-email/components';
 
 /**

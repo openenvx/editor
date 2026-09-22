@@ -1,4 +1,4 @@
-import type { SidebarHeaderDescriptor } from '@openenvx/studio/core';
+import type { SidebarHeaderDescriptor } from '#studio';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';

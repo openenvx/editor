@@ -3,7 +3,7 @@ import {
   ToolbarContribution,
   type ShellDropdownMenuItemDescriptor,
   type ToolbarBuilder,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 import { HTML_ZOOM_PRESETS } from '../editor/html-device-preview';
 

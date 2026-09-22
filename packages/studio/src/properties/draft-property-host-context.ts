@@ -1,12 +1,9 @@
-import type {
-  PropertyHostContext,
-  PropertyValuePath,
-} from '@openenvx/studio/core';
+import type { PropertyHostContext, PropertyValuePath } from '#studio';
 import {
   readLayerDataAtKey,
   SELECTION_LAYER_DATA_PATH_PREFIX,
   writeLayerDataAtKey,
-} from '@openenvx/studio/core';
+} from '#studio';
 
 export function createDraftPropertyHostContext(
   values: Record<string, unknown>,

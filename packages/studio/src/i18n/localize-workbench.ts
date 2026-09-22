@@ -1,8 +1,4 @@
-import {
-  localize,
-  type LocalizeOptions,
-  type ServiceContainer,
-} from '@openenvx/studio/core';
+import { localize, type LocalizeOptions, type ServiceContainer } from '#studio';
 
 import { WORKBENCH_I18N_KEY_PREFIX } from './workbench-i18n';
 

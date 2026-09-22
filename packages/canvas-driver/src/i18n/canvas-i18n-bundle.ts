@@ -1,5 +1,5 @@
-import { I18nContribution } from '@openenvx/studio/core';
-import type { I18nBundleRegistry } from '@openenvx/studio/core';
+import { I18nContribution } from '@openenvx/studio';
+import type { I18nBundleRegistry } from '@openenvx/studio';
 
 import canvasEn from './locales/en/canvas-en';
 import canvasPl from './locales/pl/canvas-pl';

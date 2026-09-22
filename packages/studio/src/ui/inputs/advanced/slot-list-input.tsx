@@ -1,5 +1,6 @@
-import type { Layer, SlotListFieldConfig } from '@openenvx/studio/core';
 import { IconTrash } from '@tabler/icons-react';
+
+import type { Layer, SlotListFieldConfig } from '#studio';
 
 import { IconButton } from '../../primitives/icon-button';
 import { PropertyFieldRow } from '../../primitives/property-field-row';

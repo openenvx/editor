@@ -5,7 +5,7 @@ import type {
   Selection,
   WorkbenchContribution,
   WorkbenchContributionDisposable,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 /**
  * Host surface for sandbox extensions (first-party adapter only).

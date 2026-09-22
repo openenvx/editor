@@ -1,6 +1,7 @@
-import type { MenuItemDescriptor } from '@openenvx/studio/core';
-import { isCommandMenuItem } from '@openenvx/studio/core';
 import { useCallback, useState } from 'react';
+
+import type { MenuItemDescriptor } from '#studio';
+import { isCommandMenuItem } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useMountEffect } from '../../hooks/use-mount-effect';

@@ -1,4 +1,4 @@
-import type { AssetService } from '@openenvx/studio/core';
+import type { AssetService } from '@openenvx/studio';
 import type { Artboard, DocumentNode } from '@openenvx/studio/schema';
 import {
   applyNodeTransform,

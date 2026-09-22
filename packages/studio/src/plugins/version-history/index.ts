@@ -16,5 +16,5 @@ export type {
   DocumentVersion,
   VersionAuthor,
   VersionHistoryProvider,
-} from '../../core/version-history/version-history-types';
-export { VersionHistoryProviderId } from '../../core/version-history/version-history-service-id';
+} from '../../version-history/version-history-types';
+export { VersionHistoryProviderId } from '../../version-history/version-history-service-id';

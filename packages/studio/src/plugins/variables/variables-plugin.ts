@@ -7,10 +7,10 @@ import {
   WorkbenchPlugin,
   type CommandContext,
   type WorkbenchPluginContext,
-} from '@openenvx/studio/core';
-import { documentVariables } from '@openenvx/studio/schema';
+} from '#studio';
+import { documentVariables } from '#studio/schema';
 
-import { executeSceneVariableCommand } from '../../core/plugins/template-variable-commands';
+import { executeSceneVariableCommand } from '../template-variable-commands';
 import {
   VARIABLES_CONTAINER_ID,
   VARIABLES_PLUGIN_ID,

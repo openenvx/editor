@@ -8,7 +8,7 @@ import {
   type Page,
   type PropertySectionDescriptor,
   type ServiceId,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 import { nodeProps } from '@openenvx/studio/schema';
 

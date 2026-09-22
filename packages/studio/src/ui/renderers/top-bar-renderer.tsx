@@ -1,3 +1,6 @@
+import { IconCheck } from '@tabler/icons-react';
+import { memo, useMemo } from 'react';
+
 import {
   ContextKeyServiceId,
   isTopBarDropdownItem,
@@ -10,9 +13,7 @@ import {
   type TopBarStatusItemDescriptor,
   type MenuItemDescriptor,
   type TopBarTitleItemDescriptor,
-} from '@openenvx/studio/core';
-import { IconCheck } from '@tabler/icons-react';
-import { memo, useMemo } from 'react';
+} from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useContextKeysRevision } from '../../hooks/use-context-key';

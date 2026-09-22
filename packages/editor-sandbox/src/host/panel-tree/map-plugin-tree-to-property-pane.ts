@@ -13,7 +13,7 @@ import {
   type PropertyLayoutWhenOptions,
   type PropertyPaneDescriptor,
   type PropertyValuePath,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 import {
   PLUGIN_FIELD_ELEMENT_TO_KIND,

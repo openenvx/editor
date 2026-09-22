@@ -4,7 +4,7 @@ import {
   DocumentOperationsServiceId,
   ShellUiServiceId,
   type CommandContext,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 export const WORKBENCH_SAVE_COMMAND_ID = 'workbench.save';
 export const WORKBENCH_SAVE_AS_COMMAND_ID = 'workbench.saveAs';

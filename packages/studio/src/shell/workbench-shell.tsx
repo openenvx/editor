@@ -1,3 +1,6 @@
+import type { MutableRefObject, ReactNode } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
+
 import {
   DocumentHostServiceId,
   LocalizationServiceId,
@@ -13,10 +16,8 @@ import {
   type ToolbarPlacement,
   type WorkbenchApi,
   type WorkbenchControllerOptions,
-} from '@openenvx/studio/core';
-import type { Scene } from '@openenvx/studio/schema';
-import type { MutableRefObject, ReactNode } from 'react';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+} from '#studio';
+import type { Scene } from '#studio/schema';
 
 import { EditorViewportProvider } from '../context/editor-viewport-context';
 import { DEFAULT_LOCALE, LocaleProvider } from '../context/locale-context';

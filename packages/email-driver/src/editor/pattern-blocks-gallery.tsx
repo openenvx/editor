@@ -1,6 +1,6 @@
 import type { BlockRegistry } from '@openenvx/html-driver';
 import { getPageRootId, resolveInsertParentId } from '@openenvx/html-driver';
-import { ContextKeyServiceId, getActiveArtboard } from '@openenvx/studio/core';
+import { ContextKeyServiceId, getActiveArtboard } from '@openenvx/studio';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,

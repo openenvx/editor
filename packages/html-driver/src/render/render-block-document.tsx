@@ -1,4 +1,4 @@
-import { getLayerChildren, isLayerVisible } from '@openenvx/studio/core';
+import { getLayerChildren, isLayerVisible } from '@openenvx/studio';
 import type { Layer, Page } from '@openenvx/studio/schema';
 import { nodeProps } from '@openenvx/studio/schema';
 import {

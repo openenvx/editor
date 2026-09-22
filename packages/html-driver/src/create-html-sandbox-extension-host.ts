@@ -2,7 +2,7 @@ import {
   SandboxExtensionHost,
   type SandboxExtensionHostOptions,
 } from '@openenvx/editor-sandbox/host';
-import type { Layer } from '@openenvx/studio/core';
+import type { Layer } from '@openenvx/studio';
 
 import { setOpenEnvxHtmlWidgetClickHandler } from './editor/html-widget-click-handler';
 import { applyHtmlWidgetFace } from './widgets/map-widget-tree-to-html-layers';

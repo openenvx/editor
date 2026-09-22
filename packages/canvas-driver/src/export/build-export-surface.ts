@@ -1,9 +1,5 @@
-import { getLayerChildrenForScene } from '@openenvx/studio/core';
-import type {
-  Document,
-  DocumentNode,
-  LayerRegistry,
-} from '@openenvx/studio/core';
+import { getLayerChildrenForScene } from '@openenvx/studio';
+import type { Document, DocumentNode, LayerRegistry } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import { nodeProps } from '@openenvx/studio/schema';
 

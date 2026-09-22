@@ -23,7 +23,24 @@
       }
     ],
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "paths": {
+      "#studio": ["../../packages/studio/src/index.ts"],
+      "#studio/schema": ["../../packages/studio/src/schema/index.ts"],
+      "#studio/preview": ["../../packages/studio/src/preview/index.ts"],
+      "#studio/react": ["../../packages/studio/src/react/workbench-context.tsx"],
+      "#studio/shell": ["../../packages/studio/src/shell/index.ts"],
+      "#studio/internal": ["../../packages/studio/src/workbench-barrel.ts"],
+      "#/*": ["../../packages/studio/src/*"],
+      "@openenvx/studio": ["../../packages/studio/src/index.ts"],
+      "@openenvx/studio/shell": ["../../packages/studio/src/shell/index.ts"],
+      "@openenvx/studio/schema": ["../../packages/studio/src/schema/index.ts"],
+      "@openenvx/studio/preview": ["../../packages/studio/src/preview/index.ts"],
+      "@openenvx/studio/react": ["../../packages/studio/src/react/workbench-context.tsx"],
+      "@openenvx/studio/plugins/variables": [
+        "../../packages/studio/src/plugins/variables/index.ts"
+      ]
+    }
   },
   "include": [
     "next-env.d.ts",

@@ -1,10 +1,11 @@
+import type { ComponentType } from 'react';
+import { memo } from 'react';
+
 import type {
   EditorPaneHostProps,
   EditorPaneRegistration,
   LayerSurfaceItem,
-} from '@openenvx/studio/core';
-import type { ComponentType } from 'react';
-import { memo } from 'react';
+} from '#studio';
 
 import { useEditorViewportBridge } from '../../context/editor-viewport-context';
 

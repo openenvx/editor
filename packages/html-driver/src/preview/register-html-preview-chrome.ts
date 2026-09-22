@@ -1,5 +1,5 @@
-import { SimpleServiceContribution } from '@openenvx/studio/core';
-import type { WorkbenchPluginContext } from '@openenvx/studio/core';
+import { SimpleServiceContribution } from '@openenvx/studio';
+import type { WorkbenchPluginContext } from '@openenvx/studio';
 
 import { createHtmlPreviewCommands } from '../commands/create-html-preview-commands';
 import { HtmlToolbarContribution } from '../contributions/html-toolbar-contribution';

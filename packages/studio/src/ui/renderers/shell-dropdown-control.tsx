@@ -1,13 +1,11 @@
+import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import type {
   ShellDropdownMenuItemDescriptor,
   ToolbarPlacement,
-} from '@openenvx/studio/core';
-import {
-  isShellDropdownCommandMenuItem,
-  isToolbarTopPlacement,
-} from '@openenvx/studio/core';
-import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+} from '#studio';
+import { isShellDropdownCommandMenuItem, isToolbarTopPlacement } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useContextKeyValue } from '../../hooks/use-context-key';

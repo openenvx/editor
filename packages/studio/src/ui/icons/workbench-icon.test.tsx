@@ -1,4 +1,4 @@
-import { IconRegistryImpl } from '@openenvx/studio/core';
+import { IconRegistryImpl } from '#studio';
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 

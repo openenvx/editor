@@ -1,5 +1,5 @@
-import { Command, localize, getLayerChildren } from '@openenvx/studio/core';
-import type { CommandContext } from '@openenvx/studio/core';
+import { Command, localize, getLayerChildren } from '@openenvx/studio';
+import type { CommandContext } from '@openenvx/studio';
 import type { DocumentNode } from '@openenvx/studio/schema';
 import { artboardRulesLayout } from '@openenvx/studio/schema';
 

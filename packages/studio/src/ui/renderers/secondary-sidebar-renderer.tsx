@@ -4,11 +4,9 @@ import {
   horizontalListSortingStrategy,
   useSortable,
 } from '@dnd-kit/sortable';
-import {
-  secondaryPanelContainers,
-  shouldMountSecondarySidebar,
-} from '@openenvx/studio/core';
 import { memo, useMemo } from 'react';
+
+import { secondaryPanelContainers, shouldMountSecondarySidebar } from '#studio';
 
 import { useWorkbenchContext } from '../../context/workbench-context';
 import {

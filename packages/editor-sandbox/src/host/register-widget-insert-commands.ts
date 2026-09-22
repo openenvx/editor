@@ -2,7 +2,7 @@ import {
   Command,
   getActiveArtboard,
   insertLayerIntoContainer,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 import {
   applyNodeTransform,
   artboardRulesLayout,

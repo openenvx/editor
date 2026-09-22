@@ -1,6 +1,7 @@
-import type { ToolbarPlacement } from '@openenvx/studio/core';
-import { TOOLBAR_PLACEMENTS } from '@openenvx/studio/core';
 import type { ReactNode } from 'react';
+
+import type { ToolbarPlacement } from '#studio';
+import { TOOLBAR_PLACEMENTS } from '#studio';
 
 import styles from './editor-chrome.module.css';
 

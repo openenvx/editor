@@ -5,8 +5,9 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import type { ViewTreeItem } from '@openenvx/studio/core';
 import { memo, useCallback, useRef, useState } from 'react';
+
+import type { ViewTreeItem } from '#studio';
 
 import {
   buildFlatTree,

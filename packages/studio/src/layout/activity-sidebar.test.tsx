@@ -2,8 +2,8 @@ import {
   MenuChoiceRegistryId,
   MenuChoiceRegistryImpl,
   MutableMenuChoiceProvider,
-} from '@openenvx/studio/core';
-import type { ViewContainerDescriptor } from '@openenvx/studio/core';
+} from '#studio';
+import type { ViewContainerDescriptor } from '#studio';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';

@@ -2,7 +2,7 @@ import {
   type ContributionBuildContext,
   CommandPaletteContribution,
   type CommandPaletteBuilder,
-} from '@openenvx/studio/core';
+} from '@openenvx/studio';
 
 export class CanvasCommandPaletteItems extends CommandPaletteContribution {
   contribute(

@@ -1,12 +1,13 @@
-import {
-  resolveVariableChipPresentation,
-  VARIABLE_TOKEN_CAPTURE_RE,
-  type TemplateVariable,
-} from '@openenvx/studio/schema';
 import { Extension } from '@tiptap/core';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
+
+import {
+  resolveVariableChipPresentation,
+  VARIABLE_TOKEN_CAPTURE_RE,
+  type TemplateVariable,
+} from '#studio/schema';
 
 export interface VariableTokenCatalog {
   variables: TemplateVariable[];

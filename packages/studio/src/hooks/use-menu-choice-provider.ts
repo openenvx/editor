@@ -1,10 +1,11 @@
+import { useEffect, useReducer } from 'react';
+
 import {
   LocalizationServiceId,
   MenuChoiceRegistryId,
   ThemeServiceId,
-} from '@openenvx/studio/core';
-import type { MenuChoiceProvider } from '@openenvx/studio/core';
-import { useEffect, useReducer } from 'react';
+} from '#studio';
+import type { MenuChoiceProvider } from '#studio';
 
 import { useWorkbenchContext } from '../context/workbench-context';
 

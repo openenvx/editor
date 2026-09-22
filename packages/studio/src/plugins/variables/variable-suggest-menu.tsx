@@ -1,9 +1,7 @@
-import {
-  formatVariableToken,
-  type TemplateVariable,
-} from '@openenvx/studio/schema';
 import { IconDots, IconPlus } from '@tabler/icons-react';
 import { memo, useCallback, useEffect, useRef } from 'react';
+
+import { formatVariableToken, type TemplateVariable } from '#studio/schema';
 
 import type { VariableSuggestAnchor } from './tiptap/variable-suggest-state';
 
