@@ -45,7 +45,7 @@ describe('Synara Codex token lock', () => {
     expect(readToken(light, '--wb-hover-overlay')).toBe('rgba(13, 13, 13, 0.03)');
     expect(readToken(light, '--wb-sidebar-row-selected')).toBe('rgba(13, 13, 13, 0.03)');
     expect(readToken(light, '--wb-seam-line')).toBe('rgba(0, 0, 0, 0.05)');
-    expect(readToken(light, '--wb-menu')).toBe('rgba(255, 255, 255, 0.96)');
+    expect(readToken(light, '--wb-menu')).toBe('rgba(255, 255, 255, 0.7)');
     expect(readToken(light, '--wb-primary')).toBe('#0d0d0d');
     expect(readToken(light, '--wb-focus')).toBe('#0169cc');
     expect(readToken(light, '--wb-destructive')).toBe('#e02e2a');
@@ -65,7 +65,7 @@ describe('Synara Codex token lock', () => {
     expect(readToken(dark, '--wb-hover-overlay')).toBe('rgba(252, 252, 252, 0.039)');
     expect(readToken(dark, '--wb-sidebar-row-selected')).toBe('rgba(252, 252, 252, 0.026)');
     expect(readToken(dark, '--wb-input-fill')).toBe('rgb(23, 23, 23)');
-    expect(readToken(dark, '--wb-menu')).toBe('rgba(23, 23, 23, 0.96)');
+    expect(readToken(dark, '--wb-menu')).toBe('rgba(23, 23, 23, 0.7)');
     expect(readToken(dark, '--wb-primary')).toBe('#fcfcfc');
     expect(readToken(dark, '--wb-primary-foreground')).toBe('#111111');
     expect(readToken(dark, '--wb-focus')).toBe('rgba(51, 134, 214, 0.63)');

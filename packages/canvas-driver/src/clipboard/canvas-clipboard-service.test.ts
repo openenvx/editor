@@ -1,6 +1,9 @@
-import type { AssetService } from '@openenvx/studio/core';
-import { InstantiationService } from '@openenvx/studio/core';
-import { normalizeScene } from '@openenvx/studio/schema';
+import {
+  InstantiationService,
+  type AssetService,
+} from '@openenvx/studio/core';
+import { nodeTransform } from '@openenvx/studio/schema';
+import { testArtboard } from '../test/canvas-document-fixtures';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { CanvasClipboardService } from './canvas-clipboard-service';
@@ -26,10 +29,7 @@ describe(CanvasClipboardService, () => {
     const services = new InstantiationService();
     const clipboard = services.createInstance(CanvasClipboardService);
 
-    const page = normalizeScene({
-      activePageId: 'p1',
-      pages: [{ id: 'p1', layout: 'absolute', layers: [], name: 'Page' }],
-    }).pages[0]!;
+    const page = testArtboard({ id: 'p1', name: 'Page' }, 'absolute');
     const paste = clipboard.createImageLayerFromExternalPaste(
       page,
       { x: 12, y: 34 },
@@ -42,13 +42,13 @@ describe(CanvasClipboardService, () => {
     );
 
     expect(upload).not.toHaveBeenCalled();
-    expect(paste?.layer.data).toMatchObject({
+    expect(paste?.layer.props).toMatchObject({
       alt: 'Pasted image',
       assetRef: '',
       uploading: true,
     });
     expect(getImagePastePreview(paste!.layer.id)).toMatch(/^blob:/);
-    expect(paste?.layer.transform).toMatchObject({
+    expect(nodeTransform(paste!.layer)).toMatchObject({
       x: 12,
       y: 34,
       width: 200,
@@ -74,10 +74,7 @@ describe(CanvasClipboardService, () => {
     const clipboard = new InstantiationService().createInstance(
       CanvasClipboardService
     );
-    const page = normalizeScene({
-      activePageId: 'p1',
-      pages: [{ id: 'p1', layout: 'absolute', layers: [], name: 'Page' }],
-    }).pages[0]!;
+    const page = testArtboard({ id: 'p1', name: 'Page' }, 'absolute');
     const paste = clipboard.createImageLayerFromExternalPaste(
       page,
       { x: 0, y: 0 },
@@ -101,10 +98,7 @@ describe(CanvasClipboardService, () => {
     const clipboard = new InstantiationService().createInstance(
       CanvasClipboardService
     );
-    const page = normalizeScene({
-      activePageId: 'p1',
-      pages: [{ id: 'p1', layout: 'absolute', layers: [], name: 'Page' }],
-    }).pages[0]!;
+    const page = testArtboard({ id: 'p1', name: 'Page' }, 'absolute');
 
     expect(
       clipboard.createImageLayerFromExternalPaste(

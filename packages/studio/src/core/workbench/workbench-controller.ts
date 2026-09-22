@@ -1,6 +1,6 @@
 import {
-  createEmptySceneSnapshot,
-  normalizeSceneSnapshot,
+  createEmptyProjectSnapshot,
+  normalizeProjectSnapshot,
 } from '@openenvx/studio/schema';
 
 import type { ViewContainerLocation } from '../contributions/view-contribution';
@@ -61,6 +61,8 @@ import type {
   ShowFormOptions,
 } from './dialog-registrations';
 import { DialogServiceImpl, DialogServiceId } from './dialog-service';
+import type { LayoutService } from './layout-service-id';
+import { LayoutServiceId } from './layout-service-id';
 import { ShellUiServiceId } from './shell-ui-service-id';
 import { ViewLocationService } from './view-location-service';
 import {
@@ -71,7 +73,7 @@ import {
   saveDocumentAs,
 } from './workbench-document-ops';
 import { attachWorkbenchKeybindings } from './workbench-keybindings';
-import { DEFAULT_WORKBENCH_LAYOUT } from './workbench-layout';
+import { DEFAULT_WORKBENCH_LAYOUT, WorkbenchPart } from './workbench-layout';
 import type { WorkbenchLayoutSnapshot } from './workbench-layout-store';
 import { WorkbenchLayoutStoreId } from './workbench-layout-store-id';
 import {
@@ -131,15 +133,15 @@ export class WorkbenchController {
     this.layout = { ...DEFAULT_WORKBENCH_LAYOUT, ...options.layout };
     setTemplatePolicyEnforced(options.enforceTemplatePolicy !== false);
     const snapshot = options.initialScene
-      ? normalizeSceneSnapshot({
-          scene: options.initialScene,
+      ? normalizeProjectSnapshot({
+          document: options.initialScene,
           ...(options.initialEditorState
-            ? { editorState: options.initialEditorState }
+            ? { session: options.initialEditorState }
             : {}),
         })
-      : createEmptySceneSnapshot();
+      : createEmptyProjectSnapshot();
     this.runtime = new EditorRuntime(
-      new SceneStore(snapshot.scene, snapshot.editorState),
+      new SceneStore(snapshot.document, snapshot.session),
       new EditorService()
     );
     const diagnosticsEnabled = resolveEditorDiagnosticsFromBrowser(
@@ -178,7 +180,7 @@ export class WorkbenchController {
     return {
       editorService: this.runtime.getEditor(),
       getService: <T>(token: ServiceId<T>) => this.getService(token),
-      sceneStore: this.runtime.getScene(),
+      sceneStore: this.runtime.getDocument(),
     };
   }
 
@@ -191,6 +193,7 @@ export class WorkbenchController {
     keys.setContext('workbench.secondarySidebar', this.layout.secondarySidebar);
     keys.setContext('workbench.editorArea', this.layout.editorArea);
     keys.setContext('workbench.topBar', this.layout.topBar);
+    keys.setContext('workbench.panel', this.layout.panel);
     keys.setContext(
       'template.policyEnforced',
       this.options.enforceTemplatePolicy !== false
@@ -213,6 +216,64 @@ export class WorkbenchController {
         this.setSecondarySidebarVisible(visible),
       toggleSecondarySidebar: () => this.toggleSecondarySidebar(),
     });
+    const layoutService: LayoutService = {
+      getLayout: () => this.layout,
+      isVisible: (part) => this.layout[part],
+      setVisible: (part, visible) => {
+        switch (part) {
+          case WorkbenchPart.ActivityBar: {
+            this.setActivityBarVisible(visible);
+            break;
+          }
+          case WorkbenchPart.PrimarySidebar: {
+            this.setPrimarySidebarVisible(visible);
+            break;
+          }
+          case WorkbenchPart.SecondarySidebar: {
+            this.setSecondarySidebarVisible(visible);
+            break;
+          }
+          case WorkbenchPart.Panel: {
+            this.setPanelVisible(visible);
+            break;
+          }
+          case WorkbenchPart.EditorArea: {
+            if (this.layout.editorArea !== visible) {
+              this.layout.editorArea = visible;
+              this.syncLayoutContextKeys();
+              this.stateCache.invalidateChrome();
+              this.notify();
+            }
+            break;
+          }
+          case WorkbenchPart.StatusBar: {
+            if (this.layout.statusBar !== visible) {
+              this.layout.statusBar = visible;
+              this.syncLayoutContextKeys();
+              this.stateCache.invalidateChrome();
+              this.notify();
+            }
+            break;
+          }
+          case WorkbenchPart.TopBar: {
+            if (this.layout.topBar !== visible) {
+              this.layout.topBar = visible;
+              this.syncLayoutContextKeys();
+              this.stateCache.invalidateChrome();
+              this.notify();
+            }
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      },
+      toggle: (part) => {
+        layoutService.setVisible(part, !layoutService.isVisible(part));
+      },
+    };
+    this.runtime.services.registerInstance(LayoutServiceId, layoutService);
     this.navigationService.bind({
       setActiveContainer: (location, containerId) =>
         this.setActiveContainer(location, containerId),
@@ -237,8 +298,8 @@ export class WorkbenchController {
           this.stateCache.invalidateChrome();
         } else {
           this.stateCache.invalidateSelectionOnly(
-            snapshot.scene,
-            snapshot.editorState,
+            snapshot.document,
+            snapshot.session,
             snapshot.contentRevision,
             (current) =>
               buildSelectionDerivedPatch(
@@ -301,7 +362,7 @@ export class WorkbenchController {
       save: (saveFn) => this.save(saveFn),
       saveAs: (uri) => this.saveAs(uri),
       openDocument: (uri) => this.openDocument(uri),
-      scene: this.runtime.getScene(),
+      scene: this.runtime.getDocument(),
       selectLayers: (layerIds, primaryLayerId) =>
         this.selectLayers(layerIds, primaryLayerId),
       setHoveredLayer: (layerId) => this.setHoveredLayer(layerId),
@@ -350,7 +411,7 @@ export class WorkbenchController {
     for (const plugin of this.options.plugins) {
       await this.activatePlugin(plugin, { silent: true });
     }
-    const sceneStore = this.runtime.getScene();
+    const sceneStore = this.runtime.getDocument();
     // Lookup is already live via PluginManager; re-apply after plugins register rules.
     sceneStore.renormalize();
     this.stateCache.reset();
@@ -359,7 +420,7 @@ export class WorkbenchController {
     this.runtime.getEditor().open(
       {
         isDirty: false,
-        scene: sceneStore.getScene(),
+        scene: sceneStore.getDocument(),
         title: this.options.editorTitle ?? 'Untitled',
         uri: this.options.editorUri ?? 'untitled://scene',
       },
@@ -492,8 +553,8 @@ export class WorkbenchController {
   }
 
   selectLayers(layerIds: string[], primaryLayerId?: string | null): void {
-    const sceneStore = this.runtime.getScene();
-    const currentScene = sceneStore.getScene();
+    const sceneStore = this.runtime.getDocument();
+    const currentScene = sceneStore.getDocument();
     const editableIds = layerIds.filter((id) => {
       const targetLayer = findLayerById(currentScene, id);
       return targetLayer && canSelectLayer(targetLayer);
@@ -507,6 +568,10 @@ export class WorkbenchController {
         ? primaryLayerId
         : editableIds[0];
     sceneStore.selectLayers(editableIds, validPrimary ?? null);
+  }
+
+  selectNodes(nodeIds: string[], primaryNodeId?: string | null): void {
+    this.selectLayers(nodeIds, primaryNodeId);
   }
 
   setHoveredLayer(layerId: string | null): void {
@@ -592,6 +657,21 @@ export class WorkbenchController {
 
   toggleSecondarySidebar(): void {
     this.setSecondarySidebarVisible(!this.layout.secondarySidebar);
+  }
+
+  setPanelVisible(visible: boolean): void {
+    if (this.layout.panel === visible) {
+      return;
+    }
+    this.layout.panel = visible;
+    this.syncLayoutContextKeys();
+    this.stateCache.invalidateChrome();
+    this.notify();
+    this.persistLayoutSnapshot();
+  }
+
+  togglePanel(): void {
+    this.setPanelVisible(!this.layout.panel);
   }
 
   private getLayoutStore() {
@@ -704,8 +784,8 @@ export class WorkbenchController {
       return;
     }
 
-    const sceneStore = this.runtime.getScene();
-    const currentScene = sceneStore.getScene();
+    const sceneStore = this.runtime.getDocument();
+    const currentScene = sceneStore.getDocument();
     const targetLayer = findLayerById(currentScene, layerId);
     if (!targetLayer) {
       return;
@@ -719,9 +799,9 @@ export class WorkbenchController {
     }
 
     const bindKey =
-      typeof (targetLayer.data as { bind?: unknown } | undefined)?.bind ===
+      typeof (targetLayer.props as { bind?: unknown } | undefined)?.bind ===
       'string'
-        ? ((targetLayer.data as { bind: string }).bind as string)
+        ? ((targetLayer.props as { bind: string }).bind as string)
         : null;
     const bindEntry = allowed.find(
       ([key]) => key === 'html' || key === 'text' || key === 'markup'
@@ -738,46 +818,43 @@ export class WorkbenchController {
 
     const labelKeys = allowed.map(([key]) => key).join(', ');
     sceneStore.apply({
-      apply: (scene) => {
-        let pages = scene.pages.map((page) => ({
-          ...page,
-          layers: updateLayerInTree(page.layers, layerId, (layer) => {
-            const data =
-              typeof layer.data === 'object' && layer.data !== null
-                ? { ...(layer.data as Record<string, unknown>) }
+      apply: (document: Scene) => {
+        let artboards = document.artboards.map((artboard) => ({
+          ...artboard,
+          nodes: updateLayerInTree(artboard.nodes, layerId, (layer) => {
+            const props =
+              typeof layer.props === 'object' && layer.props !== null
+                ? { ...(layer.props as Record<string, unknown>) }
                 : {};
             for (const [key, value] of allowed) {
               if (key.includes('.')) {
-                setNestedValue(data, key, value);
+                setNestedValue(props, key, value);
               } else {
-                data[key] = value;
+                props[key] = value;
               }
             }
-            return { ...layer, data };
+            return { ...layer, props };
           }),
         }));
-        // Bound face part: write committed content into widget values so the
-        // isolate re-renders (Figma/Unlayer bind path). Same apply as the face
-        // write so undo is one step and history stays consistent.
         if (widgetAncestor && bindKey && plain !== null) {
           const widgetId = widgetAncestor.id;
-          pages = pages.map((page) => ({
-            ...page,
-            layers: updateLayerInTree(page.layers, widgetId, (layer) => {
-              const data =
-                typeof layer.data === 'object' && layer.data !== null
-                  ? { ...(layer.data as Record<string, unknown>) }
+          artboards = artboards.map((artboard) => ({
+            ...artboard,
+            nodes: updateLayerInTree(artboard.nodes, widgetId, (layer) => {
+              const props =
+                typeof layer.props === 'object' && layer.props !== null
+                  ? { ...(layer.props as Record<string, unknown>) }
                   : {};
               const values =
-                data.values && typeof data.values === 'object'
-                  ? { ...(data.values as Record<string, unknown>) }
+                props.values && typeof props.values === 'object'
+                  ? { ...(props.values as Record<string, unknown>) }
                   : {};
               setNestedValue(values, bindKey, plain);
-              return { ...layer, data: { ...data, values } };
+              return { ...layer, props: { ...props, values } };
             }),
           }));
         }
-        return { ...scene, pages };
+        return { ...document, artboards };
       },
       label:
         widgetAncestor && bindKey
@@ -841,11 +918,11 @@ export class WorkbenchController {
   }
 
   undo(): boolean {
-    return this.runtime.getScene().undo();
+    return this.runtime.getDocument().undo();
   }
 
   redo(): boolean {
-    return this.runtime.getScene().redo();
+    return this.runtime.getDocument().redo();
   }
 
   async save(saveFn?: (input: EditorInput) => Promise<void>): Promise<void> {
@@ -865,7 +942,7 @@ export class WorkbenchController {
   }
 
   serializeScene(): Scene {
-    return structuredClone(this.runtime.getScene().getScene());
+    return structuredClone(this.runtime.getDocument().getScene());
   }
 
   loadScene(scene: Scene): void {
@@ -972,9 +1049,9 @@ function htmlToPlainText(html: string): string {
 }
 
 function findWidgetAncestor(scene: Scene, layerId: string): Layer | null {
-  for (const page of scene.pages) {
+  for (const artboard of scene.artboards) {
     let found: Layer | null = null;
-    walkLayers(page.layers, (layer, path) => {
+    walkLayers(artboard.nodes, (layer, path) => {
       if (layer.id !== layerId) {
         return;
       }

@@ -1,5 +1,6 @@
 import { Command, isLayoutRootLayer } from '@openenvx/studio/core';
 import type { CommandContext, ServiceId } from '@openenvx/studio/core';
+import { artboardRulesLayout } from '@openenvx/studio/schema';
 
 import type { BlockRegistry } from '../block-registry';
 import {
@@ -68,7 +69,7 @@ function resolveTargetId(
     return args.id;
   }
   return (
-    ctx.selection.primaryLayerId ?? ctx.selection.selectedLayerIds[0] ?? null
+    ctx.selection.primaryNodeId ?? ctx.selection.selectedNodeIds[0] ?? null
   );
 }
 
@@ -83,7 +84,7 @@ export function createBlockCommands(
     if (!pageLayout) {
       return true;
     }
-    return ctx.scene.getActivePage().layout === pageLayout;
+    return artboardRulesLayout(ctx.scene.getActiveArtboard()) === pageLayout;
   }
 
   function isDriverBlockType(type: string): boolean {
@@ -97,8 +98,8 @@ export function createBlockCommands(
     if (!isDriverPage(ctx)) {
       return false;
     }
-    const page = ctx.scene.getActivePage();
-    const found = findBlock(page.layers, id);
+    const page = ctx.scene.getActiveArtboard();
+    const found = findBlock(page.nodes, id);
     return Boolean(
       found &&
       !isLayoutRootLayer(found.block) &&
@@ -118,8 +119,8 @@ export function createBlockCommands(
     if (!id) {
       return false;
     }
-    const page = ctx.scene.getActivePage();
-    const found = findBlock(page.layers, id);
+    const page = ctx.scene.getActiveArtboard();
+    const found = findBlock(page.nodes, id);
     if (
       !found ||
       isLayoutRootLayer(found.block) ||
@@ -130,7 +131,7 @@ export function createBlockCommands(
     if (direction === 'up') {
       return found.index > 0;
     }
-    return found.index < siblingCount(page.layers, found.parentId) - 1;
+    return found.index < siblingCount(page.nodes, found.parentId) - 1;
   }
 
   function moveSibling(
@@ -145,8 +146,8 @@ export function createBlockCommands(
     if (!id) {
       return;
     }
-    const page = ctx.scene.getActivePage();
-    const found = findBlock(page.layers, id);
+    const page = ctx.scene.getActiveArtboard();
+    const found = findBlock(page.nodes, id);
     if (!found) {
       return;
     }
@@ -191,19 +192,19 @@ export function createBlockCommands(
         if (!config || type.endsWith('.root') || type === rootType) {
           return;
         }
-        const page = ctx.scene.getActivePage();
+        const page = ctx.scene.getActiveArtboard();
         const selectedId =
-          ctx.selection.primaryLayerId ??
-          ctx.selection.selectedLayerIds[0] ??
+          ctx.selection.primaryNodeId ??
+          ctx.selection.selectedNodeIds[0] ??
           null;
         const rootId = getPageRootId(page, rootType);
         const parentId =
           args?.parentId !== undefined
             ? args.parentId
-            : resolveInsertParentId(page.layers, selectedId, rootId, registry);
+            : resolveInsertParentId(page.nodes, selectedId, rootId, registry);
         if (
           !parentId ||
-          !parentAcceptsChildren(registry, page.layers, parentId)
+          !parentAcceptsChildren(registry, page.nodes, parentId)
         ) {
           return;
         }
@@ -244,8 +245,8 @@ export function createBlockCommands(
         if (!registry) {
           return;
         }
-        const page = ctx.scene.getActivePage();
-        const found = findBlock(page.layers, id);
+        const page = ctx.scene.getActiveArtboard();
+        const found = findBlock(page.nodes, id);
         if (
           !found ||
           isLayoutRootLayer(found.block) ||
@@ -254,7 +255,7 @@ export function createBlockCommands(
           return;
         }
         const newParentId = args?.newParentId ?? null;
-        if (!parentAcceptsChildren(registry, page.layers, newParentId)) {
+        if (!parentAcceptsChildren(registry, page.nodes, newParentId)) {
           return;
         }
         const index = args?.index ?? 0;
@@ -302,8 +303,8 @@ export function createBlockCommands(
         if (!id || !isRemovableBlock(ctx, id)) {
           return;
         }
-        const page = ctx.scene.getActivePage();
-        const found = findBlock(page.layers, id);
+        const page = ctx.scene.getActiveArtboard();
+        const found = findBlock(page.nodes, id);
         if (!found) {
           return;
         }
@@ -333,8 +334,8 @@ export function createBlockCommands(
         if (!(id && patch)) {
           return;
         }
-        const page = ctx.scene.getActivePage();
-        const found = findBlock(page.layers, id);
+        const page = ctx.scene.getActiveArtboard();
+        const found = findBlock(page.nodes, id);
         if (!found || !isDriverBlockType(found.block.type)) {
           return;
         }
@@ -360,7 +361,7 @@ export function createBlockCommands(
         if (!id || !isRemovableBlock(ctx, id)) {
           return;
         }
-        const page = ctx.scene.getActivePage();
+        const page = ctx.scene.getActiveArtboard();
         ctx.scene.apply({
           apply: (scene) =>
             mapPageLayers(scene, page.id, (layers) => removeById(layers, id)),

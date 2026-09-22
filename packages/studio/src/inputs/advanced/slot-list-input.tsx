@@ -31,8 +31,8 @@ function isPartLayer(value: unknown): value is Layer {
 }
 
 function partData(part: Layer): Record<string, unknown> {
-  return typeof part.data === 'object' && part.data !== null
-    ? (part.data as Record<string, unknown>)
+  return typeof part.props === 'object' && part.props !== null
+    ? (part.props as Record<string, unknown>)
     : {};
 }
 

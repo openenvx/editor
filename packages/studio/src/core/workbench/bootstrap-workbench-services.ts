@@ -2,6 +2,10 @@ import type { EditorRuntime } from '../core/editor-runtime';
 import type { Registries } from '../registries/registries';
 import { LayerRegistryServiceId } from '../tokens';
 import { DocumentOperationsServiceId } from './document-operations-service-id';
+import {
+  NotificationServiceImpl,
+  NotificationServiceId,
+} from './notification-service';
 import { ShellUiServiceImpl } from './shell-ui-service';
 import { ShellUiServiceId } from './shell-ui-service-id';
 
@@ -26,4 +30,8 @@ export function bootstrapWorkbenchServices(
     saveAs: deps.saveAs,
   });
   runtime.services.registerInstance(ShellUiServiceId, new ShellUiServiceImpl());
+  runtime.services.registerInstance(
+    NotificationServiceId,
+    new NotificationServiceImpl()
+  );
 }

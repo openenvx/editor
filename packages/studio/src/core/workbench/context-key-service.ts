@@ -44,10 +44,10 @@ export class ContextKeyService {
     customKeys?: Record<string, boolean | string | number>;
   }): boolean {
     const page =
-      input.scene.pages.find(
-        (entry) => entry.id === input.selection.activePageId
-      ) ?? input.scene.pages[0]!;
-    const { selectedLayerIds } = input.selection;
+      input.scene.artboards.find(
+        (entry) => entry.id === input.selection.activeArtboardId
+      ) ?? input.scene.artboards[0]!;
+    const { selectedNodeIds } = input.selection;
 
     let changed = false;
     const set = (key: string, value: boolean | string | number) => {
@@ -56,19 +56,23 @@ export class ContextKeyService {
       }
     };
 
-    const primaryLayerId =
-      input.selection.primaryLayerId ?? selectedLayerIds[0] ?? null;
-    const primaryLayer = primaryLayerId
-      ? findLayerById(input.scene, primaryLayerId)
+    const primaryNodeId =
+      input.selection.primaryNodeId ?? selectedNodeIds[0] ?? null;
+    const primaryLayer = primaryNodeId
+      ? findLayerById(input.scene, primaryNodeId)
       : null;
 
-    set('scene.layerSelected', selectedLayerIds.length > 0);
-    set('scene.multiSelect', selectedLayerIds.length > 1);
-    set('scene.multiPage', input.scene.pages.length > 1);
+    set('scene.layerSelected', selectedNodeIds.length > 0);
+    set('scene.multiSelect', selectedNodeIds.length > 1);
+    set('scene.multiPage', input.scene.artboards.length > 1);
     set('scene.primaryLayerType', primaryLayer?.type ?? '');
-    set('page.layout', page.layout);
-    set('page.layoutAbsolute', page.layout === 'absolute');
-    set('page.layoutFlow', page.layout === 'flow');
+    const layout =
+      typeof page.extensions?.layout === 'string'
+        ? page.extensions.layout
+        : 'flow';
+    set('page.layout', layout);
+    set('page.layoutAbsolute', layout === 'absolute');
+    set('page.layoutFlow', layout === 'flow');
     set('editor.dirty', input.isDirty);
     set('editor.hasActiveEditor', input.hasActiveEditor);
 

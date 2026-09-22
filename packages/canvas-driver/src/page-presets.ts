@@ -1,5 +1,5 @@
-import type { LengthUnit, Page } from '@openenvx/studio/schema';
-import { toPx } from '@openenvx/studio/schema';
+import type { Artboard, LengthUnit } from '@openenvx/studio/schema';
+import { artboardSpaceSize, toPx } from '@openenvx/studio/schema';
 
 export interface PageSizePreset {
   id: string;
@@ -43,14 +43,17 @@ export function resolvePagePreset(id: string): PageSizePreset | undefined {
   return PAGE_SIZE_PRESETS.find((entry) => entry.id === id);
 }
 
-export function findPresetForPage(page: Page): PageSizePreset | undefined {
-  if (page.width === undefined || page.height === undefined) {
-    return undefined;
-  }
+export function findPresetForArtboard(
+  artboard: Artboard
+): PageSizePreset | undefined {
+  const { width, height } = artboardSpaceSize(artboard);
   return PAGE_SIZE_PRESETS.find(
-    (entry) => entry.width === page.width && entry.height === page.height
+    (entry) => entry.width === width && entry.height === height
   );
 }
+
+/** @deprecated use findPresetForArtboard */
+export const findPresetForPage = findPresetForArtboard;
 
 export function getDefaultPageDimensions(): { width: number; height: number } {
   return {

@@ -1,6 +1,6 @@
 import type { LayerRegistry } from '@openenvx/studio/core';
-import { createDefaultTransform } from '@openenvx/studio/schema';
-import type { Scene } from '@openenvx/studio/schema';
+import { nodeTransform } from '@openenvx/studio/schema';
+import type { Document } from '@openenvx/studio/schema';
 import Konva from 'konva';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
@@ -13,7 +13,7 @@ import {
 } from './draw-preview-to-konva';
 
 export interface RenderExportStageOptions {
-  scene: Scene;
+  scene: Document;
   pageId: string;
   widthPx: number;
   heightPx: number;
@@ -30,7 +30,7 @@ async function appendSurfaceItem(
   if (item.layer.visible === false) {
     return;
   }
-  const transform = item.layer.transform ?? createDefaultTransform();
+  const transform = nodeTransform(item.layer);
   const group = new Konva.Group({
     height: transform.height,
     listening: false,

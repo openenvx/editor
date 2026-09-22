@@ -3,16 +3,16 @@ import type { CommandContext } from '../runtime/types';
 import { WorkbenchEvents } from '../runtime/workbench-events';
 import { findLayerById, updateLayerByIdInScene } from '../scene/layer-tree';
 import {
-  addVariableToScene,
+  addVariableToDocument,
   createVariableId,
+  documentVariables,
   formatVariableToken,
   isValidVariableKey,
   nextVariableKey,
-  removeVariableFromScene,
-  reorderVariablesInScene,
-  resolvePrimaryTextDataPath,
-  sceneVariables,
-  updateVariableInScene,
+  removeVariableFromDocument,
+  reorderVariablesInDocument,
+  resolvePrimaryTextPropPath,
+  updateVariableInDocument,
   validateVariableKeyForCatalog,
 } from '../schema/template-variables';
 import type { TemplateVariable } from '../schema/types';
@@ -20,26 +20,23 @@ import { RichTextInsertServiceId } from '../services/rich-text-insert-service';
 import { TextBlockInsertServiceId } from '../services/text-block-insert-service';
 import { getNestedValue, setNestedValue } from '../utils/nested-value';
 
-function appendTokenToLayerField(
-  layer: { data?: unknown },
-  dataPath: string,
+function appendTokenToNodeField(
+  node: { props?: Record<string, unknown> },
+  propPath: string,
   token: string
 ): void {
-  const data =
-    typeof layer.data === 'object' && layer.data !== null
-      ? { ...(layer.data as Record<string, unknown>) }
-      : {};
-  const current = getNestedValue(data, dataPath);
+  const props = { ...node.props };
+  const current = getNestedValue(props, propPath);
   const next =
     typeof current === 'string' && current.length > 0
       ? `${current}${token}`
       : token;
-  setNestedValue(data, dataPath, next);
-  layer.data = data;
+  setNestedValue(props, propPath, next);
+  node.props = props;
 }
 
 function catalogHasKey(ctx: CommandContext, key: string): boolean {
-  return sceneVariables(ctx.scene.getScene()).some(
+  return documentVariables(ctx.scene.getDocument()).some(
     (entry) => entry.key === key
   );
 }
@@ -50,10 +47,10 @@ function canResolveVariableInsertTarget(ctx: CommandContext): boolean {
     return true;
   }
   const selectedId =
-    ctx.selection.primaryLayerId ?? ctx.selection.selectedLayerIds[0];
+    ctx.selection.primaryNodeId ?? ctx.selection.selectedNodeIds[0];
   if (selectedId) {
-    const layer = findLayerById(ctx.scene.getScene(), selectedId);
-    if (layer && resolvePrimaryTextDataPath(layer.type)) {
+    const layer = findLayerById(ctx.scene.getDocument(), selectedId);
+    if (layer && resolvePrimaryTextPropPath(layer.type)) {
       return true;
     }
   }
@@ -73,7 +70,7 @@ export class AddVariableCommand extends Command {
 
   canExecute(ctx: CommandContext, args?: unknown): boolean {
     const patch = args as AddVariableArgs | undefined;
-    const variables = sceneVariables(ctx.scene.getScene());
+    const variables = documentVariables(ctx.scene.getDocument());
     if (patch?.key !== undefined) {
       const validation = validateVariableKeyForCatalog(variables, patch.key);
       return validation.ok;
@@ -83,7 +80,7 @@ export class AddVariableCommand extends Command {
 
   execute(ctx: CommandContext, args?: unknown): void {
     const patch = (args as AddVariableArgs | undefined) ?? {};
-    const variables = sceneVariables(ctx.scene.getScene());
+    const variables = documentVariables(ctx.scene.getDocument());
     const key = patch.key?.trim() || nextVariableKey(variables);
     const validation = validateVariableKeyForCatalog(variables, key);
     if (!validation.ok) {
@@ -95,7 +92,7 @@ export class AddVariableCommand extends Command {
       sample: patch.sample,
     };
     ctx.scene.apply({
-      apply: (scene) => addVariableToScene(scene, variable),
+      apply: (scene) => addVariableToDocument(scene, variable),
       label: 'Add variable',
     });
   }
@@ -115,7 +112,7 @@ export class UpdateVariableCommand extends Command {
     if (!patch?.id) {
       return false;
     }
-    const variables = sceneVariables(ctx.scene.getScene());
+    const variables = documentVariables(ctx.scene.getDocument());
     const variable = variables.find((entry) => entry.id === patch.id);
     if (!variable) {
       return false;
@@ -138,7 +135,7 @@ export class UpdateVariableCommand extends Command {
     }
     ctx.scene.apply({
       apply: (scene) => {
-        const next = updateVariableInScene(scene, patch.id, {
+        const next = updateVariableInDocument(scene, patch.id, {
           key: patch.key,
           sample: patch.sample,
         });
@@ -161,7 +158,7 @@ export class RemoveVariableCommand extends Command {
     if (!patch?.id) {
       return false;
     }
-    return sceneVariables(ctx.scene.getScene()).some(
+    return documentVariables(ctx.scene.getDocument()).some(
       (entry) => entry.id === patch.id
     );
   }
@@ -172,7 +169,7 @@ export class RemoveVariableCommand extends Command {
       return;
     }
     ctx.scene.apply({
-      apply: (scene) => removeVariableFromScene(scene, patch.id),
+      apply: (scene) => removeVariableFromDocument(scene, patch.id),
       label: 'Remove variable',
     });
   }
@@ -191,7 +188,7 @@ export class ReorderVariablesCommand extends Command {
     if (!patch?.activeId || !patch.overId) {
       return false;
     }
-    const variables = sceneVariables(ctx.scene.getScene());
+    const variables = documentVariables(ctx.scene.getDocument());
     return (
       variables.some((entry) => entry.id === patch.activeId) &&
       variables.some((entry) => entry.id === patch.overId)
@@ -205,7 +202,7 @@ export class ReorderVariablesCommand extends Command {
     }
     ctx.scene.apply({
       apply: (scene) =>
-        reorderVariablesInScene(scene, patch.activeId, patch.overId),
+        reorderVariablesInDocument(scene, patch.activeId, patch.overId),
       label: 'Reorder variables',
     });
   }
@@ -244,17 +241,17 @@ export class InsertVariableCommand extends Command {
     }
 
     const selectedId =
-      ctx.selection.primaryLayerId ?? ctx.selection.selectedLayerIds[0];
+      ctx.selection.primaryNodeId ?? ctx.selection.selectedNodeIds[0];
     if (selectedId) {
-      const scene = ctx.scene.getScene();
+      const scene = ctx.scene.getDocument();
       const layer = findLayerById(scene, selectedId);
-      const dataPath = layer ? resolvePrimaryTextDataPath(layer.type) : null;
+      const dataPath = layer ? resolvePrimaryTextPropPath(layer.type) : null;
       if (layer && dataPath) {
         ctx.scene.apply({
           apply: (currentScene) =>
             updateLayerByIdInScene(currentScene, selectedId, (targetLayer) => {
               const next = { ...targetLayer };
-              appendTokenToLayerField(next, dataPath, token);
+              appendTokenToNodeField(next, dataPath, token);
               return next;
             }),
           label: 'Insert variable',

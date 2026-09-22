@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { blockProps } from '../test/document-fixtures';
 import { mapWidgetTreeToHtmlLayers } from './map-widget-tree-to-html-layers';
 
 describe(mapWidgetTreeToHtmlLayers, () => {
@@ -32,24 +33,14 @@ describe(mapWidgetTreeToHtmlLayers, () => {
     if (!root) {
       return;
     }
-    const rowChildren = (root.data as { children: { type: string }[] })
-      .children;
-    const firstRow = rowChildren[0] as {
-      type: string;
-      data: {
-        children: {
-          type: string;
-          writeMode?: string;
-          data: { html: string; bind?: string };
-        }[];
-      };
-    };
+    const rowChildren = root.children ?? [];
+    const firstRow = rowChildren[0]!;
     expect(firstRow.type).toBe('html.flex');
-    const heading = firstRow.data.children[0];
+    const heading = firstRow.children?.[0];
     expect(heading?.type).toBe('html.heading');
     expect(heading?.writeMode).toBe('content');
-    expect(heading?.data.html).toBe('Hello');
-    expect(heading?.data.bind).toBe('title');
+    expect(blockProps(heading!).html).toBe('Hello');
+    expect(blockProps(heading!).bind).toBe('title');
   });
 
   it('records onClick handler ids on mapped face layers', () => {

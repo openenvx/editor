@@ -192,9 +192,9 @@ export type PluginComponent = PluginElement;
 export type PluginContextScope = 'selection' | 'scene';
 
 export interface PluginPanelSelection {
-  activePageId: string;
-  selectedLayerIds: string[];
-  primaryLayerId: string | null;
+  activeArtboardId: string;
+  selectedNodeIds: string[];
+  primaryNodeId: string | null;
 }
 
 export interface PluginPanelContext {

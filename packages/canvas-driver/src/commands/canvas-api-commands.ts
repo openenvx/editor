@@ -2,9 +2,9 @@ import {
   Command,
   canResizePage,
   canTransformLayer,
-  findLayerById,
+  findNodeById,
   FontServiceId,
-  getActivePage,
+  getActiveArtboard,
   localize,
   updateLayerInTree,
 } from '@openenvx/studio/core';
@@ -13,7 +13,12 @@ import type {
   FontDescriptor,
   FontService,
 } from '@openenvx/studio/core';
-import type { Transform } from '@openenvx/studio/schema';
+import {
+  applyNodeTransform,
+  artboardRulesLayout,
+  nodeTransform,
+  type Transform,
+} from '@openenvx/studio/schema';
 
 import {
   CanvasCommandRequestServiceId,
@@ -63,7 +68,7 @@ function getDocumentExporter(
 }
 
 function canTransformLayerById(ctx: CommandContext, layerId: string): boolean {
-  const layer = findLayerById(ctx.scene.getScene(), layerId);
+  const layer = findNodeById(ctx.scene.getDocument(), layerId);
   return layer ? canTransformLayer(layer) : false;
 }
 
@@ -76,8 +81,11 @@ export class SetPageSizeCommand extends Command {
   readonly id = 'canvas.setPageSize';
 
   canExecute(ctx: CommandContext): boolean {
-    const scene = ctx.scene.getScene();
-    return getActivePage(scene).layout === 'absolute' && canResizePage(scene);
+    const scene = ctx.scene.getDocument();
+    return (
+      artboardRulesLayout(getActiveArtboard(scene)) === 'absolute' &&
+      canResizePage(scene)
+    );
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -85,19 +93,26 @@ export class SetPageSizeCommand extends Command {
     if (!size) {
       return;
     }
-    const activePageId = ctx.scene.getActivePageId();
+    const activeArtboardId = ctx.scene.getActiveArtboardId();
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((page) =>
-          page.id === activePageId && page.layout === 'absolute'
+        artboards: scene.artboards.map((page) =>
+          page.id === activeArtboardId &&
+          artboardRulesLayout(page) === 'absolute'
             ? {
                 ...page,
-                dpi: 96,
-                height: size.height,
-                presetId: undefined,
-                unit: 'px',
-                width: size.width,
+                physical: {
+                  ...page.physical,
+                  dpi: 96,
+                  presetId: undefined,
+                  unit: 'px',
+                },
+                space: {
+                  ...page.space,
+                  height: size.height,
+                  width: size.width,
+                },
               }
             : page
         ),
@@ -129,7 +144,10 @@ export class SetBleedMmCommand extends Command {
   readonly id = 'canvas.setBleedMm';
 
   canExecute(ctx: CommandContext): boolean {
-    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+    return (
+      artboardRulesLayout(getActiveArtboard(ctx.scene.getDocument())) ===
+      'absolute'
+    );
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -137,12 +155,17 @@ export class SetBleedMmCommand extends Command {
     if (bleedMm === null) {
       return;
     }
-    const activePageId = ctx.scene.getActivePageId();
+    const activeArtboardId = ctx.scene.getActiveArtboardId();
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((page) =>
-          page.id === activePageId ? { ...page, bleedMm } : page
+        artboards: scene.artboards.map((page) =>
+          page.id === activeArtboardId
+            ? {
+                ...page,
+                physical: { ...page.physical, bleedMm },
+              }
+            : page
         ),
       }),
       label: localize(ctx.services, 'canvas.history.setBleedMm', {
@@ -156,7 +179,10 @@ export class SetSafeMmCommand extends Command {
   readonly id = 'canvas.setSafeMm';
 
   canExecute(ctx: CommandContext): boolean {
-    return getActivePage(ctx.scene.getScene()).layout === 'absolute';
+    return (
+      artboardRulesLayout(getActiveArtboard(ctx.scene.getDocument())) ===
+      'absolute'
+    );
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -164,12 +190,17 @@ export class SetSafeMmCommand extends Command {
     if (safeMm === null) {
       return;
     }
-    const activePageId = ctx.scene.getActivePageId();
+    const activeArtboardId = ctx.scene.getActiveArtboardId();
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((page) =>
-          page.id === activePageId ? { ...page, safeMm } : page
+        artboards: scene.artboards.map((page) =>
+          page.id === activeArtboardId
+            ? {
+                ...page,
+                physical: { ...page.physical, safeMm },
+              }
+            : page
         ),
       }),
       label: localize(ctx.services, 'canvas.history.setSafeMm', {
@@ -183,8 +214,11 @@ export class SetPagePresetCommand extends Command {
   readonly id = 'canvas.setPagePreset';
 
   canExecute(ctx: CommandContext): boolean {
-    const scene = ctx.scene.getScene();
-    return getActivePage(scene).layout === 'absolute' && canResizePage(scene);
+    const scene = ctx.scene.getDocument();
+    return (
+      artboardRulesLayout(getActiveArtboard(scene)) === 'absolute' &&
+      canResizePage(scene)
+    );
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -198,7 +232,7 @@ export class SetPagePresetCommand extends Command {
         CanvasPageResizeServiceId
       );
       const nextScene = pageResize.resizeSceneToPreset(
-        ctx.scene.getScene(),
+        ctx.scene.getDocument(),
         presetId
       );
       if (nextScene) {
@@ -227,10 +261,10 @@ export class ResizePagePresetCommand extends Command {
   readonly id = 'canvas.resizePagePreset';
 
   canExecute(ctx: CommandContext, args?: unknown): boolean {
-    if (ctx.scene.getActivePage().layout !== 'absolute') {
+    if (artboardRulesLayout(ctx.scene.getActiveArtboard()) !== 'absolute') {
       return false;
     }
-    if (!canResizePage(ctx.scene.getScene())) {
+    if (!canResizePage(ctx.scene.getDocument())) {
       return false;
     }
     return Boolean((args as PagePresetArgs | undefined)?.presetId);
@@ -354,19 +388,15 @@ export class UpdateRichTextTransformCommand extends Command {
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((page) => ({
+        artboards: scene.artboards.map((page) => ({
           ...page,
-          layers: updateLayerInTree(page.layers, update.layerId, (layer) => {
-            const data =
-              typeof layer.data === 'object' && layer.data !== null
-                ? { ...(layer.data as Record<string, unknown>) }
+          nodes: updateLayerInTree(page.nodes, update.layerId, (layer) => {
+            const props =
+              typeof layer.props === 'object' && layer.props !== null
+                ? { ...(layer.props as Record<string, unknown>) }
                 : {};
-            data.fontSize = update.fontSize;
-            return {
-              ...layer,
-              data,
-              transform: update.transform,
-            };
+            props.fontSize = update.fontSize;
+            return applyNodeTransform({ ...layer, props }, update.transform);
           }),
         })),
       }),
@@ -412,8 +442,8 @@ export class ExportImageCommand extends Command {
     if (!exporter) {
       return null;
     }
-    const scene = ctx.scene.getScene();
-    const page = getActivePage(scene);
+    const scene = ctx.scene.getDocument();
+    const page = getActiveArtboard(scene);
     const options =
       args && typeof args === 'object'
         ? (args as {
@@ -454,32 +484,25 @@ function applyLayerTransform(
   ctx.scene.apply({
     apply: (scene) => ({
       ...scene,
-      pages: scene.pages.map((page) => ({
+      artboards: scene.artboards.map((page) => ({
         ...page,
-        layers: updateLayerInTree(page.layers, layerId, (layer) => {
+        nodes: updateLayerInTree(page.nodes, layerId, (layer) => {
           if (!dataPatch) {
-            return {
-              ...layer,
-              transform,
-            };
+            return applyNodeTransform(layer, transform);
           }
 
-          const data =
-            typeof layer.data === 'object' && layer.data !== null
-              ? { ...(layer.data as Record<string, unknown>) }
+          const props =
+            typeof layer.props === 'object' && layer.props !== null
+              ? { ...(layer.props as Record<string, unknown>) }
               : {};
           for (const [key, value] of Object.entries(dataPatch)) {
             if (value === undefined) {
-              delete data[key];
+              delete props[key];
             } else {
-              data[key] = value;
+              props[key] = value;
             }
           }
-          return {
-            ...layer,
-            data,
-            transform,
-          };
+          return applyNodeTransform({ ...layer, props }, transform);
         }),
       })),
     }),
@@ -494,21 +517,21 @@ function setLayerRotation(
   layerId: string,
   rotation: number
 ): void {
-  const layer = findLayerById(ctx.scene.getScene(), layerId);
-  if (!layer?.transform) {
+  const layer = findNodeById(ctx.scene.getDocument(), layerId);
+  if (!layer?.frame) {
     return;
   }
   applyLayerTransform(
     ctx,
     layerId,
-    rotateTransformAroundCenter(layer.transform, rotation)
+    rotateTransformAroundCenter(nodeTransform(layer), rotation)
   );
 }
 
 function adjustLayerRotation(ctx: CommandContext, delta: number): void {
   const layer = ctx.scene.getPrimaryLayer();
-  if (!layer?.transform) {
+  if (!layer?.frame) {
     return;
   }
-  setLayerRotation(ctx, layer.id, layer.transform.rotation + delta);
+  setLayerRotation(ctx, layer.id, nodeTransform(layer).rotation + delta);
 }

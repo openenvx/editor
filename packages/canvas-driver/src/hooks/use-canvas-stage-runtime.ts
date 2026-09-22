@@ -1,6 +1,7 @@
 import type { Layer as SceneLayer } from '@openenvx/studio/core';
 import { canTransformLayer, getLayerChildren } from '@openenvx/studio/core';
 import { useStoreSelector } from '@openenvx/studio/react';
+import { nodeTransform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';
@@ -86,8 +87,8 @@ export function useCanvasStageRuntime(
     | 'artboardWidth'
     | 'artboardHeight'
     | 'layers'
-    | 'selectedLayerIds'
-    | 'primaryLayerId'
+    | 'selectedNodeIds'
+    | 'primaryNodeId'
     | 'hoveredLayerId'
     | 'editingLayerId'
     | 'pageMarginBounds'
@@ -112,8 +113,8 @@ export function useCanvasStageRuntime(
     artboardWidth,
     artboardHeight,
     layers,
-    selectedLayerIds,
-    primaryLayerId = null,
+    selectedNodeIds,
+    primaryNodeId = null,
     hoveredLayerId = null,
     editingLayerId = null,
     pageMarginBounds = null,
@@ -142,8 +143,8 @@ export function useCanvasStageRuntime(
   const transformerRef = useRef<Konva.Transformer>(null);
   const artboardGroupRef = useRef<Konva.Group>(null);
   const overlayGroupRef = useRef<Konva.Group>(null);
-  const selectedLayerIdsRef = useRef(selectedLayerIds);
-  const primaryLayerIdRef = useRef(primaryLayerId);
+  const selectedNodeIdsRef = useRef(selectedNodeIds);
+  const primaryNodeIdRef = useRef(primaryNodeId);
   const flattenedLayers = useMemo(() => flattenStageLayers(layers), [layers]);
   const flattenedLayerById = useMemo(
     () => new Map(flattenedLayers.map((entry) => [entry.layer.id, entry])),
@@ -157,14 +158,14 @@ export function useCanvasStageRuntime(
   runtime.onDoubleClickRef.current = onLayerDoubleClick;
   runtime.onTransformRef.current = onTransformChange;
   runtime.layersRef.current = flattenedLayers;
-  runtime.selectedLayerIdsRef.current = selectedLayerIds;
-  selectedLayerIdsRef.current = selectedLayerIds;
-  primaryLayerIdRef.current = primaryLayerId;
+  runtime.selectedNodeIdsRef.current = selectedNodeIds;
+  selectedNodeIdsRef.current = selectedNodeIds;
+  primaryNodeIdRef.current = primaryNodeId;
   stageInteractionRef.current = stageInteraction;
 
   const selectedLayerIdSet = useMemo(
-    () => new Set(selectedLayerIds),
-    [selectedLayerIds]
+    () => new Set(selectedNodeIds),
+    [selectedNodeIds]
   );
   runtime.selectedLayerIdSetRef.current = selectedLayerIdSet;
 
@@ -179,13 +180,14 @@ export function useCanvasStageRuntime(
     }
   );
 
-  const selectedPrimary = primaryLayerId ?? selectedLayerIds[0] ?? null;
+  const selectedPrimary = primaryNodeId ?? selectedNodeIds[0] ?? null;
   const selectedLayer = selectedPrimary
     ? flattenedLayerById.get(selectedPrimary)
     : undefined;
   // Size label / handle layout sit at artboard root - use absolute transform.
   const selectedTransform =
-    selectedLayer?.absoluteTransform ?? selectedLayer?.layer.transform ?? null;
+    selectedLayer?.absoluteTransform ??
+    (selectedLayer ? nodeTransform(selectedLayer.layer) : null);
   const selectedInteraction = selectedLayer
     ? getInteraction(canvasLayerInteractions, selectedLayer.view.kind)
     : undefined;
@@ -262,7 +264,7 @@ export function useCanvasStageRuntime(
     getUserGuidesConfig,
     layersRef: runtime.layersRef,
     nodeRefs: runtime.nodeRefs,
-    selectedLayerIdsRef,
+    selectedNodeIdsRef,
     setInteractionOverlays,
     stageInteractionRef,
     zoom: vp.zoom,
@@ -323,10 +325,10 @@ export function useCanvasStageRuntime(
     isRichTextSelected,
     nodeRefs: runtime.nodeRefs,
     onTransformRef: runtime.onTransformRef,
-    primaryLayerIdRef,
+    primaryLayerIdRef: primaryNodeIdRef,
     selectedInteraction,
     selectedLayer,
-    selectedLayerIdsRef,
+    selectedNodeIdsRef,
     selectedPrimary,
     setActiveDragAnchor,
     setInteractionOverlays,
@@ -378,8 +380,8 @@ export function useCanvasStageRuntime(
     },
     selectedInteraction,
     selectedLayer,
-    selectedLayerIds,
-    selectedLayerIdsRef,
+    selectedNodeIds,
+    selectedNodeIdsRef,
     selectedPrimary,
     selectedTransform,
     setInteractionOverlays,
@@ -455,7 +457,7 @@ export function useCanvasStageRuntime(
     isNonEmptyGroupSelected,
     nodeRefs: runtime.nodeRefs,
     selectedInteraction,
-    selectedLayerIds,
+    selectedNodeIds,
     selectedPrimary,
     selectedTransform,
     syncLabelFromTransformer,

@@ -10,14 +10,14 @@ import { getLayerAncestorIds } from './get-layer-ancestor-ids';
 export function resolveViewHoveredIds(
   view: ViewDescriptor,
   hoveredLayerId: string | null,
-  activePageId: string
+  activeArtboardId: string
 ): Set<string> {
   const viewHover = view.viewHover;
   if (!hoveredLayerId || viewHover === 'none') {
     return new Set();
   }
   if (viewHover === 'page') {
-    return new Set(activePageId ? [activePageId] : []);
+    return new Set(activeArtboardId ? [activeArtboardId] : []);
   }
   return new Set([hoveredLayerId]);
 }

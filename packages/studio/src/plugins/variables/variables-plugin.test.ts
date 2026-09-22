@@ -34,9 +34,9 @@ function createCommandContext(sceneOverrides: Record<string, unknown> = {}) {
     events: { emit: vi.fn() } as never,
     scene: sceneStore,
     selection: {
-      activePageId: 'p1',
-      primaryLayerId: null,
-      selectedLayerIds: [],
+      activeArtboardId: 'p1',
+      primaryNodeId: null,
+      selectedNodeIds: [],
     },
     services: {
       ...services,
@@ -77,7 +77,7 @@ describe('VariablesPlugin commands', () => {
         values: expect.objectContaining({ key: expect.any(String) }),
       })
     );
-    expect(ctx.scene.getScene().variables).toEqual(
+    expect(ctx.scene.getDocument().variables).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ key: 'email', sample: 'you@example.com' }),
       ])
@@ -102,7 +102,7 @@ describe('VariablesPlugin commands', () => {
         values: expect.objectContaining({ key: 'name' }),
       })
     );
-    expect(ctx.scene.getScene().variables[0]).toMatchObject({
+    expect(ctx.scene.getDocument().variables[0]).toMatchObject({
       id: 'var-1',
       key: 'renamed',
       sample: 'x',
@@ -120,6 +120,6 @@ describe('VariablesPlugin commands', () => {
 
     await command.execute(ctx as never, { id: 'var-1' });
 
-    expect(ctx.scene.getScene().variables).toHaveLength(0);
+    expect(ctx.scene.getDocument().variables).toHaveLength(0);
   });
 });

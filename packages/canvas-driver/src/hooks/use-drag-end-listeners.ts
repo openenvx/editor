@@ -8,7 +8,7 @@ export interface UseDragEndListenersInput {
   clearHandleDragState: (options?: { clearLiveOverrides?: boolean }) => void;
   nodeRefs: RefObject<Map<string, Konva.Group>>;
   onEndDrag: () => void;
-  selectedLayerIdsRef: RefObject<string[]>;
+  selectedNodeIdsRef: RefObject<string[]>;
   syncLabelFromTransformer: () => void;
   transformerRef: RefObject<Konva.Transformer | null>;
 }
@@ -17,7 +17,7 @@ export function useDragEndListeners({
   clearHandleDragState,
   nodeRefs,
   onEndDrag,
-  selectedLayerIdsRef,
+  selectedNodeIdsRef,
   syncLabelFromTransformer,
   transformerRef,
 }: UseDragEndListenersInput) {
@@ -40,7 +40,7 @@ export function useDragEndListeners({
         clearHandleDragState();
         reattachTransformerFromSelection(
           nodeRefs,
-          selectedLayerIdsRef,
+          selectedNodeIdsRef,
           transformerRef,
           syncLabelFromTransformer
         );
@@ -62,7 +62,7 @@ export function useDragEndListeners({
     detachEndDragListeners,
     nodeRefs,
     onEndDrag,
-    selectedLayerIdsRef,
+    selectedNodeIdsRef,
     syncLabelFromTransformer,
     transformerRef,
   ]);

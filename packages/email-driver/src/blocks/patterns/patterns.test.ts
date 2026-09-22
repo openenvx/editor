@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { BlockRegistry, createBlock } from '@openenvx/html-driver';
-import type { Page } from '@openenvx/studio/schema';
-
 import { builtinEmailBlocks } from '../builtin-blocks';
+import { testEmailArtboard } from '../../test/document-fixtures';
 import { renderEmailDocument } from '../../render/render-email-document';
 import {
   articleWithImageBlock,
@@ -48,24 +47,18 @@ describe('email.header pattern', () => {
       'header-1',
       headerBlock.defaultData
     );
-    const page: Page = {
+    const page = testEmailArtboard({
       id: 'page-1',
       name: 'Email',
-      layout: 'email',
-      width: 600,
-      height: 800,
-      layers: [
+      nodes: [
         {
           id: 'root-1',
           type: 'email.root',
-          data: {
-            background: '#f6f9fc',
-            preheader: '',
-            children: [header],
-          },
+          props: { background: '#f6f9fc', preheader: '' },
+          children: [header],
         },
       ],
-    };
+    });
 
     const html = await renderEmailDocument(page, registry);
 
@@ -102,8 +95,8 @@ describe('email.articleWithImage pattern', () => {
       'article-b',
       articleWithImageBlock.defaultData
     );
-    const aKids = (a.data as { children: { id: string }[] }).children;
-    const bKids = (b.data as { children: { id: string }[] }).children;
+    const aKids = a.children ?? [];
+    const bKids = b.children ?? [];
     expect(aKids).toHaveLength(5);
     expect(bKids).toHaveLength(5);
     expect(aKids.map((child) => child.id)).not.toEqual(
@@ -118,24 +111,18 @@ describe('email.articleWithImage pattern', () => {
       'article-1',
       articleWithImageBlock.defaultData
     );
-    const page: Page = {
+    const page = testEmailArtboard({
       id: 'page-1',
       name: 'Email',
-      layout: 'email',
-      width: 600,
-      height: 800,
-      layers: [
+      nodes: [
         {
           id: 'root-1',
           type: 'email.root',
-          data: {
-            background: '#f6f9fc',
-            preheader: '',
-            children: [article],
-          },
+          props: { background: '#f6f9fc', preheader: '' },
+          children: [article],
         },
       ],
-    };
+    });
 
     const html = await renderEmailDocument(page, registry);
 

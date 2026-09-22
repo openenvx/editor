@@ -6,7 +6,7 @@ import {
   resolveInsertParentId,
 } from '@openenvx/html-driver';
 import type { CommandContext } from '@openenvx/studio/core';
-import { plainTextToHtml } from '@openenvx/studio/schema';
+import { artboardRulesLayout, plainTextToHtml } from '@openenvx/studio/schema';
 
 import {
   emailBlockRegistry,
@@ -18,8 +18,8 @@ export function insertEmailTextHtml(
   ctx: CommandContext,
   html: string
 ): boolean {
-  const page = ctx.scene.getActivePage();
-  if (page.layout !== 'email') {
+  const page = ctx.scene.getActiveArtboard();
+  if (artboardRulesLayout(page) !== 'email') {
     return false;
   }
   const registry =
@@ -29,10 +29,10 @@ export function insertEmailTextHtml(
     return false;
   }
   const selectedId =
-    ctx.selection.primaryLayerId ?? ctx.selection.selectedLayerIds[0] ?? null;
+    ctx.selection.primaryNodeId ?? ctx.selection.selectedNodeIds[0] ?? null;
   const rootId = getPageRootId(page, 'email.root');
   const parentId = resolveInsertParentId(
-    page.layers,
+    page.nodes,
     selectedId,
     rootId,
     registry

@@ -1,17 +1,18 @@
 import { cloneDropNulls } from './clone-drop-nulls';
-import { pruneEditorState } from './editor-state';
-import { sceneSchemaLenient } from './scene-schema';
-import { SCHEMA_VERSION } from './types';
+import { documentSchemaLenient } from './document-schema';
+import { pruneEditorSession } from './editor-state';
+import { migrateLegacyDocumentInput } from './legacy-document-migration';
+import { defaultFrame } from './node-helpers';
 import type {
-  EditorState,
-  Layer,
-  Page,
-  Scene,
-  SceneSnapshot,
+  Artboard,
+  Document,
+  DocumentNode,
+  EditorSession,
   LengthUnit,
+  ProjectSnapshot,
 } from './types';
 import { defaultDpiForUnit } from './units';
-import { parseValidEditorState } from './validate';
+import { parseValidEditorSession } from './validate';
 
 function formatNormalizeError(
   issues: { path: PropertyKey[]; message: string }[]
@@ -25,166 +26,176 @@ function formatNormalizeError(
     .join('\n');
 }
 
-export function createDefaultTransform(): NonNullable<Layer['transform']> {
-  return {
-    height: 100,
-    opacity: 1,
-    rotation: 0,
-    scaleX: 1,
-    scaleY: 1,
-    width: 200,
-    x: 0,
-    y: 0,
-  };
+export function createDefaultFrame(): NonNullable<DocumentNode['frame']> {
+  return defaultFrame();
 }
 
-export function createDefaultPage(
-  id: string,
-  layout: Page['layout'] = 'flow'
-): Page {
+/** @deprecated use createDefaultFrame */
+export const createDefaultTransform = createDefaultFrame;
+
+export function createDefaultArtboard(id: string): Artboard {
   return {
+    extensions: { layout: 'flow' },
     id,
-    layers: [],
-    layout,
-    name: 'Page 1',
-    unit: 'px',
-    dpi: 96,
+    name: 'Artboard 1',
+    nodes: [],
+    physical: { dpi: 96, unit: 'px' },
+    space: {},
   };
 }
 
-export function createDefaultEditorState(activePageId: string): EditorState {
+/** @deprecated use createDefaultArtboard */
+export const createDefaultPage = createDefaultArtboard;
+
+export function createDefaultEditorSession(
+  activeArtboardId: string
+): EditorSession {
   return {
-    activePageId,
-    primaryLayerId: null,
-    selectedLayerIds: [],
+    activeArtboardId,
+    primaryNodeId: null,
+    selectedNodeIds: [],
   };
 }
 
-export function createEmptyScene(): Scene {
-  const page = createDefaultPage('page-1', 'flow');
+/** @deprecated use createDefaultEditorSession */
+export const createDefaultEditorState = createDefaultEditorSession;
+
+export function createEmptyDocument(): Document {
+  const artboard = createDefaultArtboard('artboard-1');
   return {
-    pages: [page],
-    schemaVersion: SCHEMA_VERSION,
+    artboards: [artboard],
   };
 }
 
-export function createEmptySceneSnapshot(): SceneSnapshot {
-  const scene = createEmptyScene();
+/** @deprecated use createEmptyDocument */
+export const createEmptyScene = createEmptyDocument;
+
+export function createEmptyProjectSnapshot(): ProjectSnapshot {
+  const document = createEmptyDocument();
   return {
-    editorState: createDefaultEditorState(scene.pages[0]!.id),
-    scene,
+    document,
+    session: createDefaultEditorSession(document.artboards[0]!.id),
   };
 }
 
-function ensurePages(scene: Scene): Scene {
-  if (scene.pages.length > 0) {
-    return scene;
+/** @deprecated use createEmptyProjectSnapshot */
+export const createEmptySceneSnapshot = createEmptyProjectSnapshot;
+
+function ensureArtboards(document: Document): Document {
+  if (document.artboards.length > 0) {
+    return document;
   }
   return {
-    ...scene,
-    pages: [createDefaultPage('page-1', 'flow')],
+    ...document,
+    artboards: [createDefaultArtboard('artboard-1')],
   };
 }
 
-/** Structural page defaults only - no layout-specific rules. */
-function applyStructuralPageDefaults(scene: Scene): Scene {
+function applyStructuralArtboardDefaults(document: Document): Document {
   return {
-    ...scene,
-    pages: scene.pages.map((page) => {
-      const unit = (page.unit ?? 'px') as LengthUnit;
+    ...document,
+    artboards: document.artboards.map((artboard) => {
+      const unit = (artboard.physical?.unit ?? 'px') as LengthUnit;
       return {
-        ...page,
-        dpi: page.dpi ?? defaultDpiForUnit(unit),
-        unit,
+        ...artboard,
+        physical: {
+          ...artboard.physical,
+          dpi: artboard.physical?.dpi ?? defaultDpiForUnit(unit),
+          unit,
+        },
       };
     }),
   };
 }
 
-/**
- * Validate and fill structural defaults via the lenient Zod schema.
- * Layout-specific rules (e.g. absolute dims/presets) live on providers.
- * Idempotent for current-format input. Does not migrate old schemaVersion docs.
- */
-export function normalizeScene(input: unknown = {}): Scene {
-  const parsed = sceneSchemaLenient.safeParse(cloneDropNulls(input ?? {}));
+export function normalizeDocument(input: unknown = {}): Document {
+  const migrated = migrateLegacyDocumentInput(cloneDropNulls(input ?? {}));
+  const parsed = documentSchemaLenient.safeParse(migrated);
   if (!parsed.success) {
     throw new Error(
-      `Failed to normalize OpenEnvx scene:\n${formatNormalizeError(parsed.error.issues)}`
+      `Failed to normalize OpenEnvx document:\n${formatNormalizeError(parsed.error.issues)}`
     );
   }
-  return applyStructuralPageDefaults(
-    ensurePages(parsed.data as unknown as Scene)
+  return applyStructuralArtboardDefaults(
+    ensureArtboards(parsed.data as unknown as Document)
   );
 }
 
-export function normalizeEditorState(
+/** @deprecated use normalizeDocument */
+export const normalizeScene = normalizeDocument;
+
+export function normalizeEditorSession(
   input: unknown,
-  fallbackActivePageId: string,
-  scene?: Scene
-): EditorState {
+  fallbackActiveArtboardId: string,
+  document?: Document
+): EditorSession {
   if (input && typeof input === 'object') {
     const record = input as Record<string, unknown>;
-    const activePageId =
-      typeof record.activePageId === 'string'
-        ? record.activePageId
-        : fallbackActivePageId;
+    const activeArtboardId =
+      typeof record.activeArtboardId === 'string'
+        ? record.activeArtboardId
+        : typeof record.activePageId === 'string'
+          ? record.activePageId
+          : fallbackActiveArtboardId;
+    const selectedNodeIds = Array.isArray(record.selectedNodeIds)
+      ? record.selectedNodeIds
+      : Array.isArray(record.selectedLayerIds)
+        ? record.selectedLayerIds
+        : undefined;
+    const primaryNodeId =
+      typeof record.primaryNodeId === 'string' || record.primaryNodeId === null
+        ? record.primaryNodeId
+        : typeof record.primaryLayerId === 'string' ||
+            record.primaryLayerId === null
+          ? record.primaryLayerId
+          : undefined;
     try {
-      const state = parseValidEditorState({
+      const session = parseValidEditorSession({
         ...record,
-        activePageId,
+        activeArtboardId,
+        ...(selectedNodeIds ? { selectedNodeIds } : {}),
+        ...(primaryNodeId !== undefined ? { primaryNodeId } : {}),
       });
-      return scene ? pruneEditorState(scene, state) : state;
+      return document ? pruneEditorSession(document, session) : session;
     } catch {
-      const fallback = createDefaultEditorState(fallbackActivePageId);
-      return scene ? pruneEditorState(scene, fallback) : fallback;
+      const fallback = createDefaultEditorSession(fallbackActiveArtboardId);
+      return document ? pruneEditorSession(document, fallback) : fallback;
     }
   }
-  const fallback = createDefaultEditorState(fallbackActivePageId);
-  return scene ? pruneEditorState(scene, fallback) : fallback;
+  const fallback = createDefaultEditorSession(fallbackActiveArtboardId);
+  return document ? pruneEditorSession(document, fallback) : fallback;
 }
 
-export function normalizeSceneSnapshot(input: unknown = {}): SceneSnapshot {
+/** @deprecated use normalizeEditorSession */
+export const normalizeEditorState = normalizeEditorSession;
+
+export function normalizeProjectSnapshot(input: unknown = {}): ProjectSnapshot {
   if (input && typeof input === 'object') {
     const record = input as Record<string, unknown>;
-    // Legacy: Scene used to embed activePageId + selection.
-    if ('pages' in record && !('scene' in record)) {
-      const legacy = record as Record<string, unknown> & {
-        activePageId?: string;
-        editorState?: unknown;
-        selection?: unknown;
-      };
-      const { activePageId, editorState, selection, ...sceneFields } = legacy;
-      const scene = normalizeScene(sceneFields);
-      const pageId =
-        (typeof activePageId === 'string' &&
-        scene.pages.some((p) => p.id === activePageId)
-          ? activePageId
-          : undefined) ?? scene.pages[0]!.id;
-      const editorInput =
-        editorState ??
-        (selection && typeof selection === 'object'
-          ? { ...(selection as object), activePageId: pageId }
-          : { activePageId: pageId });
-      const normalizedEditorState = normalizeEditorState(
-        editorInput,
-        pageId,
-        scene
-      );
-      return { editorState: normalizedEditorState, scene };
-    }
-
-    if ('scene' in record) {
-      const scene = normalizeScene(record.scene);
-      const fallbackId = scene.pages[0]!.id;
-      const editorState = normalizeEditorState(
-        record.editorState,
+    if ('document' in record) {
+      const document = normalizeDocument(record.document);
+      const fallbackId = document.artboards[0]!.id;
+      const session = normalizeEditorSession(
+        record.session ?? record.editorState,
         fallbackId,
-        scene
+        document
       );
-      return { editorState, scene };
+      return { document, session };
+    }
+    if ('scene' in record) {
+      const document = normalizeDocument(record.scene);
+      const fallbackId = document.artboards[0]!.id;
+      const session = normalizeEditorSession(
+        record.editorState ?? record.session,
+        fallbackId,
+        document
+      );
+      return { document, session };
     }
   }
 
-  return createEmptySceneSnapshot();
+  return createEmptyProjectSnapshot();
 }
+
+/** @deprecated use normalizeProjectSnapshot */
+export const normalizeSceneSnapshot = normalizeProjectSnapshot;

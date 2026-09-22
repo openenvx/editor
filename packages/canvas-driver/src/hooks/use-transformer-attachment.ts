@@ -15,7 +15,7 @@ export interface UseTransformerAttachmentInput {
   isNonEmptyGroupSelected: boolean;
   nodeRefs: RefObject<Map<string, Konva.Group>>;
   selectedInteraction: CanvasLayerInteractionRegistration | undefined;
-  selectedLayerIds: string[];
+  selectedNodeIds: string[];
   selectedPrimary: string | null;
   selectedTransform: {
     height: number;
@@ -35,7 +35,7 @@ export function useTransformerAttachment({
   isNonEmptyGroupSelected,
   nodeRefs,
   selectedInteraction,
-  selectedLayerIds,
+  selectedNodeIds,
   selectedPrimary,
   selectedTransform,
   syncLabelFromTransformer,
@@ -47,7 +47,7 @@ export function useTransformerAttachment({
       transformerRef.current?.nodes([]);
       return;
     }
-    const nodes = selectedLayerIds
+    const nodes = selectedNodeIds
       .map((layerId) => nodeRefs.current.get(layerId))
       .filter((node): node is Konva.Group => Boolean(node));
     attachTransformerToNodes(transformerRef.current, nodes);
@@ -55,7 +55,7 @@ export function useTransformerAttachment({
     activeHandleAnchor,
     editingLayerId,
     nodeRefs,
-    selectedLayerIds,
+    selectedNodeIds,
     transformerRef,
   ]);
 
@@ -69,7 +69,7 @@ export function useTransformerAttachment({
     ) {
       return;
     }
-    const nodes = selectedLayerIds
+    const nodes = selectedNodeIds
       .map((layerId) => nodeRefs.current.get(layerId))
       .filter((node): node is Konva.Group => Boolean(node));
     attachTransformerToNodes(transformerRef.current, nodes);
@@ -78,7 +78,7 @@ export function useTransformerAttachment({
     activeHandleAnchor,
     editingLayerId,
     nodeRefs,
-    selectedLayerIds,
+    selectedNodeIds,
     selectedPrimary,
     selectedTransform,
     syncLabelFromTransformer,

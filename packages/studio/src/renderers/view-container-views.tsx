@@ -46,11 +46,11 @@ function usePropertiesHostContext(
   createHostContext?: CreatePropertyHostContext
 ) {
   const { api, executeCommand } = useWorkbenchContext();
-  const primaryLayerId = useWorkbenchContextSelector(
-    (state) => state.selection.primaryLayerId
+  const primaryNodeId = useWorkbenchContextSelector(
+    (state) => state.selection.primaryNodeId
   );
   const selectionActivePageId = useWorkbenchContextSelector(
-    (state) => state.selection.activePageId
+    (state) => state.selection.activeArtboardId
   );
   const scene = useWorkbenchContextSelector((state) => state.scene);
   const fieldRenderers = useWorkbenchContextSelector(
@@ -58,19 +58,19 @@ function usePropertiesHostContext(
   );
 
   const layerData = useMemo(() => {
-    if (!scene || !primaryLayerId) {
+    if (!scene || !primaryNodeId) {
       return null;
     }
-    const primaryLayer = findLayerById(scene, primaryLayerId);
+    const primaryLayer = findLayerById(scene, primaryNodeId);
     if (
       !primaryLayer ||
-      typeof primaryLayer.data !== 'object' ||
-      primaryLayer.data === null
+      typeof primaryLayer.props !== 'object' ||
+      primaryLayer.props === null
     ) {
       return null;
     }
-    return primaryLayer.data as Record<string, unknown>;
-  }, [primaryLayerId, scene]);
+    return primaryLayer.props as Record<string, unknown>;
+  }, [primaryNodeId, scene]);
 
   const hostContext = useMemo(() => {
     if (!scene) {
@@ -79,11 +79,11 @@ function usePropertiesHostContext(
     const create = createHostContext ?? defaultPropertyHostContext;
     return create(
       {
-        activePageId: selectionActivePageId ?? null,
+        activeArtboardId: selectionActivePageId ?? null,
         executeCommand,
         layerData,
         scene,
-        selectedLayerId: primaryLayerId ?? null,
+        selectedLayerId: primaryNodeId ?? null,
         updateProperty: api.updateProperty,
       },
       { api, executeCommand }
@@ -93,7 +93,7 @@ function usePropertiesHostContext(
     createHostContext,
     executeCommand,
     layerData,
-    primaryLayerId,
+    primaryNodeId,
     scene,
     selectionActivePageId,
   ]);
@@ -103,7 +103,7 @@ function usePropertiesHostContext(
     fieldRenderers,
     hostContext,
     layerData,
-    primaryLayerId,
+    primaryNodeId,
     scene,
   };
 }
@@ -114,14 +114,14 @@ function PropertiesViewBody({
   fieldRenderers,
   hostContext,
   layerData,
-  primaryLayerId,
+  primaryNodeId,
 }: {
   view: ViewDescriptor;
   executeCommand: (commandId: string) => Promise<boolean>;
   fieldRenderers: FieldRendererRegistration[];
   hostContext: PropertyHostContext;
   layerData: Record<string, unknown> | null;
-  primaryLayerId: string | null;
+  primaryNodeId: string | null;
 }) {
   const { api } = useWorkbenchContext();
   const contextKeysRevision = useContextKeysRevision();
@@ -135,11 +135,11 @@ function PropertiesViewBody({
         readPath: (path) => hostContext.readPath(path),
         meta: {
           nodeLabel: meta?.nodeLabel,
-          primaryLayerId,
+          primaryNodeId,
         },
       });
     },
-    [api, contextKeysRevision, hostContext, primaryLayerId]
+    [api, contextKeysRevision, hostContext, primaryNodeId]
   );
 
   if (view.content.kind !== 'properties') {
@@ -152,7 +152,7 @@ function PropertiesViewBody({
       fieldRenderers={fieldRenderers}
       hostContext={hostContext}
       layerData={layerData ?? {}}
-      layerId={primaryLayerId ?? 'inspector'}
+      layerId={primaryNodeId ?? 'inspector'}
       nodes={view.content.nodes}
       onCommand={executeCommand}
     />
@@ -171,7 +171,7 @@ function PropertiesViewSection({
     fieldRenderers,
     hostContext,
     layerData,
-    primaryLayerId,
+    primaryNodeId,
     scene,
   } = usePropertiesHostContext(createHostContext);
 
@@ -209,7 +209,7 @@ function PropertiesViewSection({
       fieldRenderers={fieldRenderers as FieldRendererRegistration[]}
       hostContext={hostContext}
       layerData={layerData}
-      primaryLayerId={primaryLayerId}
+      primaryNodeId={primaryNodeId}
       view={view}
     />
   );

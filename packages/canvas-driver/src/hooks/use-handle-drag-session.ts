@@ -1,7 +1,6 @@
 import type { Layer as SceneLayer } from '@openenvx/studio/core';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import { createDefaultTransform } from '@openenvx/studio/schema';
-import type { Transform } from '@openenvx/studio/schema';
+import { nodeTransform, type Transform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
@@ -36,20 +35,17 @@ export interface UseHandleDragSessionInput {
   clearOverlays: () => void;
   editingLayerId: string | null;
   flattenedLayers: FlattenedLayerEntry[];
-  getLayerTransform: (
-    layerId: string,
-    transform: NonNullable<SceneLayer['transform']>
-  ) => NonNullable<SceneLayer['transform']>;
+  getLayerTransform: (layerId: string, transform: Transform) => Transform;
   isLayerWritableCallback: (layer: SceneLayer) => boolean;
   nodeRefs: RefObject<Map<string, Konva.Group>>;
   onTransformRef: RefObject<CanvasStageProps['onTransformChange']>;
   onHandleDragCleared?: () => void;
   selectedInteraction: CanvasLayerInteractionRegistration | undefined;
   selectedLayer: FlattenedLayerEntry | undefined;
-  selectedLayerIds: string[];
-  selectedLayerIdsRef: RefObject<string[]>;
+  selectedNodeIds: string[];
+  selectedNodeIdsRef: RefObject<string[]>;
   selectedPrimary: string | null;
-  selectedTransform: SceneLayer['transform'] | null;
+  selectedTransform: Transform | null;
   setInteractionOverlays: (overlays: CanvasOverlayPrimitive[]) => void;
   setLiveTransformOverride: (
     layerId: string,
@@ -103,8 +99,8 @@ export function useHandleDragSession({
   onHandleDragCleared,
   selectedInteraction,
   selectedLayer,
-  selectedLayerIds,
-  selectedLayerIdsRef,
+  selectedNodeIds,
+  selectedNodeIdsRef,
   selectedPrimary,
   selectedTransform,
   setInteractionOverlays,
@@ -133,9 +129,11 @@ export function useHandleDragSession({
   const selectedTransformRef = useRef(selectedTransform);
   selectedTransformRef.current = selectedTransform;
   const selectedRelativeTransformRef = useRef(
-    selectedLayer?.layer.transform ?? null
+    selectedLayer ? nodeTransform(selectedLayer.layer) : null
   );
-  selectedRelativeTransformRef.current = selectedLayer?.layer.transform ?? null;
+  selectedRelativeTransformRef.current = selectedLayer
+    ? nodeTransform(selectedLayer.layer)
+    : null;
 
   const clearHandleDragState = useCallback(
     (options?: { clearLiveOverrides?: boolean }) => {
@@ -170,7 +168,7 @@ export function useHandleDragSession({
       onEndDrag: () => {
         handleHandlePointerUpRef.current();
       },
-      selectedLayerIdsRef,
+      selectedNodeIdsRef,
       syncLabelFromTransformer,
       transformerRef,
     });
@@ -219,7 +217,7 @@ export function useHandleDragSession({
 
     reattachTransformerFromSelection(
       nodeRefs,
-      selectedLayerIdsRef,
+      selectedNodeIdsRef,
       transformerRef,
       syncLabelFromTransformer
     );
@@ -229,7 +227,7 @@ export function useHandleDragSession({
     flattenedLayers,
     nodeRefs,
     onTransformRef,
-    selectedLayerIdsRef,
+    selectedNodeIdsRef,
     setInteractionOverlays,
     setLiveTransformOverride,
     syncLabelFromTransformer,
@@ -242,7 +240,7 @@ export function useHandleDragSession({
   const showHandles = Boolean(
     selectedPrimary &&
     selectedLayer &&
-    selectedLayerIds.length === 1 &&
+    selectedNodeIds.length === 1 &&
     !editingLayerId &&
     !transformSessionLayerId &&
     !activeHandleAnchorState &&
@@ -339,8 +337,7 @@ export function useHandleDragSession({
         return;
       }
 
-      const originTransform =
-        selectedLayer.layer.transform ?? createDefaultTransform();
+      const originTransform = nodeTransform(selectedLayer.layer);
       handleDragRef.current = {
         anchor,
         layerId: selectedPrimary,

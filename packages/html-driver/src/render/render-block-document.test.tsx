@@ -13,7 +13,7 @@ describe('renderBlockDocument', () => {
       registry.register(block);
     }
     const scene = createHtmlDemoScene();
-    const page = scene.pages[0]!;
+    const page = scene.artboards[0]!;
 
     const markup = renderToStaticMarkup(
       renderBlockDocument(page, registry)
@@ -29,7 +29,7 @@ describe('renderBlockDocument', () => {
       registry.register(block);
     }
     const scene = createHtmlDemoScene();
-    const page = scene.pages[0]!;
+    const page = scene.artboards[0]!;
 
     const markup = renderToStaticMarkup(
       renderBlockDocument(page, registry, {

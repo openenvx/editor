@@ -1,40 +1,56 @@
 import { Command, updateLayerInTree } from '@openenvx/studio/core';
-import type { CommandContext, Layer } from '@openenvx/studio/core';
-import type { OpenEnvxWidgetData } from '@openenvx/studio/schema';
+import type { CommandContext, DocumentNode } from '@openenvx/studio/core';
+import type { OpenEnvxWidgetProps } from '@openenvx/studio/schema';
+import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
 
 import { WIDGET_LAYER_TYPE } from '../layers/openenvx-widget-layer';
 
-function unlockFace(layers: Layer[]): Layer[] {
-  return layers.map((layer) => {
-    const data = layer.data as { children?: Layer[] } | undefined;
-    const nextChildren = data?.children ? unlockFace(data.children) : undefined;
+function unlockFace(nodes: DocumentNode[]): DocumentNode[] {
+  return nodes.map((node) => {
+    const nextChildren = node.children ? unlockFace(node.children) : undefined;
     return {
-      ...layer,
+      ...node,
       writeMode: 'free' as const,
       showInLayers: true,
-      data:
-        nextChildren && data ? { ...data, children: nextChildren } : layer.data,
+      children: nextChildren ?? node.children,
     };
   });
 }
 
-function detachedReplacement(primary: Layer): Layer {
-  const data = primary.data as OpenEnvxWidgetData;
-  const children = unlockFace(data.children ?? []);
+function detachedReplacement(primary: DocumentNode): DocumentNode {
+  const props = (primary.props ?? {}) as unknown as OpenEnvxWidgetProps & {
+    children?: DocumentNode[];
+  };
+  const children = unlockFace(primary.children ?? []);
   const isHtmlContext =
     primary.type === WIDGET_LAYER_TYPE &&
     children.some((child) => child.type.startsWith('html.'));
-  return {
+  const transform = nodeTransform(primary);
+  const base = {
     id: primary.id,
-    type: isHtmlContext ? 'html.flex' : 'canvas.group',
-    name: data.manifest?.label || primary.name || 'Detached widget',
-    transform: primary.transform,
-    writeMode: 'free',
+    name: props.manifest?.label || primary.name || 'Detached widget',
+    writeMode: 'free' as const,
     showInLayers: true,
-    data: isHtmlContext
-      ? { direction: 'column', gap: 0, children }
-      : { children },
   };
+  if (isHtmlContext) {
+    return applyNodeTransform(
+      {
+        ...base,
+        type: 'html.flex',
+        props: { direction: 'column', gap: 0 },
+        children,
+      },
+      transform
+    );
+  }
+  return applyNodeTransform(
+    {
+      ...base,
+      type: 'canvas.group',
+      children,
+    },
+    transform
+  );
 }
 
 /**
@@ -56,13 +72,13 @@ export class DetachWidgetCommand extends Command {
       label: 'Detach widget',
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((page) => {
-          if (page.id !== ctx.scene.getActivePage().id) {
+        artboards: scene.artboards.map((page) => {
+          if (page.id !== ctx.scene.getActiveArtboard().id) {
             return page;
           }
           return {
             ...page,
-            layers: updateLayerInTree(page.layers, primary.id, () => group),
+            nodes: updateLayerInTree(page.nodes, primary.id, () => group),
           };
         }),
       }),

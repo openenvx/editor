@@ -37,7 +37,7 @@ export interface CanvasStageLayer {
 }
 
 export interface CanvasTransformChange {
-  transform: SceneLayer['transform'];
+  transform: import('@openenvx/studio/schema').Transform;
   fontSize?: number;
   dataPatch?: Record<string, unknown>;
 }
@@ -48,8 +48,8 @@ export interface CanvasStageProps {
   artboardWidth: number;
   artboardHeight: number;
   layers: CanvasStageLayer[];
-  selectedLayerIds: string[];
-  primaryLayerId?: string | null;
+  selectedNodeIds: string[];
+  primaryNodeId?: string | null;
   hoveredLayerId?: string | null;
   editingLayerId?: string | null;
   pageMarginBounds?: CanvasRect | null;

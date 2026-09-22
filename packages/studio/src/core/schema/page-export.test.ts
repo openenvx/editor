@@ -1,62 +1,75 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  computePageExportDimensions,
-  pagePhysicalSize,
-  resolvePagePixelDimensions,
-  resolvePagePresetId,
+  artboardPhysicalSize,
+  computeArtboardExportDimensions,
+  resolveArtboardPixelDimensions,
+  resolveArtboardPresetId,
 } from './page-export';
-import type { Page } from './types';
+import type { Artboard } from './types';
 
 /** A4 portrait at 96 DPI (210×297 mm). */
 const A4 = { width: 794, height: 1123 };
 
-function absolutePage(overrides: Partial<Page> = {}): Page {
+function absoluteArtboard(overrides: Partial<Artboard> = {}): Artboard {
   return {
-    height: A4.height,
+    extensions: { layout: 'absolute' },
     id: 'page-1',
-    layers: [],
-    layout: 'absolute',
     name: 'Artboard',
-    presetId: 'a4-portrait',
-    unit: 'mm',
-    width: A4.width,
+    nodes: [],
+    physical: {
+      dpi: 96,
+      presetId: 'a4-portrait',
+      unit: 'mm',
+      ...overrides.physical,
+    },
+    space: { height: A4.height, width: A4.width, ...overrides.space },
     ...overrides,
   };
 }
 
 describe('page-export', () => {
-  it('preserves explicit preset id on the page model', () => {
-    const page = absolutePage({ presetId: 'a4-portrait' });
-    expect(resolvePagePresetId(page)).toBe('a4-portrait');
+  it('preserves explicit preset id on the artboard model', () => {
+    const artboard = absoluteArtboard({
+      physical: { dpi: 96, presetId: 'a4-portrait', unit: 'mm' },
+    });
+    expect(resolveArtboardPresetId(artboard)).toBe('a4-portrait');
   });
 
-  it('throws when page is missing width/height', () => {
+  it('throws when artboard is missing width/height', () => {
     expect(() =>
-      resolvePagePixelDimensions({
+      resolveArtboardPixelDimensions({
+        extensions: { layout: 'absolute' },
         id: 'page-1',
-        layers: [],
-        layout: 'absolute',
         name: 'Broken',
+        nodes: [],
+        physical: { dpi: 96, unit: 'px' },
+        space: {},
       })
-    ).toThrow(/missing width\/height/);
+    ).toThrow(/missing space width\/height/);
   });
 
-  it('computes scaled export dimensions from page pixels', () => {
-    const page = absolutePage({ dpi: 96, height: 1000, width: 800 });
-    const dimensions = computePageExportDimensions(page, { scale: 2 });
+  it('computes scaled export dimensions from artboard pixels', () => {
+    const artboard = absoluteArtboard({
+      physical: { dpi: 96, presetId: 'a4-portrait', unit: 'mm' },
+      space: { height: 1000, width: 800 },
+    });
+    const dimensions = computeArtboardExportDimensions(artboard, { scale: 2 });
     expect(dimensions).toEqual({
+      artboardDpi: 96,
+      artboardPresetId: 'a4-portrait',
+      artboardUnit: 'mm',
       heightPx: 2000,
-      pageDpi: 96,
-      pagePresetId: 'a4-portrait',
-      pageUnit: 'mm',
       widthPx: 1600,
     });
   });
 
-  it('derives physical page size from pixels and unit', () => {
-    const page = absolutePage({ dpi: 96, height: 1123, width: 794 });
-    const physical = pagePhysicalSize(page);
+  it('derives physical artboard size from pixels and unit', () => {
+    const artboard = absoluteArtboard({
+      physical: { dpi: 96, presetId: 'a4-portrait', unit: 'mm' },
+      space: { height: 1123, width: 794 },
+    });
+    const physical = artboardPhysicalSize(artboard);
     expect(physical.unit).toBe('mm');
     expect(physical.width).toBeCloseTo(210, 0);
     expect(physical.height).toBeCloseTo(297, 0);

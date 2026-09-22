@@ -4,8 +4,9 @@ import type {
   WorkbenchApi,
   WorkbenchState,
 } from '@openenvx/studio/core';
-import { normalizeScene } from '@openenvx/studio/schema';
 import { vi } from 'vitest';
+
+import { normalizeSceneForTest } from '../core/test/document-fixtures';
 
 export function createMockWorkbenchApi(
   overrides: Partial<WorkbenchState> = {}
@@ -14,11 +15,11 @@ export function createMockWorkbenchApi(
   executeCommand: ReturnType<typeof vi.fn>;
   state: WorkbenchState;
 } {
-  const scene = normalizeScene({
+  const scene = normalizeSceneForTest({
     pages: [{ id: 'p1', name: 'Page', layout: 'flow', layers: [] }],
   });
   const state: WorkbenchState = {
-    activeContainerByLocation: { primary: null, secondary: null },
+    activeContainerByLocation: { panel: null, primary: null, secondary: null },
     commandPalette: {
       categories: [],
       items: [],
@@ -39,9 +40,9 @@ export function createMockWorkbenchApi(
     revision: 0,
     scene,
     selection: {
-      activePageId: 'p1',
-      primaryLayerId: null,
-      selectedLayerIds: [],
+      activeArtboardId: 'p1',
+      primaryNodeId: null,
+      selectedNodeIds: [],
     },
     sidebarHeaders: {},
     statusBar: [],

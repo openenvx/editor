@@ -1,15 +1,15 @@
 import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio/core';
 import type {
   CommandContext,
-  Layer,
+  DocumentNode,
   LayerPreviewContext,
-  Page,
   PropertySectionDescriptor,
 } from '@openenvx/studio/core';
 import {
   createLayerPreviewBuilder,
   encodeQrToSvg,
 } from '@openenvx/studio/preview';
+import type { Artboard } from '@openenvx/studio/schema';
 import { createDefaultTransform } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
@@ -35,9 +35,9 @@ export class CanvasQrLayer extends LayerDefinition<CanvasQrModel> {
     return canvasQrSchema.safeParse(data).success;
   }
 
-  createDefault(id: string, _page: Page): Layer {
+  createDefault(id: string, _artboard: Artboard): DocumentNode {
     return {
-      data: {
+      props: {
         background: '#ffffff',
         errorCorrection: 'M',
         foreground: '#000000',
@@ -46,13 +46,13 @@ export class CanvasQrLayer extends LayerDefinition<CanvasQrModel> {
       },
       id,
       name: 'qr',
-      transform: { ...createDefaultTransform(), height: 200, width: 200 },
+      frame: { ...createDefaultTransform(), height: 200, width: 200 },
       type: this.type,
     };
   }
 
-  serialize(layer: Layer): CanvasQrModel {
-    return layer.data as CanvasQrModel;
+  serialize(node: DocumentNode): CanvasQrModel {
+    return node.props as CanvasQrModel;
   }
 
   deserialize(data: unknown): CanvasQrModel {
@@ -68,7 +68,10 @@ export class CanvasQrLayer extends LayerDefinition<CanvasQrModel> {
         };
   }
 
-  properties(_ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
+  properties(
+    _ctx: CommandContext,
+    _node: DocumentNode
+  ): PropertySectionDescriptor[] {
     return createPropertyBuilder()
       .section('qr')
       .text('url', 'URL / payload', { debounceMs: URL_DEBOUNCE_MS })

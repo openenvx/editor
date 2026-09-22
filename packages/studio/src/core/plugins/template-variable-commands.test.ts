@@ -1,5 +1,6 @@
-import { normalizeScene } from '@openenvx/studio/schema';
 import { describe, expect, it, vi } from 'vitest';
+
+import { normalizeSceneForTest } from '../test/document-fixtures';
 
 import type { CommandContext } from '../runtime/types';
 import { InstantiationService } from '../runtime/instantiation-service';
@@ -33,9 +34,9 @@ function createCommandContext(scene: CommandContext['scene']): CommandContext {
     } as CommandContext['events'],
     scene,
     selection: {
-      activePageId: 'p1',
-      primaryLayerId: null,
-      selectedLayerIds: [],
+      activeArtboardId: 'p1',
+      primaryNodeId: null,
+      selectedNodeIds: [],
     },
     services,
   };
@@ -43,7 +44,7 @@ function createCommandContext(scene: CommandContext['scene']): CommandContext {
 
 describe('template-variable-commands', () => {
   it('executeSceneVariableCommand emits DidExecuteCommand', async () => {
-    const scene = normalizeScene({
+    const scene = normalizeSceneForTest({
       pages: [{ id: 'p1', layout: 'email', layers: [] }],
       variables: [],
     });
@@ -55,8 +56,8 @@ describe('template-variable-commands', () => {
       },
       canRedo: () => false,
       canUndo: () => false,
-      getActivePage: () => scene.pages[0]!,
-      getScene: () => scene,
+      getActivePage: () => scene.artboards[0]!,
+      getDocument: () => scene,
       redo: () => {},
       selectLayers: () => {},
       undo: () => {},
@@ -78,7 +79,7 @@ describe('template-variable-commands', () => {
   });
 
   it('rejects duplicate keys in addVariable canExecute', () => {
-    const scene = normalizeScene({
+    const scene = normalizeSceneForTest({
       pages: [{ id: 'p1', layout: 'email', layers: [] }],
       variables: [{ id: 'v1', key: 'name' }],
     });
@@ -86,8 +87,8 @@ describe('template-variable-commands', () => {
       apply: () => {},
       canRedo: () => false,
       canUndo: () => false,
-      getActivePage: () => scene.pages[0]!,
-      getScene: () => scene,
+      getActivePage: () => scene.artboards[0]!,
+      getDocument: () => scene,
       redo: () => {},
       selectLayers: () => {},
       undo: () => {},
@@ -98,7 +99,7 @@ describe('template-variable-commands', () => {
   });
 
   it('insertVariable requires an insert target', () => {
-    const scene = normalizeScene({
+    const scene = normalizeSceneForTest({
       pages: [
         {
           id: 'p1',
@@ -118,16 +119,16 @@ describe('template-variable-commands', () => {
       apply: () => {},
       canRedo: () => false,
       canUndo: () => false,
-      getActivePage: () => scene.pages[0]!,
-      getScene: () => scene,
+      getActivePage: () => scene.artboards[0]!,
+      getDocument: () => scene,
       redo: () => {},
       selectLayers: () => {},
       undo: () => {},
     } as never);
     ctx.selection = {
-      activePageId: 'p1',
-      primaryLayerId: 'img1',
-      selectedLayerIds: ['img1'],
+      activeArtboardId: 'p1',
+      primaryNodeId: 'img1',
+      selectedNodeIds: ['img1'],
     };
     const command = new InsertVariableCommand();
     expect(command.canExecute(ctx, { key: 'name' })).toBe(false);

@@ -1,23 +1,20 @@
 import { Command } from '@openenvx/studio/core';
 import type { ExtensionManifest } from '../protocol';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import {
+  normalizeDocument,
+  nodeTransform,
+  type Document,
+  type DocumentNode,
+  type OpenEnvxWidgetProps,
+  withArtboardRulesLayout,
+} from '@openenvx/studio/schema';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { extensionBlockStore } from './panel-tree/extension-block-store';
 import { registerWidgetInsertCommands } from './register-widget-insert-commands';
 import type { SandboxHostSurface } from './sandbox-host-surface';
 
-function createHost(scene: {
-  version: number;
-  pages: {
-    id: string;
-    name: string;
-    width: number;
-    height: number;
-    layers: unknown[];
-    layout?: string;
-  }[];
-}): SandboxHostSurface & {
+function createHost(document: Document): SandboxHostSurface & {
   commands: Map<string, Command>;
   applies: unknown[];
 } {
@@ -28,11 +25,11 @@ function createHost(scene: {
     applies,
     getSelection: () =>
       ({
-        selectedLayerIds: [],
-        primaryLayerId: null,
-        activePageId: scene.pages[0]?.id ?? null,
+        selectedNodeIds: [],
+        primaryNodeId: null,
+        activeArtboardId: document.artboards[0]?.id ?? null,
       }) as never,
-    getScene: () => scene as never,
+    getScene: () => document as never,
     apply: (transaction) => {
       applies.push(transaction);
     },
@@ -58,10 +55,20 @@ afterEach(() => {
 
 describe('registerWidgetInsertCommands', () => {
   it('registers widget insert command and drops a widget layer', () => {
-    const host = createHost({
-      version: 1,
-      pages: [{ id: 'p1', name: 'Page', width: 800, height: 600, layers: [] }],
+    const document = normalizeDocument({
+      artboards: [
+        withArtboardRulesLayout(
+          {
+            id: 'p1',
+            name: 'Page',
+            space: { width: 800, height: 600 },
+            nodes: [],
+          },
+          'absolute'
+        ),
+      ],
     });
+    const host = createHost(document);
     const manifest: ExtensionManifest = {
       id: 'wm.seating',
       name: 'Seating',
@@ -90,45 +97,42 @@ describe('registerWidgetInsertCommands', () => {
 
     expect(host.applies).toHaveLength(1);
     const tx = host.applies[0] as {
-      apply: (scene: {
-        pages: { id: string; layers: unknown[] }[];
-      }) => {
-        pages: { layers: { type: string; data: Record<string, unknown> }[] }[];
-      };
+      apply: (scene: Document) => Document;
     };
-    const next = tx.apply({
-      pages: [{ id: 'p1', layers: [] }],
-    });
-    const layer = next.pages[0]?.layers[0];
+    const next = tx.apply(document);
+    const layer = next.artboards[0]?.nodes[0];
+    const props = layer?.props as OpenEnvxWidgetProps | undefined;
     expect(layer?.type).toBe('openenvx.widget');
-    expect(layer?.data.extensionId).toBe('wm.seating');
-    expect(layer?.data.values).toEqual({
+    expect(props?.extensionId).toBe('wm.seating');
+    expect(props?.values).toEqual({
       tables: [{ id: 't1', label: '1', status: 'free' }],
     });
-    expect(createDefaultTransform().opacity).toBe(1);
+    expect(layer && nodeTransform(layer).opacity).toBe(1);
     expect(extensionBlockStore.getSnapshot()).toEqual([]);
   });
 
   it('nests HTML blocks under html.root and registers palette entries', () => {
-    const host = createHost({
-      version: 1,
-      pages: [
-        {
-          id: 'p1',
-          name: 'Page',
-          width: 800,
-          height: 600,
-          layout: 'html',
-          layers: [
-            {
-              id: 'root',
-              type: 'html.root',
-              data: { children: [] },
-            },
-          ],
-        },
+    const document = normalizeDocument({
+      artboards: [
+        withArtboardRulesLayout(
+          {
+            id: 'p1',
+            name: 'Page',
+            space: { width: 800, height: 600 },
+            nodes: [
+              {
+                id: 'root',
+                type: 'html.root',
+                props: {},
+                children: [],
+              },
+            ],
+          },
+          'html'
+        ),
       ],
     });
+    const host = createHost(document);
     const manifest: ExtensionManifest = {
       id: 'wm.wedding',
       name: 'Wedding',
@@ -161,28 +165,14 @@ describe('registerWidgetInsertCommands', () => {
 
     host.commands.get('wm.countdown.insert')?.execute({} as never);
     const tx = host.applies[0] as {
-      apply: (scene: {
-        pages: {
-          id: string;
-          layers: {
-            id: string;
-            type: string;
-            data: { children: { type: string; data: Record<string, unknown> }[] };
-          }[];
-        }[];
-      }) => {
-        pages: {
-          layers: {
-            data: { children: { type: string; data: Record<string, unknown> }[] };
-          }[];
-        }[];
-      };
+      apply: (scene: Document) => Document;
     };
     const next = tx.apply(host.getScene() as never);
-    const root = next.pages[0]?.layers[0];
-    const widget = root?.data.children[0];
+    const root = next.artboards[0]?.nodes[0];
+    const widget = root?.children?.[0] as DocumentNode | undefined;
+    const props = widget?.props as OpenEnvxWidgetProps | undefined;
     expect(widget?.type).toBe('openenvx.widget');
-    expect(widget?.data.extensionId).toBe('wm.countdown');
+    expect(props?.extensionId).toBe('wm.countdown');
 
     for (const d of disposables) {
       d.dispose();

@@ -7,7 +7,8 @@ import {
   WIDGET_BLOCK_ESCAPE_TYPES,
 } from '@openenvx/editor-sandbox/protocol';
 import { sanitizeHtml } from '@openenvx/studio/core';
-import type { Layer } from '@openenvx/studio/schema';
+import type { DocumentNode as Layer } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
 
 export interface MapWidgetHtmlTreeOptions {
   /** Id prefix for generated layers (usually the widget layer id). */
@@ -102,13 +103,29 @@ export function mapWidgetTreeToHtmlLayers(
     return id;
   };
 
+  const hoistChildNodes = (
+    layer: Omit<Layer, 'id' | 'writeMode' | 'showInLayers'>
+  ): Omit<Layer, 'id' | 'writeMode' | 'showInLayers'> => {
+    const props = { ...layer.props };
+    let children = layer.children;
+    if (Array.isArray(props.children)) {
+      children = props.children as Layer[];
+      delete props.children;
+    }
+    return {
+      ...layer,
+      props,
+      ...(children !== undefined ? { children } : {}),
+    };
+  };
+
   const faceLayer = (
     props: Record<string, unknown>,
     layer: Omit<Layer, 'id' | 'writeMode' | 'showInLayers'>
   ): Layer => {
     const id = nextId();
     recordHandlers(id, props, options.handlersOut);
-    return { id, ...faceMeta(), ...layer };
+    return { id, ...faceMeta(), ...hoistChildNodes(layer) };
   };
 
   const mapChildren = (children: RenderChild[]): Layer[] =>
@@ -132,7 +149,7 @@ export function mapWidgetTreeToHtmlLayers(
         return [
           faceLayer(node.props, {
             type: 'html.flex',
-            data: {
+            props: {
               direction: 'column',
               gap: 0,
               paddingY:
@@ -150,7 +167,7 @@ export function mapWidgetTreeToHtmlLayers(
         return [
           faceLayer(node.props, {
             type: 'html.flex',
-            data: {
+            props: {
               direction: 'row',
               gap: typeof node.props.gap === 'number' ? node.props.gap : 24,
               paddingY:
@@ -169,7 +186,7 @@ export function mapWidgetTreeToHtmlLayers(
         return [
           faceLayer(node.props, {
             type: 'html.flex',
-            data: {
+            props: {
               direction: 'column',
               gap: typeof node.props.gap === 'number' ? node.props.gap : 16,
               width: node.props.width,
@@ -189,7 +206,7 @@ export function mapWidgetTreeToHtmlLayers(
           faceLayer(node.props, {
             type: 'html.heading',
             ...(bound ? { allowedDataKeys: ['html'] } : {}),
-            data: {
+            props: {
               html,
               level: String(node.props.level ?? 2),
               color:
@@ -212,7 +229,7 @@ export function mapWidgetTreeToHtmlLayers(
           faceLayer(node.props, {
             type: 'html.text',
             ...(bound ? { allowedDataKeys: ['html'] } : {}),
-            data: {
+            props: {
               html,
               color:
                 typeof node.props.color === 'string'
@@ -227,7 +244,7 @@ export function mapWidgetTreeToHtmlLayers(
         return [
           faceLayer(node.props, {
             type: 'html.button',
-            data: {
+            props: {
               label: textContent(node.children) || 'Button',
               href: typeof node.props.href === 'string' ? node.props.href : '#',
               color:
@@ -242,7 +259,7 @@ export function mapWidgetTreeToHtmlLayers(
         return [
           faceLayer(node.props, {
             type: 'html.image',
-            data: {
+            props: {
               src: String(node.props.src ?? ''),
               alt: typeof node.props.alt === 'string' ? node.props.alt : '',
             },
@@ -253,7 +270,7 @@ export function mapWidgetTreeToHtmlLayers(
         return [
           faceLayer(node.props, {
             type: 'html.raw',
-            data: {
+            props: {
               markup: `<hr style="border:none;border-top:1px solid ${
                 typeof node.props.color === 'string'
                   ? node.props.color
@@ -267,7 +284,7 @@ export function mapWidgetTreeToHtmlLayers(
         return [
           faceLayer(node.props, {
             type: 'html.raw',
-            data: {
+            props: {
               markup: String(node.props.markup ?? ''),
             },
           }),
@@ -285,7 +302,7 @@ export function mapWidgetTreeToHtmlLayers(
         return [
           faceLayer(node.props, {
             type,
-            data: plainData(node.props.data),
+            props: plainData(node.props.data),
           }),
         ];
       }
@@ -311,12 +328,12 @@ export function applyHtmlWidgetFace(
     idPrefix: widgetLayer.id,
     handlersOut: handlers,
   });
-  const data = widgetLayer.data as Record<string, unknown>;
+  const data = nodeProps(widgetLayer);
   return {
     ...widgetLayer,
-    data: {
+    children: mapped,
+    props: {
       ...data,
-      children: mapped,
       ...(Object.keys(handlers).length > 0
         ? { handlers }
         : { handlers: undefined }),

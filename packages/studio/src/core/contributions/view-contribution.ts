@@ -7,7 +7,7 @@ import { WorkbenchContributionPoint } from '../workbench-contributions/workbench
 export type SidebarBehavior = 'panel' | 'dropdown' | 'command';
 
 /** Where a view container is shown in the workbench shell. */
-export type ViewContainerLocation = 'primary' | 'secondary';
+export type ViewContainerLocation = 'primary' | 'secondary' | 'panel';
 
 export interface TreeItemAction {
   commandId: string;

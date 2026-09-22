@@ -47,7 +47,7 @@ Author how-to (under `docs/architecture/`):
 
 | Tier | Packages | License / publish | Responsibility |
 | --- | --- | --- | --- |
-| Foundation | `@openenvx/studio` (`/core`, `/schema`, `/preview`) | Published npm, MPL-2.0 | Scene model (Zod + JSON Schema), plugin host primitives |
+| Foundation | `@openenvx/studio` (`/core`, `/schema`, `/preview`) | Published npm, MPL-2.0 | Document model (Zod + JSON Schema), plugin host primitives |
 | Sandbox extensions | `editor-sandbox` (`@openenvx/editor-sandbox`, `./protocol`, `./host`) | Published package, MPL-2.0 | Author SDK, protocol validators, optional QuickJS host runtime |
 | Product libs | `variables`, `agent` | Workspace-private | Variables plugin, agent |
 | Published product | `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, `@openenvx/email-driver` | Public npm, MPL-2.0 | Composable shell + artboard engines for open-source hosts |
@@ -56,7 +56,7 @@ Author how-to (under `docs/architecture/`):
 
 | Put it here | Examples |
 | --- | --- |
-| `@openenvx/studio/core` (`./schema`) | Scene Zod schemas, `validateScene` / `normalizeScene`, JSON Schema export |
+| `@openenvx/studio/core` (`./schema`) | Document Zod schemas, `validateDocument` / `normalizeDocument`, JSON Schema export |
 | `@openenvx/studio/core` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry`, `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context |
 | `@openenvx/canvas-driver` | Konva stage, layers, renderers, `CanvasPlugin`, `CanvasEditor` |
 | `@openenvx/html-driver` | Block configs, `HtmlBlocksPlugin`, `HtmlEditorPane` |

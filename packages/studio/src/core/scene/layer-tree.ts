@@ -1,4 +1,13 @@
-import type { Layer, Page, Scene } from './types';
+import { getChildNodes, hasChildNodes } from '../schema/node-helpers';
+import type { Artboard, Document, DocumentNode } from '../schema/types';
+
+export { getChildNodes, hasChildNodes };
+
+export const getNodeChildren = getChildNodes;
+
+export function hasChildNodesInTree(node: DocumentNode): boolean {
+  return hasChildNodes(node);
+}
 
 export const CONTAINER_LAYER_TYPE = 'container';
 
@@ -7,75 +16,70 @@ export interface ContainerLayoutModel {
   gap?: number;
   align?: 'start' | 'center' | 'end' | 'stretch';
   justify?: 'start' | 'center' | 'end' | 'space-between';
-  children: Layer[];
+  children: DocumentNode[];
 }
 
-export function isContainerLayer(layer: Layer): boolean {
-  return layer.type === CONTAINER_LAYER_TYPE;
+export function isContainerNode(node: DocumentNode): boolean {
+  return node.type === CONTAINER_LAYER_TYPE;
 }
 
-export function getContainerChildren(layer: Layer): Layer[] {
-  if (!isContainerLayer(layer)) {
+/** @deprecated use isContainerNode */
+export const isContainerLayer = isContainerNode;
+
+export function getContainerChildren(node: DocumentNode): DocumentNode[] {
+  if (!isContainerNode(node)) {
     return [];
   }
-  return getLayerChildren(layer);
+  return getChildNodes(node);
 }
 
-export function hasChildLayers(layer: Layer): boolean {
-  const data = layer.data;
-  if (!data || typeof data !== 'object') {
-    return false;
-  }
-  return (
-    'children' in data &&
-    Array.isArray((data as { children: unknown }).children)
-  );
-}
+/** @deprecated use hasChildNodes */
+export const hasChildLayers = hasChildNodes;
 
-export function getLayerChildren(layer: Layer): Layer[] {
-  if (!hasChildLayers(layer)) {
-    return [];
-  }
-  const data = layer.data as { children: Layer[] };
-  return data.children;
-}
+/** @deprecated use getChildNodes */
+export const getLayerChildren = getChildNodes;
 
-export function mapLayerChildren(
-  layer: Layer,
-  mapper: (layers: Layer[]) => Layer[]
-): Layer {
-  if (!hasChildLayers(layer)) {
-    return layer;
+export function mapNodeChildren(
+  node: DocumentNode,
+  mapper: (nodes: DocumentNode[]) => DocumentNode[]
+): DocumentNode {
+  if (!hasChildNodes(node)) {
+    return node;
   }
-  const data = layer.data as { children: Layer[] };
   return {
-    ...layer,
-    data: {
-      ...data,
-      children: mapper(data.children ?? []),
-    },
+    ...node,
+    children: mapper(getChildNodes(node)),
   };
 }
 
-export function walkLayers(
-  layers: Layer[],
-  visitor: (layer: Layer, path: Layer[]) => void,
-  path: Layer[] = []
+/** @deprecated use mapNodeChildren */
+export const mapLayerChildren = mapNodeChildren;
+
+export function walkNodes(
+  nodes: DocumentNode[],
+  visitor: (node: DocumentNode, path: DocumentNode[]) => void,
+  path: DocumentNode[] = []
 ): void {
-  for (const layer of layers) {
-    visitor(layer, path);
-    if (hasChildLayers(layer)) {
-      walkLayers(getLayerChildren(layer), visitor, [...path, layer]);
+  for (const node of nodes) {
+    visitor(node, path);
+    if (hasChildNodes(node)) {
+      walkNodes(getChildNodes(node), visitor, [...path, node]);
     }
   }
 }
 
-export function findLayerById(scene: Scene, layerId: string): Layer | null {
-  for (const page of scene.pages) {
-    let found: Layer | null = null;
-    walkLayers(page.layers, (layer) => {
-      if (layer.id === layerId) {
-        found = layer;
+/** @deprecated use walkNodes */
+export const walkLayers = walkNodes;
+
+export function findNodeById(
+  document: Document,
+  nodeId: string
+): DocumentNode | null {
+  for (const artboard of document.artboards) {
+    let found: DocumentNode | null = null;
+    walkNodes(artboard.nodes, (node) => {
+      if (node.id === nodeId) {
+        found = node;
       }
     });
     if (found) {
@@ -85,157 +89,185 @@ export function findLayerById(scene: Scene, layerId: string): Layer | null {
   return null;
 }
 
-export function findLayerPage(scene: Scene, layerId: string): Page | null {
-  for (const page of scene.pages) {
+/** @deprecated use findNodeById */
+export const findLayerById = findNodeById;
+
+export function findNodeArtboard(
+  document: Document,
+  nodeId: string
+): Artboard | null {
+  for (const artboard of document.artboards) {
     let found = false;
-    walkLayers(page.layers, (layer) => {
-      if (layer.id === layerId) {
+    walkNodes(artboard.nodes, (node) => {
+      if (node.id === nodeId) {
         found = true;
       }
     });
     if (found) {
-      return page;
+      return artboard;
     }
   }
   return null;
 }
 
-export function layerExistsOnPage(page: Page, layerId: string): boolean {
+/** @deprecated use findNodeArtboard */
+export const findLayerPage = findNodeArtboard;
+
+export function nodeExistsOnArtboard(
+  artboard: Artboard,
+  nodeId: string
+): boolean {
   let exists = false;
-  walkLayers(page.layers, (layer) => {
-    if (layer.id === layerId) {
+  walkNodes(artboard.nodes, (node) => {
+    if (node.id === nodeId) {
       exists = true;
     }
   });
   return exists;
 }
 
-export function mapLayers(
-  layers: Layer[],
-  mapper: (layer: Layer) => Layer
-): Layer[] {
-  return layers.map((layer) => {
-    const next = mapper(layer);
-    return mapLayerChildren(next, (children) => mapLayers(children, mapper));
+/** @deprecated use nodeExistsOnArtboard */
+export const layerExistsOnPage = nodeExistsOnArtboard;
+
+export function mapNodes(
+  nodes: DocumentNode[],
+  mapper: (node: DocumentNode) => DocumentNode
+): DocumentNode[] {
+  return nodes.map((node) => {
+    const next = mapper(node);
+    return mapNodeChildren(next, (children) => mapNodes(children, mapper));
   });
 }
 
-/** Create a stable layer id from a layer type stem. */
-export function createLayerId(type: string): string {
-  const stem = type.replace(/^canvas\./, '') || 'layer';
+/** @deprecated use mapNodes */
+export const mapLayers = mapNodes;
+
+export function createNodeId(type: string): string {
+  const stem = type.replace(/^canvas\./, '') || 'node';
   return `${stem}-${crypto.randomUUID()}`;
 }
 
-/** Deep-clone a layer tree, assigning new ids to every node (including nested children). */
-export function cloneLayerTree(layers: Layer[]): Layer[] {
-  return layers.map((layer) => {
-    const cloned = structuredClone(layer);
-    cloned.id = createLayerId(layer.type);
-    if (hasChildLayers(cloned)) {
-      const data = cloned.data as { children: Layer[] };
-      cloned.data = {
-        ...data,
-        children: cloneLayerTree(data.children ?? []),
-      };
+/** @deprecated use createNodeId */
+export const createLayerId = createNodeId;
+
+export function cloneNodeTree(nodes: DocumentNode[]): DocumentNode[] {
+  return nodes.map((node) => {
+    const cloned = structuredClone(node);
+    cloned.id = createNodeId(node.type);
+    if (hasChildNodes(cloned)) {
+      cloned.children = cloneNodeTree(getChildNodes(cloned));
     }
     return cloned;
   });
 }
 
-export function updateLayerInTree(
-  layers: Layer[],
-  layerId: string,
-  updater: (layer: Layer) => Layer
-): Layer[] {
-  return layers.map((layer) => {
-    if (layer.id === layerId) {
-      return updater(layer);
+/** @deprecated use cloneNodeTree */
+export const cloneLayerTree = cloneNodeTree;
+
+export function updateNodeInTree(
+  nodes: DocumentNode[],
+  nodeId: string,
+  updater: (node: DocumentNode) => DocumentNode
+): DocumentNode[] {
+  return nodes.map((node) => {
+    if (node.id === nodeId) {
+      return updater(node);
     }
-    return mapLayerChildren(layer, (children) =>
-      updateLayerInTree(children, layerId, updater)
+    return mapNodeChildren(node, (children) =>
+      updateNodeInTree(children, nodeId, updater)
     );
   });
 }
 
-/** Update a layer by id across pages and component definitions. */
-export function updateLayerByIdInScene(
-  scene: Scene,
-  layerId: string,
-  updater: (layer: Layer) => Layer
-): Scene {
-  const mapTree = (layers: Layer[]) =>
-    updateLayerInTree(layers, layerId, updater);
+/** @deprecated use updateNodeInTree */
+export const updateLayerInTree = updateNodeInTree;
+
+export function updateNodeByIdInDocument(
+  document: Document,
+  nodeId: string,
+  updater: (node: DocumentNode) => DocumentNode
+): Document {
+  const mapTree = (nodes: DocumentNode[]) =>
+    updateNodeInTree(nodes, nodeId, updater);
   return {
-    ...scene,
-    pages: scene.pages.map((page) => ({
-      ...page,
-      layers: mapTree(page.layers),
+    ...document,
+    artboards: document.artboards.map((artboard) => ({
+      ...artboard,
+      nodes: mapTree(artboard.nodes),
     })),
-    components: scene.components
+    components: document.components
       ? Object.fromEntries(
-          Object.entries(scene.components).map(([id, component]) => [
+          Object.entries(document.components).map(([id, component]) => [
             id,
-            { ...component, layers: mapTree(component.layers) },
+            { ...component, nodes: mapTree(component.nodes) },
           ])
         )
-      : scene.components,
+      : document.components,
   };
 }
 
-export function removeLayerFromTree(layers: Layer[], layerId: string): Layer[] {
-  return layers
-    .filter((layer) => layer.id !== layerId)
-    .map((layer) =>
-      mapLayerChildren(layer, (children) =>
-        removeLayerFromTree(children, layerId)
-      )
+/** @deprecated use updateNodeByIdInDocument */
+export const updateLayerByIdInScene = updateNodeByIdInDocument;
+
+export function removeNodeFromTree(
+  nodes: DocumentNode[],
+  nodeId: string
+): DocumentNode[] {
+  return nodes
+    .filter((node) => node.id !== nodeId)
+    .map((node) =>
+      mapNodeChildren(node, (children) => removeNodeFromTree(children, nodeId))
     );
 }
 
-/** Insert into any parent that already has a `data.children` array (container, group, html.root, …). */
-export function insertLayerIntoContainer(
-  layers: Layer[],
+/** @deprecated use removeNodeFromTree */
+export const removeLayerFromTree = removeNodeFromTree;
+
+export function insertNodeIntoContainer(
+  nodes: DocumentNode[],
   containerId: string,
-  child: Layer,
+  child: DocumentNode,
   index?: number
-): Layer[] {
-  return layers.map((layer) => {
-    if (layer.id === containerId && hasChildLayers(layer)) {
-      const data = layer.data as { children: Layer[] };
-      const children = [...(data.children ?? [])];
+): DocumentNode[] {
+  return nodes.map((node) => {
+    if (node.id === containerId && hasChildNodes(node)) {
+      const children = [...getChildNodes(node)];
       const at = index ?? children.length;
       children.splice(at, 0, child);
       return {
-        ...layer,
-        data: { ...data, children },
+        ...node,
+        children,
       };
     }
-    return mapLayerChildren(layer, (children) =>
-      insertLayerIntoContainer(children, containerId, child, index)
+    return mapNodeChildren(node, (children) =>
+      insertNodeIntoContainer(children, containerId, child, index)
     );
   });
 }
 
-export function moveLayerInTree(
-  layers: Layer[],
-  layerId: string,
+/** @deprecated use insertNodeIntoContainer */
+export const insertLayerIntoContainer = insertNodeIntoContainer;
+
+export function moveNodeInTree(
+  nodes: DocumentNode[],
+  nodeId: string,
   targetIndex: number,
   parentContainerId?: string | null
-): Layer[] {
-  let moving: Layer | null = null;
-  walkLayers(layers, (layer) => {
-    if (layer.id === layerId) {
-      moving = layer;
+): DocumentNode[] {
+  let moving: DocumentNode | null = null;
+  walkNodes(nodes, (node) => {
+    if (node.id === nodeId) {
+      moving = node;
     }
   });
   if (!moving) {
-    return layers;
+    return nodes;
   }
 
-  const without = removeLayerFromTree(layers, layerId);
+  const without = removeNodeFromTree(nodes, nodeId);
 
   if (parentContainerId) {
-    return insertLayerIntoContainer(
+    return insertNodeIntoContainer(
       without,
       parentContainerId,
       moving,
@@ -249,25 +281,28 @@ export function moveLayerInTree(
   return result;
 }
 
-interface LayerLocation {
-  parentLayers: Layer[];
+/** @deprecated use moveNodeInTree */
+export const moveLayerInTree = moveNodeInTree;
+
+interface NodeLocation {
+  parentNodes: DocumentNode[];
   index: number;
   containerId: string | null;
 }
 
-export function findLayerLocation(
-  layers: Layer[],
-  layerId: string,
+export function findNodeLocation(
+  nodes: DocumentNode[],
+  nodeId: string,
   containerId: string | null = null
-): LayerLocation | null {
-  const index = layers.findIndex((layer) => layer.id === layerId);
+): NodeLocation | null {
+  const index = nodes.findIndex((node) => node.id === nodeId);
   if (index !== -1) {
-    return { containerId, index, parentLayers: layers };
+    return { containerId, index, parentNodes: nodes };
   }
-  for (const layer of layers) {
-    if (hasChildLayers(layer)) {
-      const children = getLayerChildren(layer);
-      const nested = findLayerLocation(children, layerId, layer.id);
+  for (const node of nodes) {
+    if (hasChildNodes(node)) {
+      const children = getChildNodes(node);
+      const nested = findNodeLocation(children, nodeId, node.id);
       if (nested) {
         return nested;
       }
@@ -276,44 +311,46 @@ export function findLayerLocation(
   return null;
 }
 
-export function moveLayerRelativeToTarget(
-  layers: Layer[],
+/** @deprecated use findNodeLocation */
+export const findLayerLocation = findNodeLocation;
+
+export function moveNodeRelativeToTarget(
+  nodes: DocumentNode[],
   sourceId: string,
   targetId: string,
   position: 'before' | 'after' | 'inside'
-): Layer[] {
-  let moving: Layer | null = null;
-  walkLayers(layers, (layer) => {
-    if (layer.id === sourceId) {
-      moving = layer;
+): DocumentNode[] {
+  let moving: DocumentNode | null = null;
+  walkNodes(nodes, (node) => {
+    if (node.id === sourceId) {
+      moving = node;
     }
   });
   if (!moving || sourceId === targetId) {
-    return layers;
+    return nodes;
   }
 
-  const without = removeLayerFromTree(layers, sourceId);
+  const without = removeNodeFromTree(nodes, sourceId);
 
   if (position === 'inside') {
-    return insertLayerIntoContainer(without, targetId, moving);
+    return insertNodeIntoContainer(without, targetId, moving);
   }
 
-  const targetLoc = findLayerLocation(without, targetId);
+  const targetLoc = findNodeLocation(without, targetId);
   if (!targetLoc) {
-    return layers;
+    return nodes;
   }
 
   const insertIndex =
     position === 'before' ? targetLoc.index : targetLoc.index + 1;
 
   if (targetLoc.containerId) {
-    return updateLayerInTree(without, targetLoc.containerId, (container) => {
-      const data = container.data as { children: Layer[] };
-      const children = [...(data.children ?? [])];
+    return updateNodeInTree(without, targetLoc.containerId, (container) => {
+      const children = [...getChildNodes(container)];
       children.splice(insertIndex, 0, moving!);
       return {
         ...container,
-        data: { ...data, children },
+        children,
       };
     });
   }
@@ -323,18 +360,27 @@ export function moveLayerRelativeToTarget(
   return roots;
 }
 
-export function getLayerAncestorIds(page: Page, layerId: string): string[] {
+/** @deprecated use moveNodeRelativeToTarget */
+export const moveLayerRelativeToTarget = moveNodeRelativeToTarget;
+
+export function getNodeAncestorIds(
+  artboard: Artboard,
+  nodeId: string
+): string[] {
   let ancestorIds: string[] = [];
-  walkLayers(page.layers, (layer, path) => {
-    if (layer.id === layerId) {
+  walkNodes(artboard.nodes, (node, path) => {
+    if (node.id === nodeId) {
       ancestorIds = path.map((ancestor) => ancestor.id);
     }
   });
   return ancestorIds;
 }
 
-export function isLayerDescendant(
-  layers: Layer[],
+/** @deprecated use getNodeAncestorIds */
+export const getLayerAncestorIds = getNodeAncestorIds;
+
+export function isNodeDescendant(
+  nodes: DocumentNode[],
   ancestorId: string,
   candidateId: string
 ): boolean {
@@ -343,9 +389,9 @@ export function isLayerDescendant(
   }
 
   let descendant = false;
-  walkLayers(layers, (layer, path) => {
+  walkNodes(nodes, (node, path) => {
     if (
-      layer.id === candidateId &&
+      node.id === candidateId &&
       path.some((ancestor) => ancestor.id === ancestorId)
     ) {
       descendant = true;
@@ -353,3 +399,6 @@ export function isLayerDescendant(
   });
   return descendant;
 }
+
+/** @deprecated use isNodeDescendant */
+export const isLayerDescendant = isNodeDescendant;

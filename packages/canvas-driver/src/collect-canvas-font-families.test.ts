@@ -8,7 +8,7 @@ describe('collectCanvasFontFamilies', () => {
     const layerSurface = [
       {
         layer: {
-          data: {
+          props: {
             fontFamily: 'Roboto, sans-serif',
             html: '<p><span style="font-family: Georgia">Hi</span></p>',
           },
@@ -18,7 +18,7 @@ describe('collectCanvasFontFamilies', () => {
       },
       {
         layer: {
-          data: { src: 'x.png' },
+          props: { src: 'x.png' },
           id: 'i1',
           type: 'canvas.image',
         },

@@ -1,7 +1,11 @@
 import { canEditLayerData } from '@openenvx/studio/core';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import type { Layer } from '@openenvx/studio/schema';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import type { DocumentNode, Transform } from '@openenvx/studio/schema';
+import {
+  createDefaultTransform,
+  nodeProps,
+  nodeTransform,
+} from '@openenvx/studio/schema';
 import { memo, useMemo } from 'react';
 
 import { computeArtboardOffset } from '../artboard-offset';
@@ -23,10 +27,10 @@ import {
 import styles from './canvas-editor.module.css';
 
 interface CanvasRichTextOverlayLayer {
-  layer: Layer;
+  layer: DocumentNode;
   view: LayerPreviewDescriptor;
   /** Artboard-absolute transform when nested under a group/widget. */
-  absoluteTransform?: Layer['transform'];
+  absoluteTransform?: Transform;
 }
 
 export interface CanvasRichTextOverlayProps {
@@ -95,7 +99,7 @@ export const CanvasRichTextOverlay = memo(
         { kind: 'richText' }
       >;
       const transform =
-        absoluteTransform ?? layer.transform ?? createDefaultTransform();
+        absoluteTransform ?? nodeTransform(layer) ?? createDefaultTransform();
       const fontSize = richTextView.fontSize ?? DEFAULT_RICH_TEXT_FONT_SIZE;
       const fontFamily =
         richTextView.fontFamily ?? DEFAULT_RICH_TEXT_FONT_FAMILY;
@@ -107,12 +111,9 @@ export const CanvasRichTextOverlay = memo(
         richTextView.letterSpacing ?? DEFAULT_RICH_TEXT_LETTER_SPACING;
       const bounds = getLayerScreenBounds(transform, viewport, artboardOffset);
 
+      const props = nodeProps(layer);
       const storedHtml =
-        typeof layer.data === 'object' &&
-        layer.data !== null &&
-        typeof (layer.data as { html?: unknown }).html === 'string'
-          ? (layer.data as { html: string }).html
-          : richTextView.html;
+        typeof props.html === 'string' ? props.html : richTextView.html;
 
       return {
         align,

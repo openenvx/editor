@@ -12,7 +12,7 @@ const TEMPLATE_POLICY_KEYS = [
   'allowDeleteLayers',
   'allowDuplicateLayers',
   'allowInsertLayers',
-  'allowPageResize',
+  'allowArtboardResize',
 ] as const;
 
 type TemplatePolicyKey = (typeof TEMPLATE_POLICY_KEYS)[number];
@@ -52,7 +52,7 @@ export function writeLayerDataAtKey(
 
 export interface PropertyPathContextOptions {
   scene: Scene;
-  activePageId?: string | null;
+  activeArtboardId?: string | null;
   selectedLayerId: string | null;
   layerData: Record<string, unknown> | null;
   updateProperty: (layerId: string, key: string, value: unknown) => void;
@@ -143,10 +143,14 @@ function parseLayerByIdPath(
   return { key: match[2]!, layerId: match[1]! };
 }
 
-function layerDataRecord(layer: { data?: unknown }): Record<string, unknown> {
-  return typeof layer.data === 'object' && layer.data !== null
-    ? (layer.data as Record<string, unknown>)
-    : {};
+function layerDataRecord(layer: {
+  props?: Record<string, unknown>;
+  data?: unknown;
+}): Record<string, unknown> {
+  if (layer.props && typeof layer.props === 'object') {
+    return layer.props;
+  }
+  return {};
 }
 
 function readLayerByIdPath(path: PropertyValuePath, scene: Scene): unknown {

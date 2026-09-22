@@ -6,7 +6,12 @@ import {
   removeLayerFromTree,
   updateLayerInTree,
 } from '@openenvx/studio/core';
-import type { Layer, Page, Scene } from '@openenvx/studio/schema';
+import type { Artboard, Document, DocumentNode } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
+
+export type Layer = DocumentNode;
+export type Page = Artboard;
+export type Scene = Document;
 
 export function findBlock(
   layers: Layer[],
@@ -16,7 +21,7 @@ export function findBlock(
   if (!loc) {
     return null;
   }
-  const block = loc.parentLayers[loc.index];
+  const block = loc.parentNodes[loc.index];
   if (!block) {
     return null;
   }
@@ -67,13 +72,10 @@ export function updateBlockData(
   id: string,
   patch: Record<string, unknown>
 ): Layer[] {
-  return updateLayerInTree(layers, id, (layer) => {
-    const data =
-      typeof layer.data === 'object' && layer.data !== null
-        ? (layer.data as Record<string, unknown>)
-        : {};
-    return { ...layer, data: { ...data, ...patch } };
-  });
+  return updateLayerInTree(layers, id, (layer) => ({
+    ...layer,
+    props: { ...nodeProps(layer), ...patch },
+  }));
 }
 
 export function mapPageLayers(
@@ -83,9 +85,34 @@ export function mapPageLayers(
 ): Scene {
   return {
     ...scene,
-    pages: scene.pages.map((page) =>
-      page.id === pageId ? { ...page, layers: mapper(page.layers) } : page
+    artboards: scene.artboards.map((page) =>
+      page.id === pageId ? { ...page, nodes: mapper(page.nodes) } : page
     ),
+  };
+}
+
+function normalizeLegacyBlockNode(raw: unknown): Layer {
+  if (!raw || typeof raw !== 'object') {
+    return { id: 'invalid', type: 'html.text', props: {} };
+  }
+  const record = raw as Record<string, unknown>;
+  const props = structuredClone(
+    (record.props ?? record.data ?? {}) as Record<string, unknown>
+  );
+  let children: Layer[] | undefined;
+  if (Array.isArray(record.children)) {
+    children = record.children.map((child) => normalizeLegacyBlockNode(child));
+  } else if (Array.isArray(props.children)) {
+    children = (props.children as unknown[]).map((child) =>
+      normalizeLegacyBlockNode(child)
+    );
+    delete props.children;
+  }
+  return {
+    id: String(record.id ?? 'tmp'),
+    type: String(record.type ?? 'html.text'),
+    props,
+    ...(children ? { children } : {}),
   };
 }
 
@@ -94,11 +121,20 @@ export function createBlock(
   id: string,
   defaultData: Record<string, unknown>
 ): Layer {
+  const props = structuredClone(defaultData);
+  let children: Layer[] | undefined;
+  if (Array.isArray(props.children)) {
+    children = (props.children as unknown[]).map((child) =>
+      normalizeLegacyBlockNode(child)
+    );
+    delete props.children;
+  }
   const cloned = cloneBlockWithNewIds(
     {
       id: 'tmp',
       type,
-      data: structuredClone(defaultData),
+      props,
+      ...(children ? { children } : {}),
     },
     createPartId
   );
@@ -109,24 +145,22 @@ function createPartId(type: string): string {
   return `${type.replaceAll('.', '-')}-${crypto.randomUUID()}`;
 }
 
-/** Deep-clone a block subtree with fresh ids (nested `data.children` and `data.slots`). */
-export function cloneBlockWithNewIds(
+function clonePropsTree(
   block: Layer,
   createId: (type: string) => string
-): Layer {
-  const data =
-    typeof block.data === 'object' && block.data !== null
-      ? structuredClone(block.data as Record<string, unknown>)
-      : {};
-  if (Array.isArray(data.children)) {
-    data.children = (data.children as Layer[]).map((child) =>
+): { props: Record<string, unknown>; children?: Layer[] } {
+  const props = structuredClone(nodeProps(block));
+  let children: Layer[] | undefined;
+  if (Array.isArray(block.children)) {
+    children = block.children.map((child) =>
       cloneBlockWithNewIds(child, createId)
     );
+    delete props.children;
   }
-  if (data.slots && typeof data.slots === 'object' && data.slots !== null) {
+  if (props.slots && typeof props.slots === 'object' && props.slots !== null) {
     const nextSlots: Record<string, Layer[]> = {};
     for (const [key, parts] of Object.entries(
-      data.slots as Record<string, unknown>
+      props.slots as Record<string, unknown>
     )) {
       if (!Array.isArray(parts)) {
         continue;
@@ -138,12 +172,24 @@ export function cloneBlockWithNewIds(
         return cloneBlockWithNewIds(part as Layer, createId);
       });
     }
-    data.slots = nextSlots;
+    props.slots = nextSlots;
   }
+  return { props, ...(children ? { children } : {}) };
+}
+
+/** Deep-clone a block subtree with fresh ids (nested `children` and `props.slots`). */
+export function cloneBlockWithNewIds(
+  block: Layer,
+  createId: (type: string) => string
+): Layer {
+  const source =
+    block.props !== undefined ? block : normalizeLegacyBlockNode(block);
+  const { props, children } = clonePropsTree(source, createId);
   return {
     ...block,
     id: createId(block.type),
-    data,
+    props,
+    ...(children ? { children } : {}),
   };
 }
 
@@ -151,12 +197,11 @@ export function getPageRootId(
   page: Page,
   rootType = 'html.root'
 ): string | null {
-  const preferred = page.layers.find((layer) => layer.type === rootType);
+  const preferred = page.nodes.find((layer) => layer.type === rootType);
   if (preferred) {
     return preferred.id;
   }
-  // Product roots (email.root, snapvelo.root, …) share the *.root convention.
-  const anyRoot = page.layers.find((layer) => layer.type.endsWith('.root'));
+  const anyRoot = page.nodes.find((layer) => layer.type.endsWith('.root'));
   return anyRoot?.id ?? null;
 }
 

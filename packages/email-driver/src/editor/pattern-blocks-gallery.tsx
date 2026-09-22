@@ -1,6 +1,6 @@
 import type { BlockRegistry } from '@openenvx/html-driver';
 import { getPageRootId, resolveInsertParentId } from '@openenvx/html-driver';
-import { ContextKeyServiceId, getActivePage } from '@openenvx/studio/core';
+import { ContextKeyServiceId, getActiveArtboard } from '@openenvx/studio/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
@@ -43,12 +43,12 @@ export const EmailPatternBlocksGallery = memo(() => {
       if (!(scene && selection)) {
         return;
       }
-      const page = getActivePage(scene, selection.activePageId);
+      const page = getActiveArtboard(scene, selection.activeArtboardId);
       const selectedId =
-        selection.primaryLayerId ?? selection.selectedLayerIds[0] ?? null;
+        selection.primaryNodeId ?? selection.selectedNodeIds[0] ?? null;
       const rootId = getPageRootId(page, 'email.root');
       const parentId = resolveInsertParentId(
-        page.layers,
+        page.nodes,
         selectedId,
         rootId,
         registry

@@ -125,7 +125,13 @@ export function resolveEmailPasteInsertTarget(
   selectedId: string | null
 ): PasteInsertTarget | null {
   const rootId = getPageRootId(
-    { id: 'page', name: 'Page', layout: 'email', layers },
+    {
+      id: 'page',
+      name: 'Page',
+      space: {},
+      extensions: { layout: 'email' },
+      nodes: layers,
+    },
     'email.root'
   );
   return resolvePasteInsertTarget(layers, selectedId, rootId);

@@ -25,7 +25,7 @@ import {
 } from '@openenvx/html-driver';
 import {
   ContextKeyServiceId,
-  getActivePage,
+  getActiveArtboard,
   isTypingTarget,
   RichTextInsertServiceId,
 } from '@openenvx/studio/core';
@@ -240,7 +240,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
       if (editingTarget || !scene || !selection) {
         return;
       }
-      const page = getActivePage(scene, selection.activePageId);
+      const page = getActiveArtboard(scene, selection.activeArtboardId);
       const action = resolveStageClickAction({
         target: event.target,
         artboardTestId: 'email-artboard',
@@ -339,7 +339,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     [clearDrag, executeCommand, registry, scene, selection]
   );
 
-  const activePageId = selection?.activePageId ?? null;
+  const activeArtboardId = selection?.activeArtboardId ?? null;
   const isPreview = mode === 'preview';
   const isHtml = mode === 'html';
   const isReadOnly = isPreview || isHtml;
@@ -360,12 +360,12 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
   }, [clearDrag, clearEditing, editingTarget, isReadOnly]);
 
   useEffect(() => {
-    if (!needsRenderedHtml || !scene || !activePageId) {
+    if (!needsRenderedHtml || !scene || !activeArtboardId) {
       return;
     }
     let cancelled = false;
     const previewScene = applyTemplateVariablesForPreview(scene);
-    const page = getActivePage(previewScene, activePageId);
+    const page = getActiveArtboard(previewScene, activeArtboardId);
     void renderEmailDocument(page, registry, { pretty: isHtml })
       .then((html) => {
         if (cancelled) {
@@ -386,7 +386,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     return () => {
       cancelled = true;
     };
-  }, [activePageId, isHtml, needsRenderedHtml, registry, scene]);
+  }, [activeArtboardId, isHtml, needsRenderedHtml, registry, scene]);
 
   if (!(scene && selection)) {
     return null;
@@ -408,9 +408,9 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
     );
   }
 
-  const page = getActivePage(scene, selection.activePageId);
+  const page = getActiveArtboard(scene, selection.activeArtboardId);
   const selectedId =
-    selection.primaryLayerId ?? selection.selectedLayerIds[0] ?? null;
+    selection.primaryNodeId ?? selection.selectedNodeIds[0] ?? null;
   const rootId = getPageRootId(page, 'email.root');
 
   let artboardContent: ReactNode;
@@ -432,7 +432,7 @@ export const EmailEditorPane = memo((_props: EditorPaneHostProps) => {
         bindRichTextInsert={bindRichTextInsert}
         editingTarget={editingTarget}
         hoveredLayerId={hoveredLayerId}
-        layers={page.layers}
+        layers={page.nodes}
         onBoundary={onBoundary}
         onCommitEdit={onCommitEdit}
         onDuplicate={handleDuplicate}

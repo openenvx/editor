@@ -13,23 +13,35 @@ Plugin host primitives and the editor runtime. **No** canvas types, Konva, workb
 | `EditorRuntime` | Owns DI (`InstantiationService`), core service bootstrap, event bus, context-key contributions, sync, `createCommandContext()` |
 | `PluginManager` | Plugin lifecycle + contribution routing only; receives `EditorRuntime` via injection |
 | `Plugin` / contributions | `Command`, `LayerDefinition`, `Shortcut`, `ContextKey`, `Service`, `I18n`, `PageRulesContribution` |
-| `SceneStore` | Scene document + transactions; applies page rules after structural normalize |
+| `DocumentStore` (`SceneStore` alias) | Document + transactions; applies artboard rules after structural normalize |
 | `PropertyBuilder` | Layer property field/section descriptors (`LayerDefinition.properties()`) |
 | `Registry<K, V>` | Keyed runtime registrations (distinct from static contributions and DI services) |
 
-## Scene document (`@openenvx/studio/schema`)
+## Document model (`@openenvx/studio/schema`)
 
-Canonical content Scene JSON is Zod v4 (`sceneSchemaLenient` / `sceneSchemaCanonical`). Defaults, `validateScene` / `normalizeScene`, and published `scene.schema.json` come from that schema.
+Canonical persisted JSON is Zod v4 (`documentSchemaLenient` / `documentSchemaCanonical`). No separate schema version field (MVP). Helpers: `normalizeDocument`, `validateDocument`, `nodeTransform` / `applyNodeTransform`.
 
 | Concept | Role |
 | --- | --- |
-| `Scene` | Content only: `schemaVersion`, `pages`, optional `assets` / `templatePolicy` |
-| `EditorState` | UI state: `activePageId`, `selectedLayerIds`, `primaryLayerId` |
-| `SceneSnapshot` | Persisted pair `{ scene, editorState }` |
+| `Document` | Content: `artboards`, optional `assets` / `components` / `variables` / `templatePolicy` |
+| `Artboard` | `space` (width/height), optional `physical` (unit, dpi, bleed, safe, preset), `nodes`, `guides`, `background` |
+| `DocumentNode` | `type`, `props`, optional `children`, `frame`, opacity/scale on the node |
+| `EditorSession` | UI state: `activeArtboardId`, `selectedNodeIds`, `primaryNodeId` |
+| `ProjectSnapshot` | Persisted pair `{ document, session }` |
 
-`Page.layout` is a **provider-defined string** (e.g. `'absolute'`, `'html'`). Schema normalization is structural only; layout-specific rules (dims, presets, validation) register via `PageRulesContribution` in core.
+Editor surface kind (canvas vs html) is **not** stored on the artboard; hosts register panes/surfaces. Optional `artboard.extensions.layout` is a product hint only.
 
-Built-in canvas layer types have typed `data`; unknown plugin types use an escape hatch.
+Built-in canvas node types use typed `props`; groups/widgets nest via `children`, not `props.children`.
+
+Render pipeline: `DocumentNode` → `NodeCompilerContribution` → `RenderDocument` (`compileArtboard` in `@openenvx/studio/preview`) → driver backends (Konva, export, …).
+
+## Legacy names
+
+`Scene` / `Page` / `Layer` type aliases remain in `@openenvx/studio/core` scene helpers during driver migration; prefer `Document` / `Artboard` / `DocumentNode` in new code.
+
+## Scene document (removed)
+
+<!-- previous Scene/Page/Layer section replaced by Document model above -->
 
 ## Bootstrap sketch (without workbench)
 

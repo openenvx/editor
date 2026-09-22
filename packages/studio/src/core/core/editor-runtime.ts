@@ -104,13 +104,10 @@ export class EditorRuntime {
     this.disposables.add(
       this.scene.onDidChangeScene((snapshot) => {
         // Use the event payload - do not call getSnapshot() again (avoids a second clone).
-        this.editor.updateScene(snapshot.scene, snapshot.contentRevision);
+        this.editor.updateScene(snapshot.document, snapshot.contentRevision);
         this.syncContextKeys();
         this.events.emit(WorkbenchEvents.DidChangeScene, snapshot);
-        this.events.emit(
-          WorkbenchEvents.DidChangeSelection,
-          snapshot.editorState
-        );
+        this.events.emit(WorkbenchEvents.DidChangeSelection, snapshot.session);
       })
     );
     this.disposables.add(
@@ -145,7 +142,7 @@ export class EditorRuntime {
     return this.events;
   }
 
-  getScene(): SceneStore {
+  getDocument(): SceneStore {
     return this.scene;
   }
 

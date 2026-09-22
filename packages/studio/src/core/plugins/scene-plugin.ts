@@ -66,39 +66,39 @@ export class DeleteLayerCommand extends Command {
   readonly id = 'scene.deleteLayer';
 
   canExecute(ctx: CommandContext): boolean {
-    if (ctx.selection.selectedLayerIds.length === 0) {
+    if (ctx.selection.selectedNodeIds.length === 0) {
       return false;
     }
-    const scene = ctx.scene.getScene();
-    return ctx.selection.selectedLayerIds.every((id) => {
+    const scene = ctx.scene.getDocument();
+    return ctx.selection.selectedNodeIds.every((id) => {
       const layer = findLayerById(scene, id);
       return layer && canDeleteLayer(layer, scene);
     });
   }
 
   execute(ctx: CommandContext): void {
-    const ids = new Set(ctx.selection.selectedLayerIds);
-    const activePageId = ctx.selection.activePageId;
+    const ids = new Set(ctx.selection.selectedNodeIds);
+    const activeArtboardId = ctx.selection.activeArtboardId;
     ctx.scene.apply({
       apply: (scene) => {
-        const page = getActivePage(scene, activePageId);
-        let layers = page.layers;
+        const page = getActivePage(scene, activeArtboardId);
+        let layers = page.nodes;
         for (const id of ids) {
           layers = removeLayerFromTree(layers, id);
         }
         return {
           ...scene,
-          pages: scene.pages.map((p) =>
-            p.id === page.id ? { ...p, layers } : p
+          artboards: scene.artboards.map((p) =>
+            p.id === page.id ? { ...p, nodes: layers } : p
           ),
         };
       },
       label: 'Delete layers',
     });
     ctx.scene.setSelection({
-      activePageId,
-      primaryLayerId: null,
-      selectedLayerIds: [],
+      activeArtboardId,
+      primaryNodeId: null,
+      selectedNodeIds: [],
     });
   }
 }
@@ -116,38 +116,38 @@ class MoveLayerRelativeCommand extends Command {
   }
 
   canExecute(ctx: CommandContext): boolean {
-    const page = ctx.scene.getActivePage();
-    const id = ctx.selection.primaryLayerId;
+    const page = ctx.scene.getActiveArtboard();
+    const id = ctx.selection.primaryNodeId;
     if (!id) {
       return false;
     }
-    const layer = page.layers.find((l) => l.id === id);
+    const layer = page.nodes.find((l) => l.id === id);
     if (!layer || !canReorderLayer(layer)) {
       return false;
     }
-    const index = page.layers.indexOf(layer);
+    const index = page.nodes.indexOf(layer);
     if (index === -1) {
       return false;
     }
-    return this.direction === 'up' ? index > 0 : index < page.layers.length - 1;
+    return this.direction === 'up' ? index > 0 : index < page.nodes.length - 1;
   }
 
   execute(ctx: CommandContext): void {
-    const id = ctx.selection.primaryLayerId;
+    const id = ctx.selection.primaryNodeId;
     if (!id) {
       return;
     }
-    const activePageId = ctx.selection.activePageId;
+    const activeArtboardId = ctx.selection.activeArtboardId;
     ctx.scene.apply({
       apply: (scene) => {
-        const page = getActivePage(scene, activePageId);
+        const page = getActivePage(scene, activeArtboardId);
         return {
           ...scene,
-          pages: scene.pages.map((p) =>
+          artboards: scene.artboards.map((p) =>
             p.id === page.id
               ? {
                   ...p,
-                  layers: reorderLayers(p.layers, id, this.direction),
+                  nodes: reorderLayers(p.nodes, id, this.direction),
                 }
               : p
           ),
@@ -183,13 +183,13 @@ export class MoveLayerCommand extends Command {
     if (!moveArgs?.layerId) {
       return false;
     }
-    const scene = ctx.scene.getScene();
+    const scene = ctx.scene.getDocument();
     const layer = findLayerById(scene, moveArgs.layerId);
     if (!layer || !canReorderLayer(layer)) {
       return false;
     }
-    const page = getActivePage(scene, ctx.selection.activePageId);
-    return page.layers.some((l) => l.id === moveArgs.layerId);
+    const page = getActivePage(scene, ctx.selection.activeArtboardId);
+    return page.nodes.some((l) => l.id === moveArgs.layerId);
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -199,15 +199,15 @@ export class MoveLayerCommand extends Command {
     }
     ctx.scene.apply({
       apply: (scene) => {
-        const page = getActivePage(scene, ctx.selection.activePageId);
+        const page = getActivePage(scene, ctx.selection.activeArtboardId);
         return {
           ...scene,
-          pages: scene.pages.map((p) =>
+          artboards: scene.artboards.map((p) =>
             p.id === page.id
               ? {
                   ...p,
-                  layers: moveLayerToIndex(
-                    p.layers,
+                  nodes: moveLayerToIndex(
+                    p.nodes,
                     moveArgs.layerId,
                     moveArgs.targetIndex
                   ),
@@ -225,21 +225,21 @@ export class ToggleLayerLockCommand extends Command {
   readonly id = 'scene.toggleLayerLock';
 
   canExecute(ctx: CommandContext): boolean {
-    const id = ctx.selection.primaryLayerId;
+    const id = ctx.selection.primaryNodeId;
     if (!id) {
       return false;
     }
-    const scene = ctx.scene.getScene();
+    const scene = ctx.scene.getDocument();
     const layer = findLayerById(scene, id);
     return layer ? isLayerEditable(layer) : false;
   }
 
   execute(ctx: CommandContext): void {
-    const id = ctx.selection.primaryLayerId;
+    const id = ctx.selection.primaryNodeId;
     if (!id) {
       return;
     }
-    const scene = ctx.scene.getScene();
+    const scene = ctx.scene.getDocument();
     const layer = findLayerById(scene, id);
     if (!layer || !isLayerEditable(layer)) {
       return;
@@ -248,9 +248,9 @@ export class ToggleLayerLockCommand extends Command {
     ctx.scene.apply({
       apply: (currentScene) => ({
         ...currentScene,
-        pages: currentScene.pages.map((page) => ({
+        artboards: currentScene.artboards.map((page) => ({
           ...page,
-          layers: updateLayerInTree(page.layers, id, (l) => ({
+          nodes: updateLayerInTree(page.nodes, id, (l) => ({
             ...l,
             locked: nextLocked,
           })),
@@ -265,21 +265,21 @@ export class ToggleLayerVisibilityCommand extends Command {
   readonly id = 'scene.toggleLayerVisibility';
 
   canExecute(ctx: CommandContext): boolean {
-    const id = ctx.selection.primaryLayerId;
+    const id = ctx.selection.primaryNodeId;
     if (!id) {
       return false;
     }
-    const scene = ctx.scene.getScene();
+    const scene = ctx.scene.getDocument();
     const layer = findLayerById(scene, id);
     return layer ? isLayerEditable(layer) : false;
   }
 
   execute(ctx: CommandContext): void {
-    const id = ctx.selection.primaryLayerId;
+    const id = ctx.selection.primaryNodeId;
     if (!id) {
       return;
     }
-    const scene = ctx.scene.getScene();
+    const scene = ctx.scene.getDocument();
     const layer = findLayerById(scene, id);
     if (!layer || !isLayerEditable(layer)) {
       return;
@@ -288,9 +288,9 @@ export class ToggleLayerVisibilityCommand extends Command {
     ctx.scene.apply({
       apply: (currentScene) => ({
         ...currentScene,
-        pages: currentScene.pages.map((page) => ({
+        artboards: currentScene.artboards.map((page) => ({
           ...page,
-          layers: updateLayerInTree(page.layers, id, (l) => ({
+          nodes: updateLayerInTree(page.nodes, id, (l) => ({
             ...l,
             visible: nextVisible,
           })),
@@ -300,10 +300,10 @@ export class ToggleLayerVisibilityCommand extends Command {
     });
     if (!nextVisible) {
       const selection = ctx.scene.getSelection();
-      const remaining = selection.selectedLayerIds.filter(
+      const remaining = selection.selectedNodeIds.filter(
         (selectedId) => selectedId !== id
       );
-      ctx.scene.selectLayers(remaining, remaining[0] ?? null);
+      ctx.scene.selectNodes(remaining, remaining[0] ?? null);
     }
   }
 }
@@ -312,15 +312,15 @@ export class AddPageCommand extends Command {
   readonly id = 'scene.addPage';
 
   canExecute(ctx: CommandContext): boolean {
-    return canInsertLayers(ctx.scene.getScene());
+    return canInsertLayers(ctx.scene.getDocument());
   }
 
   execute(ctx: CommandContext): void {
     if (!this.canExecute(ctx)) {
       return;
     }
-    const source = ctx.scene.getActivePage();
-    const pages = ctx.scene.getScene().pages;
+    const source = ctx.scene.getActiveArtboard();
+    const pages = ctx.scene.getDocument().artboards;
     const newId = createPageId();
     const page = createBlankPageLike(
       source,
@@ -330,9 +330,9 @@ export class AddPageCommand extends Command {
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: [...scene.pages, page],
+        artboards: [...scene.artboards, page],
       }),
-      activePageId: newId,
+      activeArtboardId: newId,
       label: 'Add page',
     });
   }
@@ -342,16 +342,16 @@ export class RemovePageCommand extends Command {
   readonly id = 'scene.removePage';
 
   canExecute(ctx: CommandContext): boolean {
-    const scene = ctx.scene.getScene();
-    if (scene.pages.length <= 1) {
+    const scene = ctx.scene.getDocument();
+    if (scene.artboards.length <= 1) {
       return false;
     }
     if (scene.templatePolicy?.allowDeleteLayers === false) {
       return false;
     }
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     let allowed = true;
-    walkLayers(page.layers, (layer) => {
+    walkLayers(page.nodes, (layer) => {
       if (!canDeleteLayer(layer, scene)) {
         allowed = false;
       }
@@ -363,22 +363,22 @@ export class RemovePageCommand extends Command {
     if (!this.canExecute(ctx)) {
       return;
     }
-    const scene = ctx.scene.getScene();
-    const activePageId = ctx.scene.getActivePageId();
-    const index = scene.pages.findIndex((p) => p.id === activePageId);
+    const scene = ctx.scene.getDocument();
+    const activeArtboardId = ctx.scene.getActivePageId();
+    const index = scene.artboards.findIndex((p) => p.id === activeArtboardId);
     if (index === -1) {
       return;
     }
-    const neighbor = scene.pages[index - 1] ?? scene.pages[index + 1];
+    const neighbor = scene.artboards[index - 1] ?? scene.artboards[index + 1];
     if (!neighbor) {
       return;
     }
     ctx.scene.apply({
       apply: (current) => ({
         ...current,
-        pages: current.pages.filter((p) => p.id !== activePageId),
+        artboards: current.artboards.filter((p) => p.id !== activeArtboardId),
       }),
-      activePageId: neighbor.id,
+      activeArtboardId: neighbor.id,
       label: 'Delete page',
     });
   }
@@ -388,7 +388,7 @@ export class DuplicatePageCommand extends Command {
   readonly id = 'scene.duplicatePage';
 
   canExecute(ctx: CommandContext): boolean {
-    const scene = ctx.scene.getScene();
+    const scene = ctx.scene.getDocument();
     if (!canInsertLayers(scene)) {
       return false;
     }
@@ -402,7 +402,7 @@ export class DuplicatePageCommand extends Command {
     if (!this.canExecute(ctx)) {
       return;
     }
-    const source = ctx.scene.getActivePage();
+    const source = ctx.scene.getActiveArtboard();
     const newId = createPageId();
     const page = duplicatePageModel(
       source,
@@ -411,15 +411,15 @@ export class DuplicatePageCommand extends Command {
     );
     ctx.scene.apply({
       apply: (scene) => {
-        const index = scene.pages.findIndex((p) => p.id === source.id);
+        const index = scene.artboards.findIndex((p) => p.id === source.id);
         if (index === -1) {
-          return { ...scene, pages: [...scene.pages, page] };
+          return { ...scene, artboards: [...scene.artboards, page] };
         }
-        const pages = [...scene.pages];
-        pages.splice(index + 1, 0, page);
-        return { ...scene, pages };
+        const artboards = [...scene.artboards];
+        artboards.splice(index + 1, 0, page);
+        return { ...scene, artboards };
       },
-      activePageId: newId,
+      activeArtboardId: newId,
       label: 'Duplicate page',
     });
   }
@@ -438,7 +438,9 @@ export class RenamePageCommand extends Command {
     if (!renameArgs?.id || typeof renameArgs.name !== 'string') {
       return false;
     }
-    return ctx.scene.getScene().pages.some((p) => p.id === renameArgs.id);
+    return ctx.scene
+      .getDocument()
+      .artboards.some((p) => p.id === renameArgs.id);
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -450,14 +452,16 @@ export class RenamePageCommand extends Command {
     if (!trimmed) {
       return;
     }
-    const page = ctx.scene.getScene().pages.find((p) => p.id === renameArgs.id);
+    const page = ctx.scene
+      .getDocument()
+      .artboards.find((p) => p.id === renameArgs.id);
     if (!page || page.name === trimmed) {
       return;
     }
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((p) =>
+        artboards: scene.artboards.map((p) =>
           p.id === renameArgs.id ? { ...p, name: trimmed } : p
         ),
       }),
@@ -479,7 +483,7 @@ export class RenameLayerCommand extends Command {
     if (!renameArgs?.id || typeof renameArgs.name !== 'string') {
       return false;
     }
-    return Boolean(findLayerById(ctx.scene.getScene(), renameArgs.id));
+    return Boolean(findLayerById(ctx.scene.getDocument(), renameArgs.id));
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -487,7 +491,7 @@ export class RenameLayerCommand extends Command {
     if (!renameArgs?.id || typeof renameArgs.name !== 'string') {
       return;
     }
-    const scene = ctx.scene.getScene();
+    const scene = ctx.scene.getDocument();
     const layer = findLayerById(scene, renameArgs.id);
     if (!layer) {
       return;
@@ -501,9 +505,9 @@ export class RenameLayerCommand extends Command {
     ctx.scene.apply({
       apply: (currentScene) => ({
         ...currentScene,
-        pages: currentScene.pages.map((page) => ({
+        artboards: currentScene.artboards.map((page) => ({
           ...page,
-          layers: updateLayerInTree(page.layers, renameArgs.id, (l) => {
+          nodes: updateLayerInTree(page.nodes, renameArgs.id, (l) => {
             if (nextName === undefined) {
               const { name: _removed, ...rest } = l;
               return rest as typeof l;
@@ -532,21 +536,21 @@ export class SetLayerWriteModeCommand extends Command {
     if (!isLayerWriteMode(writeMode)) {
       return false;
     }
-    return Boolean(ctx.selection.primaryLayerId);
+    return Boolean(ctx.selection.primaryNodeId);
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
     const writeMode = (args as { writeMode?: unknown } | undefined)?.writeMode;
-    const id = ctx.selection.primaryLayerId;
+    const id = ctx.selection.primaryNodeId;
     if (!id || !isLayerWriteMode(writeMode)) {
       return;
     }
     ctx.scene.apply({
       apply: (currentScene) => ({
         ...currentScene,
-        pages: currentScene.pages.map((page) => ({
+        artboards: currentScene.artboards.map((page) => ({
           ...page,
-          layers: updateLayerInTree(page.layers, id, (l) => ({
+          nodes: updateLayerInTree(page.nodes, id, (l) => ({
             ...l,
             writeMode,
           })),
@@ -566,22 +570,22 @@ export class SetLayerShowInLayersCommand extends Command {
     if (typeof showInLayers !== 'boolean') {
       return false;
     }
-    return Boolean(ctx.selection.primaryLayerId);
+    return Boolean(ctx.selection.primaryNodeId);
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
     const showInLayers = (args as { showInLayers?: unknown } | undefined)
       ?.showInLayers;
-    const id = ctx.selection.primaryLayerId;
+    const id = ctx.selection.primaryNodeId;
     if (!id || typeof showInLayers !== 'boolean') {
       return;
     }
     ctx.scene.apply({
       apply: (currentScene) => ({
         ...currentScene,
-        pages: currentScene.pages.map((page) => ({
+        artboards: currentScene.artboards.map((page) => ({
           ...page,
-          layers: updateLayerInTree(page.layers, id, (l) => ({
+          nodes: updateLayerInTree(page.nodes, id, (l) => ({
             ...l,
             showInLayers,
           })),
@@ -591,10 +595,10 @@ export class SetLayerShowInLayersCommand extends Command {
     });
     if (!showInLayers && isTemplatePolicyEnforced()) {
       const selection = ctx.scene.getSelection();
-      const remaining = selection.selectedLayerIds.filter(
+      const remaining = selection.selectedNodeIds.filter(
         (selectedId) => selectedId !== id
       );
-      ctx.scene.selectLayers(remaining, remaining[0] ?? null);
+      ctx.scene.selectNodes(remaining, remaining[0] ?? null);
     }
   }
 }
@@ -604,14 +608,14 @@ type TemplatePolicyFlag = keyof Pick<
   | 'allowDeleteLayers'
   | 'allowDuplicateLayers'
   | 'allowInsertLayers'
-  | 'allowPageResize'
+  | 'allowArtboardResize'
 >;
 
 const TEMPLATE_POLICY_FLAGS: TemplatePolicyFlag[] = [
   'allowDeleteLayers',
   'allowDuplicateLayers',
   'allowInsertLayers',
-  'allowPageResize',
+  'allowArtboardResize',
 ];
 
 export class SetTemplatePolicyCommand extends Command {
@@ -640,7 +644,7 @@ export class SetTemplatePolicyCommand extends Command {
         | 'allowDeleteLayers'
         | 'allowDuplicateLayers'
         | 'allowInsertLayers'
-        | 'allowPageResize'
+        | 'allowArtboardResize'
       >
     > = {};
     for (const key of TEMPLATE_POLICY_FLAGS) {
@@ -661,7 +665,7 @@ export class SetTemplatePolicyCommand extends Command {
             allowDeleteLayers: prev?.allowDeleteLayers ?? true,
             allowDuplicateLayers: prev?.allowDuplicateLayers ?? true,
             allowInsertLayers: prev?.allowInsertLayers ?? true,
-            allowPageResize: prev?.allowPageResize ?? true,
+            allowArtboardResize: prev?.allowArtboardResize ?? true,
             ...prev,
             ...updates,
           },

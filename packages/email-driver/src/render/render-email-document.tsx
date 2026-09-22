@@ -1,6 +1,7 @@
 import { renderBlockTree, type BlockRegistry } from '@openenvx/html-driver';
 import { getLayerChildren } from '@openenvx/studio/core';
-import type { Page } from '@openenvx/studio/schema';
+import type { DocumentNode, Page } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
 import { Body, Font, Head, Html, Preview } from '@react-email/components';
 import { render } from '@react-email/render';
 
@@ -12,10 +13,8 @@ import {
   emailFontStack,
 } from './email-document-font';
 
-function layerData(layer: { data?: unknown }): Record<string, unknown> {
-  return typeof layer.data === 'object' && layer.data !== null
-    ? (layer.data as Record<string, unknown>)
-    : {};
+function layerData(layer: DocumentNode): Record<string, unknown> {
+  return nodeProps(layer);
 }
 
 export interface RenderEmailDocumentOptions {
@@ -33,7 +32,7 @@ export async function renderEmailDocument(
   registry: BlockRegistry,
   options?: RenderEmailDocumentOptions
 ): Promise<string> {
-  const root = page.layers.find((layer) => layer.type === 'email.root');
+  const root = page.nodes.find((layer) => layer.type === 'email.root');
   if (!root) {
     throw new Error('Page has no email.root block');
   }

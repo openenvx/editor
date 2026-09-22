@@ -1,8 +1,9 @@
 import {
-  createEmptyScene,
-  createEmptySceneSnapshot,
-  type SceneSnapshot,
+  createEmptyDocument,
+  createEmptyProjectSnapshot,
+  type ProjectSnapshot,
 } from '@openenvx/studio/schema';
+import { asDocumentNode } from '../test/document-fixtures';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { LocalStoragePersistenceService } from './local-storage-persistence-service';
@@ -39,13 +40,15 @@ describe('LocalStoragePersistenceService', () => {
   });
 
   it('saves and loads a scene snapshot by uri', async () => {
-    const snapshot = createEmptySceneSnapshot();
+    const snapshot = createEmptyProjectSnapshot();
     await service.save('doc://test', snapshot);
     const loaded = await service.load('doc://test');
-    expect(loaded.editorState.activePageId).toBe(
-      snapshot.editorState.activePageId
+    expect(loaded.session.activeArtboardId).toBe(
+      snapshot.session.activeArtboardId
     );
-    expect(loaded.scene.schemaVersion).toBe(snapshot.scene.schemaVersion);
+    expect(loaded.document.artboards[0]!.id).toBe(
+      snapshot.document.artboards[0]!.id
+    );
   });
 
   it('throws when loading a missing uri', async () => {
@@ -55,22 +58,34 @@ describe('LocalStoragePersistenceService', () => {
   });
 
   it('deletes and lists documents', async () => {
-    await service.save('doc://a', createEmptySceneSnapshot());
-    await service.save('doc://b', createEmptySceneSnapshot());
+    await service.save('doc://a', createEmptyProjectSnapshot());
+    await service.save('doc://b', createEmptyProjectSnapshot());
     expect(service.list()).toEqual(['doc://a', 'doc://b']);
     service.delete('doc://a');
     expect(service.list()).toEqual(['doc://b']);
   });
 
   it('saves and loads a scene with assets', async () => {
-    const snapshot: SceneSnapshot = {
-      editorState: {
-        activePageId: 'page-1',
-        primaryLayerId: null,
-        selectedLayerIds: [],
+    const artboard = createEmptyDocument().artboards[0]!;
+    const snapshot: ProjectSnapshot = {
+      session: {
+        activeArtboardId: artboard.id,
+        primaryNodeId: null,
+        selectedNodeIds: [],
       },
-      scene: {
-        ...createEmptyScene(),
+      document: {
+        artboards: [
+          {
+            ...artboard,
+            nodes: [
+              asDocumentNode({
+                data: { assetRef: 'asset://img1' },
+                id: '1',
+                type: 'image',
+              }),
+            ],
+          },
+        ],
         assets: {
           img1: {
             data: 'eHk=',
@@ -78,26 +93,14 @@ describe('LocalStoragePersistenceService', () => {
             mimeType: 'image/png',
           },
         },
-        pages: [
-          {
-            ...createEmptyScene().pages[0]!,
-            layers: [
-              {
-                data: { assetRef: 'asset://img1' },
-                id: '1',
-                type: 'image',
-              },
-            ],
-          },
-        ],
       },
     };
     await service.save('doc://assets', snapshot);
     const loaded = await service.load('doc://assets');
-    expect(loaded.scene.assets).toEqual({
+    expect(loaded.document.assets).toEqual({
       img1: { data: 'eHk=', encoding: 'base64', mimeType: 'image/png' },
     });
-    expect(loaded.scene.pages[0]!.layers[0]!.data).toEqual({
+    expect(loaded.document.artboards[0]!.nodes[0]!.props).toEqual({
       assetRef: 'asset://img1',
     });
   });

@@ -29,14 +29,14 @@ describe('EditorRuntime events', () => {
     editor.open(
       {
         isDirty: false,
-        scene: scene.getScene(),
+        scene: scene.getDocument(),
         title: 'Untitled',
         uri: 'untitled://scene',
       },
       scene.getContentRevision()
     );
 
-    scene.selectLayers([], null);
+    scene.selectNodes([], null);
 
     expect(sceneChanges.length).toBeGreaterThan(0);
     expect(dirtyChanges).toContain(false);

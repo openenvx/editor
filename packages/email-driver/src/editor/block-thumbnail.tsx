@@ -1,12 +1,18 @@
 import type { BlockConfig, BlockRegistry } from '@openenvx/html-driver';
 import { isLayerVisible } from '@openenvx/studio/core';
 import type { Layer } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
 import { createElement, Fragment, type ReactNode } from 'react';
 
-function layerData(layer: Layer): Record<string, unknown> {
-  return typeof layer.data === 'object' && layer.data !== null
-    ? (layer.data as Record<string, unknown>)
-    : {};
+function layerPayload(layer: Layer): Record<string, unknown> {
+  return nodeProps(layer);
+}
+
+function blockChildLayers(layer: Layer): Layer[] {
+  if (Array.isArray(layer.children)) {
+    return layer.children;
+  }
+  return asLayers(layerPayload(layer).children);
 }
 
 function asLayers(value: unknown): Layer[] {
@@ -56,8 +62,8 @@ function renderLayerThumbnail(
   if (!config) {
     return null;
   }
-  const data = layerData(layer);
-  const childNodes = asLayers(data.children)
+  const data = layerPayload(layer);
+  const childNodes = blockChildLayers(layer)
     .map((child) => renderLayerThumbnail(child, registry))
     .filter((node): node is ReactNode => node !== null && node !== undefined);
   const slots = renderDefaultSlots(data, config, registry);

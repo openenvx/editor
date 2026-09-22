@@ -1,18 +1,13 @@
-import type { Layer, Scene } from '@openenvx/studio/schema';
+import type { Document, DocumentNode } from '@openenvx/studio/schema';
 
-function* walkLayers(layers: Layer[]): Generator<Layer> {
-  for (const layer of layers) {
-    yield layer;
+import { getChildNodes, hasChildNodes } from '../scene/layer-tree';
+import { nodeProps } from '../schema/node-helpers';
 
-    if (
-      layer.type === 'container' &&
-      typeof layer.data === 'object' &&
-      layer.data !== null
-    ) {
-      const children = (layer.data as { children?: Layer[] }).children;
-      if (Array.isArray(children)) {
-        yield* walkLayers(children);
-      }
+function* walkNodes(nodes: DocumentNode[]): Generator<DocumentNode> {
+  for (const node of nodes) {
+    yield node;
+    if (hasChildNodes(node)) {
+      yield* walkNodes(getChildNodes(node));
     }
   }
 }
@@ -39,11 +34,11 @@ function extractAssetRefs(value: unknown, refs: Set<string>): void {
   }
 }
 
-export function collectAssetRefs(scene: Scene): Set<string> {
+export function collectAssetRefs(document: Document): Set<string> {
   const refs = new Set<string>();
-  for (const page of scene.pages) {
-    for (const layer of walkLayers(page.layers)) {
-      extractAssetRefs(layer.data, refs);
+  for (const artboard of document.artboards) {
+    for (const node of walkNodes(artboard.nodes)) {
+      extractAssetRefs(nodeProps(node), refs);
     }
   }
   return refs;

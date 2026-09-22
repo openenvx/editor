@@ -2,10 +2,12 @@ import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { getNestedValue } from '@openenvx/studio/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { blockProps, testHtmlDocument } from '../test/document-fixtures';
 import {
   createHtmlWorkbench,
   renderWithWorkbench,
 } from '../test/html-editor-harness';
+import { getBlockChildren } from '../tree/block-tree';
 import { HtmlEditorPane } from './html-editor-pane';
 
 afterEach(cleanup);
@@ -48,13 +50,13 @@ describe('HtmlEditorPane', () => {
       fireEvent.click(screen.getByText('Welcome'));
 
       await waitFor(() => {
-        expect(api.getSnapshot().selection.selectedLayerIds).toContain(
+        expect(api.getSnapshot().selection.selectedNodeIds).toContain(
           'hero-1'
         );
       });
       fireEvent.click(screen.getByText('Below the hero'));
       await waitFor(() => {
-        expect(api.getSnapshot().selection.selectedLayerIds).toContain(
+        expect(api.getSnapshot().selection.selectedNodeIds).toContain(
           'heading-1'
         );
       });
@@ -74,7 +76,7 @@ describe('HtmlEditorPane', () => {
       fireEvent.keyDown(canvas, { key: 'Escape' });
 
       await waitFor(() => {
-        expect(api.getSnapshot().selection.selectedLayerIds).toEqual([]);
+        expect(api.getSnapshot().selection.selectedNodeIds).toEqual([]);
       });
     } finally {
       dispose();
@@ -90,23 +92,21 @@ describe('HtmlEditorPane', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }));
         await waitFor(() => {
-          const root = api.getSnapshot().scene.pages[0]!.layers[0]!;
-          const children = (
-            root.data as { children: { type: string }[] }
-          ).children;
+          const root = api.getSnapshot().scene.artboards[0]!.nodes[0]!;
+          const children = getBlockChildren(root);
           expect(
             children.filter((c) => c.type === 'html.text').length
           ).toBeGreaterThan(1);
         });
 
         const selected =
-          api.getSnapshot().selection.primaryLayerId ??
-          api.getSnapshot().selection.selectedLayerIds[0]!;
+          api.getSnapshot().selection.primaryNodeId ??
+          api.getSnapshot().selection.selectedNodeIds[0]!;
         api.selectLayers([selected], selected);
         fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
         await waitFor(() => {
           expect(
-            api.getSnapshot().selection.selectedLayerIds
+            api.getSnapshot().selection.selectedNodeIds
           ).not.toContain(selected);
         });
       });
@@ -135,16 +135,11 @@ describe('HtmlEditorPane', () => {
         fireEvent.change(input, { target: { files: [file] } });
 
         await waitFor(() => {
-          const root = api.getSnapshot().scene.pages[0]!.layers[0]!;
-          const hero = (
-            root.data as {
-              children: {
-                id: string;
-                data: { backgroundImage?: string };
-              }[];
-            }
-          ).children.find((layer) => layer.id === 'hero-1');
-          expect(hero?.data.backgroundImage?.startsWith('asset://')).toBe(true);
+          const root = api.getSnapshot().scene.artboards[0]!.nodes[0]!;
+          const hero = getBlockChildren(root).find((layer) => layer.id === 'hero-1');
+          expect(
+            String(blockProps(hero!).backgroundImage).startsWith('asset://')
+          ).toBe(true);
         });
       });
     } finally {
@@ -164,7 +159,7 @@ describe('HtmlEditorPane', () => {
 
       const canvas = container.querySelector('[role="tree"]') as HTMLElement;
       fireEvent.keyDown(canvas, { key: 'Escape' });
-      expect(api.getSnapshot().selection.selectedLayerIds).toContain('hero-1');
+      expect(api.getSnapshot().selection.selectedNodeIds).toContain('hero-1');
 
       const editable = document.querySelector(
         '[contenteditable="true"]'
@@ -176,13 +171,11 @@ describe('HtmlEditorPane', () => {
       });
 
       await waitFor(() => {
-        const root = api.getSnapshot().scene.pages[0]!.layers[0]!;
-        const hero = (
-          root.data as { children: { id: string; data?: unknown }[] }
-        ).children.find((layer) => layer.id === 'hero-1');
+        const root = api.getSnapshot().scene.artboards[0]!.nodes[0]!;
+        const hero = getBlockChildren(root).find((layer) => layer.id === 'hero-1');
         expect(hero).toBeTruthy();
         const headlineHtml = getNestedValue(
-          hero!.data as Record<string, unknown>,
+          blockProps(hero!),
           'slots.headline.0.data.html'
         );
         expect(String(headlineHtml)).toBe('Welcome');
@@ -207,10 +200,8 @@ describe('HtmlEditorPane', () => {
       fireEvent.keyDown(editable, { key: 'Enter' });
 
       await waitFor(() => {
-        const root = api.getSnapshot().scene.pages[0]!.layers[0]!;
-        const children = (
-          root.data as { children: { type: string }[] }
-        ).children;
+        const root = api.getSnapshot().scene.artboards[0]!.nodes[0]!;
+        const children = getBlockChildren(root);
         const headingIndex = children.findIndex(
           (child) => child.type === 'html.heading'
         );
@@ -229,7 +220,7 @@ describe('HtmlEditorPane', () => {
       const stage = container.querySelector('[role="tree"]') as HTMLElement;
       fireEvent.click(stage);
       await waitFor(() => {
-        expect(api.getSnapshot().selection.selectedLayerIds).toEqual([]);
+        expect(api.getSnapshot().selection.selectedNodeIds).toEqual([]);
       });
     } finally {
       dispose();
@@ -243,7 +234,7 @@ describe('HtmlEditorPane', () => {
       renderWithWorkbench(api, <HtmlEditorPane />);
       fireEvent.click(screen.getByTestId('html-artboard'));
       await waitFor(() => {
-        expect(api.getSnapshot().selection.selectedLayerIds).toEqual(['root']);
+        expect(api.getSnapshot().selection.selectedNodeIds).toEqual(['root']);
       });
     } finally {
       dispose();
@@ -257,7 +248,7 @@ describe('HtmlEditorPane', () => {
       const { container } = renderWithWorkbench(api, <HtmlEditorPane />);
       const canvas = container.querySelector('[role="tree"]') as HTMLElement;
       fireEvent.keyDown(canvas, { key: 'a' });
-      expect(api.getSnapshot().selection.selectedLayerIds).toContain('heading-1');
+      expect(api.getSnapshot().selection.selectedNodeIds).toContain('heading-1');
     } finally {
       dispose();
     }
@@ -266,17 +257,16 @@ describe('HtmlEditorPane', () => {
   it('shows empty state when the page has no root block', async () => {
     const { api, dispose } = await createHtmlWorkbench();
     try {
-      api.loadScene({
-        schemaVersion: api.getSnapshot().scene.schemaVersion,
-        pages: [
+      api.loadScene(
+        testHtmlDocument([
           {
             id: 'html-page',
             name: 'Empty',
             layout: 'html',
             layers: [],
           },
-        ],
-      });
+        ])
+      );
       renderWithWorkbench(api, <HtmlEditorPane />);
       expect(screen.getByText('No root block on this page.')).toBeTruthy();
     } finally {

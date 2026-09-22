@@ -1,10 +1,10 @@
-import type { Page, ValidationError } from '@openenvx/studio/schema';
+import type { Artboard, ValidationError } from '@openenvx/studio/schema';
 
 import { Contribution } from '../core/contribution';
 import { ContributionPoint } from '../core/contribution-point';
 
 /**
- * Provider-owned normalize/validate rules for a page layout kind.
+ * Provider-owned normalize/validate rules for an artboard layout kind.
  * Registered via `ctx.register(new MyPageRules())` and keyed by `layout`.
  */
 export abstract class PageRulesContribution extends Contribution {
@@ -13,9 +13,17 @@ export abstract class PageRulesContribution extends Contribution {
   /** Layout string this contribution owns (e.g. `'absolute'`). */
   abstract readonly layout: string;
 
-  /** Fill layout-specific defaults. Idempotent. */
-  abstract normalizePage(page: Page): Page;
+  abstract normalizeArtboard(artboard: Artboard): Artboard;
 
-  /** Layout-specific validation errors (empty if valid). */
-  abstract validatePage(page: Page): ValidationError[];
+  abstract validateArtboard(artboard: Artboard): ValidationError[];
+
+  /** @deprecated use normalizeArtboard */
+  normalizePage(artboard: Artboard): Artboard {
+    return this.normalizeArtboard(artboard);
+  }
+
+  /** @deprecated use validateArtboard */
+  validatePage(artboard: Artboard): ValidationError[] {
+    return this.validateArtboard(artboard);
+  }
 }

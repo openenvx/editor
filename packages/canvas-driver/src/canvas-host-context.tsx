@@ -12,7 +12,7 @@ export interface CanvasHostApi {
     args?: Record<string, unknown>
   ): Promise<{ executed: boolean; result?: T }>;
   updateProperty(layerId: string, key: string, value: unknown): void;
-  selectLayers(layerIds: string[], primaryLayerId: string | null): void;
+  selectLayers(layerIds: string[], primaryNodeId: string | null): void;
   setContextKey(key: string, value: boolean | string | number): void;
 }
 

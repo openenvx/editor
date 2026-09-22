@@ -1,11 +1,11 @@
-import { cloneLayerTree, createLayerId } from '@openenvx/studio/core';
-import type { Layer } from '@openenvx/studio/schema';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { cloneNodeTree, createLayerId } from '@openenvx/studio/core';
+import type { DocumentNode } from '@openenvx/studio/schema';
+import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
 
 export { createLayerId };
 
-export function cloneLayers(layers: Layer[]): Layer[] {
-  return cloneLayerTree(layers);
+export function cloneLayers(layers: DocumentNode[]): DocumentNode[] {
+  return cloneNodeTree(layers);
 }
 
 export interface LayerBoundingBox {
@@ -15,11 +15,7 @@ export interface LayerBoundingBox {
   height: number;
 }
 
-function getLayerTransform(layer: Layer) {
-  return layer.transform ?? createDefaultTransform();
-}
-
-export function getLayersBoundingBox(layers: Layer[]): LayerBoundingBox {
+export function getLayersBoundingBox(layers: DocumentNode[]): LayerBoundingBox {
   if (layers.length === 0) {
     return { x: 0, y: 0, width: 0, height: 0 };
   }
@@ -30,7 +26,7 @@ export function getLayersBoundingBox(layers: Layer[]): LayerBoundingBox {
   let maxY = Number.NEGATIVE_INFINITY;
 
   for (const layer of layers) {
-    const transform = getLayerTransform(layer);
+    const transform = nodeTransform(layer);
     minX = Math.min(minX, transform.x);
     minY = Math.min(minY, transform.y);
     maxX = Math.max(maxX, transform.x + transform.width);
@@ -46,27 +42,28 @@ export function getLayersBoundingBox(layers: Layer[]): LayerBoundingBox {
 }
 
 export function positionLayersAtAnchor(
-  layers: Layer[],
+  layers: DocumentNode[],
   origin: { x: number; y: number },
   anchor: { x: number; y: number },
   offset?: { x: number; y: number }
-): Layer[] {
+): DocumentNode[] {
   const dx = anchor.x - origin.x + (offset?.x ?? 0);
   const dy = anchor.y - origin.y + (offset?.y ?? 0);
 
   return offsetLayers(layers, dx, dy);
 }
 
-export function offsetLayers(layers: Layer[], dx: number, dy: number): Layer[] {
+export function offsetLayers(
+  layers: DocumentNode[],
+  dx: number,
+  dy: number
+): DocumentNode[] {
   return layers.map((layer) => {
-    const transform = getLayerTransform(layer);
-    return {
-      ...layer,
-      transform: {
-        ...transform,
-        x: transform.x + dx,
-        y: transform.y + dy,
-      },
-    };
+    const transform = nodeTransform(layer);
+    return applyNodeTransform(layer, {
+      ...transform,
+      x: transform.x + dx,
+      y: transform.y + dy,
+    });
   });
 }

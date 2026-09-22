@@ -1,6 +1,6 @@
 import type { Layer as SceneLayer } from '@openenvx/studio/core';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import type { Transform } from '@openenvx/studio/schema';
+import { nodeTransform, type Transform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
@@ -36,6 +36,25 @@ import type {
   CanvasUserGuidesSnapConfig,
 } from '../stage/canvas-stage-interaction';
 
+function layerTransformFromFlattened(
+  flattenedLayers: { layer: SceneLayer }[],
+  layerId: string
+): Transform {
+  const entry = flattenedLayers.find(({ layer }) => layer.id === layerId);
+  return entry
+    ? nodeTransform(entry.layer)
+    : {
+        x: 0,
+        y: 0,
+        width: 1,
+        height: 1,
+        rotation: 0,
+        opacity: 1,
+        scaleX: 1,
+        scaleY: 1,
+      };
+}
+
 export interface UseLayerTransformSessionInput {
   artboardHeight: number;
   artboardWidth: number;
@@ -67,7 +86,7 @@ export interface UseLayerTransformSessionInput {
     | { layer: SceneLayer; view: LayerPreviewDescriptor }
     | undefined;
   selectedInteraction: CanvasLayerInteractionRegistration | undefined;
-  selectedLayerIdsRef: RefObject<string[]>;
+  selectedNodeIdsRef: RefObject<string[]>;
   selectedPrimary: string | null;
   setActiveDragAnchor: (anchor: string | null) => void;
   setLiveTransformOverride: (
@@ -99,7 +118,7 @@ export function useLayerTransformSession({
   primaryLayerIdRef,
   selectedInteraction,
   selectedLayer,
-  selectedLayerIdsRef,
+  selectedNodeIdsRef,
   selectedPrimary,
   setActiveDragAnchor,
   setLiveTransformOverride,
@@ -283,7 +302,7 @@ export function useLayerTransformSession({
         box: nextBox,
         grid: getGridConfig(),
         marginInset: getMarginInset(),
-        others: getOtherLayers(new Set(selectedLayerIdsRef.current)),
+        others: getOtherLayers(new Set(selectedNodeIdsRef.current)),
         userGuides: getUserGuidesConfig(),
         zoom: vpZoom,
       });
@@ -300,7 +319,7 @@ export function useLayerTransformSession({
       getOtherLayers,
       getUserGuidesConfig,
       getTransformModifiers,
-      selectedLayerIdsRef,
+      selectedNodeIdsRef,
       sessionRefs,
       setInteractionOverlays,
       setLiveTransformOverride,
@@ -327,6 +346,7 @@ export function useLayerTransformSession({
         nodeRefs: nodeRefs.current,
         refs: sessionRefs,
         setLiveTransformOverride,
+        transform: layerTransformFromFlattened(flattenedLayers, layerId),
         transformerRef,
         updateSizeLabelImperatively,
         view,
@@ -351,7 +371,7 @@ export function useLayerTransformSession({
       interactionKind: string | undefined
     ) => {
       const transformPrimary =
-        primaryLayerIdRef.current ?? selectedLayerIdsRef.current[0] ?? null;
+        primaryLayerIdRef.current ?? selectedNodeIdsRef.current[0] ?? null;
       if (layerId !== transformPrimary) {
         return;
       }
@@ -365,6 +385,7 @@ export function useLayerTransformSession({
         nodeRefs: nodeRefs.current,
         refs: sessionRefs,
         setLiveTransformOverride,
+        transform: layerTransformFromFlattened(flattenedLayers, layerId),
         transformerRef,
         updateSizeLabelImperatively,
         view,
@@ -380,7 +401,7 @@ export function useLayerTransformSession({
       getTransformModifiers,
       nodeRefs,
       primaryLayerIdRef,
-      selectedLayerIdsRef,
+      selectedNodeIdsRef,
       sessionRefs,
       setLiveTransformOverride,
       syncLabelFromTransformer,
@@ -400,7 +421,7 @@ export function useLayerTransformSession({
     }: {
       layerId: string;
       view: LayerPreviewDescriptor;
-      transform: NonNullable<SceneLayer['transform']>;
+      transform: Transform;
       node: Konva.Group;
       interactionKind: string | undefined;
     }) => {
@@ -432,9 +453,9 @@ export function useLayerTransformSession({
         fontSize: nextFontSize,
         transform: nextTransform,
       });
-      if (selectedLayerIdsRef.current.includes(layerId)) {
+      if (selectedNodeIdsRef.current.includes(layerId)) {
         requestAnimationFrame(() => {
-          const nodes = selectedLayerIdsRef.current
+          const nodes = selectedNodeIdsRef.current
             .map((id) => nodeRefs.current.get(id))
             .filter((entry): entry is Konva.Group => Boolean(entry));
           attachTransformerToNodes(transformerRef.current, nodes);
@@ -447,7 +468,7 @@ export function useLayerTransformSession({
       handleTransformEnd,
       nodeRefs,
       onTransformRef,
-      selectedLayerIdsRef,
+      selectedNodeIdsRef,
       sessionRefs,
       setLiveTransformOverride,
       syncLabelFromTransformer,

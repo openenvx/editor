@@ -87,9 +87,9 @@ export interface SandboxBridgeResponse {
 
 /** Selection snapshot pushed to showUI (requires `document:read` on the grant). */
 export interface SandboxUiSelection {
-  activePageId: string | null;
-  selectedLayerIds: string[];
-  primaryLayerId: string | null;
+  activeArtboardId: string | null;
+  selectedNodeIds: string[];
+  primaryNodeId: string | null;
 }
 
 /** Iframe → host messages. */

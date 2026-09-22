@@ -11,7 +11,7 @@ export function App() {
   const plugins = useMemo(() => defaultHtmlWorkbench.plugins, []);
 
   const onSceneChange = useCallback((scene: Scene) => {
-    const rootLayers = scene.pages[0]?.layers.length ?? 0;
+    const rootLayers = scene.artboards[0]?.nodes.length ?? 0;
     console.log('[html-package-demo] root layers:', rootLayers);
   }, []);
 

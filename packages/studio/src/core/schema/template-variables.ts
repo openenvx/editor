@@ -1,14 +1,13 @@
 /**
- * Scene-level template variables: catalog on Scene + `{{{key}}}` tokens in layer data.
- * Orthogonal to Bannerbear-style `applyModifications` (named whole layers).
+ * Document-level template variables: catalog on Document + `{{{key}}}` tokens in node props.
  */
 import {
-  hasChildLayers,
-  mapLayerChildren,
-  walkLayers,
+  hasChildNodesInTree,
+  mapNodeChildren,
+  walkNodes,
 } from '../scene/layer-tree';
 import { escapeHtml } from './template';
-import type { Layer, Scene, TemplateVariable } from './types';
+import type { Document, DocumentNode, TemplateVariable } from './types';
 
 const VARIABLE_KEY_PATTERN = /^[A-Za-z][A-Za-z0-9_]*$/;
 export const VARIABLE_TOKEN_CAPTURE_RE = /\{\{\{([A-Za-z][A-Za-z0-9_]*)\}\}\}/g;
@@ -30,9 +29,12 @@ export function extractVariableKeys(text: string): string[] {
   return keys;
 }
 
-export function sceneVariables(scene: Scene): TemplateVariable[] {
-  return scene.variables ?? [];
+export function documentVariables(document: Document): TemplateVariable[] {
+  return document.variables ?? [];
 }
+
+/** @deprecated use documentVariables */
+export const sceneVariables = documentVariables;
 
 export type VariableKeyValidationReason = 'invalid' | 'duplicate';
 
@@ -105,38 +107,38 @@ function substituteStringsInUnknown(
   return value;
 }
 
-function mapLayerDataStrings(
-  layer: Layer,
+function mapNodePropStrings(
+  node: DocumentNode,
   values: Record<string, string>
-): Layer {
-  const nextData = substituteStringsInUnknown(layer.data, values);
-  let nextLayer: Layer = {
-    ...layer,
-    data: nextData as Layer['data'],
+): DocumentNode {
+  const nextProps = substituteStringsInUnknown(node.props ?? {}, values);
+  let nextNode: DocumentNode = {
+    ...node,
+    props: nextProps as Record<string, unknown>,
   };
-  if (hasChildLayers(nextLayer)) {
-    nextLayer = mapLayerChildren(nextLayer, (children) =>
-      children.map((child) => mapLayerDataStrings(child, values))
+  if (hasChildNodesInTree(nextNode)) {
+    nextNode = mapNodeChildren(nextNode, (children) =>
+      children.map((child) => mapNodePropStrings(child, values))
     );
   }
-  return nextLayer;
+  return nextNode;
 }
 
-function mapLayerDataStringsWithMapper(
-  layer: Layer,
+function mapNodePropStringsWithMapper(
+  node: DocumentNode,
   mapper: (text: string) => string
-): Layer {
-  const mapped = substituteStringsInUnknownWithMapper(layer.data, mapper);
-  let nextLayer: Layer = {
-    ...layer,
-    data: mapped as Layer['data'],
+): DocumentNode {
+  const mapped = substituteStringsInUnknownWithMapper(node.props ?? {}, mapper);
+  let nextNode: DocumentNode = {
+    ...node,
+    props: mapped as Record<string, unknown>,
   };
-  if (hasChildLayers(nextLayer)) {
-    nextLayer = mapLayerChildren(nextLayer, (children) =>
-      children.map((child) => mapLayerDataStringsWithMapper(child, mapper))
+  if (hasChildNodesInTree(nextNode)) {
+    nextNode = mapNodeChildren(nextNode, (children) =>
+      children.map((child) => mapNodePropStringsWithMapper(child, mapper))
     );
   }
-  return nextLayer;
+  return nextNode;
 }
 
 function substituteStringsInUnknownWithMapper(
@@ -161,68 +163,78 @@ function substituteStringsInUnknownWithMapper(
   return value;
 }
 
-function mapSceneLayers(scene: Scene, mapper: (layer: Layer) => Layer): Scene {
+function mapDocumentNodes(
+  document: Document,
+  mapper: (node: DocumentNode) => DocumentNode
+): Document {
   return {
-    ...scene,
-    pages: scene.pages.map((page) => ({
-      ...page,
-      layers: page.layers.map((layer) => mapper(layer)),
+    ...document,
+    artboards: document.artboards.map((artboard) => ({
+      ...artboard,
+      nodes: artboard.nodes.map((node) => mapper(node)),
     })),
-    components: scene.components
+    components: document.components
       ? Object.fromEntries(
-          Object.entries(scene.components).map(([id, component]) => [
+          Object.entries(document.components).map(([id, component]) => [
             id,
             {
               ...component,
-              layers: component.layers.map((layer) => mapper(layer)),
+              nodes: component.nodes.map((node) => mapper(node)),
             },
           ])
         )
-      : scene.components,
+      : document.components,
   };
 }
 
-/** Replace `{{{key}}}` tokens in layer `data` string fields. Unknown keys stay. */
 export function applyTemplateVariables(
-  scene: Scene,
+  document: Document,
   values: Record<string, string>
-): Scene {
+): Document {
   if (Object.keys(values).length === 0) {
-    return scene;
+    return document;
   }
-  return mapSceneLayers(structuredClone(scene), (layer) =>
-    mapLayerDataStrings(layer, values)
+  return mapDocumentNodes(structuredClone(document), (node) =>
+    mapNodePropStrings(node, values)
   );
 }
 
-/** Rewrite token syntax when a catalog key changes. */
-export function rewriteVariableKeyInScene(
-  scene: Scene,
+export function rewriteVariableKeyInDocument(
+  document: Document,
   oldKey: string,
   newKey: string
-): Scene {
+): Document {
   const oldToken = formatVariableToken(oldKey);
   const newToken = formatVariableToken(newKey);
   const mapper = (text: string) =>
     text.includes(oldToken) ? text.split(oldToken).join(newToken) : text;
-  return mapSceneLayers(scene, (layer) =>
-    mapLayerDataStringsWithMapper(layer, mapper)
+  return mapDocumentNodes(document, (node) =>
+    mapNodePropStringsWithMapper(node, mapper)
   );
 }
 
-export function addVariableToScene(
-  scene: Scene,
+/** @deprecated use rewriteVariableKeyInDocument */
+export const rewriteVariableKeyInScene = rewriteVariableKeyInDocument;
+
+export function addVariableToDocument(
+  document: Document,
   variable: TemplateVariable
-): Scene {
-  return { ...scene, variables: [...sceneVariables(scene), variable] };
+): Document {
+  return {
+    ...document,
+    variables: [...documentVariables(document), variable],
+  };
 }
 
-export function updateVariableInScene(
-  scene: Scene,
+/** @deprecated use addVariableToDocument */
+export const addVariableToScene = addVariableToDocument;
+
+export function updateVariableInDocument(
+  document: Document,
   id: string,
   patch: { key?: string; sample?: string }
-): Scene | null {
-  const variables = [...sceneVariables(scene)];
+): Document | null {
+  const variables = [...documentVariables(document)];
   const index = variables.findIndex((entry) => entry.id === id);
   if (index === -1) {
     return null;
@@ -239,37 +251,53 @@ export function updateVariableInScene(
     sample: patch.sample !== undefined ? patch.sample : current.sample,
   };
   variables[index] = nextVariable;
-  let nextScene: Scene = { ...scene, variables };
+  let nextDocument: Document = { ...document, variables };
   if (nextKey !== current.key) {
-    nextScene = rewriteVariableKeyInScene(nextScene, current.key, nextKey);
+    nextDocument = rewriteVariableKeyInDocument(
+      nextDocument,
+      current.key,
+      nextKey
+    );
   }
-  return nextScene;
+  return nextDocument;
 }
 
-export function removeVariableFromScene(scene: Scene, id: string): Scene {
+/** @deprecated use updateVariableInDocument */
+export const updateVariableInScene = updateVariableInDocument;
+
+export function removeVariableFromDocument(
+  document: Document,
+  id: string
+): Document {
   return {
-    ...scene,
-    variables: sceneVariables(scene).filter((entry) => entry.id !== id),
+    ...document,
+    variables: documentVariables(document).filter((entry) => entry.id !== id),
   };
 }
 
-export function reorderVariablesInScene(
-  scene: Scene,
+/** @deprecated use removeVariableFromDocument */
+export const removeVariableFromScene = removeVariableFromDocument;
+
+export function reorderVariablesInDocument(
+  document: Document,
   activeId: string,
   overId: string
-): Scene {
-  const variables = [...sceneVariables(scene)];
+): Document {
+  const variables = [...documentVariables(document)];
   const from = variables.findIndex((entry) => entry.id === activeId);
   const to = variables.findIndex((entry) => entry.id === overId);
   if (from === -1 || to === -1 || from === to) {
-    return scene;
+    return document;
   }
   const [moved] = variables.splice(from, 1);
   variables.splice(to, 0, moved!);
-  return { ...scene, variables };
+  return { ...document, variables };
 }
 
-export function listVariableUsages(scene: Scene): string[] {
+/** @deprecated use reorderVariablesInDocument */
+export const reorderVariablesInScene = reorderVariablesInDocument;
+
+export function listVariableUsages(document: Document): string[] {
   const keys = new Set<string>();
   const collect = (value: unknown): void => {
     if (typeof value === 'string') {
@@ -291,22 +319,22 @@ export function listVariableUsages(scene: Scene): string[] {
     }
   };
 
-  for (const page of scene.pages) {
-    walkLayers(page.layers, (layer) => collect(layer.data));
+  for (const artboard of document.artboards) {
+    walkNodes(artboard.nodes, (node) => collect(node.props));
   }
-  if (scene.components) {
-    for (const component of Object.values(scene.components)) {
-      walkLayers(component.layers, (layer) => collect(layer.data));
+  if (document.components) {
+    for (const component of Object.values(document.components)) {
+      walkNodes(component.nodes, (node) => collect(node.props));
     }
   }
   return [...keys];
 }
 
 export function buildSampleVariableValues(
-  scene: Scene
+  document: Document
 ): Record<string, string> {
   const values: Record<string, string> = {};
-  for (const variable of sceneVariables(scene)) {
+  for (const variable of documentVariables(document)) {
     if (variable.sample !== undefined) {
       values[variable.key] = variable.sample;
     }
@@ -314,12 +342,12 @@ export function buildSampleVariableValues(
   return values;
 }
 
-export function applyTemplateVariablesForPreview(scene: Scene): Scene {
-  const values = buildSampleVariableValues(scene);
+export function applyTemplateVariablesForPreview(document: Document): Document {
+  const values = buildSampleVariableValues(document);
   if (Object.keys(values).length === 0) {
-    return scene;
+    return document;
   }
-  return applyTemplateVariables(scene, values);
+  return applyTemplateVariables(document, values);
 }
 
 export function createVariableId(): string {
@@ -339,18 +367,15 @@ export function nextVariableKey(variables: TemplateVariable[]): string {
   return `${base}${index}`;
 }
 
-/** True when the variable has a non-empty preview/fallback `sample`. */
 export function variableHasFallback(variable: TemplateVariable): boolean {
   return (variable.sample?.trim() ?? '') !== '';
 }
 
-/** Global class names for editor-only variable chips (not persisted in scene HTML). */
 export const VARIABLE_CHIP_CLASS = 'openenvx-variable-chip';
 export const VARIABLE_CHIP_MISSING_CLASS = 'openenvx-variable-chip--missing';
 export const VARIABLE_CHIP_TIP_CLASS = 'openenvx-variable-chip-tip';
 
 export interface WrapVariableTokensOptions {
-  /** Tooltip shown on hover when fallback is missing or key is unknown. */
   missingTip?: string;
 }
 
@@ -359,7 +384,6 @@ export interface VariableChipPresentation {
   title?: string;
 }
 
-/** Editor chip classes/title for a token key (static HTML + TipTap decorations). */
 export function resolveVariableChipPresentation(
   key: string,
   variables: TemplateVariable[],
@@ -376,7 +400,6 @@ export function resolveVariableChipPresentation(
   };
 }
 
-/** Wrap `{{{key}}}` tokens in display-only chip spans. Does not mutate stored HTML. */
 export function wrapVariableTokensForDisplay(
   html: string,
   variables: TemplateVariable[],
@@ -396,17 +419,19 @@ export function wrapVariableTokensForDisplay(
   });
 }
 
-/** Primary inline-text field for variable insertion by layer type. */
-export function resolvePrimaryTextDataPath(layerType: string): string | null {
-  if (layerType === 'email.button') {
+export function resolvePrimaryTextPropPath(nodeType: string): string | null {
+  if (nodeType === 'email.button') {
     return 'label';
   }
   if (
-    layerType === 'canvas.text' ||
-    layerType.endsWith('.text') ||
-    layerType.endsWith('.heading')
+    nodeType === 'canvas.text' ||
+    nodeType.endsWith('.text') ||
+    nodeType.endsWith('.heading')
   ) {
     return 'html';
   }
   return null;
 }
+
+/** @deprecated use resolvePrimaryTextPropPath */
+export const resolvePrimaryTextDataPath = resolvePrimaryTextPropPath;

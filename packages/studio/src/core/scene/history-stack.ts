@@ -1,21 +1,14 @@
-import type { SceneSnapshot } from '../scene/types';
+import type { LiveProjectSnapshot } from './types';
 
 const DEFAULT_HISTORY_DEPTH = 100;
 
-/**
- * Undo/redo stack of scene snapshots.
- *
- * Entries hold **shared scene references** (structural sharing from path-copying
- * transactions), not deep clones. Memory scales with changed nodes × depth,
- * not full-document × depth. Do not mutate stored scenes.
- */
 export class HistoryStack {
-  private past: SceneSnapshot[] = [];
-  private future: SceneSnapshot[] = [];
+  private past: LiveProjectSnapshot[] = [];
+  private future: LiveProjectSnapshot[] = [];
 
   constructor(private readonly maxDepth = DEFAULT_HISTORY_DEPTH) {}
 
-  push(snapshot: SceneSnapshot): void {
+  push(snapshot: LiveProjectSnapshot): void {
     this.past.push(snapshot);
     if (this.past.length > this.maxDepth) {
       this.past.shift();
@@ -31,7 +24,7 @@ export class HistoryStack {
     return this.future.length > 0;
   }
 
-  undo(current: SceneSnapshot): SceneSnapshot | null {
+  undo(current: LiveProjectSnapshot): LiveProjectSnapshot | null {
     const previous = this.past.pop();
     if (!previous) {
       return null;
@@ -40,7 +33,7 @@ export class HistoryStack {
     return previous;
   }
 
-  redo(current: SceneSnapshot): SceneSnapshot | null {
+  redo(current: LiveProjectSnapshot): LiveProjectSnapshot | null {
     const next = this.future.pop();
     if (!next) {
       return null;

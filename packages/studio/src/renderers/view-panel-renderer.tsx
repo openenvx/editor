@@ -357,7 +357,7 @@ function ViewPanelBody({
   collapsed,
   setCollapsed,
   hoveredLayerId,
-  activePageId,
+  activeArtboardId,
   layerSelectedIds,
   scene,
 }: {
@@ -365,7 +365,7 @@ function ViewPanelBody({
   collapsed: Set<string>;
   setCollapsed: React.Dispatch<React.SetStateAction<Set<string>>>;
   hoveredLayerId: string | null;
-  activePageId: string;
+  activeArtboardId: string;
   layerSelectedIds: Set<string>;
   scene: Scene;
 }) {
@@ -386,11 +386,11 @@ function ViewPanelBody({
 
   const selectedIds =
     view.viewSelection === 'page'
-      ? new Set(activePageId ? [activePageId] : [])
+      ? new Set(activeArtboardId ? [activeArtboardId] : [])
       : layerSelectedIds;
   const hoveredIds = useMemo(
-    () => resolveViewHoveredIds(view, hoveredLayerId, activePageId),
-    [activePageId, hoveredLayerId, view]
+    () => resolveViewHoveredIds(view, hoveredLayerId, activeArtboardId),
+    [activeArtboardId, hoveredLayerId, view]
   );
   const publishHover = view.viewHover !== 'none';
 
@@ -572,12 +572,12 @@ export const ViewPanelRenderer = memo(({ viewContainers }: Props) => {
   const hoveredLayerId = useWorkbenchContextSelector(
     (state) => state.interaction.hoveredLayerId
   );
-  const activePageId = useWorkbenchContextSelector(
-    (state) => state.selection.activePageId
+  const activeArtboardId = useWorkbenchContextSelector(
+    (state) => state.selection.activeArtboardId
   );
   const layerSelectedIds = useMemo(
-    () => new Set(selection?.selectedLayerIds),
-    [selection?.selectedLayerIds]
+    () => new Set(selection?.selectedNodeIds),
+    [selection?.selectedNodeIds]
   );
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
 
@@ -603,7 +603,7 @@ export const ViewPanelRenderer = memo(({ viewContainers }: Props) => {
     return null;
   }
 
-  const resolvedActivePageId = activePageId ?? '';
+  const resolvedActivePageId = activeArtboardId ?? '';
 
   return (
     <div className={styles.viewPanel} onMouseLeave={handlePanelMouseLeave}>
@@ -614,7 +614,7 @@ export const ViewPanelRenderer = memo(({ viewContainers }: Props) => {
             .map((view) => {
               const body = (
                 <ViewPanelBody
-                  activePageId={resolvedActivePageId}
+                  activeArtboardId={resolvedActivePageId}
                   collapsed={collapsed}
                   hoveredLayerId={hoveredLayerId}
                   layerSelectedIds={layerSelectedIds}

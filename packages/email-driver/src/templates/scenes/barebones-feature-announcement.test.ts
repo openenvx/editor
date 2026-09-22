@@ -9,7 +9,7 @@ import { renderEmailDocument } from '../../render/render-email-document';
 describe('createBarebonesFeatureAnnouncementScene', () => {
   it('uses email.row / email.column for header and ways-to-work rows', () => {
     const scene = createBarebonesFeatureAnnouncementScene();
-    const root = scene.pages[0]!.layers[0]!;
+    const root = scene.artboards[0]!.nodes[0]!;
     const json = JSON.stringify(root);
     expect(json).toContain('"type":"email.row"');
     expect(json).toContain('"type":"email.column"');
@@ -21,7 +21,7 @@ describe('createBarebonesFeatureAnnouncementScene', () => {
     for (const block of builtinEmailBlocks) {
       registry.register(block);
     }
-    const page = createBarebonesFeatureAnnouncementScene().pages[0]!;
+    const page = createBarebonesFeatureAnnouncementScene().artboards[0]!;
     const html = await renderEmailDocument(page, registry);
 
     expect(html).toContain('Barebones');

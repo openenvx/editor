@@ -1,5 +1,7 @@
+import type { DocumentNode } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
+import { artboardRulesLayout } from '../../test/document-fixtures';
 import {
   Button,
   Column,
@@ -13,6 +15,25 @@ import {
   Text,
 } from './components';
 import { childrenToHtml, sceneFromEmailJsx } from './scene-from-jsx';
+
+function findNode(
+  layers: DocumentNode[] | undefined,
+  id: string
+): DocumentNode | undefined {
+  if (!layers) {
+    return undefined;
+  }
+  for (const layer of layers) {
+    if (layer.id === id) {
+      return layer;
+    }
+    const nested = findNode(layer.children, id);
+    if (nested) {
+      return nested;
+    }
+  }
+  return undefined;
+}
 
 describe('childrenToHtml', () => {
   it('serializes Link and br inside text', () => {
@@ -106,15 +127,15 @@ describe('sceneFromEmailJsx', () => {
       { pageName: 'Activation' }
     );
 
-    expect(scene.pages[0]?.name).toBe('Activation');
-    expect(scene.pages[0]?.layout).toBe('email');
+    expect(scene.artboards[0]?.name).toBe('Activation');
+    expect(artboardRulesLayout(scene.artboards[0]!)).toBe('email');
 
-    const root = scene.pages[0]?.layers[0];
+    const root = scene.artboards[0]?.nodes[0];
     expect(root?.type).toBe('email.root');
-    expect(root?.data?.preheader).toBe('Hello');
-    expect(root?.data?.background).toBe('#F3F4F6');
-    expect(root?.data?.paddingY).toBe(32);
-    expect(root?.data?.maxWidth).toBe(640);
+    expect(root?.props?.preheader).toBe('Hello');
+    expect(root?.props?.background).toBe('#F3F4F6');
+    expect(root?.props?.paddingY).toBe(32);
+    expect(root?.props?.maxWidth).toBe(640);
 
     const json = JSON.stringify(scene);
     expect(json).toContain('"type":"email.heading"');
@@ -124,41 +145,9 @@ describe('sceneFromEmailJsx', () => {
     expect(json).toContain('"paddingY":16');
     expect(json).toContain('"type":"email.imageLink"');
 
-    const logo = JSON.parse(json) as {
-      pages: {
-        layers: {
-          data?: { children?: unknown };
-        }[];
-      }[];
-    };
-    const find = (
-      layers: unknown,
-      id: string
-    ): { data?: Record<string, unknown> } | undefined => {
-      if (!Array.isArray(layers)) {
-        return undefined;
-      }
-      for (const layer of layers) {
-        if (!layer || typeof layer !== 'object') {
-          continue;
-        }
-        const node = layer as {
-          id?: string;
-          data?: { children?: unknown } & Record<string, unknown>;
-        };
-        if (node.id === id) {
-          return node;
-        }
-        const nested = find(node.data?.children, id);
-        if (nested) {
-          return nested;
-        }
-      }
-      return undefined;
-    };
-    const logoLayer = find(logo.pages[0]?.layers, 'logo');
-    expect(logoLayer?.data?.width).toBe(48);
-    expect(logoLayer?.data?.height).toBe(48);
+    const logoLayer = findNode(scene.artboards[0]?.nodes, 'logo');
+    expect(logoLayer?.props?.width).toBe(48);
+    expect(logoLayer?.props?.height).toBe(48);
   });
 
   it('maps name prop to layer.name for Layers labels', () => {
@@ -169,9 +158,7 @@ describe('sceneFromEmailJsx', () => {
         </Section>
       </Email>
     );
-    const children = scene.pages[0]?.layers[0]?.data?.children as
-      | { id?: string; name?: string }[]
-      | undefined;
+    const children = scene.artboards[0]?.nodes[0]?.children;
     expect(children?.[0]?.id).toBe('hero');
     expect(children?.[0]?.name).toBe('Hero');
   });

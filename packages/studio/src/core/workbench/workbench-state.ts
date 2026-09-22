@@ -176,7 +176,7 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
     target: unknown,
     position: 'before' | 'after' | 'inside'
   ) => void;
-  selectLayers: (layerIds: string[], primaryLayerId?: string | null) => void;
+  selectLayers: (layerIds: string[], primaryNodeId?: string | null) => void;
   setHoveredLayer: (layerId: string | null) => void;
   setActiveContainer: (
     location: ViewContainerLocation,

@@ -22,9 +22,9 @@ import type { BlockSortDraft } from '../editor/block-dnd';
 import { HtmlBlocksPlugin } from '../plugin/html-blocks-plugin';
 
 export const htmlDemoSelection: Selection = {
-  activePageId: 'html-page',
-  primaryLayerId: null,
-  selectedLayerIds: [],
+  activeArtboardId: 'html-page',
+  primaryNodeId: null,
+  selectedNodeIds: [],
 };
 
 export function createSortDraftMock(options?: {

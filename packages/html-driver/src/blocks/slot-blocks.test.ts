@@ -1,9 +1,11 @@
 import { hasChildLayers,getNestedValue,setNestedValue } from '@openenvx/studio/core';
 import type { Layer } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { BlockRegistryServiceId } from '../block-registry';
 import { createHtmlLayerDefinition } from '../create-html-layer-definition';
+import { blockProps } from '../test/document-fixtures';
 import { createBlockRegistry } from '../test/html-editor-harness';
 import { cloneBlockWithNewIds, createBlock } from '../tree/block-tree';
 import { heroBlock } from './hero-block';
@@ -26,25 +28,21 @@ describe('slot composite blocks', () => {
   it('keeps hero atomic - slots are not data.children', () => {
     const hero = createHero();
     expect(hasChildLayers(hero)).toBe(false);
-    expect(
-      hero.data &&
-        typeof hero.data === 'object' &&
-        'slots' in (hero.data as object)
-    ).toBe(true);
+    expect('slots' in blockProps(hero)).toBe(true);
   });
 
   it('mints fresh slot part ids on create', () => {
     const a = createHero();
     const b = createHero();
-    const aSlots = (a.data as { slots: Record<string, Layer[]> }).slots;
-    const bSlots = (b.data as { slots: Record<string, Layer[]> }).slots;
+    const aSlots = blockProps(a).slots as Record<string, Layer[]>;
+    const bSlots = blockProps(b).slots as Record<string, Layer[]>;
     expect(aSlots.headline![0]!.id).not.toBe(bSlots.headline![0]!.id);
     expect(aSlots.actions![0]!.id).not.toBe(bSlots.actions![0]!.id);
   });
 
   it('resolves generated inspector keys through nested writes', () => {
     const hero = createHero();
-    const data = structuredClone(hero.data) as Record<string, unknown>;
+    const data = structuredClone(nodeProps(hero));
     setNestedValue(data, 'slots.headline.0.data.html', 'New title');
     expect(getNestedValue(data, 'slots.headline.0.data.html')).toBe(
       'New title'
@@ -73,7 +71,7 @@ describe('slot composite blocks', () => {
 
   it('slot-list add/remove produce the expected part arrays', () => {
     const hero = createHero();
-    const data = structuredClone(hero.data) as Record<string, unknown>;
+    const data = structuredClone(nodeProps(hero));
     const slots = data.slots as Record<string, Layer[]>;
     const template = slots.actions![0]!;
     const added: Layer = {
@@ -96,8 +94,8 @@ describe('slot composite blocks', () => {
       (type) => `${type.replaceAll('.', '-')}-clone`
     );
     expect(clone.id).not.toBe(hero.id);
-    const heroSlots = (hero.data as { slots: Record<string, Layer[]> }).slots;
-    const cloneSlots = (clone.data as { slots: Record<string, Layer[]> }).slots;
+    const heroSlots = blockProps(hero).slots as Record<string, Layer[]>;
+    const cloneSlots = blockProps(clone).slots as Record<string, Layer[]>;
     expect(cloneSlots.headline![0]!.id).not.toBe(heroSlots.headline![0]!.id);
     expect(cloneSlots.body![0]!.id).not.toBe(heroSlots.body![0]!.id);
     expect(cloneSlots.actions![0]!.id).not.toBe(heroSlots.actions![0]!.id);

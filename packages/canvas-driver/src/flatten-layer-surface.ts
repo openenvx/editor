@@ -1,8 +1,9 @@
-import type { Transform } from '@openenvx/studio/core';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import type { Transform } from '@openenvx/studio/schema';
+import { nodeTransform } from '@openenvx/studio/schema';
 
 import type { CanvasStageLayer } from './canvas-stage-types';
 import type { CanvasLayerSurfaceItem } from './layer-surface-item';
+import { DEFAULT_TRANSFORM } from './stage/default-transform';
 
 export interface FlattenedStageLayer extends CanvasStageLayer {
   absoluteTransform: Transform;
@@ -35,13 +36,13 @@ export function flattenStageLayers(
   layers: CanvasStageLayer[],
   parentTransform?: Transform
 ): FlattenedStageLayer[] {
-  const parent = parentTransform ?? createDefaultTransform();
+  const parent = parentTransform ?? DEFAULT_TRANSFORM;
   const result: FlattenedStageLayer[] = [];
   for (const layer of layers) {
     if (layer.layer.visible === false) {
       continue;
     }
-    const layerTransform = layer.layer.transform ?? createDefaultTransform();
+    const layerTransform = nodeTransform(layer.layer);
     const absoluteTransform = composeTransforms(parent, layerTransform);
     result.push({ ...layer, absoluteTransform });
     if (layer.children?.length) {

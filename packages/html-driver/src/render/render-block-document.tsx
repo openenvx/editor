@@ -1,5 +1,6 @@
 import { getLayerChildren, isLayerVisible } from '@openenvx/studio/core';
 import type { Layer, Page } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
 import {
   createElement,
   Fragment,
@@ -12,9 +13,7 @@ import type { BlockRegistry } from '../block-registry';
 import { resolveImageFieldsInData } from '../editor/primary-image-field';
 
 function layerData(layer: Layer): Record<string, unknown> {
-  return typeof layer.data === 'object' && layer.data !== null
-    ? (layer.data as Record<string, unknown>)
-    : {};
+  return nodeProps(layer);
 }
 
 export type BlockRenderOverride = (
@@ -122,6 +121,6 @@ export function renderBlockDocument(
   return createElement(
     Fragment,
     null,
-    ...renderBlockTree(page.layers, registry, options)
+    ...renderBlockTree(page.nodes, registry, options)
   );
 }

@@ -28,9 +28,9 @@ afterEach(() => {
 
 function createLayer(overrides: Partial<Layer> = {}): Layer {
   return {
-    data: {},
     id: 'layer-1',
     locked: overrides.locked ?? false,
+    props: {},
     type: 'canvas.text',
     writeMode: overrides.writeMode ?? 'free',
     ...overrides,
@@ -39,30 +39,33 @@ function createLayer(overrides: Partial<Layer> = {}): Layer {
 
 function createScene(overrides: Partial<Scene> = {}): Scene {
   return {
-    pages: [
+    artboards: [
       {
+        extensions: { extensions: { layout: 'absolute' } },
         id: 'page-1',
-        layers: [],
-        layout: 'absolute',
         name: 'Page',
-        height: 100,
-        width: 100,
+        nodes: [],
+        physical: { dpi: 96, unit: 'px' },
+        space: { height: 100, width: 100 },
       },
     ],
-    schemaVersion: 1,
     ...overrides,
   };
 }
 
-const baseTransform = {
+const baseFrame = {
   height: 10,
-  opacity: 1,
   rotation: 0,
-  scaleX: 1,
-  scaleY: 1,
   width: 10,
   x: 1,
   y: 2,
+};
+
+const frozenFrame = {
+  ...baseFrame,
+  opacity: 1,
+  scaleX: 1,
+  scaleY: 1,
 };
 
 describe('getLayerWriteMode', () => {
@@ -128,9 +131,9 @@ describe('canEditLayerData', () => {
     expect(canEditLayerData(createLayer({ writeMode: 'locked' }))).toBe(false);
   });
 
-  it('respects allowedDataKeys for content mode', () => {
+  it('respects allowedPropKeys for content mode', () => {
     const layer = createLayer({
-      allowedDataKeys: ['html'],
+      allowedPropKeys: ['html'],
       writeMode: 'content',
     });
     expect(canEditLayerData(layer)).toBe(true);
@@ -146,7 +149,7 @@ describe('templatePolicy', () => {
         allowDeleteLayers: false,
         allowDuplicateLayers: true,
         allowInsertLayers: true,
-        allowPageResize: true,
+        allowArtboardResize: true,
         version: 1,
       },
     });
@@ -178,7 +181,7 @@ describe('templatePolicy', () => {
         allowDeleteLayers: true,
         allowDuplicateLayers: true,
         allowInsertLayers: false,
-        allowPageResize: true,
+        allowArtboardResize: true,
         version: 1,
       },
     });
@@ -192,7 +195,7 @@ describe('templatePolicy', () => {
         allowDeleteLayers: true,
         allowDuplicateLayers: false,
         allowInsertLayers: true,
-        allowPageResize: true,
+        allowArtboardResize: true,
         version: 1,
       },
     });
@@ -206,130 +209,130 @@ describe('templatePolicy', () => {
 describe('buildFrozenLayerSnapshot', () => {
   it('freezes data and transform for locked layers', () => {
     const scene = createScene({
-      pages: [
+      artboards: [
         {
+          extensions: { layout: 'absolute' },
           id: 'page-1',
-          layers: [
+          name: 'Page',
+          nodes: [
             createLayer({
-              data: { html: '<p>x</p>' },
+              frame: { ...baseFrame },
               id: 'bg',
-              transform: { ...baseTransform },
+              props: { html: '<p>x</p>' },
               writeMode: 'locked',
             }),
           ],
-          layout: 'absolute',
-          name: 'Page',
-          height: 100,
-          width: 100,
+          physical: { dpi: 96, unit: 'px' },
+          space: { height: 100, width: 100 },
         },
       ],
     });
 
     const frozen = buildFrozenLayerSnapshot(scene);
-    expect(frozen.bg?.data).toEqual({ html: '<p>x</p>' });
-    expect(frozen.bg?.transform).toEqual(baseTransform);
+    expect(frozen.bg?.props).toEqual({ html: '<p>x</p>' });
+    expect(frozen.bg?.frame).toEqual(frozenFrame);
   });
 
   it('freezes transform only for content layers', () => {
     const scene = createScene({
-      pages: [
+      artboards: [
         {
           id: 'page-1',
-          layers: [
+          nodes: [
             createLayer({
-              data: { html: '<p>editable</p>' },
+              props: { html: '<p>editable</p>' },
               id: 'title',
-              transform: { ...baseTransform },
+              frame: { ...baseFrame },
               writeMode: 'content',
             }),
           ],
-          layout: 'absolute',
+          extensions: { layout: 'absolute' },
           name: 'Page',
-          height: 100,
-          width: 100,
+          physical: { dpi: 96, unit: 'px' },
+          space: { height: 100, width: 100 },
         },
       ],
     });
 
     const frozen = buildFrozenLayerSnapshot(scene);
-    expect(frozen.title?.data).toBeUndefined();
-    expect(frozen.title?.transform).toEqual(baseTransform);
+    expect(frozen.title?.props).toBeUndefined();
+    expect(frozen.title?.frame).toEqual(frozenFrame);
   });
 
   it('freezes data only for properties layers', () => {
     const scene = createScene({
-      pages: [
+      artboards: [
         {
           id: 'page-1',
-          layers: [
+          nodes: [
             createLayer({
-              data: { foregroundColor: '#000' },
+              props: { foregroundColor: '#000' },
               id: 'qr',
-              transform: { ...baseTransform, x: 0, y: 0 },
+              frame: { ...baseFrame, x: 0, y: 0 },
               type: 'wedding.qr',
               writeMode: 'properties',
             }),
           ],
-          layout: 'absolute',
+          extensions: { layout: 'absolute' },
           name: 'Page',
-          height: 100,
-          width: 100,
+          physical: { dpi: 96, unit: 'px' },
+          space: { height: 100, width: 100 },
         },
       ],
     });
 
     const frozen = buildFrozenLayerSnapshot(scene);
-    expect(frozen.qr?.data).toEqual({ foregroundColor: '#000' });
-    expect(frozen.qr?.transform).toBeUndefined();
+    expect(frozen.qr?.props).toEqual({ foregroundColor: '#000' });
+    expect(frozen.qr?.frame).toBeUndefined();
   });
 });
 
 describe('applyFrozenLayerPolicy', () => {
   it('restores frozen fields and leaves editable ones', () => {
     const scene = createScene({
-      pages: [
+      artboards: [
         {
           id: 'page-1',
-          layers: [
+          nodes: [
             createLayer({
-              data: { html: '<p>changed</p>' },
+              props: { html: '<p>changed</p>' },
               id: 'title',
-              transform: { ...baseTransform, x: 99 },
+              frame: { ...baseFrame, x: 99 },
               writeMode: 'content',
             }),
             createLayer({
-              data: { fill: '#fff' },
+              props: { fill: '#fff' },
               id: 'badge',
-              transform: { ...baseTransform, x: 50 },
+              frame: { ...baseFrame, x: 50 },
               writeMode: 'properties',
             }),
           ],
-          layout: 'absolute',
+          extensions: { layout: 'absolute' },
           name: 'Page',
-          height: 100,
-          width: 100,
+          physical: { dpi: 96, unit: 'px' },
+          space: { height: 100, width: 100 },
         },
       ],
       templatePolicy: {
         allowDeleteLayers: true,
         allowDuplicateLayers: true,
         allowInsertLayers: true,
-        allowPageResize: true,
-        frozenLayers: {
-          badge: { data: { fill: '#000' } },
-          title: { transform: { ...baseTransform } },
+        allowArtboardResize: true,
+        frozenNodes: {
+          badge: { props: { fill: '#000' } },
+          title: { frame: { ...baseFrame } },
         },
         version: 1,
       },
     });
 
     const next = applyFrozenLayerPolicy(scene);
-    const title = next.pages[0]!.layers[0]!;
-    const badge = next.pages[0]!.layers[1]!;
-    expect(title.data).toEqual({ html: '<p>changed</p>' });
-    expect(title.transform).toEqual(baseTransform);
-    expect(badge.data).toEqual({ fill: '#000' });
-    expect(badge.transform?.x).toBe(50);
+    const title = next.artboards[0]!.nodes[0]!;
+    const badge = next.artboards[0]!.nodes[1]!;
+    expect(title.props).toEqual({ html: '<p>changed</p>' });
+    expect(title.frame).toEqual(baseFrame);
+    expect(badge.props).toEqual({ fill: '#000' });
+    expect(badge.frame?.x).toBe(50);
   });
 });
 
@@ -337,34 +340,34 @@ describe('withFrozenLayerSnapshots + SceneStore', () => {
   it('persists snapshots and enforces them on apply', () => {
     const authored = withFrozenLayerSnapshots(
       createScene({
-        pages: [
+        artboards: [
           {
             id: 'page-1',
-            layers: [
+            nodes: [
               createLayer({
-                data: { html: '<p>tmpl</p>' },
+                props: { html: '<p>tmpl</p>' },
                 id: 'locked-bg',
-                transform: { ...baseTransform },
+                frame: { ...baseFrame },
                 writeMode: 'locked',
               }),
             ],
-            layout: 'absolute',
+            extensions: { layout: 'absolute' },
             name: 'Page',
-            height: 100,
-            width: 100,
+            physical: { dpi: 96, unit: 'px' },
+            space: { height: 100, width: 100 },
           },
         ],
         templatePolicy: {
           allowDeleteLayers: false,
           allowDuplicateLayers: false,
           allowInsertLayers: false,
-          allowPageResize: false,
+          allowArtboardResize: false,
           version: 1,
         },
       })
     );
 
-    expect(authored.templatePolicy?.frozenLayers?.['locked-bg']?.data).toEqual({
+    expect(authored.templatePolicy?.frozenNodes?.['locked-bg']?.props).toEqual({
       html: '<p>tmpl</p>',
     });
 
@@ -372,14 +375,14 @@ describe('withFrozenLayerSnapshots + SceneStore', () => {
     store.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((page) => ({
+        artboards: scene.artboards.map((page) => ({
           ...page,
-          layers: page.layers.map((layer) =>
+          nodes: page.nodes.map((layer) =>
             layer.id === 'locked-bg'
               ? {
                   ...layer,
-                  data: { html: '<p>hacked</p>' },
-                  transform: { ...baseTransform, x: 999 },
+                  props: { html: '<p>hacked</p>' },
+                  frame: { ...baseFrame, x: 999 },
                 }
               : layer
           ),
@@ -388,9 +391,9 @@ describe('withFrozenLayerSnapshots + SceneStore', () => {
       label: 'Attempt freeze breach',
     });
 
-    const layer = store.getScene().pages[0]!.layers[0]!;
-    expect(layer.data).toEqual({ html: '<p>tmpl</p>' });
-    expect(layer.transform).toEqual(baseTransform);
+    const layer = store.getDocument().artboards[0]!.nodes[0]!;
+    expect(layer.props).toEqual({ html: '<p>tmpl</p>' });
+    expect(layer.frame).toEqual(baseFrame);
   });
 });
 
@@ -467,7 +470,7 @@ describe('template policy enforcement', () => {
         allowDeleteLayers: false,
         allowDuplicateLayers: false,
         allowInsertLayers: false,
-        allowPageResize: false,
+        allowArtboardResize: false,
         version: 1,
       },
     });

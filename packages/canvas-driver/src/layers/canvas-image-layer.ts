@@ -1,11 +1,11 @@
 import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio/core';
 import type {
   CommandContext,
-  Layer,
+  DocumentNode,
   LayerPreviewContext,
-  Page,
   PropertySectionDescriptor,
 } from '@openenvx/studio/core';
+import type { Artboard } from '@openenvx/studio/schema';
 import { createDefaultTransform } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
@@ -38,22 +38,22 @@ export class CanvasImageLayer extends LayerDefinition<CanvasImageModel> {
     return canvasImageSchema.safeParse(data).success;
   }
 
-  createDefault(id: string, _page: Page): Layer {
+  createDefault(id: string, _artboard: Artboard): DocumentNode {
     return {
-      data: {
+      props: {
         alt: 'Image',
         assetRef: 'https://placehold.co/400x300',
         fit: 'cover',
         focalPoint: { x: 0.5, y: 0.5 },
       },
       id,
-      transform: { ...createDefaultTransform(), height: 240, width: 320 },
+      frame: { ...createDefaultTransform(), height: 240, width: 320 },
       type: this.type,
     };
   }
 
-  serialize(layer: Layer): CanvasImageModel {
-    const data = layer.data as CanvasImageModel;
+  serialize(node: DocumentNode): CanvasImageModel {
+    const data = node.props as CanvasImageModel;
     const { uploading: _uploading, ...rest } = data;
     return rest;
   }
@@ -65,7 +65,10 @@ export class CanvasImageLayer extends LayerDefinition<CanvasImageModel> {
       : { alt: 'Image', assetRef: 'https://placehold.co/400x300' };
   }
 
-  properties(_ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
+  properties(
+    _ctx: CommandContext,
+    _node: DocumentNode
+  ): PropertySectionDescriptor[] {
     const scrub = { scrub: true, precision: 2 };
     return createPropertyBuilder()
       .section('image')

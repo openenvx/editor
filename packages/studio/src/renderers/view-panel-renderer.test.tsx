@@ -29,9 +29,9 @@ describe('ViewPanelRenderer', () => {
         ],
       } as never,
       selection: {
-        activePageId: 'p1',
-        primaryLayerId: null,
-        selectedLayerIds: [],
+        activeArtboardId: 'p1',
+        primaryNodeId: null,
+        selectedNodeIds: [],
       },
     });
 
@@ -46,7 +46,7 @@ describe('ViewPanelRenderer', () => {
               location: 'primary',
               views: [
                 {
-                  id: 'workbench.pages',
+                  id: 'workbench.artboards',
                   name: 'Pages',
                   containerId: 'workbench.sidebar',
                   collapsible: true,
@@ -69,7 +69,7 @@ describe('ViewPanelRenderer', () => {
                   },
                 },
                 {
-                  id: 'workbench.layers',
+                  id: 'workbench.nodes',
                   name: 'Layers',
                   containerId: 'workbench.sidebar',
                   collapsible: false,

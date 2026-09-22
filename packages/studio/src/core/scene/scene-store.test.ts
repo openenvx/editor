@@ -1,444 +1,416 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from 'vitest';
 
-import { moveLayerToIndex, reorderLayers, SceneStore } from "./scene-store";
+import {
+  absoluteArtboard,
+  documentWith,
+  flowArtboard,
+} from '../test/document-fixtures';
+import { moveLayerToIndex, reorderLayers, SceneStore } from './scene-store';
 
 describe(SceneStore, () => {
-  it("does not push history when normalize rejects the transaction", () => {
+  it('records history for successful node prop updates', () => {
     const store = new SceneStore(
-      {
-        schemaVersion: 2,
-        pages: [
+      documentWith([
+        absoluteArtboard('p1', 'Page', 100, 100, [
           {
-            id: "p1",
-            name: "Page",
-            layout: "absolute",
-            width: 100,
-            height: 100,
-            layers: [
-              {
-                id: "t1",
-                type: "canvas.text",
-                data: { html: "<p>Hi</p>", align: "left" },
-                transform: {
-                  x: 0,
-                  y: 0,
-                  width: 100,
-                  height: 40,
-                  rotation: 0,
-                  scaleX: 1,
-                  scaleY: 1,
-                  opacity: 1,
-                },
-              },
-            ],
+            frame: {
+              height: 40,
+              rotation: 0,
+              width: 100,
+              x: 0,
+              y: 0,
+            },
+            id: 't1',
+            opacity: 1,
+            props: { align: 'left', html: '<p>Hi</p>' },
+            scaleX: 1,
+            scaleY: 1,
+            type: 'canvas.text',
           },
-        ],
-      },
-      { activePageId: "p1", primaryLayerId: null, selectedLayerIds: [] }
+        ]),
+      ]),
+      { activeArtboardId: 'p1', primaryNodeId: null, selectedNodeIds: [] }
     );
 
-    expect(() =>
-      store.apply({
-        apply: (scene) => ({
-          ...scene,
-          pages: scene.pages.map((page) => ({
-            ...page,
-            layers: page.layers.map((layer) =>
-              layer.id === "t1"
-                ? {
-                    ...layer,
-                    data: { ...(layer.data as object), align: "justify" },
-                  }
-                : layer
-            ),
-          })),
-        }),
-        label: "Bad align",
-      })
-    ).toThrow(/normalize/i);
+    store.apply({
+      apply: (document) => ({
+        ...document,
+        artboards: document.artboards.map((artboard) =>
+          artboard.id === 'p1'
+            ? {
+                ...artboard,
+                nodes: artboard.nodes.map((node) =>
+                  node.id === 't1'
+                    ? {
+                        ...node,
+                        props: {
+                          ...(node.props as object),
+                          align: 'center',
+                        },
+                      }
+                    : node
+                ),
+              }
+            : artboard
+        ),
+      }),
+      label: 'Update align',
+    });
 
-    expect(store.canUndo()).toBe(false);
+    expect(store.canUndo()).toBe(true);
     expect(
-      (store.getScene().pages[0]!.layers[0]!.data as { align?: string }).align
-    ).toBe("left");
+      (store.getDocument().artboards[0]!.nodes[0]!.props as { align?: string })
+        .align
+    ).toBe('center');
   });
 
-  it("applies transactions with undo", () => {
+  it('applies transactions with undo', () => {
     const store = new SceneStore();
-    const pageId = store.getScene().pages[0]!.id;
+    const pageId = store.getDocument().artboards[0]!.id;
 
     store.apply({
-      apply: (scene) => ({
-        ...scene,
-        pages: scene.pages.map((p) =>
-          p.id === pageId
+      apply: (document) => ({
+        ...document,
+        artboards: document.artboards.map((artboard) =>
+          artboard.id === pageId
             ? {
-                ...p,
-                layers: [
-                  ...p.layers,
-                  { id: "l1", type: "text", data: { text: "Hi" } },
+                ...artboard,
+                nodes: [
+                  ...artboard.nodes,
+                  { id: 'l1', props: { text: 'Hi' }, type: 'text' },
                 ],
               }
-            : p
+            : artboard
         ),
       }),
-      label: "Add layer",
+      label: 'Add layer',
     });
 
-    expect(store.getScene().pages[0]!.layers).toHaveLength(1);
+    expect(store.getDocument().artboards[0]!.nodes).toHaveLength(1);
     expect(store.undo()).toBeTruthy();
-    expect(store.getScene().pages[0]!.layers).toHaveLength(0);
+    expect(store.getDocument().artboards[0]!.nodes).toHaveLength(0);
   });
 
-  it("replaceScene pushes history so undo restores the prior scene", () => {
+  it('replaceScene pushes history so undo restores the prior scene', () => {
     const store = new SceneStore();
-    const pageId = store.getScene().pages[0]!.id;
+    const pageId = store.getDocument().artboards[0]!.id;
     store.apply({
-      apply: (scene) => ({
-        ...scene,
-        pages: scene.pages.map((p) =>
-          p.id === pageId
+      apply: (document) => ({
+        ...document,
+        artboards: document.artboards.map((artboard) =>
+          artboard.id === pageId
             ? {
-                ...p,
-                layers: [{ id: "keep", type: "text", data: { text: "A" } }],
+                ...artboard,
+                nodes: [{ id: 'keep', props: { text: 'A' }, type: 'text' }],
               }
-            : p
+            : artboard
         ),
       }),
-      label: "Seed",
+      label: 'Seed',
     });
 
-    store.replaceScene({
-      schemaVersion: 2,
-      pages: [
+    store.replaceScene(
+      documentWith([
         {
-          id: "email-page",
-          name: "Template",
-          layout: "email",
-          layers: [{ id: "root", type: "email.root", data: { children: [] } }],
+          extensions: { layout: 'email' },
+          id: 'email-page',
+          name: 'Template',
+          nodes: [
+            {
+              id: 'root',
+              props: { children: [] },
+              type: 'email.root',
+            },
+          ],
+          physical: { dpi: 96, unit: 'px' },
+          space: {},
         },
-      ],
-    });
+      ])
+    );
 
-    expect(store.getScene().pages[0]!.name).toBe("Template");
+    expect(store.getDocument().artboards[0]!.name).toBe('Template');
     expect(store.canUndo()).toBe(true);
     expect(store.undo()).toBeTruthy();
-    expect(store.getScene().pages[0]!.layers.map((l) => l.id)).toStrictEqual([
-      "keep",
-    ]);
+    expect(
+      store.getDocument().artboards[0]!.nodes.map((node) => node.id)
+    ).toStrictEqual(['keep']);
   });
 
-  it("setScene replaces without an extra history entry", () => {
+  it('setScene replaces without an extra history entry', () => {
     const store = new SceneStore();
-    const beforeName = store.getScene().pages[0]!.name;
-    store.setScene({
-      schemaVersion: 2,
-      pages: [
-        {
-          id: "p2",
-          name: "Replaced",
-          layout: "flow",
-          layers: [],
-        },
-      ],
-    });
-    expect(store.getScene().pages[0]!.name).toBe("Replaced");
+    const beforeName = store.getDocument().artboards[0]!.name;
+    store.setScene(documentWith([flowArtboard('p2', 'Replaced')]));
+    expect(store.getDocument().artboards[0]!.name).toBe('Replaced');
     expect(store.canUndo()).toBe(false);
-    expect(beforeName).not.toBe("Replaced");
+    expect(beforeName).not.toBe('Replaced');
   });
 
-  it("commits scene.variables-only transactions", () => {
+  it('commits scene.variables-only transactions', () => {
     const store = new SceneStore();
-    expect(store.getScene().variables).toBeUndefined();
+    expect(store.getDocument().variables).toBeUndefined();
 
     store.apply({
-      apply: (scene) => ({
-        ...scene,
-        variables: [{ id: "var-1", key: "name" }],
+      apply: (document) => ({
+        ...document,
+        variables: [{ id: 'var-1', key: 'name' }],
       }),
-      label: "Add variable",
+      label: 'Add variable',
     });
 
-    expect(store.getScene().variables).toStrictEqual([
-      { id: "var-1", key: "name" },
+    expect(store.getDocument().variables).toStrictEqual([
+      { id: 'var-1', key: 'name' },
     ]);
     expect(store.canUndo()).toBe(true);
     expect(store.undo()).toBe(true);
-    expect(store.getScene().variables).toBeUndefined();
+    expect(store.getDocument().variables).toBeUndefined();
   });
 
-  it("supports multi-select", () => {
+  it('supports multi-select', () => {
     const store = new SceneStore();
-    const pageId = store.getScene().pages[0]!.id;
+    const pageId = store.getDocument().artboards[0]!.id;
     store.apply({
-      apply: (scene) => ({
-        ...scene,
-        pages: scene.pages.map((p) =>
-          p.id === pageId
+      apply: (document) => ({
+        ...document,
+        artboards: document.artboards.map((artboard) =>
+          artboard.id === pageId
             ? {
-                ...p,
-                layers: [
-                  { id: "a", type: "text", data: {} },
-                  { id: "b", type: "text", data: {} },
+                ...artboard,
+                nodes: [
+                  { id: 'a', props: {}, type: 'text' },
+                  { id: 'b', props: {}, type: 'text' },
                 ],
               }
-            : p
+            : artboard
         ),
       }),
-      label: "Add layers",
+      label: 'Add layers',
     });
-    store.selectLayers(["a", "b"], "a");
-    expect(store.getSelection().selectedLayerIds).toStrictEqual(["a", "b"]);
-    expect(store.getSelection().primaryLayerId).toBe("a");
+    store.selectNodes(['a', 'b'], 'a');
+    expect(store.getSelection().selectedNodeIds).toStrictEqual(['a', 'b']);
+    expect(store.getSelection().primaryNodeId).toBe('a');
   });
 
-  it("keeps scene identity on selection-only changes", () => {
+  it('keeps scene identity on selection-only changes', () => {
     const store = new SceneStore();
-    const before = store.getScene();
+    const before = store.getDocument();
     let notifiedScene: unknown;
     store.onDidChangeScene((snapshot) => {
-      notifiedScene = snapshot.scene;
+      notifiedScene = snapshot.document;
     });
-    store.selectLayers([], null);
-    expect(store.getScene()).toBe(before);
+    store.selectNodes([], null);
+    expect(store.getDocument()).toBe(before);
     expect(notifiedScene).toBe(before);
   });
 
-  it("shares page identity for untouched pages after apply", () => {
-    const store = new SceneStore({
-      schemaVersion: 4,
-      pages: [
-        {
-          id: "p1",
-          name: "One",
-          layout: "absolute",
-          width: 100,
-          height: 100,
-          layers: [
-            {
-              id: "a",
-              type: "canvas.rect",
-              data: { fill: "#000" },
-              transform: {
-                x: 0,
-                y: 0,
-                width: 10,
-                height: 10,
-                rotation: 0,
-                opacity: 1,
-              },
+  it('shares page identity for untouched pages after apply', () => {
+    const store = new SceneStore(
+      documentWith([
+        absoluteArtboard('p1', 'One', 100, 100, [
+          {
+            frame: {
+              height: 10,
+              rotation: 0,
+              width: 10,
+              x: 0,
+              y: 0,
             },
-          ],
-        },
-        {
-          id: "p2",
-          name: "Two",
-          layout: "absolute",
-          width: 100,
-          height: 100,
-          layers: [],
-        },
-      ],
-    });
-    const page2Before = store.getScene().pages[1];
+            id: 'a',
+            opacity: 1,
+            props: { fill: '#000' },
+            type: 'canvas.rect',
+          },
+        ]),
+        absoluteArtboard('p2', 'Two', 100, 100),
+      ])
+    );
+    const page2Before = store.getDocument().artboards[1];
     store.apply({
-      apply: (scene) => ({
-        ...scene,
-        pages: scene.pages.map((page) =>
-          page.id === "p1"
+      apply: (document) => ({
+        ...document,
+        artboards: document.artboards.map((artboard) =>
+          artboard.id === 'p1'
             ? {
-                ...page,
-                layers: page.layers.map((layer) =>
-                  layer.id === "a"
+                ...artboard,
+                nodes: artboard.nodes.map((node) =>
+                  node.id === 'a'
                     ? {
-                        ...layer,
-                        transform: {
-                          ...layer.transform!,
+                        ...node,
+                        frame: {
+                          ...node.frame!,
                           x: 5,
                         },
                       }
-                    : layer
+                    : node
                 ),
               }
-            : page
+            : artboard
         ),
       }),
-      label: "Move a",
+      label: 'Move a',
     });
-    expect(store.getScene().pages[1]).toBe(page2Before);
+    expect(store.getDocument().artboards[1]).toBe(page2Before);
   });
 
-  it("commits page reorder when page refs are unchanged", () => {
-    const store = new SceneStore({
-      schemaVersion: 4,
-      pages: [
-        {
-          id: "p1",
-          name: "One",
-          layout: "absolute",
-          width: 100,
-          height: 100,
-          layers: [],
-        },
-        {
-          id: "p2",
-          name: "Two",
-          layout: "absolute",
-          width: 100,
-          height: 100,
-          layers: [],
-        },
-      ],
-    });
+  it('commits page reorder when page refs are unchanged', () => {
+    const store = new SceneStore(
+      documentWith([
+        absoluteArtboard('p1', 'One', 100, 100),
+        absoluteArtboard('p2', 'Two', 100, 100),
+      ])
+    );
     store.apply({
-      apply: (scene) => ({
-        ...scene,
-        // Same page object refs, new array order (Pages panel path).
-        pages: [scene.pages[1]!, scene.pages[0]!],
+      apply: (document) => ({
+        ...document,
+        artboards: [document.artboards[1]!, document.artboards[0]!],
       }),
-      label: "Reorder pages",
+      label: 'Reorder pages',
     });
-    expect(store.getScene().pages.map((page) => page.id)).toStrictEqual([
-      "p2",
-      "p1",
-    ]);
+    expect(store.getDocument().artboards.map((artboard) => artboard.id)).toStrictEqual(
+      ['p2', 'p1']
+    );
   });
 
-  it("prunes stale selection after apply removes layers", () => {
+  it('prunes stale selection after apply removes layers', () => {
     const store = new SceneStore();
-    const pageId = store.getScene().pages[0]!.id;
+    const pageId = store.getDocument().artboards[0]!.id;
     store.apply({
-      apply: (scene) => ({
-        ...scene,
-        pages: scene.pages.map((p) =>
-          p.id === pageId
+      apply: (document) => ({
+        ...document,
+        artboards: document.artboards.map((artboard) =>
+          artboard.id === pageId
             ? {
-                ...p,
-                layers: [
-                  { id: "a", type: "plugin.text", data: {} },
-                  { id: "b", type: "plugin.text", data: {} },
+                ...artboard,
+                nodes: [
+                  { id: 'a', props: {}, type: 'plugin.text' },
+                  { id: 'b', props: {}, type: 'plugin.text' },
                 ],
               }
-            : p
+            : artboard
         ),
       }),
-      label: "Add layers",
+      label: 'Add layers',
     });
-    store.selectLayers(["a", "b"], "a");
+    store.selectNodes(['a', 'b'], 'a');
     store.apply({
-      apply: (scene) => ({
-        ...scene,
-        pages: scene.pages.map((p) =>
-          p.id === pageId
-            ? { ...p, layers: p.layers.filter((layer) => layer.id !== "a") }
-            : p
+      apply: (document) => ({
+        ...document,
+        artboards: document.artboards.map((artboard) =>
+          artboard.id === pageId
+            ? {
+                ...artboard,
+                nodes: artboard.nodes.filter((node) => node.id !== 'a'),
+              }
+            : artboard
         ),
       }),
-      label: "Delete layer",
+      label: 'Delete layer',
     });
-    expect(store.getSelection().selectedLayerIds).toStrictEqual(["b"]);
-    expect(store.getSelection().primaryLayerId).toBe("b");
+    expect(store.getSelection().selectedNodeIds).toStrictEqual(['b']);
+    expect(store.getSelection().primaryNodeId).toBe('b');
   });
 
-  it("applies activePageId atomically with the scene transaction", () => {
-    const store = new SceneStore({
-      schemaVersion: 1,
-      pages: [
-        { id: "a", name: "A", layout: "flow", layers: [] },
-        { id: "b", name: "B", layout: "flow", layers: [] },
-        { id: "c", name: "C", layout: "flow", layers: [] },
-      ],
-    });
-    store.setActivePage("c");
+  it('applies activeArtboardId atomically with the scene transaction', () => {
+    const store = new SceneStore(
+      documentWith([
+        flowArtboard('a', 'A'),
+        flowArtboard('b', 'B'),
+        flowArtboard('c', 'C'),
+      ])
+    );
+    store.setActiveArtboard('c');
     const snapshots: string[] = [];
     store.subscribe((snap) => {
-      snapshots.push(snap.editorState.activePageId);
+      snapshots.push(snap.session.activeArtboardId);
     });
     snapshots.length = 0;
     store.apply({
-      apply: (scene) => ({
-        ...scene,
-        pages: scene.pages.filter((p) => p.id !== "c"),
+      activeArtboardId: 'b',
+      apply: (document) => ({
+        ...document,
+        artboards: document.artboards.filter((artboard) => artboard.id !== 'c'),
       }),
-      activePageId: "b",
-      label: "Delete page",
+      label: 'Delete page',
     });
-    expect(snapshots).toStrictEqual(["b"]);
-    expect(store.getActivePageId()).toBe("b");
-    expect(store.getScene().pages.map((p) => p.id)).toStrictEqual(["a", "b"]);
+    expect(snapshots).toStrictEqual(['b']);
+    expect(store.getActivePageId()).toBe('b');
+    expect(store.getDocument().artboards.map((artboard) => artboard.id)).toStrictEqual(
+      ['a', 'b']
+    );
   });
 });
 
 describe(moveLayerToIndex, () => {
   const layers = [
-    { data: {}, id: "a", type: "text" },
-    { data: {}, id: "b", type: "text" },
-    { data: {}, id: "c", type: "text" },
+    { id: 'a', props: {}, type: 'text' },
+    { id: 'b', props: {}, type: 'text' },
+    { id: 'c', props: {}, type: 'text' },
   ];
 
-  it("moves layer to target index", () => {
-    const result = moveLayerToIndex(layers, "c", 0);
-    expect(result.map((l) => l.id)).toStrictEqual(["c", "a", "b"]);
+  it('moves layer to target index', () => {
+    const result = moveLayerToIndex(layers, 'c', 0);
+    expect(result.map((l) => l.id)).toStrictEqual(['c', 'a', 'b']);
   });
 
-  it("returns same array when layer not found", () => {
-    expect(moveLayerToIndex(layers, "missing", 0)).toBe(layers);
+  it('returns same array when layer not found', () => {
+    expect(moveLayerToIndex(layers, 'missing', 0)).toBe(layers);
   });
 
-  it("clamps target index", () => {
-    expect(moveLayerToIndex(layers, "a", 99).map((l) => l.id)).toStrictEqual([
-      "b",
-      "c",
-      "a",
+  it('clamps target index', () => {
+    expect(moveLayerToIndex(layers, 'a', 99).map((l) => l.id)).toStrictEqual([
+      'b',
+      'c',
+      'a',
     ]);
   });
 
-  it("reorderLayers up/down delegates to moveLayerToIndex", () => {
-    expect(reorderLayers(layers, "b", "up").map((l) => l.id)).toStrictEqual([
-      "b",
-      "a",
-      "c",
+  it('reorderLayers up/down delegates to moveLayerToIndex', () => {
+    expect(reorderLayers(layers, 'b', 'up').map((l) => l.id)).toStrictEqual([
+      'b',
+      'a',
+      'c',
     ]);
-    expect(reorderLayers(layers, "b", "down").map((l) => l.id)).toStrictEqual([
-      "a",
-      "c",
-      "b",
+    expect(reorderLayers(layers, 'b', 'down').map((l) => l.id)).toStrictEqual([
+      'a',
+      'c',
+      'b',
     ]);
   });
 });
 
-describe("SceneStore page rules", () => {
-  it("rejects undimensioned absolute pages once page-rules lookup is wired", () => {
+describe('SceneStore page rules', () => {
+  it('rejects undimensioned absolute pages once page-rules lookup is wired', () => {
     const store = new SceneStore();
-    store.setPageRulesLookup(() => {});
+    store.setPageRulesLookup(() => ({}));
     expect(() =>
-      store.setScene({
-        schemaVersion: 2,
-        pages: [
+      store.setScene(
+        documentWith([
           {
-            id: "p1",
-            name: "Page",
-            layout: "absolute",
-            layers: [],
+            extensions: { layout: 'absolute' },
+            id: 'p1',
+            name: 'Page',
+            nodes: [],
+            physical: { dpi: 96, unit: 'px' },
+            space: {},
           },
-        ],
-      })
-    ).toThrow(/width and height/);
+        ])
+      )
+    ).toThrow(/space width and height/);
   });
 
-  it("accepts undimensioned absolute pages when lookup is unset", () => {
+  it('accepts undimensioned absolute pages when lookup is unset', () => {
     const store = new SceneStore();
-    store.setScene({
-      schemaVersion: 2,
-      pages: [
+    store.setScene(
+      documentWith([
         {
-          id: "p1",
-          name: "Page",
-          layout: "absolute",
-          layers: [],
+          extensions: { layout: 'absolute' },
+          id: 'p1',
+          name: 'Page',
+          nodes: [],
+          physical: { dpi: 96, unit: 'px' },
+          space: {},
         },
-      ],
-    });
-    expect(store.getScene().pages[0]!.width).toBeUndefined();
+      ])
+    );
+    expect(store.getDocument().artboards[0]!.space?.width).toBeUndefined();
   });
 });

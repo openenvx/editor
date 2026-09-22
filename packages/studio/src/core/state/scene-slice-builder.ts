@@ -20,8 +20,8 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
     commandCtx.services,
     canExecuteCommand
   );
-  const store = ctx.runtime.getScene();
-  const scene = store.getScene();
+  const store = ctx.runtime.getDocument();
+  const scene = store.getDocument();
   const selection = store.getSelection();
   const contextKeyService = ctx.runtime.getContextKeys();
   const evaluateWhen = (when: string | undefined) =>
@@ -127,7 +127,7 @@ function buildLayerProperties(
     WorkbenchSliceContext['runtime']['createCommandContext']
   >
 ): PropertySectionDescriptor[] | null {
-  const store = ctx.runtime.getScene();
+  const store = ctx.runtime.getDocument();
   const primaryLayer = store.getPrimaryLayer();
   if (!primaryLayer) {
     return null;

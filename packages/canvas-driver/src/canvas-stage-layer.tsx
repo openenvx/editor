@@ -1,7 +1,7 @@
 import { canSelectLayer, canTransformLayer } from '@openenvx/studio/core';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import { useStoreSelector } from '@openenvx/studio/react';
-import type { Transform } from '@openenvx/studio/schema';
+import { nodeTransform, type Transform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { memo, useCallback, useRef } from 'react';
 import { Group, Rect } from 'react-konva';
@@ -154,7 +154,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
   fontLoadRevision,
 }: CanvasStageLayerGroupProps) {
   const { layer, view, children } = entry;
-  const baseTransform = layer.transform ?? DEFAULT_TRANSFORM;
+  const baseTransform = nodeTransform(layer) ?? DEFAULT_TRANSFORM;
   const interaction = getInteraction(canvasLayerInteractions, view.kind);
   const layerWritable = canTransformLayer(layer);
   const layerSelectable = canSelectLayer(layer);

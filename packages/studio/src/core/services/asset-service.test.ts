@@ -1,6 +1,8 @@
 import { InMemoryAssetService } from '../backbone';
-import { createEmptyScene } from '@openenvx/studio/schema';
+import { createEmptyDocument } from '@openenvx/studio/schema';
 import { describe, expect, it } from "vitest";
+
+import { asDocumentNode, documentWith } from '../test/document-fixtures';
 
 function createPngBlob(): Blob {
   const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47]);
@@ -37,21 +39,19 @@ describe(InMemoryAssetService, () => {
     service.register("a", { data: "aQ==", encoding: "base64", mimeType: "image/png" });
     service.register("b", { data: "Yg==", encoding: "base64", mimeType: "image/png" });
 
-    const scene = {
-      ...createEmptyScene(),
-      pages: [
-        {
-          ...createEmptyScene().pages[0]!,
-          layers: [
-            {
-              data: { assetRef: "asset://a" },
-              id: "1",
-              type: "image",
-            },
-          ],
-        },
-      ],
-    };
+    const artboard = createEmptyDocument().artboards[0]!;
+    const scene = documentWith([
+      {
+        ...artboard,
+        nodes: [
+          asDocumentNode({
+            data: { assetRef: "asset://a" },
+            id: "1",
+            type: "image",
+          }),
+        ],
+      },
+    ]);
 
     const exported = service.exportReferenced(scene);
     expect(exported).toEqual({

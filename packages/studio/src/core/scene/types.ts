@@ -1,85 +1,117 @@
-import type { EditorState, Layer, Scene } from '@openenvx/studio/schema';
+import type {
+  Artboard,
+  Document,
+  DocumentNode,
+  EditorSession,
+} from '@openenvx/studio/schema';
 
-import { walkLayers } from './layer-tree';
+import { walkNodes } from './layer-tree';
 
 export type {
+  Artboard,
+  Document,
+  DocumentAsset,
+  DocumentNode,
   EditorPaneKind,
-  EditorState,
-  Layer,
-  Page,
-  PageLayout,
-  Scene,
-  SceneAsset,
-  Selection,
+  EditorSession,
+  EditorSurfaceKind,
+  Frame,
   Transform,
 } from '@openenvx/studio/schema';
 
+export type Page = Artboard;
+export type Scene = Document;
+export type Layer = DocumentNode;
+export type EditorState = EditorSession;
+export type Selection = EditorSession;
+
 /**
- * Scene + editor snapshot.
+ * Document + editor snapshot for the live store.
  *
- * - `SceneStore.getSnapshot()` - deep clone (persistence / export).
- * - `onDidChangeScene` / history - **shared** refs; treat as immutable.
+ * - `DocumentStore.getSnapshot()` - deep clone (persistence / export).
+ * - `onDidChangeDocument` / history - **shared** refs; treat as immutable.
  */
-export interface SceneSnapshot {
-  scene: Scene;
-  editorState: EditorState;
+export interface LiveProjectSnapshot {
+  document: Document;
+  session: EditorSession;
   contentRevision: number;
 }
 
-export interface SceneTransaction {
+export type SceneSnapshot = LiveProjectSnapshot;
+
+export interface DocumentTransaction {
   label: string;
-  /**
-   * Must be pure: return a new scene via path-copying. Do not mutate `scene`.
-   * Unchanged pages/layers should keep object identity for structural sharing.
-   * Returning the same root (or a new root that still shares every root field
-   * ref) is treated as a no-op.
-   */
-  apply(scene: Scene): Scene;
-  /**
-   * When set, editor focus switches to this page in the same history step
-   * (clears layer selection). Avoids an intermediate notify from a follow-up
-   * `setActivePage` after content mutation.
-   */
-  activePageId?: string;
+  apply(document: Document): Document;
+  activeArtboardId?: string;
 }
 
-export function cloneScene(scene: Scene): Scene {
-  return structuredClone(scene);
+export type SceneTransaction = DocumentTransaction;
+
+export function cloneDocument(document: Document): Document {
+  return structuredClone(document);
 }
 
-export function cloneEditorState(state: EditorState): EditorState {
-  return structuredClone(state);
+export const cloneScene = cloneDocument;
+
+export function cloneEditorSession(session: EditorSession): EditorSession {
+  return structuredClone(session);
 }
 
-export function getActivePage(scene: Scene, activePageId?: string) {
-  if (activePageId) {
-    return scene.pages.find((p) => p.id === activePageId) ?? scene.pages[0]!;
+export const cloneEditorState = cloneEditorSession;
+
+export function getActiveArtboard(
+  document: Document,
+  activeArtboardId?: string
+): Artboard {
+  if (activeArtboardId) {
+    return (
+      document.artboards.find((a) => a.id === activeArtboardId) ??
+      document.artboards[0]!
+    );
   }
-  return scene.pages[0]!;
+  return document.artboards[0]!;
 }
 
-export function getPrimaryLayer(scene: Scene, editorState: EditorState) {
-  const page = getActivePage(scene, editorState.activePageId);
-  const { primaryLayerId } = editorState;
-  if (!primaryLayerId) {
+export const getActivePage = getActiveArtboard;
+
+export function getPrimaryNode(
+  document: Document,
+  session: EditorSession
+): DocumentNode | null {
+  const artboard = getActiveArtboard(document, session.activeArtboardId);
+  const { primaryNodeId } = session;
+  if (!primaryNodeId) {
     return null;
   }
-  const root = page.layers.find((l) => l.id === primaryLayerId);
+  const root = artboard.nodes.find((n) => n.id === primaryNodeId);
   if (root) {
     return root;
   }
-  let found: Layer | null = null;
-  walkLayers(page.layers, (layer) => {
-    if (layer.id === primaryLayerId) {
-      found = layer;
+  let found: DocumentNode | null = null;
+  walkNodes(artboard.nodes, (node) => {
+    if (node.id === primaryNodeId) {
+      found = node;
     }
   });
   return found;
 }
 
+export const getPrimaryLayer = getPrimaryNode;
+
+/** Host resolves editor surface from product configuration, not document JSON. */
+export function resolveEditorSurfaceKind(_surfaceKind: string): string {
+  return _surfaceKind;
+}
+
+export type PageLayout = string;
+
 export function resolveEditorPaneKind(
-  scene: Scene,
-  activePageId: string
+  document: Document,
+  activeArtboardId: string
 ): string {
-  return getActivePage(scene, activePageId).layout;
+  return (
+    (getActiveArtboard(document, activeArtboardId).extensions?.layout as
+      | string
+      | undefined) ?? 'absolute'
+  );
 }

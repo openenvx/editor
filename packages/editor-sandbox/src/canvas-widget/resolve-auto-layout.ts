@@ -1,5 +1,6 @@
 import type { RenderNode } from '@openenvx/editor-sandbox/protocol';
-import { createDefaultTransform, type Layer } from '@openenvx/studio/schema';
+import type { DocumentNode as Layer } from '@openenvx/studio/schema';
+import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
 
 // ponytail: leaf import — main barrel pulls editor-sandbox (cycle)
 import { fitCanvasTextLayerToContent } from '../../../canvas-driver/src/fit-text-layer-to-content';
@@ -94,7 +95,7 @@ export function readLayoutIntent(node: RenderNode): LayoutIntent | null {
 }
 
 function layerSize(layer: Layer): { width: number; height: number } {
-  const transform = layer.transform ?? createDefaultTransform();
+  const transform = nodeTransform(layer);
   return { width: transform.width, height: transform.height };
 }
 
@@ -145,17 +146,14 @@ export function resolveAutoLayout(
       rowHeight = 0;
     }
 
-    const transform = child.transform ?? createDefaultTransform();
-    const next: Layer = {
-      ...child,
-      transform: {
-        ...transform,
-        x: cursorX,
-        y: cursorY,
-        width: size.width,
-        height: size.height,
-      },
-    };
+    const base = nodeTransform(child);
+    const next = applyNodeTransform(child, {
+      ...base,
+      x: cursorX,
+      y: cursorY,
+      width: size.width,
+      height: size.height,
+    });
 
     if (direction === 'horizontal') {
       cursorX += size.width + spacing;
@@ -212,17 +210,14 @@ function resolveGrid(
       rowHeight = 0;
     }
 
-    const transform = child.transform ?? createDefaultTransform();
-    const next: Layer = {
-      ...child,
-      transform: {
-        ...transform,
-        x: cursorX,
-        y: cursorY,
-        width: size.width,
-        height: size.height,
-      },
-    };
+    const base = nodeTransform(child);
+    const next = applyNodeTransform(child, {
+      ...base,
+      x: cursorX,
+      y: cursorY,
+      width: size.width,
+      height: size.height,
+    });
 
     cursorX += size.width + spacing;
     rowHeight = Math.max(rowHeight, size.height);

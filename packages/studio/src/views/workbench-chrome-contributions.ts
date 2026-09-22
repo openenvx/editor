@@ -25,14 +25,14 @@ import {
 import type { Page } from '@openenvx/studio/schema';
 
 export const WORKBENCH_SIDEBAR_CONTAINER_ID = 'workbench.sidebar';
-export const WORKBENCH_PAGES_VIEW_ID = 'workbench.pages';
-export const WORKBENCH_LAYERS_VIEW_ID = 'workbench.layers';
+export const WORKBENCH_PAGES_VIEW_ID = 'workbench.artboards';
+export const WORKBENCH_LAYERS_VIEW_ID = 'workbench.nodes';
 
 export { isLayoutRootLayer };
 
 export class PagesTreeProvider extends TreeDataProvider<Page> {
   getRootChildren(ctx: CommandContext): Page[] {
-    return ctx.scene.getScene().pages;
+    return ctx.scene.getDocument().artboards;
   }
 
   getChildren(): Page[] {
@@ -50,7 +50,7 @@ export class PagesTreeProvider extends TreeDataProvider<Page> {
   }
 
   onSelect(page: Page, ctx: CommandContext): void {
-    ctx.scene.setActivePage(page.id);
+    ctx.scene.setActiveArtboard(page.id);
   }
 
   canMove(
@@ -71,8 +71,8 @@ export class PagesTreeProvider extends TreeDataProvider<Page> {
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: movePageRelativeToTarget(
-          scene.pages,
+        artboards: movePageRelativeToTarget(
+          scene.artboards,
           source.id,
           target.id,
           effectivePosition
@@ -87,7 +87,7 @@ export class PagesTreeProvider extends TreeDataProvider<Page> {
 
 export class LayersTreeProvider extends TreeDataProvider<Layer> {
   getRootChildren(ctx: CommandContext): Layer[] {
-    const layers = ctx.scene.getActivePage().layers;
+    const layers = ctx.scene.getActiveArtboard().nodes;
     if (!isTemplatePolicyEnforced()) {
       return layers;
     }
@@ -145,19 +145,19 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
       return;
     }
     if (options?.additive) {
-      const current = ctx.selection.selectedLayerIds;
+      const current = ctx.selection.selectedNodeIds;
       if (current.includes(node.id)) {
         const next = current.filter((id) => id !== node.id);
-        ctx.scene.selectLayers(next, next[0] ?? null);
+        ctx.scene.selectNodes(next, next[0] ?? null);
         return;
       }
-      ctx.scene.selectLayers(
+      ctx.scene.selectNodes(
         [...current, node.id],
-        ctx.selection.primaryLayerId ?? node.id
+        ctx.selection.primaryNodeId ?? node.id
       );
       return;
     }
-    ctx.scene.selectLayers([node.id], node.id);
+    ctx.scene.selectNodes([node.id], node.id);
   }
 
   canMove(
@@ -194,7 +194,7 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
     position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     // Nest into real containers; flat canvas rows still treat "inside" as sibling after.
     const effectivePosition =
       position === 'inside' && hasChildLayers(target)
@@ -205,12 +205,12 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((p) =>
+        artboards: scene.artboards.map((p) =>
           p.id === page.id
             ? {
                 ...p,
-                layers: moveLayerRelativeToTarget(
-                  p.layers,
+                nodes: moveLayerRelativeToTarget(
+                  p.nodes,
                   source.id,
                   target.id,
                   effectivePosition

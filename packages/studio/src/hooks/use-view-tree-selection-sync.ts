@@ -9,17 +9,17 @@ import { getSelectionExpandIds } from './get-selection-expand-ids';
  */
 export function useViewTreeSelectionSync(
   view: ViewDescriptor,
-  selectedLayerIds: Set<string>,
+  selectedNodeIds: Set<string>,
   scene: Scene,
   setCollapsed: Dispatch<SetStateAction<Set<string>>>
 ): void {
   const viewSelection = view.viewSelection;
 
   useEffect(() => {
-    if (viewSelection !== 'layer' || selectedLayerIds.size === 0) {
+    if (viewSelection !== 'layer' || selectedNodeIds.size === 0) {
       return;
     }
-    const expandIds = getSelectionExpandIds(scene, selectedLayerIds);
+    const expandIds = getSelectionExpandIds(scene, selectedNodeIds);
     if (expandIds.size === 0) {
       return;
     }
@@ -34,5 +34,5 @@ export function useViewTreeSelectionSync(
       }
       return changed ? next : prev;
     });
-  }, [scene, selectedLayerIds, setCollapsed, viewSelection]);
+  }, [scene, selectedNodeIds, setCollapsed, viewSelection]);
 }

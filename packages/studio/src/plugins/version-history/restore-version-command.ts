@@ -4,7 +4,7 @@ import {
   type CommandContext,
   VersionHistoryProviderId,
 } from '@openenvx/studio/core';
-import { parseValidSceneSnapshot } from '@openenvx/studio/schema';
+import { parseValidProjectSnapshot } from '@openenvx/studio/schema';
 
 export const VERSION_HISTORY_RESTORE_COMMAND_ID = 'versionHistory.restore';
 
@@ -46,16 +46,16 @@ export class RestoreVersionCommand extends Command {
 
     const provider = ctx.services.get(VersionHistoryProviderId);
     const loaded = await provider.loadVersion(editor.uri, args.versionId);
-    const snapshot = parseValidSceneSnapshot(loaded);
+    const snapshot = parseValidProjectSnapshot(loaded);
 
     if (ctx.services.has(AssetServiceId)) {
-      ctx.services.get(AssetServiceId).hydrate?.(snapshot.scene.assets);
+      ctx.services.get(AssetServiceId).hydrate?.(snapshot.document.assets);
     }
 
     ctx.scene.restoreSnapshot({
       contentRevision: ctx.scene.getContentRevision() + 1,
-      editorState: snapshot.editorState,
-      scene: snapshot.scene,
+      session: snapshot.session,
+      document: snapshot.document,
     });
   }
 }

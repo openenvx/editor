@@ -1,12 +1,18 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  applyNodeTransform,
   createDefaultTransform,
   formatVariableToken,
-  normalizeScene,
+  nodeTransform,
 } from '@openenvx/studio/schema';
 
 import { createCanvasPropertyHostContext } from './canvas-property-path-context';
+import {
+  legacyArtboard,
+  legacyLayer,
+  testDocument,
+} from '../test/canvas-document-fixtures';
 
 function createSceneWithLayer() {
   const transform = {
@@ -16,71 +22,58 @@ function createSceneWithLayer() {
     width: 100,
     height: 50,
     rotation: 45,
+    opacity: 1,
+    scaleX: 1,
+    scaleY: 1,
   };
 
-  return normalizeScene({
-    activePageId: 'page-1',
-    pages: [
-      {
-        id: 'page-1',
-        name: 'Page',
-        layout: 'absolute',
-        width: 800,
-        height: 600,
-        layers: [
-          {
-            id: 'layer-1',
-            type: 'canvas.rect',
-            data: { fill: '#000' },
-            transform,
-          },
-        ],
-      },
-    ],
-    selection: {
-      activePageId: 'page-1',
-      selectedLayerIds: ['layer-1'],
-      primaryLayerId: 'layer-1',
-    },
-  });
+  return testDocument([
+    legacyArtboard({
+      id: 'page-1',
+      name: 'Page',
+      height: 600,
+      width: 800,
+      layers: [
+        legacyLayer({
+          id: 'layer-1',
+          type: 'canvas.rect',
+          data: { fill: '#000' },
+          transform,
+        }),
+      ],
+    }),
+  ]);
 }
 
 describe('createCanvasPropertyHostContext', () => {
   it('readPath returns preview-fitted width for canvas.text with variables', () => {
     const token = formatVariableToken('title');
-    const scene = normalizeScene({
-      variables: [{ id: 'v1', key: 'title', sample: 'Engineer' }],
-      pages: [
-        {
-          id: 'page-1',
-          layout: 'absolute',
-          width: 800,
-          height: 600,
-          layers: [
-            {
-              id: 'text-1',
-              type: 'canvas.text',
-              data: {
-                align: 'center',
-                autoFit: 'hug',
-                html: `<p>${token}</p>`,
-              },
-              transform: {
-                ...createDefaultTransform(),
-                x: 150,
-                y: 200,
-                width: 500,
-                height: 64,
-              },
+    const scene = testDocument([
+      legacyArtboard({
+        id: 'page-1',
+        height: 600,
+        width: 800,
+        layers: [
+          legacyLayer({
+            id: 'text-1',
+            type: 'canvas.text',
+            data: {
+              align: 'center',
+              autoFit: 'hug',
+              html: `<p>${token}</p>`,
             },
-          ],
-        },
-      ],
-      selection: {
-        activePageId: 'page-1',
-        selectedLayerIds: ['text-1'],
-        primaryLayerId: 'text-1',
-      },
+            transform: {
+              ...createDefaultTransform(),
+              x: 150,
+              y: 200,
+              width: 500,
+              height: 64,
+            },
+          }),
+        ],
+      }),
+    ], {
+      variables: [{ id: 'v1', key: 'title', sample: 'Engineer' }],
     });
     const ctx = createCanvasPropertyHostContext({
       scene,
@@ -127,26 +120,29 @@ describe('createCanvasPropertyHostContext', () => {
 
     ctx.writePath('selection.layer.transform.x', 30);
 
-    expect(updateLayerTransform).toHaveBeenCalledWith('layer-1', {
-      ...createDefaultTransform(),
-      x: 30,
-      y: 20,
-      width: 100,
-      height: 50,
-      rotation: 45,
-    });
+    expect(updateLayerTransform).toHaveBeenCalledWith(
+      'layer-1',
+      expect.objectContaining({
+        x: 30,
+        y: 20,
+        width: 100,
+        height: 50,
+        rotation: 45,
+      })
+    );
   });
 
   it('writePath dispatches rotation to canvas.setLayerRotation', () => {
     const scene = createSceneWithLayer();
-    scene.pages[0]!.layers[0]!.transform = {
-      ...createDefaultTransform(),
+    const node = scene.artboards[0]!.nodes[0]!;
+    scene.artboards[0]!.nodes[0] = applyNodeTransform(node, {
+      ...nodeTransform(node),
       height: 100,
       rotation: 0,
       width: 200,
       x: 100,
       y: 100,
-    };
+    });
     const executeCommand = vi.fn();
     const ctx = createCanvasPropertyHostContext({
       scene,
@@ -187,7 +183,7 @@ describe('createCanvasPropertyHostContext', () => {
     const executeCommand = vi.fn();
     const ctx = createCanvasPropertyHostContext({
       scene,
-      activePageId: 'page-1',
+      activeArtboardId: 'page-1',
       selectedLayerId: null,
       layerData: null,
       updateProperty: vi.fn(),
@@ -211,8 +207,8 @@ describe('createCanvasPropertyHostContext', () => {
 
   it('reads and writes embed layer / templatePolicy paths', () => {
     const scene = createSceneWithLayer();
-    scene.pages[0]!.layers[0]!.writeMode = 'content';
-    scene.pages[0]!.layers[0]!.showInLayers = false;
+    scene.artboards[0]!.nodes[0]!.writeMode = 'content';
+    scene.artboards[0]!.nodes[0]!.showInLayers = false;
     const executeCommand = vi.fn();
     const ctx = createCanvasPropertyHostContext({
       scene,

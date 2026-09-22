@@ -1,5 +1,4 @@
-import type { Layer as SceneLayer } from '@openenvx/studio/core';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { nodeTransform, defaultTransform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { useCallback } from 'react';
 import type { RefObject } from 'react';
@@ -34,7 +33,7 @@ export function useCanvasDragSnap({
   getUserGuidesConfig,
   layersRef,
   nodeRefs,
-  selectedLayerIdsRef,
+  selectedNodeIdsRef,
   setInteractionOverlays,
   stageInteractionRef,
   zoom,
@@ -48,7 +47,7 @@ export function useCanvasDragSnap({
   getUserGuidesConfig: () => CanvasUserGuidesSnapConfig | null;
   layersRef: RefObject<FlattenedStageLayer[]>;
   nodeRefs: RefObject<Map<string, Konva.Group>>;
-  selectedLayerIdsRef: RefObject<string[]>;
+  selectedNodeIdsRef: RefObject<string[]>;
   setInteractionOverlays: (
     overlays?: readonly CanvasOverlayPrimitive[]
   ) => void;
@@ -59,7 +58,7 @@ export function useCanvasDragSnap({
     (
       layerId: string,
       node: Konva.Group,
-      transform: NonNullable<SceneLayer['transform']>
+      transform: import('@openenvx/studio/schema').Transform
     ) => {
       const interaction = stageInteractionRef.current;
       const session = dragSessionRef.current;
@@ -75,8 +74,8 @@ export function useCanvasDragSnap({
       }
 
       const excludeIds = new Set(
-        session && selectedLayerIdsRef.current.includes(layerId)
-          ? selectedLayerIdsRef.current
+        session && selectedNodeIdsRef.current.includes(layerId)
+          ? selectedNodeIdsRef.current
           : [layerId]
       );
       for (const id of collectDescendantLayerIds(layersRef.current, layerId)) {
@@ -91,7 +90,7 @@ export function useCanvasDragSnap({
       if (
         session &&
         session.layerId === layerId &&
-        selectedLayerIdsRef.current.length > 1
+        selectedNodeIdsRef.current.length > 1
       ) {
         const start = session.starts.get(layerId);
         if (!start) {
@@ -99,14 +98,15 @@ export function useCanvasDragSnap({
         }
         const dx = node.x() - start.x;
         const dy = node.y() - start.y;
-        const proposedRects = selectedLayerIdsRef.current
+        const proposedRects = selectedNodeIdsRef.current
           .map((id) => {
             const layerStart = session.starts.get(id);
             const entry = layersRef.current.find(
               (item) => item.layer.id === id
             );
-            const relativeTransform =
-              entry?.layer.transform ?? createDefaultTransform();
+            const relativeTransform = entry
+              ? nodeTransform(entry.layer)
+              : defaultTransform();
             const absoluteTransform =
               entry?.absoluteTransform ?? relativeTransform;
             if (!layerStart) {
@@ -137,7 +137,7 @@ export function useCanvasDragSnap({
         });
         const snapDx = (adjusted?.x ?? moving.x) - moving.x;
         const snapDy = (adjusted?.y ?? moving.y) - moving.y;
-        for (const id of selectedLayerIdsRef.current) {
+        for (const id of selectedNodeIdsRef.current) {
           const layerStart = session.starts.get(id);
           const targetNode = nodeRefs.current.get(id);
           if (!layerStart || !targetNode) {
@@ -155,7 +155,7 @@ export function useCanvasDragSnap({
       }
 
       const entry = layersRef.current.find((item) => item.layer.id === layerId);
-      const relativeTransform = entry?.layer.transform ?? transform;
+      const relativeTransform = entry ? nodeTransform(entry.layer) : transform;
       const absoluteTransform = entry?.absoluteTransform ?? relativeTransform;
 
       const adjusted = interaction?.adjustDrag?.({
@@ -201,7 +201,7 @@ export function useCanvasDragSnap({
       getUserGuidesConfig,
       layersRef,
       nodeRefs,
-      selectedLayerIdsRef,
+      selectedNodeIdsRef,
       setInteractionOverlays,
       stageInteractionRef,
       zoom,

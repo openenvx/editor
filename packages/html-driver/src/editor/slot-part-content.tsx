@@ -1,5 +1,6 @@
 import { canEditLayerData, isLayerVisible } from '@openenvx/studio/core';
 import type { Layer } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
 import {
   Fragment,
   Suspense,
@@ -29,9 +30,7 @@ import { resolveSlotRichTextToolbar } from './rich-text-toolbar';
 import styles from './html-editor-pane.module.css';
 
 function layerDataRecord(layer: Layer): Record<string, unknown> {
-  return typeof layer.data === 'object' && layer.data !== null
-    ? (layer.data as Record<string, unknown>)
-    : {};
+  return nodeProps(layer);
 }
 
 function SlotPartContent({

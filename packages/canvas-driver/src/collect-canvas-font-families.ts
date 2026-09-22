@@ -24,7 +24,7 @@ export function collectCanvasFontFamilies(
     if (item.layer.type !== 'canvas.text') {
       return [];
     }
-    const data = item.layer.data as {
+    const data = (item.layer.props ?? {}) as {
       fontFamily?: string;
       html?: string;
     };

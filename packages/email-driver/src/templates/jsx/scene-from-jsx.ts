@@ -1,8 +1,5 @@
-import {
-  SCHEMA_VERSION,
-  type Layer,
-  type Scene,
-} from '@openenvx/studio/schema';
+import type { Document, DocumentNode as Layer } from '@openenvx/studio/schema';
+import { normalizeDocument } from '@openenvx/studio/schema';
 import { isValidElement, type ReactElement, type ReactNode } from 'react';
 
 import {
@@ -197,6 +194,7 @@ function elementToLayer(element: ReactElement, nextId: () => string): Layer {
     }
   }
 
+  let children: Layer[] | undefined;
   if (CONTAINER_TYPES.has(type)) {
     const childLayers: Layer[] = [];
     for (const child of flattenChildren(props.children)) {
@@ -211,15 +209,16 @@ function elementToLayer(element: ReactElement, nextId: () => string): Layer {
       }
       childLayers.push(elementToLayer(child, nextId));
     }
-    data.children = childLayers;
+    children = childLayers;
   }
 
   return {
     id: props.id ?? nextId(),
     type,
     ...(props.name?.trim() ? { name: props.name.trim() } : {}),
-    data,
-  } as Layer;
+    props: data,
+    ...(children !== undefined ? { children } : {}),
+  };
 }
 
 /**
@@ -229,7 +228,7 @@ function elementToLayer(element: ReactElement, nextId: () => string): Layer {
 export function sceneFromEmailJsx(
   element: ReactElement,
   options?: SceneFromEmailJsxOptions
-): Scene {
+): Document {
   const nextId = createIdFactory();
   const root = elementToLayer(element, nextId);
 
@@ -241,15 +240,15 @@ export function sceneFromEmailJsx(
     root.id = options.rootId;
   }
 
-  return {
-    schemaVersion: SCHEMA_VERSION,
-    pages: [
+  return normalizeDocument({
+    artboards: [
       {
         id: options?.pageId ?? 'email-page',
         name: options?.pageName ?? 'Email',
-        layout: 'email',
-        layers: [root],
+        space: {},
+        extensions: { layout: 'email' },
+        nodes: [root],
       },
     ],
-  };
+  });
 }

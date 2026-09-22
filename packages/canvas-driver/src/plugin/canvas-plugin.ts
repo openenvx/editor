@@ -11,11 +11,17 @@ import {
 } from '@openenvx/studio/core';
 import type {
   CommandContext,
-  Layer,
+  DocumentNode,
   PluginContext,
   WorkbenchPluginContext,
 } from '@openenvx/studio/core';
-import { normalizeScene } from '@openenvx/studio/schema';
+import {
+  applyNodeTransform,
+  artboardRulesLayout,
+  createDefaultTransform,
+  normalizeScene,
+  withArtboardRulesLayout,
+} from '@openenvx/studio/schema';
 
 import { AbsolutePageRules } from '../absolute-page-rules';
 import {
@@ -137,13 +143,13 @@ function createLayerId(type: string): string {
   return `${type}-${crypto.randomUUID()}`;
 }
 
-function insertCanvasLayer(ctx: CommandContext, layer: Layer): void {
-  const page = ctx.scene.getActivePage();
+function insertCanvasLayer(ctx: CommandContext, layer: DocumentNode): void {
+  const page = ctx.scene.getActiveArtboard();
   ctx.scene.apply({
     apply: (scene) => ({
       ...scene,
-      pages: scene.pages.map((p) =>
-        p.id === page.id ? { ...p, layers: [...p.layers, layer] } : p
+      artboards: scene.artboards.map((p) =>
+        p.id === page.id ? { ...p, nodes: [...p.nodes, layer] } : p
       ),
     }),
     label: localize(ctx.services, 'canvas.history.insertLayer', {
@@ -151,16 +157,17 @@ function insertCanvasLayer(ctx: CommandContext, layer: Layer): void {
     }),
   });
   ctx.scene.setSelection({
-    activePageId: page.id,
-    primaryLayerId: layer.id,
-    selectedLayerIds: [layer.id],
+    activeArtboardId: page.id,
+    primaryNodeId: layer.id,
+    selectedNodeIds: [layer.id],
   });
 }
 
 function canInsertOnActivePage(ctx: CommandContext): boolean {
-  const scene = ctx.scene.getScene();
+  const scene = ctx.scene.getDocument();
   return (
-    ctx.scene.getActivePage().layout === 'absolute' && canInsertLayers(scene)
+    artboardRulesLayout(ctx.scene.getActiveArtboard()) === 'absolute' &&
+    canInsertLayers(scene)
   );
 }
 
@@ -172,7 +179,7 @@ export class InsertCanvasTextCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasTextLayer().createDefault(
       createLayerId('text'),
       page
@@ -189,7 +196,7 @@ export class InsertOpenEnvxWidgetCommand extends Command {
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const layer = new OpenEnvxWidgetLayer().createDefault(
       createLayerId('widget'),
       page
@@ -201,13 +208,13 @@ export class InsertOpenEnvxWidgetCommand extends Command {
         ? (args as { extensionId: string }).extensionId.trim()
         : '';
     if (extensionId) {
-      layer.data = {
-        ...(layer.data as Record<string, unknown>),
+      layer.props = {
+        ...layer.props,
         extensionId,
         label: extensionId,
         values: {},
-        children: [],
       };
+      layer.children = [];
       layer.name = extensionId;
     }
     insertCanvasLayer(ctx, layer);
@@ -222,7 +229,7 @@ export class InsertCanvasImageCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasImageLayer().createDefault(
       createLayerId('image'),
       page
@@ -239,7 +246,7 @@ export class InsertCanvasSvgCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasSvgLayer().createDefault(
       createLayerId('svg'),
       page
@@ -256,7 +263,7 @@ export class InsertCanvasQrCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasQrLayer().createDefault(createLayerId('qr'), page);
     insertCanvasLayer(ctx, layer);
   }
@@ -270,7 +277,7 @@ export class InsertCanvasRectCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasRectLayer().createDefault(
       createLayerId('rect'),
       page
@@ -287,7 +294,7 @@ export class InsertCanvasCircleCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasCircleLayer().createDefault(
       createLayerId('circle'),
       page
@@ -331,12 +338,12 @@ export class UploadAssetCommand extends Command {
           return;
         }
         const assetRef = await assets.upload!(file);
-        const page = ctx.scene.getActivePage();
+        const page = ctx.scene.getActiveArtboard();
         const layer = new CanvasImageLayer().createDefault(
           createLayerId('image'),
           page
         );
-        layer.data = { alt: file.name, assetRef };
+        layer.props = { ...layer.props, alt: file.name, assetRef };
         insertCanvasLayer(ctx, layer);
         resolve();
       };
@@ -483,72 +490,44 @@ export class CanvasPlugin extends Plugin {
 
 export function createCanvasDemoScene() {
   const { width: pageWidth, height: pageHeight } = getDefaultPageDimensions();
+  const margin = 48;
 
   return normalizeScene({
-    pages: [
-      {
-        id: 'canvas-page',
-        name: 'Artboard',
-        layout: 'absolute',
-        width: pageWidth,
-        height: pageHeight,
-        layers: [
-          // {
-          //   id: 'image',
-          //   type: 'canvas.image',
-          //   editable: false,
-          //   data: {
-          //     assetRef: imageUrl,
-          //     alt: 'Image',
-          //   },
-          //   transform: {
-          //     ...createDefaultTransform(),
-          //     x: 0,
-          //     y: 0,
-          //     width: pageWidth,
-          //     height: pageHeight,
-          //   },
-          // },
-          // {
-          //   id: 'text',
-          //   type: 'canvas.text',
-          //   editable: true,
-          //   data: {
-          //     html: '<p>Warszawski developer</p>',
-          //     fontSize: 72,
-          //     fontFamily: '"Parisienne", cursive',
-          //     fill: '#000000',
-          //     align: 'center',
-          //   },
-          //   transform: {
-          //     ...createDefaultTransform(),
-          //     x: 40,
-          //     y: 180,
-          //     width: pageWidth - 80,
-          //     height: 211,
-          //   },
-          // },
-          // {
-          //   id: 'group',
-          //   type: 'canvas.rect',
-          //   editable: false,
-          //   data: {
-          //     fill: 'transparent',
-          //     stroke: 'transparent',
-          //     strokeWidth: 0,
-          //     cornerRadius: 0,
-          //   },
-          //   transform: {
-          //     ...createDefaultTransform(),
-          //     x: pageWidth / 2,
-          //     y: pageHeight / 2,
-          //     width: 0,
-          //     height: 0,
-          //     rotation: 263,
-          //   },
-          // },
-        ],
-      },
+    artboards: [
+      withArtboardRulesLayout(
+        {
+          id: 'canvas-page',
+          name: 'Artboard',
+          space: { width: pageWidth, height: pageHeight },
+          nodes: [
+            applyNodeTransform(
+              {
+                id: 'demo-heading',
+                type: 'canvas.text',
+                writeMode: 'content',
+                props: {
+                  html: '<p>Canvas demo</p>',
+                  fontSize: 48,
+                  fontFamily: 'Inter, sans-serif',
+                  fill: '#ffffff',
+                  align: 'center',
+                },
+              },
+              {
+                ...createDefaultTransform(),
+                opacity: 1,
+                scaleX: 1,
+                scaleY: 1,
+                x: margin,
+                y: pageHeight * 0.4,
+                width: pageWidth - margin * 2,
+                height: 80,
+              }
+            ),
+          ],
+        },
+        'absolute'
+      ),
     ],
   });
 }

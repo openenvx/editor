@@ -1,4 +1,8 @@
-import { createDefaultTransform, normalizeScene } from '@openenvx/studio/schema';
+import {
+  applyNodeTransform,
+  createDefaultTransform,
+  nodeTransform,
+} from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -13,6 +17,12 @@ import {
   measurePlainTextWidth,
   measureRichTextHeight,
 } from './rich-text-layout';
+import {
+  legacyArtboard,
+  legacyLayer,
+  testArtboard,
+  testDocument,
+} from './test/canvas-document-fixtures';
 
 const FONT = 'Inter, sans-serif';
 
@@ -25,7 +35,7 @@ function textLayer(options: {
   autoFit?: 'none' | 'shrink' | 'hug';
   name?: string;
 }) {
-  return {
+  return legacyLayer({
     data: {
       align: 'left' as const,
       autoFit: options.autoFit ?? 'none',
@@ -42,6 +52,15 @@ function textLayer(options: {
       width: options.width,
     },
     type: 'canvas.text',
+  });
+}
+
+function textProps(layer: ReturnType<typeof textLayer>) {
+  return layer.props as {
+    align?: string;
+    autoFit?: string;
+    html: string;
+    curve?: number;
   };
 }
 
@@ -55,15 +74,16 @@ describe('fitCanvasTextLayerToContent', () => {
     });
 
     const fitted = fitCanvasTextLayerToContent(layer);
+    const fittedT = nodeTransform(fitted);
     const expected = measureRichTextHeight({
       fontFamily: FONT,
       fontSize: 24,
-      html: layer.data.html,
+      html: textProps(layer).html,
       width,
     });
 
-    expect(fitted.transform?.width).toBe(width);
-    expect(fitted.transform?.height).toBe(expected);
+    expect(fittedT.width).toBe(width);
+    expect(fittedT.height).toBe(expected);
     expect(expected).toBeGreaterThan(0);
   });
 
@@ -75,69 +95,78 @@ describe('fitCanvasTextLayerToContent', () => {
     });
 
     const fitted = fitCanvasTextLayerToContent(layer, { mode: 'box' });
+    const fittedT = nodeTransform(fitted);
     const expected = measureRichTextContentSize({
       fontFamily: FONT,
       fontSize: 24,
       html: '<p>Hi</p>',
     });
 
-    expect(fitted.transform?.width).toBe(expected.width);
-    expect(fitted.transform?.height).toBe(expected.height);
-    expect(fitted.transform!.width).toBeLessThan(240);
-    expect(fitted.transform!.height).toBeLessThan(200);
+    expect(fittedT.width).toBe(expected.width);
+    expect(fittedT.height).toBe(expected.height);
+    expect(fittedT.width).toBeLessThan(240);
+    expect(fittedT.height).toBeLessThan(200);
   });
 
   it('box mode hugs both width and height to content and keeps x', () => {
-    const layer = textLayer({
+    let layer = textLayer({
       height: 200,
       html: '<p>Hi</p>',
       width: 240,
     });
-    layer.data.align = 'center';
-    layer.transform = { ...layer.transform!, x: 100 };
+    layer = {
+      ...layer,
+      props: { ...textProps(layer), align: 'center' },
+    };
+    layer = applyNodeTransform(layer, {
+      ...nodeTransform(layer),
+      x: 100,
+    });
 
     const fitted = fitCanvasTextLayerToContent(layer, { mode: 'box' });
+    const fittedT = nodeTransform(fitted);
     const expected = measureRichTextContentSize({
       fontFamily: FONT,
       fontSize: 24,
       html: '<p>Hi</p>',
     });
 
-    expect(fitted.transform?.width).toBe(expected.width);
-    expect(fitted.transform?.height).toBe(expected.height);
-    expect(fitted.transform?.x).toBe(100);
+    expect(fittedT.width).toBe(expected.width);
+    expect(fittedT.height).toBe(expected.height);
+    expect(fittedT.x).toBe(100);
   });
 
   it('hug autoFit hugs content without moving x', () => {
-    const layer = textLayer({
+    let layer = textLayer({
       autoFit: 'hug',
       height: 200,
       html: '<p>Hi</p>',
       width: 240,
     });
-    layer.data.align = 'center';
-    layer.transform = { ...layer.transform!, x: 50 };
+    layer = {
+      ...layer,
+      props: { ...textProps(layer), align: 'center' },
+    };
+    layer = applyNodeTransform(layer, { ...nodeTransform(layer), x: 50 });
 
     const fitted = fitCanvasTextLayerToContent(layer);
+    const fittedT = nodeTransform(fitted);
 
-    expect(fitted.transform!.width).toBeLessThan(240);
-    expect(fitted.transform?.x).toBe(50);
+    expect(fittedT.width).toBeLessThan(240);
+    expect(fittedT.x).toBe(50);
   });
 
   it('createDefault text hugs the placeholder copy', () => {
-    const created = new CanvasTextLayer().createDefault('t1', {
-      height: 600,
-      id: 'p1',
-      layers: [],
-      layout: 'absolute',
-      name: 'Page',
-      width: 800,
-    });
+    const created = new CanvasTextLayer().createDefault(
+      't1',
+      testArtboard({ id: 'p1' })
+    );
+    const t = nodeTransform(created);
 
-    expect(created.transform!.width).toBeLessThan(240);
-    expect(created.transform!.height).toBeLessThan(48);
-    expect(created.transform!.width).toBeGreaterThan(8);
-    expect(created.transform!.height).toBeGreaterThan(8);
+    expect(t.width).toBeLessThan(240);
+    expect(t.height).toBeLessThan(48);
+    expect(t.width).toBeGreaterThan(8);
+    expect(t.height).toBeGreaterThan(8);
   });
 
   it('shrinks height when injected copy is shorter than the placeholder box', () => {
@@ -149,8 +178,9 @@ describe('fitCanvasTextLayerToContent', () => {
     });
 
     const fitted = fitCanvasTextLayerToContent(layer);
-    expect(fitted.transform?.width).toBe(width);
-    expect(fitted.transform!.height).toBeLessThan(layer.transform.height);
+    const fittedT = nodeTransform(fitted);
+    expect(fittedT.width).toBe(width);
+    expect(fittedT.height).toBeLessThan(nodeTransform(layer).height);
   });
 
   it('leaves autoFit shrink layers untouched', () => {
@@ -165,21 +195,25 @@ describe('fitCanvasTextLayerToContent', () => {
   });
 
   it('curved text hugs measured TextPath bounds', () => {
-    const layer = textLayer({
+    let layer = textLayer({
       height: 200,
       html: '<p>Hi</p>',
       width: 240,
     });
-    layer.data = { ...layer.data, curve: 60 };
-    layer.transform = { ...layer.transform, x: 100 };
+    layer = {
+      ...layer,
+      props: { ...textProps(layer), curve: 60 },
+    };
+    layer = applyNodeTransform(layer, { ...nodeTransform(layer), x: 100 });
 
     const fitted = fitCanvasTextLayerToContent(layer);
-    const centerBefore = layer.transform.x + layer.transform.width / 2;
-    const centerAfter =
-      fitted.transform!.x + fitted.transform!.width / 2;
+    const before = nodeTransform(layer);
+    const after = nodeTransform(fitted);
+    const centerBefore = before.x + before.width / 2;
+    const centerAfter = after.x + after.width / 2;
 
-    expect(fitted.transform!.height).toBeGreaterThan(24);
-    expect(fitted.transform!.width).toBeGreaterThan(8);
+    expect(after.height).toBeGreaterThan(24);
+    expect(after.width).toBeGreaterThan(8);
     expect(centerAfter).toBeCloseTo(centerBefore, 5);
   });
 
@@ -189,18 +223,21 @@ describe('fitCanvasTextLayerToContent', () => {
       html: '<p>$1,195,000</p>',
       width: 300,
     });
-    layer = {
-      ...layer,
-      transform: { ...layer.transform!, x: 50 },
-    };
-    const center0 = layer.transform!.x + layer.transform!.width / 2;
+    layer = applyNodeTransform(layer, {
+      ...nodeTransform(layer),
+      x: 50,
+    });
+    const center0 =
+      nodeTransform(layer).x + nodeTransform(layer).width / 2;
 
     for (const curve of [20, 40, 60, 80, 100, 50, 0]) {
-      const data = { ...layer.data, curve };
-      layer = fitCanvasTextLayerToContent({ ...layer, data });
-      const center = layer.transform!.x + layer.transform!.width / 2;
+      layer = fitCanvasTextLayerToContent({
+        ...layer,
+        props: { ...textProps(layer), curve },
+      });
+      const center =
+        nodeTransform(layer).x + nodeTransform(layer).width / 2;
       if (curve === 0) {
-        // Straight height-mode keeps prior width; x may not recenter.
         break;
       }
       expect(center).toBeCloseTo(center0, 5);
@@ -208,13 +245,17 @@ describe('fitCanvasTextLayerToContent', () => {
   });
 
   it('fit and layoutCurvedText agree on dimensions for the same advance', () => {
-    const layer = textLayer({
+    let layer = textLayer({
       height: 48,
       html: '<p>Hello World</p>',
       width: 300,
     });
-    layer.data = { ...layer.data, curve: 40 };
+    layer = {
+      ...layer,
+      props: { ...textProps(layer), curve: 40 },
+    };
     const fitted = fitCanvasTextLayerToContent(layer);
+    const fittedT = nodeTransform(fitted);
     const plain = 'Hello World';
     const textWidth = measurePlainTextWidth(plain, 24, FONT, 0);
     const layout = layoutCurvedText({
@@ -225,30 +266,28 @@ describe('fitCanvasTextLayerToContent', () => {
       text: plain,
       textWidth,
     });
-    expect(fitted.transform!.width).toBe(layout.width);
-    expect(fitted.transform!.height).toBe(layout.height);
+    expect(fittedT.width).toBe(layout.width);
+    expect(fittedT.height).toBe(layout.height);
   });
 
   it('applyModificationsWithTextFit remasures named text after injection', () => {
-    const scene = normalizeScene({
-      pages: [
-        {
-          height: 600,
-          id: 'page-1',
-          layers: [
-            textLayer({
-              height: 48,
-              html: '<p>Hi</p>',
-              id: 'headline',
-              name: 'headline',
-              width: 160,
-            }),
-          ],
-          name: 'Page 1',
-          width: 800,
-        },
-      ],
-    });
+    const scene = testDocument([
+      legacyArtboard({
+        id: 'page-1',
+        height: 600,
+        name: 'Page 1',
+        width: 800,
+        layers: [
+          textLayer({
+            height: 48,
+            html: '<p>Hi</p>',
+            id: 'headline',
+            name: 'headline',
+            width: 160,
+          }),
+        ],
+      }),
+    ]);
 
     const resolved = applyModificationsWithTextFit(scene, [
       {
@@ -257,10 +296,11 @@ describe('fitCanvasTextLayerToContent', () => {
       },
     ]);
 
-    const layer = resolved.pages[0]!.layers[0]!;
-    const html = (layer.data as { html: string }).html;
-    expect(layer.transform?.width).toBe(160);
-    expect(layer.transform?.height).toBe(
+    const layer = resolved.artboards[0]!.nodes[0]!;
+    const html = (layer.props as { html: string }).html;
+    const t = nodeTransform(layer);
+    expect(t.width).toBe(160);
+    expect(t.height).toBe(
       measureRichTextHeight({
         fontFamily: FONT,
         fontSize: 24,
@@ -278,34 +318,30 @@ describe('fitCanvasTextLayerToContent', () => {
       id: 'nested',
       width: 120,
     });
-    const scene = normalizeScene({
-      pages: [
-        {
-          height: 600,
-          id: 'page-1',
-          layers: [
-            {
-              data: { children: [child] },
-              id: 'group-1',
-              transform: createDefaultTransform(),
-              type: 'canvas.group',
-            },
-          ],
-          name: 'Page 1',
-          width: 800,
-        },
-      ],
-    });
+    const scene = testDocument([
+      legacyArtboard({
+        id: 'page-1',
+        height: 600,
+        name: 'Page 1',
+        width: 800,
+        layers: [
+          legacyLayer({
+            children: [child],
+            id: 'group-1',
+            transform: createDefaultTransform(),
+            type: 'canvas.group',
+          }),
+        ],
+      }),
+    ]);
 
     const fitted = fitSceneCanvasTextToContent(scene);
-    const nested = (
-      fitted.pages[0]!.layers[0]!.data as { children: typeof child[] }
-    ).children[0]!;
-    expect(nested.transform.height).toBe(
+    const nested = fitted.artboards[0]!.nodes[0]!.children![0]!;
+    expect(nodeTransform(nested).height).toBe(
       measureRichTextHeight({
         fontFamily: FONT,
         fontSize: 24,
-        html: nested.data.html,
+        html: (nested.props as { html: string }).html,
         width: 120,
       })
     );

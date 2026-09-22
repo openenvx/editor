@@ -1,6 +1,9 @@
 import type { AssetService } from '@openenvx/studio/core';
-import type { Layer, Page } from '@openenvx/studio/schema';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import type { Artboard, DocumentNode } from '@openenvx/studio/schema';
+import {
+  applyNodeTransform,
+  createDefaultTransform,
+} from '@openenvx/studio/schema';
 
 import { computeArtboardOffset } from '../artboard-offset';
 import { CanvasImageLayer } from '../layers/canvas-image-layer';
@@ -14,7 +17,7 @@ import type { CapturedClipboardPayload } from './read-external-clipboard';
 const MAX_IMAGE_DIMENSION = 800;
 
 export interface InternalClipboardPayload {
-  layers: Layer[];
+  layers: DocumentNode[];
   origin: { x: number; y: number };
 }
 
@@ -34,7 +37,7 @@ export interface ArtboardPointerContext {
 }
 
 export interface ExternalImagePasteResult {
-  layer: Layer;
+  layer: DocumentNode;
   /** Upload preview → durable ref. Does not revoke the object URL. */
   finalizeUpload: () => Promise<string>;
   /** Drop the session preview object URL for this layer. */
@@ -191,7 +194,7 @@ export class CanvasClipboardService {
    * Pass `assets` from `ctx.services.get(AssetServiceId)` so host overrides apply.
    */
   createImageLayerFromExternalPaste(
-    page: Page,
+    page: Artboard,
     anchor: { x: number; y: number },
     payload: { blob: Blob; naturalWidth: number; naturalHeight: number },
     assets: AssetService
@@ -216,22 +219,24 @@ export class CanvasClipboardService {
       payload.naturalHeight
     );
 
-    const layer = new CanvasImageLayer().createDefault(
-      createLayerId('image'),
-      page
+    const layer = applyNodeTransform(
+      {
+        ...new CanvasImageLayer().createDefault(createLayerId('image'), page),
+        props: {
+          alt: 'Pasted image',
+          assetRef: '',
+          uploading: true,
+        },
+      },
+      {
+        ...createDefaultTransform(),
+        opacity: 1,
+        x: anchor.x,
+        y: anchor.y,
+        width,
+        height,
+      }
     );
-    layer.data = {
-      alt: 'Pasted image',
-      assetRef: '',
-      uploading: true,
-    };
-    layer.transform = {
-      ...createDefaultTransform(),
-      x: anchor.x,
-      y: anchor.y,
-      width,
-      height,
-    };
     registerImagePastePreview(layer.id, previewUrl);
 
     return {

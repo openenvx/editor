@@ -1,10 +1,10 @@
-import { normalizeSceneSnapshot } from '@openenvx/studio/schema';
 import { describe, expect, it, vi } from 'vitest';
 
+import { projectSnapshotFromLegacy } from '../test/document-fixtures';
 import { PropertyPath } from './property-path';
 import { createPropertyHostContext } from './property-path-context';
 
-const scene = normalizeSceneSnapshot({
+const scene = projectSnapshotFromLegacy({
   pages: [
     {
       id: 'p1',
@@ -28,9 +28,9 @@ const scene = normalizeSceneSnapshot({
     allowInsertLayers: true,
     allowDeleteLayers: true,
     allowDuplicateLayers: true,
-    allowPageResize: true,
+    allowArtboardResize: true,
   },
-}).scene;
+}).document;
 
 describe('createPropertyHostContext', () => {
   it('reads and writes layer data paths', () => {

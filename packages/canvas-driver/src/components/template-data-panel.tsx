@@ -48,7 +48,7 @@ function valuesEqualScene(a: Scene, b: Scene): boolean {
 export const TemplateDataPanel = memo(() => {
   const { api } = useWorkbenchContext();
   const selectedScene = useWorkbenchContextSelector((state) => state.scene);
-  const scene = selectedScene ?? api.scene.getScene() ?? createEmptyScene();
+  const scene = selectedScene ?? api.scene.getDocument() ?? createEmptyScene();
 
   const baseSceneRef = useRef<Scene>(structuredClone(scene));
   const previewingRef = useRef(false);
@@ -100,7 +100,7 @@ export const TemplateDataPanel = memo(() => {
       );
       previewingRef.current = true;
       setPreviewing(true);
-      if (!valuesEqualScene(api.scene.getScene(), resolved)) {
+      if (!valuesEqualScene(api.scene.getDocument(), resolved)) {
         api.scene.setScene(resolved);
       }
     },

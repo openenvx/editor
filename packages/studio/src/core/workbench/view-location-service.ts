@@ -10,6 +10,7 @@ export class ViewLocationService {
   private readonly defaults = new Map<string, ViewContainerLocation>();
   private readonly locations = new Map<string, ViewContainerLocation>();
   private readonly orders: Record<ViewContainerLocation, string[]> = {
+    panel: [],
     primary: [],
     secondary: [],
   };
@@ -17,12 +18,14 @@ export class ViewLocationService {
     ViewContainerLocation,
     string | null
   > = {
+    panel: null,
     primary: null,
     secondary: null,
   };
   private readonly listeners = new Set<Listener>();
   private viewLocationsSnapshot: Record<string, ViewContainerLocation> = {};
   private ordersSnapshot: Record<ViewContainerLocation, string[]> = {
+    panel: [],
     primary: [],
     secondary: [],
   };
@@ -30,6 +33,7 @@ export class ViewLocationService {
     ViewContainerLocation,
     string | null
   > = {
+    panel: null,
     primary: null,
     secondary: null,
   };
@@ -220,6 +224,7 @@ export class ViewLocationService {
 
   private invalidateOrdersSnapshot(): void {
     this.ordersSnapshot = {
+      panel: [...this.orders.panel],
       primary: [...this.orders.primary],
       secondary: [...this.orders.secondary],
     };

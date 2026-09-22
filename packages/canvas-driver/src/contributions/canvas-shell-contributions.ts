@@ -1,5 +1,5 @@
 import {
-  findLayerById,
+  findNodeById,
   StatusBarContribution,
   ToolbarContribution,
   type ShellDropdownMenuItemDescriptor,
@@ -7,6 +7,7 @@ import {
   type ToolbarBuilder,
   type CommandContext,
 } from '@openenvx/studio/core';
+import { nodeTransform } from '@openenvx/studio/schema';
 
 import { CANVAS_GRID_SIZE_PRESETS } from '../commands/canvas-grid-commands';
 
@@ -34,21 +35,21 @@ export class CanvasStatusBarContribution extends StatusBarContribution {
       priority: -10,
     });
 
-    const scene = ctx.scene.getScene();
-    const { selectedLayerIds, primaryLayerId } = ctx.selection;
-    if (selectedLayerIds.length !== 1 || !primaryLayerId) {
+    const scene = ctx.scene.getDocument();
+    const { selectedNodeIds, primaryNodeId } = ctx.selection;
+    if (selectedNodeIds.length !== 1 || !primaryNodeId) {
       return;
     }
 
-    const layer = findLayerById(scene, primaryLayerId);
-    if (!layer?.transform) {
+    const layer = findNodeById(scene, primaryNodeId);
+    if (!layer?.frame) {
       return;
     }
 
     const label = layer.type
       .replace(/^canvas\./, '')
       .replace(/^\w/, (char) => char.toUpperCase());
-    const { width, height } = layer.transform;
+    const { width, height } = nodeTransform(layer);
 
     builder
       .right()

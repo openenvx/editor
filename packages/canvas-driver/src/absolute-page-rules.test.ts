@@ -1,3 +1,4 @@
+import { artboardSpaceSize, withArtboardRulesLayout } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { AbsolutePageRules } from './absolute-page-rules';
@@ -8,25 +9,25 @@ describe('AbsolutePageRules', () => {
 
   it('fills default dimensions and infers preset id', () => {
     const defaults = getDefaultPageDimensions();
-    const normalized = rules.normalizePage({
-      id: 'p1',
-      layers: [],
-      layout: 'absolute',
-      name: 'Page',
-    });
-    expect(normalized.width).toBe(defaults.width);
-    expect(normalized.height).toBe(defaults.height);
-    expect(normalized.presetId).toBe('a4-portrait');
+    const normalized = rules.normalizeArtboard(
+      withArtboardRulesLayout(
+        { id: 'p1', name: 'Page', nodes: [], space: {} },
+        'absolute'
+      )
+    );
+    const { width, height } = artboardSpaceSize(normalized);
+    expect(width).toBe(defaults.width);
+    expect(height).toBe(defaults.height);
+    expect(normalized.physical?.presetId).toBe('a4-portrait');
   });
 
-  it('rejects absolute pages missing width/height after normalize failure path', () => {
-    const errors = rules.validatePage({
-      id: 'p1',
-      layers: [],
-      layout: 'absolute',
-      name: 'Page',
-    });
-    expect(errors).toHaveLength(1);
-    expect(errors[0]!.message).toContain('width and height');
+  it('validateArtboard passes after normalize fills space dimensions', () => {
+    const normalized = rules.normalizeArtboard(
+      withArtboardRulesLayout(
+        { id: 'p1', name: 'Page', nodes: [], space: {} },
+        'absolute'
+      )
+    );
+    expect(rules.validateArtboard(normalized)).toEqual([]);
   });
 });

@@ -14,6 +14,7 @@ import {
   WIDGET_LAYER_TYPE,
 } from '@openenvx/studio/core';
 import type { Layer, Scene } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
 import {
   memo,
   Suspense,
@@ -65,9 +66,7 @@ import styles from './html-editor-pane.module.css';
 export type { BlockSortDraft };
 
 function layerDataRecord(layer: Layer): Record<string, unknown> {
-  return typeof layer.data === 'object' && layer.data !== null
-    ? (layer.data as Record<string, unknown>)
-    : {};
+  return nodeProps(layer);
 }
 
 function DropZone({

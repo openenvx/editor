@@ -4,6 +4,7 @@ import type { Layer } from '@openenvx/studio/schema';
 
 import type { BlockConfig } from '../block-config';
 import { BlockRegistry } from '../block-registry';
+import { testHtmlBlock } from '../test/document-fixtures';
 import {
   findAdjacentTextBlockId,
   isRichTextBlock,
@@ -31,12 +32,7 @@ function layer(
   children: Layer[] = [],
   extra?: Partial<Layer>
 ): Layer {
-  return {
-    id,
-    type,
-    data: { children },
-    ...extra,
-  };
+  return { ...testHtmlBlock(id, type, children), ...extra };
 }
 
 function registryWith(...configs: BlockConfig[]): BlockRegistry {

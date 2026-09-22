@@ -1,77 +1,74 @@
 import type {
-  CanvasInstanceData,
-  SceneComponent,
+  CanvasInstanceProps,
+  Document,
+  DocumentComponent,
+  DocumentNode,
 } from '@openenvx/studio/schema';
 
-import { getLayerChildren, hasChildLayers } from './layer-tree';
-import type { Layer, Scene } from './types';
+import { nodeProps } from '../schema/node-helpers';
+import { getNodeChildren, hasChildNodesInTree } from './layer-tree';
 
 export const CANVAS_INSTANCE_LAYER_TYPE = 'canvas.instance';
 
-/** Separates instance layer id from definition layer id in surface-only child ids. */
 export const INSTANCE_SURFACE_CHILD_SEP = '::';
 
 export function buildInstanceSurfaceLayerId(
-  instanceLayerId: string,
-  definitionLayerId: string
+  instanceNodeId: string,
+  definitionNodeId: string
 ): string {
-  return `${instanceLayerId}${INSTANCE_SURFACE_CHILD_SEP}${definitionLayerId}`;
+  return `${instanceNodeId}${INSTANCE_SURFACE_CHILD_SEP}${definitionNodeId}`;
 }
 
-function remapLayerForInstanceSurface(
-  instanceLayerId: string,
-  layer: Layer
-): Layer {
-  const id = buildInstanceSurfaceLayerId(instanceLayerId, layer.id);
-  const surfaceLayer: Layer = {
-    ...layer,
+function remapNodeForInstanceSurface(
+  instanceNodeId: string,
+  node: DocumentNode
+): DocumentNode {
+  const id = buildInstanceSurfaceLayerId(instanceNodeId, node.id);
+  const surfaceNode: DocumentNode = {
+    ...node,
     id,
     locked: true,
     writeMode: 'locked',
   };
-  if (!hasChildLayers(layer)) {
-    return surfaceLayer;
+  if (!hasChildNodesInTree(node)) {
+    return surfaceNode;
   }
-  const data = layer.data as { children: Layer[] };
   return {
-    ...surfaceLayer,
-    data: {
-      ...data,
-      children: getLayerChildren(layer).map((child) =>
-        remapLayerForInstanceSurface(instanceLayerId, child)
-      ),
-    },
+    ...surfaceNode,
+    children: getNodeChildren(node).map((child) =>
+      remapNodeForInstanceSurface(instanceNodeId, child)
+    ),
   };
 }
 
-function remapLayersForInstanceSurface(
-  instanceLayerId: string,
-  layers: Layer[]
-): Layer[] {
-  return layers.map((layer) =>
-    remapLayerForInstanceSurface(instanceLayerId, layer)
-  );
+function remapNodesForInstanceSurface(
+  instanceNodeId: string,
+  nodes: DocumentNode[]
+): DocumentNode[] {
+  return nodes.map((node) => remapNodeForInstanceSurface(instanceNodeId, node));
 }
 
-export function isCanvasInstanceLayer(layer: Layer): boolean {
-  return layer.type === CANVAS_INSTANCE_LAYER_TYPE;
+export function isCanvasInstanceNode(node: DocumentNode): boolean {
+  return node.type === CANVAS_INSTANCE_LAYER_TYPE;
 }
 
-export function getInstanceComponentId(layer: Layer): string | null {
-  if (!isCanvasInstanceLayer(layer)) {
+/** @deprecated use isCanvasInstanceNode */
+export const isCanvasInstanceLayer = isCanvasInstanceNode;
+
+export function getInstanceComponentId(node: DocumentNode): string | null {
+  if (!isCanvasInstanceNode(node)) {
     return null;
   }
-  const componentId = (layer.data as CanvasInstanceData | undefined)
-    ?.componentId;
+  const props = nodeProps(node) as unknown as CanvasInstanceProps;
+  const componentId = props.componentId;
   return typeof componentId === 'string' && componentId ? componentId : null;
 }
 
-/** Definition layers for an instance, with optional shallow data overrides applied. */
-export function resolveInstanceDefinitionLayers(
-  layer: Layer,
-  components: Record<string, SceneComponent> | undefined
-): Layer[] {
-  const componentId = getInstanceComponentId(layer);
+export function resolveInstanceDefinitionNodes(
+  node: DocumentNode,
+  components: Record<string, DocumentComponent> | undefined
+): DocumentNode[] {
+  const componentId = getInstanceComponentId(node);
   if (!componentId) {
     return [];
   }
@@ -79,31 +76,42 @@ export function resolveInstanceDefinitionLayers(
   if (!definition) {
     return [];
   }
-  const overrides = (layer.data as CanvasInstanceData).overrides;
+  const props = nodeProps(node) as unknown as CanvasInstanceProps;
+  const overrides = props.overrides;
   if (!overrides) {
-    return definition.layers;
+    return definition.nodes;
   }
-  return definition.layers.map((child) => {
+  return definition.nodes.map((child) => {
     const patch = overrides[child.id];
     if (!patch) {
       return child;
     }
-    const data =
-      typeof child.data === 'object' && child.data !== null
-        ? { ...(child.data as Record<string, unknown>), ...patch }
-        : patch;
-    return { ...child, data } as Layer;
+    return {
+      ...child,
+      props: {
+        ...nodeProps(child),
+        ...patch,
+      },
+    };
   });
 }
 
-/** Children for surface/export: instance → component layers; else data.children. */
-export function getLayerChildrenForScene(layer: Layer, scene: Scene): Layer[] {
-  if (isCanvasInstanceLayer(layer)) {
-    const definitionLayers = resolveInstanceDefinitionLayers(
-      layer,
-      scene.components
+/** @deprecated use resolveInstanceDefinitionNodes */
+export const resolveInstanceDefinitionLayers = resolveInstanceDefinitionNodes;
+
+export function getNodeChildrenForDocument(
+  node: DocumentNode,
+  document: Document
+): DocumentNode[] {
+  if (isCanvasInstanceNode(node)) {
+    const definitionNodes = resolveInstanceDefinitionNodes(
+      node,
+      document.components
     );
-    return remapLayersForInstanceSurface(layer.id, definitionLayers);
+    return remapNodesForInstanceSurface(node.id, definitionNodes);
   }
-  return getLayerChildren(layer);
+  return getNodeChildren(node);
 }
+
+/** @deprecated use getNodeChildrenForDocument */
+export const getLayerChildrenForScene = getNodeChildrenForDocument;

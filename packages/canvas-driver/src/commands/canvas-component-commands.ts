@@ -2,13 +2,18 @@ import {
   Command,
   canInsertLayers,
   canTransformLayer,
-  cloneLayerTree,
-  findLayerById,
+  cloneNodeTree,
+  findNodeById,
   localize,
+  getLayerChildren,
 } from '@openenvx/studio/core';
-import type { CommandContext, Layer } from '@openenvx/studio/core';
-import type { SceneComponent } from '@openenvx/studio/schema';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import type { CommandContext, DocumentNode } from '@openenvx/studio/core';
+import type { DocumentComponent } from '@openenvx/studio/schema';
+import {
+  applyNodeTransform,
+  createDefaultTransform,
+  nodeTransform,
+} from '@openenvx/studio/schema';
 
 import { createGroupFromLayers } from '../scene/group-layers';
 
@@ -25,16 +30,16 @@ export class CreateComponentFromSelectionCommand extends Command {
   readonly id = 'canvas.createComponent';
 
   canExecute(ctx: CommandContext): boolean {
-    if (!canInsertLayers(ctx.scene.getScene())) {
+    if (!canInsertLayers(ctx.scene.getDocument())) {
       return false;
     }
-    const ids = ctx.selection.selectedLayerIds;
+    const ids = ctx.selection.selectedNodeIds;
     if (ids.length === 0) {
       return false;
     }
-    const scene = ctx.scene.getScene();
+    const scene = ctx.scene.getDocument();
     return ids.every((id) => {
-      const layer = findLayerById(scene, id);
+      const layer = findNodeById(scene, id);
       return layer ? canTransformLayer(layer) : false;
     });
   }
@@ -43,11 +48,11 @@ export class CreateComponentFromSelectionCommand extends Command {
     if (!this.canExecute(ctx)) {
       return;
     }
-    const scene = ctx.scene.getScene();
-    const page = ctx.scene.getActivePage();
-    const selected = ctx.selection.selectedLayerIds
-      .map((id) => findLayerById(scene, id))
-      .filter((layer): layer is Layer => Boolean(layer));
+    const scene = ctx.scene.getDocument();
+    const page = ctx.scene.getActiveArtboard();
+    const selected = ctx.selection.selectedNodeIds
+      .map((id) => findNodeById(scene, id))
+      .filter((layer): layer is DocumentNode => Boolean(layer));
     if (selected.length === 0) {
       return;
     }
@@ -58,19 +63,18 @@ export class CreateComponentFromSelectionCommand extends Command {
       page
     );
     const componentId = createComponentId();
-    const component: SceneComponent = {
+    const component: DocumentComponent = {
       id: componentId,
-      layers: cloneLayerTree((group.data as { children: Layer[] }).children),
+      nodes: cloneNodeTree(getLayerChildren(group)),
       name: `Component ${Object.keys(scene.components ?? {}).length + 1}`,
     };
-    const instance: Layer = {
-      data: { componentId },
-      id: createInstanceId(),
-      transform: group.transform ?? createDefaultTransform(),
-      type: 'canvas.instance',
-    };
-    const selectedSet = new Set(ctx.selection.selectedLayerIds);
-    const activePageId = page.id;
+    const instanceId = createInstanceId();
+    const instance: DocumentNode = applyNodeTransform(
+      { id: instanceId, props: { componentId }, type: 'canvas.instance' },
+      nodeTransform(group)
+    );
+    const selectedSet = new Set(ctx.selection.selectedNodeIds);
+    const activeArtboardId = page.id;
 
     ctx.scene.apply({
       apply: (current) => ({
@@ -79,12 +83,12 @@ export class CreateComponentFromSelectionCommand extends Command {
           ...current.components,
           [componentId]: component,
         },
-        pages: current.pages.map((entry) =>
-          entry.id === activePageId
+        artboards: current.artboards.map((entry) =>
+          entry.id === activeArtboardId
             ? {
                 ...entry,
-                layers: [
-                  ...entry.layers.filter((layer) => !selectedSet.has(layer.id)),
+                nodes: [
+                  ...entry.nodes.filter((layer) => !selectedSet.has(layer.id)),
                   instance,
                 ],
               }
@@ -103,7 +107,7 @@ export class InsertComponentInstanceCommand extends Command {
   readonly id = 'canvas.insertInstance';
 
   canExecute(ctx: CommandContext, args?: unknown): boolean {
-    if (!canInsertLayers(ctx.scene.getScene())) {
+    if (!canInsertLayers(ctx.scene.getDocument())) {
       return false;
     }
     const componentId = (args as { componentId?: string } | undefined)
@@ -111,7 +115,7 @@ export class InsertComponentInstanceCommand extends Command {
     if (!componentId) {
       return false;
     }
-    return Boolean(ctx.scene.getScene().components?.[componentId]);
+    return Boolean(ctx.scene.getDocument().components?.[componentId]);
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -120,26 +124,31 @@ export class InsertComponentInstanceCommand extends Command {
     if (!componentId || !this.canExecute(ctx, args)) {
       return;
     }
-    const page = ctx.scene.getActivePage();
-    const instance: Layer = {
-      data: { componentId },
-      id: createInstanceId(),
-      transform: {
+    const page = ctx.scene.getActiveArtboard();
+    const instance: DocumentNode = applyNodeTransform(
+      {
+        props: { componentId },
+        id: createInstanceId(),
+        type: 'canvas.instance',
+      },
+      {
         ...createDefaultTransform(),
         height: 120,
         width: 120,
         x: 40,
         y: 40,
-      },
-      type: 'canvas.instance',
-    };
-    const activePageId = page.id;
+        opacity: 1,
+        scaleX: 1,
+        scaleY: 1,
+      }
+    );
+    const activeArtboardId = page.id;
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((entry) =>
-          entry.id === activePageId
-            ? { ...entry, layers: [...entry.layers, instance] }
+        artboards: scene.artboards.map((entry) =>
+          entry.id === activeArtboardId
+            ? { ...entry, nodes: [...entry.nodes, instance] }
             : entry
         ),
       }),
@@ -158,16 +167,16 @@ export class UpdateComponentDefinitionCommand extends Command {
   canExecute(ctx: CommandContext, args?: unknown): boolean {
     const componentId = (args as { componentId?: string } | undefined)
       ?.componentId;
-    const layers = (args as { layers?: Layer[] } | undefined)?.layers;
+    const layers = (args as { layers?: DocumentNode[] } | undefined)?.layers;
     if (!(componentId && Array.isArray(layers))) {
       return false;
     }
-    return Boolean(ctx.scene.getScene().components?.[componentId]);
+    return Boolean(ctx.scene.getDocument().components?.[componentId]);
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
     const input = args as
-      | { componentId?: string; layers?: Layer[]; name?: string }
+      | { componentId?: string; layers?: DocumentNode[]; name?: string }
       | undefined;
     if (!input?.componentId || !Array.isArray(input.layers)) {
       return;
@@ -188,7 +197,7 @@ export class UpdateComponentDefinitionCommand extends Command {
             ...scene.components,
             [componentId]: {
               ...existing,
-              layers: cloneLayerTree(input.layers as Layer[]),
+              nodes: cloneNodeTree(input.layers as DocumentNode[]),
               ...(input.name !== undefined ? { name: input.name } : {}),
             },
           },

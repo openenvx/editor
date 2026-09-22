@@ -11,9 +11,9 @@ export class ResetImageCropCommand extends Command {
     if (!layer || layer.type !== 'canvas.image') {
       return false;
     }
-    const data = layer.data as Record<string, unknown>;
+    const props = (layer.props ?? {}) as Record<string, unknown>;
     return hasActiveCrop(
-      readImageCrop({ crop: data.crop, kind: 'image', src: '' })
+      readImageCrop({ crop: props.crop, kind: 'image', src: '' })
     );
   }
 
@@ -26,17 +26,17 @@ export class ResetImageCropCommand extends Command {
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((page) => ({
+        artboards: scene.artboards.map((page) => ({
           ...page,
-          layers: updateLayerInTree(page.layers, layer.id, (entry) => {
-            const data =
-              typeof entry.data === 'object' && entry.data !== null
-                ? { ...(entry.data as Record<string, unknown>) }
+          nodes: updateLayerInTree(page.nodes, layer.id, (entry) => {
+            const props =
+              typeof entry.props === 'object' && entry.props !== null
+                ? { ...(entry.props as Record<string, unknown>) }
                 : {};
-            delete data.crop;
+            delete props.crop;
             return {
               ...entry,
-              data,
+              props,
             };
           }),
         })),

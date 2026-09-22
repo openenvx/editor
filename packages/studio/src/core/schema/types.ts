@@ -1,17 +1,12 @@
 /**
- * Hand-written Scene document types.
- * Leaf field shapes match Zod inference; recursive Layer / Page / Scene are
- * authored here because Zod cannot cleanly infer the recursive group type.
+ * Hand-written document types.
+ * Leaf prop shapes match Zod inference; recursive DocumentNode / Artboard /
+ * Document are authored here because Zod cannot cleanly infer the recursive type.
  */
-
-export const SCHEMA_VERSION = 4;
-
-/** Provider-defined page layout / editor-pane kind (e.g. `'absolute'`, `'html'`). */
-export type PageLayout = string;
 
 export type LengthUnit = 'px' | 'mm' | 'in' | 'cm' | 'pt';
 
-export interface LayerBorder {
+export interface NodeBorder {
   width: number;
   color: string;
 }
@@ -30,7 +25,7 @@ export interface Padding {
   left: number;
 }
 
-export interface LayerShadow {
+export interface NodeShadow {
   offsetX: number;
   offsetY: number;
   blur: number;
@@ -38,37 +33,48 @@ export interface LayerShadow {
   color: string;
 }
 
-export interface LayerStyle {
+export interface NodeStyle {
   padding?: Padding;
   cornerRadius?: CornerRadius;
-  border?: LayerBorder;
-  shadow?: LayerShadow;
+  border?: NodeBorder;
+  shadow?: NodeShadow;
   fill?: string;
   flipH?: boolean;
   flipV?: boolean;
 }
 
-export interface Transform {
+/** Logical placement box on the artboard (no opacity / scale). */
+export interface Frame {
   x: number;
   y: number;
   width: number;
   height: number;
   rotation: number;
+}
+
+/** Full transform used by canvas geometry (frame + opacity + scale). */
+export interface Transform extends Frame {
   opacity: number;
   scaleX?: number;
   scaleY?: number;
 }
 
-export const LAYER_WRITE_MODES = [
+export const NODE_WRITE_MODES = [
   'locked',
   'free',
   'content',
   'properties',
 ] as const;
 
-export type LayerWriteMode = (typeof LAYER_WRITE_MODES)[number];
+export type NodeWriteMode = (typeof NODE_WRITE_MODES)[number];
 
-export const BUILTIN_LAYER_TYPES = [
+/** @deprecated use NODE_WRITE_MODES */
+export const LAYER_WRITE_MODES = NODE_WRITE_MODES;
+
+/** @deprecated use NodeWriteMode */
+export type LayerWriteMode = NodeWriteMode;
+
+export const BUILTIN_NODE_TYPES = [
   'canvas.rect',
   'canvas.image',
   'canvas.svg',
@@ -80,197 +86,157 @@ export const BUILTIN_LAYER_TYPES = [
   'openenvx.widget',
 ] as const;
 
-export type BuiltinLayerType = (typeof BUILTIN_LAYER_TYPES)[number];
+export type BuiltinNodeType = (typeof BUILTIN_NODE_TYPES)[number];
 
-export interface FrozenLayerSnapshot {
-  data?: unknown;
-  transform?: Transform;
+/** @deprecated use BUILTIN_NODE_TYPES */
+export const BUILTIN_LAYER_TYPES = BUILTIN_NODE_TYPES;
+
+/** @deprecated use BuiltinNodeType */
+export type BuiltinLayerType = BuiltinNodeType;
+
+export interface FrozenNodeSnapshot {
+  props?: unknown;
+  frame?: Frame;
 }
+
+/** @deprecated use FrozenNodeSnapshot */
+export type FrozenLayerSnapshot = FrozenNodeSnapshot;
 
 export interface TemplatePolicy {
   version: 1;
   allowInsertLayers: boolean;
   allowDeleteLayers: boolean;
   allowDuplicateLayers: boolean;
-  allowPageResize: boolean;
-  frozenLayers?: Record<string, FrozenLayerSnapshot>;
+  allowArtboardResize: boolean;
+  frozenNodes?: Record<string, FrozenNodeSnapshot>;
 }
 
-export interface CanvasRectData {
+export interface CanvasRectProps {
   fill: string;
   stroke?: string;
   strokeWidth?: number;
   cornerRadius?: CornerRadius;
   padding?: Padding;
-  shadow?: LayerShadow;
+  shadow?: NodeShadow;
   flipH?: boolean;
   flipV?: boolean;
 }
 
+/** @deprecated use CanvasRectProps */
+export type CanvasRectData = CanvasRectProps;
+
 export type ImageFit = 'cover' | 'contain' | 'fill';
 
 export interface FocalPoint {
-  /** Horizontal focus in the source image, 0 = left, 1 = right. */
   x: number;
-  /** Vertical focus in the source image, 0 = top, 1 = bottom. */
   y: number;
 }
 
-export interface CanvasImageData {
+export interface CanvasImageProps {
   assetRef: string;
   alt?: string;
-  /**
-   * How the image fills its transform box.
-   * Absent = legacy stretch (`fill`). Prefer `cover` for templates.
-   */
   fit?: ImageFit;
-  /** Focus used when `fit` is `cover` (defaults to center). */
   focalPoint?: FocalPoint;
   [key: string]: unknown;
 }
 
-export interface CanvasSvgData {
-  /** Full SVG markup (`<svg>…</svg>`) or inner vector markup. */
+/** @deprecated use CanvasImageProps */
+export type CanvasImageData = CanvasImageProps;
+
+export interface CanvasSvgProps {
   svg: string;
-  /** Optional viewBox; when absent, parsed from the svg root if present. */
   viewBox?: string;
-  /** Optional tint for monochrome icons (e.g. currentColor icons). */
   fill?: string;
   stroke?: string;
 }
 
+/** @deprecated use CanvasSvgProps */
+export type CanvasSvgData = CanvasSvgProps;
+
 export type QrErrorCorrection = 'L' | 'M' | 'Q' | 'H';
 
-export interface CanvasQrData {
-  /** Payload encoded into the QR (usually a URL). */
+export interface CanvasQrProps {
   url: string;
   foreground?: string;
   background?: string;
   errorCorrection?: QrErrorCorrection;
-  /** Quiet-zone modules around the code. */
   margin?: number;
 }
 
+/** @deprecated use CanvasQrProps */
+export type CanvasQrData = CanvasQrProps;
+
 export type TextAutoFit = 'none' | 'shrink' | 'hug';
 
-/** Slider / schema range for `CanvasTextData.curve` (unitless power, not degrees). */
 export const MAX_TEXT_CURVE = 100;
 
 export function clampTextCurve(curve: number): number {
   return Math.max(-MAX_TEXT_CURVE, Math.min(MAX_TEXT_CURVE, curve));
 }
 
-export interface CanvasTextData {
+export interface CanvasTextProps {
   html: string;
   align?: 'left' | 'center' | 'right';
-  /**
-   * Curve amount (−100…100); 0 = straight, positive = arch (sides down),
-   * negative = bowl (center down). Out-of-range values are clamped on normalize.
-   */
   curve?: number;
   fill?: string;
   fontFamily?: string;
   fontSize?: number;
   letterSpacing?: number;
   lineHeight?: number;
-  /**
-   * When `shrink`, font size scales down (to `minFontSize`) so text stays
-   * inside the fixed transform box. `fontSize` is the maximum / starting size.
-   * When `hug`, transform width/height follow the glyphs; `x`/`y` stay put.
-   * Use `align` for text-align inside the box, not to move the box on the artboard.
-   */
   autoFit?: TextAutoFit;
-  /** Minimum font size used by shrink-to-fit. Defaults to 8. */
   minFontSize?: number;
 }
 
-export interface CanvasCircleData {
+/** @deprecated use CanvasTextProps */
+export type CanvasTextData = CanvasTextProps;
+
+export interface CanvasCircleProps {
   fill: string;
   stroke?: string;
   strokeWidth?: number;
 }
 
-export interface CanvasGroupData {
-  children: Layer[];
-}
+/** @deprecated use CanvasCircleProps */
+export type CanvasCircleData = CanvasCircleProps;
 
-export interface LayerBase {
+export interface DocumentNode {
   id: string;
-  /** Optional display name in the layers tree. Absent/empty falls back to type label. */
+  type: string;
   name?: string;
-  transform?: Transform;
-  style?: LayerStyle;
-  writeMode?: LayerWriteMode;
-  /**
-   * When `writeMode` is `content`, optional allowlist of `data` keys that may be
-   * edited. Absent/empty means all data keys are editable.
-   */
-  allowedDataKeys?: string[];
+  frame?: Frame;
+  props?: Record<string, unknown>;
+  children?: DocumentNode[];
+  opacity?: number;
+  scaleX?: number;
+  scaleY?: number;
+  style?: NodeStyle;
+  writeMode?: NodeWriteMode;
+  allowedPropKeys?: string[];
   locked?: boolean;
-  /** When false, the layer is hidden on canvas and in export. Absent/true = visible. */
   visible?: boolean;
-  /**
-   * When false, embed consumers omit the layer from the Layers tree and cannot
-   * select it on canvas. Still renders and exports. Absent/true = listed.
-   * Authors always see and select the layer (template policy not enforced).
-   */
   showInLayers?: boolean;
 }
 
-export interface CanvasRectLayer extends LayerBase {
-  type: 'canvas.rect';
-  data: CanvasRectData;
-}
+/** @deprecated use DocumentNode */
+export type Layer = DocumentNode;
 
-export interface CanvasImageLayer extends LayerBase {
-  type: 'canvas.image';
-  data: CanvasImageData;
-}
-
-export interface CanvasSvgLayer extends LayerBase {
-  type: 'canvas.svg';
-  data: CanvasSvgData;
-}
-
-export interface CanvasQrLayer extends LayerBase {
-  type: 'canvas.qr';
-  data: CanvasQrData;
-}
-
-export interface CanvasTextLayer extends LayerBase {
-  type: 'canvas.text';
-  data: CanvasTextData;
-}
-
-export interface CanvasCircleLayer extends LayerBase {
-  type: 'canvas.circle';
-  data: CanvasCircleData;
-}
-
-export interface CanvasGroupLayer extends LayerBase {
-  type: 'canvas.group';
-  data: CanvasGroupData;
-}
-
-/** One-way symbol definition: layers are relative to the instance transform. */
-export interface SceneComponent {
+export interface DocumentComponent {
   id: string;
   name?: string;
-  layers: Layer[];
+  nodes: DocumentNode[];
 }
 
-export interface CanvasInstanceData {
+/** @deprecated use DocumentComponent */
+export type SceneComponent = DocumentComponent;
+
+export interface CanvasInstanceProps {
   componentId: string;
-  /** Optional shallow data overrides keyed by definition layer id. */
   overrides?: Record<string, Record<string, unknown>>;
 }
 
-export interface CanvasInstanceLayer extends LayerBase {
-  type: 'canvas.instance';
-  data: CanvasInstanceData;
-}
+/** @deprecated use CanvasInstanceProps */
+export type CanvasInstanceData = CanvasInstanceProps;
 
-/** Field def persisted on a widget layer for Inspector without the source. */
 export type WidgetFieldDef =
   | { kind: string; label: string }
   | {
@@ -284,7 +250,6 @@ export type WidgetFieldDef =
       of: Record<string, WidgetFieldDef>;
     };
 
-/** Manifest snapshot stored on the widget so Inspector works offline. */
 export interface WidgetManifestSnapshot {
   id: string;
   label: string;
@@ -294,130 +259,123 @@ export interface WidgetManifestSnapshot {
   defaults?: Record<string, unknown>;
 }
 
-/**
- * Sandbox widget on the canvas/HTML page.
- * `values` is the synced state / Unlayer options bag; `children` is the last
- * rendered face (hidden from Layers, locked for editing).
- */
-export interface OpenEnvxWidgetData {
+export interface OpenEnvxWidgetProps {
   extensionId: string;
   values: Record<string, unknown>;
   manifest?: WidgetManifestSnapshot;
-  children: Layer[];
-  /**
-   * Face event handlers: child layer id → event name → isolate handler id.
-   * e.g. `{ "w1:0": { click: "h1" } }`
-   */
   handlers?: Record<string, Record<string, string>>;
   label?: string;
 }
 
-export interface OpenEnvxWidgetLayer extends LayerBase {
-  type: 'openenvx.widget';
-  data: OpenEnvxWidgetData;
-}
+/** @deprecated use OpenEnvxWidgetProps */
+export type OpenEnvxWidgetData = OpenEnvxWidgetProps;
 
-/** Unknown plugin layer - structural fields validated; data opaque. */
-export interface PluginLayer extends LayerBase {
-  type: string;
-  data: unknown;
-}
+export type ArtboardGuideOrientation = 'horizontal' | 'vertical';
 
-export type Layer =
-  | CanvasRectLayer
-  | CanvasImageLayer
-  | CanvasSvgLayer
-  | CanvasQrLayer
-  | CanvasTextLayer
-  | CanvasCircleLayer
-  | CanvasGroupLayer
-  | CanvasInstanceLayer
-  | OpenEnvxWidgetLayer
-  | PluginLayer;
+/** @deprecated use ArtboardGuideOrientation */
+export type PageGuideOrientation = ArtboardGuideOrientation;
 
-export type PageGuideOrientation = 'horizontal' | 'vertical';
-
-/** User-placed ruler guide on a page (artboard pixels). */
-export interface PageGuide {
+export interface ArtboardGuide {
   id: string;
-  orientation: PageGuideOrientation;
-  /** Position in artboard pixels (x for vertical, y for horizontal). */
+  orientation: ArtboardGuideOrientation;
   position: number;
 }
 
-export interface Page {
-  id: string;
-  name: string;
+/** @deprecated use ArtboardGuide */
+export type PageGuide = ArtboardGuide;
+
+export interface ArtboardSpace {
   width?: number;
   height?: number;
-  layout: PageLayout;
+}
+
+export interface ArtboardPhysical {
   unit?: LengthUnit;
   dpi?: number;
-  /** ISO page preset id when the page matches a known preset. */
   presetId?: string;
-  /**
-   * Bleed outside trim, in millimetres. When unset, print-eligible pages
-   * default to 3 mm and other pages to 0.
-   */
   bleedMm?: number;
-  /**
-   * Safe/content inset inside trim, in millimetres. When unset, print-eligible
-   * pages default to 10 mm and other pages to 0.
-   */
   safeMm?: number;
-  /** Artboard background used for document export. */
-  backgroundColor?: string;
-  /** User-placed ruler guides (persisted; undoable via scene history). */
-  guides?: PageGuide[];
-  layers: Layer[];
 }
 
-/**
- * Editor UI state - not part of the content Scene consumed by LLMs/SDKs.
- * Persisted alongside Scene in SceneSnapshot.
- */
-export interface EditorState {
-  activePageId: string;
-  selectedLayerIds: string[];
-  primaryLayerId: string | null;
+export interface Artboard {
+  id: string;
+  name: string;
+  space: ArtboardSpace;
+  physical?: ArtboardPhysical;
+  background?: string;
+  guides?: ArtboardGuide[];
+  nodes: DocumentNode[];
+  extensions?: Record<string, unknown>;
 }
 
-/** Alias used by workbench selection APIs. */
-export type Selection = EditorState;
+/** @deprecated use Artboard */
+export type Page = Artboard;
 
-export interface SceneAssetInline {
+export interface EditorSession {
+  activeArtboardId: string;
+  selectedNodeIds: string[];
+  primaryNodeId: string | null;
+}
+
+/** @deprecated use EditorSession */
+export type EditorState = EditorSession;
+
+/** @deprecated use EditorSession */
+export type Selection = EditorSession;
+
+export interface DocumentAssetInline {
   mimeType: string;
   encoding: 'base64';
   data: string;
 }
 
-export type SceneAsset = SceneAssetInline;
+export type DocumentAsset = DocumentAssetInline;
 
-/** Catalog entry for `{{{key}}}` merge-style tokens in layer data strings. */
+/** @deprecated use DocumentAsset */
+export type SceneAsset = DocumentAsset;
+
+/** @deprecated use DocumentAssetInline */
+export type SceneAssetInline = DocumentAssetInline;
+
 export interface TemplateVariable {
   id: string;
-  /** Token id - `[A-Za-z][A-Za-z0-9_]*`. */
   key: string;
-  /** Editor preview / default render value. */
   sample?: string;
 }
 
-/** Content-only design document (no editor UI state). */
-export interface Scene {
-  schemaVersion: number;
-  pages: Page[];
-  assets?: Record<string, SceneAsset>;
-  /** Reusable layer trees referenced by `canvas.instance` layers. */
-  components?: Record<string, SceneComponent>;
+export interface Document {
+  artboards: Artboard[];
+  assets?: Record<string, DocumentAsset>;
+  components?: Record<string, DocumentComponent>;
   templatePolicy?: TemplatePolicy;
-  /** Per-template variable catalog for inline `{{{key}}}` tokens. */
   variables?: TemplateVariable[];
 }
 
-/** Persisted / transferable document: content + editor UI state. */
+/** @deprecated use Document */
+export type Scene = Document;
+
+export interface ProjectSnapshot {
+  document: Document;
+  session: EditorSession;
+}
+
+/** @deprecated use ProjectSnapshot */
 export interface SceneSnapshot {
-  scene: Scene;
-  editorState: EditorState;
+  scene: Document;
+  editorState: EditorSession;
 }
 
 export type EditorPaneKind = string;
+export type EditorSurfaceKind = string;
+
+/** @deprecated provider-defined layout string */
+export type PageLayout = string;
+
+/** @deprecated use NodeBorder */
+export type LayerBorder = NodeBorder;
+
+/** @deprecated use NodeShadow */
+export type LayerShadow = NodeShadow;
+
+/** @deprecated use NodeStyle */
+export type LayerStyle = NodeStyle;

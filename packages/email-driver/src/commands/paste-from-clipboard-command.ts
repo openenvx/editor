@@ -9,6 +9,7 @@ import {
 import { Command } from '@openenvx/studio/core';
 import type { CommandContext } from '@openenvx/studio/core';
 import type { Layer } from '@openenvx/studio/schema';
+import { artboardRulesLayout } from '@openenvx/studio/schema';
 
 import { EmailBlockRegistryServiceId } from '../block-registry';
 import {
@@ -89,9 +90,7 @@ function insertPastedLayers(
     if (!section) {
       return { firstInsertedId: null, layers };
     }
-    const firstChild = (
-      (section.data as Record<string, unknown>).children as Layer[] | undefined
-    )?.[0];
+    const firstChild = section.children?.[0];
     return {
       firstInsertedId: firstChild?.id ?? section.id,
       layers: insertAt(layers, target.parentId, section, target.index),
@@ -115,7 +114,10 @@ export class PasteFromClipboardCommand extends Command {
   readonly id = 'email.pasteFromClipboard';
 
   canExecute(ctx: CommandContext): boolean {
-    return ctx.scene.getActivePage().layout === 'email' && isEmailEditMode(ctx);
+    return (
+      artboardRulesLayout(ctx.scene.getActiveArtboard()) === 'email' &&
+      isEmailEditMode(ctx)
+    );
   }
 
   execute(
@@ -138,12 +140,12 @@ export class PasteFromClipboardCommand extends Command {
       return;
     }
 
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const rootId = getPageRootId(page, 'email.root');
     const selectedId =
-      ctx.selection.primaryLayerId ?? ctx.selection.selectedLayerIds[0] ?? null;
+      ctx.selection.primaryNodeId ?? ctx.selection.selectedNodeIds[0] ?? null;
     const target = resolvePasteInsertTarget(
-      page.layers,
+      page.nodes,
       selectedId,
       rootId,
       registry
@@ -152,7 +154,7 @@ export class PasteFromClipboardCommand extends Command {
       return;
     }
 
-    const parent = findBlock(page.layers, target.parentId);
+    const parent = findBlock(page.nodes, target.parentId);
     if (!parent && target.parentId !== rootId) {
       return;
     }
@@ -163,7 +165,7 @@ export class PasteFromClipboardCommand extends Command {
     }
 
     const { layers: nextLayers, firstInsertedId } = insertPastedLayers(
-      page.layers,
+      page.nodes,
       target,
       pasted,
       registry

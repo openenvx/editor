@@ -46,7 +46,7 @@ function createFileMenuContainers(): ViewContainerDescriptor[] {
     },
     {
       icon: 'layers',
-      id: 'workbench.layers',
+      id: 'workbench.nodes',
       location: 'primary',
       sidebarBehavior: 'panel',
       sidebarGroup: 0,

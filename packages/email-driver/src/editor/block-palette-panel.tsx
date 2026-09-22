@@ -1,5 +1,5 @@
 import { getPageRootId, resolveInsertParentId } from '@openenvx/html-driver';
-import { getActivePage } from '@openenvx/studio/core';
+import { getActiveArtboard } from '@openenvx/studio/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
@@ -25,12 +25,12 @@ export const EmailBlockPalettePanel = memo(() => {
       if (!(scene && selection)) {
         return;
       }
-      const page = getActivePage(scene, selection.activePageId);
+      const page = getActiveArtboard(scene, selection.activeArtboardId);
       const selectedId =
-        selection.primaryLayerId ?? selection.selectedLayerIds[0] ?? null;
+        selection.primaryNodeId ?? selection.selectedNodeIds[0] ?? null;
       const rootId = getPageRootId(page, 'email.root');
       const parentId = resolveInsertParentId(
-        page.layers,
+        page.nodes,
         selectedId,
         rootId,
         registry

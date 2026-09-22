@@ -1,17 +1,13 @@
 import type {
-  FrozenLayerSnapshot,
-  LayerWriteMode,
-  Scene,
+  Document,
+  DocumentNode,
+  FrozenNodeSnapshot,
+  NodeWriteMode,
 } from '@openenvx/studio/schema';
 
-import { getLayerChildren, hasChildLayers, walkLayers } from './layer-tree';
-import type { Layer } from './types';
+import { nodeProps, nodeTransform } from '../schema/node-helpers';
+import { getNodeChildren, hasChildNodesInTree, walkNodes } from './layer-tree';
 
-/**
- * Session flag: when false (dashboard authoring), writeMode / showInLayers /
- * templatePolicy do not constrain editing. When true (embed consumer), they do.
- * ponytail: process-wide for the active workbench; set once at shell start.
- */
 let templatePolicyEnforced = true;
 
 export function setTemplatePolicyEnforced(enforced: boolean): void {
@@ -22,74 +18,85 @@ export function isTemplatePolicyEnforced(): boolean {
   return templatePolicyEnforced;
 }
 
-export function getLayerWriteMode(layer: Layer): LayerWriteMode {
-  return layer.writeMode ?? 'free';
+export function getNodeWriteMode(node: DocumentNode): NodeWriteMode {
+  return node.writeMode ?? 'free';
 }
 
-/** Absent/true = listed in Layers tree for consumers. */
-export function isLayerShownInLayers(layer: Layer): boolean {
-  return layer.showInLayers !== false;
+export const getLayerWriteMode = getNodeWriteMode;
+
+export function isNodeShownInLayers(node: DocumentNode): boolean {
+  return node.showInLayers !== false;
 }
 
-export function isLayerEditable(layer: Layer): boolean {
+export const isLayerShownInLayers = isNodeShownInLayers;
+
+export function isNodeEditable(node: DocumentNode): boolean {
   if (!isTemplatePolicyEnforced()) {
     return true;
   }
-  return getLayerWriteMode(layer) !== 'locked';
+  return getNodeWriteMode(node) !== 'locked';
 }
 
-export function isLayerLocked(layer: Layer): boolean {
-  return layer.locked === true;
+export const isLayerEditable = isNodeEditable;
+
+export function isNodeLocked(node: DocumentNode): boolean {
+  return node.locked === true;
 }
 
-export function isLayerVisible(layer: Layer): boolean {
-  return layer.visible !== false;
+export const isLayerLocked = isNodeLocked;
+
+export function isNodeVisible(node: DocumentNode): boolean {
+  return node.visible !== false;
 }
 
-export function isLayerWritable(layer: Layer): boolean {
-  return isLayerEditable(layer) && !isLayerLocked(layer);
+export const isLayerVisible = isNodeVisible;
+
+export function isNodeWritable(node: DocumentNode): boolean {
+  return isNodeEditable(node) && !isNodeLocked(node);
 }
 
-export function canSelectLayer(layer: Layer): boolean {
+export const isLayerWritable = isNodeWritable;
+
+export function canSelectNode(node: DocumentNode): boolean {
   if (!isTemplatePolicyEnforced()) {
     return true;
   }
-  if (!isLayerShownInLayers(layer)) {
-    // Bound widget face parts stay out of the Layers tree but must remain
-    // selectable so inline content editing (`writeMode: 'content'`) works.
-    return getLayerWriteMode(layer) === 'content';
+  if (!isNodeShownInLayers(node)) {
+    return getNodeWriteMode(node) === 'content';
   }
-  return getLayerWriteMode(layer) !== 'locked';
+  return getNodeWriteMode(node) !== 'locked';
 }
 
-export function canTransformLayer(layer: Layer): boolean {
-  if (!isLayerWritable(layer)) {
+export const canSelectLayer = canSelectNode;
+
+export function canTransformNode(node: DocumentNode): boolean {
+  if (!isNodeWritable(node)) {
     return false;
   }
   if (!isTemplatePolicyEnforced()) {
     return true;
   }
-
-  const mode = getLayerWriteMode(layer);
+  const mode = getNodeWriteMode(node);
   return mode === 'free' || mode === 'properties';
 }
 
-export function canEditLayerData(layer: Layer, key?: string): boolean {
-  if (!isLayerWritable(layer)) {
+export const canTransformLayer = canTransformNode;
+
+export function canEditNodeProps(node: DocumentNode, key?: string): boolean {
+  if (!isNodeWritable(node)) {
     return false;
   }
   if (!isTemplatePolicyEnforced()) {
     return true;
   }
-
-  const mode = getLayerWriteMode(layer);
+  const mode = getNodeWriteMode(node);
   if (mode === 'free') {
     return true;
   }
   if (mode !== 'content') {
     return false;
   }
-  const allowed = layer.allowedDataKeys;
+  const allowed = node.allowedPropKeys;
   if (!allowed || allowed.length === 0) {
     return true;
   }
@@ -99,90 +106,94 @@ export function canEditLayerData(layer: Layer, key?: string): boolean {
   return allowed.includes(key);
 }
 
-/** `html.root` / `email.root` - sole page frame; never a reorder sibling or delete target. */
-export function isLayoutRootLayer(layer: Layer): boolean {
-  return layer.type.endsWith('.root');
+export const canEditLayerData = canEditNodeProps;
+
+export function isLayoutRootNode(node: DocumentNode): boolean {
+  return node.type.endsWith('.root');
 }
 
-export function canDeleteLayer(layer: Layer, scene: Scene): boolean {
-  // Page/Email frame is structural - never remove from Layers or shortcuts.
-  if (isLayoutRootLayer(layer)) {
+export const isLayoutRootLayer = isLayoutRootNode;
+
+export function canDeleteNode(node: DocumentNode, document: Document): boolean {
+  if (isLayoutRootNode(node)) {
     return false;
   }
-  if (!canTransformLayer(layer)) {
-    return false;
-  }
-  if (!isTemplatePolicyEnforced()) {
-    return true;
-  }
-
-  return scene.templatePolicy?.allowDeleteLayers !== false;
-}
-
-export function canDuplicateLayer(layer: Layer, scene: Scene): boolean {
-  if (!canTransformLayer(layer)) {
+  if (!canTransformNode(node)) {
     return false;
   }
   if (!isTemplatePolicyEnforced()) {
     return true;
   }
-
-  return scene.templatePolicy?.allowDuplicateLayers !== false;
+  return document.templatePolicy?.allowDeleteLayers !== false;
 }
 
-export function canReorderLayer(layer: Layer): boolean {
-  return canTransformLayer(layer);
-}
+export const canDeleteLayer = canDeleteNode;
 
-export function canInsertLayers(scene: Scene): boolean {
+export function canDuplicateNode(
+  node: DocumentNode,
+  document: Document
+): boolean {
+  if (!canTransformNode(node)) {
+    return false;
+  }
   if (!isTemplatePolicyEnforced()) {
     return true;
   }
-  return scene.templatePolicy?.allowInsertLayers !== false;
+  return document.templatePolicy?.allowDuplicateLayers !== false;
 }
 
-export function canResizePage(scene: Scene): boolean {
+export const canDuplicateLayer = canDuplicateNode;
+
+export function canReorderNode(node: DocumentNode): boolean {
+  return canTransformNode(node);
+}
+
+export const canReorderLayer = canReorderNode;
+
+export function canInsertNodes(document: Document): boolean {
   if (!isTemplatePolicyEnforced()) {
     return true;
   }
-  return scene.templatePolicy?.allowPageResize !== false;
+  return document.templatePolicy?.allowInsertLayers !== false;
 }
 
-/**
- * Capture immutable fields from writeMode constraints.
- * - locked: data + transform
- * - content (data-only): transform
- * - properties (transform-only): data
- */
-export function buildFrozenLayerSnapshot(
-  scene: Scene
-): Record<string, FrozenLayerSnapshot> {
-  const frozen: Record<string, FrozenLayerSnapshot> = {};
+export const canInsertLayers = canInsertNodes;
 
-  for (const page of scene.pages) {
-    walkLayers(page.layers, (layer) => {
-      const mode = getLayerWriteMode(layer);
+export function canResizeArtboard(document: Document): boolean {
+  if (!isTemplatePolicyEnforced()) {
+    return true;
+  }
+  return document.templatePolicy?.allowArtboardResize !== false;
+}
+
+export const canResizePage = canResizeArtboard;
+
+export function buildFrozenNodeSnapshot(
+  document: Document
+): Record<string, FrozenNodeSnapshot> {
+  const frozen: Record<string, FrozenNodeSnapshot> = {};
+
+  for (const artboard of document.artboards) {
+    walkNodes(artboard.nodes, (node) => {
+      const mode = getNodeWriteMode(node);
+      const frame = nodeTransform(node);
 
       if (mode === 'locked') {
-        frozen[layer.id] = {
-          data: structuredClone(layer.data),
-          ...(layer.transform
-            ? { transform: structuredClone(layer.transform) }
-            : {}),
+        frozen[node.id] = {
+          props: structuredClone(nodeProps(node)),
+          frame: structuredClone(frame),
         };
         return;
       }
 
-      if (mode === 'content' && layer.transform) {
-        frozen[layer.id] = {
-          transform: structuredClone(layer.transform),
-        };
+      if (mode === 'content') {
+        frozen[node.id] = { frame: structuredClone(frame) };
         return;
       }
 
       if (mode === 'properties') {
-        frozen[layer.id] = {
-          data: structuredClone(layer.data),
+        frozen[node.id] = {
+          props: structuredClone(nodeProps(node)),
         };
       }
     });
@@ -191,66 +202,70 @@ export function buildFrozenLayerSnapshot(
   return frozen;
 }
 
-/** Persist freeze snapshots onto `templatePolicy.frozenLayers` for write enforcement. */
-export function withFrozenLayerSnapshots(scene: Scene): Scene {
-  const policy = scene.templatePolicy;
+export const buildFrozenLayerSnapshot = buildFrozenNodeSnapshot;
+
+export function withFrozenNodeSnapshots(document: Document): Document {
+  const policy = document.templatePolicy;
   return {
-    ...scene,
+    ...document,
     templatePolicy: {
       allowDeleteLayers: policy?.allowDeleteLayers ?? true,
       allowDuplicateLayers: policy?.allowDuplicateLayers ?? true,
       allowInsertLayers: policy?.allowInsertLayers ?? true,
-      allowPageResize: policy?.allowPageResize ?? true,
+      allowArtboardResize: policy?.allowArtboardResize ?? true,
       version: 1,
       ...policy,
-      frozenLayers: buildFrozenLayerSnapshot(scene),
+      frozenNodes: buildFrozenNodeSnapshot(document),
     },
   };
 }
 
-function restoreFrozenLayer(
-  layer: Layer,
-  frozen: Record<string, FrozenLayerSnapshot>
-): Layer {
-  const snap = frozen[layer.id];
-  let next = layer;
+export const withFrozenLayerSnapshots = withFrozenNodeSnapshots;
+
+function restoreFrozenNode(
+  node: DocumentNode,
+  frozen: Record<string, FrozenNodeSnapshot>
+): DocumentNode {
+  const snap = frozen[node.id];
+  let next = node;
   if (snap) {
     next = { ...next };
-    if ('data' in snap && snap.data !== undefined) {
-      next = { ...next, data: structuredClone(snap.data) as Layer['data'] };
+    if (snap.props !== undefined) {
+      next = {
+        ...next,
+        props: structuredClone(snap.props) as Record<string, unknown>,
+      };
     }
-    if (snap.transform !== undefined) {
-      next = { ...next, transform: structuredClone(snap.transform) };
+    if (snap.frame !== undefined) {
+      next = { ...next, frame: structuredClone(snap.frame) };
     }
   }
-  if (!hasChildLayers(next)) {
+  if (!hasChildNodesInTree(next)) {
     return next;
   }
   return {
     ...next,
-    data: {
-      ...(next.data as object),
-      children: getLayerChildren(next).map((child) =>
-        restoreFrozenLayer(child, frozen)
-      ),
-    },
-  } as Layer;
+    children: getNodeChildren(next).map((child) =>
+      restoreFrozenNode(child, frozen)
+    ),
+  };
 }
 
-/** Re-apply `templatePolicy.frozenLayers` snapshots onto matching layers. */
-export function applyFrozenLayerPolicy(scene: Scene): Scene {
+export function applyFrozenNodePolicy(document: Document): Document {
   if (!isTemplatePolicyEnforced()) {
-    return scene;
+    return document;
   }
-  const frozen = scene.templatePolicy?.frozenLayers;
+  const frozen = document.templatePolicy?.frozenNodes;
   if (!frozen || Object.keys(frozen).length === 0) {
-    return scene;
+    return document;
   }
   return {
-    ...scene,
-    pages: scene.pages.map((page) => ({
-      ...page,
-      layers: page.layers.map((layer) => restoreFrozenLayer(layer, frozen)),
+    ...document,
+    artboards: document.artboards.map((artboard) => ({
+      ...artboard,
+      nodes: artboard.nodes.map((node) => restoreFrozenNode(node, frozen)),
     })),
   };
 }
+
+export const applyFrozenLayerPolicy = applyFrozenNodePolicy;

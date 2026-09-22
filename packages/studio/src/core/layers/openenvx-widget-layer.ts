@@ -1,6 +1,6 @@
 import {
-  createDefaultTransform,
-  type OpenEnvxWidgetData,
+  createDefaultFrame,
+  type OpenEnvxWidgetProps,
   type WidgetManifestSnapshot,
 } from '@openenvx/studio/schema';
 import { z } from 'zod';
@@ -14,7 +14,7 @@ import { LayerDefinition } from '../contributions/layer-definition';
 import type { LayerPreviewContext } from '../contributions/layer-preview-context';
 import { createLayerPreviewBuilder } from '../preview';
 import type { CommandContext } from '../runtime/types';
-import type { Layer, Page } from '../scene/types';
+import type { Artboard, DocumentNode } from '../scene/types';
 
 export const WIDGET_LAYER_TYPE = 'openenvx.widget';
 
@@ -31,26 +31,24 @@ export const openenvxWidgetSchema = z.object({
   extensionId: z.string().min(1),
   values: z.record(z.string(), z.unknown()).default({}),
   manifest: widgetManifestSchema.optional(),
-  children: z.array(z.unknown()).default([]),
   label: z.string().optional(),
 });
 
-export type OpenEnvxWidgetModel = OpenEnvxWidgetData;
+export type OpenEnvxWidgetModel = OpenEnvxWidgetProps;
 
 /**
  * Sandbox widget node shared by canvas and HTML engines.
- * Face lives in `data.children`; values drive re-render when Inspector / setProps
- * change them.
+ * Face lives in `children`; values drive re-render when Inspector / setProps change.
  */
 export class OpenEnvxWidgetLayer extends LayerDefinition<OpenEnvxWidgetModel> {
   readonly type = WIDGET_LAYER_TYPE;
   readonly treeIcon = 'sparkles';
   readonly treeDisplayName = 'Widget';
 
-  treeLabel(layer: Layer): string {
-    const model = this.getModel(layer);
+  treeLabel(node: DocumentNode): string {
+    const model = this.getModel(node);
     return (
-      layer.name?.trim() ||
+      node.name?.trim() ||
       model.manifest?.label?.trim() ||
       model.label?.trim() ||
       this.treeDisplayName
@@ -61,23 +59,23 @@ export class OpenEnvxWidgetLayer extends LayerDefinition<OpenEnvxWidgetModel> {
     return openenvxWidgetSchema.safeParse(data).success;
   }
 
-  createDefault(id: string, _page: Page): Layer {
+  createDefault(id: string, _artboard: Artboard): DocumentNode {
     return {
-      data: {
-        extensionId: 'demo-widget',
-        values: {},
-        children: [],
-        label: 'Widget',
-      },
+      children: [],
+      frame: { ...createDefaultFrame(), height: 160, width: 240 },
       id,
-      transform: { ...createDefaultTransform(), height: 160, width: 240 },
-      type: this.type,
       name: 'Widget',
+      props: {
+        extensionId: 'demo-widget',
+        label: 'Widget',
+        values: {},
+      },
+      type: this.type,
     };
   }
 
-  serialize(layer: Layer): OpenEnvxWidgetModel {
-    return this.getModel(layer);
+  serialize(node: DocumentNode): OpenEnvxWidgetModel {
+    return this.getModel(node);
   }
 
   deserialize(data: unknown): OpenEnvxWidgetModel {
@@ -85,21 +83,19 @@ export class OpenEnvxWidgetLayer extends LayerDefinition<OpenEnvxWidgetModel> {
     if (parsed.success) {
       return {
         extensionId: parsed.data.extensionId,
-        values: parsed.data.values,
-        children: Array.isArray(parsed.data.children)
-          ? (parsed.data.children.filter(
-              (child) => child && typeof child === 'object' && 'id' in child
-            ) as Layer[])
-          : [],
-        manifest: parsed.data.manifest as WidgetManifestSnapshot | undefined,
         label: parsed.data.label,
+        manifest: parsed.data.manifest as WidgetManifestSnapshot | undefined,
+        values: parsed.data.values,
       };
     }
-    return { extensionId: '', values: {}, children: [], label: 'Widget' };
+    return { extensionId: '', label: 'Widget', values: {} };
   }
 
-  properties(_ctx: CommandContext, layer: Layer): PropertySectionDescriptor[] {
-    const model = this.getModel(layer);
+  properties(
+    _ctx: CommandContext,
+    node: DocumentNode
+  ): PropertySectionDescriptor[] {
+    const model = this.getModel(node);
     const builder = createPropertyBuilder();
     const manifest = model.manifest;
 
@@ -119,11 +115,6 @@ export class OpenEnvxWidgetLayer extends LayerDefinition<OpenEnvxWidgetModel> {
   }
 
   renderPreview(ctx: LayerPreviewContext<OpenEnvxWidgetModel>) {
-    // Canvas: face paints via nested children; transparent envelope hit target.
-    // HTML: placeholder until the isolate maps a face.
-    if (ctx.model.children.length > 0) {
-      return createLayerPreviewBuilder().rect('transparent');
-    }
     const label =
       ctx.model.manifest?.label?.trim() ||
       ctx.model.label?.trim() ||

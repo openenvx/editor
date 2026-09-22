@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { BlockConfig } from '../block-config';
 import { BlockRegistry } from '../block-registry';
+import { legacyTestDocument, testHtmlBlock } from '../test/document-fixtures';
 import {
   resolveRichTextToolbar,
   resolveSlotRichTextToolbar,
@@ -27,31 +28,27 @@ function registryOf(...configs: BlockConfig[]): BlockRegistry {
 }
 
 function layer(id: string, type: string, children?: Layer[]): Layer {
-  return {
-    id,
-    type,
-    data: children ? { children } : { html: 'x' },
-  };
+  if (children) {
+    return testHtmlBlock(id, type, children, {});
+  }
+  return testHtmlBlock(id, type, undefined, { html: 'x' });
 }
 
 describe('resolveRichTextToolbar', () => {
   it('defaults to full toolbar', () => {
     const registry = registryOf(stub({ type: 'html.text' }));
-    const scene: Scene = {
-      schemaVersion: 1,
-      pages: [
-        {
-          id: 'p',
-          name: 'P',
-          layout: 'html',
-          width: 100,
-          height: 100,
-          layers: [layer('t', 'html.text')],
-        },
-      ],
-    };
+    const scene: Scene = legacyTestDocument([
+      {
+        id: 'p',
+        name: 'P',
+        layout: 'html',
+        width: 100,
+        height: 100,
+        layers: [layer('t', 'html.text')],
+      },
+    ]);
     expect(
-      resolveRichTextToolbar(scene.pages[0]!.layers[0]!, scene, registry)
+      resolveRichTextToolbar(scene.artboards[0]!.nodes[0]!, scene, registry)
     ).toEqual({
       blockType: true,
       link: true,
@@ -79,19 +76,16 @@ describe('resolveRichTextToolbar', () => {
     );
     const heading = layer('h', 'html.heading');
     const text = layer('t', 'html.text');
-    const scene: Scene = {
-      schemaVersion: 1,
-      pages: [
-        {
-          id: 'p',
-          name: 'P',
-          layout: 'html',
-          width: 100,
-          height: 100,
-          layers: [layer('hero', 'snapvelo.eventHero', [heading, text])],
-        },
-      ],
-    };
+    const scene: Scene = legacyTestDocument([
+      {
+        id: 'p',
+        name: 'P',
+        layout: 'html',
+        width: 100,
+        height: 100,
+        layers: [layer('hero', 'snapvelo.eventHero', [heading, text])],
+      },
+    ]);
     expect(resolveRichTextToolbar(heading, scene, registry)).toEqual({
       blockType: false,
       link: false,
@@ -123,19 +117,16 @@ describe('resolveSlotRichTextToolbar', () => {
     );
     const host = layer('hero', 'html.hero');
     const part = layer('headline', 'html.heading');
-    const scene: Scene = {
-      schemaVersion: 1,
-      pages: [
-        {
-          id: 'p',
-          name: 'P',
-          layout: 'html',
-          width: 100,
-          height: 100,
-          layers: [host],
-        },
-      ],
-    };
+    const scene: Scene = legacyTestDocument([
+      {
+        id: 'p',
+        name: 'P',
+        layout: 'html',
+        width: 100,
+        height: 100,
+        layers: [host],
+      },
+    ]);
     expect(resolveSlotRichTextToolbar('hero', part, scene, registry)).toEqual({
       blockType: false,
       link: false,

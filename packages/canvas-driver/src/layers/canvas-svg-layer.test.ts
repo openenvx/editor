@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { testArtboard } from '../test/canvas-document-fixtures';
 import { CanvasSvgLayer } from './canvas-svg-layer';
 
 describe('CanvasSvgLayer', () => {
@@ -13,25 +14,20 @@ describe('CanvasSvgLayer', () => {
   });
 
   it('creates a default layer with svg markup', () => {
-    const created = layer.createDefault('svg-1', {
-      id: 'p1',
-      layout: 'absolute',
-      layers: [],
-      name: 'Page',
-    });
+    const created = layer.createDefault('svg-1', testArtboard({ id: 'p1' }));
     expect(created.type).toBe('canvas.svg');
-    expect(typeof (created.data as { svg?: string }).svg).toBe('string');
+    expect(typeof (created.props as { svg?: string }).svg).toBe('string');
   });
 
   it('renders svg preview kind', () => {
     const preview = layer.renderPreview({
       layer: {
-        data: { fill: '#f00', svg: '<svg></svg>' },
+        props: { fill: '#f00', svg: '<svg></svg>' },
         id: 's1',
         type: 'canvas.svg',
       },
       model: { fill: '#f00', svg: '<svg></svg>' },
-      page: { id: 'p1', layout: 'absolute', layers: [], name: 'Page' },
+      page: testArtboard({ id: 'p1' }),
     });
     expect(preview).toMatchObject({ fill: '#f00', kind: 'svg', svg: '<svg></svg>' });
   });

@@ -1,12 +1,12 @@
 import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio/core';
 import type {
   CommandContext,
-  Layer,
+  DocumentNode,
   LayerPreviewContext,
-  Page,
   PropertySectionDescriptor,
 } from '@openenvx/studio/core';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
+import type { Artboard } from '@openenvx/studio/schema';
 import { createDefaultTransform } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
@@ -31,21 +31,21 @@ export class CanvasSvgLayer extends LayerDefinition<CanvasSvgModel> {
     return canvasSvgSchema.safeParse(data).success;
   }
 
-  createDefault(id: string, _page: Page): Layer {
+  createDefault(id: string, _artboard: Artboard): DocumentNode {
     return {
-      data: {
+      props: {
         fill: '#111827',
         svg: DEFAULT_SVG,
         viewBox: '0 0 24 24',
       },
       id,
-      transform: { ...createDefaultTransform(), height: 96, width: 96 },
+      frame: { ...createDefaultTransform(), height: 96, width: 96 },
       type: this.type,
     };
   }
 
-  serialize(layer: Layer): CanvasSvgModel {
-    return layer.data as CanvasSvgModel;
+  serialize(node: DocumentNode): CanvasSvgModel {
+    return node.props as CanvasSvgModel;
   }
 
   deserialize(data: unknown): CanvasSvgModel {
@@ -55,7 +55,10 @@ export class CanvasSvgLayer extends LayerDefinition<CanvasSvgModel> {
       : { fill: '#111827', svg: DEFAULT_SVG, viewBox: '0 0 24 24' };
   }
 
-  properties(_ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
+  properties(
+    _ctx: CommandContext,
+    _node: DocumentNode
+  ): PropertySectionDescriptor[] {
     return createPropertyBuilder()
       .section('svg')
       .text('svg', 'SVG markup')

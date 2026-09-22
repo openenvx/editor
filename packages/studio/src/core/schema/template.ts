@@ -1,15 +1,16 @@
 /**
- * Bannerbear-style template contract: named layers are addressable via
- * modifications. Pure scene transforms - shared by editor preview and cloud render.
+ * Bannerbear-style template contract: named nodes are addressable via
+ * modifications. Pure document transforms - shared by editor preview and cloud render.
  */
+import { getChildNodes, hasChildNodes, nodeProps } from './node-helpers';
 import type {
-  CanvasCircleData,
-  CanvasImageData,
-  CanvasQrData,
-  CanvasRectData,
-  CanvasTextData,
-  Layer,
-  Scene,
+  CanvasCircleProps,
+  CanvasImageProps,
+  CanvasQrProps,
+  CanvasRectProps,
+  CanvasTextProps,
+  Document,
+  DocumentNode,
 } from './types';
 
 const HTML_ENTITY_MAP: Record<string, string> = {
@@ -50,8 +51,9 @@ export interface TemplateField {
   kind: TemplateFieldKind;
   layerType: string;
   layerId: string;
+  artboardId: string;
+  /** @deprecated use artboardId */
   pageId: string;
-  /** Sample / current value suitable for a form default. */
   sample?: string;
 }
 
@@ -60,10 +62,6 @@ export interface TemplateManifest {
   fields: TemplateField[];
 }
 
-/**
- * One modification targets a uniquely named layer.
- * Which optional fields are valid depends on the layer kind (see contract doc).
- */
 export interface Modification {
   name: string;
   text?: string;
@@ -78,39 +76,30 @@ export interface TemplateNameValidation {
   duplicates: string[];
 }
 
-function walkNamedLayers(
-  layers: Layer[],
-  pageId: string,
-  visit: (layer: Layer, pageId: string) => void
+function walkNamedNodes(
+  nodes: DocumentNode[],
+  artboardId: string,
+  visit: (node: DocumentNode, artboardId: string) => void
 ): void {
-  for (const layer of layers) {
-    visit(layer, pageId);
-    if (
-      layer.type === 'canvas.group' &&
-      layer.data &&
-      typeof layer.data === 'object' &&
-      Array.isArray((layer.data as { children?: unknown }).children)
-    ) {
-      walkNamedLayers(
-        (layer.data as { children: Layer[] }).children,
-        pageId,
-        visit
-      );
+  for (const node of nodes) {
+    visit(node, artboardId);
+    if (hasChildNodes(node)) {
+      walkNamedNodes(getChildNodes(node), artboardId, visit);
     }
   }
 }
 
-function forEachLayer(
-  scene: Scene,
-  visit: (layer: Layer, pageId: string) => void
+function forEachNamedNode(
+  document: Document,
+  visit: (node: DocumentNode, artboardId: string) => void
 ): void {
-  for (const page of scene.pages) {
-    walkNamedLayers(page.layers, page.id, visit);
+  for (const artboard of document.artboards) {
+    walkNamedNodes(artboard.nodes, artboard.id, visit);
   }
 }
 
-function fieldKindForLayer(layer: Layer): TemplateFieldKind | null {
-  switch (layer.type) {
+function fieldKindForNode(node: DocumentNode): TemplateFieldKind | null {
+  switch (node.type) {
     case 'canvas.text': {
       return 'text';
     }
@@ -130,31 +119,31 @@ function fieldKindForLayer(layer: Layer): TemplateFieldKind | null {
   }
 }
 
-function sampleForLayer(
-  layer: Layer,
+function sampleForNode(
+  node: DocumentNode,
   kind: TemplateFieldKind
 ): string | undefined {
   switch (kind) {
     case 'text': {
-      const data = layer.data as CanvasTextData;
-      return typeof data.html === 'string'
-        ? stripHtmlToPlainText(data.html)
+      const props = nodeProps(node) as unknown as CanvasTextProps;
+      return typeof props.html === 'string'
+        ? stripHtmlToPlainText(props.html)
         : undefined;
     }
     case 'qr': {
-      const data = layer.data as CanvasQrData;
-      return typeof data.url === 'string' ? data.url : undefined;
+      const props = nodeProps(node) as unknown as CanvasQrProps;
+      return typeof props.url === 'string' ? props.url : undefined;
     }
     case 'image': {
-      const data = layer.data as CanvasImageData;
-      return typeof data.assetRef === 'string' ? data.assetRef : undefined;
+      const props = nodeProps(node) as CanvasImageProps;
+      return typeof props.assetRef === 'string' ? props.assetRef : undefined;
     }
     case 'color': {
-      const data = layer.data as
-        | CanvasRectData
-        | CanvasCircleData
-        | CanvasTextData;
-      return typeof data.fill === 'string' ? data.fill : undefined;
+      const props = nodeProps(node) as unknown as
+        | CanvasRectProps
+        | CanvasCircleProps
+        | CanvasTextProps;
+      return typeof props.fill === 'string' ? props.fill : undefined;
     }
     default: {
       return undefined;
@@ -162,38 +151,39 @@ function sampleForLayer(
   }
 }
 
-/** Collect named layers into a stable public template manifest. */
-export function extractTemplateManifest(scene: Scene): TemplateManifest {
+export function extractTemplateManifest(document: Document): TemplateManifest {
   const fields: TemplateField[] = [];
-  forEachLayer(scene, (layer, pageId) => {
-    const name = layer.name?.trim();
+  forEachNamedNode(document, (node, artboardId) => {
+    const name = node.name?.trim();
     if (!name) {
       return;
     }
-    const kind = fieldKindForLayer(layer);
+    const kind = fieldKindForNode(node);
     if (!kind) {
       return;
     }
     fields.push({
       kind,
-      layerId: layer.id,
-      layerType: layer.type,
+      layerId: node.id,
+      layerType: node.type,
       name,
-      pageId,
-      sample: sampleForLayer(layer, kind),
+      artboardId,
+      pageId: artboardId,
+      sample: sampleForNode(node, kind),
     });
   });
   return {
     fields,
-    schemaVersion: scene.schemaVersion,
+    schemaVersion: 1,
   };
 }
 
-/** Report duplicate layer names (non-empty) across the whole scene. */
-export function validateTemplateNames(scene: Scene): TemplateNameValidation {
+export function validateTemplateNames(
+  document: Document
+): TemplateNameValidation {
   const counts = new Map<string, number>();
-  forEachLayer(scene, (layer) => {
-    const name = layer.name?.trim();
+  forEachNamedNode(document, (node) => {
+    const name = node.name?.trim();
     if (!name) {
       return;
     }
@@ -209,116 +199,106 @@ export function validateTemplateNames(scene: Scene): TemplateNameValidation {
   return { duplicates };
 }
 
-function findNamedLayer(
-  scene: Scene,
+function findNamedNode(
+  document: Document,
   name: string
-): { pageId: string; layer: Layer } | null {
+): { artboardId: string; node: DocumentNode } | null {
   const trimmed = name.trim();
   if (!trimmed) {
     return null;
   }
-  let match: { pageId: string; layer: Layer } | null = null;
-  forEachLayer(scene, (layer, pageId) => {
+  let match: { artboardId: string; node: DocumentNode } | null = null;
+  forEachNamedNode(document, (node, artboardId) => {
     if (match) {
       return;
     }
-    if (layer.name?.trim() === trimmed) {
-      match = { layer, pageId };
+    if (node.name?.trim() === trimmed) {
+      match = { node, artboardId };
     }
   });
   return match;
 }
 
-function mapLayers(layers: Layer[], mapper: (layer: Layer) => Layer): Layer[] {
-  return layers.map((layer) => {
-    const next = mapper(layer);
-    if (
-      next.type === 'canvas.group' &&
-      next.data &&
-      typeof next.data === 'object' &&
-      Array.isArray((next.data as { children?: unknown }).children)
-    ) {
-      const children = (next.data as { children: Layer[] }).children;
+function mapNodes(
+  nodes: DocumentNode[],
+  mapper: (node: DocumentNode) => DocumentNode
+): DocumentNode[] {
+  return nodes.map((node) => {
+    const next = mapper(node);
+    if (hasChildNodes(next)) {
       return {
         ...next,
-        data: {
-          ...next.data,
-          children: mapLayers(children, mapper),
-        },
+        children: mapNodes(getChildNodes(next), mapper),
       };
     }
     return next;
   });
 }
 
-function applyModificationToLayer(layer: Layer, mod: Modification): Layer {
-  let next: Layer = { ...layer };
-  let dataChanged = false;
-  let data: Record<string, unknown> =
-    layer.data && typeof layer.data === 'object'
-      ? { ...(layer.data as Record<string, unknown>) }
-      : {};
+function applyModificationToNode(
+  node: DocumentNode,
+  mod: Modification
+): DocumentNode {
+  let next: DocumentNode = { ...node };
+  let propsChanged = false;
+  let props: Record<string, unknown> = {
+    ...nodeProps(node),
+  };
 
   if (mod.hidden !== undefined) {
     next = { ...next, visible: !mod.hidden };
   }
 
-  if (layer.type === 'canvas.text') {
+  if (node.type === 'canvas.text') {
     if (mod.text !== undefined) {
-      data = { ...data, html: plainTextToHtml(mod.text) };
-      dataChanged = true;
+      props = { ...props, html: plainTextToHtml(mod.text) };
+      propsChanged = true;
     }
     if (mod.color !== undefined) {
-      data = { ...data, fill: mod.color };
-      dataChanged = true;
+      props = { ...props, fill: mod.color };
+      propsChanged = true;
     }
     if (mod.fontFamily !== undefined) {
-      data = { ...data, fontFamily: mod.fontFamily };
-      dataChanged = true;
+      props = { ...props, fontFamily: mod.fontFamily };
+      propsChanged = true;
     }
     if (mod.fontSize !== undefined) {
-      data = { ...data, fontSize: mod.fontSize };
-      dataChanged = true;
+      props = { ...props, fontSize: mod.fontSize };
+      propsChanged = true;
     }
-  } else if (layer.type === 'canvas.qr') {
+  } else if (node.type === 'canvas.qr') {
     if (mod.text !== undefined) {
-      data = { ...data, url: mod.text };
-      dataChanged = true;
+      props = { ...props, url: mod.text };
+      propsChanged = true;
     }
     if (mod.color !== undefined) {
-      data = { ...data, foreground: mod.color };
-      dataChanged = true;
+      props = { ...props, foreground: mod.color };
+      propsChanged = true;
     }
-  } else if (layer.type === 'canvas.image') {
+  } else if (node.type === 'canvas.image') {
     if (mod.imageUrl !== undefined) {
-      data = { ...data, assetRef: mod.imageUrl };
-      dataChanged = true;
+      props = { ...props, assetRef: mod.imageUrl };
+      propsChanged = true;
     }
-  } else if (layer.type === 'canvas.rect' || layer.type === 'canvas.circle') {
+  } else if (node.type === 'canvas.rect' || node.type === 'canvas.circle') {
     if (mod.color !== undefined) {
-      data = { ...data, fill: mod.color };
-      dataChanged = true;
+      props = { ...props, fill: mod.color };
+      propsChanged = true;
     }
   }
 
-  if (dataChanged) {
-    next = { ...next, data };
+  if (propsChanged) {
+    next = { ...next, props };
   }
   return next;
 }
 
-/**
- * Clone the scene and apply modifications by layer name.
- * Unknown names are skipped. Duplicate names apply to the first match only
- * (callers should enforce uniqueness via `validateTemplateNames`).
- * Auto-fit / image-fit are layout-time; this only mutates stored values.
- */
 export function applyModifications(
-  scene: Scene,
+  document: Document,
   modifications: Modification[]
-): Scene {
+): Document {
   if (modifications.length === 0) {
-    return structuredClone(scene);
+    return structuredClone(document);
   }
 
   const byName = new Map<string, Modification>();
@@ -331,31 +311,30 @@ export function applyModifications(
   }
 
   if (byName.size === 0) {
-    return structuredClone(scene);
+    return structuredClone(document);
   }
 
-  const clone = structuredClone(scene);
-  clone.pages = clone.pages.map((page) => ({
-    ...page,
-    layers: mapLayers(page.layers, (layer) => {
-      const name = layer.name?.trim();
+  const clone = structuredClone(document);
+  clone.artboards = clone.artboards.map((artboard) => ({
+    ...artboard,
+    nodes: mapNodes(artboard.nodes, (node) => {
+      const name = node.name?.trim();
       if (!name) {
-        return layer;
+        return node;
       }
       const mod = byName.get(name);
       if (!mod) {
-        return layer;
+        return node;
       }
-      return applyModificationToLayer(layer, mod);
+      return applyModificationToNode(node, mod);
     }),
   }));
   return clone;
 }
 
-/** Find first layer by name (test helper). */
 export function findTemplateLayerByName(
-  scene: Scene,
+  document: Document,
   name: string
-): Layer | null {
-  return findNamedLayer(scene, name)?.layer ?? null;
+): DocumentNode | null {
+  return findNamedNode(document, name)?.node ?? null;
 }

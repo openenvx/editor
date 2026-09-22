@@ -6,13 +6,16 @@ import {
 } from '@openenvx/studio/core';
 import type {
   ContainerLayoutModel,
-  Layer,
-  Page,
+  DocumentNode,
   Transform,
 } from '@openenvx/studio/core';
-import type { LayerStyle } from '@openenvx/studio/schema';
+import type { Artboard, NodeStyle } from '@openenvx/studio/schema';
+import {
+  applyNodeTransform,
+  artboardSpaceSize,
+  nodeTransform,
+} from '@openenvx/studio/schema';
 
-import { getDefaultPageDimensions } from '../page-presets';
 import { measureRichTextHeight } from '../rich-text-layout';
 import { MIN_RICH_TEXT_FONT_SIZE } from '../rich-text-resize';
 import {
@@ -48,13 +51,11 @@ function bakeTransformScale(transform: Transform): Transform {
 }
 
 function scaleTransform(
-  transform: Transform | undefined,
+  transform: Transform,
   scaleX: number,
   scaleY: number
 ): Transform {
-  const base = bakeTransformScale(
-    transform ?? { x: 0, y: 0, width: 0, height: 0, rotation: 0, opacity: 1 }
-  );
+  const base = bakeTransformScale(transform);
   return {
     ...base,
     x: scaleValue(base.x, scaleX),
@@ -65,10 +66,10 @@ function scaleTransform(
 }
 
 function scaleLayerStyle(
-  style: LayerStyle | undefined,
+  style: NodeStyle | undefined,
   scaleX: number,
   scaleY: number
-): LayerStyle | undefined {
+): NodeStyle | undefined {
   if (!style) {
     return undefined;
   }
@@ -122,9 +123,13 @@ interface CanvasCircleData {
   strokeWidth?: number;
 }
 
-function scaleTextLayer(layer: Layer, scaleX: number, scaleY: number): Layer {
-  const data = layer.data as CanvasTextData;
-  const transform = scaleTransform(layer.transform, scaleX, scaleY);
+function scaleTextLayer(
+  layer: DocumentNode,
+  scaleX: number,
+  scaleY: number
+): DocumentNode {
+  const data = layer.props as unknown as CanvasTextData;
+  const scaled = scaleTransform(nodeTransform(layer), scaleX, scaleY);
   const averageScale = (scaleX + scaleY) / 2;
   const fontSize = clampMin(
     scaleValue(data.fontSize ?? 24, averageScale),
@@ -141,73 +146,100 @@ function scaleTextLayer(layer: Layer, scaleX: number, scaleY: number): Layer {
     html: data.html,
     letterSpacing,
     lineHeightMultiplier: data.lineHeight,
-    width: transform.width,
+    width: scaled.width,
   });
 
-  return {
-    ...layer,
-    data: { ...data, fontSize, letterSpacing },
-    style: scaleLayerStyle(layer.style, scaleX, scaleY),
-    transform: {
-      ...transform,
+  return applyNodeTransform(
+    {
+      ...layer,
+      props: { ...data, fontSize, letterSpacing },
+      style: scaleLayerStyle(layer.style, scaleX, scaleY),
+    },
+    {
+      ...scaled,
       height: clampMin(height, MIN_LAYER_SIZE),
-    },
-  };
+    }
+  );
 }
 
-function scaleRectLayer(layer: Layer, scaleX: number, scaleY: number): Layer {
-  const data = layer.data as CanvasRectData;
+function scaleRectLayer(
+  layer: DocumentNode,
+  scaleX: number,
+  scaleY: number
+): DocumentNode {
+  const data = layer.props as unknown as CanvasRectData;
   const uniform = (value: number) => scaleValue(value, (scaleX + scaleY) / 2);
 
-  return {
-    ...layer,
-    data: {
-      ...data,
-      cornerRadius: scaleCornerRadius(data.cornerRadius, (scaleX + scaleY) / 2),
-      strokeWidth:
-        data.strokeWidth === undefined ? undefined : uniform(data.strokeWidth),
+  return applyNodeTransform(
+    {
+      ...layer,
+      props: {
+        ...data,
+        cornerRadius: scaleCornerRadius(
+          data.cornerRadius,
+          (scaleX + scaleY) / 2
+        ),
+        strokeWidth:
+          data.strokeWidth === undefined
+            ? undefined
+            : uniform(data.strokeWidth),
+      },
+      style: scaleLayerStyle(layer.style, scaleX, scaleY),
     },
-    style: scaleLayerStyle(layer.style, scaleX, scaleY),
-    transform: scaleTransform(layer.transform, scaleX, scaleY),
-  };
+    scaleTransform(nodeTransform(layer), scaleX, scaleY)
+  );
 }
 
-function scaleCircleLayer(layer: Layer, scaleX: number, scaleY: number): Layer {
-  const data = layer.data as CanvasCircleData;
+function scaleCircleLayer(
+  layer: DocumentNode,
+  scaleX: number,
+  scaleY: number
+): DocumentNode {
+  const data = layer.props as unknown as CanvasCircleData;
   const uniform = (value: number) => scaleValue(value, (scaleX + scaleY) / 2);
 
-  return {
-    ...layer,
-    data: {
-      ...data,
-      strokeWidth:
-        data.strokeWidth === undefined ? undefined : uniform(data.strokeWidth),
+  return applyNodeTransform(
+    {
+      ...layer,
+      props: {
+        ...data,
+        strokeWidth:
+          data.strokeWidth === undefined
+            ? undefined
+            : uniform(data.strokeWidth),
+      },
+      style: scaleLayerStyle(layer.style, scaleX, scaleY),
     },
-    style: scaleLayerStyle(layer.style, scaleX, scaleY),
-    transform: scaleTransform(layer.transform, scaleX, scaleY),
-  };
+    scaleTransform(nodeTransform(layer), scaleX, scaleY)
+  );
 }
 
 function scaleContainerLayer(
-  layer: Layer,
+  layer: DocumentNode,
   scaleX: number,
   scaleY: number
-): Layer {
-  const data = layer.data as ContainerLayoutModel;
+): DocumentNode {
+  const data = layer.props as unknown as ContainerLayoutModel;
   const uniform = (value: number) => scaleValue(value, (scaleX + scaleY) / 2);
 
-  return {
-    ...layer,
-    data: {
-      ...data,
-      gap: data.gap === undefined ? undefined : uniform(data.gap),
+  return applyNodeTransform(
+    {
+      ...layer,
+      props: {
+        ...data,
+        gap: data.gap === undefined ? undefined : uniform(data.gap),
+      },
+      style: scaleLayerStyle(layer.style, scaleX, scaleY),
     },
-    style: scaleLayerStyle(layer.style, scaleX, scaleY),
-    transform: scaleTransform(layer.transform, scaleX, scaleY),
-  };
+    scaleTransform(nodeTransform(layer), scaleX, scaleY)
+  );
 }
 
-function scaleLayer(layer: Layer, scaleX: number, scaleY: number): Layer {
+function scaleLayer(
+  layer: DocumentNode,
+  scaleX: number,
+  scaleY: number
+): DocumentNode {
   if (layer.type === CANVAS_TEXT_TYPE) {
     return scaleTextLayer(layer, scaleX, scaleY);
   }
@@ -221,39 +253,50 @@ function scaleLayer(layer: Layer, scaleX: number, scaleY: number): Layer {
     return scaleContainerLayer(layer, scaleX, scaleY);
   }
 
-  return {
-    ...layer,
-    style: scaleLayerStyle(layer.style, scaleX, scaleY),
-    transform: scaleTransform(layer.transform, scaleX, scaleY),
-  };
+  return applyNodeTransform(
+    {
+      ...layer,
+      style: scaleLayerStyle(layer.style, scaleX, scaleY),
+    },
+    scaleTransform(nodeTransform(layer), scaleX, scaleY)
+  );
 }
 
 export function resizeAbsolutePage(
-  page: Page,
+  artboard: Artboard,
   newWidth: number,
   newHeight: number,
   presetId?: string
-): Page {
-  const defaults = getDefaultPageDimensions();
-  const oldWidth = page.width ?? defaults.width;
-  const oldHeight = page.height ?? defaults.height;
+): Artboard {
+  const { width: oldWidth, height: oldHeight } = artboardSpaceSize(artboard);
 
   if (oldWidth === newWidth && oldHeight === newHeight) {
-    return presetId ? { ...page, presetId } : page;
+    return presetId
+      ? {
+          ...artboard,
+          physical: { ...artboard.physical, presetId, dpi: 96, unit: 'px' },
+        }
+      : artboard;
   }
 
   const scaleX = newWidth / oldWidth;
   const scaleY = newHeight / oldHeight;
 
   return {
-    ...page,
-    dpi: 96,
-    height: newHeight,
-    layers: mapLayers(page.layers, (layer) =>
+    ...artboard,
+    nodes: mapLayers(artboard.nodes, (layer) =>
       scaleLayer(layer, scaleX, scaleY)
     ),
-    ...(presetId ? { presetId } : { presetId: undefined }),
-    unit: 'px',
-    width: newWidth,
+    physical: {
+      ...artboard.physical,
+      dpi: 96,
+      presetId: presetId ?? undefined,
+      unit: 'px',
+    },
+    space: {
+      ...artboard.space,
+      height: newHeight,
+      width: newWidth,
+    },
   };
 }

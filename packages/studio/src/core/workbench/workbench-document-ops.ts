@@ -1,14 +1,14 @@
 import type { ServiceId } from '../runtime/create-service-id';
 import { walkLayers } from '../scene/layer-tree';
 import type { SceneStore } from '../scene/scene-store';
-import { SceneValidationError } from '../scene/scene-validation-error';
-import type { Scene } from '../scene/types';
+import { DocumentValidationError } from '../scene/scene-validation-error';
+import type { Document } from '../scene/types';
 import {
-  normalizeScene,
-  normalizeSceneSnapshot,
-  validateScene,
+  normalizeDocument,
+  normalizeProjectSnapshot,
+  validateDocument,
 } from '../schema';
-import type { SceneAsset, SceneSnapshot } from '../schema/types';
+import type { DocumentAsset, ProjectSnapshot } from '../schema/types';
 import type { AssetService } from '../services/types';
 import { AssetServiceId, PersistenceServiceId } from '../tokens';
 import type { EditorInput, EditorService } from '../workbench/editor-service';
@@ -27,11 +27,11 @@ function layerIsUploading(data: unknown): boolean {
   );
 }
 
-export function sceneHasUploadingLayers(scene: Scene): boolean {
-  for (const page of scene.pages) {
+export function sceneHasUploadingLayers(document: Document): boolean {
+  for (const artboard of document.artboards) {
     let found = false;
-    walkLayers(page.layers, (layer) => {
-      if (layerIsUploading(layer.data)) {
+    walkLayers(artboard.nodes, (layer) => {
+      if (layerIsUploading(layer.props)) {
         found = true;
       }
     });
@@ -47,7 +47,7 @@ async function waitForUploadingLayers(
   timeoutMs = 60_000
 ): Promise<void> {
   const started = Date.now();
-  while (sceneHasUploadingLayers(sceneStore.getScene())) {
+  while (sceneHasUploadingLayers(sceneStore.getDocument())) {
     if (Date.now() - started > timeoutMs) {
       throw new Error('Timed out waiting for image uploads to finish');
     }
@@ -59,33 +59,39 @@ async function waitForUploadingLayers(
 
 function hydrateAssets(
   deps: DocumentOpsDeps,
-  assets: Record<string, SceneAsset> | undefined
+  assets: Record<string, DocumentAsset> | undefined
 ): void {
   const assetService = deps.getService(AssetServiceId);
   assetService?.hydrate?.(assets);
 }
 
-function exportSceneAssets(scene: Scene, assets: AssetService | null): Scene {
+function exportDocumentAssets(
+  document: Document,
+  assets: AssetService | null
+): Document {
   if (!assets?.exportReferenced) {
-    return scene;
+    return document;
   }
-  const referenced = assets.exportReferenced(scene);
+  const referenced = assets.exportReferenced(document);
   if (Object.keys(referenced).length === 0) {
-    return scene;
+    return document;
   }
   return {
-    ...scene,
+    ...document,
     assets: referenced,
   };
 }
 
 function toPersistedSnapshot(
   deps: DocumentOpsDeps,
-  scene: Scene
-): SceneSnapshot {
+  document: Document
+): ProjectSnapshot {
   return {
-    editorState: deps.sceneStore.getEditorState(),
-    scene: exportSceneAssets(scene, deps.getService(AssetServiceId) ?? null),
+    session: deps.sceneStore.getSession(),
+    document: exportDocumentAssets(
+      document,
+      deps.getService(AssetServiceId) ?? null
+    ),
   };
 }
 
@@ -107,13 +113,13 @@ export async function saveDocument(
           persistence.save(input.uri, toPersistedSnapshot(deps, input.scene))
       : () => Promise.resolve());
   const wrappedSaveFn = (input: EditorInput): Promise<void> => {
-    const scene = exportSceneAssets(input.scene, assets ?? null);
+    const scene = exportDocumentAssets(input.scene, assets ?? null);
     return effectiveSaveFn({ ...input, scene });
   };
   await deps.editorService.save(
     wrappedSaveFn,
     deps.sceneStore.getContentRevision(),
-    deps.sceneStore.getEditorState()
+    deps.sceneStore.getSession()
   );
 }
 
@@ -134,7 +140,7 @@ export async function saveDocumentAs(
       title: uri,
     },
     deps.sceneStore.getContentRevision(),
-    deps.sceneStore.getEditorState()
+    deps.sceneStore.getSession()
   );
   await saveDocument(
     deps,
@@ -153,22 +159,22 @@ export async function openDocument(
     return;
   }
   const loaded = await persistence.load(uri);
-  const snapshot = normalizeSceneSnapshot(loaded);
-  hydrateAssets(deps, snapshot.scene.assets);
+  const snapshot = normalizeProjectSnapshot(loaded);
+  hydrateAssets(deps, snapshot.document.assets);
   deps.sceneStore.restoreSnapshot({
     contentRevision: 0,
-    editorState: snapshot.editorState,
-    scene: snapshot.scene,
+    session: snapshot.session,
+    document: snapshot.document,
   });
   deps.editorService.open(
     {
       isDirty: false,
-      scene: deps.sceneStore.getScene(),
+      scene: deps.sceneStore.getDocument(),
       title: uri,
       uri,
     },
     deps.sceneStore.getContentRevision(),
-    deps.sceneStore.getEditorState()
+    deps.sceneStore.getSession()
   );
 }
 
@@ -178,22 +184,22 @@ export function revertDocument(deps: DocumentOpsDeps): void {
     hydrateAssets(deps, reverted.scene.assets);
     deps.sceneStore.restoreSnapshot({
       contentRevision: deps.editorService.getSavedContentRevision() ?? 0,
-      editorState: reverted.editorState ?? deps.sceneStore.getEditorState(),
-      scene: reverted.scene,
+      session: reverted.editorState ?? deps.sceneStore.getSession(),
+      document: reverted.scene,
     });
   }
 }
 
-export function loadScene(deps: DocumentOpsDeps, scene: Scene): void {
-  const validation = validateScene(scene);
+export function loadScene(deps: DocumentOpsDeps, document: Document): void {
+  const validation = validateDocument(document);
   if (!validation.valid) {
-    throw new SceneValidationError(
+    throw new DocumentValidationError(
       validation.errors.map((e) =>
         e.path ? `${e.path}: ${e.message}` : e.message
       )
     );
   }
-  const normalized = normalizeScene(scene);
+  const normalized = normalizeDocument(document);
   hydrateAssets(deps, normalized.assets);
-  deps.sceneStore.replaceScene(normalized);
+  deps.sceneStore.replaceDocument(normalized);
 }

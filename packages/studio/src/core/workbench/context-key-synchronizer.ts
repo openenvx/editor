@@ -16,7 +16,7 @@ export class ContextKeySynchronizer {
       customKeys,
       hasActiveEditor: this.editor.getActiveEditor() !== null,
       isDirty: this.editor.getActiveEditor()?.isDirty ?? false,
-      scene: this.scene.getScene(),
+      scene: this.scene.getDocument(),
       selection: this.scene.getSelection(),
     });
   }

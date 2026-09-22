@@ -1,75 +1,104 @@
-import type { LengthUnit, Page } from './types';
+import type { Artboard, LengthUnit } from './types';
 import { defaultDpiForUnit, fromPx, toPx } from './units';
 
-export interface PageExportDimensions {
+export interface ArtboardExportDimensions {
   widthPx: number;
   heightPx: number;
-  pageUnit: LengthUnit;
-  pageDpi: number;
-  pagePresetId?: string;
+  artboardUnit: LengthUnit;
+  artboardDpi: number;
+  artboardPresetId?: string;
 }
 
-export interface PageExportOptions {
+/** @deprecated use ArtboardExportDimensions */
+export type PageExportDimensions = ArtboardExportDimensions;
+
+export interface ArtboardExportOptions {
   scale?: number;
   dpi?: number;
 }
 
-export function resolvePagePresetId(page: Page): string | undefined {
-  return page.presetId;
+/** @deprecated use ArtboardExportOptions */
+export type PageExportOptions = ArtboardExportOptions;
+
+export function resolveArtboardPresetId(
+  artboard: Artboard
+): string | undefined {
+  return artboard.physical?.presetId;
 }
 
-export function resolvePageBackground(page: Page): string {
-  return page.backgroundColor ?? '#ffffff';
+/** @deprecated use resolveArtboardPresetId */
+export const resolvePagePresetId = resolveArtboardPresetId;
+
+export function resolveArtboardBackground(artboard: Artboard): string {
+  return artboard.background ?? '#ffffff';
 }
 
-export function resolvePageDpi(page: Page, exportDpi?: number): number {
-  return exportDpi ?? page.dpi ?? defaultDpiForUnit(page.unit ?? 'px');
+/** @deprecated use resolveArtboardBackground */
+export const resolvePageBackground = resolveArtboardBackground;
+
+export function resolveArtboardDpi(
+  artboard: Artboard,
+  exportDpi?: number
+): number {
+  const unit = artboard.physical?.unit ?? 'px';
+  return exportDpi ?? artboard.physical?.dpi ?? defaultDpiForUnit(unit);
 }
 
-export function resolvePageUnit(page: Page): LengthUnit {
-  return page.unit ?? 'px';
+/** @deprecated use resolveArtboardDpi */
+export const resolvePageDpi = resolveArtboardDpi;
+
+export function resolveArtboardUnit(artboard: Artboard): LengthUnit {
+  return artboard.physical?.unit ?? 'px';
 }
 
-export function resolvePagePixelDimensions(page: Page): {
+/** @deprecated use resolveArtboardUnit */
+export const resolvePageUnit = resolveArtboardUnit;
+
+export function resolveArtboardPixelDimensions(artboard: Artboard): {
   width: number;
   height: number;
 } {
-  if (typeof page.width !== 'number' || typeof page.height !== 'number') {
+  const width = artboard.space?.width;
+  const height = artboard.space?.height;
+  if (typeof width !== 'number' || typeof height !== 'number') {
     throw new TypeError(
-      `Page "${page.id}" is missing width/height (required for export)`
+      `Artboard "${artboard.id}" is missing space width/height (required for export)`
     );
   }
-  return {
-    width: page.width,
-    height: page.height,
-  };
+  return { width, height };
 }
 
-export function computePageExportDimensions(
-  page: Page,
-  options: PageExportOptions = {}
-): PageExportDimensions {
-  const { width, height } = resolvePagePixelDimensions(page);
+/** @deprecated use resolveArtboardPixelDimensions */
+export const resolvePagePixelDimensions = resolveArtboardPixelDimensions;
+
+export function computeArtboardExportDimensions(
+  artboard: Artboard,
+  options: ArtboardExportOptions = {}
+): ArtboardExportDimensions {
+  const { width, height } = resolveArtboardPixelDimensions(artboard);
   const scale = options.scale ?? 1;
-  const pageDpi = resolvePageDpi(page, options.dpi);
-  const pageUnit = resolvePageUnit(page);
+  const artboardDpi = resolveArtboardDpi(artboard, options.dpi);
+  const artboardUnit = resolveArtboardUnit(artboard);
 
   return {
+    artboardDpi,
+    artboardPresetId: resolveArtboardPresetId(artboard),
+    artboardUnit,
     heightPx: Math.round(height * scale),
-    pageDpi,
-    pagePresetId: resolvePagePresetId(page),
-    pageUnit,
     widthPx: Math.round(width * scale),
   };
 }
 
-export function pagePhysicalSize(
-  page: Page,
-  options: PageExportOptions = {}
+/** @deprecated use computeArtboardExportDimensions */
+export const computePageExportDimensions = computeArtboardExportDimensions;
+
+export function artboardPhysicalSize(
+  artboard: Artboard,
+  options: ArtboardExportOptions = {}
 ): { width: number; height: number; unit: LengthUnit } {
-  const { width, height } = resolvePagePixelDimensions(page);
-  const unit = resolvePageUnit(page);
-  const dpi = resolvePageDpi(page, options.dpi);
+  const { width, height } = resolveArtboardPixelDimensions(artboard);
+  const unit = resolveArtboardUnit(artboard);
+  const dpi = resolveArtboardDpi(artboard, options.dpi);
 
   if (unit === 'px') {
     return { height, unit, width };
@@ -81,6 +110,9 @@ export function pagePhysicalSize(
     width: fromPx(width, unit, dpi),
   };
 }
+
+/** @deprecated use artboardPhysicalSize */
+export const pagePhysicalSize = artboardPhysicalSize;
 
 export function physicalSizeToPixels(
   width: number,

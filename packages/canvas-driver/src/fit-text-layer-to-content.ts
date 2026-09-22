@@ -1,13 +1,11 @@
-import {
-  findLayerById,
-  mapLayers,
-  MIN_LAYER_SIZE,
-} from '@openenvx/studio/core';
+import { findNodeById, mapLayers, MIN_LAYER_SIZE } from '@openenvx/studio/core';
 import {
   applyModifications,
-  type Layer,
+  applyNodeTransform,
+  type Document,
+  type DocumentNode,
   type Modification,
-  type Scene,
+  nodeTransform,
   type Transform,
 } from '@openenvx/studio/schema';
 
@@ -69,14 +67,14 @@ export interface TextBoxFitTransformUpdate {
   transform: Transform;
 }
 
-function readTextData(layer: Layer): CanvasTextDataLike | null {
+function readTextData(layer: DocumentNode): CanvasTextDataLike | null {
   if (layer.type !== CANVAS_TEXT_TYPE) {
     return null;
   }
-  if (typeof layer.data !== 'object' || layer.data === null) {
+  if (typeof layer.props !== 'object' || layer.props === null) {
     return null;
   }
-  return layer.data as CanvasTextDataLike;
+  return layer.props as CanvasTextDataLike;
 }
 
 function resolveFitMode(
@@ -97,7 +95,7 @@ function resolveFitMode(
  * Otherwise `null` - callers should use plain `updateProperty`.
  */
 export function resolveTextBoxFitPropertyUpdate(
-  scene: Scene,
+  scene: Document,
   layerId: string,
   key: string,
   value: unknown
@@ -106,23 +104,30 @@ export function resolveTextBoxFitPropertyUpdate(
     return null;
   }
 
-  const layer = findLayerById(scene, layerId);
+  const layer = findNodeById(scene, layerId);
   if (!layer || layer.type !== CANVAS_TEXT_TYPE) {
     return null;
   }
 
-  const data =
-    typeof layer.data === 'object' && layer.data !== null
-      ? { ...(layer.data as Record<string, unknown>), [key]: value }
+  const props =
+    typeof layer.props === 'object' && layer.props !== null
+      ? { ...(layer.props as Record<string, unknown>), [key]: value }
       : { [key]: value };
-  const fitted = fitCanvasTextLayerToContent({ ...layer, data });
-  if (fitted === layer || !fitted.transform) {
+  const fitted = fitCanvasTextLayerToContent({ ...layer, props });
+  const before = nodeTransform(layer);
+  const after = nodeTransform(fitted);
+  if (
+    fitted === layer ||
+    (before.width === after.width &&
+      before.height === after.height &&
+      before.x === after.x)
+  ) {
     return null;
   }
 
   return {
     dataPatch: { [key]: value },
-    transform: fitted.transform,
+    transform: after,
   };
 }
 
@@ -133,9 +138,9 @@ export function resolveTextBoxFitPropertyUpdate(
  * Curved text hugs measured TextPath bounds (keeps horizontal center).
  */
 export function fitCanvasTextLayerToContent(
-  layer: Layer,
+  layer: DocumentNode,
   options: FitTextLayerOptions = {}
-): Layer {
+): DocumentNode {
   const data = readTextData(layer);
   if (!data || typeof data.html !== 'string') {
     return layer;
@@ -144,10 +149,7 @@ export function fitCanvasTextLayerToContent(
     return layer;
   }
 
-  const transform = layer.transform;
-  if (!transform) {
-    return layer;
-  }
+  const transform = nodeTransform(layer);
 
   const fontFamily = data.fontFamily ?? DEFAULT_RICH_TEXT_FONT_FAMILY;
   const fontSize = data.fontSize ?? DEFAULT_RICH_TEXT_FONT_SIZE;
@@ -220,27 +222,24 @@ export function fitCanvasTextLayerToContent(
     return layer;
   }
 
-  return {
-    ...layer,
-    transform: {
-      ...transform,
-      height,
-      width,
-      x,
-    },
-  };
+  return applyNodeTransform(layer, {
+    ...transform,
+    height,
+    width,
+    x,
+  });
 }
 
 /**
  * Remasure every eligible `canvas.text` layer: `shrink` skipped, `hug` → box,
  * default / `none` → height (curved text keeps horizontal center).
  */
-export function fitSceneCanvasTextToContent(scene: Scene): Scene {
+export function fitSceneCanvasTextToContent(scene: Document): Document {
   return {
     ...scene,
-    pages: scene.pages.map((page) => ({
-      ...page,
-      layers: mapLayers(page.layers, fitCanvasTextLayerToContent),
+    artboards: scene.artboards.map((artboard) => ({
+      ...artboard,
+      nodes: mapLayers(artboard.nodes, fitCanvasTextLayerToContent),
     })),
   };
 }
@@ -250,8 +249,8 @@ export function fitSceneCanvasTextToContent(scene: Scene): Scene {
  * Use this when spinning up the editor / live preview with placeholder data.
  */
 export function applyModificationsWithTextFit(
-  scene: Scene,
+  scene: Document,
   modifications: Modification[]
-): Scene {
+): Document {
   return fitSceneCanvasTextToContent(applyModifications(scene, modifications));
 }

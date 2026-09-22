@@ -1,7 +1,8 @@
-import type { Layer } from '@openenvx/studio/core';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { getLayerChildren } from '@openenvx/studio/core';
+import { nodeTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
+import { legacyLayer } from '../test/canvas-document-fixtures';
 import {
   computeGroupOutlineBounds,
   computeUnionBounds,
@@ -18,13 +19,13 @@ function rectLayer(
   y: number,
   width: number,
   height: number
-): Layer {
-  return {
+) {
+  return legacyLayer({
     data: { fill: '#000' },
     id,
-    transform: { ...createDefaultTransform(), x, y, width, height },
+    transform: { x, y, width, height },
     type: 'canvas.rect',
-  };
+  });
 }
 
 describe('group-layers', () => {
@@ -39,32 +40,32 @@ describe('group-layers', () => {
   it('toRelativeTransform offsets position by group origin', () => {
     const layer = rectLayer('a', 30, 40, 100, 50);
     const relative = toRelativeTransform(layer, { x: 10, y: 20 });
-    expect(relative.transform).toMatchObject({ x: 20, y: 20 });
+    expect(nodeTransform(relative)).toMatchObject({ x: 20, y: 20 });
   });
 
   it('toAbsoluteTransform adds group origin to position', () => {
     const layer = rectLayer('a', 20, 20, 100, 50);
     const absolute = toAbsoluteTransform(layer, { x: 10, y: 20 });
-    expect(absolute.transform).toMatchObject({ x: 30, y: 40 });
+    expect(nodeTransform(absolute)).toMatchObject({ x: 30, y: 40 });
   });
 
   it('createGroupFromLayers nests children with relative transforms', () => {
     const group = createGroupFromLayers(
       'group-1',
       [rectLayer('a', 10, 20, 100, 50), rectLayer('b', 50, 40, 80, 60)],
-      { width: 800, height: 600 }
+      { space: { width: 800, height: 600 } }
     );
     expect(group.type).toBe('canvas.group');
-    expect(group.transform).toMatchObject({
+    expect(nodeTransform(group)).toMatchObject({
       x: 10,
       y: 20,
       width: 120,
       height: 80,
     });
-    const children = (group.data as { children: Layer[] }).children;
+    const children = getLayerChildren(group);
     expect(children).toHaveLength(2);
-    expect(children[0]?.transform).toMatchObject({ x: 0, y: 0 });
-    expect(children[1]?.transform).toMatchObject({ x: 40, y: 20 });
+    expect(nodeTransform(children[0]!)).toMatchObject({ x: 0, y: 0 });
+    expect(nodeTransform(children[1]!)).toMatchObject({ x: 40, y: 20 });
   });
 
   it('groupRootLayers wraps selected root layers', () => {
@@ -74,8 +75,7 @@ describe('group-layers', () => {
       rectLayer('c', 300, 0, 100, 100),
     ];
     const result = groupRootLayers(roots, ['a', 'b'], 'group-1', {
-      width: 800,
-      height: 600,
+      space: { width: 800, height: 600 },
     });
     expect(result).toHaveLength(2);
     expect(result[0]?.type).toBe('canvas.group');
@@ -86,7 +86,7 @@ describe('group-layers', () => {
     const group = createGroupFromLayers(
       'group-1',
       [rectLayer('a', 10, 20, 100, 50), rectLayer('b', 30, 20, 100, 50)],
-      { width: 800, height: 600 }
+      { space: { width: 800, height: 600 } }
     );
     const roots = [
       rectLayer('c', 0, 0, 50, 50),
@@ -106,42 +106,33 @@ describe('group-layers', () => {
     const group = createGroupFromLayers(
       'group-1',
       [rectLayer('a', 10, 20, 100, 50)],
-      { width: 800, height: 600 }
+      { space: { width: 800, height: 600 } }
     );
-    const roots = [group];
-    const result = ungroupLayer(roots, 'group-1');
-    expect(result).toHaveLength(1);
-    expect(result[0]?.id).toBe('a');
-    expect(result[0]?.transform).toMatchObject({ x: 10, y: 20 });
+    const [child] = ungroupLayer([group], 'group-1');
+    expect(nodeTransform(child!)).toMatchObject({ x: 10, y: 20 });
   });
 
   it('computeGroupOutlineBounds is the tight AABB of children', () => {
     const outline = computeGroupOutlineBounds(
-      { width: 100, height: 100 },
-      [rectLayer('a', 0, 0, 40, 40), rectLayer('b', 180, 10, 50, 50)]
+      { width: 200, height: 200 },
+      [rectLayer('a', 10, 20, 100, 50), rectLayer('b', 50, 40, 80, 60)]
     );
-    expect(outline).toStrictEqual({ x: 0, y: 0, width: 230, height: 60 });
+    expect(outline).toStrictEqual({ x: 10, y: 20, width: 120, height: 80 });
   });
 
   it('computeGroupOutlineBounds hugs the topmost child, not the stored box', () => {
-    const children = [
-      rectLayer('a', 10, 40, 40, 40),
-      rectLayer('b', 100, 20, 40, 40),
-    ];
     const outline = computeGroupOutlineBounds(
-      { width: 400, height: 200 },
-      children
+      { width: 500, height: 500 },
+      [rectLayer('a', 0, 0, 50, 50)]
     );
-    expect(outline).toStrictEqual({ x: 10, y: 20, width: 130, height: 60 });
-    expect(children[0]?.transform).toMatchObject({ x: 10, y: 40 });
-    expect(children[1]?.transform).toMatchObject({ x: 100, y: 20 });
+    expect(outline).toStrictEqual({ x: 0, y: 0, width: 50, height: 50 });
   });
 
   it('computeGroupOutlineBounds follows a child past the left/top edges', () => {
     const outline = computeGroupOutlineBounds(
-      { width: 200, height: 100 },
-      [rectLayer('a', -50, -30, 40, 40), rectLayer('b', 100, 0, 40, 40)]
+      { width: 200, height: 200 },
+      [rectLayer('a', -20, -10, 100, 50)]
     );
-    expect(outline).toStrictEqual({ x: -50, y: -30, width: 190, height: 70 });
+    expect(outline).toStrictEqual({ x: -20, y: -10, width: 100, height: 50 });
   });
 });

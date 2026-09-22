@@ -1,118 +1,120 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  computePagePrintBoxes,
+  computeArtboardPrintBoxes,
   DEFAULT_BLEED_MM,
   DEFAULT_SAFE_MM,
-  isPrintEligiblePage,
-  resolvePageBleedMm,
-  resolvePageSafeMm,
+  isPrintEligibleArtboard,
+  resolveArtboardBleedMm,
+  resolveArtboardSafeMm,
 } from './page-print';
-import type { Page } from './types';
+import type { Artboard } from './types';
 import { toPx } from './units';
 
 /** A4 portrait at 96 DPI (210×297 mm). */
 const A4 = { width: 794, height: 1123 };
 
-function a4Page(overrides: Partial<Page> = {}): Page {
+function a4Artboard(overrides: Partial<Artboard> = {}): Artboard {
   return {
-    height: A4.height,
+    extensions: { layout: 'absolute' },
     id: 'p1',
-    layers: [],
-    layout: 'absolute',
     name: 'Page',
-    presetId: 'a4-portrait',
-    unit: 'mm',
-    width: A4.width,
+    nodes: [],
+    physical: { presetId: 'a4-portrait', unit: 'mm' },
+    space: { height: A4.height, width: A4.width },
     ...overrides,
   };
 }
 
 describe('page-print', () => {
-  it('treats preset pages as print-eligible', () => {
-    expect(isPrintEligiblePage(a4Page())).toBe(true);
+  it('treats preset artboards as print-eligible', () => {
+    expect(isPrintEligibleArtboard(a4Artboard())).toBe(true);
   });
 
-  it('treats physical-unit pages as print-eligible', () => {
+  it('treats physical-unit artboards as print-eligible', () => {
     expect(
-      isPrintEligiblePage({
-        height: 500,
+      isPrintEligibleArtboard({
+        extensions: { layout: 'absolute' },
         id: 'p1',
-        layers: [],
-        layout: 'absolute',
         name: 'Page',
-        unit: 'mm',
-        width: 700,
+        nodes: [],
+        physical: { unit: 'mm' },
+        space: { height: 500, width: 700 },
       })
     ).toBe(true);
   });
 
-  it('treats px-only custom pages as not print-eligible', () => {
+  it('treats px-only custom artboards as not print-eligible', () => {
     expect(
-      isPrintEligiblePage({
-        height: 500,
+      isPrintEligibleArtboard({
+        extensions: { layout: 'absolute' },
         id: 'p1',
-        layers: [],
-        layout: 'absolute',
         name: 'Page',
-        width: 700,
+        nodes: [],
+        space: { height: 500, width: 700 },
       })
     ).toBe(false);
   });
 
-  it('defaults bleed/safe for print-eligible pages', () => {
-    const page = a4Page();
-    expect(resolvePageBleedMm(page)).toBe(DEFAULT_BLEED_MM);
-    expect(resolvePageSafeMm(page)).toBe(DEFAULT_SAFE_MM);
+  it('defaults bleed/safe for print-eligible artboards', () => {
+    const artboard = a4Artboard();
+    expect(resolveArtboardBleedMm(artboard)).toBe(DEFAULT_BLEED_MM);
+    expect(resolveArtboardSafeMm(artboard)).toBe(DEFAULT_SAFE_MM);
   });
 
-  it('defaults bleed/safe to 0 for non-print pages', () => {
-    const page: Page = {
-      height: 500,
+  it('defaults bleed/safe to 0 for non-print artboards', () => {
+    const artboard: Artboard = {
+      extensions: { layout: 'absolute' },
       id: 'p1',
-      layers: [],
-      layout: 'absolute',
       name: 'Page',
-      width: 700,
+      nodes: [],
+      space: { height: 500, width: 700 },
     };
-    expect(resolvePageBleedMm(page)).toBe(0);
-    expect(resolvePageSafeMm(page)).toBe(0);
+    expect(resolveArtboardBleedMm(artboard)).toBe(0);
+    expect(resolveArtboardSafeMm(artboard)).toBe(0);
   });
 
   it('honors explicit bleedMm and safeMm', () => {
-    const page = a4Page({ bleedMm: 5, safeMm: 12 });
-    expect(resolvePageBleedMm(page)).toBe(5);
-    expect(resolvePageSafeMm(page)).toBe(12);
+    const artboard = a4Artboard({
+      physical: { bleedMm: 5, presetId: 'a4-portrait', safeMm: 12, unit: 'mm' },
+    });
+    expect(resolveArtboardBleedMm(artboard)).toBe(5);
+    expect(resolveArtboardSafeMm(artboard)).toBe(12);
   });
 
-  it('honors explicit zero bleed on print pages', () => {
-    expect(resolvePageBleedMm(a4Page({ bleedMm: 0 }))).toBe(0);
+  it('honors explicit zero bleed on print artboards', () => {
+    expect(
+      resolveArtboardBleedMm(
+        a4Artboard({ physical: { bleedMm: 0, presetId: 'a4-portrait', unit: 'mm' } })
+      )
+    ).toBe(0);
   });
 
   it('computes print boxes in px from mm + dpi', () => {
-    const page = a4Page({ bleedMm: 3, dpi: 96, safeMm: 10 });
-    const boxes = computePagePrintBoxes(page);
+    const artboard = a4Artboard({
+      physical: { bleedMm: 3, dpi: 96, presetId: 'a4-portrait', safeMm: 10, unit: 'mm' },
+    });
+    const boxes = computeArtboardPrintBoxes(artboard);
     const bleedPx = Math.round(toPx(3, 'mm', 96));
     const safePx = Math.round(toPx(10, 'mm', 96));
-    expect(boxes.trim.width).toBe(page.width);
-    expect(boxes.trim.height).toBe(page.height);
+    expect(boxes.trim.width).toBe(A4.width);
+    expect(boxes.trim.height).toBe(A4.height);
     expect(boxes.bleedPx).toBe(bleedPx);
     expect(boxes.safePx).toBe(safePx);
     expect(boxes.safe).toEqual({
-      height: page.height! - safePx * 2,
-      width: page.width! - safePx * 2,
+      height: A4.height - safePx * 2,
+      width: A4.width - safePx * 2,
       x: safePx,
       y: safePx,
     });
   });
 
   it('returns null safe bounds when inset does not fit', () => {
-    const page = a4Page({
-      height: 20,
-      safeMm: 10,
-      width: 20,
+    const artboard = a4Artboard({
+      physical: { presetId: 'a4-portrait', safeMm: 10, unit: 'mm' },
+      space: { height: 20, width: 20 },
     });
-    const boxes = computePagePrintBoxes(page);
+    const boxes = computeArtboardPrintBoxes(artboard);
     expect(boxes.safe).toBeNull();
   });
 });

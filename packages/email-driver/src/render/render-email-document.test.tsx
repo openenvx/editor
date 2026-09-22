@@ -13,7 +13,7 @@ describe('renderEmailDocument', () => {
       registry.register(block);
     }
     const scene = createEmailDemoScene();
-    const page = scene.pages[0]!;
+    const page = scene.artboards[0]!;
 
     const html = await renderEmailDocument(page, registry);
 
@@ -30,9 +30,9 @@ describe('renderEmailDocument', () => {
       registry.register(block);
     }
     const scene = createEmailDemoScene();
-    const page = scene.pages[0]!;
-    const root = page.layers.find((layer) => layer.type === 'email.root')!;
-    (root.data as { background: string }).background = '#abcdef';
+    const page = scene.artboards[0]!;
+    const root = page.nodes.find((layer) => layer.type === 'email.root')!;
+    root.props = { ...root.props, background: '#abcdef' };
 
     const html = await renderEmailDocument(page, registry);
 
@@ -50,9 +50,9 @@ describe('renderEmailDocument', () => {
       registry.register(block);
     }
     const scene = createEmailDemoScene();
-    const page = scene.pages[0]!;
-    const root = page.layers.find((layer) => layer.type === 'email.root')!;
-    (root.data as { paddingY: number }).paddingY = 48;
+    const page = scene.artboards[0]!;
+    const root = page.nodes.find((layer) => layer.type === 'email.root')!;
+    root.props = { ...root.props, paddingY: 48 };
 
     const html = await renderEmailDocument(page, registry);
 
@@ -65,7 +65,7 @@ describe('renderEmailDocument', () => {
       registry.register(block);
     }
     const scene = createEmailDemoScene();
-    const page = scene.pages[0]!;
+    const page = scene.artboards[0]!;
 
     const html = await renderEmailDocument(page, registry);
 
@@ -84,7 +84,7 @@ describe('renderEmailDocument', () => {
       registry.register(block);
     }
     const scene = createEmailDemoScene();
-    const page = scene.pages[0]!;
+    const page = scene.artboards[0]!;
 
     const html = await renderEmailDocument(page, registry);
 
@@ -97,7 +97,7 @@ describe('renderEmailDocument', () => {
       registry.register(block);
     }
     const scene = createEmailDemoScene();
-    const page = scene.pages[0]!;
+    const page = scene.artboards[0]!;
 
     const compact = await renderEmailDocument(page, registry);
     const pretty = await renderEmailDocument(page, registry, { pretty: true });

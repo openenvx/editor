@@ -1,4 +1,4 @@
-import { findLayerById, walkLayers } from '@openenvx/studio/core';
+import { findNodeById, walkNodes } from '@openenvx/studio/core';
 import type { Layer, Scene } from '@openenvx/studio/schema';
 
 import type { RichTextToolbarOptions } from '../block-config';
@@ -34,9 +34,9 @@ function mergeToolbar(
 }
 
 function ancestorPath(scene: Scene, layerId: string): Layer[] {
-  for (const page of scene.pages) {
+  for (const page of scene.artboards) {
     let found: Layer[] | null = null;
-    walkLayers(page.layers, (layer, path) => {
+    walkNodes(page.nodes, (layer, path) => {
       if (layer.id === layerId) {
         found = path;
       }
@@ -71,7 +71,7 @@ export function resolveSlotRichTextToolbar(
   scene: Scene,
   registry: BlockRegistry
 ): ResolvedRichTextToolbar {
-  const host = findLayerById(scene, hostId);
+  const host = findNodeById(scene, hostId);
   let resolved = DEFAULT_TOOLBAR;
   if (host) {
     for (const ancestor of [...ancestorPath(scene, host.id), host]) {

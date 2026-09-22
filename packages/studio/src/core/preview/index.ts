@@ -1,4 +1,8 @@
 export {
+  compileArtboard,
+  type CompileArtboardResult,
+} from './compile-artboard';
+export {
   encodeQrToSvg,
   type EncodeQrToSvgOptions,
   type QrErrorCorrection,
@@ -27,3 +31,13 @@ export {
   type RenderIrPage,
   type ServerKnownPreviewKind,
 } from './render-ir';
+export {
+  type CompileContext,
+  type CompileDiagnostic,
+  type NodeCompiler,
+  type NodeCompilerLookup,
+  type RenderArtboard,
+  type RenderDocument,
+  type RenderNode,
+} from './render-document';
+export { renderNodeToLayerPreview } from './render-node-to-preview';

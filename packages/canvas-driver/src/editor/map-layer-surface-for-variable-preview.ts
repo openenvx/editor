@@ -1,6 +1,11 @@
-import { findLayerById } from '@openenvx/studio/core';
+import { findNodeById } from '@openenvx/studio/core';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import type { Scene } from '@openenvx/studio/schema';
+import type { Document } from '@openenvx/studio/schema';
+import {
+  applyNodeTransform,
+  nodeProps,
+  nodeTransform,
+} from '@openenvx/studio/schema';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
 import { prepareCanvasSceneForRender } from '../prepare-canvas-scene-for-render';
@@ -17,27 +22,22 @@ function mapViewForVariablePreview(
 
 function mapLayerSurfaceItemForVariablePreview(
   item: CanvasLayerSurfaceItem,
-  fittedScene: Scene
+  fittedScene: Document
 ): CanvasLayerSurfaceItem {
-  const fittedLayer = findLayerById(fittedScene, item.layer.id);
-  const previewHtml =
-    fittedLayer &&
-    typeof fittedLayer.data === 'object' &&
-    fittedLayer.data !== null
-      ? (fittedLayer.data as { html?: string }).html
-      : undefined;
+  const fittedLayer = findNodeById(fittedScene, item.layer.id);
+  const props = fittedLayer ? nodeProps(fittedLayer) : {};
+  const previewHtml = typeof props.html === 'string' ? props.html : undefined;
 
   const children = item.children?.map((child) =>
     mapLayerSurfaceItemForVariablePreview(child, fittedScene)
   );
 
   const layer =
-    fittedLayer && fittedLayer.transform
-      ? {
-          ...item.layer,
-          data: fittedLayer.data,
-          transform: fittedLayer.transform,
-        }
+    fittedLayer && fittedLayer.frame
+      ? applyNodeTransform(
+          { ...item.layer, props: fittedLayer.props },
+          nodeTransform(fittedLayer)
+        )
       : item.layer;
 
   return {
@@ -51,7 +51,7 @@ function mapLayerSurfaceItemForVariablePreview(
 /** Konva preview with catalog `sample` values; stored scene keeps `{{{key}}}` tokens. */
 export function mapLayerSurfaceForVariablePreview(
   layerSurface: CanvasLayerSurfaceItem[],
-  scene: Scene
+  scene: Document
 ): CanvasLayerSurfaceItem[] {
   const fittedScene = prepareCanvasSceneForRender(scene, { mode: 'preview' });
   return layerSurface.map((item) =>

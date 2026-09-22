@@ -3,6 +3,7 @@ export enum WorkbenchPart {
   PrimarySidebar = 'primarySidebar',
   EditorArea = 'editorArea',
   SecondarySidebar = 'secondarySidebar',
+  Panel = 'panel',
   StatusBar = 'statusBar',
   TopBar = 'topBar',
 }
@@ -12,6 +13,7 @@ export interface WorkbenchLayout {
   primarySidebar: boolean;
   editorArea: boolean;
   secondarySidebar: boolean;
+  panel: boolean;
   statusBar: boolean;
   /** Show editor overlay toolbars (top/bottom placements). */
   editorToolbars: boolean;
@@ -26,6 +28,7 @@ export const DEFAULT_WORKBENCH_LAYOUT: WorkbenchLayout = {
   editorToolbars: false,
   primarySidebar: true,
   secondarySidebar: true,
+  panel: false,
   statusBar: true,
   /** Defaults to false. Email enables via `DEFAULT_EMAIL_LAYOUT`. */
   topBar: false,

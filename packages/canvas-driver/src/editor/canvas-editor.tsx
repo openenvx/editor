@@ -64,8 +64,8 @@ export interface CanvasEditorProps {
   artboardWidth: number;
   artboardHeight: number;
   page: Page;
-  selectedLayerIds: string[];
-  primaryLayerId?: string | null;
+  selectedNodeIds: string[];
+  primaryNodeId?: string | null;
   hoveredLayerId?: string | null;
   canvasLayerRenderers: CanvasLayerRendererRegistration[];
   canvasLayerInteractions: CanvasLayerInteractionRegistration[];
@@ -128,8 +128,8 @@ export const CanvasEditor = memo(
     artboardWidth,
     artboardHeight,
     page,
-    selectedLayerIds,
-    primaryLayerId = null,
+    selectedNodeIds,
+    primaryNodeId = null,
     hoveredLayerId = null,
     canvasLayerRenderers,
     canvasLayerInteractions,
@@ -640,8 +640,8 @@ export const CanvasEditor = memo(
               onViewportChange={handleViewportChange}
               pageBleedEdgeBounds={pageBleedEdgeBounds}
               pageMarginBounds={pageMarginBounds}
-              primaryLayerId={primaryLayerId}
-              selectedLayerIds={selectedLayerIds}
+              primaryNodeId={primaryNodeId}
+              selectedNodeIds={selectedNodeIds}
               showGrid={gridSettings.enabled}
               showMargins={showMargins}
               userGuides={pageGuides}

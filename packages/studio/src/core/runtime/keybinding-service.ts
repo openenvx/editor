@@ -10,6 +10,14 @@ export class KeybindingService {
     this.bindings.push(shortcut);
   }
 
+  unregister(commandId: string): void {
+    for (let i = this.bindings.length - 1; i >= 0; i -= 1) {
+      if (this.bindings[i]!.commandId === commandId) {
+        this.bindings.splice(i, 1);
+      }
+    }
+  }
+
   getAll(): ShortcutContribution[] {
     return [...this.bindings];
   }

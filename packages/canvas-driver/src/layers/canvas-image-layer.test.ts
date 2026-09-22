@@ -33,10 +33,10 @@ describe('CanvasImageLayer', () => {
   it('forwards unknown preview fields from renderPreview', () => {
     const layer = new CanvasImageLayer();
     const scene = normalizeScene({
-      activePageId: 'p1',
+      activeArtboardId: 'p1',
       pages: [{ id: 'p1', layout: 'absolute', layers: [], name: 'Page' }],
     });
-    const created = layer.createDefault('image-1', scene.pages[0]!);
+    const created = layer.createDefault('image-1', scene.artboards[0]!);
     const view = layer.renderPreview({
       isSelected: false,
       layerId: created.id,
@@ -57,10 +57,10 @@ describe('CanvasImageLayer', () => {
   it('keeps canonical kind and src authoritative over passthrough collisions', () => {
     const layer = new CanvasImageLayer();
     const scene = normalizeScene({
-      activePageId: 'p1',
+      activeArtboardId: 'p1',
       pages: [{ id: 'p1', layout: 'absolute', layers: [], name: 'Page' }],
     });
-    const created = layer.createDefault('image-1', scene.pages[0]!);
+    const created = layer.createDefault('image-1', scene.artboards[0]!);
     const view = layer.renderPreview({
       isSelected: false,
       layerId: created.id,

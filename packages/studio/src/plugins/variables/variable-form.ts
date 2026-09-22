@@ -6,7 +6,7 @@ import {
 } from '@openenvx/studio/core';
 import {
   nextVariableKey,
-  sceneVariables,
+  documentVariables,
   validateVariableKeyForCatalog,
   type Scene,
   type TemplateVariable,
@@ -24,7 +24,7 @@ export function buildVariableFormOptions(
 ): ShowFormOptions {
   const t = (key: string, defaultValue?: string) =>
     localizeWorkbench(services, key, { defaultValue });
-  const existingVariables = sceneVariables(getScene());
+  const existingVariables = documentVariables(getScene());
   const initialKey =
     mode === 'edit' && variable
       ? variable.key
@@ -82,7 +82,7 @@ export function buildVariableFormOptions(
     validate: (values) => {
       const key = String(values.key ?? '').trim();
       const validation = validateVariableKeyForCatalog(
-        sceneVariables(getScene()),
+        documentVariables(getScene()),
         key,
         editingId
       );

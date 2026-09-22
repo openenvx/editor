@@ -1,4 +1,4 @@
-import { ContextKeyServiceId, getActivePage } from '@openenvx/studio/core';
+import { ContextKeyServiceId, getActiveArtboard } from '@openenvx/studio/core';
 import { useWorkbenchContext } from '@openenvx/studio/react';
 import { useCallback, useRef, useState } from 'react';
 
@@ -120,14 +120,17 @@ export function useBlockTextFlow({
         return false;
       }
       const snap = api.getSnapshot();
-      const page = getActivePage(snap.scene, snap.selection.activePageId);
-      const found = findBlock(page.layers, target.hostId);
+      const page = getActiveArtboard(
+        snap.scene,
+        snap.selection.activeArtboardId
+      );
+      const found = findBlock(page.nodes, target.hostId);
       if (!found) {
         return false;
       }
 
       if (intent.kind === 'insertAfter') {
-        if (!parentAcceptsChildren(registry, page.layers, found.parentId)) {
+        if (!parentAcceptsChildren(registry, page.nodes, found.parentId)) {
           return false;
         }
         api.updateProperty(target.hostId, target.dataPath, intent.html);
@@ -141,7 +144,7 @@ export function useBlockTextFlow({
           if (!ok) {
             return;
           }
-          const nextId = api.getSnapshot().selection.primaryLayerId;
+          const nextId = api.getSnapshot().selection.primaryNodeId;
           if (!nextId) {
             return;
           }
@@ -151,11 +154,11 @@ export function useBlockTextFlow({
       }
 
       if (intent.kind === 'deleteEmpty') {
-        if (siblingCount(page.layers, found.parentId) <= 1) {
+        if (siblingCount(page.nodes, found.parentId) <= 1) {
           return false;
         }
         const prevId = findAdjacentTextBlockId(
-          page.layers,
+          page.nodes,
           registry,
           target.hostId,
           'prev'
@@ -163,7 +166,7 @@ export function useBlockTextFlow({
         const nextId = prevId
           ? null
           : findAdjacentTextBlockId(
-              page.layers,
+              page.nodes,
               registry,
               target.hostId,
               'next'
@@ -186,7 +189,7 @@ export function useBlockTextFlow({
 
       const direction = intent.kind === 'focusPrev' ? 'prev' : 'next';
       const neighbourId = findAdjacentTextBlockId(
-        page.layers,
+        page.nodes,
         registry,
         target.hostId,
         direction

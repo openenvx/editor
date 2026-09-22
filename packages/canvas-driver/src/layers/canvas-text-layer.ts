@@ -7,13 +7,13 @@ import {
 } from '@openenvx/studio/core';
 import type {
   CommandContext,
+  DocumentNode,
   FontService,
-  Layer,
   LayerPreviewContext,
-  Page,
   PropertySectionDescriptor,
 } from '@openenvx/studio/core';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
+import type { Artboard } from '@openenvx/studio/schema';
 import {
   clampTextCurve,
   createDefaultTransform,
@@ -113,20 +113,20 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
     );
   }
 
-  createDefault(id: string, _page: Page): Layer {
+  createDefault(id: string, _artboard: Artboard): DocumentNode {
     return fitCanvasTextLayerToContent(
       {
-        data: { ...DEFAULT_MODEL },
+        props: { ...DEFAULT_MODEL },
         id,
-        transform: { ...createDefaultTransform(), height: 48, width: 240 },
+        frame: { ...createDefaultTransform(), height: 48, width: 240 },
         type: this.type,
       },
       { mode: 'box' }
     );
   }
 
-  serialize(layer: Layer): CanvasTextModel {
-    return layer.data as CanvasTextModel;
+  serialize(node: DocumentNode): CanvasTextModel {
+    return node.props as CanvasTextModel;
   }
 
   deserialize(data: unknown): CanvasTextModel {
@@ -138,7 +138,10 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
     return parsed.success ? parsed.data : { ...DEFAULT_MODEL };
   }
 
-  properties(ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
+  properties(
+    ctx: CommandContext,
+    _node: DocumentNode
+  ): PropertySectionDescriptor[] {
     const scrubPx = { scrub: true, precision: 0 };
     const scrubLineHeight = { scrub: true, precision: 1 };
     const scrubCurve = {

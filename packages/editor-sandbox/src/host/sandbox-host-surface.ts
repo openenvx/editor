@@ -16,7 +16,7 @@ export interface SandboxHostSurface {
   getSelection(): Selection;
   getScene(): Scene;
   apply(transaction: SceneTransaction): void;
-  selectLayers(layerIds: string[], primaryLayerId?: string | null): void;
+  selectLayers(layerIds: string[], primaryNodeId?: string | null): void;
   onDidChangeScene(listener: () => void): () => void;
   onDidChangeSelection(listener: () => void): () => void;
   executeCommand(

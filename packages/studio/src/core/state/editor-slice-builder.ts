@@ -1,6 +1,7 @@
 import { getLayerChildrenForScene, resolveEditorPaneKind } from '../backbone';
 import type { Layer } from '../backbone';
 import type { LayerPreviewDescriptor } from '../preview';
+import { nodeProps } from '../schema/node-helpers';
 import { resolveLayerPreview } from '../utils/layer-preview-resolver';
 import type { EditorSlice } from '../workbench/workbench-state-cache';
 import type { WorkbenchSliceContext } from './workbench-slice-context';
@@ -15,19 +16,19 @@ export class EditorSliceBuilder {
   build(ctx: WorkbenchSliceContext): EditorSlice {
     const coreRegistries = ctx.coreRegistries;
     const commandCtx = ctx.runtime.createCommandContext();
-    const store = ctx.runtime.getScene();
-    const scene = store.getScene();
+    const store = ctx.runtime.getDocument();
+    const scene = store.getDocument();
     const editor = ctx.runtime.getEditor().getActiveEditor();
-    const activePage = store.getActivePage();
-    const selectedIds = new Set(store.getSelection().selectedLayerIds);
-    const activePageId = store.getActivePageId();
+    const activePage = store.getActiveArtboard();
+    const selectedIds = new Set(store.getSelection().selectedNodeIds);
+    const activeArtboardId = store.getActivePageId();
 
     const buildSurfaceItem = (layer: Layer): LayerSurfaceItem => {
       const def = coreRegistries.layers.get(layer.type);
       const previewCtx = {
         isSelected: selectedIds.has(layer.id),
         layerId: layer.id,
-        model: def ? def.getModel(layer) : layer.data,
+        model: def ? def.getModel(layer) : nodeProps(layer),
         registry: coreRegistries.layers,
       };
       const view = resolveLayerPreview(
@@ -47,13 +48,13 @@ export class EditorSliceBuilder {
       return { layer, view, children };
     };
 
-    const layerSurface = activePage.layers.map((layer) =>
+    const layerSurface = activePage.nodes.map((layer) =>
       buildSurfaceItem(layer)
     );
 
     return {
       editor,
-      editorPaneKind: resolveEditorPaneKind(scene, activePageId),
+      editorPaneKind: resolveEditorPaneKind(scene, activeArtboardId),
       editorPanes: ctx.providerRegistries.editorPaneRegistry
         .entries()
         .map(([editorPaneKind, Component]) => ({

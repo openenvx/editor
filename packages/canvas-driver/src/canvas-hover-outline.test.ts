@@ -1,9 +1,10 @@
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultTransform, nodeTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { resolveHoverOutlineRect, readLiveHoverOutlineRect } from './canvas-hover-outline';
 import type { FlattenedStageLayer } from './flatten-layer-surface';
 import { flattenStageLayers } from './flatten-layer-surface';
+import { legacyLayer } from './test/canvas-document-fixtures';
 
 /**
  * Hover outline must use absoluteTransform from flattenStageLayers - relative
@@ -19,35 +20,36 @@ describe('widget face hover outline transforms', () => {
       width: 200,
       height: 216,
     };
-    const bg = {
-      layer: {
-        id: 'w:bg',
-        type: 'canvas.rect',
-        transform: {
-          ...createDefaultTransform(),
-          x: 0,
-          y: 0,
-          width: 200,
-          height: 216,
-        },
-        data: {},
+    const bgLayer = legacyLayer({
+      id: 'w:bg',
+      type: 'canvas.rect',
+      transform: {
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 216,
       },
-      view: { kind: 'rect' as const, fill: '#fff' },
-    };
+      data: {},
+    });
     const surface = [
       {
-        layer: {
+        layer: legacyLayer({
           id: 'w',
           type: 'openenvx.widget',
           transform: widgetTransform,
-          data: { children: [bg.layer] },
-        },
+          children: [bgLayer],
+        }),
         view: {
           kind: 'stack' as const,
           direction: 'vertical' as const,
           children: [],
         },
-        children: [bg],
+        children: [
+          {
+            layer: bgLayer,
+            view: { kind: 'rect' as const, fill: '#fff' },
+          },
+        ],
       },
     ];
 
@@ -62,56 +64,52 @@ describe('widget face hover outline transforms', () => {
       width: 200,
       height: 216,
     });
-    // Relative alone is the bug the outline used to paint with:
-    expect(face?.layer.transform).toMatchObject({ x: 0, y: 0 });
+    expect(nodeTransform(face!.layer)).toMatchObject({ x: 0, y: 0 });
   });
 });
 
 describe('resolveHoverOutlineRect', () => {
   it('hugs group children AABB in artboard space', () => {
     const childA = {
-      layer: {
+      layer: legacyLayer({
         id: 'a',
         type: 'canvas.rect',
         transform: {
-          ...createDefaultTransform(),
           x: 10,
           y: 40,
           width: 40,
           height: 40,
         },
         data: {},
-      },
+      }),
       view: { kind: 'rect' as const },
     };
     const childB = {
-      layer: {
+      layer: legacyLayer({
         id: 'b',
         type: 'canvas.rect',
         transform: {
-          ...createDefaultTransform(),
           x: 100,
           y: 20,
           width: 40,
           height: 40,
         },
         data: {},
-      },
+      }),
       view: { kind: 'rect' as const },
     };
     const group = {
-      layer: {
+      layer: legacyLayer({
         id: 'g',
         type: 'canvas.group',
         transform: {
-          ...createDefaultTransform(),
           x: 100,
           y: 100,
           width: 400,
           height: 200,
         },
-        data: { children: [childA.layer, childB.layer] },
-      },
+        children: [childA.layer, childB.layer],
+      }),
       view: { kind: 'group' as const },
       children: [childA, childB],
       absoluteTransform: {

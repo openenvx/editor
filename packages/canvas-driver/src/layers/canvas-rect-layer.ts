@@ -6,12 +6,12 @@ import {
 import type {
   CommandContext,
   CornerRadiusValue,
-  Layer,
+  DocumentNode,
   LayerPreviewContext,
-  Page,
   PropertySectionDescriptor,
 } from '@openenvx/studio/core';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
+import type { Artboard } from '@openenvx/studio/schema';
 import { createDefaultTransform } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
@@ -59,9 +59,9 @@ export class CanvasRectLayer extends LayerDefinition<CanvasRectModel> {
     return canvasRectSchema.safeParse(data).success;
   }
 
-  createDefault(id: string, _page: Page): Layer {
+  createDefault(id: string, _artboard: Artboard): DocumentNode {
     return {
-      data: {
+      props: {
         cornerRadius: {
           ...DEFAULT_CORNER_RADIUS,
           topLeft: 4,
@@ -74,13 +74,13 @@ export class CanvasRectLayer extends LayerDefinition<CanvasRectModel> {
         strokeWidth: 2,
       },
       id,
-      transform: { ...createDefaultTransform(), height: 120, width: 160 },
+      frame: { ...createDefaultTransform(), height: 120, width: 160 },
       type: this.type,
     };
   }
 
-  serialize(layer: Layer): CanvasRectModel {
-    return layer.data as CanvasRectModel;
+  serialize(node: DocumentNode): CanvasRectModel {
+    return node.props as CanvasRectModel;
   }
 
   deserialize(data: unknown): CanvasRectModel {
@@ -101,7 +101,10 @@ export class CanvasRectLayer extends LayerDefinition<CanvasRectModel> {
         };
   }
 
-  properties(_ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
+  properties(
+    _ctx: CommandContext,
+    _node: DocumentNode
+  ): PropertySectionDescriptor[] {
     const scrub = { scrub: true, precision: 0 };
     return createPropertyBuilder()
       .section('Styles')

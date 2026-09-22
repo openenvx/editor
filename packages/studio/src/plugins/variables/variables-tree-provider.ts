@@ -3,11 +3,14 @@ import {
   type CommandContext,
   type TreeItem,
 } from '@openenvx/studio/core';
-import { sceneVariables, type TemplateVariable } from '@openenvx/studio/schema';
+import {
+  documentVariables,
+  type TemplateVariable,
+} from '@openenvx/studio/schema';
 
 export class VariablesTreeProvider extends TreeDataProvider<TemplateVariable> {
   getRootChildren(ctx: CommandContext): TemplateVariable[] {
-    return sceneVariables(ctx.scene.getScene());
+    return documentVariables(ctx.scene.getScene());
   }
 
   getChildren(): TemplateVariable[] {

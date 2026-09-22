@@ -23,6 +23,6 @@ describe('browser canvas export', () => {
     const scene = createRectExportScene();
     await expect(
       exportBrowserCanvasDocument(scene, 'page-1', { format: 'pdf' })
-    ).rejects.toThrow(/canvas-driver\/export\/node/);
+    ).rejects.toThrow(/does not support format "pdf"/);
   });
 });

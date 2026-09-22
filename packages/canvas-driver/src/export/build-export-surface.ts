@@ -1,19 +1,24 @@
 import { getLayerChildrenForScene } from '@openenvx/studio/core';
-import type { Layer, LayerRegistry, Scene } from '@openenvx/studio/core';
+import type {
+  Document,
+  DocumentNode,
+  LayerRegistry,
+} from '@openenvx/studio/core';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import { nodeProps } from '@openenvx/studio/schema';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
 
 function buildSurfaceItem(
-  layer: Layer,
-  scene: Scene,
+  layer: DocumentNode,
+  scene: Document,
   registry: LayerRegistry
 ): CanvasLayerSurfaceItem {
   const def = registry.get(layer.type);
   const previewCtx = {
     isSelected: false,
     layerId: layer.id,
-    model: def ? def.getModel(layer) : layer.data,
+    model: def ? def.getModel(layer) : nodeProps(layer),
     registry,
   };
   const view = (
@@ -30,13 +35,13 @@ function buildSurfaceItem(
 }
 
 export function buildExportSurface(
-  scene: Scene,
+  scene: Document,
   pageId: string,
   registry: LayerRegistry
 ): CanvasLayerSurfaceItem[] {
-  const page = scene.pages.find((entry) => entry.id === pageId);
+  const page = scene.artboards.find((entry) => entry.id === pageId);
   if (!page) {
-    throw new Error(`Page "${pageId}" not found`);
+    throw new Error(`Artboard "${pageId}" not found`);
   }
-  return page.layers.map((layer) => buildSurfaceItem(layer, scene, registry));
+  return page.nodes.map((layer) => buildSurfaceItem(layer, scene, registry));
 }

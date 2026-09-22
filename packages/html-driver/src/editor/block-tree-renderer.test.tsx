@@ -5,6 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createHtmlDemoScene } from '../create-html-demo-scene';
 import {
+  legacyTestDocument,
+  legacyTestLayer,
+} from '../test/document-fixtures';
+import {
   createBlockRegistry,
   createHtmlWorkbench,
   renderWithWorkbench,
@@ -92,7 +96,7 @@ function renderTree(
     <DndContext>
       <BlockTreeRenderer
         editingTarget={overrides.editingTarget ?? null}
-        layers={scene.pages[0]!.layers}
+        layers={scene.artboards[0]!.nodes}
         registry={registry}
         scene={scene}
         selectedId={overrides.selectedId ?? null}
@@ -232,41 +236,39 @@ describe('BlockTreeRenderer', () => {
   });
 
   it('shows empty drop zone copy for empty containers', () => {
-    const scene = createHtmlDemoScene();
-    const emptyFlex = {
-      ...scene,
-      pages: [
-        {
-          ...scene.pages[0]!,
-          layers: [
-            {
-              id: 'root',
-              type: 'html.root',
-              data: {
-                background: '#fff',
-                children: [
-                  {
-                    id: 'flex-empty',
-                    type: 'html.flex',
-                    data: {
-                      direction: 'row',
-                      wrap: 'true',
-                      children: [],
-                    },
+    const emptyFlex = legacyTestDocument([
+      {
+        id: 'html-page',
+        name: 'Home',
+        layout: 'html',
+        layers: [
+          legacyTestLayer({
+            id: 'root',
+            type: 'html.root',
+            data: {
+              background: '#fff',
+              children: [
+                {
+                  id: 'flex-empty',
+                  type: 'html.flex',
+                  data: {
+                    direction: 'row',
+                    wrap: 'true',
+                    children: [],
                   },
-                ],
-              },
+                },
+              ],
             },
-          ],
-        },
-      ],
-    };
+          }),
+        ],
+      },
+    ]);
     const registry = createBlockRegistry();
     renderWithWorkbench(api,
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
-          layers={emptyFlex.pages[0]!.layers}
+          layers={emptyFlex.artboards[0]!.nodes}
           registry={registry}
           scene={emptyFlex}
           selectedId={null}
@@ -301,7 +303,7 @@ describe('BlockTreeRenderer', () => {
         <BlockTreeRenderer
           editingTarget={null}
           hoveredLayerId="heading-1"
-          layers={scene.pages[0]!.layers}
+          layers={scene.artboards[0]!.nodes}
           registry={registry}
           scene={scene}
           selectedId={null}
@@ -327,7 +329,7 @@ describe('BlockTreeRenderer', () => {
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
-          layers={scene.pages[0]!.layers}
+          layers={scene.artboards[0]!.nodes}
           registry={registry}
           scene={scene}
           selectedId={null}
@@ -356,7 +358,7 @@ describe('BlockTreeRenderer', () => {
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
-          layers={scene.pages[0]!.layers}
+          layers={scene.artboards[0]!.nodes}
           registry={registry}
           scene={scene}
           selectedId={null}
@@ -389,41 +391,38 @@ describe('BlockTreeRenderer', () => {
       defaultData: { html: 'chip' },
       render: ({ data }) => <span>{String(data.html ?? '')}</span>,
     });
-    const scene = {
-      schemaVersion: createHtmlDemoScene().schemaVersion,
-      pages: [
-        {
-          id: 'page-1',
-          name: 'Page',
-          layout: 'html' as const,
-          layers: [
-            {
-              id: 'root',
-              type: 'html.root',
-              data: {
-                children: [
-                  {
-                    id: 'chip-1',
-                    type: 'html.inlineChip',
-                    data: { html: 'chip-a' },
-                  },
-                  {
-                    id: 'chip-2',
-                    type: 'html.inlineChip',
-                    data: { html: 'chip-b' },
-                  },
-                ],
-              },
+    const scene = legacyTestDocument([
+      {
+        id: 'page-1',
+        name: 'Page',
+        layout: 'html',
+        layers: [
+          legacyTestLayer({
+            id: 'root',
+            type: 'html.root',
+            data: {
+              children: [
+                {
+                  id: 'chip-1',
+                  type: 'html.inlineChip',
+                  data: { html: 'chip-a' },
+                },
+                {
+                  id: 'chip-2',
+                  type: 'html.inlineChip',
+                  data: { html: 'chip-b' },
+                },
+              ],
             },
-          ],
-        },
-      ],
-    };
+          }),
+        ],
+      },
+    ]);
     renderWithWorkbench(api,
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
-          layers={scene.pages[0]!.layers}
+          layers={scene.artboards[0]!.nodes}
           registry={registry}
           scene={scene}
           selectedId={null}
@@ -464,44 +463,41 @@ describe('BlockTreeRenderer', () => {
         </table>
       ),
     });
-    const scene = {
-      schemaVersion: createHtmlDemoScene().schemaVersion,
-      pages: [
-        {
-          id: 'page-1',
-          name: 'Page',
-          layout: 'html' as const,
-          layers: [
-            {
-              id: 'root',
-              type: 'html.root',
-              data: {
-                children: [
-                  {
-                    id: 'row-1',
-                    type: 'html.rowLike',
-                    data: {
-                      children: [
-                        {
-                          id: 'cell-1',
-                          type: 'html.cell',
-                          data: { children: [] },
-                        },
-                      ],
-                    },
+    const scene = legacyTestDocument([
+      {
+        id: 'page-1',
+        name: 'Page',
+        layout: 'html',
+        layers: [
+          legacyTestLayer({
+            id: 'root',
+            type: 'html.root',
+            data: {
+              children: [
+                {
+                  id: 'row-1',
+                  type: 'html.rowLike',
+                  data: {
+                    children: [
+                      {
+                        id: 'cell-1',
+                        type: 'html.cell',
+                        data: { children: [] },
+                      },
+                    ],
                   },
-                ],
-              },
+                },
+              ],
             },
-          ],
-        },
-      ],
-    };
+          }),
+        ],
+      },
+    ]);
     const { container } = renderWithWorkbench(api,
       <DndContext>
         <BlockTreeRenderer
           editingTarget={null}
-          layers={scene.pages[0]!.layers}
+          layers={scene.artboards[0]!.nodes}
           registry={registry}
           scene={scene}
           selectedId="cell-1"
@@ -539,46 +535,43 @@ describe('BlockTreeRenderer', () => {
         },
         render: ({ slots }) => <div data-testid="card">{slots?.logo}</div>,
       });
-      const scene = {
-        schemaVersion: 1 as const,
-        pages: [
-          {
-            id: 'p1',
-            name: 'P',
-            layout: 'html' as const,
-            layers: [
-              {
-                id: 'root',
-                type: 'html.root',
-                data: {
-                  background: '#fff',
-                  children: [
-                    {
-                      id: 'card-1',
-                      type: 'test.card',
-                      data: {
-                        backgroundImage: '',
-                        slots: {
-                          logo: [
-                            {
-                              id: 'logo-1',
-                              type: 'html.image',
-                              data: {
-                                src: 'https://placehold.co/100',
-                                alt: 'Logo',
-                              },
+      const scene = legacyTestDocument([
+        {
+          id: 'p1',
+          name: 'P',
+          layout: 'html',
+          layers: [
+            legacyTestLayer({
+              id: 'root',
+              type: 'html.root',
+              data: {
+                background: '#fff',
+                children: [
+                  {
+                    id: 'card-1',
+                    type: 'test.card',
+                    data: {
+                      backgroundImage: '',
+                      slots: {
+                        logo: [
+                          {
+                            id: 'logo-1',
+                            type: 'html.image',
+                            data: {
+                              src: 'https://placehold.co/100',
+                              alt: 'Logo',
                             },
-                          ],
-                        },
+                          },
+                        ],
                       },
                     },
-                  ],
-                },
+                  },
+                ],
               },
-            ],
-          },
-        ],
-      };
+            }),
+          ],
+        },
+      ]);
       const onSelect = vi.fn();
       const onReplaceImage = vi.fn();
       renderWithWorkbench(api,
@@ -586,7 +579,7 @@ describe('BlockTreeRenderer', () => {
           <BlockTreeRenderer
             canReplaceImage
             editingTarget={null}
-            layers={scene.pages[0]!.layers}
+            layers={scene.artboards[0]!.nodes}
             registry={registry}
             scene={scene}
             selectedId="card-1"

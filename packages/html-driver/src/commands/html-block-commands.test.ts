@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { blockProps } from '../test/document-fixtures';
 import { createHtmlCommandHarness, htmlDemoSelection } from '../test/html-editor-harness';
 import { findBlock, getBlockChildren } from '../tree/block-tree';
 
@@ -18,10 +19,10 @@ describe('html block commands', () => {
       });
 
     const afterInsert = store.getScene();
-    const inserted = afterInsert.pages[0]!.layers[0]!;
-    const children = (inserted.data as { children: { id: string }[] }).children;
+    const inserted = afterInsert.artboards[0]!.nodes[0]!;
+    const children = getBlockChildren(inserted);
     const newId = children[0]!.id;
-    expect(findBlock(afterInsert.pages[0]!.layers, newId)).not.toBeNull();
+    expect(findBlock(afterInsert.artboards[0]!.nodes, newId)).not.toBeNull();
 
     await manager
       .getRegistries()
@@ -30,7 +31,7 @@ describe('html block commands', () => {
         newParentId: 'flex-1',
         index: 0,
       });
-    expect(findBlock(store.getScene().pages[0]!.layers, newId)?.parentId).toBe(
+    expect(findBlock(store.getScene().artboards[0]!.nodes, newId)?.parentId).toBe(
       'flex-1'
     );
 
@@ -40,13 +41,9 @@ describe('html block commands', () => {
         id: newId,
         patch: { html: 'Updated' },
       });
-    expect(
-      (
-        findBlock(store.getScene().pages[0]!.layers, newId)!.block.data as {
-          html: string;
-        }
-      ).html
-    ).toBe('Updated');
+    expect(blockProps(findBlock(store.getScene().artboards[0]!.nodes, newId)!.block).html).toBe(
+      'Updated'
+    );
 
     expect(store.undo()).toBe(true);
     expect(store.undo()).toBe(true);
@@ -75,8 +72,8 @@ describe('html block commands', () => {
     const { manager, runtime, store } = createHtmlCommandHarness();
     store.setSelection({
       ...htmlDemoSelection,
-      primaryLayerId: 'text-1',
-      selectedLayerIds: ['text-1'],
+      primaryNodeId: 'text-1',
+      selectedNodeIds: ['text-1'],
     });
     const ctx = runtime.createCommandContext();
 
@@ -84,7 +81,7 @@ describe('html block commands', () => {
       .getRegistries()
       .commands.execute('html.removeBlock', ctx, runtime.getEvents());
 
-    expect(findBlock(store.getScene().pages[0]!.layers, 'text-1')).toBeNull();
+    expect(findBlock(store.getScene().artboards[0]!.nodes, 'text-1')).toBeNull();
     runtime.dispose();
   });
 
@@ -92,8 +89,8 @@ describe('html block commands', () => {
     const { manager, runtime, store } = createHtmlCommandHarness();
     store.setSelection({
       ...htmlDemoSelection,
-      primaryLayerId: 'heading-1',
-      selectedLayerIds: ['heading-1'],
+      primaryNodeId: 'heading-1',
+      selectedNodeIds: ['heading-1'],
     });
     const ctx = runtime.createCommandContext();
 
@@ -101,12 +98,12 @@ describe('html block commands', () => {
       .getRegistries()
       .commands.execute('html.duplicateBlock', ctx, runtime.getEvents());
 
-    const root = store.getScene().pages[0]!.layers[0]!;
+    const root = store.getScene().artboards[0]!.nodes[0]!;
     const children = getBlockChildren(root);
     expect(children.length).toBe(6);
     expect(children[2]!.type).toBe('html.heading');
     expect(children[2]!.id).not.toBe('heading-1');
-    expect(store.getSelection().selectedLayerIds).toEqual([children[2]!.id]);
+    expect(store.getSelection().selectedNodeIds).toEqual([children[2]!.id]);
     runtime.dispose();
   });
 
@@ -114,8 +111,8 @@ describe('html block commands', () => {
     const { manager, runtime, store } = createHtmlCommandHarness();
     store.setSelection({
       ...htmlDemoSelection,
-      primaryLayerId: 'text-1',
-      selectedLayerIds: ['text-1'],
+      primaryNodeId: 'text-1',
+      selectedNodeIds: ['text-1'],
     });
     const ctx = runtime.createCommandContext();
 
@@ -123,14 +120,14 @@ describe('html block commands', () => {
       .getRegistries()
       .commands.execute('html.moveBlockUp', ctx, runtime.getEvents());
 
-    let children = getBlockChildren(store.getScene().pages[0]!.layers[0]!);
+    let children = getBlockChildren(store.getScene().artboards[0]!.nodes[0]!);
     expect(children[1]!.id).toBe('text-1');
 
     await manager
       .getRegistries()
       .commands.execute('html.moveBlockDown', ctx, runtime.getEvents());
 
-    children = getBlockChildren(store.getScene().pages[0]!.layers[0]!);
+    children = getBlockChildren(store.getScene().artboards[0]!.nodes[0]!);
     expect(children[2]!.id).toBe('text-1');
     runtime.dispose();
   });
@@ -189,8 +186,8 @@ describe('html block commands', () => {
     expect(commands.get('html.moveBlockUp')!.canExecute(ctx)).toBe(false);
     store.setSelection({
       ...htmlDemoSelection,
-      primaryLayerId: 'heading-1',
-      selectedLayerIds: ['heading-1'],
+      primaryNodeId: 'heading-1',
+      selectedNodeIds: ['heading-1'],
     });
     expect(
       commands
@@ -199,8 +196,8 @@ describe('html block commands', () => {
     ).toBe(true);
     store.setSelection({
       ...htmlDemoSelection,
-      primaryLayerId: 'hero-1',
-      selectedLayerIds: ['hero-1'],
+      primaryNodeId: 'hero-1',
+      selectedNodeIds: ['hero-1'],
     });
     expect(
       commands
@@ -209,8 +206,8 @@ describe('html block commands', () => {
     ).toBe(false);
     store.setSelection({
       ...htmlDemoSelection,
-      primaryLayerId: 'heading-1',
-      selectedLayerIds: ['heading-1'],
+      primaryNodeId: 'heading-1',
+      selectedNodeIds: ['heading-1'],
     });
     expect(
       commands
@@ -252,8 +249,8 @@ describe('html block commands', () => {
 
     store.setSelection({
       ...htmlDemoSelection,
-      primaryLayerId: 'grid-1',
-      selectedLayerIds: ['grid-1'],
+      primaryNodeId: 'grid-1',
+      selectedNodeIds: ['grid-1'],
     });
     expect(
       commands
@@ -276,7 +273,7 @@ describe('html block commands', () => {
         index: Number.POSITIVE_INFINITY,
       });
 
-    let grid = findBlock(store.getScene().pages[0]!.layers, 'grid-1')!.block;
+    let grid = findBlock(store.getScene().artboards[0]!.nodes, 'grid-1')!.block;
     let children = getBlockChildren(grid);
     expect(children).toHaveLength(3);
     expect(children.every((child) => child.type !== 'html.slot')).toBe(true);
@@ -291,13 +288,13 @@ describe('html block commands', () => {
       });
 
     expect(
-      findBlock(store.getScene().pages[0]!.layers, insertedId)?.parentId
+      findBlock(store.getScene().artboards[0]!.nodes, insertedId)?.parentId
     ).toBe('flex-1');
-    grid = findBlock(store.getScene().pages[0]!.layers, 'grid-1')!.block;
+    grid = findBlock(store.getScene().artboards[0]!.nodes, 'grid-1')!.block;
     expect(getBlockChildren(grid)).toHaveLength(2);
 
     children = getBlockChildren(
-      findBlock(store.getScene().pages[0]!.layers, 'flex-1')!.block
+      findBlock(store.getScene().artboards[0]!.nodes, 'flex-1')!.block
     );
     expect(children[0]!.id).toBe(insertedId);
     runtime.dispose();
@@ -313,12 +310,12 @@ describe('html block commands', () => {
         type: 'html.text',
       });
 
-    const page = store.getScene().pages[0]!;
-    const root = findBlock(page.layers, 'root')!.block;
+    const page = store.getScene().artboards[0]!;
+    const root = findBlock(page.nodes, 'root')!.block;
     const children = getBlockChildren(root);
     const inserted = children.at(-1)!;
     expect(inserted.type).toBe('html.text');
-    expect(findBlock(page.layers, inserted.id)?.parentId).toBe('root');
+    expect(findBlock(page.nodes, inserted.id)?.parentId).toBe('root');
 
     runtime.dispose();
   });
@@ -335,11 +332,11 @@ describe('html block commands', () => {
         data: { level: '1' },
       });
 
-    const page = store.getScene().pages[0]!;
-    const root = findBlock(page.layers, 'root')!.block;
+    const page = store.getScene().artboards[0]!;
+    const root = findBlock(page.nodes, 'root')!.block;
     const heading = getBlockChildren(root).at(-1)!;
     expect(heading.type).toBe('html.heading');
-    expect((heading.data as { level: string }).level).toBe('1');
+    expect(blockProps(heading).level).toBe('1');
 
     runtime.dispose();
   });

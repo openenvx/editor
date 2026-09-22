@@ -1,11 +1,12 @@
 // @vitest-environment node
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import { formatVariableToken, nodeTransform } from '@openenvx/studio/schema';
 import {
-  createDefaultTransform,
-  formatVariableToken,
-  normalizeScene,
-} from '@openenvx/studio/schema';
+  legacyArtboard,
+  legacyLayer,
+  testDocument,
+} from '../../test/canvas-document-fixtures';
 
 import { createRectExportScene } from '../export-test-fixtures';
 import { resolveCanvasExportScene } from '../resolve-canvas-export-scene';
@@ -39,39 +40,36 @@ describe('node canvas export', () => {
 
   it('substitutes variables and hugs text width in node layout', async () => {
     const token = formatVariableToken('title');
-    const scene = normalizeScene({
-      pages: [
-        {
-          id: 'page-1',
-          layout: 'absolute',
-          width: 800,
-          height: 600,
-          layers: [
-            {
-              id: 't1',
-              type: 'canvas.text',
-              data: {
-                align: 'center',
-                autoFit: 'hug',
-                html: `<p>${token}</p>`,
-              },
-              transform: {
-                ...createDefaultTransform(),
-                x: 150,
-                y: 200,
-                width: 500,
-                height: 64,
-              },
+    const scene = testDocument([
+      legacyArtboard({
+        id: 'page-1',
+        layout: 'absolute',
+        width: 800,
+        height: 600,
+        layers: [
+          legacyLayer({
+            id: 't1',
+            type: 'canvas.text',
+            data: {
+              align: 'center',
+              autoFit: 'hug',
+              html: `<p>${token}</p>`,
             },
-          ],
-        },
-      ],
-    });
+            transform: {
+              x: 150,
+              y: 200,
+              width: 500,
+              height: 64,
+            },
+          }),
+        ],
+      }),
+    ]);
     const laidOut = resolveCanvasExportScene(scene, {
       variables: { title: 'Engineer' },
     });
-    const layer = laidOut.pages[0]!.layers[0]!;
-    expect(layer.transform!.width).toBeLessThan(500);
+    const layer = laidOut.artboards[0]!.nodes[0]!;
+    expect(nodeTransform(layer).width).toBeLessThan(500);
     const result = await exportCanvasDocument(scene, 'page-1', {
       format: 'png',
       variables: { title: 'Engineer' },

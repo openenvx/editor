@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createHtmlDemoScene } from '../create-html-demo-scene';
+import { blockProps } from '../test/document-fixtures';
+import { findBlock } from '../tree/block-tree';
 import {
   createBlockRegistry,
   createSortDraftMock,
@@ -23,14 +25,14 @@ function draftRef(current: BlockSortDraft | null = null) {
 describe('visibleSiblingIds', () => {
   it('returns visible children or empty when parent missing', () => {
     const scene = createHtmlDemoScene();
-    expect(visibleSiblingIds(scene.pages[0]!.layers, 'root')).toEqual([
+    expect(visibleSiblingIds(scene.artboards[0]!.nodes, 'root')).toEqual([
       'hero-1',
       'heading-1',
       'text-1',
       'flex-1',
       'grid-1',
     ]);
-    expect(visibleSiblingIds(scene.pages[0]!.layers, 'missing')).toEqual([]);
+    expect(visibleSiblingIds(scene.artboards[0]!.nodes, 'missing')).toEqual([]);
   });
 });
 
@@ -187,12 +189,8 @@ describe('applyHtmlDragOver', () => {
   it('inserts beside a sibling in a nowrap flex parent', () => {
     const scene = createHtmlDemoScene();
     // Force flex to nowrap so insert-line path is used instead of container preview.
-    const flex = (
-      scene.pages[0]!.layers[0]!.data as {
-        children: { id: string; data: Record<string, unknown> }[];
-      }
-    ).children.find((c) => c.id === 'flex-1')!;
-    flex.data.wrap = 'false';
+    const flex = findBlock(scene.artboards[0]!.nodes, 'flex-1')!.block;
+    flex.props = { ...blockProps(flex), wrap: 'false' };
 
     const { sortDraftRef, setSortDraft } = createSortDraftMock();
 

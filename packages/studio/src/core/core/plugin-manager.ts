@@ -11,7 +11,9 @@ import type { ContextKeyService } from '../workbench/context-key-service';
 import type { EditorService } from '../workbench/editor-service';
 
 export interface PluginContext {
-  register(...contributions: Contribution[]): void;
+  register(
+    ...contributions: Contribution[]
+  ): import('../runtime/emitter').Disposable;
   commands: CommandService;
   events: EventBus;
   services: InstantiationService;
@@ -32,7 +34,10 @@ class MutablePluginContext implements PluginContext {
     private readonly registries: Registries
   ) {}
 
-  register(...contributions: Contribution[]): void {
+  register(
+    ...contributions: Contribution[]
+  ): import('../runtime/emitter').Disposable {
+    const disposables: import('../runtime/emitter').Disposable[] = [];
     const i18nContributions = contributions.filter(
       (contribution) => contribution.contributionPoint === 'i18n'
     );
@@ -40,11 +45,22 @@ class MutablePluginContext implements PluginContext {
       (contribution) => contribution.contributionPoint !== 'i18n'
     );
     for (const contribution of i18nContributions) {
-      registerContribution(this.registries, contribution, this.runtime);
+      disposables.push(
+        registerContribution(this.registries, contribution, this.runtime)
+      );
     }
     for (const contribution of otherContributions) {
-      registerContribution(this.registries, contribution, this.runtime);
+      disposables.push(
+        registerContribution(this.registries, contribution, this.runtime)
+      );
     }
+    return {
+      dispose: () => {
+        for (const disposable of disposables.toReversed()) {
+          disposable.dispose();
+        }
+      },
+    };
   }
 }
 
@@ -55,7 +71,7 @@ export class PluginManager {
   constructor(private readonly runtime: EditorRuntime) {
     // Live lookup - contributions registered later are visible immediately.
     this.runtime
-      .getScene()
+      .getDocument()
       .setPageRulesLookup((layout) => this.registries.pageRules.get(layout));
   }
 
@@ -68,7 +84,7 @@ export class PluginManager {
       this.registries.commands,
       this.runtime.getEvents(),
       this.runtime.services,
-      this.runtime.getScene(),
+      this.runtime.getDocument(),
       this.runtime.getEditor(),
       this.runtime.getContextKeys(),
       this.runtime,
@@ -110,6 +126,6 @@ export class PluginManager {
     for (const plugin of plugins) {
       await this.activate(plugin);
     }
-    this.runtime.getScene().renormalize();
+    this.runtime.getDocument().renormalize();
   }
 }

@@ -1,26 +1,39 @@
 import { describe, expect, it } from 'vitest';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import {
+  applyNodeTransform,
+  createDefaultTransform,
+  nodeTransform,
+  type OpenEnvxWidgetProps,
+} from '@openenvx/studio/schema';
 
 import { applyWidgetFace } from './apply-widget-face';
 
+function widgetNode(
+  id: string,
+  frame: Partial<ReturnType<typeof createDefaultTransform>>,
+  props: OpenEnvxWidgetProps
+) {
+  return applyNodeTransform(
+    {
+      id,
+      type: 'openenvx.widget',
+      props,
+      children: [],
+    },
+    { ...createDefaultTransform(), ...frame }
+  );
+}
+
 describe(applyWidgetFace, () => {
   it('unwraps root group, syncs size, and keeps nested face children', () => {
-    const widget = {
-      id: 'w1',
-      type: 'openenvx.widget',
-      transform: {
-        ...createDefaultTransform(),
-        x: 40,
-        y: 60,
-        width: 240,
-        height: 160,
-      },
-      data: {
+    const widget = widgetNode(
+      'w1',
+      { x: 40, y: 60, width: 240, height: 160 },
+      {
         extensionId: 'demo',
         values: { title: 'Hi' },
-        children: [],
-      },
-    };
+      }
+    );
 
     const next = applyWidgetFace(widget, {
       type: 'Stack',
@@ -45,34 +58,29 @@ describe(applyWidgetFace, () => {
       ],
     });
 
-    expect(next.transform).toMatchObject({
+    expect(nodeTransform(next)).toMatchObject({
       x: 40,
       y: 60,
       width: 200,
     });
-    const data = next.data as {
-      children: { type: string; writeMode?: string }[];
-      handlers?: unknown;
-    };
-    // Unwrapped: bg rect + laid-out children (no nested root group).
-    expect(data.children.length).toBeGreaterThanOrEqual(2);
-    expect(data.children.every((child) => child.type !== 'openenvx.widget')).toBe(
+    const children = next.children ?? [];
+    expect(children.length).toBeGreaterThanOrEqual(2);
+    expect(children.every((child) => child.type !== 'openenvx.widget')).toBe(
       true
     );
     expect(
-      data.children.some(
+      children.some(
         (child) => child.type === 'canvas.text' && child.writeMode === 'free'
       )
     ).toBe(true);
   });
 
   it('records Stack onClick handlers on nested groups after Grid unwrap', () => {
-    const widget = {
-      id: 'seat',
-      type: 'openenvx.widget',
-      transform: { ...createDefaultTransform(), width: 240, height: 160 },
-      data: { extensionId: 'wm.seating', values: {}, children: [] },
-    };
+    const widget = widgetNode(
+      'seat',
+      { width: 240, height: 160 },
+      { extensionId: 'wm.seating', values: {} }
+    );
 
     const next = applyWidgetFace(widget, {
       type: 'Grid',
@@ -98,25 +106,21 @@ describe(applyWidgetFace, () => {
       ],
     });
 
-    const data = next.data as {
-      children: { id: string; type: string }[];
-      handlers?: Record<string, Record<string, string>>;
-    };
-    expect(next.transform?.width).toBe(220);
-    expect(next.transform?.height).toBe(180);
-    expect(data.children[0]?.type).toBe('canvas.group');
-    const groupId = data.children[0]?.id;
+    const props = next.props as OpenEnvxWidgetProps;
+    const children = next.children ?? [];
+    expect(nodeTransform(next).width).toBe(220);
+    expect(nodeTransform(next).height).toBe(180);
+    expect(children[0]?.type).toBe('canvas.group');
+    const groupId = children[0]?.id;
     expect(groupId).toBeTruthy();
-    expect(data.handlers?.[groupId!]?.click).toBe('h1');
+    expect(props.handlers?.[groupId!]?.click).toBe('h1');
   });
 
   it('retargets root Stack onClick to the widget id after unwrap', () => {
-    const widget = {
-      id: 'w-root',
-      type: 'openenvx.widget',
-      transform: { ...createDefaultTransform(), width: 100, height: 100 },
-      data: { extensionId: 'x', values: {}, children: [] },
-    };
+    const widget = widgetNode('w-root', { width: 100, height: 100 }, {
+      extensionId: 'x',
+      values: {},
+    });
 
     const next = applyWidgetFace(widget, {
       type: 'Stack',
@@ -136,9 +140,7 @@ describe(applyWidgetFace, () => {
       ],
     });
 
-    const data = next.data as {
-      handlers?: Record<string, Record<string, string>>;
-    };
-    expect(data.handlers?.['w-root']?.click).toBe('h9');
+    const props = next.props as OpenEnvxWidgetProps;
+    expect(props.handlers?.['w-root']?.click).toBe('h9');
   });
 });

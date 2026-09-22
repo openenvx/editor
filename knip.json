@@ -56,7 +56,10 @@
         "rolldown.publish.config.ts",
         "css-modules-plugin.ts",
         "build-dts.ts",
-      ]
+      ],
+      "ignoreIssues": {
+        "src/page-presets.ts": ["duplicates"]
+      }
     },
     "packages/editor-sandbox": {
       "entry": [
@@ -82,7 +85,10 @@
         "rolldown.config.ts",
         "css-modules-plugin.ts",
         "build-dts.ts",
-      ]
+      ],
+      "ignoreIssues": {
+        "src/canvas-widget/document-node-build.ts": ["exports"]
+      }
     },
     "packages/agent": {
       "entry": [
@@ -126,6 +132,14 @@
       "ignoreDependencies": [
         "zod"
       ],
+      "ignoreIssues": {
+        "src/core/schema/**": ["duplicates", "exports"],
+        "src/core/scene/**": ["duplicates"],
+        "src/core/scene/layer-tree.ts": ["exports"],
+        "src/core/scene/scene-store.ts": ["types"],
+        "src/core/scene/types.ts": ["types"],
+        "src/core/schema/types.ts": ["types"]
+      },
       "ignore": [
         "src/primitives/combobox.tsx",
         "src/plugins/version-history/**",

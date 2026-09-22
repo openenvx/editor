@@ -7,37 +7,47 @@ import {
   RemoveCanvasGuideCommand,
 } from './canvas-ruler-commands';
 
-function createCtx(guides?: { id: string; orientation: 'horizontal' | 'vertical'; position: number }[]) {
+function createCtx(
+  guides?: {
+    id: string;
+    orientation: 'horizontal' | 'vertical';
+    position: number;
+  }[]
+) {
   let pageGuides = guides;
   const applyCalls: unknown[] = [];
+  const artboard = () => ({
+    guides: pageGuides,
+    id: 'page-1',
+    nodes: [],
+    space: { height: 600, width: 800 },
+  });
   return {
     applyCalls,
     ctx: {
       scene: {
-        getActivePageId: () => 'page-1',
-        getActivePage: () => ({
-          id: 'page-1',
-          guides: pageGuides,
-        }),
         apply: (op: {
           apply: (scene: {
-            pages: { id: string; guides?: typeof pageGuides }[];
+            artboards: { id: string; guides?: typeof pageGuides }[];
           }) => {
-            pages: { id: string; guides?: typeof pageGuides }[];
+            artboards: { id: string; guides?: typeof pageGuides }[];
           };
         }) => {
           applyCalls.push(op);
           const next = op.apply({
-            pages: [{ id: 'page-1', guides: pageGuides }],
+            artboards: [{ id: 'page-1', guides: pageGuides }],
           });
-          pageGuides = next.pages[0]?.guides;
+          pageGuides = next.artboards[0]?.guides;
         },
+        getActiveArtboard: artboard,
+        getActiveArtboardId: () => 'page-1',
+        getActivePage: artboard,
       },
       services: {
-        has: () => false,
         get: () => {
           throw new Error('unexpected');
         },
+        has: () => false,
       },
     } as never,
   };
@@ -47,12 +57,12 @@ describe('canvas guide commands', () => {
   it('adds a guide via scene.apply', () => {
     const { applyCalls, ctx } = createCtx();
     new AddCanvasGuideCommand().execute(ctx, {
+      id: 'g1',
       orientation: 'vertical',
       position: 120,
-      id: 'g1',
     });
     expect(applyCalls).toHaveLength(1);
-    expect(ctx.scene.getActivePage().guides).toEqual([
+    expect(ctx.scene.getActiveArtboard().guides).toEqual([
       { id: 'g1', orientation: 'vertical', position: 120 },
     ]);
   });
@@ -64,14 +74,14 @@ describe('canvas guide commands', () => {
     ]);
 
     new MoveCanvasGuideCommand().execute(ctx, { guideId: 'g1', position: 40 });
-    expect(ctx.scene.getActivePage().guides?.[0]?.position).toBe(40);
+    expect(ctx.scene.getActiveArtboard().guides?.[0]?.position).toBe(40);
 
     new RemoveCanvasGuideCommand().execute(ctx, { guideId: 'g2' });
-    expect(ctx.scene.getActivePage().guides).toEqual([
+    expect(ctx.scene.getActiveArtboard().guides).toEqual([
       { id: 'g1', orientation: 'vertical', position: 40 },
     ]);
 
     new ClearCanvasGuidesCommand().execute(ctx);
-    expect(ctx.scene.getActivePage().guides).toBeUndefined();
+    expect(ctx.scene.getActiveArtboard().guides).toBeUndefined();
   });
 });

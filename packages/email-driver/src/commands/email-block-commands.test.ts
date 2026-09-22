@@ -39,17 +39,17 @@ describe('email block commands', () => {
   it('refuses to remove a non-email layer type', async () => {
     const { manager, runtime, store } = createEmailCommandHarness();
     const scene = store.getScene();
-    const page = scene.pages[0]!;
-    page.layers.push({
+    const page = scene.artboards[0]!;
+    page.nodes.push({
       id: 'html-intruder',
       type: 'html.text',
       data: { html: 'nope' },
-    } as (typeof page.layers)[number]);
+    } as (typeof page.nodes)[number]);
     store.setScene(scene);
     store.setSelection({
-      activePageId: page.id,
-      primaryLayerId: 'html-intruder',
-      selectedLayerIds: ['html-intruder'],
+      activeArtboardId: page.id,
+      primaryNodeId: 'html-intruder',
+      selectedNodeIds: ['html-intruder'],
     });
     const before = structuredClone(store.getScene());
     const ctx = runtime.createCommandContext();
@@ -75,7 +75,7 @@ describe('email block commands', () => {
       });
 
     expect(
-      findBlock(store.getScene().pages[0]!.layers, 'text-1')
+      findBlock(store.getScene().artboards[0]!.nodes, 'text-1')
     ).toBeNull();
     runtime.dispose();
   });

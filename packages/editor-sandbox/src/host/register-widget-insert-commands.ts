@@ -1,12 +1,14 @@
 import {
   Command,
-  getActivePage,
+  getActiveArtboard,
   insertLayerIntoContainer,
 } from '@openenvx/studio/core';
 import {
+  applyNodeTransform,
+  artboardRulesLayout,
   createDefaultTransform,
-  type Layer,
-  type Page,
+  type Artboard,
+  type DocumentNode,
 } from '@openenvx/studio/schema';
 
 import type {
@@ -49,13 +51,13 @@ function insertCommandId(widget: ExtensionWidgetContribution): string {
  * Nest widgets under the page root for html-like layouts only.
  * Never under `email.root` (widgets do not round-trip through email render).
  */
-function findHtmlLikeRootId(page: Page): string | null {
-  if (page.layout !== 'html') {
+function findHtmlLikeRootId(artboard: Artboard): string | null {
+  if (artboardRulesLayout(artboard) !== 'html') {
     return null;
   }
   return (
-    page.layers.find((layer) => layer.type === 'html.root')?.id ??
-    page.layers.find(
+    artboard.nodes.find((layer) => layer.type === 'html.root')?.id ??
+    artboard.nodes.find(
       (layer) => layer.type.endsWith('.root') && layer.type !== 'email.root'
     )?.id ??
     null
@@ -65,8 +67,8 @@ function findHtmlLikeRootId(page: Page): string | null {
 /**
  * Register host Commands that drop widget layers for each widgets/blocks
  * contribution. Command id is `${widget.id}.insert`. Outer-world path - no
- * internal Plugin. HTML pages nest under the page `*.root`; canvas pages append to
- * page.layers. `contributes.blocks` also register in {@link extensionBlockStore}
+ * internal Plugin. HTML artboards nest under the page `*.root`; canvas artboards append to
+ * artboard.nodes. `contributes.blocks` also register in {@link extensionBlockStore}
  * for the HTML Blocks palette.
  */
 export function registerWidgetInsertCommands(
@@ -97,54 +99,60 @@ export function registerWidgetInsertCommands(
           readonly id = commandId;
           readonly title = title;
           execute(): void {
-            const layer: Layer = {
-              id: `${widget.id}-${Date.now()}`,
-              type: widgetLayerType,
-              name: widget.label || widget.id,
-              transform: {
+            const layer: DocumentNode = applyNodeTransform(
+              {
+                id: `${widget.id}-${Date.now()}`,
+                type: widgetLayerType,
+                name: widget.label || widget.id,
+                props: {
+                  extensionId: widget.id,
+                  label: widget.label,
+                  values: { ...values },
+                  manifest: {
+                    id: widget.id,
+                    label: widget.label,
+                    kinds: widget.kinds,
+                    fields: widget.fields ?? {},
+                    defaults: values,
+                  },
+                },
+                children: [],
+              },
+              {
                 ...createDefaultTransform(),
+                opacity: 1,
                 x: 40,
                 y: 40,
                 width: size.width,
                 height: size.height,
-              },
-              data: {
-                extensionId: widget.id,
-                label: widget.label,
-                values: { ...values },
-                children: [],
-                manifest: {
-                  id: widget.id,
-                  label: widget.label,
-                  kinds: widget.kinds,
-                  fields: widget.fields ?? {},
-                  defaults: values,
-                },
-              },
-            };
+              }
+            );
             host.apply({
               label: title,
               apply: (scene) => {
                 const selection = host.getSelection();
-                const page = getActivePage(scene, selection.activePageId);
+                const page = getActiveArtboard(
+                  scene,
+                  selection.activeArtboardId
+                );
                 const htmlRootId = findHtmlLikeRootId(page);
                 return {
                   ...scene,
-                  pages: scene.pages.map((entry) => {
+                  artboards: scene.artboards.map((entry) => {
                     if (entry.id !== page.id) {
                       return entry;
                     }
                     if (htmlRootId) {
                       return {
                         ...entry,
-                        layers: insertLayerIntoContainer(
-                          entry.layers,
+                        nodes: insertLayerIntoContainer(
+                          entry.nodes,
                           htmlRootId,
                           layer
                         ),
                       };
                     }
-                    return { ...entry, layers: [...entry.layers, layer] };
+                    return { ...entry, nodes: [...entry.nodes, layer] };
                   }),
                 };
               },

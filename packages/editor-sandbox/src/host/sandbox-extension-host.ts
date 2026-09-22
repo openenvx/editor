@@ -1,11 +1,12 @@
 import {
   Command,
-  findLayerById,
+  findNodeById,
   updateLayerInTree,
   walkLayers,
 } from '@openenvx/studio/core';
 import type { WorkbenchApi } from '@openenvx/studio/core';
-import type { Layer, Scene } from '@openenvx/studio/schema';
+import type { Document, DocumentNode } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
@@ -38,13 +39,13 @@ function resolveWidgetFaceKind(
 
 /** Host-injected face applicator (studio / html-driver). */
 export type ApplyWidgetFaceFn = (
-  widgetLayer: Layer,
+  widgetLayer: DocumentNode,
   tree: RenderNode,
   kind?: 'canvas' | 'html'
-) => Layer;
+) => DocumentNode;
 
 function findWidgetClickInLayers(
-  layers: Scene['pages'][number]['layers'],
+  layers: DocumentNode[],
   targetLayerId: string,
   widgetLayerType: string
 ): {
@@ -68,7 +69,7 @@ function findWidgetClickInLayers(
       if (candidate?.type !== widgetLayerType) {
         continue;
       }
-      const data = candidate.data as {
+      const data = (candidate.props ?? {}) as {
         extensionId?: string;
         handlers?: Record<string, Record<string, string>>;
       };
@@ -88,7 +89,7 @@ function findWidgetClickInLayers(
 }
 
 function resolveWidgetClickTarget(
-  scene: Scene,
+  scene: Document,
   targetLayerId: string,
   widgetLayerType: string
 ): {
@@ -96,9 +97,9 @@ function resolveWidgetClickTarget(
   extensionId: string;
   handlerId: string;
 } | null {
-  for (const page of scene.pages) {
+  for (const page of scene.artboards) {
     const found = findWidgetClickInLayers(
-      page.layers,
+      page.nodes,
       targetLayerId,
       widgetLayerType
     );
@@ -243,11 +244,11 @@ export class SandboxExtensionHost {
       }
       const epoch = (faceEpoch.get(layerId) ?? 0) + 1;
       faceEpoch.set(layerId, epoch);
-      const layer = findLayerById(host.getScene(), layerId);
+      const layer = findNodeById(host.getScene(), layerId);
       if (!layer || layer.type !== widgetLayerType) {
         return;
       }
-      const data = layer.data as {
+      const data = nodeProps(layer) as {
         extensionId?: string;
         values?: Record<string, unknown>;
         manifest?: { id?: string; kinds?: ('canvas' | 'html')[] };
@@ -276,24 +277,17 @@ export class SandboxExtensionHost {
         label: 'Render widget face',
         apply: (scene) => ({
           ...scene,
-          pages: scene.pages.map((page) => ({
+          artboards: scene.artboards.map((page) => ({
             ...page,
-            layers: updateLayerInTree(page.layers, layerId, (current) => ({
-              ...current,
-              ...(next.transform ? { transform: next.transform } : {}),
-              data: {
-                ...(current.data as Record<string, unknown>),
-                ...(next.data as Record<string, unknown>),
-              },
-            })),
+            nodes: updateLayerInTree(page.nodes, layerId, () => next),
           })),
         }),
       });
-      const applied = findLayerById(host.getScene(), layerId);
+      const applied = findNodeById(host.getScene(), layerId);
       if (applied) {
         lastValues.set(
           layerId,
-          JSON.stringify((applied.data as { values?: unknown }).values ?? {})
+          JSON.stringify((nodeProps(applied).values as unknown) ?? {})
         );
       }
     };
@@ -375,12 +369,12 @@ export class SandboxExtensionHost {
       const scene = host.getScene();
       const desired: { extensionId: string; layerId: string }[] = [];
       const seenLayerIds = new Set<string>();
-      for (const page of scene.pages) {
-        walkLayers(page.layers, (layer) => {
+      for (const page of scene.artboards) {
+        walkLayers(page.nodes, (layer) => {
           if (layer.type !== widgetLayerType) {
             return;
           }
-          const data = layer.data as { extensionId?: string };
+          const data = nodeProps(layer) as { extensionId?: string };
           if (!data.extensionId) {
             return;
           }
@@ -393,7 +387,7 @@ export class SandboxExtensionHost {
           desired.push({ extensionId: grant.id, layerId: layer.id });
           seenLayerIds.add(layer.id);
           const valuesKey = JSON.stringify(
-            (layer.data as { values?: unknown }).values ?? {}
+            (nodeProps(layer).values as unknown) ?? {}
           );
           const shouldRefresh = lastValues.get(layer.id) !== valuesKey;
           void controller

@@ -1,4 +1,7 @@
-export { SceneValidationError } from './scene/scene-validation-error';
+export {
+  DocumentValidationError,
+  SceneValidationError,
+} from './scene/scene-validation-error';
 export {
   escapeAttr,
   escapeHtml,
@@ -13,6 +16,10 @@ export { EditorRuntime } from './core/editor-runtime';
 
 export { Command } from './contributions/command';
 export { LayerDefinition } from './contributions/layer-definition';
+export { NodeCompilerContribution } from './contributions/node-compiler-contribution';
+export { NodeDefinition } from './contributions/node-definition';
+export { NodeInspectorContribution } from './contributions/node-inspector-contribution';
+export { NodeTreeContribution } from './contributions/node-tree-contribution';
 export { PageRulesContribution } from './contributions/page-rules-contribution';
 export { ShortcutContribution } from './contributions/shortcut-contribution';
 export { ContextKeyContribution } from './contributions/context-key-contribution';
@@ -23,13 +30,27 @@ export {
 } from './contributions/service-contribution';
 
 export {
-  SceneStore,
+  DocumentStore,
+  DocumentStore as SceneStore,
+  DEFAULT_ARTBOARD_RULES_LAYOUT_KEY,
   moveLayerToIndex,
+  moveNodeToIndex,
   reorderLayers,
+  reorderNodes,
   type PageRulesLookup,
-} from './scene/scene-store';
+} from './scene/document-store';
 export { HistoryStack } from './scene/history-stack';
 export type {
+  Artboard,
+  Document,
+  DocumentNode,
+  DocumentTransaction,
+  EditorPaneKind,
+  EditorSession,
+  EditorSurfaceKind,
+  Frame,
+  LiveProjectSnapshot,
+  Transform,
   EditorState,
   Layer,
   Page,
@@ -38,10 +59,13 @@ export type {
   SceneSnapshot,
   SceneTransaction,
   Selection,
-  Transform,
-  EditorPaneKind,
 } from './scene/types';
 export {
+  cloneDocument,
+  cloneEditorSession,
+  getActiveArtboard,
+  getPrimaryNode,
+  resolveEditorSurfaceKind,
   cloneEditorState,
   cloneScene,
   getActivePage,
@@ -82,9 +106,12 @@ export {
   CONTAINER_LAYER_TYPE,
   type ContainerLayoutModel,
   cloneLayerTree,
+  cloneNodeTree,
   createLayerId,
   findLayerById,
+  findNodeById,
   findLayerPage,
+  findNodeArtboard,
   getLayerAncestorIds,
   getContainerChildren,
   getLayerChildren,
@@ -93,13 +120,16 @@ export {
   isContainerLayer,
   layerExistsOnPage,
   mapLayers,
+  mapNodes,
   findLayerLocation,
   moveLayerInTree,
   moveLayerRelativeToTarget,
   isLayerDescendant,
   removeLayerFromTree,
   updateLayerInTree,
+  updateNodeInTree,
   walkLayers,
+  walkNodes,
 } from './scene/layer-tree';
 export {
   createBlankPageLike,

@@ -8,9 +8,15 @@ import {
   type TreeItem,
   type WorkbenchPluginContext,type CommandContext,type Layer
 } from '@openenvx/studio/core';
-import { createDefaultTransform, normalizeScene } from '@openenvx/studio/schema';
-import type { Page } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
+import type { Artboard } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
+
+import {
+  asDocumentNode,
+  flowArtboard,
+  normalizeSceneForTest,
+} from '../core/test/document-fixtures';
 
 import {
   LayersTreeProvider,
@@ -20,7 +26,7 @@ import {
 
 class TestLayersTreeProvider extends TreeDataProvider<Layer> {
   getRootChildren(ctx: CommandContext): Layer[] {
-    return ctx.scene.getActivePage().layers;
+    return ctx.scene.getActiveArtboard().nodes;
   }
 
   getChildren(): Layer[] {
@@ -37,17 +43,17 @@ class TestLayersTreeProvider extends TreeDataProvider<Layer> {
     position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const effectivePosition = position === 'inside' ? 'after' : position;
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((p) =>
+        artboards: scene.artboards.map((p) =>
           p.id === page.id
             ? {
                 ...p,
-                layers: moveLayerRelativeToTarget(
-                  p.layers,
+                nodes: moveLayerRelativeToTarget(
+                  p.nodes,
                   source.id,
                   target.id,
                   effectivePosition
@@ -73,7 +79,7 @@ class LayersViewContainer extends ViewContainerContribution {
 }
 
 class LayersPlugin extends WorkbenchPlugin {
-  readonly id = 'test.layers';
+  readonly id = 'test.nodes';
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
     ctx.registerWorkbench(new LayersViewContainer(), new LayersView());
@@ -93,7 +99,7 @@ class PagesViewContainer extends ViewContainerContribution {
 }
 
 class PagesPlugin extends WorkbenchPlugin {
-  readonly id = 'test.pages';
+  readonly id = 'test.artboards';
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
     ctx.registerWorkbench(new PagesViewContainer(), new PagesView());
@@ -107,7 +113,7 @@ class PagesPlugin extends WorkbenchPlugin {
 describe('moveViewItem', () => {
   it('delegates to tree provider handleMove', async () => {
     const controller = new WorkbenchController({
-      initialScene: normalizeScene({
+      initialScene: normalizeSceneForTest({
         pages: [
           {
             id: 'p1',
@@ -120,18 +126,18 @@ describe('moveViewItem', () => {
                 id: 'x',
                 type: 'canvas.rect',
                 data: { fill: '#000000' },
-                transform: createDefaultTransform(),
+                transform: createDefaultFrame(),
               },
               {
                 id: 'y',
                 type: 'canvas.rect',
                 data: { fill: '#ffffff' },
-                transform: createDefaultTransform(),
+                transform: createDefaultFrame(),
               },
             ],
           },
         ],
-        activePageId: 'p1',
+        activeArtboardId: 'p1',
       }),
       plugins: [new LayersPlugin()],
     });
@@ -142,18 +148,18 @@ describe('moveViewItem', () => {
         id: 'y',
         type: 'canvas.rect',
         data: { fill: '#ffffff' },
-        transform: createDefaultTransform(),
+        transform: createDefaultFrame(),
       },
       {
         id: 'x',
         type: 'canvas.rect',
         data: { fill: '#000000' },
-        transform: createDefaultTransform(),
+        transform: createDefaultFrame(),
       },
       'before'
     );
     expect(
-      controller.getState().scene.pages[0]!.layers.map((l) => l.id)
+      controller.getState().scene.artboards[0]!.nodes.map((l) => l.id)
     ).toStrictEqual(['y', 'x']);
   });
 });
@@ -161,12 +167,12 @@ describe('moveViewItem', () => {
 describe('PagesTreeProvider', () => {
   it('selects a page via setActivePage', async () => {
     const controller = new WorkbenchController({
-      initialScene: normalizeScene({
+      initialScene: normalizeSceneForTest({
         pages: [
           { id: 'a', name: 'A', layout: 'flow', layers: [] },
           { id: 'b', name: 'B', layout: 'flow', layers: [] },
         ],
-        activePageId: 'a',
+        activeArtboardId: 'a',
       }),
       plugins: [new PagesPlugin()],
     });
@@ -177,41 +183,41 @@ describe('PagesTreeProvider', () => {
       layout: 'flow',
       layers: [],
     });
-    expect(controller.getState().selection.activePageId).toBe('b');
-    expect(controller.getState().scene.pages).toHaveLength(2);
+    expect(controller.getState().selection.activeArtboardId).toBe('b');
+    expect(controller.getState().scene.artboards).toHaveLength(2);
   });
 
   it('reorders pages via handleMove', async () => {
     const controller = new WorkbenchController({
-      initialScene: normalizeScene({
+      initialScene: normalizeSceneForTest({
         pages: [
           { id: 'a', name: 'A', layout: 'flow', layers: [] },
           { id: 'b', name: 'B', layout: 'flow', layers: [] },
           { id: 'c', name: 'C', layout: 'flow', layers: [] },
         ],
-        activePageId: 'a',
+        activeArtboardId: 'a',
       }),
       plugins: [new PagesPlugin()],
     });
     await controller.start();
     controller.moveViewItem(
       WORKBENCH_PAGES_VIEW_ID,
-      { id: 'c', name: 'C', layout: 'flow', layers: [] } satisfies Page,
-      { id: 'a', name: 'A', layout: 'flow', layers: [] } satisfies Page,
+      flowArtboard('c', 'C'),
+      flowArtboard('a', 'A'),
       'before'
     );
-    expect(controller.getState().scene.pages.map((p) => p.id)).toStrictEqual([
+    expect(controller.getState().scene.artboards.map((p) => p.id)).toStrictEqual([
       'c',
       'a',
       'b',
     ]);
-    expect(controller.getState().selection.activePageId).toBe('a');
+    expect(controller.getState().selection.activeArtboardId).toBe('a');
   });
 
   it('canMove rejects inside drops', () => {
     const provider = new PagesTreeProvider();
-    const a = { id: 'a', name: 'A', layout: 'flow' as const, layers: [] };
-    const b = { id: 'b', name: 'B', layout: 'flow' as const, layers: [] };
+    const a = flowArtboard('a', 'A');
+    const b = flowArtboard('b', 'B');
     expect(provider.canMove?.(a, b, 'before')).toBe(true);
     expect(provider.canMove?.(a, b, 'inside')).toBe(false);
   });
@@ -219,7 +225,7 @@ describe('PagesTreeProvider', () => {
   it('exposes rename command and edit label', () => {
     const provider = new PagesTreeProvider();
     const item = provider.getTreeItem(
-      { id: 'a', name: 'Cover', layout: 'flow', layers: [] },
+      flowArtboard('a', 'Cover'),
       {} as CommandContext
     );
     expect(item).toMatchObject({
@@ -231,34 +237,34 @@ describe('PagesTreeProvider', () => {
 });
 
 describe('LayersTreeProvider', () => {
-  it('walks data.children for nested layers', () => {
+  it('walks node children for nested layers', () => {
     const provider = new LayersTreeProvider();
-    const child: Layer = {
+    const child = asDocumentNode({
       id: 'child',
       type: 'html.text',
       data: { text: 'Hi' },
-    };
-    const parent: Layer = {
+    });
+    const parent = asDocumentNode({
       id: 'parent',
       type: 'html.flex',
-      data: { children: [child] },
-    };
+      children: [child],
+    });
     expect(provider.getChildren(parent)).toEqual([child]);
     expect(provider.getChildren(child)).toEqual([]);
   });
 
   it('rejects moves that would place a layer beside or above the layout root', () => {
     const provider = new LayersTreeProvider();
-    const root: Layer = {
+    const root = asDocumentNode({
       id: 'root',
       type: 'email.root',
-      data: { children: [] },
-    };
-    const block: Layer = {
+      children: [],
+    });
+    const block = asDocumentNode({
       id: 'section-1',
       type: 'email.section',
-      data: { children: [] },
-    };
+      children: [],
+    });
 
     expect(provider.canMove?.(block, root, 'before')).toBe(false);
     expect(provider.canMove?.(block, root, 'after')).toBe(false);
@@ -268,16 +274,16 @@ describe('LayersTreeProvider', () => {
 
   it('marks empty containers collapsible and accepts nest-into drops', () => {
     const provider = new LayersTreeProvider();
-    const section: Layer = {
+    const section = asDocumentNode({
       id: 'section',
       type: 'email.section',
-      data: { children: [] },
-    };
-    const text: Layer = {
+      children: [],
+    });
+    const text = asDocumentNode({
       id: 'text',
       type: 'email.text',
       data: { text: 'Hi' },
-    };
+    });
     const item = provider.getTreeItem(section, {
       services: { has: () => false },
     } as unknown as CommandContext);
@@ -300,32 +306,34 @@ describe('LayersTreeProvider', () => {
 
   it('nests into an empty section on inside drops', () => {
     const provider = new LayersTreeProvider();
-    const section: Layer = {
+    const section = asDocumentNode({
       id: 'section',
       type: 'email.section',
-      data: { children: [] },
-    };
-    const text: Layer = {
+      children: [],
+    });
+    const text = asDocumentNode({
       id: 'text',
       type: 'email.text',
       data: { text: 'Hi' },
-    };
-    const root: Layer = {
+    });
+    const root = asDocumentNode({
       id: 'root',
       type: 'email.root',
-      data: { children: [section, text] },
-    };
+      children: [section, text],
+    });
     let pageLayers: Layer[] = [root];
     const ctx = {
       scene: {
-        getActivePage: () => ({ id: 'p1', layers: pageLayers }),
+        getActiveArtboard: () => flowArtboard('p1', 'p1', pageLayers),
         apply: (op: {
-          apply: (scene: {
-            pages: { id: string; layers: Layer[] }[];
-          }) => { pages: { id: string; layers: Layer[] }[] };
+          apply: (document: { artboards: Artboard[] }) => {
+            artboards: Artboard[];
+          };
         }) => {
-          const next = op.apply({ pages: [{ id: 'p1', layers: pageLayers }] });
-          pageLayers = next.pages[0]!.layers;
+          const next = op.apply({
+            artboards: [flowArtboard('p1', 'p1', pageLayers)],
+          });
+          pageLayers = next.artboards[0]!.nodes;
         },
       },
       services: { has: () => false },
@@ -334,62 +342,61 @@ describe('LayersTreeProvider', () => {
     provider.handleMove?.(text, section, 'inside', ctx);
 
     const nextRoot = pageLayers[0]!;
-    const nextSection = (nextRoot.data as { children: Layer[] }).children[0]!;
-    expect((nextRoot.data as { children: Layer[] }).children.map((l) => l.id)).toEqual([
-      'section',
-    ]);
-    expect(
-      (nextSection.data as { children: Layer[] }).children.map((l) => l.id)
-    ).toEqual(['text']);
+    const nextSection = nextRoot.children![0]!;
+    expect(nextRoot.children!.map((l) => l.id)).toEqual(['section']);
+    expect(nextSection.children!.map((l) => l.id)).toEqual(['text']);
   });
 
   it('nests into the layout root on inside drops instead of hoisting beside it', () => {
     const provider = new LayersTreeProvider();
-    const root: Layer = {
+    const root = asDocumentNode({
       id: 'root',
       type: 'email.root',
-      data: {
-        children: [
-          { id: 'a', type: 'email.section', data: { children: [] } },
-          { id: 'b', type: 'email.section', data: { children: [] } },
-        ],
-      },
-    };
+      children: [
+        asDocumentNode({ id: 'a', type: 'email.section', children: [] }),
+        asDocumentNode({ id: 'b', type: 'email.section', children: [] }),
+      ],
+    });
     let pageLayers: Layer[] = [root];
     const ctx = {
       scene: {
-        getActivePage: () => ({ id: 'p1', layers: pageLayers }),
-        apply: (op: { apply: (scene: { pages: { id: string; layers: Layer[] }[] }) => { pages: { id: string; layers: Layer[] }[] } }) => {
-          const next = op.apply({ pages: [{ id: 'p1', layers: pageLayers }] });
-          pageLayers = next.pages[0]!.layers;
+        getActiveArtboard: () => flowArtboard('p1', 'p1', pageLayers),
+        apply: (op: {
+          apply: (document: { artboards: Artboard[] }) => {
+            artboards: Artboard[];
+          };
+        }) => {
+          const next = op.apply({
+            artboards: [flowArtboard('p1', 'p1', pageLayers)],
+          });
+          pageLayers = next.artboards[0]!.nodes;
         },
       },
       services: { has: () => false },
     } as unknown as CommandContext;
 
-    const b = (root.data as { children: Layer[] }).children[1]!;
+    const b = root.children![1]!;
     provider.handleMove?.(b, root, 'inside', ctx);
 
     expect(pageLayers).toHaveLength(1);
-    expect(
-      (pageLayers[0]!.data as { children: Layer[] }).children.map(
-        (layer) => layer.id
-      )
-    ).toEqual(['a', 'b']);
+    expect(pageLayers[0]!.children!.map((layer) => layer.id)).toEqual([
+      'a',
+      'b',
+    ]);
   });
 
   it('additive select toggles layers into and out of selection', () => {
     const provider = new LayersTreeProvider();
     const selection = {
-      activePageId: 'p1',
-      primaryLayerId: null as string | null,
-      selectedLayerIds: [] as string[],
+      activeArtboardId: 'p1',
+      primaryNodeId: null as string | null,
+      selectedNodeIds: [] as string[],
     };
     const ctx = {
       scene: {
-        selectLayers(ids: string[], primary: string | null) {
-          selection.selectedLayerIds = ids;
-          selection.primaryLayerId = primary;
+        selectNodes(ids: string[], primary: string | null) {
+          selection.selectedNodeIds = ids;
+          selection.primaryNodeId = primary;
         },
       },
       selection,
@@ -398,25 +405,25 @@ describe('LayersTreeProvider', () => {
     const a: Layer = {
       data: { fill: '#000' },
       id: 'a',
-      transform: createDefaultTransform(),
+      transform: createDefaultFrame(),
       type: 'canvas.rect',
     };
     const b: Layer = {
       data: { fill: '#fff' },
       id: 'b',
-      transform: createDefaultTransform(),
+      transform: createDefaultFrame(),
       type: 'canvas.rect',
     };
 
     provider.onSelect?.(a, ctx);
-    expect(selection.selectedLayerIds).toEqual(['a']);
+    expect(selection.selectedNodeIds).toEqual(['a']);
 
     provider.onSelect?.(b, ctx, { additive: true });
-    expect(selection.selectedLayerIds).toEqual(['a', 'b']);
-    expect(selection.primaryLayerId).toBe('a');
+    expect(selection.selectedNodeIds).toEqual(['a', 'b']);
+    expect(selection.primaryNodeId).toBe('a');
 
     provider.onSelect?.(a, ctx, { additive: true });
-    expect(selection.selectedLayerIds).toEqual(['b']);
-    expect(selection.primaryLayerId).toBe('b');
+    expect(selection.selectedNodeIds).toEqual(['b']);
+    expect(selection.primaryNodeId).toBe('b');
   });
 });

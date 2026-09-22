@@ -11,8 +11,9 @@ import {
   createPropertyBuilder,
 } from '../backbone';
 import { createLayerPreviewBuilder } from '../preview';
-import { normalizeSceneSnapshot } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
+
+import { normalizeProjectSnapshotForTest } from '../test/document-fixtures';
 
 import {
   ViewContainerContribution,
@@ -30,11 +31,11 @@ class TestLayer extends LayerDefinition<{ text: string }> {
   readonly treeDisplayName = 'Test';
 
   createDefault(id: string, _page: Page): Layer {
-    return { data: { text: 'hello' }, id, type: this.type };
+    return { props: { text: 'hello' }, id, type: this.type };
   }
 
   serialize(layer: Layer) {
-    return layer.data as { text: string };
+    return layer.props as { text: string };
   }
 
   deserialize(data: unknown) {
@@ -153,8 +154,8 @@ class EmbedWorkbenchPlugin extends WorkbenchPlugin {
 }
 
 function sceneWithSelection() {
-  return normalizeSceneSnapshot({
-    activePageId: 'p1',
+  return normalizeProjectSnapshotForTest({
+    activeArtboardId: 'p1',
     pages: [
       {
         id: 'p1',
@@ -166,16 +167,16 @@ function sceneWithSelection() {
       },
     ],
     selection: {
-      activePageId: 'p1',
-      primaryLayerId: 'a',
-      selectedLayerIds: ['a'],
+      activeArtboardId: 'p1',
+      primaryNodeId: 'a',
+      selectedNodeIds: ['a'],
     },
   });
 }
 
 function sceneWithoutSelection() {
-  return normalizeSceneSnapshot({
-    activePageId: 'p1',
+  return normalizeProjectSnapshotForTest({
+    activeArtboardId: 'p1',
     pages: [
       {
         id: 'p1',
@@ -187,9 +188,9 @@ function sceneWithoutSelection() {
       },
     ],
     selection: {
-      activePageId: 'p1',
-      primaryLayerId: null,
-      selectedLayerIds: [],
+      activeArtboardId: 'p1',
+      primaryNodeId: null,
+      selectedNodeIds: [],
     },
   });
 }
@@ -198,8 +199,8 @@ describe('ViewContribution.buildProperties', () => {
   it('emits properties views with headerToggle and welcome when', async () => {
     const snapshot = sceneWithSelection();
     const controller = new WorkbenchController({
-      initialEditorState: snapshot.editorState,
-      initialScene: snapshot.scene,
+      initialEditorState: snapshot.session,
+      initialScene: snapshot.document,
       plugins: [new LayerPlugin(), new ContextPlugin(), new EmbedWorkbenchPlugin()],
     });
     await controller.start();
@@ -231,8 +232,8 @@ describe('ViewContribution.buildProperties', () => {
   it('shows welcome view when no layer is selected', async () => {
     const snapshot = sceneWithoutSelection();
     const controller = new WorkbenchController({
-      initialEditorState: snapshot.editorState,
-      initialScene: snapshot.scene,
+      initialEditorState: snapshot.session,
+      initialScene: snapshot.document,
       plugins: [new LayerPlugin(), new ContextPlugin(), new EmbedWorkbenchPlugin()],
     });
     await controller.start();
@@ -262,8 +263,8 @@ describe('ViewContribution.buildProperties', () => {
   it('carries icon and group onto view descriptors', async () => {
     const snapshot = sceneWithSelection();
     const controller = new WorkbenchController({
-      initialEditorState: snapshot.editorState,
-      initialScene: snapshot.scene,
+      initialEditorState: snapshot.session,
+      initialScene: snapshot.document,
       plugins: [new LayerPlugin(), new ContextPlugin(), new EmbedWorkbenchPlugin()],
     });
     await controller.start();

@@ -1,12 +1,12 @@
 import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio/core';
 import type {
   CommandContext,
-  Layer,
+  DocumentNode,
   LayerPreviewContext,
-  Page,
   PropertySectionDescriptor,
 } from '@openenvx/studio/core';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
+import type { Artboard } from '@openenvx/studio/schema';
 import { createDefaultTransform } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
@@ -27,21 +27,21 @@ export class CanvasCircleLayer extends LayerDefinition<CanvasCircleModel> {
     return canvasCircleSchema.safeParse(data).success;
   }
 
-  createDefault(id: string, _page: Page): Layer {
+  createDefault(id: string, _artboard: Artboard): DocumentNode {
     return {
-      data: {
+      props: {
         fill: '#22c55e',
         stroke: '#15803d',
         strokeWidth: 2,
       },
       id,
-      transform: { ...createDefaultTransform(), height: 120, width: 120 },
+      frame: { ...createDefaultTransform(), height: 120, width: 120 },
       type: this.type,
     };
   }
 
-  serialize(layer: Layer): CanvasCircleModel {
-    return layer.data as CanvasCircleModel;
+  serialize(node: DocumentNode): CanvasCircleModel {
+    return node.props as CanvasCircleModel;
   }
 
   deserialize(data: unknown): CanvasCircleModel {
@@ -51,7 +51,10 @@ export class CanvasCircleLayer extends LayerDefinition<CanvasCircleModel> {
       : { fill: '#22c55e', stroke: '#15803d', strokeWidth: 2 };
   }
 
-  properties(_ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
+  properties(
+    _ctx: CommandContext,
+    _node: DocumentNode
+  ): PropertySectionDescriptor[] {
     return createPropertyBuilder()
       .section('shape')
       .color('fill', 'Fill')

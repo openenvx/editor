@@ -9,7 +9,15 @@ vi.mock('./render/render-email-html', () => ({
 vi.mock('./create-email-demo-scene', () => ({
   createEmailDemoScene: () => ({
     schemaVersion: 1,
-    pages: [{ id: 'email-page', layout: 'email', layers: [] }],
+    artboards: [
+      {
+        id: 'email-page',
+        name: 'Email',
+        extensions: { layout: 'email' },
+        space: {},
+        nodes: [],
+      },
+    ],
   }),
 }));
 

@@ -1,16 +1,13 @@
 import {
   EditorService,
+  getLayerChildren,
   InstantiationService,
   SceneStore,
   WorkbenchEventService,
+  type CommandContext,
 } from '@openenvx/studio/core';
-import type { CommandContext } from '@openenvx/studio/core';
-import {
-  createDefaultTransform,
-  normalizeSceneSnapshot,
-  type EditorState,
-  type Scene,
-} from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
+import type { EditorSession } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -19,6 +16,11 @@ import {
   UngroupSelectionCommand,
 } from './canvas-group-commands';
 import { groupRootLayers } from '../scene/group-layers';
+import {
+  legacyLayer,
+  testArtboard,
+  testDocument,
+} from '../test/canvas-document-fixtures';
 
 function createContext(sceneStore: SceneStore): CommandContext {
   return {
@@ -30,77 +32,67 @@ function createContext(sceneStore: SceneStore): CommandContext {
   };
 }
 
-function createStore(scene: Scene, editorState: EditorState) {
-  return new SceneStore(scene, editorState);
-}
+const baseNodes = [
+  legacyLayer({
+    data: { fill: '#000' },
+    id: 'rect-1',
+    transform: { ...createDefaultFrame(), height: 100, width: 100 },
+    type: 'canvas.rect',
+  }),
+  legacyLayer({
+    data: { fill: '#fff' },
+    id: 'rect-2',
+    transform: {
+      ...createDefaultFrame(),
+      height: 100,
+      width: 100,
+      x: 120,
+    },
+    type: 'canvas.rect',
+  }),
+];
+
+const baseArtboard = testArtboard({
+  id: 'page-1',
+  nodes: baseNodes,
+});
+
+const baseScene = testDocument([baseArtboard]);
+
+const selectedSession: EditorSession = {
+  activeArtboardId: 'page-1',
+  primaryNodeId: 'rect-1',
+  selectedNodeIds: ['rect-1', 'rect-2'],
+};
 
 describe('canvas group commands', () => {
-  const baseSnapshot = normalizeSceneSnapshot({
-    activePageId: 'page-1',
-    pages: [
-      {
-        id: 'page-1',
-        layout: 'absolute',
-        layers: [
-          {
-            data: { fill: '#000' },
-            id: 'rect-1',
-            transform: { ...createDefaultTransform(), width: 100, height: 100 },
-            type: 'canvas.rect',
-          },
-          {
-            data: { fill: '#fff' },
-            id: 'rect-2',
-            transform: {
-              ...createDefaultTransform(),
-              x: 120,
-              width: 100,
-              height: 100,
-            },
-            type: 'canvas.rect',
-          },
-        ],
-        name: 'Page',
-        width: 800,
-        height: 600,
-      },
-    ],
-    selection: {
-      activePageId: 'page-1',
-      primaryLayerId: 'rect-1',
-      selectedLayerIds: ['rect-1', 'rect-2'],
-    },
-  });
-
   it('insertGroup appends a canvas.group layer', () => {
-    const store = createStore(baseSnapshot.scene, {
-      activePageId: 'page-1',
-      primaryLayerId: null,
-      selectedLayerIds: [],
+    const store = new SceneStore(baseScene, {
+      activeArtboardId: 'page-1',
+      primaryNodeId: null,
+      selectedNodeIds: [],
     });
     const ctx = createContext(store);
     const command = new InsertCanvasGroupCommand();
     expect(command.canExecute(ctx)).toBe(true);
     command.execute(ctx);
-    const page = ctx.scene.getScene().pages[0];
-    const group = page?.layers.find((layer) => layer.type === 'canvas.group');
+    const page = ctx.scene.getDocument().artboards[0];
+    const group = page?.nodes.find((layer) => layer.type === 'canvas.group');
     expect(group).toBeDefined();
-    expect(ctx.scene.getSelection().primaryLayerId).toBe(group?.id);
+    expect(ctx.scene.getSelection().primaryNodeId).toBe(group?.id);
   });
 
   it('groupSelection wraps selected root layers', () => {
-    const store = createStore(baseSnapshot.scene, baseSnapshot.editorState);
+    const store = new SceneStore(baseScene, selectedSession);
     const ctx = createContext(store);
     const command = new GroupSelectionCommand();
     expect(command.canExecute(ctx)).toBe(true);
     command.execute(ctx);
-    const page = ctx.scene.getScene().pages[0];
-    expect(page?.layers).toHaveLength(1);
-    const groupLayer = page?.layers[0];
+    const page = ctx.scene.getDocument().artboards[0];
+    expect(page?.nodes).toHaveLength(1);
+    const groupLayer = page?.nodes[0];
     expect(groupLayer?.type).toBe('canvas.group');
-    const children =
-      (groupLayer?.data as { children: { id: string }[] } | undefined)
-        ?.children ?? [];
+    const children = getLayerChildren(groupLayer!);
     expect(children.map((child) => child.id)).toStrictEqual([
       'rect-1',
       'rect-2',
@@ -109,31 +101,26 @@ describe('canvas group commands', () => {
 
   it('ungroup restores children to root', () => {
     const groupedLayers = groupRootLayers(
-      baseSnapshot.scene.pages[0]!.layers,
+      baseScene.artboards[0]!.nodes,
       ['rect-1', 'rect-2'],
       'group-1',
-      baseSnapshot.scene.pages[0]!
+      baseScene.artboards[0]!
     );
-    const store = createStore(
+    const store = new SceneStore(
+      testDocument([{ ...baseArtboard, nodes: groupedLayers }]),
       {
-        ...baseSnapshot.scene,
-        pages: [
-          { ...baseSnapshot.scene.pages[0]!, layers: groupedLayers },
-        ],
-      },
-      {
-        activePageId: 'page-1',
-        primaryLayerId: 'group-1',
-        selectedLayerIds: ['group-1'],
+        activeArtboardId: 'page-1',
+        primaryNodeId: 'group-1',
+        selectedNodeIds: ['group-1'],
       }
     );
     const ctx = createContext(store);
     const command = new UngroupSelectionCommand();
     expect(command.canExecute(ctx)).toBe(true);
     command.execute(ctx);
-    const page = ctx.scene.getScene().pages[0];
-    expect(page?.layers).toHaveLength(2);
-    expect(page?.layers.map((layer) => layer.id)).toStrictEqual([
+    const page = ctx.scene.getDocument().artboards[0];
+    expect(page?.nodes).toHaveLength(2);
+    expect(page?.nodes.map((layer) => layer.id)).toStrictEqual([
       'rect-1',
       'rect-2',
     ]);

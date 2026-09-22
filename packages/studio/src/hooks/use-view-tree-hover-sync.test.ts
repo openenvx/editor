@@ -1,8 +1,9 @@
-import type { Scene,ViewDescriptor,ViewTreeItem } from '@openenvx/studio/core';
+import type { Document, ViewDescriptor, ViewTreeItem } from '@openenvx/studio/core';
 import { act, renderHook } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { asDocumentNode, normalizeSceneForTest } from '../core/test/document-fixtures';
 import { useViewTreeCollapseSeed } from './use-view-tree-collapse-seed';
 import {
   resolveViewHoveredIds,
@@ -10,17 +11,15 @@ import {
 } from './use-view-tree-hover-sync';
 import { useViewTreeSelectionSync } from './use-view-tree-selection-sync';
 
-const transform = {
+const frame = {
   height: 100,
-  opacity: 1,
   rotation: 0,
   width: 100,
   x: 0,
   y: 0,
 };
 
-const scene: Scene = {
-  activePageId: 'p1',
+const scene: Document = normalizeSceneForTest({
   pages: [
     {
       id: 'p1',
@@ -28,32 +27,25 @@ const scene: Scene = {
       width: 800,
       height: 600,
       layers: [
-        {
-          data: {
-            children: [
-              {
-                data: { fill: '#000000' },
-                id: 'child',
-                transform,
-                type: 'canvas.rect',
-              },
-            ],
-            layout: 'column',
-          },
+        asDocumentNode({
+          children: [
+            {
+              data: { fill: '#000000' },
+              frame,
+              id: 'child',
+              type: 'canvas.rect',
+            },
+          ],
+          frame,
           id: 'group',
-          transform,
+          props: { layout: 'column' },
           type: 'container',
-        },
+        }),
       ],
       name: 'Page',
     },
   ],
-  selection: {
-    activePageId: 'p1',
-    primaryLayerId: null,
-    selectedLayerIds: [],
-  },
-};
+});
 
 function createView(
   viewSelection: ViewDescriptor['viewSelection'] = 'layer',
@@ -63,7 +55,7 @@ function createView(
     collapsible: true,
     containerId: 'layers',
     content: { items: [], kind: 'tree' },
-    id: 'workbench.layers',
+    id: 'workbench.nodes',
     initialCollapsed: false,
     name: 'Layers',
     supportsReorder: true,

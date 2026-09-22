@@ -1,21 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Page } from '@openenvx/studio/schema';
-
+import { testHtmlArtboard } from '../test/document-fixtures';
 import { resolveStageClickAction } from './resolve-stage-click-selection';
 
-const page: Page = {
+const page = testHtmlArtboard({
   id: 'p1',
-  name: 'P',
-  layout: 'html',
-  layers: [
+  nodes: [
     {
       id: 'root-1',
       type: 'html.root',
-      data: { children: [] },
+      props: {},
+      children: [],
     },
   ],
-};
+});
 
 describe('resolveStageClickAction', () => {
   it('selects root when the click is inside the artboard', () => {

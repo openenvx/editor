@@ -2,8 +2,10 @@ import {
   moveLayerRelativeToTarget,
 } from '../backbone';
 import type { CommandContext, Layer } from '../backbone';
-import { createDefaultTransform, normalizeScene } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
+
+import { normalizeSceneForTest } from '../test/document-fixtures';
 
 import {
   TreeDataProvider,
@@ -17,7 +19,7 @@ import type { WorkbenchPluginContext } from './workbench-plugin-context';
 
 class LayersTreeProvider extends TreeDataProvider<Layer> {
   getRootChildren(ctx: CommandContext): Layer[] {
-    return ctx.scene.getActivePage().layers;
+    return ctx.scene.getActiveArtboard().nodes;
   }
 
   getChildren(): Layer[] {
@@ -34,17 +36,17 @@ class LayersTreeProvider extends TreeDataProvider<Layer> {
     position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const effectivePosition = position === 'inside' ? 'after' : position;
     ctx.scene.apply({
       apply: (scene) => ({
         ...scene,
-        pages: scene.pages.map((p) =>
+        artboards: scene.artboards.map((p) =>
           p.id === page.id
             ? {
                 ...p,
-                layers: moveLayerRelativeToTarget(
-                  p.layers,
+                nodes: moveLayerRelativeToTarget(
+                  p.nodes,
                   source.id,
                   target.id,
                   effectivePosition
@@ -70,7 +72,7 @@ class LayersViewContainer extends ViewContainerContribution {
 }
 
 class LayersPlugin extends WorkbenchPlugin {
-  readonly id = 'test.layers';
+  readonly id = 'test.nodes';
 
   activateWorkbench(ctx: WorkbenchPluginContext): void {
     ctx.registerWorkbench(new LayersViewContainer(), new LayersView());
@@ -81,7 +83,7 @@ class LayersPlugin extends WorkbenchPlugin {
 describe('moveViewItem', () => {
   it('delegates to tree provider handleMove', async () => {
     const controller = new WorkbenchController({
-      initialScene: normalizeScene({
+      initialScene: normalizeSceneForTest({
         pages: [
           {
             id: 'p1',
@@ -94,18 +96,18 @@ describe('moveViewItem', () => {
                 id: 'x',
                 type: 'canvas.rect',
                 data: { fill: '#000000' },
-                transform: createDefaultTransform(),
+                transform: createDefaultFrame(),
               },
               {
                 id: 'y',
                 type: 'canvas.rect',
                 data: { fill: '#ffffff' },
-                transform: createDefaultTransform(),
+                transform: createDefaultFrame(),
               },
             ],
           },
         ],
-        activePageId: 'p1',
+        activeArtboardId: 'p1',
       }),
       plugins: [new LayersPlugin()],
     });
@@ -116,18 +118,18 @@ describe('moveViewItem', () => {
         id: 'y',
         type: 'canvas.rect',
         data: { fill: '#ffffff' },
-        transform: createDefaultTransform(),
+        transform: createDefaultFrame(),
       },
       {
         id: 'x',
         type: 'canvas.rect',
         data: { fill: '#000000' },
-        transform: createDefaultTransform(),
+        transform: createDefaultFrame(),
       },
       'before'
     );
     expect(
-      controller.getState().scene.pages[0]!.layers.map((l) => l.id)
+      controller.getState().scene.artboards[0]!.nodes.map((l) => l.id)
     ).toStrictEqual(['y', 'x']);
   });
 });
@@ -151,7 +153,7 @@ describe('view when clause', () => {
 
   it('omits views when when clause is false', async () => {
     const controller = new WorkbenchController({
-      initialScene: normalizeScene({
+      initialScene: normalizeSceneForTest({
         pages: [
           {
             id: 'p1',
@@ -162,7 +164,7 @@ describe('view when clause', () => {
             layers: [],
           },
         ],
-        activePageId: 'p1',
+        activeArtboardId: 'p1',
       }),
       plugins: [new HiddenViewPlugin()],
     });
@@ -188,7 +190,7 @@ describe('registerTreeDataProvider primary and order', () => {
     }
 
     const controller = new WorkbenchController({
-      initialScene: normalizeScene({
+      initialScene: normalizeSceneForTest({
         pages: [
           {
             id: 'p1',
@@ -199,7 +201,7 @@ describe('registerTreeDataProvider primary and order', () => {
             layers: [],
           },
         ],
-        activePageId: 'p1',
+        activeArtboardId: 'p1',
       }),
       plugins: [new PrimaryPlugin()],
     });
@@ -223,7 +225,7 @@ describe('registerTreeDataProvider primary and order', () => {
     }
 
     const controller = new WorkbenchController({
-      initialScene: normalizeScene({
+      initialScene: normalizeSceneForTest({
         pages: [
           {
             id: 'p1',
@@ -234,7 +236,7 @@ describe('registerTreeDataProvider primary and order', () => {
             layers: [],
           },
         ],
-        activePageId: 'p1',
+        activeArtboardId: 'p1',
       }),
       plugins: [new OrderPlugin()],
     });

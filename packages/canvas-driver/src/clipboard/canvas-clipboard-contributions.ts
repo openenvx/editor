@@ -2,6 +2,7 @@ import {
   canDuplicateLayer,
   canSelectLayer,
   Command,
+  findNodeById,
   ShortcutContribution,
 } from '@openenvx/studio/core';
 import type { CommandContext } from '@openenvx/studio/core';
@@ -16,19 +17,19 @@ import {
   executePasteLayers,
 } from './canvas-clipboard-commands';
 
+function findSelectedLayer(ctx: CommandContext, id: string) {
+  return findNodeById(ctx.scene.getDocument(), id);
+}
+
 function canExecuteWithSelection(ctx: CommandContext): boolean {
   if (!canExecuteCanvasClipboard(ctx)) {
     return false;
   }
-  if (ctx.selection.selectedLayerIds.length === 0) {
+  if (ctx.selection.selectedNodeIds.length === 0) {
     return false;
   }
-  const scene = ctx.scene.getScene();
-  return ctx.selection.selectedLayerIds.every((id) => {
-    const layer =
-      scene.pages
-        .find((page) => page.id === ctx.selection.activePageId)
-        ?.layers.find((l) => l.id === id) ?? null;
+  return ctx.selection.selectedNodeIds.every((id) => {
+    const layer = findSelectedLayer(ctx, id);
     return layer && canSelectLayer(layer);
   });
 }
@@ -37,12 +38,9 @@ function canExecuteWithWritableSelection(ctx: CommandContext): boolean {
   if (!canExecuteWithSelection(ctx)) {
     return false;
   }
-  const scene = ctx.scene.getScene();
-  return ctx.selection.selectedLayerIds.every((id) => {
-    const layer =
-      scene.pages
-        .find((page) => page.id === ctx.selection.activePageId)
-        ?.layers.find((l) => l.id === id) ?? null;
+  const scene = ctx.scene.getDocument();
+  return ctx.selection.selectedNodeIds.every((id) => {
+    const layer = findSelectedLayer(ctx, id);
     return layer && canDuplicateLayer(layer, scene);
   });
 }

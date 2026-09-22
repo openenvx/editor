@@ -10,6 +10,7 @@ import {
   type ServiceId,
 } from '@openenvx/studio/core';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
+import { nodeProps } from '@openenvx/studio/schema';
 
 import type { BlockConfig, FieldDef, SlotDef } from './block-config';
 import { BlockRegistryServiceId, type BlockRegistry } from './block-registry';
@@ -167,7 +168,7 @@ function appendSlotSection(
     const newPart: Layer = {
       id: 'slot-part-template',
       type: slotDef.partType,
-      data: structuredClone(partConfig.defaultData),
+      props: structuredClone(partConfig.defaultData),
     };
     builder
       .section(`slot.${slotKey}`, slotDef.label)
@@ -210,7 +211,7 @@ export function createHtmlLayerDefinition(
     }
 
     serialize(layer: Layer): Record<string, unknown> {
-      return (layer.data ?? {}) as Record<string, unknown>;
+      return nodeProps(layer);
     }
 
     deserialize(data: unknown): Record<string, unknown> {

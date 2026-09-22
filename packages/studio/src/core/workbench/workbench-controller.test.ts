@@ -14,8 +14,12 @@ import type {
   PluginContext,
   PropertySectionDescriptor,
 } from '../backbone';
-import { normalizeScene, normalizeSceneSnapshot } from '@openenvx/studio/schema';
 import { describe, expect, it, vi } from "vitest";
+
+import {
+  normalizeProjectSnapshotForTest,
+  normalizeSceneForTest,
+} from '../test/document-fixtures';
 
 import {
   CommandPaletteContribution,
@@ -34,11 +38,11 @@ class TestLayer extends LayerDefinition<{ text: string }> {
   readonly treeDisplayName = "Test";
 
   createDefault(id: string, _page: Page): Layer {
-    return { data: { text: "hello" }, id, type: this.type };
+    return { props: { text: "hello" }, id, type: this.type };
   }
 
   serialize(layer: Layer) {
-    return layer.data as { text: string };
+    return layer.props as { text: string };
   }
 
   deserialize(data: unknown) {
@@ -183,8 +187,8 @@ describe(WorkbenchController, () => {
   });
 
   it("reuses cached command palette when selection changes without context key changes", async () => {
-    const snapshot = normalizeSceneSnapshot({
-      activePageId: "p1",
+    const snapshot = normalizeProjectSnapshotForTest({
+      activeArtboardId: "p1",
       pages: [
         {
           id: "p1",
@@ -197,19 +201,19 @@ describe(WorkbenchController, () => {
         },
       ],
       selection: {
-        activePageId: "p1",
-        primaryLayerId: "a",
-        selectedLayerIds: ["a"],
+        activeArtboardId: "p1",
+        primaryNodeId: "a",
+        selectedNodeIds: ["a"],
       },
     });
     const controller = new WorkbenchController({
-      initialEditorState: snapshot.editorState,
-      initialScene: snapshot.scene,
+      initialEditorState: snapshot.session,
+      initialScene: snapshot.document,
       plugins: [new LayerPlugin()],
     });
     await controller.start();
     const initialPalette = controller.getState().commandPalette;
-    controller.selectLayers(["b"], "b");
+    controller.selectNodes(["b"], "b");
     expect(controller.getState().commandPalette).toBe(initialPalette);
   });
 
@@ -234,8 +238,8 @@ describe(WorkbenchController, () => {
   });
 
   it("renders layerSurface from layer registry", async () => {
-    const scene = normalizeScene({
-      activePageId: "p1",
+    const scene = normalizeSceneForTest({
+      activeArtboardId: "p1",
       pages: [
         {
           id: "p1",
@@ -258,8 +262,8 @@ describe(WorkbenchController, () => {
   });
 
   it("updates properties via updateProperty", async () => {
-    const scene = normalizeScene({
-      activePageId: "p1",
+    const scene = normalizeSceneForTest({
+      activeArtboardId: "p1",
       pages: [
         {
           id: "p1",
@@ -269,9 +273,9 @@ describe(WorkbenchController, () => {
         },
       ],
       selection: {
-        activePageId: "p1",
-        primaryLayerId: "1",
-        selectedLayerIds: ["1"],
+        activeArtboardId: "p1",
+        primaryNodeId: "1",
+        selectedNodeIds: ["1"],
       },
     });
     const controller = new WorkbenchController({
@@ -280,13 +284,13 @@ describe(WorkbenchController, () => {
     });
     await controller.start();
     controller.updateProperty("1", "text", "after");
-    const layer = controller.getState().scene.pages[0]!.layers[0]!;
-    expect((layer.data as { text: string }).text).toBe("after");
+    const layer = controller.getState().scene.artboards[0]!.nodes[0]!;
+    expect((layer.props as { text: string }).text).toBe("after");
   });
 
   it("writes bound face html into nested widget values paths", async () => {
-    const scene = normalizeScene({
-      activePageId: "p1",
+    const scene = normalizeSceneForTest({
+      activeArtboardId: "p1",
       pages: [
         {
           id: "p1",
@@ -326,9 +330,9 @@ describe(WorkbenchController, () => {
         },
       ],
       selection: {
-        activePageId: "p1",
-        primaryLayerId: "face-title",
-        selectedLayerIds: ["face-title"],
+        activeArtboardId: "p1",
+        primaryNodeId: "face-title",
+        selectedNodeIds: ["face-title"],
       },
     });
     const controller = new WorkbenchController({
@@ -337,18 +341,17 @@ describe(WorkbenchController, () => {
     });
     await controller.start();
     controller.updateProperty("face-title", "html", "<p>Zupa weselna</p>");
-    const root = controller.getState().scene.pages[0]!.layers[0]!;
-    const widget = (root.data as { children: { data: Record<string, unknown> }[] })
-      .children[0]!;
-    const values = widget.data.values as {
+    const root = controller.getState().scene.artboards[0]!.nodes[0]!;
+    const widget = root.children![0]!;
+    const values = widget.props.values as {
       sections: { title: string }[];
     };
     expect(values.sections[0]!.title).toBe("Zupa weselna");
   });
 
   it("undo restores nested widget bind values after face html edit", async () => {
-    const scene = normalizeScene({
-      activePageId: "p1",
+    const scene = normalizeSceneForTest({
+      activeArtboardId: "p1",
       pages: [
         {
           id: "p1",
@@ -388,9 +391,9 @@ describe(WorkbenchController, () => {
         },
       ],
       selection: {
-        activePageId: "p1",
-        primaryLayerId: "face-title",
-        selectedLayerIds: ["face-title"],
+        activeArtboardId: "p1",
+        primaryNodeId: "face-title",
+        selectedNodeIds: ["face-title"],
       },
     });
     const controller = new WorkbenchController({
@@ -400,21 +403,18 @@ describe(WorkbenchController, () => {
     await controller.start();
     controller.updateProperty("face-title", "html", "<p>Zupa weselna</p>");
     expect(controller.undo()).toBe(true);
-    const root = controller.getState().scene.pages[0]!.layers[0]!;
-    const widget = (root.data as { children: { data: Record<string, unknown> }[] })
-      .children[0]!;
-    const values = widget.data.values as {
+    const root = controller.getState().scene.artboards[0]!.nodes[0]!;
+    const widget = root.children![0]!;
+    const values = widget.props.values as {
       sections: { title: string }[];
     };
     expect(values.sections[0]!.title).toBe("Zupa");
-    expect((widget.data.children as { data: { html: string } }[])[0]!.data.html).toBe(
-      "Zupa"
-    );
+    expect(widget.children![0]!.props.html).toBe("Zupa");
   });
 
   it("does not delete the selected layer while typing in an input", async () => {
-    const scene = normalizeScene({
-      activePageId: "p1",
+    const scene = normalizeSceneForTest({
+      activeArtboardId: "p1",
       pages: [
         {
           id: "p1",
@@ -424,9 +424,9 @@ describe(WorkbenchController, () => {
         },
       ],
       selection: {
-        activePageId: "p1",
-        primaryLayerId: "1",
-        selectedLayerIds: ["1"],
+        activeArtboardId: "p1",
+        primaryNodeId: "1",
+        selectedNodeIds: ["1"],
       },
     });
 
@@ -477,9 +477,9 @@ describe(WorkbenchController, () => {
       keydownListener(event);
       await Promise.resolve();
 
-      const page = controller.getState().scene.pages[0];
+      const page = controller.getState().scene.artboards[0];
       expect(page).toBeDefined();
-      expect(page?.layers).toHaveLength(1);
+      expect(page?.nodes).toHaveLength(1);
     } finally {
       globalThis.window = previousWindow;
       globalThis.document = previousDocument;
@@ -500,7 +500,7 @@ describe(WorkbenchController, () => {
       }
 
       serialize(layer: Layer) {
-        return layer.data as { assetRef: string };
+        return layer.props as { assetRef: string };
       }
 
       deserialize(data: unknown) {
@@ -529,8 +529,8 @@ describe(WorkbenchController, () => {
       }
     }
 
-    const scene = normalizeScene({
-      activePageId: "p1",
+    const scene = normalizeSceneForTest({
+      activeArtboardId: "p1",
       pages: [
         {
           id: "p1",
@@ -578,7 +578,7 @@ describe(WorkbenchController, () => {
       }
 
       serialize(layer: Layer) {
-        return layer.data as { assetRef: string };
+        return layer.props as { assetRef: string };
       }
 
       deserialize(data: unknown) {
@@ -608,8 +608,8 @@ describe(WorkbenchController, () => {
       }
     }
 
-    const initialScene = normalizeScene({
-      activePageId: "p1",
+    const initialScene = normalizeSceneForTest({
+      activeArtboardId: "p1",
       pages: [
         {
           id: "p1",
@@ -646,56 +646,33 @@ describe(WorkbenchController, () => {
   });
 
   it("rejects invalid scenes on loadScene", async () => {
-    const { SceneValidationError } = await import('@openenvx/studio/core');
-    const { SCHEMA_VERSION } = await import('@openenvx/studio/schema');
+    const { DocumentValidationError } = await import('@openenvx/studio/core');
     const controller = new WorkbenchController({
       plugins: [new EmptyPlugin()],
     });
     await controller.start();
-    expect(() =>
-      controller.loadScene({
-        schemaVersion: SCHEMA_VERSION + 100,
-        activePageId: "p1",
-        pages: [
-          {
-            id: "p1",
-            name: "Page",
-            layout: "flow",
-            layers: [],
-          },
-        ],
-        selection: {
-          activePageId: "p1",
-          primaryLayerId: null,
-          selectedLayerIds: [],
-        },
-      })
-    ).toThrow(SceneValidationError);
+    expect(() => controller.loadScene({ artboards: [] })).toThrow(
+      DocumentValidationError
+    );
   });
 
   it("loadScene pushes history so undo restores the prior scene", async () => {
-    const { SCHEMA_VERSION } = await import('@openenvx/studio/schema');
+    const { flowArtboard } = await import('../test/document-fixtures');
     const controller = new WorkbenchController({
       plugins: [new EmptyPlugin()],
     });
     await controller.start();
-    const beforeName = controller.getState().scene.pages[0]!.name;
+    const beforeName = controller.getState().scene.artboards[0]!.name;
 
     controller.loadScene({
-      schemaVersion: SCHEMA_VERSION,
-      pages: [
-        {
-          id: "tpl",
-          name: "Template",
-          layout: "email",
-          layers: [],
-        },
+      artboards: [
+        { ...flowArtboard('tpl', 'Template'), extensions: { layout: 'email' } },
       ],
     });
-    expect(controller.getState().scene.pages[0]!.name).toBe("Template");
+    expect(controller.getState().scene.artboards[0]!.name).toBe("Template");
     expect(controller.api.scene.canUndo()).toBe(true);
     expect(controller.api.scene.undo()).toBe(true);
-    expect(controller.getState().scene.pages[0]!.name).toBe(beforeName);
+    expect(controller.getState().scene.artboards[0]!.name).toBe(beforeName);
   });
 
   it("setHoveredLayer updates state without rebuilding scene slice", async () => {

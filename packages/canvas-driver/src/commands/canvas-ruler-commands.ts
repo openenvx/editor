@@ -1,6 +1,9 @@
 import { Command, localize } from '@openenvx/studio/core';
 import type { CommandContext } from '@openenvx/studio/core';
-import type { PageGuide, PageGuideOrientation } from '@openenvx/studio/schema';
+import type {
+  ArtboardGuide,
+  ArtboardGuideOrientation,
+} from '@openenvx/studio/schema';
 
 import { CanvasRulerGuidesSettingsServiceId } from '../canvas-service-tokens';
 
@@ -13,15 +16,15 @@ function getRulerGuidesSettings(ctx: CommandContext) {
 
 function mapActivePageGuides(
   ctx: CommandContext,
-  nextGuides: PageGuide[] | undefined,
+  nextGuides: ArtboardGuide[] | undefined,
   label: string
 ): void {
-  const activePageId = ctx.scene.getActivePageId();
+  const activeArtboardId = ctx.scene.getActiveArtboardId();
   ctx.scene.apply({
     apply: (scene) => ({
       ...scene,
-      pages: scene.pages.map((page) =>
-        page.id === activePageId
+      artboards: scene.artboards.map((page) =>
+        page.id === activeArtboardId
           ? {
               ...page,
               guides:
@@ -50,7 +53,7 @@ export class ClearCanvasGuidesCommand extends Command {
   readonly id = 'canvas.clearGuides';
 
   canExecute(ctx: CommandContext): boolean {
-    return (ctx.scene.getActivePage().guides?.length ?? 0) > 0;
+    return (ctx.scene.getActiveArtboard().guides?.length ?? 0) > 0;
   }
 
   execute(ctx: CommandContext): void {
@@ -76,7 +79,11 @@ export class AddCanvasGuideCommand extends Command {
 
   execute(ctx: CommandContext, args?: unknown): void {
     const input = args as
-      | { orientation?: PageGuideOrientation; position?: number; id?: string }
+      | {
+          orientation?: ArtboardGuideOrientation;
+          position?: number;
+          id?: string;
+        }
       | undefined;
     if (
       !input ||
@@ -87,8 +94,8 @@ export class AddCanvasGuideCommand extends Command {
     ) {
       return;
     }
-    const page = ctx.scene.getActivePage();
-    const guide: PageGuide = {
+    const page = ctx.scene.getActiveArtboard();
+    const guide: ArtboardGuide = {
       id: input.id ?? crypto.randomUUID(),
       orientation: input.orientation,
       position: input.position,
@@ -111,7 +118,7 @@ export class MoveCanvasGuideCommand extends Command {
     if (!guideId) {
       return false;
     }
-    return (ctx.scene.getActivePage().guides ?? []).some(
+    return (ctx.scene.getActiveArtboard().guides ?? []).some(
       (g) => g.id === guideId
     );
   }
@@ -125,7 +132,7 @@ export class MoveCanvasGuideCommand extends Command {
     ) {
       return;
     }
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const guides = page.guides ?? [];
     if (!guides.some((g) => g.id === input.guideId)) {
       return;
@@ -152,7 +159,7 @@ export class RemoveCanvasGuideCommand extends Command {
     if (!guideId) {
       return false;
     }
-    return (ctx.scene.getActivePage().guides ?? []).some(
+    return (ctx.scene.getActiveArtboard().guides ?? []).some(
       (g) => g.id === guideId
     );
   }
@@ -162,7 +169,7 @@ export class RemoveCanvasGuideCommand extends Command {
     if (!guideId) {
       return;
     }
-    const page = ctx.scene.getActivePage();
+    const page = ctx.scene.getActiveArtboard();
     const guides = page.guides ?? [];
     if (!guides.some((g) => g.id === guideId)) {
       return;

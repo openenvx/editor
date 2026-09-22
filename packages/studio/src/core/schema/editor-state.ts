@@ -1,54 +1,37 @@
-import type { EditorState, Layer, Page, Scene } from './types';
+import { nodeExistsOnArtboard } from '../scene/layer-tree';
+import type { Document, EditorSession } from './types';
 
-function layerExistsOnPage(page: Page, layerId: string): boolean {
-  let exists = false;
-
-  function walk(layers: Layer[]): void {
-    for (const layer of layers) {
-      if (layer.id === layerId) {
-        exists = true;
-        return;
-      }
-      const data = layer.data;
-      if (
-        data &&
-        typeof data === 'object' &&
-        'children' in data &&
-        Array.isArray((data as { children: unknown }).children)
-      ) {
-        walk((data as { children: Layer[] }).children);
-      }
-    }
+/** Drop selection references to nodes/artboards that no longer exist. */
+export function pruneEditorSession(
+  document: Document,
+  session: EditorSession
+): EditorSession {
+  const fallbackArtboardId = document.artboards[0]?.id;
+  if (!fallbackArtboardId) {
+    return session;
   }
 
-  walk(page.layers ?? []);
-  return exists;
+  const activeArtboardId = document.artboards.some(
+    (a) => a.id === session.activeArtboardId
+  )
+    ? session.activeArtboardId
+    : fallbackArtboardId;
+  const artboard = document.artboards.find((a) => a.id === activeArtboardId)!;
+  const selectedNodeIds = session.selectedNodeIds.filter((id) =>
+    nodeExistsOnArtboard(artboard, id)
+  );
+  const primaryNodeId =
+    session.primaryNodeId && selectedNodeIds.includes(session.primaryNodeId)
+      ? session.primaryNodeId
+      : (selectedNodeIds[0] ?? null);
+
+  return { activeArtboardId, primaryNodeId, selectedNodeIds };
 }
 
-/** Drop selection references to layers/pages that no longer exist. */
+/** @deprecated use pruneEditorSession */
 export function pruneEditorState(
-  scene: Scene,
-  editorState: EditorState
-): EditorState {
-  const fallbackPageId = scene.pages[0]?.id;
-  if (!fallbackPageId) {
-    return editorState;
-  }
-
-  const activePageId = scene.pages.some(
-    (p) => p.id === editorState.activePageId
-  )
-    ? editorState.activePageId
-    : fallbackPageId;
-  const page = scene.pages.find((p) => p.id === activePageId)!;
-  const selectedLayerIds = editorState.selectedLayerIds.filter((id) =>
-    layerExistsOnPage(page, id)
-  );
-  const primaryLayerId =
-    editorState.primaryLayerId &&
-    selectedLayerIds.includes(editorState.primaryLayerId)
-      ? editorState.primaryLayerId
-      : (selectedLayerIds[0] ?? null);
-
-  return { activePageId, primaryLayerId, selectedLayerIds };
+  document: Document,
+  session: EditorSession
+): EditorSession {
+  return pruneEditorSession(document, session);
 }

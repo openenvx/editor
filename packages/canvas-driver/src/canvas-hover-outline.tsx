@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { nodeTransform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { useEffect, useReducer } from 'react';
 import type { RefObject } from 'react';
@@ -7,6 +7,7 @@ import { Rect } from 'react-konva';
 import type { FlattenedStageLayer } from './flatten-layer-surface';
 import { CANVAS_GROUP_LAYER_TYPE } from './layers/canvas-group-layer';
 import { computeGroupOutlineBounds } from './scene/group-layers';
+import { DEFAULT_TRANSFORM } from './stage/default-transform';
 
 const CANVAS_HOVER_OUTLINE_STROKE_WIDTH = 1;
 
@@ -26,9 +27,7 @@ export function resolveHoverOutlineRect(
   entry: FlattenedStageLayer
 ): HoverOutlineRect {
   const absolute =
-    entry.absoluteTransform ??
-    entry.layer.transform ??
-    createDefaultTransform();
+    entry.absoluteTransform ?? nodeTransform(entry.layer) ?? DEFAULT_TRANSFORM;
 
   if (entry.layer.type === CANVAS_GROUP_LAYER_TYPE) {
     const childLayers = (entry.children ?? []).map((child) => child.layer);

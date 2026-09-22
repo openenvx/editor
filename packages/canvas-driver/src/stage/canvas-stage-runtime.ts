@@ -5,7 +5,7 @@ import {
   type Layer as SceneLayer,
 } from '@openenvx/studio/core';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { nodeTransform } from '@openenvx/studio/schema';
 import type { Transform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import type { RefObject } from 'react';
@@ -36,13 +36,13 @@ export interface CanvasStageRuntimeLayerBindings {
   applyDragSnap: (
     layerId: string,
     node: Konva.Group,
-    transform: NonNullable<SceneLayer['transform']>
+    transform: NonNullable<Transform>
   ) => void;
   clearOverlays: () => void;
   completeLayerTransform: (input: {
     layerId: string;
     view: LayerPreviewDescriptor;
-    transform: NonNullable<SceneLayer['transform']>;
+    transform: NonNullable<Transform>;
     node: Konva.Group;
     interactionKind: string | undefined;
   }) => void;
@@ -65,7 +65,7 @@ export class CanvasStageRuntime implements ExternalStore<CanvasStageSnapshot> {
 
   readonly layersRef: RefObject<FlattenedStageLayer[]> = { current: [] };
 
-  readonly selectedLayerIdsRef: RefObject<string[]> = { current: [] };
+  readonly selectedNodeIdsRef: RefObject<string[]> = { current: [] };
 
   readonly selectedLayerIdSetRef: RefObject<Set<string>> = {
     current: new Set(),
@@ -206,13 +206,13 @@ export class CanvasStageRuntime implements ExternalStore<CanvasStageSnapshot> {
 
   getLayerTransform(
     layerId: string,
-    transform: NonNullable<SceneLayer['transform']>
-  ): NonNullable<SceneLayer['transform']> {
+    transform: NonNullable<Transform>
+  ): NonNullable<Transform> {
     return selectLayerTransform(this.cachedSnapshot, layerId, transform);
   }
 
   onLayerDragStart(layerId: string): void {
-    const selectedLayerIds = this.selectedLayerIdsRef.current ?? [];
+    const selectedNodeIds = this.selectedNodeIdsRef.current ?? [];
     const selectedLayerIdSet = this.selectedLayerIdSetRef.current ?? new Set();
 
     // Avoid selection churn while already dragging the primary - React re-applying
@@ -221,13 +221,13 @@ export class CanvasStageRuntime implements ExternalStore<CanvasStageSnapshot> {
       this.selectLayer(layerId, { setPrimary: true });
     }
 
-    if (!selectedLayerIdSet.has(layerId) || selectedLayerIds.length <= 1) {
+    if (!selectedLayerIdSet.has(layerId) || selectedNodeIds.length <= 1) {
       this.dragSessionRef.current = null;
       return;
     }
 
     const starts = new Map<string, { x: number; y: number }>();
-    for (const id of selectedLayerIds) {
+    for (const id of selectedNodeIds) {
       const node = this.nodeRefs.current?.get(id);
       if (!node) {
         continue;
@@ -243,25 +243,25 @@ export class CanvasStageRuntime implements ExternalStore<CanvasStageSnapshot> {
   onLayerDragMove(
     layerId: string,
     node: Konva.Group,
-    transform: NonNullable<SceneLayer['transform']>
+    transform: NonNullable<Transform>
   ): void {
-    const selectedLayerIds = this.selectedLayerIdsRef.current ?? [];
+    const selectedNodeIds = this.selectedNodeIdsRef.current ?? [];
     this.layerBindings?.applyDragSnap(layerId, node, transform);
-    if (selectedLayerIds.includes(layerId)) {
+    if (selectedNodeIds.includes(layerId)) {
       this.layerBindings?.syncLabelFromTransformer();
       this.layerBindings?.syncHandlesFromNode(layerId);
     }
   }
 
   onLayerDragEnd(layerId: string): void {
-    const selectedLayerIds = this.selectedLayerIdsRef.current ?? [];
+    const selectedNodeIds = this.selectedNodeIdsRef.current ?? [];
     const selectedLayerIdSet = this.selectedLayerIdSetRef.current ?? new Set();
     const session = this.dragSessionRef.current;
     const isGroupDragTarget =
-      selectedLayerIdSet.has(layerId) && selectedLayerIds.length > 1;
+      selectedLayerIdSet.has(layerId) && selectedNodeIds.length > 1;
     const movedIds =
       session && session.layerId === layerId && isGroupDragTarget
-        ? selectedLayerIds
+        ? selectedNodeIds
         : [layerId];
 
     for (const movedId of movedIds) {
@@ -272,7 +272,7 @@ export class CanvasStageRuntime implements ExternalStore<CanvasStageSnapshot> {
       if (!node || !movedLayer) {
         continue;
       }
-      const movedTransform = movedLayer.transform ?? createDefaultTransform();
+      const movedTransform = nodeTransform(movedLayer);
       this.onTransformRef.current?.(movedId, {
         transform: {
           ...movedTransform,
@@ -284,7 +284,7 @@ export class CanvasStageRuntime implements ExternalStore<CanvasStageSnapshot> {
 
     this.dragSessionRef.current = null;
     this.layerBindings?.clearOverlays();
-    if (selectedLayerIds.includes(layerId)) {
+    if (selectedNodeIds.includes(layerId)) {
       this.layerBindings?.syncLabelFromTransformer();
     }
     this.dispatch({ type: 'layerDragEnd' });
@@ -311,7 +311,7 @@ export class CanvasStageRuntime implements ExternalStore<CanvasStageSnapshot> {
   onLayerTransformEnd(input: {
     layerId: string;
     view: LayerPreviewDescriptor;
-    transform: NonNullable<SceneLayer['transform']>;
+    transform: NonNullable<Transform>;
     node: Konva.Group;
     interactionKind: string | undefined;
     writable: boolean;

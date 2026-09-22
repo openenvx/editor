@@ -7,4 +7,8 @@ export enum ContributionPoint {
   ContextKey = 'contextKey',
   I18n = 'i18n',
   PageRules = 'pageRules',
+  NodeDefinition = 'nodeDefinition',
+  NodeInspector = 'nodeInspector',
+  NodeTree = 'nodeTree',
+  NodeCompiler = 'nodeCompiler',
 }

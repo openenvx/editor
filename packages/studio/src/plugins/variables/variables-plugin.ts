@@ -8,7 +8,7 @@ import {
   type CommandContext,
   type WorkbenchPluginContext,
 } from '@openenvx/studio/core';
-import { sceneVariables } from '@openenvx/studio/schema';
+import { documentVariables } from '@openenvx/studio/schema';
 
 import { executeSceneVariableCommand } from '../../core/plugins/template-variable-commands';
 import {
@@ -107,7 +107,7 @@ export class EditVariableCommand extends Command {
     if (!patch?.id) {
       return false;
     }
-    return sceneVariables(ctx.scene.getScene()).some(
+    return documentVariables(ctx.scene.getScene()).some(
       (entry) => entry.id === patch.id
     );
   }
@@ -118,7 +118,7 @@ export class EditVariableCommand extends Command {
       return;
     }
     const scene = ctx.scene.getScene();
-    const variable = sceneVariables(scene).find(
+    const variable = documentVariables(scene).find(
       (entry) => entry.id === patch.id
     );
     if (!variable) {

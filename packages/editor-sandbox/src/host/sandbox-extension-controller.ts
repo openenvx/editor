@@ -165,9 +165,9 @@ export class SandboxExtensionController {
     }
     const selection = this.options.host.getSelection();
     return {
-      activePageId: selection.activePageId,
-      selectedLayerIds: [...selection.selectedLayerIds],
-      primaryLayerId: selection.primaryLayerId,
+      activeArtboardId: selection.activeArtboardId,
+      selectedNodeIds: [...selection.selectedNodeIds],
+      primaryNodeId: selection.primaryNodeId,
     };
   }
 
@@ -609,12 +609,12 @@ export class SandboxExtensionController {
       getSelection: () => {
         const selection = host.getSelection();
         return {
-          activePageId: selection.activePageId,
-          selectedLayerIds: selection.selectedLayerIds,
-          primaryLayerId: selection.primaryLayerId,
+          activeArtboardId: selection.activeArtboardId,
+          selectedNodeIds: selection.selectedNodeIds,
+          primaryNodeId: selection.primaryNodeId,
         };
       },
-      getPageId: () => host.getSelection().activePageId,
+      getPageId: () => host.getSelection().activeArtboardId,
       executeCommand: async (commandId, args) =>
         host.executeCommand(commandId, args),
       showUI: (html, options) => {

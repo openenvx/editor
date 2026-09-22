@@ -1,6 +1,12 @@
-import type { Layer, Transform } from '@openenvx/studio/core';
+import type { DocumentNode, Transform } from '@openenvx/studio/core';
 import { getLayerChildren } from '@openenvx/studio/core';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import {
+  applyNodeTransform,
+  artboardSpaceSize,
+  createDefaultTransform,
+  nodeTransform,
+} from '@openenvx/studio/schema';
+import type { Artboard } from '@openenvx/studio/schema';
 
 import {
   CANVAS_GROUP_LAYER_TYPE,
@@ -14,11 +20,11 @@ export interface LayerBounds {
   height: number;
 }
 
-function getLayerTransform(layer: Layer): Transform {
-  return layer.transform ?? createDefaultTransform();
+function getLayerTransform(layer: DocumentNode): Transform {
+  return nodeTransform(layer);
 }
 
-function computeLayerBounds(layer: Layer): LayerBounds {
+function computeLayerBounds(layer: DocumentNode): LayerBounds {
   const transform = getLayerTransform(layer);
   return {
     x: transform.x,
@@ -28,7 +34,7 @@ function computeLayerBounds(layer: Layer): LayerBounds {
   };
 }
 
-export function computeUnionBounds(layers: Layer[]): LayerBounds {
+export function computeUnionBounds(layers: DocumentNode[]): LayerBounds {
   if (layers.length === 0) {
     return { x: 0, y: 0, width: 200, height: 200 };
   }
@@ -61,7 +67,7 @@ export function computeUnionBounds(layers: Layer[]): LayerBounds {
  */
 export function computeGroupOutlineBounds(
   groupTransform: Pick<Transform, 'width' | 'height'>,
-  children: Layer[]
+  children: DocumentNode[]
 ): LayerBounds {
   if (children.length === 0) {
     return {
@@ -75,59 +81,59 @@ export function computeGroupOutlineBounds(
 }
 
 export function toRelativeTransform(
-  layer: Layer,
+  layer: DocumentNode,
   groupOrigin: { x: number; y: number }
-): Layer {
+): DocumentNode {
   const transform = getLayerTransform(layer);
-  return {
-    ...layer,
-    transform: {
-      ...transform,
-      x: transform.x - groupOrigin.x,
-      y: transform.y - groupOrigin.y,
-    },
-  };
+  return applyNodeTransform(layer, {
+    ...transform,
+    x: transform.x - groupOrigin.x,
+    y: transform.y - groupOrigin.y,
+  });
 }
 
 export function toAbsoluteTransform(
-  layer: Layer,
+  layer: DocumentNode,
   groupOrigin: { x: number; y: number }
-): Layer {
+): DocumentNode {
   const transform = getLayerTransform(layer);
-  return {
-    ...layer,
-    transform: {
-      ...transform,
-      x: transform.x + groupOrigin.x,
-      y: transform.y + groupOrigin.y,
-    },
-  };
+  return applyNodeTransform(layer, {
+    ...transform,
+    x: transform.x + groupOrigin.x,
+    y: transform.y + groupOrigin.y,
+  });
 }
 
 export function createGroupFromLayers(
   groupId: string,
-  layers: Layer[],
-  page: { width?: number; height?: number }
-): Layer {
+  layers: DocumentNode[],
+  artboard: Pick<Artboard, 'space'>
+): DocumentNode {
   const bounds = computeUnionBounds(layers);
   const children = layers.map((layer) =>
     toRelativeTransform(layer, { x: bounds.x, y: bounds.y })
   );
 
+  const { width, height } = artboardSpaceSize({
+    id: 'page',
+    name: 'Page',
+    nodes: [],
+    space: artboard.space,
+  });
+
   const groupLayer = new CanvasGroupLayer().createDefault(groupId, {
     id: 'page',
-    layers: [],
     name: 'Page',
-    layout: 'absolute',
-    width: page.width,
-    height: page.height,
+    nodes: [],
+    space: { width, height },
+    extensions: { layout: 'absolute' },
   });
 
   return {
     ...groupLayer,
-    data: { children },
-    transform: {
-      ...(groupLayer.transform ?? createDefaultTransform()),
+    children,
+    frame: {
+      ...(groupLayer.frame ?? createDefaultTransform()),
       x: bounds.x,
       y: bounds.y,
       width: bounds.width,
@@ -137,19 +143,19 @@ export function createGroupFromLayers(
 }
 
 export function groupRootLayers(
-  rootLayers: Layer[],
+  rootLayers: DocumentNode[],
   selectedIds: string[],
   groupId: string,
-  page: { width?: number; height?: number }
-): Layer[] {
+  artboard: Pick<Artboard, 'space'>
+): DocumentNode[] {
   const selectedSet = new Set(selectedIds);
   const toGroup = rootLayers.filter((layer) => selectedSet.has(layer.id));
   if (toGroup.length < 2) {
     return rootLayers;
   }
 
-  const group = createGroupFromLayers(groupId, toGroup, page);
-  const result: Layer[] = [];
+  const group = createGroupFromLayers(groupId, toGroup, artboard);
+  const result: DocumentNode[] = [];
   let groupInserted = false;
   for (const layer of rootLayers) {
     if (selectedSet.has(layer.id)) {
@@ -164,7 +170,10 @@ export function groupRootLayers(
   return result;
 }
 
-export function ungroupLayer(rootLayers: Layer[], groupId: string): Layer[] {
+export function ungroupLayer(
+  rootLayers: DocumentNode[],
+  groupId: string
+): DocumentNode[] {
   const group = rootLayers.find((layer) => layer.id === groupId);
   if (!group || group.type !== CANVAS_GROUP_LAYER_TYPE) {
     return rootLayers;
@@ -182,7 +191,7 @@ export function ungroupLayer(rootLayers: Layer[], groupId: string): Layer[] {
 }
 
 export function isRootLevelSelection(
-  rootLayers: Layer[],
+  rootLayers: DocumentNode[],
   selectedIds: string[]
 ): boolean {
   const rootIds = new Set(rootLayers.map((layer) => layer.id));
@@ -190,9 +199,9 @@ export function isRootLevelSelection(
 }
 
 function findRootGroupLayer(
-  rootLayers: Layer[],
+  rootLayers: DocumentNode[],
   layerId: string
-): Layer | null {
+): DocumentNode | null {
   const layer = rootLayers.find((entry) => entry.id === layerId);
   if (layer?.type === CANVAS_GROUP_LAYER_TYPE) {
     return layer;
@@ -201,9 +210,9 @@ function findRootGroupLayer(
 }
 
 export function findSelectedRootGroup(
-  rootLayers: Layer[],
+  rootLayers: DocumentNode[],
   selectedIds: string[]
-): Layer | null {
+): DocumentNode | null {
   for (const id of selectedIds) {
     const group = findRootGroupLayer(rootLayers, id);
     if (group) {

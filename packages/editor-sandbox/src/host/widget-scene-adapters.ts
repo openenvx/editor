@@ -1,8 +1,9 @@
-import { findLayerById, updateLayerInTree } from '@openenvx/studio/core';
+import { findNodeById, updateLayerInTree } from '@openenvx/studio/core';
+import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
 
 import type { SandboxHostSurface } from './sandbox-host-surface';
 
-/** Scene adapters for widget `data.values` + transform resize. */
+/** Scene adapters for widget `props.values` + transform resize. */
 export function createWidgetSceneAdapters(input: {
   host: SandboxHostSurface;
   widgetLayerType: string;
@@ -10,15 +11,15 @@ export function createWidgetSceneAdapters(input: {
   const { host, widgetLayerType } = input;
   return {
     getWidgetValues: (layerId: string): unknown => {
-      const layer = findLayerById(host.getScene(), layerId);
+      const layer = findNodeById(host.getScene(), layerId);
       if (!layer || layer.type !== widgetLayerType) {
         return null;
       }
-      const data = layer.data as { values?: Record<string, unknown> };
-      return data.values ?? null;
+      const props = layer.props as { values?: Record<string, unknown> };
+      return props.values ?? null;
     },
     setWidgetValues: (layerId: string, value: unknown): void => {
-      const layer = findLayerById(host.getScene(), layerId);
+      const layer = findNodeById(host.getScene(), layerId);
       if (!layer || layer.type !== widgetLayerType) {
         return;
       }
@@ -30,12 +31,12 @@ export function createWidgetSceneAdapters(input: {
         label: 'Update widget values',
         apply: (scene) => ({
           ...scene,
-          pages: scene.pages.map((page) => ({
+          artboards: scene.artboards.map((page) => ({
             ...page,
-            layers: updateLayerInTree(page.layers, layerId, (current) => ({
+            nodes: updateLayerInTree(page.nodes, layerId, (current) => ({
               ...current,
-              data: {
-                ...(current.data as Record<string, unknown>),
+              props: {
+                ...current.props,
                 values,
               },
             })),
@@ -48,7 +49,7 @@ export function createWidgetSceneAdapters(input: {
       width: number,
       height: number
     ): void => {
-      const layer = findLayerById(host.getScene(), layerId);
+      const layer = findNodeById(host.getScene(), layerId);
       if (!layer || layer.type !== widgetLayerType) {
         return;
       }
@@ -56,26 +57,15 @@ export function createWidgetSceneAdapters(input: {
         label: 'Resize widget',
         apply: (scene) => ({
           ...scene,
-          pages: scene.pages.map((page) => ({
+          artboards: scene.artboards.map((page) => ({
             ...page,
-            layers: updateLayerInTree(page.layers, layerId, (current) => {
-              const prev = current.transform ?? {
-                x: 0,
-                y: 0,
-                width: 0,
-                height: 0,
-                rotation: 0,
-                opacity: 1,
-              };
-              return {
-                ...current,
-                transform: {
-                  ...prev,
-                  width,
-                  height,
-                },
-              };
-            }),
+            nodes: updateLayerInTree(page.nodes, layerId, (current) =>
+              applyNodeTransform(current, {
+                ...nodeTransform(current),
+                width,
+                height,
+              })
+            ),
           })),
         }),
       });

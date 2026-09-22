@@ -1,12 +1,13 @@
 import { arrayMove } from '@dnd-kit/sortable';
 import {
-  getActivePage,
+  getActiveArtboard,
   isLayerDescendant,
   isLayerLocked,
   isLayerVisible,
 } from '@openenvx/studio/core';
 import type { Selection } from '@openenvx/studio/core';
 import type { Layer, Scene } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
 import type { MutableRefObject } from 'react';
 
 import type { BlockRegistry } from '../block-registry';
@@ -52,12 +53,12 @@ export function applyHtmlDragStart(args: {
   if (activeData.parentId === null) {
     return;
   }
-  const page = getActivePage(scene, selection.activePageId);
+  const page = getActiveArtboard(scene, selection.activeArtboardId);
   const draft: BlockSortDraft = {
     activeId: activeData.blockId,
     sourceParentId: activeData.parentId,
     parentId: activeData.parentId,
-    orderedIds: visibleSiblingIds(page.layers, activeData.parentId),
+    orderedIds: visibleSiblingIds(page.nodes, activeData.parentId),
   };
   sortDraftRef.current = draft;
   setSortDraft(draft);
@@ -92,9 +93,9 @@ export function applyHtmlDragOver(args: {
     return;
   }
 
-  const page = getActivePage(scene, selection.activePageId);
+  const page = getActiveArtboard(scene, selection.activeArtboardId);
   const isAncestorOfLocked = (ancestorId: string, lockedParentId: string) =>
-    isLayerDescendant(page.layers, ancestorId, lockedParentId);
+    isLayerDescendant(page.nodes, ancestorId, lockedParentId);
 
   const overSourceParentZone =
     overData.type === 'zone' && overData.parentId === sourceParentId;
@@ -107,7 +108,7 @@ export function applyHtmlDragOver(args: {
       current: sortDraftRef.current,
       activeId: activeData.blockId,
       sourceParentId,
-      sourceVisibleIds: visibleSiblingIds(page.layers, sourceParentId),
+      sourceVisibleIds: visibleSiblingIds(page.nodes, sourceParentId),
     });
     if (next) {
       sortDraftRef.current = next;
@@ -133,7 +134,7 @@ export function applyHtmlDragOver(args: {
   ) => {
     if (
       parentId === activeData.blockId ||
-      isLayerDescendant(page.layers, activeData.blockId, parentId)
+      isLayerDescendant(page.nodes, activeData.blockId, parentId)
     ) {
       return;
     }
@@ -141,7 +142,7 @@ export function applyHtmlDragOver(args: {
       activeId: activeData.blockId,
       sourceParentId,
       parentId,
-      targetVisibleIds: visibleSiblingIds(page.layers, parentId),
+      targetVisibleIds: visibleSiblingIds(page.nodes, parentId),
       placeholderIndex,
       containerPreview,
     });
@@ -153,13 +154,10 @@ export function applyHtmlDragOver(args: {
   };
 
   const nestIntoParent = (parentId: string) => {
-    const parent = findBlock(page.layers, parentId)?.block;
+    const parent = findBlock(page.nodes, parentId)?.block;
     const parentType = parent?.type ?? '';
-    const parentData =
-      parent && typeof parent.data === 'object' && parent.data !== null
-        ? (parent.data as Record<string, unknown>)
-        : {};
-    const targetIds = visibleSiblingIds(page.layers, parentId).filter(
+    const parentData = parent ? nodeProps(parent) : {};
+    const targetIds = visibleSiblingIds(page.nodes, parentId).filter(
       (id) => id !== activeData.blockId
     );
     setCrossParentDraft(
@@ -207,7 +205,7 @@ export function applyHtmlDragOver(args: {
         current.sourceParentId !== sourceParentId ||
         current.placeholderIndex !== undefined
       ) {
-        const orderedIds = visibleSiblingIds(page.layers, sourceParentId);
+        const orderedIds = visibleSiblingIds(page.nodes, sourceParentId);
         const oldIndex = orderedIds.indexOf(activeData.blockId);
         const newIndex = orderedIds.indexOf(overData.blockId);
         if (oldIndex === -1 || newIndex === -1) {
@@ -252,18 +250,15 @@ export function applyHtmlDragOver(args: {
     return;
   }
 
-  const parent = findBlock(page.layers, overData.parentId)?.block;
+  const parent = findBlock(page.nodes, overData.parentId)?.block;
   const parentType = parent?.type ?? '';
-  const parentData =
-    parent && typeof parent.data === 'object' && parent.data !== null
-      ? (parent.data as Record<string, unknown>)
-      : {};
+  const parentData = parent ? nodeProps(parent) : {};
   if (usesContainerNestPreview(parentType, parentData)) {
     nestIntoParent(overData.parentId);
     return;
   }
 
-  const targetIds = visibleSiblingIds(page.layers, overData.parentId).filter(
+  const targetIds = visibleSiblingIds(page.nodes, overData.parentId).filter(
     (id) => id !== activeData.blockId
   );
   const overVisibleIndex = targetIds.indexOf(overData.blockId);
@@ -308,7 +303,7 @@ export function applyHtmlDragEnd(args: {
     return;
   }
 
-  const page = getActivePage(scene, selection.activePageId);
+  const page = getActiveArtboard(scene, selection.activeArtboardId);
   const targetParentId =
     draft && typeof draft.placeholderIndex === 'number'
       ? draft.parentId
@@ -317,7 +312,7 @@ export function applyHtmlDragEnd(args: {
     return;
   }
 
-  const targetParentBlock = findBlock(page.layers, targetParentId)?.block;
+  const targetParentBlock = findBlock(page.nodes, targetParentId)?.block;
   const targetParentLocked = targetParentBlock
     ? isLayerLocked(targetParentBlock)
     : false;
@@ -326,12 +321,12 @@ export function applyHtmlDragEnd(args: {
 
   const wouldCreateCycle =
     targetParentId === activeData.blockId ||
-    isLayerDescendant(page.layers, activeData.blockId, targetParentId);
+    isLayerDescendant(page.nodes, activeData.blockId, targetParentId);
 
   let activeParentFullChildIds: string[] = [];
   let activeParentChildren: Layer[] = [];
   if (activeData.parentId) {
-    const activeParent = findBlock(page.layers, activeData.parentId);
+    const activeParent = findBlock(page.nodes, activeData.parentId);
     if (activeParent) {
       activeParentChildren = getBlockChildren(activeParent.block);
       activeParentFullChildIds = activeParentChildren.map((child) => child.id);

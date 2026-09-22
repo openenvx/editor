@@ -9,7 +9,7 @@ import { renderEmailDocument } from '../../render/render-email-document';
 describe('createBarebonesActivationScene', () => {
   it('uses email.row / email.column for the header (not email.columns)', () => {
     const scene = createBarebonesActivationScene();
-    const root = scene.pages[0]!.layers[0]!;
+    const root = scene.artboards[0]!.nodes[0]!;
     const json = JSON.stringify(root);
     expect(json).toContain('"type":"email.row"');
     expect(json).toContain('"type":"email.column"');
@@ -21,7 +21,7 @@ describe('createBarebonesActivationScene', () => {
     for (const block of builtinEmailBlocks) {
       registry.register(block);
     }
-    const page = createBarebonesActivationScene().pages[0]!;
+    const page = createBarebonesActivationScene().artboards[0]!;
     const html = await renderEmailDocument(page, registry);
 
     expect(html).toContain('Barebones');
@@ -42,7 +42,7 @@ describe('createBarebonesActivationScene', () => {
       registry.register(block);
     }
     const html = await renderEmailDocument(
-      createBarebonesActivationScene().pages[0]!,
+      createBarebonesActivationScene().artboards[0]!,
       registry
     );
     const sloganAt = html.indexOf('catchy slogan');

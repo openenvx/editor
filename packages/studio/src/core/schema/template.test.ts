@@ -11,57 +11,54 @@ import {
 
 function sampleScene() {
   return normalizeScene({
-    pages: [
+    artboards: [
       {
-        height: 600,
+        extensions: { layout: 'absolute' },
         id: 'p1',
-        layers: [
+        name: 'Page',
+        nodes: [
           {
-            data: { html: '<p>Hello</p>', fontSize: 24, fill: '#111' },
             id: 't1',
             name: 'headline',
+            props: { fill: '#111', fontSize: 24, html: '<p>Hello</p>' },
             type: 'canvas.text',
           },
           {
-            data: { assetRef: 'https://example.com/a.png', fit: 'cover' },
             id: 'i1',
             name: 'hero',
+            props: { assetRef: 'https://example.com/a.png', fit: 'cover' },
             type: 'canvas.image',
           },
           {
-            data: { fill: '#3b82f6' },
             id: 'r1',
             name: 'accent',
+            props: { fill: '#3b82f6' },
             type: 'canvas.rect',
           },
           {
-            data: {
+            id: 'q1',
+            name: 'qr',
+            props: {
               background: '#ffffff',
               foreground: '#000000',
               url: 'https://example.com/demo',
             },
-            id: 'q1',
-            name: 'qr',
             type: 'canvas.qr',
           },
           {
-            data: {
-              children: [
-                {
-                  data: { html: '<p>Nested</p>' },
-                  id: 't2',
-                  name: 'subtitle',
-                  type: 'canvas.text',
-                },
-              ],
-            },
+            children: [
+              {
+                id: 't2',
+                name: 'subtitle',
+                props: { html: '<p>Nested</p>' },
+                type: 'canvas.text',
+              },
+            ],
             id: 'g1',
             type: 'canvas.group',
           },
         ],
-        layout: 'absolute',
-        name: 'Page',
-        width: 800,
+        space: { height: 600, width: 800 },
       },
     ],
   });
@@ -101,25 +98,26 @@ describe('template', () => {
 
   it('validateTemplateNames reports duplicates', () => {
     const scene = normalizeScene({
-      pages: [
+      artboards: [
         {
+          extensions: { layout: 'absolute' },
           id: 'p1',
-          layers: [
+          name: 'Page',
+          nodes: [
             {
-              data: { html: '<p>A</p>' },
               id: 't1',
               name: 'title',
+              props: { html: '<p>A</p>' },
               type: 'canvas.text',
             },
             {
-              data: { html: '<p>B</p>' },
               id: 't2',
               name: 'title',
+              props: { html: '<p>B</p>' },
               type: 'canvas.text',
             },
           ],
-          layout: 'absolute',
-          name: 'Page',
+          space: {},
         },
       ],
     });
@@ -147,33 +145,31 @@ describe('template', () => {
 
     const headline = findTemplateLayerByName(resolved, 'headline');
     expect(headline?.type).toBe('canvas.text');
-    if (headline?.type === 'canvas.text') {
-      expect(headline.data.html).toBe('<p>World</p>');
-      expect(headline.data.fontFamily).toBe('Inter');
-      expect(headline.data.fontSize).toBe(18);
-    }
+    expect(headline?.props).toMatchObject({
+      fontFamily: 'Inter',
+      fontSize: 18,
+      html: '<p>World</p>',
+    });
 
     const hero = findTemplateLayerByName(resolved, 'hero');
     expect(hero?.type).toBe('canvas.image');
-    if (hero?.type === 'canvas.image') {
-      expect(hero.data.assetRef).toBe('https://cdn.example/b.png');
-    }
+    expect(hero?.props).toMatchObject({
+      assetRef: 'https://cdn.example/b.png',
+    });
 
     const accent = findTemplateLayerByName(resolved, 'accent');
     expect(accent?.type).toBe('canvas.rect');
-    if (accent?.type === 'canvas.rect') {
-      expect(accent.data.fill).toBe('#ff0000');
-    }
+    expect(accent?.props).toMatchObject({ fill: '#ff0000' });
 
     const subtitle = findTemplateLayerByName(resolved, 'subtitle');
     expect(subtitle?.visible).toBe(false);
 
     const qr = findTemplateLayerByName(resolved, 'qr');
     expect(qr?.type).toBe('canvas.qr');
-    if (qr?.type === 'canvas.qr') {
-      expect(qr.data.url).toBe('https://weselnemomenty.pl/e/abc');
-      expect(qr.data.foreground).toBe('#1d4ed8');
-    }
+    expect(qr?.props).toMatchObject({
+      foreground: '#1d4ed8',
+      url: 'https://weselnemomenty.pl/e/abc',
+    });
   });
 
   it('applyModifications does not mutate the source scene', () => {

@@ -1,6 +1,6 @@
 import type { Layer as SceneLayer } from '@openenvx/studio/core';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { nodeTransform } from '@openenvx/studio/schema';
 import type { Transform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import type { RefObject } from 'react';
@@ -72,6 +72,7 @@ interface TransformBoundBoxInput {
 interface TransformLiveInput {
   layerId: string;
   view: LayerPreviewDescriptor;
+  transform: Transform;
   node: Konva.Group;
   refs: TransformSessionRefs;
   transformerRef: RefObject<Konva.Transformer | null>;
@@ -88,7 +89,7 @@ interface TransformLiveInput {
 interface TransformCompleteInput {
   layerId: string;
   view: LayerPreviewDescriptor;
-  transform: NonNullable<SceneLayer['transform']>;
+  transform: Transform;
   node: Konva.Group;
   refs: TransformSessionRefs;
   transformerRef: RefObject<Konva.Transformer | null>;
@@ -141,7 +142,7 @@ export const richTextTransformStrategy: LayerTransformStrategy = {
       createRichTextTransformRuntime(
         layerId,
         view as Extract<LayerPreviewDescriptor, { kind: 'richText' }>,
-        layer.transform,
+        nodeTransform(layer),
         node,
         transformer,
         activeAnchor,
@@ -194,8 +195,12 @@ export const richTextTransformStrategy: LayerTransformStrategy = {
       createRichTextTransformRuntime(
         input.layerId,
         input.view as Extract<LayerPreviewDescriptor, { kind: 'richText' }>,
-        input.flattenedLayers.find(({ layer }) => layer.id === input.layerId)
-          ?.layer.transform,
+        (() => {
+          const entry = input.flattenedLayers.find(
+            ({ layer }) => layer.id === input.layerId
+          );
+          return entry ? nodeTransform(entry.layer) : input.transform;
+        })(),
         node,
         input.transformerRef.current,
         input.refs.transformDragRef.current?.anchor ?? null,
@@ -253,7 +258,7 @@ export const genericTransformStrategy: LayerTransformStrategy = {
       transformer,
       view,
     } = input;
-    const currentTransform = layer.transform ?? createDefaultTransform();
+    const currentTransform = nodeTransform(layer);
     refs.genericTransformSessionRef.current = createGenericTransformSession({
       interaction,
       layerId,

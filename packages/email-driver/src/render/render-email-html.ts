@@ -1,6 +1,9 @@
 import { BlockRegistry } from '@openenvx/html-driver';
 import type { Scene } from '@openenvx/studio/schema';
-import { applyTemplateVariables } from '@openenvx/studio/schema';
+import {
+  applyTemplateVariables,
+  artboardRulesLayout,
+} from '@openenvx/studio/schema';
 
 import { allEmailBlocks } from '../blocks/all-email-blocks';
 import { renderEmailDocument } from './render-email-document';
@@ -18,7 +21,9 @@ export async function renderEmailHtml(
   const resolved = options?.variables
     ? applyTemplateVariables(scene, options.variables)
     : scene;
-  const page = resolved.pages.find((candidate) => candidate.layout === 'email');
+  const page = resolved.artboards.find(
+    (candidate) => artboardRulesLayout(candidate) === 'email'
+  );
   if (!page) {
     throw new Error('Scene has no email layout page');
   }

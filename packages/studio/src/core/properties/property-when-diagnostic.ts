@@ -17,7 +17,7 @@ export interface PropertyWhenTokenResolution {
 
 export interface PropertyWhenEvalMeta {
   nodeLabel?: string;
-  primaryLayerId?: string | null;
+  primaryNodeId?: string | null;
   contextKeyCount?: number;
   contextKeysSample?: Record<string, boolean | string | number>;
 }
@@ -153,7 +153,7 @@ export function logPropertyWhenEval(
       result,
       visibility,
       nodeLabel: meta?.nodeLabel,
-      primaryLayerId: meta?.primaryLayerId,
+      primaryNodeId: meta?.primaryNodeId,
       contextKeyCount: meta?.contextKeyCount,
       contextKeysSample: meta?.contextKeysSample,
       tokenResolutions: resolutions,

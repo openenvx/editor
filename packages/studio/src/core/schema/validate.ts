@@ -1,13 +1,13 @@
 import { cloneDropNulls } from './clone-drop-nulls';
 import {
-  editorStateSchemaCanonical,
-  editorStateSchemaLenient,
-  sceneSchemaCanonical,
-  sceneSchemaLenient,
-  sceneSnapshotSchemaCanonical,
-  sceneSnapshotSchemaLenient,
-} from './scene-schema';
-import type { EditorState, Scene, SceneSnapshot } from './types';
+  documentSchemaCanonical,
+  documentSchemaLenient,
+  editorSessionSchemaCanonical,
+  editorSessionSchemaLenient,
+  projectSnapshotSchemaCanonical,
+  projectSnapshotSchemaLenient,
+} from './document-schema';
+import type { Document, EditorSession, ProjectSnapshot } from './types';
 
 export interface ValidationError {
   path: string;
@@ -30,86 +30,98 @@ function toErrors(
   }));
 }
 
-function pickSceneSchema(mode: ValidateMode) {
-  return mode === 'canonical' ? sceneSchemaCanonical : sceneSchemaLenient;
+function pickDocumentSchema(mode: ValidateMode) {
+  return mode === 'canonical' ? documentSchemaCanonical : documentSchemaLenient;
 }
 
-function pickEditorStateSchema(mode: ValidateMode) {
+function pickEditorSessionSchema(mode: ValidateMode) {
   return mode === 'canonical'
-    ? editorStateSchemaCanonical
-    : editorStateSchemaLenient;
+    ? editorSessionSchemaCanonical
+    : editorSessionSchemaLenient;
 }
 
 function pickSnapshotSchema(mode: ValidateMode) {
   return mode === 'canonical'
-    ? sceneSnapshotSchemaCanonical
-    : sceneSnapshotSchemaLenient;
+    ? projectSnapshotSchemaCanonical
+    : projectSnapshotSchemaLenient;
 }
 
-function validateSceneShape(scene: Scene): ValidationError[] {
+function validateDocumentShape(document: Document): ValidationError[] {
   const errors: ValidationError[] = [];
 
-  if (!Array.isArray(scene.pages) || scene.pages.length === 0) {
+  if (!Array.isArray(document.artboards) || document.artboards.length === 0) {
     errors.push({
-      message: 'pages must be a non-empty array',
-      path: 'pages',
+      message: 'artboards must be a non-empty array',
+      path: 'artboards',
     });
   }
 
   return errors;
 }
 
-export function validateScene(
+export function validateDocument(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
 ): ValidationResult {
   const mode = opts.mode ?? 'partial';
-  const result = pickSceneSchema(mode).safeParse(cloneDropNulls(input));
+  const result = pickDocumentSchema(mode).safeParse(cloneDropNulls(input));
   if (!result.success) {
     return { errors: toErrors(result.error.issues), valid: false };
   }
-  const shapeErrors = validateSceneShape(result.data as unknown as Scene);
+  const shapeErrors = validateDocumentShape(result.data as unknown as Document);
   return shapeErrors.length === 0
     ? { errors: [], valid: true }
     : { errors: shapeErrors, valid: false };
 }
 
-export function assertValidScene(
+/** @deprecated use validateDocument */
+export const validateScene = validateDocument;
+
+export function assertValidDocument(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
 ): void {
-  const { valid, errors } = validateScene(input, opts);
+  const { valid, errors } = validateDocument(input, opts);
   if (!valid) {
     const summary = errors
       .slice(0, 10)
       .map((e) => `  ${e.path}: ${e.message}`)
       .join('\n');
-    throw new Error(`Invalid OpenEnvx scene:\n${summary}`);
+    throw new Error(`Invalid OpenEnvx document:\n${summary}`);
   }
 }
 
-export function parseValidScene(
+/** @deprecated use assertValidDocument */
+export const assertValidScene = assertValidDocument;
+
+export function parseValidDocument(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
-): Scene {
-  assertValidScene(input, opts);
+): Document {
+  assertValidDocument(input, opts);
   const mode = opts.mode ?? 'partial';
-  const result = pickSceneSchema(mode).safeParse(cloneDropNulls(input));
-  return result.data as unknown as Scene;
+  const result = pickDocumentSchema(mode).safeParse(cloneDropNulls(input));
+  return result.data as unknown as Document;
 }
 
-export function validateEditorState(
+/** @deprecated use parseValidDocument */
+export const parseValidScene = parseValidDocument;
+
+export function validateEditorSession(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
 ): ValidationResult {
   const mode = opts.mode ?? 'partial';
-  const result = pickEditorStateSchema(mode).safeParse(cloneDropNulls(input));
+  const result = pickEditorSessionSchema(mode).safeParse(cloneDropNulls(input));
   return result.success
     ? { errors: [], valid: true }
     : { errors: toErrors(result.error.issues), valid: false };
 }
 
-export function validateSceneSnapshot(
+/** @deprecated use validateEditorSession */
+export const validateEditorState = validateEditorSession;
+
+export function validateProjectSnapshot(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
 ): ValidationResult {
@@ -120,36 +132,45 @@ export function validateSceneSnapshot(
     : { errors: toErrors(result.error.issues), valid: false };
 }
 
-export function parseValidSceneSnapshot(
+/** @deprecated use validateProjectSnapshot */
+export const validateSceneSnapshot = validateProjectSnapshot;
+
+export function parseValidProjectSnapshot(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
-): SceneSnapshot {
+): ProjectSnapshot {
   const mode = opts.mode ?? 'partial';
   const result = pickSnapshotSchema(mode).safeParse(cloneDropNulls(input));
   if (!result.success) {
-    const { errors } = validateSceneSnapshot(input, opts);
+    const { errors } = validateProjectSnapshot(input, opts);
     const summary = errors
       .slice(0, 10)
       .map((e) => `  ${e.path}: ${e.message}`)
       .join('\n');
-    throw new Error(`Invalid OpenEnvx scene snapshot:\n${summary}`);
+    throw new Error(`Invalid OpenEnvx project snapshot:\n${summary}`);
   }
-  return result.data as unknown as SceneSnapshot;
+  return result.data as unknown as ProjectSnapshot;
 }
 
-export function parseValidEditorState(
+/** @deprecated use parseValidProjectSnapshot */
+export const parseValidSceneSnapshot = parseValidProjectSnapshot;
+
+export function parseValidEditorSession(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
-): EditorState {
+): EditorSession {
   const mode = opts.mode ?? 'partial';
-  const result = pickEditorStateSchema(mode).safeParse(cloneDropNulls(input));
+  const result = pickEditorSessionSchema(mode).safeParse(cloneDropNulls(input));
   if (!result.success) {
-    const { errors } = validateEditorState(input, opts);
+    const { errors } = validateEditorSession(input, opts);
     const summary = errors
       .slice(0, 10)
       .map((e) => `  ${e.path}: ${e.message}`)
       .join('\n');
-    throw new Error(`Invalid OpenEnvx editor state:\n${summary}`);
+    throw new Error(`Invalid OpenEnvx editor session:\n${summary}`);
   }
-  return result.data as unknown as EditorState;
+  return result.data as unknown as EditorSession;
 }
+
+/** @deprecated use parseValidEditorSession */
+export const parseValidEditorState = parseValidEditorSession;

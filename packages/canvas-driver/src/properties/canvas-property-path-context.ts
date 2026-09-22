@@ -1,7 +1,7 @@
 import {
   clampTransformSize,
-  findLayerById,
-  getActivePage,
+  findNodeById,
+  getActiveArtboard,
   getLayerWriteMode,
   isLayerShownInLayers,
   createPropertyHostContext,
@@ -12,6 +12,7 @@ import type {
   PropertyPathContextOptions,
 } from '@openenvx/studio/core';
 import {
+  nodeTransform,
   resolvePageBleedMm,
   resolvePageSafeMm,
   type Transform,
@@ -33,7 +34,7 @@ const TEMPLATE_POLICY_KEYS = [
   'allowDeleteLayers',
   'allowDuplicateLayers',
   'allowInsertLayers',
-  'allowPageResize',
+  'allowArtboardResize',
 ] as const;
 
 type TemplatePolicyKey = (typeof TEMPLATE_POLICY_KEYS)[number];
@@ -48,15 +49,15 @@ export function createCanvasPropertyHostContext(
   const base = createPropertyHostContext(options);
   const {
     scene,
-    activePageId,
+    activeArtboardId,
     selectedLayerId,
     updateLayerTransform,
     executeCommand,
   } = options;
   const primaryLayer = selectedLayerId
-    ? findLayerById(scene, selectedLayerId)
+    ? findNodeById(scene, selectedLayerId)
     : null;
-  const activePage = getActivePage(scene, activePageId ?? undefined);
+  const activePage = getActiveArtboard(scene, activeArtboardId ?? undefined);
   const textDisplayTransformCache: CanvasTextDisplayTransformCache = {
     scene: null,
     fitted: null,
@@ -141,7 +142,7 @@ export function createCanvasPropertyHostContext(
 
       if (selectedLayerId && path.startsWith('selection.layer.transform.')) {
         const key = path.slice('selection.layer.transform.'.length);
-        const current = primaryLayer?.transform;
+        const current = primaryLayer ? nodeTransform(primaryLayer) : null;
         if (!current) {
           return;
         }

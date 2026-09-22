@@ -1,12 +1,17 @@
 import {
   Command,
-  findLayerById,
-  getActivePage,
+  findNodeById,
+  getActiveArtboard,
   localize,
   updateLayerInTree,
 } from '@openenvx/studio/core';
 import type { CommandContext } from '@openenvx/studio/core';
-import type { Transform } from '@openenvx/studio/schema';
+import {
+  applyNodeTransform,
+  artboardRulesLayout,
+  nodeTransform,
+  type Transform,
+} from '@openenvx/studio/schema';
 
 import { alignTransforms, distributeHorizontally } from '../layer-align/align';
 
@@ -16,14 +21,14 @@ function getSelectedTransforms(ctx: CommandContext): {
   layerIds: string[];
   transforms: Transform[];
 } {
-  const scene = ctx.scene.getScene();
-  const page = getActivePage(scene);
-  if (page.layout !== 'absolute') {
+  const scene = ctx.scene.getDocument();
+  const page = getActiveArtboard(scene);
+  if (artboardRulesLayout(page) !== 'absolute') {
     return { layerIds: [], transforms: [] };
   }
-  const pairs = ctx.selection.selectedLayerIds.flatMap((layerId) => {
-    const transform = findLayerById(scene, layerId)?.transform;
-    return transform ? [{ layerId, transform }] : [];
+  const pairs = ctx.selection.selectedNodeIds.flatMap((layerId) => {
+    const layer = findNodeById(scene, layerId);
+    return layer ? [{ layerId, transform: nodeTransform(layer) }] : [];
   });
   return {
     layerIds: pairs.map((pair) => pair.layerId),
@@ -38,21 +43,23 @@ function applyTransforms(
   labelKey: string,
   defaultLabel: string
 ): void {
-  const activePageId = ctx.scene.getActivePageId();
+  const activeArtboardId = ctx.scene.getActiveArtboardId();
   ctx.scene.apply({
     apply: (scene) => ({
       ...scene,
-      pages: scene.pages.map((page) =>
-        page.id === activePageId
+      artboards: scene.artboards.map((page) =>
+        page.id === activeArtboardId
           ? {
               ...page,
-              layers: layerIds.reduce(
-                (layers, layerId, index) =>
-                  updateLayerInTree(layers, layerId, (layer) => ({
-                    ...layer,
-                    transform: transforms[index] ?? layer.transform,
-                  })),
-                page.layers
+              nodes: layerIds.reduce(
+                (nodes, layerId, index) =>
+                  updateLayerInTree(nodes, layerId, (layer) =>
+                    applyNodeTransform(
+                      layer,
+                      transforms[index] ?? nodeTransform(layer)
+                    )
+                  ),
+                page.nodes
               ),
             }
           : page

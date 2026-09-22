@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { createEmailDemoScene } from '../create-email-demo-scene';
+import { legacyTestLayer } from '../test/document-fixtures';
 import { resolveEmailPasteInsertTarget } from './resolve-paste-insert-target';
 
 function layersFromDemo() {
-  return structuredClone(createEmailDemoScene().pages[0]!.layers);
+  return structuredClone(createEmailDemoScene().artboards[0]!.nodes);
 }
 
 describe('resolveEmailPasteInsertTarget', () => {
@@ -30,32 +31,35 @@ describe('resolveEmailPasteInsertTarget', () => {
 
   it('inserts after a selected row in its parent section', () => {
     const layers = layersFromDemo();
-    layers[0]!.data = {
-      ...(layers[0]!.data as Record<string, unknown>),
-      children: [
-        {
-          id: 'section-1',
-          type: 'email.section',
-          data: {
-            children: [
-              {
-                id: 'row-1',
-                type: 'email.row',
-                data: {
-                  children: [
-                    {
-                      id: 'col-1',
-                      type: 'email.column',
-                      data: { children: [] },
-                    },
-                  ],
+    layers[0] = legacyTestLayer({
+      id: layers[0]!.id,
+      type: layers[0]!.type,
+      data: {
+        children: [
+          {
+            id: 'section-1',
+            type: 'email.section',
+            data: {
+              children: [
+                {
+                  id: 'row-1',
+                  type: 'email.row',
+                  data: {
+                    children: [
+                      {
+                        id: 'col-1',
+                        type: 'email.column',
+                        data: { children: [] },
+                      },
+                    ],
+                  },
                 },
-              },
-            ],
+              ],
+            },
           },
-        },
-      ],
-    };
+        ],
+      },
+    });
 
     const target = resolveEmailPasteInsertTarget(layers, 'row-1');
     expect(target).toEqual({
@@ -67,40 +71,43 @@ describe('resolveEmailPasteInsertTarget', () => {
 
   it('appends inside a selected column', () => {
     const layers = layersFromDemo();
-    layers[0]!.data = {
-      ...(layers[0]!.data as Record<string, unknown>),
-      children: [
-        {
-          id: 'section-1',
-          type: 'email.section',
-          data: {
-            children: [
-              {
-                id: 'row-1',
-                type: 'email.row',
-                data: {
-                  children: [
-                    {
-                      id: 'col-1',
-                      type: 'email.column',
-                      data: {
-                        children: [
-                          {
-                            id: 'text-in-col',
-                            type: 'email.text',
-                            data: { html: 'Cell' },
-                          },
-                        ],
+    layers[0] = legacyTestLayer({
+      id: layers[0]!.id,
+      type: layers[0]!.type,
+      data: {
+        children: [
+          {
+            id: 'section-1',
+            type: 'email.section',
+            data: {
+              children: [
+                {
+                  id: 'row-1',
+                  type: 'email.row',
+                  data: {
+                    children: [
+                      {
+                        id: 'col-1',
+                        type: 'email.column',
+                        data: {
+                          children: [
+                            {
+                              id: 'text-in-col',
+                              type: 'email.text',
+                              data: { html: 'Cell' },
+                            },
+                          ],
+                        },
                       },
-                    },
-                  ],
+                    ],
+                  },
                 },
-              },
-            ],
+              ],
+            },
           },
-        },
-      ],
-    };
+        ],
+      },
+    });
 
     const target = resolveEmailPasteInsertTarget(layers, 'col-1');
     expect(target).toEqual({
@@ -122,21 +129,24 @@ describe('resolveEmailPasteInsertTarget', () => {
 
   it('inserts after a content block that is a direct child of root', () => {
     const layers = layersFromDemo();
-    layers[0]!.data = {
-      ...(layers[0]!.data as Record<string, unknown>),
-      children: [
-        {
-          id: 'text-root',
-          type: 'email.text',
-          data: { html: 'Orphan text' },
-        },
-        {
-          id: 'section-1',
-          type: 'email.section',
-          data: { children: [] },
-        },
-      ],
-    };
+    layers[0] = legacyTestLayer({
+      id: layers[0]!.id,
+      type: layers[0]!.type,
+      data: {
+        children: [
+          {
+            id: 'text-root',
+            type: 'email.text',
+            data: { html: 'Orphan text' },
+          },
+          {
+            id: 'section-1',
+            type: 'email.section',
+            data: { children: [] },
+          },
+        ],
+      },
+    });
 
     const target = resolveEmailPasteInsertTarget(layers, 'text-root');
     expect(target).toEqual({

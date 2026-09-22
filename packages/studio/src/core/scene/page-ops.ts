@@ -1,75 +1,82 @@
-import { cloneLayerTree } from './layer-tree';
-import type { Page } from './types';
+import type { Artboard } from '../schema/types';
+import { cloneNodeTree } from './layer-tree';
 
-/** Blank page with the same layout/size settings as `source`. */
-export function createBlankPageLike(
-  source: Page,
+export function createBlankArtboardLike(
+  source: Artboard,
   id: string,
   name: string
-): Page {
+): Artboard {
   const { guides: _guides, ...rest } = source;
-  return { ...rest, id, name, layers: [] };
+  return { ...rest, id, name, nodes: [] };
 }
 
-/** Deep-clone a page including layers with remapped ids. */
-export function duplicatePageModel(
-  source: Page,
+export const createBlankPageLike = createBlankArtboardLike;
+
+export function duplicateArtboardModel(
+  source: Artboard,
   id: string,
   name: string
-): Page {
+): Artboard {
   return {
     ...source,
     id,
     name,
-    layers: cloneLayerTree(source.layers),
+    nodes: cloneNodeTree(source.nodes),
   };
 }
 
-export function nextPageName(existingNames: Iterable<string>): string {
+export const duplicatePageModel = duplicateArtboardModel;
+
+export function nextArtboardName(existingNames: Iterable<string>): string {
   const names = new Set(
     [...existingNames].map((name) => name.trim()).filter(Boolean)
   );
   let n = 1;
-  while (names.has(`Page ${n}`)) {
+  while (names.has(`Artboard ${n}`)) {
     n += 1;
   }
-  return `Page ${n}`;
+  return `Artboard ${n}`;
 }
 
-export function duplicatePageName(sourceName: string): string {
+export const nextPageName = nextArtboardName;
+
+export function duplicateArtboardName(sourceName: string): string {
   const trimmed = sourceName.trim();
-  return trimmed ? `${trimmed} copy` : 'Page copy';
+  return trimmed ? `${trimmed} copy` : 'Artboard copy';
 }
 
-export function createPageId(): string {
-  return `page-${crypto.randomUUID()}`;
+export const duplicatePageName = duplicateArtboardName;
+
+export function createArtboardId(): string {
+  return `artboard-${crypto.randomUUID()}`;
 }
 
-/** Reorder pages so `sourceId` lands before/after `targetId`. */
-export function movePageRelativeToTarget(
-  pages: Page[],
+export const createPageId = createArtboardId;
+
+export function moveArtboardRelativeToTarget(
+  artboards: Artboard[],
   sourceId: string,
   targetId: string,
   position: 'before' | 'after'
-): Page[] {
+): Artboard[] {
   if (sourceId === targetId) {
-    return pages;
+    return artboards;
   }
-  const sourceIndex = pages.findIndex((p) => p.id === sourceId);
-  const targetIndex = pages.findIndex((p) => p.id === targetId);
+  const sourceIndex = artboards.findIndex((a) => a.id === sourceId);
+  const targetIndex = artboards.findIndex((a) => a.id === targetId);
   if (sourceIndex === -1 || targetIndex === -1) {
-    return pages;
+    return artboards;
   }
 
-  const next = [...pages];
+  const next = [...artboards];
   const [moved] = next.splice(sourceIndex, 1);
   if (!moved) {
-    return pages;
+    return artboards;
   }
 
-  let insertIndex = next.findIndex((p) => p.id === targetId);
+  let insertIndex = next.findIndex((a) => a.id === targetId);
   if (insertIndex === -1) {
-    return pages;
+    return artboards;
   }
   if (position === 'after') {
     insertIndex += 1;
@@ -77,3 +84,5 @@ export function movePageRelativeToTarget(
   next.splice(insertIndex, 0, moved);
   return next;
 }
+
+export const movePageRelativeToTarget = moveArtboardRelativeToTarget;

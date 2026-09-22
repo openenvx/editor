@@ -1,14 +1,15 @@
 import {
   ContextKeyServiceId,
-  getActivePage,
-  type Scene,
-  type Selection,
+  getActiveArtboard,
+  type Document,
+  type EditorSession,
   type EditorPaneHostProps,
 } from '@openenvx/studio/core';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/studio/react';
+import { artboardSpaceSize } from '@openenvx/studio/schema';
 import { memo, useCallback, useMemo } from 'react';
 
 import { CanvasHostProvider } from '../canvas-host-context';
@@ -19,7 +20,6 @@ import { useCanvasApi } from '../hooks/use-canvas-api';
 import { useCanvasRegistries } from '../hooks/use-canvas-registries';
 import { useCanvasStageInteraction } from '../hooks/use-canvas-stage-interaction';
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
-import { getDefaultPageDimensions } from '../page-presets';
 import { CanvasEditor, type CanvasEditorProps } from './canvas-editor';
 
 export const AbsoluteEditorPane = memo(
@@ -41,8 +41,8 @@ export const AbsoluteEditorPane = memo(
         executeCommand,
         getService: (token) => api.getService(token),
         runCommand: (commandId, args) => api.runCommand(commandId, args),
-        selectLayers: (layerIds, primaryLayerId) =>
-          api.selectLayers(layerIds, primaryLayerId),
+        selectLayers: (layerIds, primaryNodeId) =>
+          api.selectLayers(layerIds, primaryNodeId),
         setContextKey: (key, value) =>
           api.getService(ContextKeyServiceId)?.setContext(key, value),
         updateProperty: (layerId, key, value) =>
@@ -82,8 +82,8 @@ const AbsoluteEditorPaneInner = memo(
     onViewportApiReady,
   }: {
     layerSurface: CanvasLayerSurfaceItem[];
-    scene: Scene;
-    selection: Selection;
+    scene: Document;
+    selection: EditorSession;
     hoveredLayerId: string | null;
     onZoomChange?: (zoomPercent: number) => void;
     onContainerResize?: (size: { width: number; height: number }) => void;
@@ -94,10 +94,9 @@ const AbsoluteEditorPaneInner = memo(
     const { canvasLayerInteractions, canvasLayerRenderers } =
       useCanvasRegistries();
     const stageInteraction = useCanvasStageInteraction();
-    const page = getActivePage(scene);
-    const defaultDimensions = getDefaultPageDimensions();
-    const artboardWidth = page.width ?? defaultDimensions.width;
-    const artboardHeight = page.height ?? defaultDimensions.height;
+    const page = getActiveArtboard(scene);
+    const { width: artboardWidth, height: artboardHeight } =
+      artboardSpaceSize(page);
 
     const handleTransformChange = useCallback<
       CanvasEditorProps['onTransformChange']
@@ -148,11 +147,11 @@ const AbsoluteEditorPaneInner = memo(
           return;
         }
         if (options?.setPrimary) {
-          api.selectLayers(selection.selectedLayerIds, layerId);
+          api.selectLayers(selection.selectedNodeIds, layerId);
           return;
         }
         if (options?.additive) {
-          const current = selection.selectedLayerIds;
+          const current = selection.selectedNodeIds;
           if (current.includes(layerId)) {
             const next = current.filter((id) => id !== layerId);
             api.selectLayers(next, next[0] ?? null);
@@ -160,13 +159,13 @@ const AbsoluteEditorPaneInner = memo(
           }
           api.selectLayers(
             [...current, layerId],
-            selection.primaryLayerId ?? layerId
+            selection.primaryNodeId ?? layerId
           );
           return;
         }
         api.selectLayers([layerId], layerId);
       },
-      [api, selection.primaryLayerId, selection.selectedLayerIds]
+      [api, selection.primaryNodeId, selection.selectedNodeIds]
     );
 
     return (
@@ -186,9 +185,9 @@ const AbsoluteEditorPaneInner = memo(
         onViewportApiReady={onViewportApiReady}
         onZoomChange={onZoomChange}
         page={page}
-        primaryLayerId={selection.primaryLayerId}
+        primaryNodeId={selection.primaryNodeId}
         scene={scene}
-        selectedLayerIds={selection.selectedLayerIds}
+        selectedNodeIds={selection.selectedNodeIds}
         stageInteraction={stageInteraction}
       />
     );

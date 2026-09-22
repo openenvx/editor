@@ -1,26 +1,27 @@
-import { getActivePage, localize } from '@openenvx/studio/core';
-import type { CommandContext, Scene } from '@openenvx/studio/core';
+import { getActiveArtboard, localize } from '@openenvx/studio/core';
+import type { CommandContext, Document } from '@openenvx/studio/core';
+import { artboardRulesLayout } from '@openenvx/studio/schema';
 
 import { resolvePagePreset } from '../page-presets';
 import { resizeAbsolutePage } from './scale-page-content';
 
 export function resizeSceneToPagePreset(
-  scene: Scene,
+  scene: Document,
   presetId: string
-): Scene | null {
+): Document | null {
   const preset = resolvePagePreset(presetId);
   if (!preset) {
     return null;
   }
 
-  const page = getActivePage(scene);
-  if (page.layout !== 'absolute') {
+  const page = getActiveArtboard(scene);
+  if (artboardRulesLayout(page) !== 'absolute') {
     return null;
   }
 
   return {
     ...scene,
-    pages: scene.pages.map((entry) =>
+    artboards: scene.artboards.map((entry) =>
       entry.id === page.id
         ? resizeAbsolutePage(entry, preset.width, preset.height, preset.id)
         : entry
@@ -32,7 +33,7 @@ export function applyPagePresetResize(
   ctx: CommandContext,
   presetId: string
 ): boolean {
-  const nextScene = resizeSceneToPagePreset(ctx.scene.getScene(), presetId);
+  const nextScene = resizeSceneToPagePreset(ctx.scene.getDocument(), presetId);
   if (!nextScene) {
     return false;
   }

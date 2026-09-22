@@ -10,7 +10,7 @@ import {
 } from '@dnd-kit/core';
 import {
   AssetServiceId,
-  getActivePage,
+  getActiveArtboard,
   RichTextInsertServiceId,
 } from '@openenvx/studio/core';
 import type { EditorPaneHostProps } from '@openenvx/studio/core';
@@ -164,7 +164,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
       if (editingTarget || !scene || !selection) {
         return;
       }
-      const page = getActivePage(scene, selection.activePageId);
+      const page = getActiveArtboard(scene, selection.activeArtboardId);
       const action = resolveStageClickAction({
         target: event.target,
         artboardTestId: 'html-artboard',
@@ -265,9 +265,9 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
     return null;
   }
 
-  const page = getActivePage(scene, selection.activePageId);
+  const page = getActiveArtboard(scene, selection.activeArtboardId);
   const selectedId =
-    selection.primaryLayerId ?? selection.selectedLayerIds[0] ?? null;
+    selection.primaryNodeId ?? selection.selectedNodeIds[0] ?? null;
   const rootId = getPageRootId(page);
 
   return (
@@ -318,7 +318,7 @@ export const HtmlEditorPane = memo((_props: EditorPaneHostProps) => {
                   canReplaceImage={canReplaceImage}
                   editingTarget={editingTarget}
                   hoveredLayerId={hoveredLayerId}
-                  layers={page.layers}
+                  layers={page.nodes}
                   onBoundary={onBoundary}
                   onCommitEdit={onCommitEdit}
                   onDuplicate={handleDuplicate}

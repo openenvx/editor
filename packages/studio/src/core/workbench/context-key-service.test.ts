@@ -1,20 +1,20 @@
-import { normalizeScene } from '@openenvx/studio/schema';
 import { describe, expect, it } from "vitest";
 
+import { normalizeSceneForTest } from '../test/document-fixtures';
 import { createContextKeyService } from "./context-key-service";
 
 describe("ContextKeyService", () => {
   it("evaluates when expressions", () => {
-    const scene = normalizeScene({});
+    const scene = normalizeSceneForTest({});
     const keys = createContextKeyService();
     keys.syncSceneKeys({
       hasActiveEditor: true,
       isDirty: false,
       scene,
       selection: {
-        activePageId: scene.pages[0]!.id,
-        primaryLayerId: null,
-        selectedLayerIds: [],
+        activeArtboardId: scene.artboards[0]!.id,
+        primaryNodeId: null,
+        selectedNodeIds: [],
       },
     });
 
@@ -26,7 +26,7 @@ describe("ContextKeyService", () => {
   });
 
   it("sets scene.primaryLayerType from the primary selection", () => {
-    const scene = normalizeScene({
+    const scene = normalizeSceneForTest({
       pages: [
         {
           id: "a",
@@ -50,16 +50,16 @@ describe("ContextKeyService", () => {
       isDirty: false,
       scene,
       selection: {
-        activePageId: "a",
-        primaryLayerId: "svg-1",
-        selectedLayerIds: ["svg-1"],
+        activeArtboardId: "a",
+        primaryNodeId: "svg-1",
+        selectedNodeIds: ["svg-1"],
       },
     });
     expect(keys.evaluate("scene.primaryLayerType == 'canvas.svg'")).toBeTruthy();
   });
 
   it("sets scene.multiPage when more than one page exists", () => {
-    const scene = normalizeScene({
+    const scene = normalizeSceneForTest({
       pages: [
         { id: "a", name: "A", layout: "flow", layers: [] },
         { id: "b", name: "B", layout: "flow", layers: [] },
@@ -71,9 +71,9 @@ describe("ContextKeyService", () => {
       isDirty: false,
       scene,
       selection: {
-        activePageId: "a",
-        primaryLayerId: null,
-        selectedLayerIds: [],
+        activeArtboardId: "a",
+        primaryNodeId: null,
+        selectedNodeIds: [],
       },
     });
     expect(keys.evaluate("scene.multiPage")).toBeTruthy();

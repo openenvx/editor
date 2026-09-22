@@ -38,12 +38,12 @@ export function attachTransformerToNodes(
 
 export function reattachTransformerFromSelection(
   nodeRefs: RefObject<Map<string, Konva.Group>>,
-  selectedLayerIdsRef: RefObject<string[]>,
+  selectedNodeIdsRef: RefObject<string[]>,
   transformerRef: RefObject<Konva.Transformer | null>,
   syncLabelFromTransformer: () => void
 ): void {
   requestAnimationFrame(() => {
-    const nodes = (selectedLayerIdsRef.current ?? [])
+    const nodes = (selectedNodeIdsRef.current ?? [])
       .map((id) => nodeRefs.current?.get(id))
       .filter((entryNode): entryNode is Konva.Group => Boolean(entryNode));
     attachTransformerToNodes(transformerRef.current, nodes);

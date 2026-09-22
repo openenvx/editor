@@ -5,15 +5,17 @@ import {
   InstantiationService,
   SceneStore,
   WorkbenchEventService,
+  type CommandContext,
 } from '@openenvx/studio/core';
-import type { CommandContext } from '@openenvx/studio/core';
-import {
-  createDefaultTransform,
-  normalizeSceneSnapshot,
-} from '@openenvx/studio/schema';
+import { createDefaultFrame, nodeTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { CanvasClipboardServiceId } from '../canvas-service-tokens';
+import {
+  legacyLayer,
+  testArtboard,
+  testDocument,
+} from '../test/canvas-document-fixtures';
 
 import { CanvasClipboardService } from './canvas-clipboard-service';
 import {
@@ -37,30 +39,24 @@ function createContext(sceneStore: SceneStore): CommandContext {
 }
 
 function createStoreWithSelection() {
-  const snapshot = normalizeSceneSnapshot({
-    activePageId: 'p1',
-    pages: [
-      {
-        id: 'p1',
-        layout: 'absolute',
-        layers: [
-          {
-            data: { fill: '#000' },
-            id: 'rect-1',
-            transform: { ...createDefaultTransform(), x: 10, y: 20 },
-            type: 'canvas.rect',
-          },
-        ],
-        name: 'Page',
-      },
-    ],
-    selection: {
-      activePageId: 'p1',
-      primaryLayerId: 'rect-1',
-      selectedLayerIds: ['rect-1'],
-    },
+  const scene = testDocument([
+    testArtboard({
+      id: 'p1',
+      nodes: [
+        legacyLayer({
+          data: { fill: '#000' },
+          id: 'rect-1',
+          transform: { ...createDefaultFrame(), x: 10, y: 20 },
+          type: 'canvas.rect',
+        }),
+      ],
+    }),
+  ]);
+  return new SceneStore(scene, {
+    activeArtboardId: 'p1',
+    primaryNodeId: 'rect-1',
+    selectedNodeIds: ['rect-1'],
   });
-  return new SceneStore(snapshot.scene, snapshot.editorState);
 }
 
 describe('canvas clipboard commands', () => {
@@ -93,22 +89,22 @@ describe('canvas clipboard commands', () => {
     clipboard.setLastPointer({ screenX: 540, screenY: 960 });
     clipboard.setInternal({
       layers: [
-        {
+        legacyLayer({
           data: { fill: '#000' },
           id: 'rect-1',
-          transform: { ...createDefaultTransform(), x: 10, y: 20 },
+          transform: { ...createDefaultFrame(), x: 10, y: 20 },
           type: 'canvas.rect',
-        },
+        }),
       ],
       origin: { x: 10, y: 20 },
     });
 
     await executePasteLayers(ctx);
 
-    const page = store.getScene().pages[0]!;
-    expect(page.layers).toHaveLength(2);
-    expect(page.layers[1]!.id).not.toBe('rect-1');
-    expect(store.getSelection().selectedLayerIds).toHaveLength(1);
+    const artboard = store.getScene().artboards[0]!;
+    expect(artboard.nodes).toHaveLength(2);
+    expect(artboard.nodes[1]!.id).not.toBe('rect-1');
+    expect(store.getSelection().selectedNodeIds).toHaveLength(1);
   });
 
   it('duplicates selected layers with offset', async () => {
@@ -119,10 +115,10 @@ describe('canvas clipboard commands', () => {
 
     await executeDuplicateLayers(ctx);
 
-    const page = store.getScene().pages[0]!;
-    expect(page.layers).toHaveLength(2);
-    expect(page.layers[1]!.transform?.x).toBe(20);
-    expect(page.layers[1]!.transform?.y).toBe(30);
-    expect(store.getSelection().selectedLayerIds[0]).toBe(page.layers[1]!.id);
+    const artboard = store.getScene().artboards[0]!;
+    expect(artboard.nodes).toHaveLength(2);
+    expect(nodeTransform(artboard.nodes[1]!).x).toBe(20);
+    expect(nodeTransform(artboard.nodes[1]!).y).toBe(30);
+    expect(store.getSelection().selectedNodeIds[0]).toBe(artboard.nodes[1]!.id);
   });
 });

@@ -4,13 +4,12 @@ import { createCanvasScene } from './publish-runtime';
 
 vi.mock('./plugin/canvas-plugin', () => ({
   createCanvasDemoScene: () => ({
-    schemaVersion: 1,
-    pages: [
+    artboards: [
       {
         id: 'canvas-page',
         name: 'Artboard',
-        layout: 'absolute',
-        layers: [],
+        nodes: [],
+        space: { height: 600, width: 800 },
       },
     ],
   }),
@@ -19,8 +18,7 @@ vi.mock('./plugin/canvas-plugin', () => ({
 describe('canvas publish runtime', () => {
   it('creates a starter scene without the editor shell', () => {
     const scene = createCanvasScene();
-    expect(scene.schemaVersion).toBe(1);
-    expect(scene.pages).toBeDefined();
-    expect(Array.isArray(scene.pages)).toBe(true);
+    expect(scene.artboards).toBeDefined();
+    expect(Array.isArray(scene.artboards)).toBe(true);
   });
 });

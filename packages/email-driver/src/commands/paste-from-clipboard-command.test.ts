@@ -1,6 +1,7 @@
 import {
   EditorRuntime,
   EditorService,
+  getLayerChildren,
   PluginManager,
   SceneStore,
   SimpleServiceContribution,
@@ -41,15 +42,16 @@ describe('email.pasteFromClipboard', () => {
   it('inserts mapped blocks after the selected text block', async () => {
     const { manager, runtime, store } = createEmailCommandHarness();
     store.setSelection({
-      activePageId: store.getScene().pages[0]!.id,
-      primaryLayerId: 'text-1',
-      selectedLayerIds: ['text-1'],
+      activeArtboardId: store.getScene().artboards[0]!.id,
+      primaryNodeId: 'text-1',
+      selectedNodeIds: ['text-1'],
     });
     const ctx = runtime.createCommandContext();
-    const beforeCount = findBlock(
-      store.getScene().pages[0]!.layers,
+    const sectionBefore = findBlock(
+      store.getScene().artboards[0]!.nodes,
       'section-1'
-    )!.block.data.children?.length;
+    )!.block;
+    const beforeCount = getLayerChildren(sectionBefore).length;
 
     await manager.getRegistries().commands.execute(
       'email.pasteFromClipboard',
@@ -60,23 +62,22 @@ describe('email.pasteFromClipboard', () => {
       }
     );
 
-    const section = findBlock(store.getScene().pages[0]!.layers, 'section-1')!
+    const section = findBlock(store.getScene().artboards[0]!.nodes, 'section-1')!
       .block;
-    const children = (section.data as { children: { id: string; type: string }[] })
-      .children;
+    const children = getLayerChildren(section);
     expect(children.length).toBe((beforeCount as number) + 2);
     expect(children[2]?.type).toBe('email.heading');
     expect(children[3]?.type).toBe('email.text');
-    expect(store.getSelection().selectedLayerIds[0]).toBe(children[2]?.id);
+    expect(store.getSelection().selectedNodeIds[0]).toBe(children[2]?.id);
     runtime.dispose();
   });
 
   it('wraps root paste in a new section', async () => {
     const { manager, runtime, store } = createEmailCommandHarness();
     store.setSelection({
-      activePageId: store.getScene().pages[0]!.id,
-      primaryLayerId: null,
-      selectedLayerIds: [],
+      activeArtboardId: store.getScene().artboards[0]!.id,
+      primaryNodeId: null,
+      selectedNodeIds: [],
     });
     const ctx = runtime.createCommandContext();
 
@@ -87,9 +88,9 @@ describe('email.pasteFromClipboard', () => {
       { plain: 'Hello there' }
     );
 
-    const root = findBlock(store.getScene().pages[0]!.layers, 'email-root')!
+    const root = findBlock(store.getScene().artboards[0]!.nodes, 'email-root')!
       .block;
-    const children = (root.data as { children: { type: string }[] }).children;
+    const children = getLayerChildren(root);
     expect(children).toHaveLength(2);
     expect(children[1]?.type).toBe('email.section');
     runtime.dispose();

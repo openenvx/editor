@@ -13,8 +13,9 @@ import type {
   PropertySectionDescriptor,
 } from '../backbone';
 import { createLayerPreviewBuilder } from '../preview';
-import { normalizeScene } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
+
+import { normalizeSceneForTest } from '../test/document-fixtures';
 
 import { PropertyPaneContribution } from '../contributions/property-pane-contribution';
 import { ViewContainerContribution } from '../contributions/view-contribution';
@@ -30,11 +31,11 @@ class TestLayer extends LayerDefinition<{ text: string }> {
   readonly treeDisplayName = 'Test';
 
   createDefault(id: string, _page: Page): Layer {
-    return { data: { text: 'hello' }, id, type: this.type };
+    return { props: { text: 'hello' }, id, type: this.type };
   }
 
   serialize(layer: Layer) {
-    return layer.data as { text: string };
+    return layer.props as { text: string };
   }
 
   deserialize(data: unknown) {
@@ -72,8 +73,8 @@ class ContextPlugin extends Plugin {
 }
 
 function createSceneWithLayers() {
-  return normalizeScene({
-    activePageId: 'p1',
+  return normalizeSceneForTest({
+    activeArtboardId: 'p1',
     pages: [
       {
         id: 'p1',
@@ -86,9 +87,9 @@ function createSceneWithLayers() {
       },
     ],
     selection: {
-      activePageId: 'p1',
-      primaryLayerId: 'a',
-      selectedLayerIds: ['a'],
+      activeArtboardId: 'p1',
+      primaryNodeId: 'a',
+      selectedNodeIds: ['a'],
     },
   });
 }
@@ -112,7 +113,7 @@ class InspectorContainer extends ViewContainerContribution {
 }
 
 class LayersContainer extends ViewContainerContribution {
-  readonly id = 'test.layers';
+  readonly id = 'test.nodes';
   readonly title = 'Layers';
   readonly defaultLocation = 'primary' as const;
   readonly sidebarBehavior = 'panel' as const;
@@ -132,8 +133,8 @@ class InspectorWorkbenchPlugin extends WorkbenchPlugin {
 }
 
 function createAbsoluteSceneWithoutSelection() {
-  return normalizeScene({
-    activePageId: 'p1',
+  return normalizeSceneForTest({
+    activeArtboardId: 'p1',
     pages: [
       {
         id: 'p1',
@@ -148,9 +149,9 @@ function createAbsoluteSceneWithoutSelection() {
       },
     ],
     selection: {
-      activePageId: 'p1',
-      primaryLayerId: null,
-      selectedLayerIds: [],
+      activeArtboardId: 'p1',
+      primaryNodeId: null,
+      selectedNodeIds: [],
     },
   });
 }
@@ -165,10 +166,10 @@ describe('WorkbenchStateCache', () => {
     const cache = controller.getStateCacheForTest();
     const sceneRebuildsBefore = cache.rebuildCounts.scene;
 
-    controller.selectLayers(['b'], 'b');
+    controller.selectNodes(['b'], 'b');
 
     expect(cache.rebuildCounts.scene).toBe(sceneRebuildsBefore);
-    expect(controller.getState().selection.primaryLayerId).toBe('b');
+    expect(controller.getState().selection.primaryNodeId).toBe('b');
   });
 
   it('rebuilds editor slice on selection-only change', async () => {
@@ -180,7 +181,7 @@ describe('WorkbenchStateCache', () => {
     const cache = controller.getStateCacheForTest();
     const editorRebuildsBefore = cache.rebuildCounts.editor;
 
-    controller.selectLayers(['b'], 'b');
+    controller.selectNodes(['b'], 'b');
 
     expect(cache.rebuildCounts.editor).toBe(editorRebuildsBefore + 1);
   });
@@ -239,7 +240,7 @@ describe('WorkbenchStateCache', () => {
 
     expect(paneIds()).toEqual([]);
 
-    controller.selectLayers(['a'], 'a');
+    controller.selectNodes(['a'], 'a');
     expect(cache.rebuildCounts.scene).toBe(sceneRebuildsBefore);
     expect(paneIds()).toEqual(['test.layer-selected']);
 
@@ -251,7 +252,7 @@ describe('WorkbenchStateCache', () => {
       expect(nonInspectorAfterSelect[i]).toBe(nonInspectorBefore[i]);
     }
 
-    controller.selectLayers([], null);
+    controller.selectNodes([], null);
     expect(cache.rebuildCounts.scene).toBe(sceneRebuildsBefore);
     expect(paneIds()).toEqual([]);
   });

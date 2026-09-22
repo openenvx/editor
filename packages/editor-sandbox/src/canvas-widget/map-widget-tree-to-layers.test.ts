@@ -1,7 +1,25 @@
 import { describe, expect, it } from 'vitest';
+import { applyNodeTransform, createDefaultTransform } from '@openenvx/studio/schema';
 
 import { mapWidgetTreeToLayers } from './map-widget-tree-to-layers';
 import { readLayoutIntent, resolveAutoLayout } from './resolve-auto-layout';
+
+function rectNode(id: string, width: number, height: number) {
+  return applyNodeTransform(
+    {
+      id,
+      type: 'canvas.rect',
+      props: { fill: '#000' },
+    },
+    {
+      ...createDefaultTransform(),
+      x: 0,
+      y: 0,
+      width,
+      height,
+    }
+  );
+}
 
 describe(mapWidgetTreeToLayers, () => {
   it('maps Stack + Text + Rect into locked face layers', () => {
@@ -27,14 +45,13 @@ describe(mapWidgetTreeToLayers, () => {
 
     expect(layers).toHaveLength(1);
     expect(layers[0]?.type).toBe('canvas.group');
-    const data = layers[0]?.data as { children: unknown[] } | undefined;
-    expect(data?.children).toHaveLength(2);
-    expect(data?.children[0]).toMatchObject({
+    expect(layers[0]?.children).toHaveLength(2);
+    expect(layers[0]?.children?.[0]).toMatchObject({
       type: 'canvas.text',
       writeMode: 'free',
       showInLayers: true,
     });
-    expect(data?.children[1]).toMatchObject({
+    expect(layers[0]?.children?.[1]).toMatchObject({
       type: 'canvas.rect',
       writeMode: 'free',
       showInLayers: true,
@@ -75,34 +92,10 @@ describe(resolveAutoLayout, () => {
       return;
     }
     const result = resolveAutoLayout(intent, [
-      {
-        id: 'a',
-        type: 'canvas.rect',
-        transform: {
-          x: 0,
-          y: 0,
-          width: 50,
-          height: 20,
-          rotation: 0,
-          opacity: 1,
-        },
-        data: { fill: '#000' },
-      },
-      {
-        id: 'b',
-        type: 'canvas.rect',
-        transform: {
-          x: 0,
-          y: 0,
-          width: 50,
-          height: 20,
-          rotation: 0,
-          opacity: 1,
-        },
-        data: { fill: '#000' },
-      },
+      rectNode('a', 50, 20),
+      rectNode('b', 50, 20),
     ]);
-    expect(result.children[1]?.transform?.y).toBe(30);
+    expect(result.children[1]?.frame?.y).toBe(30);
     expect(result.height).toBe(50);
   });
 
@@ -117,48 +110,12 @@ describe(resolveAutoLayout, () => {
       return;
     }
     const result = resolveAutoLayout(intent, [
-      {
-        id: 'a',
-        type: 'canvas.rect',
-        transform: {
-          x: 0,
-          y: 0,
-          width: 40,
-          height: 20,
-          rotation: 0,
-          opacity: 1,
-        },
-        data: {},
-      },
-      {
-        id: 'b',
-        type: 'canvas.rect',
-        transform: {
-          x: 0,
-          y: 0,
-          width: 40,
-          height: 20,
-          rotation: 0,
-          opacity: 1,
-        },
-        data: {},
-      },
-      {
-        id: 'c',
-        type: 'canvas.rect',
-        transform: {
-          x: 0,
-          y: 0,
-          width: 40,
-          height: 20,
-          rotation: 0,
-          opacity: 1,
-        },
-        data: {},
-      },
+      rectNode('a', 40, 20),
+      rectNode('b', 40, 20),
+      rectNode('c', 40, 20),
     ]);
-    expect(result.children[0]?.transform?.x).toBe(0);
-    expect(result.children[1]?.transform?.x).toBe(48);
-    expect(result.children[2]?.transform?.y).toBe(28);
+    expect(result.children[0]?.frame?.x).toBe(0);
+    expect(result.children[1]?.frame?.x).toBe(48);
+    expect(result.children[2]?.frame?.y).toBe(28);
   });
 });

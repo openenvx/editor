@@ -7,6 +7,7 @@ import {
   PAGE_SIZE_PRESETS,
   resolvePagePreset,
 } from './page-presets';
+import { legacyArtboard } from './test/canvas-document-fixtures';
 
 describe('page-presets', () => {
   it('defines all six ISO presets at 96 DPI', () => {
@@ -40,14 +41,13 @@ describe('page-presets', () => {
 
   it('findPresetForPage matches by width and height', () => {
     const a4 = resolvePagePreset('a4-portrait')!;
-    const match = findPresetForPage({
-      id: 'p1',
-      name: 'Page',
-      layout: 'absolute',
-      width: a4.width,
-      height: a4.height,
-      layers: [],
-    });
+    const match = findPresetForPage(
+      legacyArtboard({
+        id: 'p1',
+        width: a4.width,
+        height: a4.height,
+      })
+    );
     expect(match?.id).toBe('a4-portrait');
   });
 

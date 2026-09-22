@@ -16,9 +16,9 @@ import { SandboxExtensionController } from './sandbox-extension-controller';
 function mockHost(): SandboxHostSurface {
   return {
     getSelection: () => ({
-      activePageId: 'page-1',
-      selectedLayerIds: [],
-      primaryLayerId: null,
+      activeArtboardId: 'page-1',
+      selectedNodeIds: [],
+      primaryNodeId: null,
     }),
     getScene: () =>
       ({
@@ -324,9 +324,9 @@ describe('SandboxExtensionController', () => {
       fetchImpl: async () => new Response('globalThis.ok = 1;', { status: 200 }),
     });
     expect(controller.getUiContextSelection(grant.id)).toEqual({
-      activePageId: 'page-1',
-      selectedLayerIds: [],
-      primaryLayerId: null,
+      activeArtboardId: 'page-1',
+      selectedNodeIds: [],
+      primaryNodeId: null,
     });
     controller.dispose();
   });

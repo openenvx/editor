@@ -636,10 +636,10 @@ These changes enhance the plugin architecture, enabling more flexible and powerf
 
 These changes significantly improve the extensibility and maintainability of the OpenEnvx framework.
 
-- Simplify WorkbenchController by integrating SceneStore and EditorService into EditorRuntime
+- Simplify WorkbenchController by integrating DocumentStore and EditorService into EditorRuntime
 
-- Removed direct references to SceneStore and EditorService in WorkbenchController.
-- Updated constructor to instantiate SceneStore and EditorService within EditorRuntime, enhancing encapsulation.
+- Removed direct references to DocumentStore and EditorService in WorkbenchController.
+- Updated constructor to instantiate DocumentStore and EditorService within EditorRuntime, enhancing encapsulation.
 - Adjusted methods to retrieve scene and editor instances from EditorRuntime, streamlining state management and improving code clarity.
 
 These changes contribute to a cleaner architecture and better separation of concerns within the WorkbenchController.

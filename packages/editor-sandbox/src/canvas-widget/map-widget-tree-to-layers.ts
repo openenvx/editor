@@ -4,11 +4,11 @@ import type {
 } from '@openenvx/editor-sandbox/protocol';
 import { WIDGET_LAYER_ESCAPE_TYPES } from '@openenvx/editor-sandbox/protocol';
 import {
-  createDefaultTransform,
-  type Layer,
-  type Transform,
+  defaultTransform,
+  type DocumentNode as Layer,
 } from '@openenvx/studio/schema';
 
+import { buildFaceLayer, faceTransform } from './document-node-build';
 import { readLayoutIntent, resolveAutoLayout } from './resolve-auto-layout';
 
 export interface MapWidgetTreeOptions {
@@ -37,22 +37,6 @@ function textContent(children: RenderChild[]): string {
       return '';
     })
     .join('');
-}
-
-function boxTransform(
-  props: Record<string, unknown>,
-  fallback: Partial<Transform> = {}
-): Transform {
-  return {
-    ...createDefaultTransform(),
-    ...fallback,
-    x: typeof props.x === 'number' ? props.x : (fallback.x ?? 0),
-    y: typeof props.y === 'number' ? props.y : (fallback.y ?? 0),
-    width:
-      typeof props.width === 'number' ? props.width : (fallback.width ?? 100),
-    height:
-      typeof props.height === 'number' ? props.height : (fallback.height ?? 40),
-  };
 }
 
 function faceMeta(): Pick<Layer, 'writeMode' | 'showInLayers'> {
@@ -112,48 +96,50 @@ export function mapWidgetTreeToLayers(
         const bound = typeof node.props.bind === 'string';
         const id = nextId();
         recordHandlers(id, node.props, options.handlersOut);
-        const layer: Layer = {
-          id,
-          type: 'canvas.text',
-          writeMode: 'free',
-          showInLayers: true,
-          ...(bound ? { allowedDataKeys: ['html'] } : {}),
-          transform: boxTransform(node.props, {
-            width:
-              typeof node.props.width === 'number'
-                ? node.props.width
-                : Math.max(html.length * fontSize * 0.55, 40),
-            height:
-              typeof node.props.height === 'number'
-                ? node.props.height
-                : fontSize * 1.4,
+        return [
+          buildFaceLayer({
+            id,
+            type: 'canvas.text',
+            writeMode: 'free',
+            showInLayers: true,
+            ...(bound ? { allowedPropKeys: ['html'] } : {}),
+            props: {
+              html,
+              fontSize,
+              fill:
+                typeof node.props.fill === 'string'
+                  ? node.props.fill
+                  : '#111827',
+              fontFamily:
+                typeof node.props.fontFamily === 'string'
+                  ? node.props.fontFamily
+                  : undefined,
+              align:
+                node.props.align === 'center' || node.props.align === 'right'
+                  ? node.props.align
+                  : 'left',
+              ...(bound ? { bind: node.props.bind } : {}),
+            },
+            transform: faceTransform(node.props, {
+              width:
+                typeof node.props.width === 'number'
+                  ? node.props.width
+                  : Math.max(html.length * fontSize * 0.55, 40),
+              height:
+                typeof node.props.height === 'number'
+                  ? node.props.height
+                  : fontSize * 1.4,
+            }),
           }),
-          data: {
-            html,
-            fontSize,
-            fill:
-              typeof node.props.fill === 'string' ? node.props.fill : '#111827',
-            fontFamily:
-              typeof node.props.fontFamily === 'string'
-                ? node.props.fontFamily
-                : undefined,
-            align:
-              node.props.align === 'center' || node.props.align === 'right'
-                ? node.props.align
-                : 'left',
-            ...(bound ? { bind: node.props.bind } : {}),
-          },
-        };
-        return [layer];
+        ];
       }
       case 'Rect': {
         return [
-          {
+          buildFaceLayer({
             id: nextId(),
             type: 'canvas.rect',
             ...faceMeta(),
-            transform: boxTransform(node.props),
-            data: {
+            props: {
               fill:
                 typeof node.props.fill === 'string'
                   ? node.props.fill
@@ -177,17 +163,17 @@ export function mapWidgetTreeToLayers(
                   }
                 : {}),
             },
-          },
+            transform: faceTransform(node.props),
+          }),
         ];
       }
       case 'Ellipse': {
         return [
-          {
+          buildFaceLayer({
             id: nextId(),
             type: 'canvas.circle',
             ...faceMeta(),
-            transform: boxTransform(node.props, { width: 80, height: 80 }),
-            data: {
+            props: {
               fill:
                 typeof node.props.fill === 'string'
                   ? node.props.fill
@@ -201,7 +187,8 @@ export function mapWidgetTreeToLayers(
                   ? node.props.strokeWidth
                   : undefined,
             },
-          },
+            transform: faceTransform(node.props, { width: 80, height: 80 }),
+          }),
         ];
       }
       case 'Image': {
@@ -210,12 +197,11 @@ export function mapWidgetTreeToLayers(
           (typeof node.props.src === 'string' && node.props.src) ||
           '';
         return [
-          {
+          buildFaceLayer({
             id: nextId(),
             type: 'canvas.image',
             ...faceMeta(),
-            transform: boxTransform(node.props, { width: 200, height: 150 }),
-            data: {
+            props: {
               assetRef,
               alt:
                 typeof node.props.alt === 'string' ? node.props.alt : undefined,
@@ -226,34 +212,34 @@ export function mapWidgetTreeToLayers(
                   ? node.props.fit
                   : 'cover',
             },
-          },
+            transform: faceTransform(node.props, { width: 200, height: 150 }),
+          }),
         ];
       }
       case 'SVG': {
         return [
-          {
+          buildFaceLayer({
             id: nextId(),
             type: 'canvas.svg',
             ...faceMeta(),
-            transform: boxTransform(node.props, { width: 64, height: 64 }),
-            data: {
+            props: {
               svg: String(node.props.svg ?? ''),
               fill:
                 typeof node.props.fill === 'string'
                   ? node.props.fill
                   : undefined,
             },
-          },
+            transform: faceTransform(node.props, { width: 64, height: 64 }),
+          }),
         ];
       }
       case 'QR': {
         return [
-          {
+          buildFaceLayer({
             id: nextId(),
             type: 'canvas.qr',
             ...faceMeta(),
-            transform: boxTransform(node.props, { width: 128, height: 128 }),
-            data: {
+            props: {
               url: String(node.props.value ?? ''),
               foreground:
                 typeof node.props.foreground === 'string'
@@ -264,7 +250,8 @@ export function mapWidgetTreeToLayers(
                   ? node.props.background
                   : undefined,
             },
-          },
+            transform: faceTransform(node.props, { width: 128, height: 128 }),
+          }),
         ];
       }
       case 'Layer': {
@@ -276,7 +263,7 @@ export function mapWidgetTreeToLayers(
         if (!type) {
           return [];
         }
-        const data: Record<string, unknown> = {};
+        const props: Record<string, unknown> = {};
         if (node.props.data && typeof node.props.data === 'object') {
           for (const [key, value] of Object.entries(
             node.props.data as Record<string, unknown>
@@ -285,31 +272,31 @@ export function mapWidgetTreeToLayers(
               key === 'children' ||
               key === 'writeMode' ||
               key === 'showInLayers' ||
+              key === 'allowedPropKeys' ||
               key === 'allowedDataKeys'
             ) {
               continue;
             }
-            data[key] = value;
+            props[key] = value;
           }
         }
         return [
-          {
+          buildFaceLayer({
             id: nextId(),
             type,
             ...faceMeta(),
-            transform: boxTransform(node.props),
-            data,
-          },
+            props,
+            transform: faceTransform(node.props),
+          }),
         ];
       }
       case 'Instance': {
         return [
-          {
+          buildFaceLayer({
             id: nextId(),
             type: 'canvas.instance',
             ...faceMeta(),
-            transform: boxTransform(node.props, { width: 200, height: 200 }),
-            data: {
+            props: {
               componentId: String(node.props.componentId ?? ''),
               overrides:
                 node.props.overrides && typeof node.props.overrides === 'object'
@@ -319,7 +306,8 @@ export function mapWidgetTreeToLayers(
                     >)
                   : undefined,
             },
-          },
+            transform: faceTransform(node.props, { width: 200, height: 200 }),
+          }),
         ];
       }
       case 'Group':
@@ -373,18 +361,11 @@ export function mapWidgetTreeToLayers(
         // When the layout has a visible chrome, wrap in a rect group via group+bg.
         if (fill || stroke || cornerRadius !== undefined) {
           const bgId = nextId();
-          const bg: Layer = {
+          const bg = buildFaceLayer({
             id: bgId,
             type: 'canvas.rect',
             ...faceMeta(),
-            transform: {
-              ...createDefaultTransform(),
-              x: 0,
-              y: 0,
-              width: resolved.width,
-              height: resolved.height,
-            },
-            data: {
+            props: {
               fill: fill ?? 'transparent',
               stroke,
               strokeWidth:
@@ -404,38 +385,44 @@ export function mapWidgetTreeToLayers(
                   }
                 : {}),
             },
-          };
+            transform: defaultTransform({
+              x: 0,
+              y: 0,
+              width: resolved.width,
+              height: resolved.height,
+            }),
+          });
           return [
-            {
+            buildFaceLayer({
               id: groupId,
               type: 'canvas.group',
               ...faceMeta(),
-              transform: {
-                ...createDefaultTransform(),
+              children: [bg, ...resolved.children],
+              props: {},
+              transform: defaultTransform({
                 x: typeof node.props.x === 'number' ? node.props.x : 0,
                 y: typeof node.props.y === 'number' ? node.props.y : 0,
                 width: resolved.width,
                 height: resolved.height,
-              },
-              data: { children: [bg, ...resolved.children] },
-            },
+              }),
+            }),
           ];
         }
 
         return [
-          {
+          buildFaceLayer({
             id: groupId,
             type: 'canvas.group',
             ...faceMeta(),
-            transform: {
-              ...createDefaultTransform(),
+            children: resolved.children,
+            props: {},
+            transform: defaultTransform({
               x: typeof node.props.x === 'number' ? node.props.x : 0,
               y: typeof node.props.y === 'number' ? node.props.y : 0,
               width: resolved.width,
               height: resolved.height,
-            },
-            data: { children: resolved.children },
-          },
+            }),
+          }),
         ];
       }
       default: {

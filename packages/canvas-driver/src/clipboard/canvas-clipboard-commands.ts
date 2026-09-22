@@ -1,13 +1,17 @@
 import {
   AssetServiceId,
-  getActivePage,
+  getActiveArtboard,
   canInsertLayers,
-  findLayerById,
+  findNodeById,
   localize,
   updateLayerInTree,
 } from '@openenvx/studio/core';
-import type { CommandContext, Layer } from '@openenvx/studio/core';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import type { CommandContext, DocumentNode } from '@openenvx/studio/core';
+import {
+  applyNodeTransform,
+  artboardRulesLayout,
+  createDefaultTransform,
+} from '@openenvx/studio/schema';
 
 import { CanvasClipboardServiceId } from '../canvas-service-tokens';
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';
@@ -42,35 +46,35 @@ function isCanvasClipboardActive(service: CanvasClipboardService): boolean {
   return service.isEditorActive() && !service.isEditingText();
 }
 
-function getSelectedLayers(ctx: CommandContext): Layer[] {
-  const scene = ctx.scene.getScene();
-  return ctx.selection.selectedLayerIds
-    .map((id) => findLayerById(scene, id))
-    .filter((layer): layer is Layer => layer !== null);
+function getSelectedLayers(ctx: CommandContext): DocumentNode[] {
+  const scene = ctx.scene.getDocument();
+  return ctx.selection.selectedNodeIds
+    .map((id) => findNodeById(scene, id))
+    .filter((layer): layer is DocumentNode => layer !== null);
 }
 
 function insertCanvasLayers(
   ctx: CommandContext,
-  layers: Layer[],
+  layers: DocumentNode[],
   options?: { insertIndex?: number; label?: string }
 ): void {
   if (layers.length === 0) {
     return;
   }
 
-  const page = ctx.scene.getActivePage();
-  const insertIndex = options?.insertIndex ?? page.layers.length;
-  const activePageId = page.id;
+  const page = ctx.scene.getActiveArtboard();
+  const insertIndex = options?.insertIndex ?? page.nodes.length;
+  const activeArtboardId = page.id;
 
   ctx.scene.apply({
     apply: (scene) => {
-      const activePage = getActivePage(scene, activePageId);
-      const nextLayers = [...activePage.layers];
+      const activePage = getActiveArtboard(scene, activeArtboardId);
+      const nextLayers = [...activePage.nodes];
       nextLayers.splice(insertIndex, 0, ...layers);
       return {
         ...scene,
-        pages: scene.pages.map((entry) =>
-          entry.id === activePage.id ? { ...entry, layers: nextLayers } : entry
+        artboards: scene.artboards.map((entry) =>
+          entry.id === activePage.id ? { ...entry, nodes: nextLayers } : entry
         ),
       };
     },
@@ -81,9 +85,9 @@ function insertCanvasLayers(
       }),
   });
   ctx.scene.setSelection({
-    activePageId,
-    primaryLayerId: layers[0]?.id ?? null,
-    selectedLayerIds: layers.map((layer) => layer.id),
+    activeArtboardId,
+    primaryNodeId: layers[0]?.id ?? null,
+    selectedNodeIds: layers.map((layer) => layer.id),
   });
 }
 
@@ -95,7 +99,7 @@ function getPasteAnchor(service: CanvasClipboardService): {
 }
 
 type ExternalPasteBuild =
-  | { kind: 'layers'; layers: Layer[] }
+  | { kind: 'layers'; layers: DocumentNode[] }
   | { kind: 'image'; paste: ExternalImagePasteResult };
 
 function layersFromExternalPayload(
@@ -104,26 +108,28 @@ function layersFromExternalPayload(
   anchor: { x: number; y: number },
   payload: ExternalClipboardPayload
 ): ExternalPasteBuild | null {
-  const page = ctx.scene.getActivePage();
+  const page = ctx.scene.getActiveArtboard();
 
   if (payload.kind === 'text') {
     const layer = new CanvasTextLayer().createDefault(
       createLayerId('text'),
       page
     );
-    layer.data = payload.model;
     const fitted = fitCanvasTextLayerToContent(
-      {
-        ...layer,
-        data: payload.model,
-        transform: {
+      applyNodeTransform(
+        {
+          ...layer,
+          props: payload.model,
+        },
+        {
           ...createDefaultTransform(),
+          opacity: 1,
           x: anchor.x,
           y: anchor.y,
           width: MAX_PASTED_TEXT_WIDTH,
           height: 48,
-        },
-      },
+        }
+      ),
       { maxWidth: MAX_PASTED_TEXT_WIDTH, mode: 'box' }
     );
     return { kind: 'layers', layers: [fitted] };
@@ -149,23 +155,23 @@ function layersFromExternalPayload(
 function patchImageLayerData(
   ctx: CommandContext,
   layerId: string,
-  patch: (data: Record<string, unknown>) => Record<string, unknown>
+  patch: (props: Record<string, unknown>) => Record<string, unknown>
 ): boolean {
-  if (!findLayerById(ctx.scene.getScene(), layerId)) {
+  if (!findNodeById(ctx.scene.getDocument(), layerId)) {
     return false;
   }
   // setScene: don't push a second undo step for preview → CDN / flag updates
-  const scene = ctx.scene.getScene();
+  const scene = ctx.scene.getDocument();
   ctx.scene.setScene({
     ...scene,
-    pages: scene.pages.map((page) => ({
+    artboards: scene.artboards.map((page) => ({
       ...page,
-      layers: updateLayerInTree(page.layers, layerId, (layer) => {
-        const data =
-          typeof layer.data === 'object' && layer.data !== null
-            ? { ...(layer.data as Record<string, unknown>) }
+      nodes: updateLayerInTree(page.nodes, layerId, (layer) => {
+        const props =
+          typeof layer.props === 'object' && layer.props !== null
+            ? { ...(layer.props as Record<string, unknown>) }
             : {};
-        return { ...layer, data: patch(data) };
+        return { ...layer, props: patch(props) };
       }),
     })),
   });
@@ -177,10 +183,10 @@ function applyDurableImagePaste(
   layerId: string,
   assetRef: string
 ): boolean {
-  return patchImageLayerData(ctx, layerId, (data) => {
-    data.assetRef = assetRef;
-    delete data.uploading;
-    return data;
+  return patchImageLayerData(ctx, layerId, (props) => {
+    props.assetRef = assetRef;
+    delete props.uploading;
+    return props;
   });
 }
 
@@ -209,9 +215,9 @@ async function finalizeImagePaste(
       paste.revokePreview();
     }, 30_000);
   } catch {
-    const cleared = patchImageLayerData(ctx, layerId, (data) => {
-      delete data.uploading;
-      return data;
+    const cleared = patchImageLayerData(ctx, layerId, (props) => {
+      delete props.uploading;
+      return props;
     });
     // Layer gone and upload failed - drop the unreclaimed object URL.
     if (!cleared) {
@@ -297,9 +303,9 @@ export async function executePasteExternalLayers(
 }
 
 export function canExecuteCanvasClipboard(ctx: CommandContext): boolean {
-  const scene = ctx.scene.getScene();
-  const page = getActivePage(scene);
-  if (page.layout !== 'absolute') {
+  const scene = ctx.scene.getDocument();
+  const page = getActiveArtboard(scene);
+  if (artboardRulesLayout(page) !== 'absolute') {
     return false;
   }
   const service = getClipboardService(ctx);
@@ -308,7 +314,7 @@ export function canExecuteCanvasClipboard(ctx: CommandContext): boolean {
 
 export function canExecuteExternalPaste(ctx: CommandContext): boolean {
   return (
-    canExecuteCanvasClipboard(ctx) && canInsertLayers(ctx.scene.getScene())
+    canExecuteCanvasClipboard(ctx) && canInsertLayers(ctx.scene.getDocument())
   );
 }
 
@@ -316,7 +322,7 @@ export function canExecuteInternalPaste(ctx: CommandContext): boolean {
   const service = getClipboardService(ctx);
   return (
     canExecuteCanvasClipboard(ctx) &&
-    canInsertLayers(ctx.scene.getScene()) &&
+    canInsertLayers(ctx.scene.getDocument()) &&
     Boolean(service?.hasInternal())
   );
 }
@@ -354,10 +360,10 @@ export async function executeDuplicateLayers(
     return;
   }
 
-  const page = ctx.scene.getActivePage();
+  const page = ctx.scene.getActiveArtboard();
   const indices = selected.map((layer) => {
-    const rootIndex = page.layers.findIndex((entry) => entry.id === layer.id);
-    return rootIndex !== -1 ? rootIndex : page.layers.length;
+    const rootIndex = page.nodes.findIndex((entry) => entry.id === layer.id);
+    return rootIndex !== -1 ? rootIndex : page.nodes.length;
   });
   const insertIndex = Math.max(...indices) + 1;
   const clones = offsetLayers(

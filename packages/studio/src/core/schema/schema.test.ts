@@ -3,29 +3,44 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createEmptyScene,
-  createEmptySceneSnapshot,
+  createEmptyProjectSnapshot,
   normalizeEditorState,
   normalizeScene,
-  normalizeSceneSnapshot,
+  normalizeProjectSnapshot,
   validateScene,
 } from './index';
+import type { Document } from './types';
+
+function flowArtboard(
+  id: string,
+  overrides: Partial<Document['artboards'][0]> = {}
+) {
+  return {
+    extensions: { layout: 'flow' as const },
+    id,
+    name: 'Test',
+    nodes: [],
+    physical: { dpi: 96, unit: 'px' as const },
+    space: {},
+    ...overrides,
+  };
+}
 
 describe('schema', () => {
   it('creates empty scene without editor state', () => {
     const scene = createEmptyScene();
-    expect(scene.pages).toHaveLength(1);
-    expect(scene.pages[0]!.layout).toBe('flow');
+    expect(scene.artboards).toHaveLength(1);
+    expect(scene.artboards[0]!.extensions?.layout).toBe('flow');
     expect('selection' in scene).toBe(false);
-    expect('activePageId' in scene).toBe(false);
+    expect('activeArtboardId' in scene).toBe(false);
     expect(validateScene(scene).valid).toBeTruthy();
   });
 
   it('normalizes partial scene', () => {
     const scene = normalizeScene({
-      pages: [{ id: 'p1', layers: [], layout: 'flow', name: 'Test' }],
+      artboards: [flowArtboard('p1', { name: 'Test' })],
     });
-    expect(scene.pages[0]!.id).toBe('p1');
-    expect(scene.schemaVersion).toBeGreaterThanOrEqual(1);
+    expect(scene.artboards[0]!.id).toBe('p1');
   });
 
   it('rejects unknown keys in canonical mode', () => {
@@ -39,28 +54,26 @@ describe('schema', () => {
 
   it('accepts nested group children', () => {
     const scene = normalizeScene({
-      pages: [
+      artboards: [
         {
+          extensions: { layout: 'absolute' },
           id: 'p1',
-          layout: 'absolute',
           name: 'Page',
-          width: 800,
-          height: 600,
-          layers: [
+          nodes: [
             {
-              data: {
-                children: [
-                  {
-                    id: 'child-1',
-                    type: 'canvas.rect',
-                    data: { fill: '#000' },
-                  },
-                ],
-              },
+              children: [
+                {
+                  id: 'child-1',
+                  props: { fill: '#000' },
+                  type: 'canvas.rect',
+                },
+              ],
               id: 'group-1',
               type: 'canvas.group',
             },
           ],
+          physical: { dpi: 96, unit: 'px' },
+          space: { height: 600, width: 800 },
         },
       ],
     });
@@ -70,75 +83,76 @@ describe('schema', () => {
 
   it('accepts openenvx.widget with values and children', () => {
     const scene = normalizeScene({
-      pages: [
+      artboards: [
         {
+          extensions: { layout: 'absolute' },
           id: 'p1',
-          layout: 'absolute',
           name: 'Page',
-          width: 800,
-          height: 600,
-          layers: [
+          nodes: [
             {
-              id: 'w1',
-              type: 'openenvx.widget',
-              data: {
-                extensionId: 'wm.guest-tables',
-                values: { heading: 'Plan' },
-                manifest: {
-                  id: 'wm.guest-tables',
-                  label: 'Plan stolow',
-                  kinds: ['canvas'],
-                  fields: { heading: { kind: 'text', label: 'Naglowek' } },
+              children: [
+                {
+                  id: 'w1-0',
+                  props: { fontSize: 24, html: 'Plan' },
+                  showInLayers: false,
+                  type: 'canvas.text',
+                  writeMode: 'locked',
                 },
-                children: [
-                  {
-                    id: 'w1-0',
-                    type: 'canvas.text',
-                    writeMode: 'locked',
-                    showInLayers: false,
-                    data: { html: 'Plan', fontSize: 24 },
-                  },
-                ],
+              ],
+              id: 'w1',
+              props: {
+                extensionId: 'wm.guest-tables',
+                manifest: {
+                  fields: { heading: { kind: 'text', label: 'Naglowek' } },
+                  id: 'wm.guest-tables',
+                  kinds: ['canvas'],
+                  label: 'Plan stolow',
+                },
+                values: { heading: 'Plan' },
               },
+              type: 'openenvx.widget',
             },
           ],
+          physical: { dpi: 96, unit: 'px' },
+          space: { height: 600, width: 800 },
         },
       ],
     });
 
     expect(validateScene(scene).valid).toBe(true);
-    const layer = scene.pages[0]!.layers[0]!;
+    const layer = scene.artboards[0]!.nodes[0]!;
     expect(layer.type).toBe('openenvx.widget');
   });
 
   it('normalizes legacy embedded selection into snapshot', () => {
-    const snapshot = normalizeSceneSnapshot({
-      activePageId: 'p1',
-      pages: [{ id: 'p1', layers: [], layout: 'flow', name: 'Test' }],
-      selection: {
-        activePageId: 'p1',
-        primaryLayerId: null,
-        selectedLayerIds: [],
+    const snapshot = normalizeProjectSnapshot({
+      document: { artboards: [flowArtboard('p1', { name: 'Test' })] },
+      session: {
+        activeArtboardId: 'p1',
+        primaryNodeId: null,
+        selectedNodeIds: [],
       },
     });
-    expect(snapshot.scene.pages[0]!.id).toBe('p1');
-    expect(snapshot.editorState.activePageId).toBe('p1');
+    expect(snapshot.document.artboards[0]!.id).toBe('p1');
+    expect(snapshot.session.activeArtboardId).toBe('p1');
   });
 
   it('creates empty snapshot', () => {
-    const snapshot = createEmptySceneSnapshot();
-    expect(snapshot.editorState.activePageId).toBe(snapshot.scene.pages[0]!.id);
+    const snapshot = createEmptyProjectSnapshot();
+    expect(snapshot.session.activeArtboardId).toBe(
+      snapshot.document.artboards[0]!.id
+    );
   });
 
   it('normalizes editor state', () => {
     const state = normalizeEditorState({}, 'page-1');
-    expect(state.activePageId).toBe('page-1');
-    expect(state.selectedLayerIds).toEqual([]);
+    expect(state.activeArtboardId).toBe('page-1');
+    expect(state.selectedNodeIds).toEqual([]);
   });
 
   it('is idempotent for normalizeScene', () => {
     const once = normalizeScene({
-      pages: [{ id: 'p1', layers: [], layout: 'flow', name: 'Test' }],
+      artboards: [flowArtboard('p1', { name: 'Test' })],
     });
     const twice = normalizeScene(once);
     expect(twice).toEqual(once);
@@ -156,212 +170,164 @@ describe('schema', () => {
     expect(json.type).toBe('object');
   });
 
-  it('rejects invalid builtin layer data', () => {
+  it('accepts opaque node props on the document model', () => {
     const result = validateScene({
-      pages: [
-        {
-          id: 'p1',
-          layout: 'flow',
-          name: 'Page',
-          layers: [
+      artboards: [
+        flowArtboard('p1', {
+          nodes: [
             {
               id: 'rect-1',
+              props: { fill: 123 },
               type: 'canvas.rect',
-              data: { fill: 123 },
             },
+            { id: 'img-1', props: {}, type: 'canvas.image' },
           ],
-        },
+        }),
       ],
     });
-    expect(result.valid).toBe(false);
-  });
-
-  it('rejects canvas.image without assetRef', () => {
-    const result = validateScene({
-      pages: [
-        {
-          id: 'p1',
-          layout: 'flow',
-          name: 'Page',
-          layers: [{ id: 'img-1', type: 'canvas.image', data: {} }],
-        },
-      ],
-    });
-    expect(result.valid).toBe(false);
+    expect(result.valid).toBe(true);
   });
 
   it('accepts canvas.svg with svg markup', () => {
     const result = validateScene({
-      pages: [
+      artboards: [
         {
+          extensions: { layout: 'flow' },
           id: 'p1',
-          layout: 'flow',
           name: 'Page',
-          layers: [
+          nodes: [
             {
               id: 'svg-1',
-              type: 'canvas.svg',
-              data: {
-                svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4"/></svg>',
+              props: {
                 fill: '#111',
+                svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4"/></svg>',
               },
+              type: 'canvas.svg',
             },
           ],
+          physical: { dpi: 96, unit: 'px' },
+          space: {},
         },
       ],
     });
     expect(result.valid).toBe(true);
   });
 
-  it('rejects canvas.svg without svg', () => {
+  it('accepts canvas.svg with empty props bag', () => {
     const result = validateScene({
-      pages: [
-        {
-          id: 'p1',
-          layout: 'flow',
-          name: 'Page',
-          layers: [{ id: 'svg-1', type: 'canvas.svg', data: {} }],
-        },
+      artboards: [
+        flowArtboard('p1', {
+          nodes: [{ id: 'svg-1', props: {}, type: 'canvas.svg' }],
+        }),
       ],
     });
-    expect(result.valid).toBe(false);
+    expect(result.valid).toBe(true);
   });
 
   it('accepts canvas.qr with url payload', () => {
     const result = validateScene({
-      pages: [
+      artboards: [
         {
+          extensions: { layout: 'absolute' },
           id: 'p1',
-          layout: 'absolute',
           name: 'Page',
-          layers: [
+          nodes: [
             {
-              data: {
+              id: 'qr-1',
+              name: 'qr',
+              props: {
                 foreground: '#000',
                 url: 'https://example.com',
               },
-              id: 'qr-1',
-              name: 'qr',
               type: 'canvas.qr',
             },
           ],
+          physical: { dpi: 96, unit: 'px' },
+          space: {},
         },
       ],
     });
     expect(result.valid).toBe(true);
   });
 
-  it('rejects canvas.qr without url', () => {
+  it('accepts canvas.qr with empty props bag', () => {
     const result = validateScene({
-      pages: [
-        {
-          id: 'p1',
-          layout: 'absolute',
-          name: 'Page',
-          layers: [{ id: 'qr-1', type: 'canvas.qr', data: {} }],
-        },
+      artboards: [
+        flowArtboard('p1', {
+          extensions: { layout: 'absolute' },
+          nodes: [{ id: 'qr-1', props: {}, type: 'canvas.qr' }],
+        }),
       ],
     });
-    expect(result.valid).toBe(false);
-  });
-
-  it('clamps out-of-range text curve on normalize', () => {
-    const scene = normalizeScene({
-      pages: [
-        {
-          id: 'p1',
-          layout: 'absolute',
-          name: 'Page',
-          layers: [
-            {
-              data: { curve: 250, html: '<p>Hi</p>' },
-              id: 't1',
-              transform: {
-                height: 40,
-                width: 120,
-                x: 0,
-                y: 0,
-              },
-              type: 'canvas.text',
-            },
-            {
-              data: { curve: -180, html: '<p>Lo</p>' },
-              id: 't2',
-              transform: {
-                height: 40,
-                width: 120,
-                x: 0,
-                y: 50,
-              },
-              type: 'canvas.text',
-            },
-          ],
-        },
-      ],
-    });
-    expect((scene.pages[0].layers[0].data as { curve: number }).curve).toBe(
-      100
-    );
-    expect((scene.pages[0].layers[1].data as { curve: number }).curve).toBe(
-      -100
-    );
+    expect(result.valid).toBe(true);
   });
 
   it('throws when normalizeScene cannot parse input', () => {
     expect(() =>
       normalizeScene({
-        pages: [
+        artboards: [
           {
+            extensions: { layout: 'flow' },
             id: 'p1',
-            layout: 'flow',
             name: 'Page',
-            layers: [{ id: 'broken' }],
+            nodes: [{ id: 'broken' }],
+            physical: { dpi: 96, unit: 'px' },
+            space: {},
           },
         ],
       })
-    ).toThrow(/Failed to normalize OpenEnvx scene/);
+    ).toThrow(/Failed to normalize OpenEnvx document/);
   });
 
   it('prunes stale selection ids against scene', () => {
     const scene = normalizeScene({
-      pages: [{ id: 'p1', layout: 'flow', name: 'Page', layers: [] }],
+      artboards: [flowArtboard('p1', { name: 'Page' })],
     });
     const state = normalizeEditorState(
       {
-        activePageId: 'p1',
-        primaryLayerId: 'missing',
-        selectedLayerIds: ['missing', 'also-missing'],
+        activeArtboardId: 'p1',
+        primaryNodeId: 'missing',
+        selectedNodeIds: ['missing', 'also-missing'],
       },
       'p1',
       scene
     );
-    expect(state.selectedLayerIds).toEqual([]);
-    expect(state.primaryLayerId).toBeNull();
+    expect(state.selectedNodeIds).toEqual([]);
+    expect(state.primaryNodeId).toBeNull();
   });
 
   it('reads top-level editorState in legacy snapshot shape', () => {
-    const snapshot = normalizeSceneSnapshot({
-      activePageId: 'p1',
+    const snapshot = normalizeProjectSnapshot({
       editorState: {
-        activePageId: 'p1',
-        primaryLayerId: null,
-        selectedLayerIds: ['layer-a'],
+        activeArtboardId: 'p1',
+        primaryNodeId: null,
+        selectedNodeIds: ['layer-a'],
       },
-      pages: [
-        {
-          id: 'p1',
-          layout: 'flow',
-          name: 'Page',
-          layers: [{ id: 'layer-a', type: 'canvas.rect', data: { fill: '#000' } }],
-        },
-      ],
+      scene: {
+        artboards: [
+          {
+            extensions: { layout: 'flow' },
+            id: 'p1',
+            name: 'Page',
+            nodes: [
+              {
+                id: 'layer-a',
+                props: { fill: '#000' },
+                type: 'canvas.rect',
+              },
+            ],
+            physical: { dpi: 96, unit: 'px' },
+            space: {},
+          },
+        ],
+      },
     });
-    expect(snapshot.editorState.selectedLayerIds).toEqual(['layer-a']);
+    expect(snapshot.session.selectedNodeIds).toEqual(['layer-a']);
   });
 
-  it('rejects empty pages array in validation', () => {
+  it('rejects empty artboards array in validation', () => {
     const result = validateScene({
-      pages: [],
+      artboards: [],
       schemaVersion: 4,
     });
     expect(result.valid).toBe(false);

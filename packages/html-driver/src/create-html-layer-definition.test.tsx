@@ -1,8 +1,9 @@
-import { normalizeScene } from '@openenvx/studio/schema';
+import { nodeProps } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import type { BlockConfig, FieldDef } from './block-config';
 import { createHtmlLayerDefinition } from './create-html-layer-definition';
+import { testHtmlArtboard } from './test/document-fixtures';
 
 function configWithFields(
   type: string,
@@ -24,18 +25,16 @@ describe('createHtmlLayerDefinition', () => {
     const def = createHtmlLayerDefinition(
       configWithFields('html.heading', {}, defaults)
     );
-    const page = normalizeScene({
-      pages: [{ id: 'p1', name: 'Page', layout: 'html', layers: [] }],
-    }).pages[0]!;
+    const page = testHtmlArtboard({ id: 'p1', nodes: [] });
 
     const layer = def.createDefault('h1', page);
     expect(layer).toEqual({
-      data: defaults,
+      props: defaults,
       id: 'h1',
       type: 'html.heading',
     });
-    layer.data = { html: 'mutated' };
-    expect(def.createDefault('h2', page).data).toEqual(defaults);
+    layer.props = { html: 'mutated' };
+    expect(nodeProps(def.createDefault('h2', page))).toEqual(defaults);
 
     expect(def.serialize(layer)).toEqual({ html: 'mutated' });
     expect(def.deserialize({ html: 'from-disk' })).toEqual({
@@ -71,7 +70,7 @@ describe('createHtmlLayerDefinition', () => {
     );
     const sections = withFields.properties(
       {} as never,
-      { id: 'x', type: 'html.flex', data: {} }
+      { id: 'x', type: 'html.flex', props: {} }
     );
     expect(sections).toHaveLength(1);
     expect(sections[0]!.fields.map((f) => f.key)).toEqual([

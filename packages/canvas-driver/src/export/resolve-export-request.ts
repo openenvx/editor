@@ -1,21 +1,21 @@
 import { resolvePageBackground } from '@openenvx/studio/schema';
-import type { Page, Scene } from '@openenvx/studio/schema';
+import type { Artboard, Document } from '@openenvx/studio/schema';
 
 import type {
   CanvasExportFormat,
   CanvasExportOptions,
 } from './canvas-document-export-service';
 
-export function findExportPage(scene: Scene, pageId: string): Page {
-  const page = scene.pages.find((entry) => entry.id === pageId);
+export function findExportPage(scene: Document, pageId: string): Artboard {
+  const page = scene.artboards.find((entry) => entry.id === pageId);
   if (!page) {
-    throw new Error(`Page "${pageId}" not found`);
+    throw new Error(`Artboard "${pageId}" not found`);
   }
   return page;
 }
 
 export function resolveExportBackground(
-  page: Page,
+  page: Artboard,
   background?: CanvasExportOptions['background']
 ): string {
   if (background === 'transparent') {
@@ -28,9 +28,7 @@ export function resolveExportBackground(
 }
 
 export function assertBrowserExportFormat(format: CanvasExportFormat): void {
-  if (format === 'pdf') {
-    throw new Error(
-      `Format "${format}" is not supported in the browser. Use exportCanvasDocumentNode from @openenvx/canvas-driver/export/node in Node for PDF export.`
-    );
+  if (format !== 'png' && format !== 'jpg') {
+    throw new Error(`Browser export does not support format "${format}"`);
   }
 }

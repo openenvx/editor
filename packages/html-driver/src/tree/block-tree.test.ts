@@ -1,7 +1,12 @@
+import { nodeProps } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
-import type { Layer } from '@openenvx/studio/schema';
-
+import {
+  blockProps,
+  testHtmlArtboard,
+  testHtmlBlock,
+  testHtmlDocument,
+} from '../test/document-fixtures';
 import {
   cloneBlockWithNewIds,
   createBlock,
@@ -15,20 +20,12 @@ import {
   updateBlockData,
 } from './block-tree';
 
-function block(id: string, type: string, children: Layer[] = []): Layer {
-  return {
-    id,
-    type,
-    data: { children },
-  };
-}
-
 describe('block-tree', () => {
   it('finds nested blocks and reports parent', () => {
     const layers = [
-      block('root', 'html.root', [
-        block('a', 'html.heading'),
-        block('c', 'html.flex', [block('b', 'html.text')]),
+      testHtmlBlock('root', 'html.root', [
+        testHtmlBlock('a', 'html.heading'),
+        testHtmlBlock('c', 'html.flex', [testHtmlBlock('b', 'html.text')]),
       ]),
     ];
     expect(findBlock(layers, 'b')).toEqual({
@@ -39,7 +36,7 @@ describe('block-tree', () => {
   });
 
   it('inserts, moves, updates, and removes', () => {
-    let layers = [block('root', 'html.root', [])];
+    let layers = [testHtmlBlock('root', 'html.root', [])];
     const heading = createBlock('html.heading', 'h1', { html: 'Hi' });
     layers = insertAt(layers, 'root', heading, 0);
     expect(findBlock(layers, 'h1')?.parentId).toBe('root');
@@ -50,9 +47,7 @@ describe('block-tree', () => {
     expect(findBlock(layers, 'h1')?.parentId).toBe('box');
 
     layers = updateBlockData(layers, 'h1', { html: 'Hello' });
-    expect((findBlock(layers, 'h1')!.block.data as { html: string }).html).toBe(
-      'Hello'
-    );
+    expect(blockProps(findBlock(layers, 'h1')!.block).html).toBe('Hello');
 
     layers = removeById(layers, 'h1');
     expect(findBlock(layers, 'h1')).toBeNull();
@@ -60,60 +55,58 @@ describe('block-tree', () => {
 
   it('refuses to move a block into itself', () => {
     const layers = [
-      block('root', 'html.root', [block('box', 'html.flex', [])]),
+      testHtmlBlock('root', 'html.root', [testHtmlBlock('box', 'html.flex', [])]),
     ];
     expect(moveTo(layers, 'box', 'box', 0)).toBe(layers);
   });
 
   it('clones nested trees, reports root and sibling counts', () => {
-    const nested = block('root', 'html.root', [
-      block('box', 'html.flex', [block('a', 'html.text')]),
+    const nested = testHtmlBlock('root', 'html.root', [
+      testHtmlBlock('box', 'html.flex', [testHtmlBlock('a', 'html.text')]),
     ]);
     const clone = cloneBlockWithNewIds(nested, (type) => `${type}-new`);
     expect(clone.id).toBe('html.root-new');
     expect(clone.id).not.toBe('root');
-    const children = (clone.data as { children: Layer[] }).children;
+    const children = clone.children ?? [];
     expect(children[0]!.id).toBe('html.flex-new');
-    expect((children[0]!.data as { children: Layer[] }).children[0]!.id).toBe(
-      'html.text-new'
-    );
+    expect(children[0]!.children?.[0]!.id).toBe('html.text-new');
 
     const fromDefaults = createBlock('html.flex', 'box-1', {
       children: [{ id: 'fixed-child', type: 'html.text', data: { html: 'x' } }],
     });
-    const minted = (fromDefaults.data as { children: Layer[] }).children[0]!;
+    const minted = fromDefaults.children?.[0];
     expect(fromDefaults.id).toBe('box-1');
-    expect(minted.id).not.toBe('fixed-child');
-    expect(minted.type).toBe('html.text');
+    expect(minted?.id).not.toBe('fixed-child');
+    expect(minted?.type).toBe('html.text');
 
     const bare = cloneBlockWithNewIds(
-      { id: 'x', type: 'html.text', data: null },
+      { id: 'x', type: 'html.text', data: null } as never,
       () => 'fresh'
     );
     expect(bare.id).toBe('fresh');
-    expect(bare.data).toEqual({});
+    expect(nodeProps(bare)).toEqual({});
 
     expect(
-      getPageRootId({
-        id: 'p',
-        name: 'P',
-        layout: 'html',
-        layers: [block('root', 'html.root')],
-      })
+      getPageRootId(
+        testHtmlArtboard({
+          id: 'p',
+          nodes: [testHtmlBlock('root', 'html.root')],
+        })
+      )
     ).toBe('root');
     expect(
-      getPageRootId({
-        id: 'p',
-        name: 'P',
-        layout: 'html',
-        layers: [block('event', 'snapvelo.root')],
-      })
+      getPageRootId(
+        testHtmlArtboard({
+          id: 'p',
+          nodes: [testHtmlBlock('event', 'snapvelo.root')],
+        })
+      )
     ).toBe('event');
     expect(
-      getPageRootId({ id: 'p', name: 'P', layout: 'html', layers: [] })
+      getPageRootId(testHtmlArtboard({ id: 'p', nodes: [] }))
     ).toBeNull();
 
-    const layers = [block('root', 'html.root', [block('a', 'html.text')])];
+    const layers = [testHtmlBlock('root', 'html.root', [testHtmlBlock('a', 'html.text')])];
     expect(siblingCount(layers, null)).toBe(1);
     expect(siblingCount(layers, 'root')).toBe(1);
     expect(siblingCount(layers, 'missing')).toBe(0);
@@ -124,21 +117,18 @@ describe('block-tree', () => {
     expect(moveTo(layers, 'a', 'a', 0)).toBe(layers);
 
     const updated = updateBlockData(
-      [{ id: 'n', type: 'html.text', data: null }],
+      [{ id: 'n', type: 'html.text', props: {} }],
       'n',
       { html: 'x' }
     );
-    expect(updated[0]!.data).toEqual({ html: 'x' });
+    expect(nodeProps(updated[0]!)).toEqual({ html: 'x' });
 
-    const scene = {
-      schemaVersion: 1,
-      pages: [
-        { id: 'p1', name: 'A', layout: 'html' as const, layers },
-        { id: 'p2', name: 'B', layout: 'html' as const, layers: [] },
-      ],
-    };
+    const scene = testHtmlDocument([
+      testHtmlArtboard({ id: 'p1', nodes: layers }),
+      testHtmlArtboard({ id: 'p2', nodes: [] }),
+    ]);
     const mapped = mapPageLayers(scene, 'p1', () => []);
-    expect(mapped.pages[0]!.layers).toEqual([]);
-    expect(mapped.pages[1]!.layers).toEqual([]);
+    expect(mapped.artboards[0]!.nodes).toEqual([]);
+    expect(mapped.artboards[1]!.nodes).toEqual([]);
   });
 });

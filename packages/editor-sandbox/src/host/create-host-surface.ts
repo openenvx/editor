@@ -20,8 +20,8 @@ export function createSandboxHostSurface(
     getSelection: () => api.scene.getSelection(),
     getScene: (): Scene => api.scene.getScene(),
     apply: (transaction: SceneTransaction) => api.scene.apply(transaction),
-    selectLayers: (layerIds, primaryLayerId) =>
-      api.selectLayers(layerIds, primaryLayerId ?? null),
+    selectLayers: (layerIds, primaryNodeId) =>
+      api.selectLayers(layerIds, primaryNodeId ?? null),
     onDidChangeScene: (listener) =>
       api.scene.onDidChangeScene(() => listener()).dispose,
     onDidChangeSelection: (listener) =>

@@ -1,18 +1,18 @@
-import { computePageExportDimensions } from '@openenvx/studio/schema';
-import type { Page } from '@openenvx/studio/schema';
+import { computeArtboardExportDimensions } from '@openenvx/studio/schema';
+import type { Artboard } from '@openenvx/studio/schema';
 import { PDFDocument } from 'pdf-lib';
 
 export async function encodePngBytesToPdf(
   pngBytes: Uint8Array,
-  page: Page,
+  artboard: Artboard,
   options: { dpi?: number }
 ): Promise<Uint8Array> {
-  const dimensions = computePageExportDimensions(page, {
+  const dimensions = computeArtboardExportDimensions(artboard, {
     dpi: options.dpi,
     scale: 1,
   });
-  const widthPt = (dimensions.widthPx / dimensions.pageDpi) * 72;
-  const heightPt = (dimensions.heightPx / dimensions.pageDpi) * 72;
+  const widthPt = (dimensions.widthPx / dimensions.artboardDpi) * 72;
+  const heightPt = (dimensions.heightPx / dimensions.artboardDpi) * 72;
   const pdf = await PDFDocument.create();
   const embedded = await pdf.embedPng(pngBytes);
   const pdfPage = pdf.addPage([widthPt, heightPt]);

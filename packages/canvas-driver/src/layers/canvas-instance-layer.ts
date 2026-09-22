@@ -4,13 +4,16 @@ import {
 } from '@openenvx/studio/core';
 import type {
   CommandContext,
-  Layer,
+  DocumentNode,
   LayerPreviewContext,
-  Page,
   PropertySectionDescriptor,
 } from '@openenvx/studio/core';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import type { Artboard } from '@openenvx/studio/schema';
+import {
+  artboardSpaceSize,
+  createDefaultTransform,
+} from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 const canvasInstanceSchema = z.object({
@@ -31,16 +34,16 @@ export class CanvasInstanceLayer extends LayerDefinition<CanvasInstanceModel> {
     return canvasInstanceSchema.safeParse(data).success;
   }
 
-  createDefault(id: string, page: Page): Layer {
-    const pageWidth = page.width ?? 800;
-    const pageHeight = page.height ?? 600;
+  createDefault(id: string, artboard: Artboard): DocumentNode {
+    const { width: pageWidth, height: pageHeight } =
+      artboardSpaceSize(artboard);
     const width = 120;
     const height = 120;
 
     return {
-      data: { componentId: '' },
+      props: { componentId: '' },
       id,
-      transform: {
+      frame: {
         ...createDefaultTransform(),
         height,
         width,
@@ -51,8 +54,8 @@ export class CanvasInstanceLayer extends LayerDefinition<CanvasInstanceModel> {
     };
   }
 
-  serialize(layer: Layer): CanvasInstanceModel {
-    return layer.data as CanvasInstanceModel;
+  serialize(node: DocumentNode): CanvasInstanceModel {
+    return node.props as CanvasInstanceModel;
   }
 
   deserialize(data: unknown): CanvasInstanceModel {
@@ -60,7 +63,10 @@ export class CanvasInstanceLayer extends LayerDefinition<CanvasInstanceModel> {
     return parsed.success ? parsed.data : { componentId: '' };
   }
 
-  properties(_ctx: CommandContext, _layer: Layer): PropertySectionDescriptor[] {
+  properties(
+    _ctx: CommandContext,
+    _node: DocumentNode
+  ): PropertySectionDescriptor[] {
     return [];
   }
 
