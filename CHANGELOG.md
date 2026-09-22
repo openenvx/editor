@@ -3,6 +3,60 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.3.8] - 2026-09-22
+
+### Other
+
+- Enhance UI components and update design tokens
+
+- Refined styles across various components to improve consistency and usability, including buttons, inputs, and menus.
+- Updated design tokens in `tokens.css` to reflect new radius and color specifications, ensuring alignment with the Codex theme.
+- Enhanced hover and focus states for interactive elements to provide better user feedback.
+- Adjusted layout styles for the status bar and command palette to improve visual coherence.
+- Introduced new CSS properties for popups and dialogs to enhance the overall aesthetic and functionality.
+
+- Update canvas field token for improved design consistency
+
+- Changed the `--wb-canvas-field` token value from `#ffffff` to `rgba(13, 13, 13, 0.03)` in both `Design.md` and `tokens.css` to enhance visual coherence with the Codex theme.
+- This update aligns the design tokens with the intended aesthetic for the infinite workspace component.
+
+- Streamline variable handling and enhance property list styling
+
+- Removed the `handleMove` and `canMove` methods from `VariablesTreeProvider` to simplify variable management.
+- Updated `PropertyListRow` to support a new `plain` prop for a sidebar-style row appearance, enhancing UI flexibility.
+- Refined CSS styles for property list components, introducing new classes for improved layout and hover effects.
+- Adjusted `ListViewBody` to utilize the new `addRow` class for better spacing in the add item section.
+
+- Enhance dialog handling and introduce form dialog functionality
+
+- Updated the dialog service to support form dialogs, allowing for more flexible user interactions.
+- Removed the deprecated dialog registry and streamlined dialog management within the workbench.
+- Introduced new types and interfaces for form dialog options, including validation and extra actions.
+- Enhanced the confirm dialog to utilize the new dialog service structure, improving consistency across dialog types.
+- Added tests for the new form dialog functionality to ensure proper behavior and validation handling.
+
+- Update architecture and terminology for document model
+
+- Renamed `Scene` and related terms to `Document`, `Artboard`, and `DocumentNode` for clarity and consistency across the codebase.
+- Updated references in the architecture documentation to reflect the new terminology.
+- Simplified the WorkbenchController by integrating `DocumentStore` and `EditorService` into `EditorRuntime`, enhancing encapsulation and maintainability.
+- Adjusted various components and tests to align with the new document model structure, ensuring compatibility and improved functionality.
+
+- Add comprehensive testing for dialog and renderer components
+
+- Introduced unit tests for `ConfirmWorkbenchDialog` and `FormWorkbenchDialog`, ensuring proper functionality and user interactions.
+- Added tests for `ContextMenuRenderer`, `OverlayRenderer`, and `CommandPaletteRenderer` to validate rendering and command execution.
+- Implemented a new test suite for various input fields and their corresponding renderers, enhancing overall test coverage.
+- Established a consistent testing structure using `@testing-library/react` and `vitest` for improved maintainability and reliability.
+
+- Introduce new backbone and evaluation modules with comprehensive tests
+
+- Added `backbone.ts` for runtime exports to streamline in-package imports.
+- Implemented `evaluate-when-expression.ts` and its corresponding test suite to evaluate context keys and property layout conditions.
+- Created `headless-exports.ts` to consolidate headless module exports for better organization.
+- Developed tests for various components, including command palette and property evaluation, ensuring robust functionality and reliability.
+- Introduced new builders for menus and popup fields to enhance UI component flexibility and usability.
+
 ## [0.3.7] - 2026-09-20
 
 ### Other
@@ -15,6 +69,8 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Updated various package configurations to include necessary dependencies like `react-reconciler`, `scheduler`, and `use-sync-external-store`.
 - Enhanced Vite configuration to support ESM imports and resolve React runtime aliases for better compatibility with Next.js.
 - Added tests to validate the publishing bundle and ensure compliance with React's ESM import requirements.
+
+- V0.3.7
 
 ## [0.3.6] - 2026-09-19
 
@@ -132,7 +188,7 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Updated `PUBLISHING.md` to reflect the new publishing structure and clarified the versioning strategy for public npm packages.
 - Enhanced `package.json` scripts for `@openenvx/editor-sandbox` to include a new `verify-pack` command, improving package validation.
 - Added `verify-pack.ts` for `@openenvx/editor-sandbox` to enforce build checks and sourcemap restrictions.
-- Updated documentation in `AGENTS.md` to clarify the usage of `@openenvx/studio` as a subpath of `@openenvx/studio`.
+- Updated documentation in `AGENTS.md` to clarify the usage of `@openenvx/studio/core` as a subpath of `@openenvx/studio`.
 
 - V0.3.0
 
@@ -178,7 +234,7 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 
 - Update peer dependency validation in verify-pack.ts
 
-- Removed the check for the presence of `@openenvx/studio` as a peer dependency and added a new validation to ensure it is not included, enforcing the use of `@openenvx/studio` instead.
+- Removed the check for the presence of `@openenvx/studio/core` as a peer dependency and added a new validation to ensure it is not included, enforcing the use of `@openenvx/studio` instead.
 - This change clarifies the intended package structure and improves error handling during the verification process.
 
 - V0.2.1
@@ -636,10 +692,10 @@ These changes enhance the plugin architecture, enabling more flexible and powerf
 
 These changes significantly improve the extensibility and maintainability of the OpenEnvx framework.
 
-- Simplify WorkbenchController by integrating DocumentStore and EditorService into EditorRuntime
+- Simplify WorkbenchController by integrating SceneStore and EditorService into EditorRuntime
 
-- Removed direct references to DocumentStore and EditorService in WorkbenchController.
-- Updated constructor to instantiate DocumentStore and EditorService within EditorRuntime, enhancing encapsulation.
+- Removed direct references to SceneStore and EditorService in WorkbenchController.
+- Updated constructor to instantiate SceneStore and EditorService within EditorRuntime, enhancing encapsulation.
 - Adjusted methods to retrieve scene and editor instances from EditorRuntime, streamlining state management and improving code clarity.
 
 These changes contribute to a cleaner architecture and better separation of concerns within the WorkbenchController.
