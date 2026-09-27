@@ -34,7 +34,7 @@ jobs:
     env:
       HUSKY: '0'
       PUBLISHED_PACKAGES: >-
-        packages/studio packages/canvas-driver packages/html-driver packages/email-driver packages/editor-sandbox
+        packages/studio packages/canvas-driver packages/editor-sandbox
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -125,7 +125,7 @@ jobs:
 
       - name: Build published packages
         run: |
-          bun run build --filter=@openenvx/studio --filter=@openenvx/canvas-driver --filter=@openenvx/html-driver --filter=@openenvx/email-driver --filter=@openenvx/editor-sandbox
+          bun run build --filter=@openenvx/studio --filter=@openenvx/canvas-driver --filter=@openenvx/editor-sandbox
 
       - name: Lint and type check
         run: bun run check && bun run check-types

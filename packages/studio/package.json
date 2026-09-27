@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/studio",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "description": "OpenEnvx editor studio - workbench shell and headless runtime",
   "license": "MPL-2.0",
   "type": "module",
@@ -67,13 +67,21 @@
     },
     "./internal": "./src/workbench-barrel.ts",
     "./plugins": "./src/plugins/index.ts",
-    "./plugins/variables": "./src/plugins/variables/index.ts",
-    "./plugins/variables/tiptap": "./src/plugins/variables/tiptap/index.ts",
+    "./plugins/variables": {
+      "types": "./dist/plugins/variables/index.d.ts",
+      "import": "./dist/plugins/variables/index.js",
+      "default": "./dist/plugins/variables/index.js"
+    },
+    "./plugins/variables/tiptap": {
+      "types": "./dist/plugins/variables/tiptap/index.d.ts",
+      "import": "./dist/plugins/variables/tiptap/index.js",
+      "default": "./dist/plugins/variables/tiptap/index.js"
+    },
     "./plugins/version-history": "./src/plugins/version-history/index.ts"
   },
   "scripts": {
     "generate:json-schema": "bun run src/schema/generate-json-schema.ts",
-    "build": "bun ./clean-dist.ts && rolldown -c rolldown.core.publish.config.ts && rolldown -c rolldown.shell.config.ts && node ./build-dts.ts",
+    "build": "bun ./clean-dist.ts && rolldown -c rolldown.core.publish.config.ts && rolldown -c rolldown.variables-plugin.config.ts && rolldown -c rolldown.shell.config.ts && node ./build-dts.ts",
     "build:debug": "STUDIO_SOURCEMAP=1 bun run build",
     "prepack": "bun run build",
     "test": "vitest run",

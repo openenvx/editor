@@ -6,9 +6,6 @@
     "packages/editor-sandbox/src/host/quickjs-isolate-engine.ts": ["exports"],
     "packages/editor-sandbox/src/host/quickjs-runtime.ts": ["exports"],
     "packages/editor-sandbox/src/host/sandbox-extension-controller.ts": ["exports"],
-    "packages/email-driver/src/templates/index.ts": ["exports"],
-    "packages/email-driver/src/templates/jsx/index.ts": ["exports"],
-    "packages/html-driver/src/editor/floating-pill/index.ts": ["exports", "types"],
     "packages/studio/src/ui/primitives/input.tsx": ["exports", "types"],
     "packages/studio/src/context/workbench-context.tsx": ["types"],
     "packages/studio/src/workbench-barrel.ts": ["exports"],
@@ -112,6 +109,9 @@
         "src/workbench-barrel.ts!",
         "rolldown.shell.config.ts!",
         "rolldown.core.publish.config.ts!",
+        "rolldown.variables-plugin.config.ts!",
+        "src/plugins/variables/index.ts!",
+        "src/plugins/variables/tiptap/index.ts!",
         "css-modules-plugin.ts!",
         "build-dts.ts!",
         "smoke-next-consumer.ts!",
@@ -124,6 +124,7 @@
         "!src/**/*.test.tsx",
         "rolldown.shell.config.ts",
         "rolldown.core.publish.config.ts",
+        "rolldown.variables-plugin.config.ts",
         "css-modules-plugin.ts",
         "build-dts.ts",
         "smoke-next-consumer.ts",
@@ -147,46 +148,6 @@
         "src/layout/editor-layout-styles.ts",
         "src/layout/local-storage-workbench-layout-store.ts",
         "src/ui/primitives/confirm-dialog.tsx"
-      ]
-    },
-    "packages/html-driver": {
-      "entry": [
-        "src/index.ts!",
-        "src/runtime.ts!",
-        "src/publish.ts!",
-        "src/publish-runtime.ts!",
-        "src/plugin/html-blocks-plugin.ts!",
-        "rolldown.publish.config.ts!",
-        "css-modules-plugin.ts!",
-        "build-dts.ts!",
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts",
-        "!src/**/*.test.tsx",
-        "rolldown.publish.config.ts",
-        "css-modules-plugin.ts",
-        "build-dts.ts",
-      ]
-    },
-    "packages/email-driver": {
-      "entry": [
-        "src/index.ts!",
-        "src/runtime.ts!",
-        "src/publish.ts!",
-        "src/publish-runtime.ts!",
-        "src/plugin/email-blocks-plugin.ts!",
-        "rolldown.publish.config.ts!",
-        "css-modules-plugin.ts!",
-        "build-dts.ts!",
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "!src/**/*.test.ts",
-        "!src/**/*.test.tsx",
-        "rolldown.publish.config.ts",
-        "css-modules-plugin.ts",
-        "build-dts.ts",
       ]
     },
     "apps/demo-playground": {
@@ -217,29 +178,6 @@
       ],
       "ignoreDependencies": [
         "openenvx-widget"
-      ]
-    },
-    "apps/html-demo": {
-      "entry": [
-        "src/main.tsx",
-        "src/app.tsx",
-        "index.html"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}"
-      ],
-      "ignoreDependencies": [
-        "openenvx-widget"
-      ]
-    },
-    "apps/email-demo": {
-      "entry": [
-        "src/main.tsx",
-        "src/app.tsx",
-        "index.html"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}"
       ]
     },
     "apps/canvas-package-demo": {

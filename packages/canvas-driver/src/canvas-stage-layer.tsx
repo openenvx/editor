@@ -399,7 +399,11 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
 
   const handleDragMove = useCallback(
     (event: Konva.KonvaEventObject<DragEvent>) => {
-      runtime.onLayerDragMove(layer.id, event.target as Konva.Group, transform);
+      runtime.onLayerDragMove(
+        layer.id,
+        event.target as unknown as Konva.Group,
+        transform
+      );
     },
     [layer.id, runtime, transform]
   );
@@ -412,7 +416,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
     (event: Konva.KonvaEventObject<Event>) => {
       runtime.onLayerTransform(
         layer.id,
-        event.target as Konva.Group,
+        event.target as unknown as Konva.Group,
         view,
         interaction?.kind,
         layerWritable
@@ -426,7 +430,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
       runtime.onLayerTransformEnd({
         interactionKind: interaction?.kind,
         layerId: layer.id,
-        node: event.target as Konva.Group,
+        node: event.target as unknown as Konva.Group,
         transform: baseTransform,
         view,
         writable: layerWritable,

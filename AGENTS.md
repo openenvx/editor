@@ -85,8 +85,7 @@ Published packages:
 
 - **`@openenvx/editor-sandbox`** - published sandbox SDK: `./protocol`, `./host`, `./canvas-widget`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts opt in via **`@openenvx/editor-sandbox/host`** on `mountExternalHosts`; canvas faces map via **`@openenvx/editor-sandbox/canvas-widget`** (`applyWidgetFace`).
 - **`@openenvx/studio`** - published editor studio (public npm, MPL-2.0). `.` (headless), `./shell` + `./theme.css` / `./styles.css`, `./schema`, `./preview`, `./react`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/html-driver`** - published HTML engine (public npm, MPL-2.0). `.` + `./theme.css` (artboard editor CSS; shell is `@openenvx/studio/theme.css`). See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/email-driver`** - published email engine (public npm, MPL-2.0). `.` + `./theme.css`. Source: `packages/email-driver`. See [PUBLISHING.md](PUBLISHING.md).
+- **`@openenvx/html-driver`** / **`@openenvx/email-driver`** - published from the sibling [openenvx-html](https://github.com/openenvx/openenvx-html) repo (not this monorepo). Package demos here consume them from npm (`apps/*-package-demo`).
 - **`@openenvx/canvas-driver`** - published canvas engine (public npm, MPL-2.0). `.` + `./theme.css` + `./fonts.css`. See [PUBLISHING.md](PUBLISHING.md).
 
 ## Host sidebar panels (product hosts)
@@ -230,7 +229,7 @@ bun run changelog     # preview unreleased changelog (git-cliff)
 
 ## Publishing
 
-`@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, `@openenvx/email-driver`, and `@openenvx/editor-sandbox` are published via the GitHub Actions **Release** workflow (see [PUBLISHING.md](PUBLISHING.md)). Headless/runtime imports use `@openenvx/studio` (package root); hosts import `WorkbenchShell` from `@openenvx/studio/shell`.
+`@openenvx/studio`, `@openenvx/canvas-driver`, and `@openenvx/editor-sandbox` are published via the GitHub Actions **Release** workflow in this repo (see [PUBLISHING.md](PUBLISHING.md)). `@openenvx/html-driver` and `@openenvx/email-driver` publish from **openenvx-html**. Headless/runtime imports use `@openenvx/studio` (package root); hosts import `WorkbenchShell` from `@openenvx/studio/shell`.
 
 ## Before you finish
 

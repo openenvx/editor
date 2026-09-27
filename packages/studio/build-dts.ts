@@ -49,6 +49,11 @@ const entries: [string, string][] = [
   ['src/schema/index.ts', 'dist/schema/index.d.ts'],
   ['src/preview/index.ts', 'dist/preview/index.d.ts'],
   ['src/react/workbench-context.tsx', 'dist/react/workbench-context.d.ts'],
+  ['src/plugins/variables/index.ts', 'dist/plugins/variables/index.d.ts'],
+  [
+    'src/plugins/variables/tiptap/index.ts',
+    'dist/plugins/variables/tiptap/index.d.ts',
+  ],
 ];
 
 for (const [entry, outfile] of entries) {
