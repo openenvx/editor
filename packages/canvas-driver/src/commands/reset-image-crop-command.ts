@@ -1,4 +1,4 @@
-import { Command, localize, updateLayerInTree } from '@openenvx/studio';
+import { Command, localize, updateNodeInTree } from '@openenvx/studio';
 import type { CommandContext } from '@openenvx/studio';
 
 import { hasActiveCrop, readImageCrop } from '../crop/normalized-crop';
@@ -7,7 +7,7 @@ export class ResetImageCropCommand extends Command {
   readonly id = 'canvas.resetImageCrop';
 
   canExecute(ctx: CommandContext): boolean {
-    const layer = ctx.scene.getPrimaryLayer();
+    const layer = ctx.scene.getPrimaryNode();
     if (!layer || layer.type !== 'canvas.image') {
       return false;
     }
@@ -18,7 +18,7 @@ export class ResetImageCropCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const layer = ctx.scene.getPrimaryLayer();
+    const layer = ctx.scene.getPrimaryNode();
     if (!layer) {
       return;
     }
@@ -28,7 +28,7 @@ export class ResetImageCropCommand extends Command {
         ...scene,
         artboards: scene.artboards.map((page) => ({
           ...page,
-          nodes: updateLayerInTree(page.nodes, layer.id, (entry) => {
+          nodes: updateNodeInTree(page.nodes, layer.id, (entry) => {
             const props =
               typeof entry.props === 'object' && entry.props !== null
                 ? { ...(entry.props as Record<string, unknown>) }

@@ -1,4 +1,4 @@
-import { Command, localize, getLayerChildren } from '@openenvx/studio';
+import { Command, localize, getChildNodes } from '@openenvx/studio';
 import type { CommandContext } from '@openenvx/studio';
 import type { DocumentNode } from '@openenvx/studio/schema';
 import { artboardRulesLayout } from '@openenvx/studio/schema';
@@ -11,7 +11,7 @@ import {
   ungroupLayer,
 } from '../scene/group-layers';
 
-function createLayerId(type: string): string {
+function createNodeId(type: string): string {
   return `${type}-${crypto.randomUUID()}`;
 }
 
@@ -35,7 +35,7 @@ function applyPageLayers(
       defaultValue: 'Group layers',
     }),
   });
-  ctx.scene.setSelection({
+  ctx.scene.setSession({
     activeArtboardId: page.id,
     ...selection,
   });
@@ -52,7 +52,7 @@ export class InsertCanvasGroupCommand extends Command {
   execute(ctx: CommandContext): void {
     const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasGroupLayer().createDefault(
-      createLayerId('group'),
+      createNodeId('group'),
       page
     );
     applyPageLayers(ctx, [...page.nodes, layer], {
@@ -78,7 +78,7 @@ export class GroupSelectionCommand extends Command {
   execute(ctx: CommandContext): void {
     const page = ctx.scene.getActiveArtboard();
     const { selectedNodeIds } = ctx.selection;
-    const groupId = createLayerId('group');
+    const groupId = createNodeId('group');
     const nextLayers = groupRootLayers(
       page.nodes,
       selectedNodeIds,
@@ -109,7 +109,7 @@ export class UngroupSelectionCommand extends Command {
       return;
     }
     const nextLayers = ungroupLayer(page.nodes, group.id);
-    const childIds = getLayerChildren(group).map((child) => child.id);
+    const childIds = getChildNodes(group).map((child) => child.id);
     applyPageLayers(ctx, nextLayers, {
       selectedNodeIds: childIds,
       primaryNodeId: childIds[0] ?? null,

@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -14,7 +14,7 @@ function createRuntime(
   } = {}
 ): RichTextTransformRuntime {
   const origin = {
-    ...createDefaultTransform(),
+    ...createDefaultFrame(),
     height: 40,
     width: 200,
     x: 10,

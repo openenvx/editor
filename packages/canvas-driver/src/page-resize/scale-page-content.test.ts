@@ -1,9 +1,9 @@
-import { createDefaultTransform, nodeTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame, nodeTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { legacyArtboard, legacyLayer } from '../test/canvas-document-fixtures';
 import {
-  findPresetForPage,
+  findPresetForArtboard,
   getDefaultPageDimensions,
   resolvePagePreset,
 } from '../page-presets';
@@ -36,7 +36,7 @@ describe('resizeAbsolutePage', () => {
             strokeWidth: 2,
           },
           transform: {
-            ...createDefaultTransform(),
+            ...createDefaultFrame(),
             x: 100,
             y: 200,
             width: 400,
@@ -79,7 +79,7 @@ describe('resizeAbsolutePage', () => {
           type: 'canvas.image',
           data: { alt: 'Image', assetRef: 'https://example.com/image.png' },
           transform: {
-            ...createDefaultTransform(),
+            ...createDefaultFrame(),
             x: 40,
             y: 80,
             width: 320,
@@ -119,7 +119,7 @@ describe('resizeAbsolutePage', () => {
             align: 'left' as const,
           },
           transform: {
-            ...createDefaultTransform(),
+            ...createDefaultFrame(),
             x: 40,
             y: 100,
             width: portrait.width - 80,
@@ -151,7 +151,7 @@ describe('resizeAbsolutePage', () => {
       type: 'canvas.rect',
       data: { fill: '#000000' },
       transform: {
-        ...createDefaultTransform(),
+        ...createDefaultFrame(),
         x: 10,
         y: 20,
         width: 100,
@@ -173,7 +173,7 @@ describe('resizeAbsolutePage', () => {
           },
           children: [child],
           transform: {
-            ...createDefaultTransform(),
+            ...createDefaultFrame(),
             x: 0,
             y: 0,
             width: 200,
@@ -208,7 +208,7 @@ describe('resizeAbsolutePage', () => {
     expect(resizeAbsolutePage(page, a4.width, a4.height)).toBe(page);
   });
 
-  it('matches resized page to a preset via findPresetForPage', () => {
+  it('matches resized page to a preset via findPresetForArtboard', () => {
     const a4 = resolvePagePreset('a4-portrait')!;
     const a5 = resolvePagePreset('a5-portrait')!;
     const page = legacyArtboard({
@@ -220,6 +220,6 @@ describe('resizeAbsolutePage', () => {
     });
 
     const resized = resizeAbsolutePage(page, a5.width, a5.height);
-    expect(findPresetForPage(resized)?.id).toBe('a5-portrait');
+    expect(findPresetForArtboard(resized)?.id).toBe('a5-portrait');
   });
 });

@@ -1,4 +1,4 @@
-import { resolvePageBackground } from '@openenvx/studio/schema';
+import { resolveArtboardBackground } from '@openenvx/studio/schema';
 import type { Artboard, Document } from '@openenvx/studio/schema';
 
 import type {
@@ -22,7 +22,7 @@ export function resolveExportBackground(
     return 'rgba(0,0,0,0)';
   }
   if (background === 'white' || background === undefined) {
-    return resolvePageBackground(page);
+    return resolveArtboardBackground(page);
   }
   return background;
 }

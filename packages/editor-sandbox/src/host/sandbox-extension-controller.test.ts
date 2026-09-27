@@ -20,15 +20,15 @@ function mockHost(): SandboxHostSurface {
       selectedNodeIds: [],
       primaryNodeId: null,
     }),
-    getScene: () =>
+    getDocument: () =>
       ({
         version: 1,
         pages: [],
         assets: {},
-      }) as ReturnType<SandboxHostSurface['getScene']>,
+      }) as ReturnType<SandboxHostSurface['getDocument']>,
     apply: () => {},
-    selectLayers: () => {},
-    onDidChangeScene: () => () => {},
+    selectNodes: () => {},
+    onDidChangeDocument: () => () => {},
     onDidChangeSelection: () => () => {},
     executeCommand: async () => ({ executed: true }),
     registerCommand: () => ({ dispose: () => {} }),

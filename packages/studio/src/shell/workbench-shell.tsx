@@ -17,7 +17,7 @@ import {
   type WorkbenchApi,
   type WorkbenchControllerOptions,
 } from '#studio';
-import type { Scene } from '#studio/schema';
+import type { Document } from '#studio/schema';
 
 import { EditorViewportProvider } from '../context/editor-viewport-context';
 import { DEFAULT_LOCALE, LocaleProvider } from '../context/locale-context';
@@ -54,7 +54,7 @@ export interface WorkbenchShellProps {
   className?: string;
   theme?: 'light' | 'dark' | string;
   onThemeChange?: (theme: string) => void;
-  initialScene?: Scene;
+  initialScene?: Document;
   editorUri?: string;
   editorTitle?: string;
   layout?: WorkbenchControllerOptions['layout'];
@@ -73,7 +73,7 @@ export interface WorkbenchShellProps {
    * Selection and hover do not fire. The shell always subscribes, so a
    * callback passed after the first paint still receives later edits.
    */
-  onSceneChange?: (scene: Scene) => void;
+  onSceneChange?: (scene: Document) => void;
   createPropertyHostContext?: (
     options: PropertyPathContextOptions,
     helpers: {
@@ -334,7 +334,7 @@ function SceneChangeBinding({
   onSceneChangeRef,
 }: {
   api: WorkbenchApi;
-  onSceneChangeRef: MutableRefObject<((scene: Scene) => void) | undefined>;
+  onSceneChangeRef: MutableRefObject<((scene: Document) => void) | undefined>;
 }) {
   useMountEffect(() => {
     let lastRevision = api.scene.getContentRevision();

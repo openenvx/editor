@@ -1,7 +1,10 @@
-import { createDefaultTransform, nodeTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame, nodeTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
-import { resolveHoverOutlineRect, readLiveHoverOutlineRect } from './canvas-hover-outline';
+import {
+  readLiveHoverOutlineRect,
+  resolveHoverOutlineRect,
+} from './canvas-hover-outline-geometry';
 import type { FlattenedStageLayer } from './flatten-layer-surface';
 import { flattenStageLayers } from './flatten-layer-surface';
 import { legacyLayer } from './test/canvas-document-fixtures';
@@ -14,7 +17,7 @@ import { legacyLayer } from './test/canvas-document-fixtures';
 describe('widget face hover outline transforms', () => {
   it('composes nested face children under the widget origin', () => {
     const widgetTransform = {
-      ...createDefaultTransform(),
+      ...createDefaultFrame(),
       x: 40,
       y: 40,
       width: 200,
@@ -113,7 +116,7 @@ describe('resolveHoverOutlineRect', () => {
       view: { kind: 'group' as const },
       children: [childA, childB],
       absoluteTransform: {
-        ...createDefaultTransform(),
+        ...createDefaultFrame(),
         x: 100,
         y: 100,
         width: 400,

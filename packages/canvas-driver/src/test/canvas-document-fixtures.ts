@@ -6,7 +6,7 @@ import type {
 } from '@openenvx/studio/schema';
 import {
   migrateLegacyLayerInput,
-  normalizeScene,
+  normalizeDocument,
   withArtboardRulesLayout,
 } from '@openenvx/studio/schema';
 
@@ -63,7 +63,7 @@ export function testDocument(
   artboards: Artboard[],
   extras: Omit<Partial<Document>, 'artboards'> = {}
 ): Document {
-  return normalizeScene({ artboards, ...extras });
+  return normalizeDocument({ artboards, ...extras });
 }
 
 /** Build a document node from legacy test literals (`data` / `transform`). */

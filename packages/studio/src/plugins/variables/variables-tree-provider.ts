@@ -3,7 +3,7 @@ import { documentVariables, type TemplateVariable } from '#studio/schema';
 
 export class VariablesTreeProvider extends TreeDataProvider<TemplateVariable> {
   getRootChildren(ctx: CommandContext): TemplateVariable[] {
-    return documentVariables(ctx.scene.getScene());
+    return documentVariables(ctx.scene.getDocument());
   }
 
   getChildren(): TemplateVariable[] {

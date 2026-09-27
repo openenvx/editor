@@ -1,10 +1,10 @@
-import type { SceneStore } from '../scene/scene-store';
+import type { DocumentStore } from '../scene/document-store';
 import type { ContextKeyService } from './context-key-service';
 import type { EditorService } from './editor-service';
 
 export class ContextKeySynchronizer {
   constructor(
-    private readonly scene: SceneStore,
+    private readonly scene: DocumentStore,
     private readonly editor: EditorService,
     private readonly contextKeys: ContextKeyService
   ) {}
@@ -17,7 +17,7 @@ export class ContextKeySynchronizer {
       hasActiveEditor: this.editor.getActiveEditor() !== null,
       isDirty: this.editor.getActiveEditor()?.isDirty ?? false,
       scene: this.scene.getDocument(),
-      selection: this.scene.getSelection(),
+      selection: this.scene.getSession(),
     });
   }
 }

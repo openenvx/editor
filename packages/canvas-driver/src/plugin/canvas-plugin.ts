@@ -18,8 +18,8 @@ import type {
 import {
   applyNodeTransform,
   artboardRulesLayout,
-  createDefaultTransform,
-  normalizeScene,
+  createDefaultFrame,
+  normalizeDocument,
   withArtboardRulesLayout,
 } from '@openenvx/studio/schema';
 
@@ -139,7 +139,7 @@ import {
   registerCanvasContribution,
 } from './canvas-registry-service';
 
-function createLayerId(type: string): string {
+function createNodeId(type: string): string {
   return `${type}-${crypto.randomUUID()}`;
 }
 
@@ -156,7 +156,7 @@ function insertCanvasLayer(ctx: CommandContext, layer: DocumentNode): void {
       defaultValue: 'Insert layer',
     }),
   });
-  ctx.scene.setSelection({
+  ctx.scene.setSession({
     activeArtboardId: page.id,
     primaryNodeId: layer.id,
     selectedNodeIds: [layer.id],
@@ -181,7 +181,7 @@ export class InsertCanvasTextCommand extends Command {
   execute(ctx: CommandContext): void {
     const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasTextLayer().createDefault(
-      createLayerId('text'),
+      createNodeId('text'),
       page
     );
     insertCanvasLayer(ctx, layer);
@@ -198,7 +198,7 @@ export class InsertOpenEnvxWidgetCommand extends Command {
   execute(ctx: CommandContext, args?: unknown): void {
     const page = ctx.scene.getActiveArtboard();
     const layer = new OpenEnvxWidgetLayer().createDefault(
-      createLayerId('widget'),
+      createNodeId('widget'),
       page
     );
     const extensionId =
@@ -231,7 +231,7 @@ export class InsertCanvasImageCommand extends Command {
   execute(ctx: CommandContext): void {
     const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasImageLayer().createDefault(
-      createLayerId('image'),
+      createNodeId('image'),
       page
     );
     insertCanvasLayer(ctx, layer);
@@ -247,10 +247,7 @@ export class InsertCanvasSvgCommand extends Command {
 
   execute(ctx: CommandContext): void {
     const page = ctx.scene.getActiveArtboard();
-    const layer = new CanvasSvgLayer().createDefault(
-      createLayerId('svg'),
-      page
-    );
+    const layer = new CanvasSvgLayer().createDefault(createNodeId('svg'), page);
     insertCanvasLayer(ctx, layer);
   }
 }
@@ -264,7 +261,7 @@ export class InsertCanvasQrCommand extends Command {
 
   execute(ctx: CommandContext): void {
     const page = ctx.scene.getActiveArtboard();
-    const layer = new CanvasQrLayer().createDefault(createLayerId('qr'), page);
+    const layer = new CanvasQrLayer().createDefault(createNodeId('qr'), page);
     insertCanvasLayer(ctx, layer);
   }
 }
@@ -279,7 +276,7 @@ export class InsertCanvasRectCommand extends Command {
   execute(ctx: CommandContext): void {
     const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasRectLayer().createDefault(
-      createLayerId('rect'),
+      createNodeId('rect'),
       page
     );
     insertCanvasLayer(ctx, layer);
@@ -296,7 +293,7 @@ export class InsertCanvasCircleCommand extends Command {
   execute(ctx: CommandContext): void {
     const page = ctx.scene.getActiveArtboard();
     const layer = new CanvasCircleLayer().createDefault(
-      createLayerId('circle'),
+      createNodeId('circle'),
       page
     );
     insertCanvasLayer(ctx, layer);
@@ -340,7 +337,7 @@ export class UploadAssetCommand extends Command {
         const assetRef = await assets.upload!(file);
         const page = ctx.scene.getActiveArtboard();
         const layer = new CanvasImageLayer().createDefault(
-          createLayerId('image'),
+          createNodeId('image'),
           page
         );
         layer.props = { ...layer.props, alt: file.name, assetRef };
@@ -492,7 +489,7 @@ export function createCanvasDemoScene() {
   const { width: pageWidth, height: pageHeight } = getDefaultPageDimensions();
   const margin = 48;
 
-  return normalizeScene({
+  return normalizeDocument({
     artboards: [
       withArtboardRulesLayout(
         {
@@ -514,7 +511,7 @@ export function createCanvasDemoScene() {
                 },
               },
               {
-                ...createDefaultTransform(),
+                ...createDefaultFrame(),
                 opacity: 1,
                 scaleX: 1,
                 scaleY: 1,

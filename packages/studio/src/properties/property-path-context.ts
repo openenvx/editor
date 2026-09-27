@@ -1,8 +1,8 @@
 import {
-  findLayerById,
+  findNodeById,
   getLayerWriteMode,
   isLayerShownInLayers,
-  type Scene,
+  type Document,
 } from '../backbone';
 import { getNestedValue, setNestedValue } from '../utils/nested-value';
 import type { PropertyHostContext } from './property-path-resolver';
@@ -51,7 +51,7 @@ export function writeLayerDataAtKey(
 }
 
 export interface PropertyPathContextOptions {
-  scene: Scene;
+  scene: Document;
   activeArtboardId?: string | null;
   selectedLayerId: string | null;
   layerData: Record<string, unknown> | null;
@@ -68,7 +68,7 @@ export function createPropertyHostContext(
   const { scene, selectedLayerId, layerData, updateProperty, executeCommand } =
     options;
   const primaryLayer = selectedLayerId
-    ? findLayerById(scene, selectedLayerId)
+    ? findNodeById(scene, selectedLayerId)
     : null;
 
   return {
@@ -153,12 +153,12 @@ function layerDataRecord(layer: {
   return {};
 }
 
-function readLayerByIdPath(path: PropertyValuePath, scene: Scene): unknown {
+function readLayerByIdPath(path: PropertyValuePath, scene: Document): unknown {
   const parsed = parseLayerByIdPath(path);
   if (!parsed) {
     return undefined;
   }
-  const layer = findLayerById(scene, parsed.layerId);
+  const layer = findNodeById(scene, parsed.layerId);
   if (!layer) {
     return undefined;
   }

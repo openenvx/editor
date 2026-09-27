@@ -1,11 +1,12 @@
-import type { LayerWriteMode, TemplatePolicy } from '#studio/schema';
-import { LAYER_WRITE_MODES } from '#studio/schema';
+import type { NodeWriteMode, TemplatePolicy } from '#studio/schema';
+import { NODE_WRITE_MODES } from '#studio/schema';
 
 import { Command } from '../contributions/command';
 import { ShortcutContribution } from '../contributions/shortcut-contribution';
 import { Plugin } from '../runtime/plugin';
 import type { PluginContext } from '../runtime/plugin-manager';
 import type { CommandContext } from '../runtime/types';
+import { reorderNodes, moveNodeToIndex } from '../scene/document-store';
 import {
   canDeleteLayer,
   canInsertLayers,
@@ -16,10 +17,10 @@ import {
   isTemplatePolicyEnforced,
 } from '../scene/layer-editability';
 import {
-  findLayerById,
-  removeLayerFromTree,
-  updateLayerInTree,
-  walkLayers,
+  findNodeById,
+  removeNodeFromTree,
+  updateNodeInTree,
+  walkNodes,
 } from '../scene/layer-tree';
 import {
   createBlankPageLike,
@@ -28,8 +29,7 @@ import {
   duplicatePageName,
   nextPageName,
 } from '../scene/page-ops';
-import { reorderLayers, moveLayerToIndex } from '../scene/scene-store';
-import { getActivePage } from '../scene/types';
+import { getActiveArtboard } from '../scene/types';
 import {
   AddVariableCommand,
   InsertVariableCommand,
@@ -71,7 +71,7 @@ export class DeleteLayerCommand extends Command {
     }
     const scene = ctx.scene.getDocument();
     return ctx.selection.selectedNodeIds.every((id) => {
-      const layer = findLayerById(scene, id);
+      const layer = findNodeById(scene, id);
       return layer && canDeleteLayer(layer, scene);
     });
   }
@@ -81,10 +81,10 @@ export class DeleteLayerCommand extends Command {
     const activeArtboardId = ctx.selection.activeArtboardId;
     ctx.scene.apply({
       apply: (scene) => {
-        const page = getActivePage(scene, activeArtboardId);
+        const page = getActiveArtboard(scene, activeArtboardId);
         let layers = page.nodes;
         for (const id of ids) {
-          layers = removeLayerFromTree(layers, id);
+          layers = removeNodeFromTree(layers, id);
         }
         return {
           ...scene,
@@ -95,7 +95,7 @@ export class DeleteLayerCommand extends Command {
       },
       label: 'Delete layers',
     });
-    ctx.scene.setSelection({
+    ctx.scene.setSession({
       activeArtboardId,
       primaryNodeId: null,
       selectedNodeIds: [],
@@ -140,14 +140,14 @@ class MoveLayerRelativeCommand extends Command {
     const activeArtboardId = ctx.selection.activeArtboardId;
     ctx.scene.apply({
       apply: (scene) => {
-        const page = getActivePage(scene, activeArtboardId);
+        const page = getActiveArtboard(scene, activeArtboardId);
         return {
           ...scene,
           artboards: scene.artboards.map((p) =>
             p.id === page.id
               ? {
                   ...p,
-                  nodes: reorderLayers(p.nodes, id, this.direction),
+                  nodes: reorderNodes(p.nodes, id, this.direction),
                 }
               : p
           ),
@@ -184,11 +184,11 @@ export class MoveLayerCommand extends Command {
       return false;
     }
     const scene = ctx.scene.getDocument();
-    const layer = findLayerById(scene, moveArgs.layerId);
+    const layer = findNodeById(scene, moveArgs.layerId);
     if (!layer || !canReorderLayer(layer)) {
       return false;
     }
-    const page = getActivePage(scene, ctx.selection.activeArtboardId);
+    const page = getActiveArtboard(scene, ctx.selection.activeArtboardId);
     return page.nodes.some((l) => l.id === moveArgs.layerId);
   }
 
@@ -199,14 +199,14 @@ export class MoveLayerCommand extends Command {
     }
     ctx.scene.apply({
       apply: (scene) => {
-        const page = getActivePage(scene, ctx.selection.activeArtboardId);
+        const page = getActiveArtboard(scene, ctx.selection.activeArtboardId);
         return {
           ...scene,
           artboards: scene.artboards.map((p) =>
             p.id === page.id
               ? {
                   ...p,
-                  nodes: moveLayerToIndex(
+                  nodes: moveNodeToIndex(
                     p.nodes,
                     moveArgs.layerId,
                     moveArgs.targetIndex
@@ -230,7 +230,7 @@ export class ToggleLayerLockCommand extends Command {
       return false;
     }
     const scene = ctx.scene.getDocument();
-    const layer = findLayerById(scene, id);
+    const layer = findNodeById(scene, id);
     return layer ? isLayerEditable(layer) : false;
   }
 
@@ -240,7 +240,7 @@ export class ToggleLayerLockCommand extends Command {
       return;
     }
     const scene = ctx.scene.getDocument();
-    const layer = findLayerById(scene, id);
+    const layer = findNodeById(scene, id);
     if (!layer || !isLayerEditable(layer)) {
       return;
     }
@@ -250,7 +250,7 @@ export class ToggleLayerLockCommand extends Command {
         ...currentScene,
         artboards: currentScene.artboards.map((page) => ({
           ...page,
-          nodes: updateLayerInTree(page.nodes, id, (l) => ({
+          nodes: updateNodeInTree(page.nodes, id, (l) => ({
             ...l,
             locked: nextLocked,
           })),
@@ -270,7 +270,7 @@ export class ToggleLayerVisibilityCommand extends Command {
       return false;
     }
     const scene = ctx.scene.getDocument();
-    const layer = findLayerById(scene, id);
+    const layer = findNodeById(scene, id);
     return layer ? isLayerEditable(layer) : false;
   }
 
@@ -280,7 +280,7 @@ export class ToggleLayerVisibilityCommand extends Command {
       return;
     }
     const scene = ctx.scene.getDocument();
-    const layer = findLayerById(scene, id);
+    const layer = findNodeById(scene, id);
     if (!layer || !isLayerEditable(layer)) {
       return;
     }
@@ -290,7 +290,7 @@ export class ToggleLayerVisibilityCommand extends Command {
         ...currentScene,
         artboards: currentScene.artboards.map((page) => ({
           ...page,
-          nodes: updateLayerInTree(page.nodes, id, (l) => ({
+          nodes: updateNodeInTree(page.nodes, id, (l) => ({
             ...l,
             visible: nextVisible,
           })),
@@ -299,7 +299,7 @@ export class ToggleLayerVisibilityCommand extends Command {
       label: nextVisible ? 'Show layer' : 'Hide layer',
     });
     if (!nextVisible) {
-      const selection = ctx.scene.getSelection();
+      const selection = ctx.scene.getSession();
       const remaining = selection.selectedNodeIds.filter(
         (selectedId) => selectedId !== id
       );
@@ -351,7 +351,7 @@ export class RemovePageCommand extends Command {
     }
     const page = ctx.scene.getActiveArtboard();
     let allowed = true;
-    walkLayers(page.nodes, (layer) => {
+    walkNodes(page.nodes, (layer) => {
       if (!canDeleteLayer(layer, scene)) {
         allowed = false;
       }
@@ -364,7 +364,7 @@ export class RemovePageCommand extends Command {
       return;
     }
     const scene = ctx.scene.getDocument();
-    const activeArtboardId = ctx.scene.getActivePageId();
+    const activeArtboardId = ctx.scene.getActiveArtboardId();
     const index = scene.artboards.findIndex((p) => p.id === activeArtboardId);
     if (index === -1) {
       return;
@@ -483,7 +483,7 @@ export class RenameLayerCommand extends Command {
     if (!renameArgs?.id || typeof renameArgs.name !== 'string') {
       return false;
     }
-    return Boolean(findLayerById(ctx.scene.getDocument(), renameArgs.id));
+    return Boolean(findNodeById(ctx.scene.getDocument(), renameArgs.id));
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -492,7 +492,7 @@ export class RenameLayerCommand extends Command {
       return;
     }
     const scene = ctx.scene.getDocument();
-    const layer = findLayerById(scene, renameArgs.id);
+    const layer = findNodeById(scene, renameArgs.id);
     if (!layer) {
       return;
     }
@@ -507,7 +507,7 @@ export class RenameLayerCommand extends Command {
         ...currentScene,
         artboards: currentScene.artboards.map((page) => ({
           ...page,
-          nodes: updateLayerInTree(page.nodes, renameArgs.id, (l) => {
+          nodes: updateNodeInTree(page.nodes, renameArgs.id, (l) => {
             if (nextName === undefined) {
               const { name: _removed, ...rest } = l;
               return rest as typeof l;
@@ -521,10 +521,10 @@ export class RenameLayerCommand extends Command {
   }
 }
 
-function isLayerWriteMode(value: unknown): value is LayerWriteMode {
+function isLayerWriteMode(value: unknown): value is NodeWriteMode {
   return (
     typeof value === 'string' &&
-    (LAYER_WRITE_MODES as readonly string[]).includes(value)
+    (NODE_WRITE_MODES as readonly string[]).includes(value)
   );
 }
 
@@ -550,7 +550,7 @@ export class SetLayerWriteModeCommand extends Command {
         ...currentScene,
         artboards: currentScene.artboards.map((page) => ({
           ...page,
-          nodes: updateLayerInTree(page.nodes, id, (l) => ({
+          nodes: updateNodeInTree(page.nodes, id, (l) => ({
             ...l,
             writeMode,
           })),
@@ -585,7 +585,7 @@ export class SetLayerShowInLayersCommand extends Command {
         ...currentScene,
         artboards: currentScene.artboards.map((page) => ({
           ...page,
-          nodes: updateLayerInTree(page.nodes, id, (l) => ({
+          nodes: updateNodeInTree(page.nodes, id, (l) => ({
             ...l,
             showInLayers,
           })),
@@ -594,7 +594,7 @@ export class SetLayerShowInLayersCommand extends Command {
       label: showInLayers ? 'Show layer in Layers' : 'Hide layer from Layers',
     });
     if (!showInLayers && isTemplatePolicyEnforced()) {
-      const selection = ctx.scene.getSelection();
+      const selection = ctx.scene.getSession();
       const remaining = selection.selectedNodeIds.filter(
         (selectedId) => selectedId !== id
       );
@@ -752,4 +752,4 @@ export class ScenePlugin extends Plugin {
   }
 }
 
-export { reorderLayers, moveLayerToIndex };
+export { reorderNodes, moveNodeToIndex };

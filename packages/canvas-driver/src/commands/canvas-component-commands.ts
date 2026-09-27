@@ -5,13 +5,13 @@ import {
   cloneNodeTree,
   findNodeById,
   localize,
-  getLayerChildren,
+  getChildNodes,
 } from '@openenvx/studio';
 import type { CommandContext, DocumentNode } from '@openenvx/studio';
 import type { DocumentComponent } from '@openenvx/studio/schema';
 import {
   applyNodeTransform,
-  createDefaultTransform,
+  createDefaultFrame,
   nodeTransform,
 } from '@openenvx/studio/schema';
 
@@ -65,7 +65,7 @@ export class CreateComponentFromSelectionCommand extends Command {
     const componentId = createComponentId();
     const component: DocumentComponent = {
       id: componentId,
-      nodes: cloneNodeTree(getLayerChildren(group)),
+      nodes: cloneNodeTree(getChildNodes(group)),
       name: `Component ${Object.keys(scene.components ?? {}).length + 1}`,
     };
     const instanceId = createInstanceId();
@@ -99,7 +99,7 @@ export class CreateComponentFromSelectionCommand extends Command {
         defaultValue: 'Create component',
       }),
     });
-    ctx.scene.selectLayers([instance.id], instance.id);
+    ctx.scene.selectNodes([instance.id], instance.id);
   }
 }
 
@@ -132,7 +132,7 @@ export class InsertComponentInstanceCommand extends Command {
         type: 'canvas.instance',
       },
       {
-        ...createDefaultTransform(),
+        ...createDefaultFrame(),
         height: 120,
         width: 120,
         x: 40,
@@ -156,7 +156,7 @@ export class InsertComponentInstanceCommand extends Command {
         defaultValue: 'Insert instance',
       }),
     });
-    ctx.scene.selectLayers([instance.id], instance.id);
+    ctx.scene.selectNodes([instance.id], instance.id);
   }
 }
 

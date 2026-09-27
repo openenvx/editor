@@ -1,20 +1,20 @@
-import { getActivePage, type Scene } from '#studio';
+import { getActiveArtboard, type Document } from '#studio';
 
-import { getLayerAncestorIds } from './get-layer-ancestor-ids';
+import { getNodeAncestorIds } from './get-layer-ancestor-ids';
 
 /** Selected layer ids plus ancestors - expand so selection is visible. */
 export function getSelectionExpandIds(
-  scene: Scene,
+  scene: Document,
   selectedNodeIds: Set<string>
 ): Set<string> {
   if (selectedNodeIds.size === 0) {
     return new Set();
   }
-  const page = getActivePage(scene);
+  const page = getActiveArtboard(scene);
   const expandIds = new Set<string>();
   for (const layerId of selectedNodeIds) {
     expandIds.add(layerId);
-    for (const ancestorId of getLayerAncestorIds(page, layerId)) {
+    for (const ancestorId of getNodeAncestorIds(page, layerId)) {
       expandIds.add(ancestorId);
     }
   }

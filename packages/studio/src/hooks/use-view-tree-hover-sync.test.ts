@@ -3,7 +3,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { asDocumentNode, normalizeSceneForTest } from '../test/document-fixtures';
+import { asDocumentNode, normalizeDocumentForTest } from '../test/document-fixtures';
 import { useViewTreeCollapseSeed } from './use-view-tree-collapse-seed';
 import {
   resolveViewHoveredIds,
@@ -19,7 +19,7 @@ const frame = {
   y: 0,
 };
 
-const scene: Document = normalizeSceneForTest({
+const scene: Document = normalizeDocumentForTest({
   pages: [
     {
       id: 'p1',

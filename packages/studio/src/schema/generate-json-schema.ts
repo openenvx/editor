@@ -7,12 +7,12 @@ import path from 'node:path';
 
 import { z } from 'zod';
 
-import { sceneSchemaLenient } from './scene-schema';
+import { documentSchemaLenient } from './document-schema';
 
 const here = import.meta.dirname;
 const outPath = path.join(here, '..', '..', 'scene.schema.json');
 
-const jsonSchema = z.toJSONSchema(sceneSchemaLenient, {
+const jsonSchema = z.toJSONSchema(documentSchemaLenient, {
   target: 'draft-2020-12',
 });
 

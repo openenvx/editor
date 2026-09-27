@@ -63,7 +63,7 @@ export class CanvasStatusBarContribution extends StatusBarContribution {
 
 export class CanvasToolbarContribution extends ToolbarContribution {
   contribute(builder: ToolbarBuilder, ctx: CommandContext): void {
-    const variables = ctx.scene.getScene().variables ?? [];
+    const variables = ctx.scene.getDocument().variables ?? [];
 
     builder
       .placement('bottom-center')

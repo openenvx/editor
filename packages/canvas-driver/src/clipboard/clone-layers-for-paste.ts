@@ -1,8 +1,8 @@
-import { cloneNodeTree, createLayerId } from '@openenvx/studio';
+import { cloneNodeTree, createNodeId } from '@openenvx/studio';
 import type { DocumentNode } from '@openenvx/studio/schema';
 import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
 
-export { createLayerId };
+export { createNodeId };
 
 export function cloneLayers(layers: DocumentNode[]): DocumentNode[] {
   return cloneNodeTree(layers);

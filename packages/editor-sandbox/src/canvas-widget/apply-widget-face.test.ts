@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   applyNodeTransform,
-  createDefaultTransform,
+  defaultTransform,
   nodeTransform,
   type OpenEnvxWidgetProps,
 } from '@openenvx/studio/schema';
@@ -10,7 +10,7 @@ import { applyWidgetFace } from './apply-widget-face';
 
 function widgetNode(
   id: string,
-  frame: Partial<ReturnType<typeof createDefaultTransform>>,
+  frame: Partial<ReturnType<typeof defaultTransform>>,
   props: OpenEnvxWidgetProps
 ) {
   return applyNodeTransform(
@@ -20,7 +20,7 @@ function widgetNode(
       props,
       children: [],
     },
-    { ...createDefaultTransform(), ...frame }
+    { ...defaultTransform(), ...frame }
   );
 }
 

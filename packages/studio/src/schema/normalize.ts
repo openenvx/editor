@@ -30,9 +30,6 @@ export function createDefaultFrame(): NonNullable<DocumentNode['frame']> {
   return defaultFrame();
 }
 
-/** @deprecated use createDefaultFrame */
-export const createDefaultTransform = createDefaultFrame;
-
 export function createDefaultArtboard(id: string): Artboard {
   return {
     extensions: { layout: 'flow' },
@@ -44,9 +41,6 @@ export function createDefaultArtboard(id: string): Artboard {
   };
 }
 
-/** @deprecated use createDefaultArtboard */
-export const createDefaultPage = createDefaultArtboard;
-
 export function createDefaultEditorSession(
   activeArtboardId: string
 ): EditorSession {
@@ -57,18 +51,12 @@ export function createDefaultEditorSession(
   };
 }
 
-/** @deprecated use createDefaultEditorSession */
-export const createDefaultEditorState = createDefaultEditorSession;
-
 export function createEmptyDocument(): Document {
   const artboard = createDefaultArtboard('artboard-1');
   return {
     artboards: [artboard],
   };
 }
-
-/** @deprecated use createEmptyDocument */
-export const createEmptyScene = createEmptyDocument;
 
 export function createEmptyProjectSnapshot(): ProjectSnapshot {
   const document = createEmptyDocument();
@@ -77,9 +65,6 @@ export function createEmptyProjectSnapshot(): ProjectSnapshot {
     session: createDefaultEditorSession(document.artboards[0]!.id),
   };
 }
-
-/** @deprecated use createEmptyProjectSnapshot */
-export const createEmptySceneSnapshot = createEmptyProjectSnapshot;
 
 function ensureArtboards(document: Document): Document {
   if (document.artboards.length > 0) {
@@ -120,9 +105,6 @@ export function normalizeDocument(input: unknown = {}): Document {
     ensureArtboards(parsed.data as unknown as Document)
   );
 }
-
-/** @deprecated use normalizeDocument */
-export const normalizeScene = normalizeDocument;
 
 export function normalizeEditorSession(
   input: unknown,
@@ -166,9 +148,6 @@ export function normalizeEditorSession(
   return document ? pruneEditorSession(document, fallback) : fallback;
 }
 
-/** @deprecated use normalizeEditorSession */
-export const normalizeEditorState = normalizeEditorSession;
-
 export function normalizeProjectSnapshot(input: unknown = {}): ProjectSnapshot {
   if (input && typeof input === 'object') {
     const record = input as Record<string, unknown>;
@@ -196,6 +175,3 @@ export function normalizeProjectSnapshot(input: unknown = {}): ProjectSnapshot {
 
   return createEmptyProjectSnapshot();
 }
-
-/** @deprecated use normalizeProjectSnapshot */
-export const normalizeSceneSnapshot = normalizeProjectSnapshot;

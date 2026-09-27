@@ -1,7 +1,7 @@
 import {
   applyTemplateVariables,
   applyTemplateVariablesForPreview,
-  type Scene,
+  type Document,
 } from '@openenvx/studio/schema';
 
 import type { CanvasExportOptions } from './export/canvas-document-export-service';
@@ -20,9 +20,9 @@ export type CanvasSceneSubstitution =
 
 /** Substitute template tokens (when requested) and remeasure eligible `canvas.text` boxes. */
 export function prepareCanvasSceneForRender(
-  scene: Scene,
+  scene: Document,
   substitution: CanvasSceneSubstitution
-): Scene {
+): Document {
   let substituted = scene;
   if (substitution.mode === 'preview') {
     substituted = applyTemplateVariablesForPreview(scene);
@@ -34,9 +34,9 @@ export function prepareCanvasSceneForRender(
 
 /** Export pipeline: optional `variables`, then text remasure (including `autoFit: 'hug'`). */
 export function resolveCanvasExportScene(
-  scene: Scene,
+  scene: Document,
   options: Pick<CanvasExportOptions, 'variables'>
-): Scene {
+): Document {
   return prepareCanvasSceneForRender(
     scene,
     options.variables

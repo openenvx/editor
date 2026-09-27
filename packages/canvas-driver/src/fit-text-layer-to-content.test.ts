@@ -1,6 +1,6 @@
 import {
   applyNodeTransform,
-  createDefaultTransform,
+  createDefaultFrame,
   nodeTransform,
 } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
@@ -47,7 +47,7 @@ function textLayer(options: {
     id: options.id ?? 't1',
     name: options.name,
     transform: {
-      ...createDefaultTransform(),
+      ...createDefaultFrame(),
       height: options.height,
       width: options.width,
     },
@@ -328,7 +328,7 @@ describe('fitCanvasTextLayerToContent', () => {
           legacyLayer({
             children: [child],
             id: 'group-1',
-            transform: createDefaultTransform(),
+            transform: createDefaultFrame(),
             type: 'canvas.group',
           }),
         ],

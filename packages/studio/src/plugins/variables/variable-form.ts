@@ -8,7 +8,7 @@ import {
   nextVariableKey,
   documentVariables,
   validateVariableKeyForCatalog,
-  type Scene,
+  type Document,
   type TemplateVariable,
 } from '#studio/schema';
 
@@ -18,13 +18,13 @@ export const VARIABLE_FORM_DELETE_ACTION = 'delete';
 
 export function buildVariableFormOptions(
   services: ServiceContainer,
-  getScene: () => Scene,
+  getDocument: () => Document,
   mode: 'create' | 'edit',
   variable?: TemplateVariable
 ): ShowFormOptions {
   const t = (key: string, defaultValue?: string) =>
     localizeWorkbench(services, key, { defaultValue });
-  const existingVariables = documentVariables(getScene());
+  const existingVariables = documentVariables(getDocument());
   const initialKey =
     mode === 'edit' && variable
       ? variable.key
@@ -82,7 +82,7 @@ export function buildVariableFormOptions(
     validate: (values) => {
       const key = String(values.key ?? '').trim();
       const validation = validateVariableKeyForCatalog(
-        documentVariables(getScene()),
+        documentVariables(getDocument()),
         key,
         editingId
       );

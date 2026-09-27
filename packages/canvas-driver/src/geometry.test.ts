@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import type Konva from "konva";
 import { describe, expect, it } from "vitest";
 
@@ -23,7 +23,7 @@ type MockGroup = Konva.Group & {
 };
 
 function createMockNode(
-  transform: ReturnType<typeof createDefaultTransform>
+  transform: ReturnType<typeof createDefaultFrame>
 ): MockGroup {
   const state = { ...transform, scaleX: 1, scaleY: 1 };
   return {
@@ -66,7 +66,7 @@ function createMockNode(
 describe("geometry", () => {
   it("clampTransformSize enforces minimum and absolute dimensions", () => {
     const transform = {
-      ...createDefaultTransform(),
+      ...createDefaultFrame(),
       width: -50,
       height: 2,
     };
@@ -152,7 +152,7 @@ describe("geometry", () => {
 
   it("isValidNodeTransform rejects flip and sub-minimum size", () => {
     const transform = {
-      ...createDefaultTransform(),
+      ...createDefaultFrame(),
       height: 80,
       width: 100,
     };
@@ -169,7 +169,7 @@ describe("geometry", () => {
 
   it("enforceNodeTransformLimits snaps back to last valid state", () => {
     const transform = {
-      ...createDefaultTransform(),
+      ...createDefaultFrame(),
       height: 80,
       width: 100,
       x: 10,
@@ -192,7 +192,7 @@ describe("geometry", () => {
 
   it("bakeNodeTransform reverts invalid resize without moving element", () => {
     const transform = {
-      ...createDefaultTransform(),
+      ...createDefaultFrame(),
       height: 80,
       width: 100,
       x: 10,
@@ -215,7 +215,7 @@ describe("geometry", () => {
 
   it("applyTransformToNode syncs node position, size, rotation, and scale", () => {
     const transform = {
-      ...createDefaultTransform(),
+      ...createDefaultFrame(),
       height: 80,
       rotation: 15,
       width: 100,
@@ -247,7 +247,7 @@ describe("geometry", () => {
 
   it("hitTestRotatedLayer detects point inside rotated rect", () => {
     const transform = {
-      ...createDefaultTransform(),
+      ...createDefaultFrame(),
       height: 50,
       rotation: 0,
       width: 100,
@@ -260,7 +260,7 @@ describe("geometry", () => {
 
   it("rotateTransformAroundCenter keeps visual center fixed", () => {
     const transform = {
-      ...createDefaultTransform(),
+      ...createDefaultFrame(),
       height: 100,
       rotation: 0,
       width: 200,
@@ -283,7 +283,7 @@ describe("geometry", () => {
 
   it("reconcileRotationTransform pivots when only rotation changes", () => {
     const transform = {
-      ...createDefaultTransform(),
+      ...createDefaultFrame(),
       height: 100,
       rotation: 0,
       width: 200,

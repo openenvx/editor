@@ -1,6 +1,6 @@
 import {
-  getLayerChildren,
-  hasChildLayers,
+  getChildNodes,
+  hasChildNodes,
   isLayerEditable,
   isLayerLocked,
   isLayerShownInLayers,
@@ -9,7 +9,7 @@ import {
   isLayoutRootLayer,
   isTemplatePolicyEnforced,
   localize,
-  moveLayerRelativeToTarget,
+  moveNodeRelativeToTarget,
   movePageRelativeToTarget,
   LayerRegistryServiceId,
   StatusBarContribution,
@@ -20,9 +20,9 @@ import {
   type TreeItem,
   type TreeSelectOptions,
   type CommandContext,
-  type Layer,
+  type DocumentNode,
 } from '#studio';
-import type { Page } from '#studio/schema';
+import type { Artboard } from '#studio/schema';
 
 export const WORKBENCH_SIDEBAR_CONTAINER_ID = 'workbench.sidebar';
 export const WORKBENCH_PAGES_VIEW_ID = 'workbench.artboards';
@@ -30,40 +30,40 @@ export const WORKBENCH_LAYERS_VIEW_ID = 'workbench.nodes';
 
 export { isLayoutRootLayer };
 
-export class PagesTreeProvider extends TreeDataProvider<Page> {
-  getRootChildren(ctx: CommandContext): Page[] {
+export class PagesTreeProvider extends TreeDataProvider<Artboard> {
+  getRootChildren(ctx: CommandContext): Artboard[] {
     return ctx.scene.getDocument().artboards;
   }
 
-  getChildren(): Page[] {
+  getChildren(): Artboard[] {
     return [];
   }
 
-  getTreeItem(page: Page, _ctx: CommandContext): TreeItem {
+  getTreeItem(page: Artboard, _ctx: CommandContext): TreeItem {
     return {
       editLabel: page.name ?? '',
       icon: 'file',
       id: page.id,
-      label: page.name?.trim() ? page.name : 'Page',
+      label: page.name?.trim() ? page.name : 'Artboard',
       renameCommandId: 'scene.renamePage',
     };
   }
 
-  onSelect(page: Page, ctx: CommandContext): void {
+  onSelect(page: Artboard, ctx: CommandContext): void {
     ctx.scene.setActiveArtboard(page.id);
   }
 
   canMove(
-    source: Page,
-    target: Page,
+    source: Artboard,
+    target: Artboard,
     position: 'before' | 'after' | 'inside'
   ): boolean {
     return source.id !== target.id && position !== 'inside';
   }
 
   handleMove(
-    source: Page,
-    target: Page,
+    source: Artboard,
+    target: Artboard,
     position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
@@ -78,15 +78,15 @@ export class PagesTreeProvider extends TreeDataProvider<Page> {
           effectivePosition
         ),
       }),
-      label: localize(ctx.services, 'workbench.history.reorderPage', {
+      label: localize(ctx.services, 'workbench.history.reorderArtboard', {
         defaultValue: 'Reorder page',
       }),
     });
   }
 }
 
-export class LayersTreeProvider extends TreeDataProvider<Layer> {
-  getRootChildren(ctx: CommandContext): Layer[] {
+export class LayersTreeProvider extends TreeDataProvider<DocumentNode> {
+  getRootChildren(ctx: CommandContext): DocumentNode[] {
     const layers = ctx.scene.getActiveArtboard().nodes;
     if (!isTemplatePolicyEnforced()) {
       return layers;
@@ -94,15 +94,15 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
     return layers.filter((layer) => isLayerShownInLayers(layer));
   }
 
-  getChildren(node: Layer): Layer[] {
-    const children = getLayerChildren(node);
+  getChildren(node: DocumentNode): DocumentNode[] {
+    const children = getChildNodes(node);
     if (!isTemplatePolicyEnforced()) {
       return children;
     }
     return children.filter((layer) => isLayerShownInLayers(layer));
   }
 
-  getTreeItem(node: Layer, ctx: CommandContext): TreeItem {
+  getTreeItem(node: DocumentNode, ctx: CommandContext): TreeItem {
     const layers = ctx.services.has(LayerRegistryServiceId)
       ? ctx.services.get(LayerRegistryServiceId)
       : undefined;
@@ -120,7 +120,7 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
       : node.type;
     return {
       // Nestable even when empty (email.section/row/column, html.flex, …).
-      collapsible: hasChildLayers(node),
+      collapsible: hasChildNodes(node),
       editLabel: node.name ?? '',
       icon: definition?.treeIcon,
       id: node.id,
@@ -137,7 +137,7 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
   }
 
   onSelect(
-    node: Layer,
+    node: DocumentNode,
     ctx: CommandContext,
     options?: TreeSelectOptions
   ): void {
@@ -161,8 +161,8 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
   }
 
   canMove(
-    source: Layer,
-    target: Layer,
+    source: DocumentNode,
+    target: DocumentNode,
     position: 'before' | 'after' | 'inside'
   ): boolean {
     if (
@@ -172,7 +172,7 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
     ) {
       return false;
     }
-    // Page/Email frame stays the sole top-level row - never move it or hoist beside it.
+    // Artboard/Email frame stays the sole top-level row - never move it or hoist beside it.
     if (isLayoutRootLayer(source)) {
       return false;
     }
@@ -182,22 +182,22 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
     ) {
       return false;
     }
-    if (position === 'inside' && !hasChildLayers(target)) {
+    if (position === 'inside' && !hasChildNodes(target)) {
       return false;
     }
     return true;
   }
 
   handleMove(
-    source: Layer,
-    target: Layer,
+    source: DocumentNode,
+    target: DocumentNode,
     position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
     const page = ctx.scene.getActiveArtboard();
     // Nest into real containers; flat canvas rows still treat "inside" as sibling after.
     const effectivePosition =
-      position === 'inside' && hasChildLayers(target)
+      position === 'inside' && hasChildNodes(target)
         ? 'inside'
         : position === 'inside'
           ? 'after'
@@ -209,7 +209,7 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
           p.id === page.id
             ? {
                 ...p,
-                nodes: moveLayerRelativeToTarget(
+                nodes: moveNodeRelativeToTarget(
                   p.nodes,
                   source.id,
                   target.id,
@@ -229,7 +229,7 @@ export class LayersTreeProvider extends TreeDataProvider<Layer> {
 export class WorkbenchPagesView extends ViewContribution {
   readonly id = WORKBENCH_PAGES_VIEW_ID;
   readonly containerId = WORKBENCH_SIDEBAR_CONTAINER_ID;
-  readonly name = 'Pages';
+  readonly name = 'Artboards';
   readonly viewOrder = 0;
   readonly viewSelection = 'page' as const;
   readonly viewHover = 'none' as const;

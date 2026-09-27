@@ -1,5 +1,5 @@
 import type { DocumentNode } from '@openenvx/studio/schema';
-import { getLayerChildren } from '@openenvx/studio';
+import { getChildNodes } from '@openenvx/studio';
 import { nodeTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
@@ -44,7 +44,7 @@ describe('clone-layers-for-paste', () => {
       }),
     ];
     const cloned = cloneLayers(layers);
-    const children = getLayerChildren(cloned[0]!);
+    const children = getChildNodes(cloned[0]!);
     expect(cloned[0]!.id).not.toBe('group-1');
     expect(children[0]!.id).not.toBe('child-1');
   });

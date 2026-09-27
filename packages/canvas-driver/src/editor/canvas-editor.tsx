@@ -4,7 +4,7 @@ import {
   canSelectLayer,
   isTypingTarget,
 } from '@openenvx/studio';
-import type { Page, Scene } from '@openenvx/studio/schema';
+import type { Artboard, Document } from '@openenvx/studio/schema';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useCanvasHost } from '../canvas-host-context';
@@ -60,10 +60,10 @@ import styles from './canvas-editor.module.css';
 export interface CanvasEditorProps {
   layerSurface: CanvasLayerSurfaceItem[];
   /** Workbench scene for variable preview + hug remasure (stored tokens stay in the store). */
-  scene?: Scene;
+  scene?: Document;
   artboardWidth: number;
   artboardHeight: number;
-  page: Page;
+  page: Artboard;
   selectedNodeIds: string[];
   primaryNodeId?: string | null;
   hoveredLayerId?: string | null;

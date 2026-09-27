@@ -6,7 +6,7 @@ import type { InstantiationService } from '../runtime/instantiation-service';
 import { Lifecycle } from '../runtime/lifecycle';
 import type { Plugin } from '../runtime/plugin';
 import type { EventBus } from '../runtime/workbench-events';
-import type { SceneStore } from '../scene/scene-store';
+import type { DocumentStore } from '../scene/document-store';
 import type { ContextKeyService } from '../workbench/context-key-service';
 import type { EditorService } from '../workbench/editor-service';
 
@@ -17,7 +17,7 @@ export interface PluginContext {
   commands: CommandService;
   events: EventBus;
   services: InstantiationService;
-  scene: SceneStore;
+  scene: DocumentStore;
   editor: EditorService;
   contextKeys: ContextKeyService;
 }
@@ -27,7 +27,7 @@ class MutablePluginContext implements PluginContext {
     readonly commands: CommandService,
     readonly events: EventBus,
     readonly services: InstantiationService,
-    readonly scene: SceneStore,
+    readonly scene: DocumentStore,
     readonly editor: EditorService,
     readonly contextKeys: ContextKeyService,
     private readonly runtime: EditorRuntime,

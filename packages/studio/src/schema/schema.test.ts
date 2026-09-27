@@ -2,12 +2,12 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
-  createEmptyScene,
+  createEmptyDocument,
   createEmptyProjectSnapshot,
-  normalizeEditorState,
-  normalizeScene,
+  normalizeEditorSession,
+  normalizeDocument,
   normalizeProjectSnapshot,
-  validateScene,
+  validateDocument,
 } from './index';
 import type { Document } from './types';
 
@@ -28,24 +28,24 @@ function flowArtboard(
 
 describe('schema', () => {
   it('creates empty scene without editor state', () => {
-    const scene = createEmptyScene();
+    const scene = createEmptyDocument();
     expect(scene.artboards).toHaveLength(1);
     expect(scene.artboards[0]!.extensions?.layout).toBe('flow');
     expect('selection' in scene).toBe(false);
     expect('activeArtboardId' in scene).toBe(false);
-    expect(validateScene(scene).valid).toBeTruthy();
+    expect(validateDocument(scene).valid).toBeTruthy();
   });
 
   it('normalizes partial scene', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [flowArtboard('p1', { name: 'Test' })],
     });
     expect(scene.artboards[0]!.id).toBe('p1');
   });
 
   it('rejects unknown keys in canonical mode', () => {
-    const scene = createEmptyScene();
-    const result = validateScene(
+    const scene = createEmptyDocument();
+    const result = validateDocument(
       { ...scene, unexpected: true },
       { mode: 'canonical' }
     );
@@ -53,7 +53,7 @@ describe('schema', () => {
   });
 
   it('accepts nested group children', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [
         {
           extensions: { layout: 'absolute' },
@@ -78,11 +78,11 @@ describe('schema', () => {
       ],
     });
 
-    expect(validateScene(scene).valid).toBe(true);
+    expect(validateDocument(scene).valid).toBe(true);
   });
 
   it('accepts openenvx.widget with values and children', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [
         {
           extensions: { layout: 'absolute' },
@@ -119,7 +119,7 @@ describe('schema', () => {
       ],
     });
 
-    expect(validateScene(scene).valid).toBe(true);
+    expect(validateDocument(scene).valid).toBe(true);
     const layer = scene.artboards[0]!.nodes[0]!;
     expect(layer.type).toBe('openenvx.widget');
   });
@@ -145,16 +145,16 @@ describe('schema', () => {
   });
 
   it('normalizes editor state', () => {
-    const state = normalizeEditorState({}, 'page-1');
+    const state = normalizeEditorSession({}, 'page-1');
     expect(state.activeArtboardId).toBe('page-1');
     expect(state.selectedNodeIds).toEqual([]);
   });
 
-  it('is idempotent for normalizeScene', () => {
-    const once = normalizeScene({
+  it('is idempotent for normalizeDocument', () => {
+    const once = normalizeDocument({
       artboards: [flowArtboard('p1', { name: 'Test' })],
     });
-    const twice = normalizeScene(once);
+    const twice = normalizeDocument(once);
     expect(twice).toEqual(once);
   });
 
@@ -171,7 +171,7 @@ describe('schema', () => {
   });
 
   it('accepts opaque node props on the document model', () => {
-    const result = validateScene({
+    const result = validateDocument({
       artboards: [
         flowArtboard('p1', {
           nodes: [
@@ -189,7 +189,7 @@ describe('schema', () => {
   });
 
   it('accepts canvas.svg with svg markup', () => {
-    const result = validateScene({
+    const result = validateDocument({
       artboards: [
         {
           extensions: { layout: 'flow' },
@@ -214,7 +214,7 @@ describe('schema', () => {
   });
 
   it('accepts canvas.svg with empty props bag', () => {
-    const result = validateScene({
+    const result = validateDocument({
       artboards: [
         flowArtboard('p1', {
           nodes: [{ id: 'svg-1', props: {}, type: 'canvas.svg' }],
@@ -225,7 +225,7 @@ describe('schema', () => {
   });
 
   it('accepts canvas.qr with url payload', () => {
-    const result = validateScene({
+    const result = validateDocument({
       artboards: [
         {
           extensions: { layout: 'absolute' },
@@ -251,7 +251,7 @@ describe('schema', () => {
   });
 
   it('accepts canvas.qr with empty props bag', () => {
-    const result = validateScene({
+    const result = validateDocument({
       artboards: [
         flowArtboard('p1', {
           extensions: { layout: 'absolute' },
@@ -262,9 +262,9 @@ describe('schema', () => {
     expect(result.valid).toBe(true);
   });
 
-  it('throws when normalizeScene cannot parse input', () => {
+  it('throws when normalizeDocument cannot parse input', () => {
     expect(() =>
-      normalizeScene({
+      normalizeDocument({
         artboards: [
           {
             extensions: { layout: 'flow' },
@@ -280,10 +280,10 @@ describe('schema', () => {
   });
 
   it('prunes stale selection ids against scene', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [flowArtboard('p1', { name: 'Page' })],
     });
-    const state = normalizeEditorState(
+    const state = normalizeEditorSession(
       {
         activeArtboardId: 'p1',
         primaryNodeId: 'missing',
@@ -326,7 +326,7 @@ describe('schema', () => {
   });
 
   it('rejects empty artboards array in validation', () => {
-    const result = validateScene({
+    const result = validateDocument({
       artboards: [],
       schemaVersion: 4,
     });

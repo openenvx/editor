@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { flattenStageLayers } from '../flatten-layer-surface';
@@ -21,7 +21,7 @@ describe(findContainerAncestorId, () => {
           id: 'w',
           type: 'openenvx.widget',
           transform: {
-            ...createDefaultTransform(),
+            ...createDefaultFrame(),
             x: 40,
             y: 40,
             width: 200,
@@ -36,7 +36,7 @@ describe(findContainerAncestorId, () => {
               id: 'w:text',
               type: 'canvas.text',
               transform: {
-                ...createDefaultTransform(),
+                ...createDefaultFrame(),
                 x: 16,
                 y: 16,
                 width: 100,

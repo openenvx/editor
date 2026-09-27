@@ -6,7 +6,7 @@ import {
   FontServiceId,
   getActiveArtboard,
   localize,
-  updateLayerInTree,
+  updateNodeInTree,
 } from '@openenvx/studio';
 import type {
   CommandContext,
@@ -73,7 +73,7 @@ function canTransformLayerById(ctx: CommandContext, layerId: string): boolean {
 }
 
 function canTransformPrimaryLayer(ctx: CommandContext): boolean {
-  const layer = ctx.scene.getPrimaryLayer();
+  const layer = ctx.scene.getPrimaryNode();
   return layer ? canTransformLayer(layer) : false;
 }
 
@@ -390,7 +390,7 @@ export class UpdateRichTextTransformCommand extends Command {
         ...scene,
         artboards: scene.artboards.map((page) => ({
           ...page,
-          nodes: updateLayerInTree(page.nodes, update.layerId, (layer) => {
+          nodes: updateNodeInTree(page.nodes, update.layerId, (layer) => {
             const props =
               typeof layer.props === 'object' && layer.props !== null
                 ? { ...(layer.props as Record<string, unknown>) }
@@ -486,7 +486,7 @@ function applyLayerTransform(
       ...scene,
       artboards: scene.artboards.map((page) => ({
         ...page,
-        nodes: updateLayerInTree(page.nodes, layerId, (layer) => {
+        nodes: updateNodeInTree(page.nodes, layerId, (layer) => {
           if (!dataPatch) {
             return applyNodeTransform(layer, transform);
           }
@@ -529,7 +529,7 @@ function setLayerRotation(
 }
 
 function adjustLayerRotation(ctx: CommandContext, delta: number): void {
-  const layer = ctx.scene.getPrimaryLayer();
+  const layer = ctx.scene.getPrimaryNode();
   if (!layer?.frame) {
     return;
   }

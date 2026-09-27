@@ -14,7 +14,7 @@ import {
   WorkbenchEvents,
 } from '../runtime/workbench-events';
 import type { EventBus } from '../runtime/workbench-events';
-import type { SceneStore } from '../scene/scene-store';
+import type { DocumentStore } from '../scene/document-store';
 import {
   RichTextInsertServiceImpl,
   RichTextInsertServiceId,
@@ -22,7 +22,7 @@ import {
 import {
   ContextKeyServiceId,
   EditorServiceId,
-  SceneStoreServiceId,
+  DocumentStoreServiceId,
 } from '../tokens';
 import type { ContextKeyService } from '../workbench/context-key-service';
 import { createContextKeyService } from '../workbench/context-key-service';
@@ -48,7 +48,7 @@ export class EditorRuntime {
   private readonly events = new WorkbenchEventService();
 
   constructor(
-    private readonly scene: SceneStore,
+    private readonly scene: DocumentStore,
     private readonly editor: EditorService
   ) {
     this.installCoreServices();
@@ -65,7 +65,7 @@ export class EditorRuntime {
   }
 
   private installCoreServices(): void {
-    this.services.registerInstance(SceneStoreServiceId, this.scene);
+    this.services.registerInstance(DocumentStoreServiceId, this.scene);
     this.services.registerInstance(EditorServiceId, this.editor);
     this.services.registerInstance(ContextKeyServiceId, this.contextKeys);
     this.services.registerInstance(
@@ -102,11 +102,11 @@ export class EditorRuntime {
 
   private wireEvents(): void {
     this.disposables.add(
-      this.scene.onDidChangeScene((snapshot) => {
+      this.scene.onDidChangeDocument((snapshot) => {
         // Use the event payload - do not call getSnapshot() again (avoids a second clone).
         this.editor.updateScene(snapshot.document, snapshot.contentRevision);
         this.syncContextKeys();
-        this.events.emit(WorkbenchEvents.DidChangeScene, snapshot);
+        this.events.emit(WorkbenchEvents.DidChangeDocument, snapshot);
         this.events.emit(WorkbenchEvents.DidChangeSelection, snapshot.session);
       })
     );
@@ -142,7 +142,7 @@ export class EditorRuntime {
     return this.events;
   }
 
-  getDocument(): SceneStore {
+  getDocument(): DocumentStore {
     return this.scene;
   }
 
@@ -159,7 +159,7 @@ export class EditorRuntime {
       editor: this.editor,
       events: this.events,
       scene: this.scene,
-      selection: this.scene.getSelection(),
+      selection: this.scene.getSession(),
       services: this.services,
     };
   }

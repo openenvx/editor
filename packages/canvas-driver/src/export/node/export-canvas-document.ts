@@ -1,4 +1,4 @@
-import type { Scene } from '@openenvx/studio/schema';
+import type { Document } from '@openenvx/studio/schema';
 
 import type {
   CanvasExportOptions,
@@ -15,7 +15,7 @@ import {
 } from './setup-konva-node';
 
 export async function exportCanvasDocument(
-  scene: Scene,
+  scene: Document,
   pageId: string,
   options: CanvasExportOptions
 ): Promise<CanvasExportResult> {

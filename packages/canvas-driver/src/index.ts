@@ -192,7 +192,7 @@ export {
   DEFAULT_CANVAS_WORKBENCH_PLUGINS,
   defaultCanvasWorkbench,
 } from './default-canvas-workbench';
-export { createCanvasScene, type Scene } from './publish-runtime';
+export { createCanvasScene, type Document } from './publish-runtime';
 export { exportCanvasDocument } from './export/browser/export-canvas-document';
 export { createCanvasPropertyHostContextWithApi } from './properties/create-canvas-property-host-context';
 export { SmartGuidesStageInteraction } from './stage/smart-guides-stage-interaction';
@@ -381,7 +381,7 @@ export type { PageResizeService } from './page-resize/page-resize-types';
 export {
   DEFAULT_PAGE_SIZE_PRESET,
   PAGE_SIZE_PRESETS,
-  findPresetForPage,
+  findPresetForArtboard,
   getDefaultPageDimensions,
   resolvePagePreset,
   type PageSizePreset,

@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { describe, expect, it } from 'vitest';
 
@@ -12,7 +12,7 @@ type MockGroup = Konva.Group & {
 };
 
 function createMockNode(
-  transform: ReturnType<typeof createDefaultTransform>
+  transform: ReturnType<typeof createDefaultFrame>
 ): MockGroup {
   const state = { ...transform, scaleX: 1, scaleY: 1 };
   return {
@@ -50,7 +50,7 @@ function createMockNode(
 
 describe('bakeRichTextNodeTransform', () => {
   const snapshot = {
-    ...createDefaultTransform(),
+    ...createDefaultFrame(),
     height: 80,
     width: 200,
     x: 10,

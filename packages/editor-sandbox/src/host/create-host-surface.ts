@@ -1,7 +1,7 @@
 import type {
   Command,
-  Scene,
-  SceneTransaction,
+  Document,
+  DocumentTransaction,
   WorkbenchApi,
   WorkbenchContributionDisposable,
 } from '@openenvx/studio';
@@ -17,13 +17,13 @@ export function createSandboxHostSurface(
   trackDisposable: (disposable: WorkbenchContributionDisposable) => void
 ): SandboxHostSurface {
   return {
-    getSelection: () => api.scene.getSelection(),
-    getScene: (): Scene => api.scene.getScene(),
-    apply: (transaction: SceneTransaction) => api.scene.apply(transaction),
-    selectLayers: (layerIds, primaryNodeId) =>
-      api.selectLayers(layerIds, primaryNodeId ?? null),
-    onDidChangeScene: (listener) =>
-      api.scene.onDidChangeScene(() => listener()).dispose,
+    getSelection: () => api.scene.getSession(),
+    getDocument: (): Document => api.scene.getDocument(),
+    apply: (transaction: DocumentTransaction) => api.scene.apply(transaction),
+    selectNodes: (layerIds, primaryNodeId) =>
+      api.selectNodes(layerIds, primaryNodeId ?? null),
+    onDidChangeDocument: (listener) =>
+      api.scene.onDidChangeDocument(() => listener()).dispose,
     onDidChangeSelection: (listener) =>
       api.events.onDidChangeSelection(() => listener()).dispose,
     executeCommand: async (commandId, args) => {

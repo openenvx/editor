@@ -1,8 +1,8 @@
 import type {
   Command,
-  Scene,
-  SceneTransaction,
-  Selection,
+  Document,
+  DocumentTransaction,
+  EditorSession,
   WorkbenchContribution,
   WorkbenchContributionDisposable,
 } from '@openenvx/studio';
@@ -13,11 +13,11 @@ import type {
  * Isolates never receive this - capability gates stay on the host bridge.
  */
 export interface SandboxHostSurface {
-  getSelection(): Selection;
-  getScene(): Scene;
-  apply(transaction: SceneTransaction): void;
-  selectLayers(layerIds: string[], primaryNodeId?: string | null): void;
-  onDidChangeScene(listener: () => void): () => void;
+  getSelection(): EditorSession;
+  getDocument(): Document;
+  apply(transaction: DocumentTransaction): void;
+  selectNodes(layerIds: string[], primaryNodeId?: string | null): void;
+  onDidChangeDocument(listener: () => void): () => void;
   onDidChangeSelection(listener: () => void): () => void;
   executeCommand(
     commandId: string,

@@ -1,4 +1,4 @@
-import { createEmptyScene } from '#studio/schema';
+import { createEmptyDocument } from '#studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { collectAssetRefs } from './collect-asset-refs';
@@ -10,10 +10,10 @@ function createNode(id: string, type: string, props: unknown) {
 describe(collectAssetRefs, () => {
   it('finds asset refs in node props', () => {
     const document = {
-      ...createEmptyScene(),
+      ...createEmptyDocument(),
       artboards: [
         {
-          ...createEmptyScene().artboards[0]!,
+          ...createEmptyDocument().artboards[0]!,
           nodes: [
             createNode('1', 'image', { assetRef: 'asset://img-1' }),
           ],
@@ -26,10 +26,10 @@ describe(collectAssetRefs, () => {
 
   it('finds asset refs inside nested containers', () => {
     const document = {
-      ...createEmptyScene(),
+      ...createEmptyDocument(),
       artboards: [
         {
-          ...createEmptyScene().artboards[0]!,
+          ...createEmptyDocument().artboards[0]!,
           nodes: [
             {
               children: [
@@ -49,10 +49,10 @@ describe(collectAssetRefs, () => {
 
   it('ignores http, https, and data refs', () => {
     const document = {
-      ...createEmptyScene(),
+      ...createEmptyDocument(),
       artboards: [
         {
-          ...createEmptyScene().artboards[0]!,
+          ...createEmptyDocument().artboards[0]!,
           nodes: [
             createNode('1', 'image', {
               assetRef: 'https://example.com/image.png',
@@ -67,10 +67,10 @@ describe(collectAssetRefs, () => {
 
   it('handles multiple refs on the same node', () => {
     const document = {
-      ...createEmptyScene(),
+      ...createEmptyDocument(),
       artboards: [
         {
-          ...createEmptyScene().artboards[0]!,
+          ...createEmptyDocument().artboards[0]!,
           nodes: [
             createNode('1', 'image', {
               dark: { assetRef: 'asset://dark' },

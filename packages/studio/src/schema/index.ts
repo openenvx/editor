@@ -1,37 +1,9 @@
 export {
-  BUILTIN_LAYER_TYPES,
   BUILTIN_NODE_TYPES,
-  LAYER_WRITE_MODES,
   clampTextCurve,
   MAX_TEXT_CURVE,
   NODE_WRITE_MODES,
   type LengthUnit,
-  type LayerWriteMode,
-  type CanvasCircleData,
-  type CanvasImageData,
-  type CanvasInstanceData,
-  type CanvasQrData,
-  type CanvasRectData,
-  type CanvasTextData,
-  type FrozenLayerSnapshot,
-  type Layer,
-  type LayerShadow,
-  type LayerStyle,
-  type OpenEnvxWidgetData,
-  type Page,
-  type Scene,
-  type SceneAsset,
-  type SceneComponent,
-  type SceneSnapshot,
-  type Selection,
-  type Artboard,
-  type ArtboardGuide,
-  type ArtboardGuideOrientation,
-  type PageGuide,
-  type PageGuideOrientation,
-  type ArtboardPhysical,
-  type ArtboardSpace,
-  type BuiltinNodeType,
   type CanvasCircleProps,
   type CanvasImageProps,
   type CanvasInstanceProps,
@@ -39,6 +11,13 @@ export {
   type CanvasRectProps,
   type CanvasSvgProps,
   type CanvasTextProps,
+  type OpenEnvxWidgetProps,
+  type Artboard,
+  type ArtboardGuide,
+  type ArtboardGuideOrientation,
+  type ArtboardPhysical,
+  type ArtboardSpace,
+  type BuiltinNodeType,
   type CornerRadius,
   type Document,
   type DocumentAsset,
@@ -56,7 +35,6 @@ export {
   type NodeShadow,
   type NodeStyle,
   type NodeWriteMode,
-  type OpenEnvxWidgetProps,
   type Padding,
   type ProjectSnapshot,
   type QrErrorCorrection,
@@ -66,8 +44,6 @@ export {
   type Transform,
   type WidgetFieldDef,
   type WidgetManifestSnapshot,
-  type EditorState,
-  type PageLayout,
 } from './types';
 
 export {
@@ -105,16 +81,9 @@ export {
   normalizeDocument,
   normalizeEditorSession,
   normalizeProjectSnapshot,
-  createDefaultTransform,
-  createDefaultPage,
-  createDefaultEditorState,
-  createEmptyScene,
-  normalizeScene,
-  normalizeEditorState,
-  normalizeSceneSnapshot,
 } from './normalize';
 
-export { pruneEditorSession, pruneEditorState } from './editor-state';
+export { pruneEditorSession } from './editor-state';
 
 export {
   computeArtboardExportDimensions,
@@ -127,14 +96,6 @@ export {
   resolveArtboardUnit,
   type ArtboardExportDimensions,
   type ArtboardExportOptions,
-  computePageExportDimensions,
-  resolvePageBackground,
-  resolvePageDpi,
-  resolvePagePixelDimensions,
-  resolvePagePresetId,
-  resolvePageUnit,
-  type PageExportDimensions,
-  type PageExportOptions,
 } from './page-export';
 
 export {
@@ -146,12 +107,6 @@ export {
   resolveArtboardSafeMm,
   type ArtboardPrintBoxes,
   type ArtboardPrintRect,
-  computePagePrintBoxes,
-  isPrintEligiblePage,
-  resolvePageBleedMm,
-  resolvePageSafeMm,
-  type PagePrintBoxes,
-  type PagePrintRect,
 } from './page-print';
 
 export {
@@ -165,13 +120,6 @@ export {
   type ValidateMode,
   type ValidationError,
   type ValidationResult,
-  assertValidScene,
-  parseValidScene,
-  parseValidEditorState,
-  parseValidSceneSnapshot,
-  validateScene,
-  validateEditorState,
-  validateSceneSnapshot,
 } from './validate';
 
 export {
@@ -230,11 +178,4 @@ export {
   type VariableChipPresentation,
   type VariableKeyValidationReason,
   type WrapVariableTokensOptions,
-  addVariableToScene,
-  removeVariableFromScene,
-  reorderVariablesInScene,
-  rewriteVariableKeyInScene,
-  sceneVariables,
-  updateVariableInScene,
-  resolvePrimaryTextDataPath,
 } from './template-variables';

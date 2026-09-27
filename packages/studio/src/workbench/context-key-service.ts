@@ -1,8 +1,8 @@
 import { evaluateContextKeyWhenExpression } from '../evaluate-when-expression';
 import { Emitter } from '../runtime/emitter';
 import type { Event } from '../runtime/emitter';
-import { findLayerById } from '../scene/layer-tree';
-import type { Scene, Selection } from '../scene/types';
+import { findNodeById } from '../scene/layer-tree';
+import type { Document, EditorSession } from '../scene/types';
 
 export class ContextKeyService {
   private readonly keys = new Map<string, boolean | string | number>();
@@ -37,8 +37,8 @@ export class ContextKeyService {
   }
 
   syncSceneKeys(input: {
-    scene: Scene;
-    selection: Selection;
+    scene: Document;
+    selection: EditorSession;
     isDirty: boolean;
     hasActiveEditor: boolean;
     customKeys?: Record<string, boolean | string | number>;
@@ -59,7 +59,7 @@ export class ContextKeyService {
     const primaryNodeId =
       input.selection.primaryNodeId ?? selectedNodeIds[0] ?? null;
     const primaryLayer = primaryNodeId
-      ? findLayerById(input.scene, primaryNodeId)
+      ? findNodeById(input.scene, primaryNodeId)
       : null;
 
     set('scene.layerSelected', selectedNodeIds.length > 0);

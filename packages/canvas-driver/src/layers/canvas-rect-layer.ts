@@ -12,7 +12,7 @@ import type {
 } from '@openenvx/studio';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 import type { Artboard } from '@openenvx/studio/schema';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 const cornerRadiusSchema = z.object({
@@ -74,7 +74,7 @@ export class CanvasRectLayer extends LayerDefinition<CanvasRectModel> {
         strokeWidth: 2,
       },
       id,
-      frame: { ...createDefaultTransform(), height: 120, width: 160 },
+      frame: { ...createDefaultFrame(), height: 120, width: 160 },
       type: this.type,
     };
   }

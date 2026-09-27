@@ -10,7 +10,7 @@ import {
   encodeQrToSvg,
 } from '@openenvx/studio/preview';
 import type { Artboard } from '@openenvx/studio/schema';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 export const canvasQrSchema = z.object({
@@ -46,7 +46,7 @@ export class CanvasQrLayer extends LayerDefinition<CanvasQrModel> {
       },
       id,
       name: 'qr',
-      frame: { ...createDefaultTransform(), height: 200, width: 200 },
+      frame: { ...createDefaultFrame(), height: 200, width: 200 },
       type: this.type,
     };
   }

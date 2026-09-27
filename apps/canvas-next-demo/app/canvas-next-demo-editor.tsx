@@ -4,7 +4,6 @@ import {
   createCanvasScene,
   defaultCanvasWorkbench,
 } from '@openenvx/canvas-driver';
-import type { Scene as CoreScene } from '@openenvx/studio/schema';
 import { WorkbenchShell } from '@openenvx/studio/shell';
 import { useMemo } from 'react';
 
@@ -20,7 +19,7 @@ export function CanvasNextDemoEditor() {
         }
         editorTitle="Artboard"
         editorUri="openenvx://canvas/next-demo"
-        initialScene={initialScene as unknown as CoreScene}
+        initialScene={initialScene}
         layout={defaultCanvasWorkbench.layout}
         plugins={defaultCanvasWorkbench.plugins}
         theme="dark"

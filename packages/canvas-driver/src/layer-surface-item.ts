@@ -1,8 +1,8 @@
-import type { Layer } from '@openenvx/studio';
+import type { DocumentNode } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 
 export interface CanvasLayerSurfaceItem {
-  layer: Layer;
+  layer: DocumentNode;
   view: LayerPreviewDescriptor;
   children?: CanvasLayerSurfaceItem[];
 }

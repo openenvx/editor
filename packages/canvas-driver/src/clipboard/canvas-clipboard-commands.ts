@@ -4,13 +4,13 @@ import {
   canInsertLayers,
   findNodeById,
   localize,
-  updateLayerInTree,
+  updateNodeInTree,
 } from '@openenvx/studio';
 import type { CommandContext, DocumentNode } from '@openenvx/studio';
 import {
   applyNodeTransform,
   artboardRulesLayout,
-  createDefaultTransform,
+  createDefaultFrame,
 } from '@openenvx/studio/schema';
 
 import { CanvasClipboardServiceId } from '../canvas-service-tokens';
@@ -22,7 +22,7 @@ import type {
 } from './canvas-clipboard-service';
 import {
   cloneLayers,
-  createLayerId,
+  createNodeId,
   getLayersBoundingBox,
   offsetLayers,
   positionLayersAtAnchor,
@@ -84,7 +84,7 @@ function insertCanvasLayers(
         defaultValue: 'Insert layers',
       }),
   });
-  ctx.scene.setSelection({
+  ctx.scene.setSession({
     activeArtboardId,
     primaryNodeId: layers[0]?.id ?? null,
     selectedNodeIds: layers.map((layer) => layer.id),
@@ -112,7 +112,7 @@ function layersFromExternalPayload(
 
   if (payload.kind === 'text') {
     const layer = new CanvasTextLayer().createDefault(
-      createLayerId('text'),
+      createNodeId('text'),
       page
     );
     const fitted = fitCanvasTextLayerToContent(
@@ -122,7 +122,7 @@ function layersFromExternalPayload(
           props: payload.model,
         },
         {
-          ...createDefaultTransform(),
+          ...createDefaultFrame(),
           opacity: 1,
           x: anchor.x,
           y: anchor.y,
@@ -162,11 +162,11 @@ function patchImageLayerData(
   }
   // setScene: don't push a second undo step for preview → CDN / flag updates
   const scene = ctx.scene.getDocument();
-  ctx.scene.setScene({
+  ctx.scene.setDocument({
     ...scene,
     artboards: scene.artboards.map((page) => ({
       ...page,
-      nodes: updateLayerInTree(page.nodes, layerId, (layer) => {
+      nodes: updateNodeInTree(page.nodes, layerId, (layer) => {
         const props =
           typeof layer.props === 'object' && layer.props !== null
             ? { ...(layer.props as Record<string, unknown>) }

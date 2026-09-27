@@ -1,7 +1,7 @@
 import { downloadBytes, exportCanvasDocument } from '@openenvx/canvas-driver';
 import {
   Command,
-  getActivePage,
+  getActiveArtboard,
   TopBarContribution,
   WorkbenchPlugin,
   type CommandContext,
@@ -19,8 +19,8 @@ abstract class DownloadCanvasExportCommand extends Command {
   abstract readonly format: ExportFormat;
 
   async execute(ctx: CommandContext): Promise<void> {
-    const scene = ctx.scene.getScene();
-    const page = getActivePage(scene);
+    const scene = ctx.scene.getDocument();
+    const page = getActiveArtboard(scene);
     const format = this.format;
     try {
       const result = await exportCanvasDocument(scene, page.id, {

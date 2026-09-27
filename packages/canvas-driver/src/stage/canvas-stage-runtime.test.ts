@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { selectLayerTransform } from './canvas-stage-selectors';
@@ -11,7 +11,7 @@ describe('CanvasStageRuntime live transforms', () => {
   let runtime: CanvasStageRuntime;
 
   function getBaseTransform() {
-    return createDefaultTransform();
+    return createDefaultFrame();
   }
 
   it('returns the base transform when no override exists', () => {

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -82,7 +82,7 @@ describe('useLayerTransformSession integration', () => {
   it('completes a default transform and notifies onTransform', () => {
     const { input, onTransform } = createSessionHookInput();
     const { result } = renderHook(() => useLayerTransformSession(input));
-    const transform = createDefaultTransform();
+    const transform = createDefaultFrame();
     const node = {
       height: () => transform.height,
       position: vi.fn(),

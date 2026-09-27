@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { normalizeScene } from './normalize';
+import { normalizeDocument } from './normalize';
 import {
   applyTemplateVariables,
   extractVariableKeys,
   formatVariableToken,
   listVariableUsages,
-  rewriteVariableKeyInScene,
+  rewriteVariableKeyInDocument,
   validateVariableKeyForCatalog,
   wrapVariableTokensForDisplay,
 } from './template-variables';
@@ -23,7 +23,7 @@ function emailArtboard(nodes: unknown[]) {
 
 describe('template-variables', () => {
   it('substitutes known keys and escapes HTML in values', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [
         emailArtboard([
           {
@@ -44,7 +44,7 @@ describe('template-variables', () => {
   });
 
   it('does not escape plain-text label fields', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [
         emailArtboard([
           {
@@ -63,7 +63,7 @@ describe('template-variables', () => {
   });
 
   it('does not escape canvas.qr url payloads', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [
         {
           extensions: { layout: 'absolute' },
@@ -90,7 +90,7 @@ describe('template-variables', () => {
   });
 
   it('leaves unknown tokens intact', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [
         emailArtboard([
           {
@@ -112,7 +112,7 @@ describe('template-variables', () => {
       'test',
       'other',
     ]);
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [
         emailArtboard([
           {
@@ -124,7 +124,7 @@ describe('template-variables', () => {
       ],
       variables: [{ id: 'v1', key: 'old' }],
     });
-    const rewritten = rewriteVariableKeyInScene(scene, 'old', 'new');
+    const rewritten = rewriteVariableKeyInDocument(scene, 'old', 'new');
     expect(rewritten.artboards[0]!.nodes[0]!.props).toMatchObject({
       html: formatVariableToken('new'),
     });

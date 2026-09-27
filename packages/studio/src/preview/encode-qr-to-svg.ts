@@ -1,11 +1,11 @@
 import { renderSVG } from 'uqr';
 
-import type { CanvasQrData } from '#studio/schema';
+import type { CanvasQrProps } from '#studio/schema';
 
 export type { QrErrorCorrection } from '#studio/schema';
 
 /** Encode options = QR layer data minus the payload string. */
-export type EncodeQrToSvgOptions = Omit<CanvasQrData, 'url'>;
+export type EncodeQrToSvgOptions = Omit<CanvasQrProps, 'url'>;
 
 const PLACEHOLDER_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-label="QR placeholder">' +

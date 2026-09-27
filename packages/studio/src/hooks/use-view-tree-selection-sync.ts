@@ -1,6 +1,6 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 
-import type { Scene, ViewDescriptor } from '#studio';
+import type { Document, ViewDescriptor } from '#studio';
 
 import { getSelectionExpandIds } from './get-selection-expand-ids';
 
@@ -11,7 +11,7 @@ import { getSelectionExpandIds } from './get-selection-expand-ids';
 export function useViewTreeSelectionSync(
   view: ViewDescriptor,
   selectedNodeIds: Set<string>,
-  scene: Scene,
+  scene: Document,
   setCollapsed: Dispatch<SetStateAction<Set<string>>>
 ): void {
   const viewSelection = view.viewSelection;

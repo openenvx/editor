@@ -15,9 +15,6 @@ export interface ArtboardPrintRect {
   height: number;
 }
 
-/** @deprecated use ArtboardPrintRect */
-export type PagePrintRect = ArtboardPrintRect;
-
 export interface ArtboardPrintBoxes {
   bleedMm: number;
   bleedPx: number;
@@ -28,9 +25,6 @@ export interface ArtboardPrintBoxes {
   trim: { width: number; height: number };
 }
 
-/** @deprecated use ArtboardPrintBoxes */
-export type PagePrintBoxes = ArtboardPrintBoxes;
-
 export function isPrintEligibleArtboard(artboard: Artboard): boolean {
   if (resolveArtboardPresetId(artboard)) {
     return true;
@@ -39,9 +33,6 @@ export function isPrintEligibleArtboard(artboard: Artboard): boolean {
   return unit !== undefined && unit !== 'px';
 }
 
-/** @deprecated use isPrintEligibleArtboard */
-export const isPrintEligiblePage = isPrintEligibleArtboard;
-
 export function resolveArtboardBleedMm(artboard: Artboard): number {
   if (artboard.physical?.bleedMm !== undefined) {
     return artboard.physical.bleedMm;
@@ -49,18 +40,12 @@ export function resolveArtboardBleedMm(artboard: Artboard): number {
   return isPrintEligibleArtboard(artboard) ? DEFAULT_BLEED_MM : 0;
 }
 
-/** @deprecated use resolveArtboardBleedMm */
-export const resolvePageBleedMm = resolveArtboardBleedMm;
-
 export function resolveArtboardSafeMm(artboard: Artboard): number {
   if (artboard.physical?.safeMm !== undefined) {
     return artboard.physical.safeMm;
   }
   return isPrintEligibleArtboard(artboard) ? DEFAULT_SAFE_MM : 0;
 }
-
-/** @deprecated use resolveArtboardSafeMm */
-export const resolvePageSafeMm = resolveArtboardSafeMm;
 
 export function computeArtboardPrintBoxes(
   artboard: Artboard,
@@ -93,6 +78,3 @@ export function computeArtboardPrintBoxes(
     trim,
   };
 }
-
-/** @deprecated use computeArtboardPrintBoxes */
-export const computePagePrintBoxes = computeArtboardPrintBoxes;

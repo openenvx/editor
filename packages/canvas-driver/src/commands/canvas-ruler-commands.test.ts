@@ -16,12 +16,13 @@ function createCtx(
 ) {
   let pageGuides = guides;
   const applyCalls: unknown[] = [];
-  const artboard = () => ({
+  const artboard = {
     guides: pageGuides,
     id: 'page-1',
+    name: 'Page',
     nodes: [],
     space: { height: 600, width: 800 },
-  });
+  };
   return {
     applyCalls,
     ctx: {
@@ -39,9 +40,8 @@ function createCtx(
           });
           pageGuides = next.artboards[0]?.guides;
         },
-        getActiveArtboard: artboard,
+        getActiveArtboard: () => ({ ...artboard, guides: pageGuides }),
         getActiveArtboardId: () => 'page-1',
-        getActivePage: artboard,
       },
       services: {
         get: () => {

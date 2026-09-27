@@ -7,10 +7,7 @@ import type {
 } from '@openenvx/studio';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 import type { Artboard } from '@openenvx/studio/schema';
-import {
-  artboardSpaceSize,
-  createDefaultTransform,
-} from '@openenvx/studio/schema';
+import { artboardSpaceSize, createDefaultFrame } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 const canvasGroupSchema = z.object({
@@ -40,7 +37,7 @@ export class CanvasGroupLayer extends LayerDefinition<CanvasGroupModel> {
       children: [],
       id,
       frame: {
-        ...createDefaultTransform(),
+        ...createDefaultFrame(),
         x: (pageWidth - width) / 2,
         y: (pageHeight - height) / 2,
         width,

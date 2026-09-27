@@ -1,11 +1,12 @@
-import type { Scene } from './opaque-scene';
+import type { Document } from '@openenvx/studio/schema';
+
 /**
  * Headless scene factory - no WorkbenchShell or component CSS.
  */
 import { createCanvasDemoScene } from './plugin/canvas-plugin';
 
-export type { Scene } from './opaque-scene';
+export type { Document } from '@openenvx/studio/schema';
 
-export function createCanvasScene(): Scene {
-  return createCanvasDemoScene() as unknown as Scene;
+export function createCanvasScene(): Document {
+  return createCanvasDemoScene();
 }

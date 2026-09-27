@@ -1,8 +1,8 @@
 import {
   EditorService,
-  getLayerChildren,
+  getChildNodes,
   InstantiationService,
-  SceneStore,
+  DocumentStore,
   WorkbenchEventService,
   type CommandContext,
 } from '@openenvx/studio';
@@ -20,12 +20,12 @@ import {
   testDocument,
 } from '../test/canvas-document-fixtures';
 
-function createContext(sceneStore: SceneStore): CommandContext {
+function createContext(sceneStore: DocumentStore): CommandContext {
   return {
     editor: new EditorService(),
     events: new WorkbenchEventService(),
     scene: sceneStore,
-    selection: sceneStore.getSelection(),
+    selection: sceneStore.getSession(),
     services: new InstantiationService(),
   };
 }
@@ -49,7 +49,7 @@ describe('UpdateLayerTransformCommand dataPatch', () => {
         ],
       }),
     ]);
-    const store = new SceneStore(scene, {
+    const store = new DocumentStore(scene, {
       activeArtboardId: 'p1',
       primaryNodeId: 'image-1',
       selectedNodeIds: ['image-1'],
@@ -68,7 +68,7 @@ describe('UpdateLayerTransformCommand dataPatch', () => {
       },
     });
 
-    const layer = store.getScene().artboards[0]!.nodes[0]!;
+    const layer = store.getDocument().artboards[0]!.nodes[0]!;
     expect(layer.props).toEqual({
       alt: 'Alt',
       assetRef: 'asset://image.png',
@@ -98,7 +98,7 @@ describe('UpdateLayerTransformCommand dataPatch', () => {
         ],
       }),
     ]);
-    const store = new SceneStore(scene, {
+    const store = new DocumentStore(scene, {
       activeArtboardId: 'p1',
       primaryNodeId: 'image-1',
       selectedNodeIds: ['image-1'],
@@ -113,7 +113,7 @@ describe('UpdateLayerTransformCommand dataPatch', () => {
       transform: createDefaultFrame(),
     });
 
-    const layer = store.getScene().artboards[0]!.nodes[0]!;
+    const layer = store.getDocument().artboards[0]!.nodes[0]!;
     expect(layer.props).toEqual({
       alt: 'Alt',
       assetRef: 'asset://image.png',
@@ -169,7 +169,7 @@ describe('UpdateLayerTransformCommand group child isolation', () => {
         ],
       }),
     ]);
-    const store = new SceneStore(scene, {
+    const store = new DocumentStore(scene, {
       activeArtboardId: 'p1',
       primaryNodeId: 'child-a',
       selectedNodeIds: ['child-a'],
@@ -187,8 +187,8 @@ describe('UpdateLayerTransformCommand group child isolation', () => {
       },
     });
 
-    const group = store.getScene().artboards[0]!.nodes[0]!;
-    const children = getLayerChildren(group);
+    const group = store.getDocument().artboards[0]!.nodes[0]!;
+    const children = getChildNodes(group);
     expect(nodeTransform(group)).toMatchObject(groupTransform);
     expect(nodeTransform(children[0]!)).toMatchObject({ x: -30, y: -20 });
     expect(nodeTransform(children[1]!)).toMatchObject(siblingTransform);
@@ -216,7 +216,7 @@ describe('SetLayerRotationCommand', () => {
         ],
       }),
     ]);
-    const store = new SceneStore(scene, {
+    const store = new DocumentStore(scene, {
       activeArtboardId: 'p1',
       primaryNodeId: 'rect-1',
       selectedNodeIds: ['rect-1'],
@@ -226,7 +226,7 @@ describe('SetLayerRotationCommand', () => {
       rotation: 90,
     });
 
-    const transform = nodeTransform(store.getScene().artboards[0]!.nodes[0]!);
+    const transform = nodeTransform(store.getDocument().artboards[0]!.nodes[0]!);
     expect(transform.rotation).toBe(90);
     expect(transform.x).toBeCloseTo(250);
     expect(transform.y).toBeCloseTo(50);
@@ -254,14 +254,14 @@ describe('RotateLayerRightCommand', () => {
         ],
       }),
     ]);
-    const store = new SceneStore(scene, {
+    const store = new DocumentStore(scene, {
       activeArtboardId: 'p1',
       primaryNodeId: 'rect-1',
       selectedNodeIds: ['rect-1'],
     });
     new RotateLayerRightCommand().execute(createContext(store));
 
-    const transform = nodeTransform(store.getScene().artboards[0]!.nodes[0]!);
+    const transform = nodeTransform(store.getDocument().artboards[0]!.nodes[0]!);
     expect(transform.rotation).toBe(90);
     expect(transform.x).toBeCloseTo(250);
     expect(transform.y).toBeCloseTo(50);

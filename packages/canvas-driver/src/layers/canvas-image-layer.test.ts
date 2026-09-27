@@ -1,4 +1,4 @@
-import { normalizeScene } from '@openenvx/studio/schema';
+import { normalizeDocument } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { CanvasImageLayer } from './canvas-image-layer';
@@ -32,7 +32,7 @@ describe('CanvasImageLayer', () => {
 
   it('forwards unknown preview fields from renderPreview', () => {
     const layer = new CanvasImageLayer();
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       activeArtboardId: 'p1',
       pages: [{ id: 'p1', layout: 'absolute', layers: [], name: 'Page' }],
     });
@@ -56,7 +56,7 @@ describe('CanvasImageLayer', () => {
 
   it('keeps canonical kind and src authoritative over passthrough collisions', () => {
     const layer = new CanvasImageLayer();
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       activeArtboardId: 'p1',
       pages: [{ id: 'p1', layout: 'absolute', layers: [], name: 'Page' }],
     });

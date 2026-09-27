@@ -7,7 +7,7 @@ import type {
 } from '@openenvx/studio';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 import type { Artboard } from '@openenvx/studio/schema';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 export const canvasCircleSchema = z.object({
@@ -35,7 +35,7 @@ export class CanvasCircleLayer extends LayerDefinition<CanvasCircleModel> {
         strokeWidth: 2,
       },
       id,
-      frame: { ...createDefaultTransform(), height: 120, width: 120 },
+      frame: { ...createDefaultFrame(), height: 120, width: 120 },
       type: this.type,
     };
   }

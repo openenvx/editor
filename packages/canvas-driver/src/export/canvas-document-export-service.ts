@@ -1,5 +1,5 @@
 import { createServiceId } from '@openenvx/studio';
-import type { LengthUnit, Scene } from '@openenvx/studio/schema';
+import type { Document, LengthUnit } from '@openenvx/studio/schema';
 
 export type CanvasExportFormat = 'png' | 'jpg' | 'pdf';
 
@@ -39,7 +39,7 @@ export interface CanvasExportResult {
 
 export interface CanvasDocumentExportService {
   exportDocument(
-    scene: Scene,
+    scene: Document,
     pageId: string,
     options: CanvasExportOptions
   ): Promise<CanvasExportResult>;

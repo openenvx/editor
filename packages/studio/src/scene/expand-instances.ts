@@ -52,9 +52,6 @@ export function isCanvasInstanceNode(node: DocumentNode): boolean {
   return node.type === CANVAS_INSTANCE_LAYER_TYPE;
 }
 
-/** @deprecated use isCanvasInstanceNode */
-export const isCanvasInstanceLayer = isCanvasInstanceNode;
-
 export function getInstanceComponentId(node: DocumentNode): string | null {
   if (!isCanvasInstanceNode(node)) {
     return null;
@@ -96,9 +93,6 @@ export function resolveInstanceDefinitionNodes(
   });
 }
 
-/** @deprecated use resolveInstanceDefinitionNodes */
-export const resolveInstanceDefinitionLayers = resolveInstanceDefinitionNodes;
-
 export function getNodeChildrenForDocument(
   node: DocumentNode,
   document: Document
@@ -112,6 +106,3 @@ export function getNodeChildrenForDocument(
   }
   return getNodeChildren(node);
 }
-
-/** @deprecated use getNodeChildrenForDocument */
-export const getLayerChildrenForScene = getNodeChildrenForDocument;

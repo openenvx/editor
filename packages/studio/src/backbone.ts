@@ -31,11 +31,11 @@ export {
 export { InMemoryAssetService } from './services/asset-service';
 export { AssetServiceId } from './tokens';
 export type { EditorViewportApi } from './workbench/editor-viewport-api';
-export { getLayerChildrenForScene } from './scene/expand-instances';
+export { getNodeChildrenForDocument } from './scene/expand-instances';
 export { resolveEditorPaneKind } from './scene/types';
-export type { Layer, Page, Scene } from './scene/types';
+export type { Artboard, Document, DocumentNode } from './scene/types';
 export type { LayerPreviewContext } from './contributions/layer-preview-context';
-export { findLayerById, moveLayerRelativeToTarget } from './scene/layer-tree';
+export { findNodeById, moveNodeRelativeToTarget } from './scene/layer-tree';
 export {
   getLayerWriteMode,
   isLayerShownInLayers,

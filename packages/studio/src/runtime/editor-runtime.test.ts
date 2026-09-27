@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import { EditorRuntime } from '../runtime/editor-runtime';
 import { WorkbenchEvents } from '../runtime/workbench-events';
-import { SceneStore } from '../scene/scene-store';
+import { DocumentStore } from '../scene/document-store';
 import { EditorService } from '../workbench/editor-service';
 
 describe('EditorRuntime events', () => {
   it('bridges scene, editor dirty, and active editor changes to the event bus', () => {
-    const scene = new SceneStore();
+    const scene = new DocumentStore();
     const editor = new EditorService();
     const runtime = new EditorRuntime(scene, editor);
     const events = runtime.getEvents();
@@ -16,7 +16,7 @@ describe('EditorRuntime events', () => {
     const dirtyChanges: boolean[] = [];
     const editorChanges: number[] = [];
 
-    events.on(WorkbenchEvents.DidChangeScene, (snapshot) => {
+    events.on(WorkbenchEvents.DidChangeDocument, (snapshot) => {
       sceneChanges.push(snapshot.contentRevision);
     });
     events.on(WorkbenchEvents.DidChangeDirty, (isDirty) => {
@@ -44,7 +44,7 @@ describe('EditorRuntime events', () => {
   });
 
   it('disposes event listeners and context keys', () => {
-    const scene = new SceneStore();
+    const scene = new DocumentStore();
     const editor = new EditorService();
     const runtime = new EditorRuntime(scene, editor);
     const events = runtime.getEvents();

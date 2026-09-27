@@ -1,4 +1,4 @@
-import type { Scene } from '@openenvx/studio/schema';
+import type { Document } from '@openenvx/studio/schema';
 import { useMemo } from 'react';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
@@ -7,7 +7,7 @@ import { mapLayerSurfaceForVariablePreview } from './map-layer-surface-for-varia
 /** Konva display surface; remeasures when webfonts finish loading (`fontLoadRevision`). */
 export function useDisplayLayerSurface(
   layerSurface: CanvasLayerSurfaceItem[],
-  scene: Scene | undefined,
+  scene: Document | undefined,
   fontLoadRevision: number
 ): CanvasLayerSurfaceItem[] {
   return useMemo(() => {

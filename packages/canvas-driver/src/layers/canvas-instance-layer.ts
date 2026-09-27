@@ -7,10 +7,7 @@ import type {
 } from '@openenvx/studio';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 import type { Artboard } from '@openenvx/studio/schema';
-import {
-  artboardSpaceSize,
-  createDefaultTransform,
-} from '@openenvx/studio/schema';
+import { artboardSpaceSize, createDefaultFrame } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 const canvasInstanceSchema = z.object({
@@ -41,7 +38,7 @@ export class CanvasInstanceLayer extends LayerDefinition<CanvasInstanceModel> {
       props: { componentId: '' },
       id,
       frame: {
-        ...createDefaultTransform(),
+        ...createDefaultFrame(),
         height,
         width,
         x: (pageWidth - width) / 2,

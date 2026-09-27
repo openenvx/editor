@@ -5,7 +5,7 @@ import { EditorRuntime } from '../runtime/editor-runtime';
 import type { Plugin } from '../runtime/plugin';
 import { PluginManager } from '../runtime/plugin-manager';
 import type { CommandContext } from '../runtime/types';
-import { SceneStore } from '../scene/scene-store';
+import { DocumentStore } from '../scene/document-store';
 import { EditorService } from '../workbench/editor-service';
 
 class AlwaysTrueContextKey extends ContextKeyContribution {
@@ -18,7 +18,7 @@ class AlwaysTrueContextKey extends ContextKeyContribution {
 
 describe('PluginManager', () => {
   it('creates plugin context from the injected runtime', () => {
-    const scene = new SceneStore();
+    const scene = new DocumentStore();
     const editor = new EditorService();
     const runtime = new EditorRuntime(scene, editor);
     const manager = new PluginManager(runtime);
@@ -32,7 +32,7 @@ describe('PluginManager', () => {
   });
 
   it('syncs plugin-registered context keys after activation', async () => {
-    const scene = new SceneStore();
+    const scene = new DocumentStore();
     const editor = new EditorService();
     const runtime = new EditorRuntime(scene, editor);
     const manager = new PluginManager(runtime);

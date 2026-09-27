@@ -1,7 +1,4 @@
-export {
-  DocumentValidationError,
-  SceneValidationError,
-} from './scene/scene-validation-error';
+export { DocumentValidationError } from './scene/scene-validation-error';
 export {
   escapeAttr,
   escapeHtml,
@@ -31,11 +28,8 @@ export {
 
 export {
   DocumentStore,
-  DocumentStore as SceneStore,
   DEFAULT_ARTBOARD_RULES_LAYOUT_KEY,
-  moveLayerToIndex,
   moveNodeToIndex,
-  reorderLayers,
   reorderNodes,
   type PageRulesLookup,
 } from './scene/document-store';
@@ -51,14 +45,6 @@ export type {
   Frame,
   LiveProjectSnapshot,
   Transform,
-  EditorState,
-  Layer,
-  Page,
-  PageLayout,
-  Scene,
-  SceneSnapshot,
-  SceneTransaction,
-  Selection,
 } from './scene/types';
 export {
   cloneDocument,
@@ -66,10 +52,6 @@ export {
   getActiveArtboard,
   getPrimaryNode,
   resolveEditorSurfaceKind,
-  cloneEditorState,
-  cloneScene,
-  getActivePage,
-  getPrimaryLayer,
   resolveEditorPaneKind,
 } from './scene/types';
 export {
@@ -98,37 +80,33 @@ export { clampTransformSize, MIN_LAYER_SIZE } from './scene/transform-utils';
 export {
   CANVAS_INSTANCE_LAYER_TYPE,
   getInstanceComponentId,
-  getLayerChildrenForScene,
-  isCanvasInstanceLayer,
-  resolveInstanceDefinitionLayers,
+  getNodeChildrenForDocument,
+  isCanvasInstanceNode,
+  resolveInstanceDefinitionNodes,
 } from './scene/expand-instances';
 export {
   CONTAINER_LAYER_TYPE,
   type ContainerLayoutModel,
-  cloneLayerTree,
   cloneNodeTree,
-  createLayerId,
-  findLayerById,
+  createNodeId,
   findNodeById,
-  findLayerPage,
   findNodeArtboard,
-  getLayerAncestorIds,
+  findNodeLocation,
+  getNodeAncestorIds,
   getContainerChildren,
-  getLayerChildren,
-  hasChildLayers,
-  insertLayerIntoContainer,
-  isContainerLayer,
-  layerExistsOnPage,
-  mapLayers,
+  getChildNodes,
+  hasChildNodes,
+  insertNodeIntoContainer,
+  isContainerNode,
+  isNodeDescendant,
+  mapNodeChildren,
   mapNodes,
-  findLayerLocation,
-  moveLayerInTree,
-  moveLayerRelativeToTarget,
-  isLayerDescendant,
-  removeLayerFromTree,
-  updateLayerInTree,
+  moveNodeInTree,
+  moveNodeRelativeToTarget,
+  nodeExistsOnArtboard,
+  removeNodeFromTree,
+  updateNodeByIdInDocument,
   updateNodeInTree,
-  walkLayers,
   walkNodes,
 } from './scene/layer-tree';
 export {
@@ -296,7 +274,7 @@ export {
   FontServiceId,
   LayerRegistryServiceId,
   PersistenceServiceId,
-  SceneStoreServiceId,
+  DocumentStoreServiceId,
 } from './tokens';
 export { InMemoryAssetService } from './services/asset-service';
 export { collectAssetRefs } from './services/collect-asset-refs';

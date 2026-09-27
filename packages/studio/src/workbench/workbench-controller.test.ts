@@ -7,10 +7,10 @@ import {
   WorkbenchEvents,
 } from '../backbone';
 import type {
+  Artboard,
   CommandContext,
-  Layer,
+  DocumentNode,
   LayerPreviewContext,
-  Page,
   PluginContext,
   PropertySectionDescriptor,
 } from '../backbone';
@@ -18,7 +18,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   normalizeProjectSnapshotForTest,
-  normalizeSceneForTest,
+  normalizeDocumentForTest,
 } from '../test/document-fixtures';
 
 import {
@@ -37,11 +37,11 @@ class TestLayer extends LayerDefinition<{ text: string }> {
   readonly treeIcon = "text";
   readonly treeDisplayName = "Test";
 
-  createDefault(id: string, _page: Page): Layer {
+  createDefault(id: string, _page: Artboard): DocumentNode {
     return { props: { text: "hello" }, id, type: this.type };
   }
 
-  serialize(layer: Layer) {
+  serialize(layer: DocumentNode) {
     return layer.props as { text: string };
   }
 
@@ -238,7 +238,7 @@ describe(WorkbenchController, () => {
   });
 
   it("renders layerSurface from layer registry", async () => {
-    const scene = normalizeSceneForTest({
+    const scene = normalizeDocumentForTest({
       activeArtboardId: "p1",
       pages: [
         {
@@ -262,7 +262,7 @@ describe(WorkbenchController, () => {
   });
 
   it("updates properties via updateProperty", async () => {
-    const scene = normalizeSceneForTest({
+    const scene = normalizeDocumentForTest({
       activeArtboardId: "p1",
       pages: [
         {
@@ -289,7 +289,7 @@ describe(WorkbenchController, () => {
   });
 
   it("writes bound face html into nested widget values paths", async () => {
-    const scene = normalizeSceneForTest({
+    const scene = normalizeDocumentForTest({
       activeArtboardId: "p1",
       pages: [
         {
@@ -350,7 +350,7 @@ describe(WorkbenchController, () => {
   });
 
   it("undo restores nested widget bind values after face html edit", async () => {
-    const scene = normalizeSceneForTest({
+    const scene = normalizeDocumentForTest({
       activeArtboardId: "p1",
       pages: [
         {
@@ -413,7 +413,7 @@ describe(WorkbenchController, () => {
   });
 
   it("does not delete the selected layer while typing in an input", async () => {
-    const scene = normalizeSceneForTest({
+    const scene = normalizeDocumentForTest({
       activeArtboardId: "p1",
       pages: [
         {
@@ -495,11 +495,11 @@ describe(WorkbenchController, () => {
       readonly treeIcon = "image";
       readonly treeDisplayName = "Image";
 
-      createDefault(id: string, _page: Page): Layer {
+      createDefault(id: string, _page: Artboard): DocumentNode {
         return { data: { assetRef: "asset://x" }, id, type: this.type };
       }
 
-      serialize(layer: Layer) {
+      serialize(layer: DocumentNode) {
         return layer.props as { assetRef: string };
       }
 
@@ -529,7 +529,7 @@ describe(WorkbenchController, () => {
       }
     }
 
-    const scene = normalizeSceneForTest({
+    const scene = normalizeDocumentForTest({
       activeArtboardId: "p1",
       pages: [
         {
@@ -573,11 +573,11 @@ describe(WorkbenchController, () => {
       readonly treeIcon = "image";
       readonly treeDisplayName = "Image";
 
-      createDefault(id: string, _page: Page): Layer {
+      createDefault(id: string, _page: Artboard): DocumentNode {
         return { data: { assetRef: "asset://x" }, id, type: this.type };
       }
 
-      serialize(layer: Layer) {
+      serialize(layer: DocumentNode) {
         return layer.props as { assetRef: string };
       }
 
@@ -608,7 +608,7 @@ describe(WorkbenchController, () => {
       }
     }
 
-    const initialScene = normalizeSceneForTest({
+    const initialScene = normalizeDocumentForTest({
       activeArtboardId: "p1",
       pages: [
         {

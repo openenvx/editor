@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyNodeTransform, createDefaultTransform } from '@openenvx/studio/schema';
+import { applyNodeTransform, defaultTransform } from '@openenvx/studio/schema';
 
 import { mapWidgetTreeToLayers } from './map-widget-tree-to-layers';
 import { readLayoutIntent, resolveAutoLayout } from './resolve-auto-layout';
@@ -12,7 +12,7 @@ function rectNode(id: string, width: number, height: number) {
       props: { fill: '#000' },
     },
     {
-      ...createDefaultTransform(),
+      ...defaultTransform(),
       x: 0,
       y: 0,
       width,

@@ -1,12 +1,12 @@
 import {
   Command,
   getActiveArtboard,
-  insertLayerIntoContainer,
+  insertNodeIntoContainer,
 } from '@openenvx/studio';
 import {
   applyNodeTransform,
   artboardRulesLayout,
-  createDefaultTransform,
+  createDefaultFrame,
   type Artboard,
   type DocumentNode,
 } from '@openenvx/studio/schema';
@@ -119,7 +119,7 @@ export function registerWidgetInsertCommands(
                 children: [],
               },
               {
-                ...createDefaultTransform(),
+                ...createDefaultFrame(),
                 opacity: 1,
                 x: 40,
                 y: 40,
@@ -145,7 +145,7 @@ export function registerWidgetInsertCommands(
                     if (htmlRootId) {
                       return {
                         ...entry,
-                        nodes: insertLayerIntoContainer(
+                        nodes: insertNodeIntoContainer(
                           entry.nodes,
                           htmlRootId,
                           layer
@@ -157,7 +157,7 @@ export function registerWidgetInsertCommands(
                 };
               },
             });
-            host.selectLayers([layer.id], layer.id);
+            host.selectNodes([layer.id], layer.id);
           }
         })()
       )

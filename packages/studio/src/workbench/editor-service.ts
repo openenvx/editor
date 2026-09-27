@@ -1,19 +1,19 @@
 import { Emitter } from '../runtime/emitter';
 import type { Event } from '../runtime/emitter';
-import { cloneEditorState, cloneScene } from '../scene/types';
-import type { EditorState, Scene } from '../scene/types';
+import { cloneDocument, cloneEditorSession } from '../scene/types';
+import type { EditorSession, Document } from '../scene/types';
 
 export interface EditorInput {
   uri: string;
   title: string;
-  scene: Scene;
+  scene: Document;
   isDirty: boolean;
 }
 
 export class EditorService {
   private activeEditor: EditorInput | null = null;
-  private savedScene: Scene | null = null;
-  private savedEditorState: EditorState | null = null;
+  private savedScene: Document | null = null;
+  private savedEditorState: EditorSession | null = null;
   private savedContentRevision: number | null = null;
   private readonly onDidChangeDirtyEmitter = new Emitter<boolean>();
   private readonly onDidChangeActiveEditorEmitter =
@@ -31,17 +31,19 @@ export class EditorService {
   open(
     input: EditorInput,
     contentRevision = 0,
-    editorState?: EditorState
+    editorState?: EditorSession
   ): void {
     this.activeEditor = input;
-    this.savedScene = cloneScene(input.scene);
-    this.savedEditorState = editorState ? cloneEditorState(editorState) : null;
+    this.savedScene = cloneDocument(input.scene);
+    this.savedEditorState = editorState
+      ? cloneEditorSession(editorState)
+      : null;
     this.savedContentRevision = contentRevision;
     this.onDidChangeActiveEditorEmitter.fire(this.activeEditor);
     this.emitDirty(false);
   }
 
-  markDirty(scene: Scene): void {
+  markDirty(scene: Document): void {
     if (!this.activeEditor) {
       return;
     }
@@ -49,7 +51,7 @@ export class EditorService {
     this.emitDirty(true);
   }
 
-  updateScene(scene: Scene, contentRevision: number): void {
+  updateScene(scene: Document, contentRevision: number): void {
     if (!this.activeEditor) {
       return;
     }
@@ -63,7 +65,7 @@ export class EditorService {
   async save(
     saveFn?: (input: EditorInput) => Promise<void>,
     contentRevision?: number,
-    editorState?: EditorState
+    editorState?: EditorSession
   ): Promise<void> {
     if (!this.activeEditor) {
       return;
@@ -71,9 +73,9 @@ export class EditorService {
     if (saveFn) {
       await saveFn(this.activeEditor);
     }
-    this.savedScene = cloneScene(this.activeEditor.scene);
+    this.savedScene = cloneDocument(this.activeEditor.scene);
     if (editorState !== undefined) {
-      this.savedEditorState = cloneEditorState(editorState);
+      this.savedEditorState = cloneEditorSession(editorState);
     }
     if (contentRevision !== undefined) {
       this.savedContentRevision = contentRevision;
@@ -82,13 +84,13 @@ export class EditorService {
     this.emitDirty(false);
   }
 
-  revert(): { scene: Scene; editorState: EditorState | null } | null {
+  revert(): { scene: Document; editorState: EditorSession | null } | null {
     if (!this.activeEditor || this.savedScene === null) {
       return null;
     }
-    const scene = cloneScene(this.savedScene);
+    const scene = cloneDocument(this.savedScene);
     const editorState = this.savedEditorState
-      ? cloneEditorState(this.savedEditorState)
+      ? cloneEditorSession(this.savedEditorState)
       : null;
     this.activeEditor = { ...this.activeEditor, isDirty: false, scene };
     this.emitDirty(false);

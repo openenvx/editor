@@ -3,12 +3,12 @@ import {
   useWorkbenchContextSelector,
 } from '@openenvx/studio/react';
 import type {
+  Document,
   Modification,
-  Scene,
   TemplateField,
 } from '@openenvx/studio/schema';
 import {
-  createEmptyScene,
+  createEmptyDocument,
   extractTemplateManifest,
   validateTemplateNames,
 } from '@openenvx/studio/schema';
@@ -41,16 +41,17 @@ function modificationFromField(
   return base;
 }
 
-function valuesEqualScene(a: Scene, b: Scene): boolean {
+function valuesEqualDocument(a: Document, b: Document): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
 export const TemplateDataPanel = memo(() => {
   const { api } = useWorkbenchContext();
   const selectedScene = useWorkbenchContextSelector((state) => state.scene);
-  const scene = selectedScene ?? api.scene.getDocument() ?? createEmptyScene();
+  const scene =
+    selectedScene ?? api.scene.getDocument() ?? createEmptyDocument();
 
-  const baseSceneRef = useRef<Scene>(structuredClone(scene));
+  const baseSceneRef = useRef<Document>(structuredClone(scene));
   const previewingRef = useRef(false);
   const lastContentRevisionRef = useRef(api.scene.getContentRevision());
   const [values, setValues] = useState<FieldValues>({});
@@ -100,8 +101,8 @@ export const TemplateDataPanel = memo(() => {
       );
       previewingRef.current = true;
       setPreviewing(true);
-      if (!valuesEqualScene(api.scene.getDocument(), resolved)) {
-        api.scene.setScene(resolved);
+      if (!valuesEqualDocument(api.scene.getDocument(), resolved)) {
+        api.scene.setDocument(resolved);
       }
     },
     [api.scene]
@@ -111,7 +112,7 @@ export const TemplateDataPanel = memo(() => {
     previewingRef.current = false;
     setPreviewing(false);
     setValues({});
-    api.scene.setScene(structuredClone(baseSceneRef.current));
+    api.scene.setDocument(structuredClone(baseSceneRef.current));
   }, [api.scene]);
 
   const updateField = useCallback(

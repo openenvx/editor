@@ -16,14 +16,4 @@ export abstract class PageRulesContribution extends Contribution {
   abstract normalizeArtboard(artboard: Artboard): Artboard;
 
   abstract validateArtboard(artboard: Artboard): ValidationError[];
-
-  /** @deprecated use normalizeArtboard */
-  normalizePage(artboard: Artboard): Artboard {
-    return this.normalizeArtboard(artboard);
-  }
-
-  /** @deprecated use validateArtboard */
-  validatePage(artboard: Artboard): ValidationError[] {
-    return this.validateArtboard(artboard);
-  }
 }

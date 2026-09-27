@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 import { DEFAULT_WORKBENCH_LAYOUT } from '#studio';
 import type { FormDialogPayload, WorkbenchApi, WorkbenchState } from '#studio';
 
-import { normalizeSceneForTest } from '../test/document-fixtures';
+import { normalizeDocumentForTest } from '../test/document-fixtures';
 
 export function createMockWorkbenchApi(
   overrides: Partial<WorkbenchState> = {}
@@ -12,7 +12,7 @@ export function createMockWorkbenchApi(
   executeCommand: ReturnType<typeof vi.fn>;
   state: WorkbenchState;
 } {
-  const scene = normalizeSceneForTest({
+  const scene = normalizeDocumentForTest({
     pages: [{ id: 'p1', name: 'Page', layout: 'flow', layers: [] }],
   });
   const state: WorkbenchState = {

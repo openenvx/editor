@@ -41,8 +41,8 @@ export const AbsoluteEditorPane = memo(
         executeCommand,
         getService: (token) => api.getService(token),
         runCommand: (commandId, args) => api.runCommand(commandId, args),
-        selectLayers: (layerIds, primaryNodeId) =>
-          api.selectLayers(layerIds, primaryNodeId),
+        selectNodes: (layerIds, primaryNodeId) =>
+          api.selectNodes(layerIds, primaryNodeId),
         setContextKey: (key, value) =>
           api.getService(ContextKeyServiceId)?.setContext(key, value),
         updateProperty: (layerId, key, value) =>
@@ -143,27 +143,27 @@ const AbsoluteEditorPaneInner = memo(
     const handleSelectLayer = useCallback(
       (layerId: string, options?: CanvasSelectLayerOptions) => {
         if (!layerId) {
-          api.selectLayers([], null);
+          api.selectNodes([], null);
           return;
         }
         if (options?.setPrimary) {
-          api.selectLayers(selection.selectedNodeIds, layerId);
+          api.selectNodes(selection.selectedNodeIds, layerId);
           return;
         }
         if (options?.additive) {
           const current = selection.selectedNodeIds;
           if (current.includes(layerId)) {
             const next = current.filter((id) => id !== layerId);
-            api.selectLayers(next, next[0] ?? null);
+            api.selectNodes(next, next[0] ?? null);
             return;
           }
-          api.selectLayers(
+          api.selectNodes(
             [...current, layerId],
             selection.primaryNodeId ?? layerId
           );
           return;
         }
-        api.selectLayers([layerId], layerId);
+        api.selectNodes([layerId], layerId);
       },
       [api, selection.primaryNodeId, selection.selectedNodeIds]
     );

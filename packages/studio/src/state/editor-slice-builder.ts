@@ -1,5 +1,5 @@
-import { getLayerChildrenForScene, resolveEditorPaneKind } from '../backbone';
-import type { Layer } from '../backbone';
+import { getNodeChildrenForDocument, resolveEditorPaneKind } from '../backbone';
+import type { DocumentNode } from '../backbone';
 import type { LayerPreviewDescriptor } from '../preview';
 import { nodeProps } from '../schema/node-helpers';
 import { resolveLayerPreview } from '../utils/layer-preview-resolver';
@@ -7,7 +7,7 @@ import type { EditorSlice } from '../workbench/workbench-state-cache';
 import type { WorkbenchSliceContext } from './workbench-slice-context';
 
 interface LayerSurfaceItem {
-  layer: Layer;
+  layer: DocumentNode;
   view: LayerPreviewDescriptor;
   children?: LayerSurfaceItem[];
 }
@@ -20,10 +20,10 @@ export class EditorSliceBuilder {
     const scene = store.getDocument();
     const editor = ctx.runtime.getEditor().getActiveEditor();
     const activePage = store.getActiveArtboard();
-    const selectedIds = new Set(store.getSelection().selectedNodeIds);
-    const activeArtboardId = store.getActivePageId();
+    const selectedIds = new Set(store.getSession().selectedNodeIds);
+    const activeArtboardId = store.getActiveArtboardId();
 
-    const buildSurfaceItem = (layer: Layer): LayerSurfaceItem => {
+    const buildSurfaceItem = (layer: DocumentNode): LayerSurfaceItem => {
       const def = coreRegistries.layers.get(layer.type);
       const previewCtx = {
         isSelected: selectedIds.has(layer.id),
@@ -40,7 +40,7 @@ export class EditorSliceBuilder {
             },
         commandCtx
       );
-      const childLayers = getLayerChildrenForScene(layer, scene);
+      const childLayers = getNodeChildrenForDocument(layer, scene);
       const children =
         childLayers.length > 0
           ? childLayers.map((child) => buildSurfaceItem(child))

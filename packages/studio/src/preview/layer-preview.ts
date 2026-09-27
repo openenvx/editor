@@ -1,4 +1,4 @@
-import type { CornerRadius, LayerShadow, Padding } from '#studio/schema';
+import type { CornerRadius, NodeShadow, Padding } from '#studio/schema';
 
 export type BuiltinLayerPreviewDescriptor =
   | { kind: 'image'; src: string; alt?: string; [key: string]: unknown }
@@ -16,7 +16,7 @@ export type BuiltinLayerPreviewDescriptor =
       strokeWidth?: number;
       cornerRadius?: number | CornerRadius;
       padding?: Padding;
-      shadow?: LayerShadow;
+      shadow?: NodeShadow;
       flipH?: boolean;
       flipV?: boolean;
     }
@@ -69,7 +69,7 @@ export class LayerPreviewBuilder {
       strokeWidth?: number;
       cornerRadius?: number | CornerRadius;
       padding?: Padding;
-      shadow?: LayerShadow;
+      shadow?: NodeShadow;
       flipH?: boolean;
       flipV?: boolean;
     }

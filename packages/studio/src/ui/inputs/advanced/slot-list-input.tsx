@@ -1,6 +1,6 @@
 import { IconTrash } from '@tabler/icons-react';
 
-import type { Layer, SlotListFieldConfig } from '#studio';
+import type { DocumentNode, SlotListFieldConfig } from '#studio';
 
 import { IconButton } from '../../primitives/icon-button';
 import { PropertyFieldRow } from '../../primitives/property-field-row';
@@ -22,16 +22,16 @@ export interface SlotListInputProps {
   renderField: PropertyFieldRendererProps['renderField'];
 }
 
-function isPartLayer(value: unknown): value is Layer {
+function isPartLayer(value: unknown): value is DocumentNode {
   return (
     typeof value === 'object' &&
     value !== null &&
-    typeof (value as Layer).id === 'string' &&
-    typeof (value as Layer).type === 'string'
+    typeof (value as DocumentNode).id === 'string' &&
+    typeof (value as DocumentNode).type === 'string'
   );
 }
 
-function partData(part: Layer): Record<string, unknown> {
+function partData(part: DocumentNode): Record<string, unknown> {
   return typeof part.props === 'object' && part.props !== null
     ? (part.props as Record<string, unknown>)
     : {};
@@ -108,7 +108,7 @@ export function SlotListInput({
           if (!isPartLayer(template)) {
             return;
           }
-          const nextPart: Layer = {
+          const nextPart: DocumentNode = {
             ...structuredClone(template),
             id: mintPartId(template.type),
           };

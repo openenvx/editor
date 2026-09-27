@@ -1,4 +1,4 @@
-import { findNodeById, updateLayerInTree } from '@openenvx/studio';
+import { findNodeById, updateNodeInTree } from '@openenvx/studio';
 import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
 
 import type { SandboxHostSurface } from './sandbox-host-surface';
@@ -11,7 +11,7 @@ export function createWidgetSceneAdapters(input: {
   const { host, widgetLayerType } = input;
   return {
     getWidgetValues: (layerId: string): unknown => {
-      const layer = findNodeById(host.getScene(), layerId);
+      const layer = findNodeById(host.getDocument(), layerId);
       if (!layer || layer.type !== widgetLayerType) {
         return null;
       }
@@ -19,7 +19,7 @@ export function createWidgetSceneAdapters(input: {
       return props.values ?? null;
     },
     setWidgetValues: (layerId: string, value: unknown): void => {
-      const layer = findNodeById(host.getScene(), layerId);
+      const layer = findNodeById(host.getDocument(), layerId);
       if (!layer || layer.type !== widgetLayerType) {
         return;
       }
@@ -33,7 +33,7 @@ export function createWidgetSceneAdapters(input: {
           ...scene,
           artboards: scene.artboards.map((page) => ({
             ...page,
-            nodes: updateLayerInTree(page.nodes, layerId, (current) => ({
+            nodes: updateNodeInTree(page.nodes, layerId, (current) => ({
               ...current,
               props: {
                 ...current.props,
@@ -49,7 +49,7 @@ export function createWidgetSceneAdapters(input: {
       width: number,
       height: number
     ): void => {
-      const layer = findNodeById(host.getScene(), layerId);
+      const layer = findNodeById(host.getDocument(), layerId);
       if (!layer || layer.type !== widgetLayerType) {
         return;
       }
@@ -59,7 +59,7 @@ export function createWidgetSceneAdapters(input: {
           ...scene,
           artboards: scene.artboards.map((page) => ({
             ...page,
-            nodes: updateLayerInTree(page.nodes, layerId, (current) =>
+            nodes: updateNodeInTree(page.nodes, layerId, (current) =>
               applyNodeTransform(current, {
                 ...nodeTransform(current),
                 width,

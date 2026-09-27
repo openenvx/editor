@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   DEFAULT_PAGE_SIZE_PRESET,
-  findPresetForPage,
+  findPresetForArtboard,
   PAGE_SIZE_PRESETS,
   resolvePagePreset,
 } from './page-presets';
@@ -39,9 +39,9 @@ describe('page-presets', () => {
     ]);
   });
 
-  it('findPresetForPage matches by width and height', () => {
+  it('findPresetForArtboard matches by width and height', () => {
     const a4 = resolvePagePreset('a4-portrait')!;
-    const match = findPresetForPage(
+    const match = findPresetForArtboard(
       legacyArtboard({
         id: 'p1',
         width: a4.width,

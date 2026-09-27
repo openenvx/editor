@@ -7,11 +7,3 @@ export class DocumentValidationError extends Error {
     this.errors = errors;
   }
 }
-
-/** @deprecated use DocumentValidationError */
-export class SceneValidationError extends DocumentValidationError {
-  constructor(errors: string[]) {
-    super(errors);
-    this.name = 'SceneValidationError';
-  }
-}

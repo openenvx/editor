@@ -13,8 +13,8 @@ import type {
 } from '@openenvx/studio';
 import {
   nodeTransform,
-  resolvePageBleedMm,
-  resolvePageSafeMm,
+  resolveArtboardBleedMm,
+  resolveArtboardSafeMm,
   type Transform,
 } from '@openenvx/studio/schema';
 
@@ -70,10 +70,10 @@ export function createCanvasPropertyHostContext(
       if (path.startsWith('scene.activePage.')) {
         const key = path.slice('scene.activePage.'.length);
         if (key === 'bleedMm') {
-          return resolvePageBleedMm(activePage);
+          return resolveArtboardBleedMm(activePage);
         }
         if (key === 'safeMm') {
-          return resolvePageSafeMm(activePage);
+          return resolveArtboardSafeMm(activePage);
         }
         return undefined;
       }

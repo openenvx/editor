@@ -3,7 +3,7 @@ import {
   LayerDefinition,
   Plugin,
   type ContributionBuildContext,
-  type Layer,
+  type DocumentNode,
   type LayerPreviewContext,
   type Page,
   type PluginContext,
@@ -30,11 +30,11 @@ class TestLayer extends LayerDefinition<{ text: string }> {
   readonly treeIcon = 'text';
   readonly treeDisplayName = 'Test';
 
-  createDefault(id: string, _page: Page): Layer {
+  createDefault(id: string, _page: Page): DocumentNode {
     return { props: { text: 'hello' }, id, type: this.type };
   }
 
-  serialize(layer: Layer) {
+  serialize(layer: DocumentNode) {
     return layer.props as { text: string };
   }
 

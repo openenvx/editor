@@ -3,7 +3,7 @@ import {
   EditorService,
   InMemoryAssetService,
   InstantiationService,
-  SceneStore,
+  DocumentStore,
   WorkbenchEventService,
   type CommandContext,
 } from '@openenvx/studio';
@@ -24,7 +24,7 @@ import {
   executePasteLayers,
 } from './canvas-clipboard-commands';
 
-function createContext(sceneStore: SceneStore): CommandContext {
+function createContext(sceneStore: DocumentStore): CommandContext {
   const services = new InstantiationService();
   services.registerFactory(AssetServiceId, () => new InMemoryAssetService());
   const clipboard = services.createInstance(CanvasClipboardService);
@@ -33,7 +33,7 @@ function createContext(sceneStore: SceneStore): CommandContext {
     editor: new EditorService(),
     events: new WorkbenchEventService(),
     scene: sceneStore,
-    selection: sceneStore.getSelection(),
+    selection: sceneStore.getSession(),
     services,
   };
 }
@@ -52,7 +52,7 @@ function createStoreWithSelection() {
       ],
     }),
   ]);
-  return new SceneStore(scene, {
+  return new DocumentStore(scene, {
     activeArtboardId: 'p1',
     primaryNodeId: 'rect-1',
     selectedNodeIds: ['rect-1'],
@@ -101,10 +101,10 @@ describe('canvas clipboard commands', () => {
 
     await executePasteLayers(ctx);
 
-    const artboard = store.getScene().artboards[0]!;
+    const artboard = store.getDocument().artboards[0]!;
     expect(artboard.nodes).toHaveLength(2);
     expect(artboard.nodes[1]!.id).not.toBe('rect-1');
-    expect(store.getSelection().selectedNodeIds).toHaveLength(1);
+    expect(store.getSession().selectedNodeIds).toHaveLength(1);
   });
 
   it('duplicates selected layers with offset', async () => {
@@ -115,10 +115,10 @@ describe('canvas clipboard commands', () => {
 
     await executeDuplicateLayers(ctx);
 
-    const artboard = store.getScene().artboards[0]!;
+    const artboard = store.getDocument().artboards[0]!;
     expect(artboard.nodes).toHaveLength(2);
     expect(nodeTransform(artboard.nodes[1]!).x).toBe(20);
     expect(nodeTransform(artboard.nodes[1]!).y).toBe(30);
-    expect(store.getSelection().selectedNodeIds[0]).toBe(artboard.nodes[1]!.id);
+    expect(store.getSession().selectedNodeIds[0]).toBe(artboard.nodes[1]!.id);
   });
 });

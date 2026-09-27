@@ -22,7 +22,7 @@ export function buildSceneSlice(ctx: WorkbenchSliceContext): SceneSlice {
   );
   const store = ctx.runtime.getDocument();
   const scene = store.getDocument();
-  const selection = store.getSelection();
+  const selection = store.getSession();
   const contextKeyService = ctx.runtime.getContextKeys();
   const evaluateWhen = (when: string | undefined) =>
     contextKeyService.evaluate(when);
@@ -128,7 +128,7 @@ function buildLayerProperties(
   >
 ): PropertySectionDescriptor[] | null {
   const store = ctx.runtime.getDocument();
-  const primaryLayer = store.getPrimaryLayer();
+  const primaryLayer = store.getPrimaryNode();
   if (!primaryLayer) {
     return null;
   }

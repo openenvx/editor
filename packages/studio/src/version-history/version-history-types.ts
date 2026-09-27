@@ -1,4 +1,4 @@
-import type { SceneSnapshot } from '#studio/schema';
+import type { ProjectSnapshot } from '#studio/schema';
 
 /** Author metadata shown next to a version entry. */
 export interface VersionAuthor {
@@ -30,5 +30,5 @@ export interface DocumentVersion {
  */
 export interface VersionHistoryProvider {
   listVersions(documentUri: string): Promise<DocumentVersion[]>;
-  loadVersion(documentUri: string, versionId: string): Promise<SceneSnapshot>;
+  loadVersion(documentUri: string, versionId: string): Promise<ProjectSnapshot>;
 }

@@ -7,7 +7,7 @@ import type { ToolbarItemDescriptor } from '../builders/toolbar-builder';
 import type { TopBarItemDescriptor } from '../builders/top-bar-builder';
 import type { OverlayDescriptor } from '../contributions/overlay-contribution';
 import type { InteractionState } from '../runtime/interaction-state';
-import type { Scene, Selection } from '../scene/types';
+import type { Document, EditorSession } from '../scene/types';
 import type { EditorInput } from '../workbench/editor-service';
 import type {
   FieldRendererRegistration,
@@ -30,8 +30,8 @@ export type SliceName =
   | 'interaction';
 
 export interface SceneSlice {
-  scene: Scene;
-  selection: Selection;
+  scene: Document;
+  selection: EditorSession;
   properties: PropertySectionDescriptor[] | null;
   viewContainers: ViewContainerDescriptor[];
   fieldRenderers: FieldRendererRegistration[];
@@ -114,8 +114,8 @@ export class WorkbenchStateCache {
   }
 
   invalidateSelectionOnly(
-    scene: Scene,
-    selection: Selection,
+    scene: Document,
+    selection: EditorSession,
     contentRevision: number,
     rebuildSelectionDerived?: (
       current: SceneSlice

@@ -117,7 +117,7 @@ function pickDocumentExtras(
   };
 }
 
-export function normalizeSceneForTest(input: unknown): Document {
+export function normalizeDocumentForTest(input: unknown): Document {
   if (input && typeof input === 'object' && 'pages' in input) {
     const record = input as { pages: LegacyPageInput[] } & Omit<
       Document,

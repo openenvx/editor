@@ -19,14 +19,14 @@ import {
   setTemplatePolicyEnforced,
   withFrozenLayerSnapshots,
 } from './layer-editability';
-import { SceneStore } from './scene-store';
-import type { Layer, Scene } from './types';
+import { DocumentStore } from './document-store';
+import type { Document, DocumentNode } from '#studio/schema';
 
 afterEach(() => {
   setTemplatePolicyEnforced(true);
 });
 
-function createLayer(overrides: Partial<Layer> = {}): Layer {
+function createLayer(overrides: Partial<DocumentNode> = {}): DocumentNode {
   return {
     id: 'layer-1',
     locked: overrides.locked ?? false,
@@ -37,7 +37,7 @@ function createLayer(overrides: Partial<Layer> = {}): Layer {
   };
 }
 
-function createScene(overrides: Partial<Scene> = {}): Scene {
+function createScene(overrides: Partial<Document> = {}): Document {
   return {
     artboards: [
       {
@@ -336,7 +336,7 @@ describe('applyFrozenLayerPolicy', () => {
   });
 });
 
-describe('withFrozenLayerSnapshots + SceneStore', () => {
+describe('withFrozenLayerSnapshots + DocumentStore', () => {
   it('persists snapshots and enforces them on apply', () => {
     const authored = withFrozenLayerSnapshots(
       createScene({
@@ -371,7 +371,7 @@ describe('withFrozenLayerSnapshots + SceneStore', () => {
       html: '<p>tmpl</p>',
     });
 
-    const store = new SceneStore(authored);
+    const store = new DocumentStore(authored);
     store.apply({
       apply: (scene) => ({
         ...scene,

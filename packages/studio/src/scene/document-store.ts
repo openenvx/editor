@@ -96,9 +96,6 @@ export class DocumentStore {
   readonly onDidChangeDocument: Event<LiveProjectSnapshot> =
     this.onDidChangeDocumentEmitter.event;
 
-  /** @deprecated use onDidChangeDocument */
-  readonly onDidChangeScene = this.onDidChangeDocument;
-
   constructor(initial?: Document, initialSession?: EditorSession) {
     this.doc = normalizeDocument(initial ?? {});
     const fallbackArtboardId = this.doc.artboards[0]!.id;
@@ -123,17 +120,7 @@ export class DocumentStore {
     return this.doc;
   }
 
-  /** @deprecated use getDocument */
-  getScene(): Readonly<Document> {
-    return this.doc;
-  }
-
   getSession(): Readonly<EditorSession> {
-    return this.session;
-  }
-
-  /** @deprecated use getSession */
-  getEditorState(): Readonly<EditorSession> {
     return this.session;
   }
 
@@ -161,17 +148,7 @@ export class DocumentStore {
     };
   }
 
-  /** @deprecated use getSession */
-  getSelection(): EditorSession {
-    return { ...this.session };
-  }
-
   getActiveArtboardId(): string {
-    return this.session.activeArtboardId;
-  }
-
-  /** @deprecated use getActiveArtboardId */
-  getActivePageId(): string {
     return this.session.activeArtboardId;
   }
 
@@ -179,18 +156,8 @@ export class DocumentStore {
     return getActiveArtboard(this.doc, this.session.activeArtboardId);
   }
 
-  /** @deprecated use getActiveArtboard */
-  getActivePage() {
-    return this.getActiveArtboard();
-  }
-
   getPrimaryNode() {
     return getPrimaryNode(this.doc, this.session);
-  }
-
-  /** @deprecated use getPrimaryNode */
-  getPrimaryLayer() {
-    return this.getPrimaryNode();
   }
 
   setDocument(document: Document): void {
@@ -198,11 +165,6 @@ export class DocumentStore {
     this.syncSessionToDocument();
     this.bumpContentRevision();
     this.notify();
-  }
-
-  /** @deprecated use setDocument */
-  setScene(document: Document): void {
-    this.setDocument(document);
   }
 
   replaceDocument(document: Document): void {
@@ -214,22 +176,12 @@ export class DocumentStore {
     this.notify();
   }
 
-  /** @deprecated use replaceDocument */
-  replaceScene(document: Document): void {
-    this.replaceDocument(document);
-  }
-
   restoreDocument(document: Document, contentRevision: number): void {
     this.doc = this.finalizeDocumentFull(document);
     this.syncSessionToDocument();
     this.contentRevision = contentRevision;
     this.bumpRevision();
     this.notify();
-  }
-
-  /** @deprecated use restoreDocument */
-  restoreScene(document: Document, contentRevision: number): void {
-    this.restoreDocument(document, contentRevision);
   }
 
   restoreSnapshot(snapshot: LiveProjectSnapshot): void {
@@ -254,16 +206,6 @@ export class DocumentStore {
     this.notify();
   }
 
-  /** @deprecated use setSession */
-  setEditorState(session: EditorSession): void {
-    this.setSession(session);
-  }
-
-  /** @deprecated use setSession */
-  setSelection(selection: EditorSession): void {
-    this.setSession(selection);
-  }
-
   selectNodes(nodeIds: string[], primaryNodeId?: string | null): void {
     const artboard = getActiveArtboard(this.doc, this.session.activeArtboardId);
     const valid = nodeIds.filter((id) => nodeExistsOnArtboard(artboard, id));
@@ -280,11 +222,6 @@ export class DocumentStore {
     });
   }
 
-  /** @deprecated use selectNodes */
-  selectLayers(layerIds: string[], primaryNodeId?: string | null): void {
-    this.selectNodes(layerIds, primaryNodeId);
-  }
-
   setActiveArtboard(artboardId: string): void {
     if (!this.doc.artboards.some((a) => a.id === artboardId)) {
       return;
@@ -294,11 +231,6 @@ export class DocumentStore {
       primaryNodeId: null,
       selectedNodeIds: [],
     });
-  }
-
-  /** @deprecated use setActiveArtboard */
-  setActivePage(artboardId: string): void {
-    this.setActiveArtboard(artboardId);
   }
 
   apply(transaction: DocumentTransaction): void {
@@ -458,11 +390,7 @@ export class DocumentStore {
 
   private normalizeOneArtboard(artboard: Artboard): Artboard {
     const rules = this.pageRulesLookup?.(artboardRulesLayout(artboard));
-    return rules
-      ? (rules.normalizeArtboard?.(artboard) ??
-          rules.normalizePage?.(artboard) ??
-          artboard)
-      : artboard;
+    return rules?.normalizeArtboard?.(artboard) ?? artboard;
   }
 
   private collectArtboardRulesErrors(
@@ -480,8 +408,7 @@ export class DocumentStore {
       const layout = artboardRulesLayout(artboard);
       const rules = this.pageRulesLookup(layout);
       if (rules) {
-        const ruleErrors =
-          rules.validateArtboard?.(artboard) ?? rules.validatePage?.(artboard);
+        const ruleErrors = rules.validateArtboard?.(artboard);
         if (ruleErrors) {
           errors.push(...ruleErrors);
           continue;
@@ -550,9 +477,3 @@ export function moveNodeToIndex(
   result.splice(clamped, 0, removed!);
   return result;
 }
-
-/** @deprecated use reorderNodes */
-export const reorderLayers = reorderNodes;
-
-/** @deprecated use moveNodeToIndex */
-export const moveLayerToIndex = moveNodeToIndex;

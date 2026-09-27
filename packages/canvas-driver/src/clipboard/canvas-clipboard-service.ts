@@ -2,12 +2,12 @@ import type { AssetService } from '@openenvx/studio';
 import type { Artboard, DocumentNode } from '@openenvx/studio/schema';
 import {
   applyNodeTransform,
-  createDefaultTransform,
+  createDefaultFrame,
 } from '@openenvx/studio/schema';
 
 import { computeArtboardOffset } from '../artboard-offset';
 import { CanvasImageLayer } from '../layers/canvas-image-layer';
-import { createLayerId } from './clone-layers-for-paste';
+import { createNodeId } from './clone-layers-for-paste';
 import {
   registerImagePastePreview,
   revokeImagePastePreview,
@@ -221,7 +221,7 @@ export class CanvasClipboardService {
 
     const layer = applyNodeTransform(
       {
-        ...new CanvasImageLayer().createDefault(createLayerId('image'), page),
+        ...new CanvasImageLayer().createDefault(createNodeId('image'), page),
         props: {
           alt: 'Pasted image',
           assetRef: '',
@@ -229,7 +229,7 @@ export class CanvasClipboardService {
         },
       },
       {
-        ...createDefaultTransform(),
+        ...createDefaultFrame(),
         opacity: 1,
         x: anchor.x,
         y: anchor.y,

@@ -29,12 +29,12 @@ function createHost(document: Document): SandboxHostSurface & {
         primaryNodeId: null,
         activeArtboardId: document.artboards[0]?.id ?? null,
       }) as never,
-    getScene: () => document as never,
+    getDocument: () => document as never,
     apply: (transaction) => {
       applies.push(transaction);
     },
-    selectLayers: vi.fn(),
-    onDidChangeScene: () => () => {},
+    selectNodes: vi.fn(),
+    onDidChangeDocument: () => () => {},
     onDidChangeSelection: () => () => {},
     executeCommand: async () => ({ executed: true }),
     registerCommand: (command) => {
@@ -167,7 +167,7 @@ describe('registerWidgetInsertCommands', () => {
     const tx = host.applies[0] as {
       apply: (scene: Document) => Document;
     };
-    const next = tx.apply(host.getScene() as never);
+    const next = tx.apply(host.getDocument() as never);
     const root = next.artboards[0]?.nodes[0];
     const widget = root?.children?.[0] as DocumentNode | undefined;
     const props = widget?.props as OpenEnvxWidgetProps | undefined;

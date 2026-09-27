@@ -1,8 +1,8 @@
 import {
   EditorService,
-  getLayerChildren,
+  getChildNodes,
   InstantiationService,
-  SceneStore,
+  DocumentStore,
   WorkbenchEventService,
   type CommandContext,
 } from '@openenvx/studio';
@@ -22,12 +22,12 @@ import {
   testDocument,
 } from '../test/canvas-document-fixtures';
 
-function createContext(sceneStore: SceneStore): CommandContext {
+function createContext(sceneStore: DocumentStore): CommandContext {
   return {
     editor: new EditorService(),
     events: new WorkbenchEventService(),
     scene: sceneStore,
-    selection: sceneStore.getSelection(),
+    selection: sceneStore.getSession(),
     services: new InstantiationService(),
   };
 }
@@ -67,7 +67,7 @@ const selectedSession: EditorSession = {
 
 describe('canvas group commands', () => {
   it('insertGroup appends a canvas.group layer', () => {
-    const store = new SceneStore(baseScene, {
+    const store = new DocumentStore(baseScene, {
       activeArtboardId: 'page-1',
       primaryNodeId: null,
       selectedNodeIds: [],
@@ -79,11 +79,11 @@ describe('canvas group commands', () => {
     const page = ctx.scene.getDocument().artboards[0];
     const group = page?.nodes.find((layer) => layer.type === 'canvas.group');
     expect(group).toBeDefined();
-    expect(ctx.scene.getSelection().primaryNodeId).toBe(group?.id);
+    expect(ctx.scene.getSession().primaryNodeId).toBe(group?.id);
   });
 
   it('groupSelection wraps selected root layers', () => {
-    const store = new SceneStore(baseScene, selectedSession);
+    const store = new DocumentStore(baseScene, selectedSession);
     const ctx = createContext(store);
     const command = new GroupSelectionCommand();
     expect(command.canExecute(ctx)).toBe(true);
@@ -92,7 +92,7 @@ describe('canvas group commands', () => {
     expect(page?.nodes).toHaveLength(1);
     const groupLayer = page?.nodes[0];
     expect(groupLayer?.type).toBe('canvas.group');
-    const children = getLayerChildren(groupLayer!);
+    const children = getChildNodes(groupLayer!);
     expect(children.map((child) => child.id)).toStrictEqual([
       'rect-1',
       'rect-2',
@@ -106,7 +106,7 @@ describe('canvas group commands', () => {
       'group-1',
       baseScene.artboards[0]!
     );
-    const store = new SceneStore(
+    const store = new DocumentStore(
       testDocument([{ ...baseArtboard, nodes: groupedLayers }]),
       {
         activeArtboardId: 'page-1',

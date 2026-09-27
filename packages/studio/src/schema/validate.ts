@@ -74,9 +74,6 @@ export function validateDocument(
     : { errors: shapeErrors, valid: false };
 }
 
-/** @deprecated use validateDocument */
-export const validateScene = validateDocument;
-
 export function assertValidDocument(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
@@ -91,9 +88,6 @@ export function assertValidDocument(
   }
 }
 
-/** @deprecated use assertValidDocument */
-export const assertValidScene = assertValidDocument;
-
 export function parseValidDocument(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
@@ -103,9 +97,6 @@ export function parseValidDocument(
   const result = pickDocumentSchema(mode).safeParse(cloneDropNulls(input));
   return result.data as unknown as Document;
 }
-
-/** @deprecated use parseValidDocument */
-export const parseValidScene = parseValidDocument;
 
 export function validateEditorSession(
   input: unknown,
@@ -118,9 +109,6 @@ export function validateEditorSession(
     : { errors: toErrors(result.error.issues), valid: false };
 }
 
-/** @deprecated use validateEditorSession */
-export const validateEditorState = validateEditorSession;
-
 export function validateProjectSnapshot(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
@@ -131,9 +119,6 @@ export function validateProjectSnapshot(
     ? { errors: [], valid: true }
     : { errors: toErrors(result.error.issues), valid: false };
 }
-
-/** @deprecated use validateProjectSnapshot */
-export const validateSceneSnapshot = validateProjectSnapshot;
 
 export function parseValidProjectSnapshot(
   input: unknown,
@@ -152,9 +137,6 @@ export function parseValidProjectSnapshot(
   return result.data as unknown as ProjectSnapshot;
 }
 
-/** @deprecated use parseValidProjectSnapshot */
-export const parseValidSceneSnapshot = parseValidProjectSnapshot;
-
 export function parseValidEditorSession(
   input: unknown,
   opts: { mode?: ValidateMode } = {}
@@ -171,6 +153,3 @@ export function parseValidEditorSession(
   }
   return result.data as unknown as EditorSession;
 }
-
-/** @deprecated use parseValidEditorSession */
-export const parseValidEditorState = parseValidEditorSession;

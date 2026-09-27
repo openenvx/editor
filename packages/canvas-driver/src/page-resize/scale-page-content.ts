@@ -1,7 +1,7 @@
 import {
   CONTAINER_LAYER_TYPE,
-  isContainerLayer,
-  mapLayers,
+  isContainerNode,
+  mapNodes,
   MIN_LAYER_SIZE,
 } from '@openenvx/studio';
 import type {
@@ -249,7 +249,7 @@ function scaleLayer(
   if (layer.type === CANVAS_CIRCLE_TYPE) {
     return scaleCircleLayer(layer, scaleX, scaleY);
   }
-  if (layer.type === CONTAINER_LAYER_TYPE || isContainerLayer(layer)) {
+  if (layer.type === CONTAINER_LAYER_TYPE || isContainerNode(layer)) {
     return scaleContainerLayer(layer, scaleX, scaleY);
   }
 
@@ -284,7 +284,7 @@ export function resizeAbsolutePage(
 
   return {
     ...artboard,
-    nodes: mapLayers(artboard.nodes, (layer) =>
+    nodes: mapNodes(artboard.nodes, (layer) =>
       scaleLayer(layer, scaleX, scaleY)
     ),
     physical: {

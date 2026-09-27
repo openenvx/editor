@@ -3,7 +3,7 @@ import {
   SandboxExtensionHost,
   type SandboxExtensionHostOptions,
 } from '@openenvx/editor-sandbox/host';
-import type { Layer } from '@openenvx/studio';
+import type { DocumentNode } from '@openenvx/studio';
 
 import { setOpenEnvxWidgetClickHandler } from './interactions/widget-click-handler';
 
@@ -16,7 +16,8 @@ export function createCanvasSandboxExtensionHost(
 ): SandboxExtensionHost {
   return new SandboxExtensionHost({
     ...options,
-    applyWidgetFace: (layer, tree) => applyWidgetFace(layer as Layer, tree),
+    applyWidgetFace: (layer, tree) =>
+      applyWidgetFace(layer as DocumentNode, tree),
     bindWidgetClick: setOpenEnvxWidgetClickHandler,
   });
 }

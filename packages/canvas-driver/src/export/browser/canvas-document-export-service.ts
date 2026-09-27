@@ -1,4 +1,4 @@
-import type { Scene } from '@openenvx/studio/schema';
+import type { Document } from '@openenvx/studio/schema';
 
 import type {
   CanvasDocumentExportService,
@@ -10,7 +10,7 @@ import { exportCanvasDocument } from './export-canvas-document';
 
 export class BrowserCanvasDocumentExportService implements CanvasDocumentExportService {
   exportDocument(
-    scene: Scene,
+    scene: Document,
     pageId: string,
     options: CanvasExportOptions
   ): Promise<CanvasExportResult> {

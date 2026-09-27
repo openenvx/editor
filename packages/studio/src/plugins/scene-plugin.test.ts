@@ -1,13 +1,12 @@
-import type { LayerWriteMode } from '#studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import { EditorService } from '../workbench/editor-service';
-import { SceneStore } from '../scene/scene-store';
+import { DocumentStore } from '../scene/document-store';
 import { WorkbenchEventService } from '../runtime/workbench-events';
 import { InstantiationService } from '../runtime/instantiation-service';
 import type { CommandContext } from '../runtime/types';
 import { documentFromLegacyPages } from '../test/document-fixtures';
-import type { Layer } from '../scene/types';
+import type { DocumentNode } from '../scene/types';
 import {
   DeleteLayerCommand,
   MoveDownCommand,
@@ -20,19 +19,19 @@ import {
   ToggleLayerVisibilityCommand,
 } from './scene-plugin';
 
-function createScene(layers: Layer[]) {
+function createScene(layers: DocumentNode[]) {
   return documentFromLegacyPages([
     { id: 'page-1', name: 'Page', layout: 'flow', layers },
   ]);
 }
 
 function createContext(
-  layers: Layer[],
+  layers: DocumentNode[],
   selectedIds: string[],
   primaryId: string | null = null
 ): CommandContext {
   const scene = createScene(layers);
-  const store = new SceneStore(scene);
+  const store = new DocumentStore(scene);
   store.selectNodes(selectedIds, primaryId);
   const services = new InstantiationService();
   const editor = new EditorService();
@@ -47,7 +46,7 @@ function createContext(
   );
   const ctx: CommandContext = {
     scene: store,
-    selection: store.getSelection(),
+    selection: store.getSession(),
     services,
     events: new WorkbenchEventService(),
     editor,
@@ -59,7 +58,7 @@ function createLayer(
   id: string,
   writeMode: LayerWriteMode = 'free',
   locked = false
-): Layer {
+): DocumentNode {
   return {
     id,
     type: 'canvas.text',
@@ -252,8 +251,8 @@ describe('ScenePlugin toggle layer visibility command', () => {
     expect(ctx.scene.getDocument().artboards[0]!.nodes[0]!.visible).toBe(true);
     toggleVisibility.execute(ctx);
     expect(ctx.scene.getDocument().artboards[0]!.nodes[0]!.visible).toBe(false);
-    expect(ctx.scene.getSelection().selectedNodeIds).toEqual([]);
-    expect(ctx.scene.getSelection().primaryNodeId).toBeNull();
+    expect(ctx.scene.getSession().selectedNodeIds).toEqual([]);
+    expect(ctx.scene.getSession().primaryNodeId).toBeNull();
   });
 
   it('shows a hidden layer when selected again', () => {
@@ -262,7 +261,7 @@ describe('ScenePlugin toggle layer visibility command', () => {
     const ctx = createContext(layers, ['a'], 'a');
     toggleVisibility.execute(ctx);
     expect(ctx.scene.getDocument().artboards[0]!.nodes[0]!.visible).toBe(true);
-    expect(ctx.scene.getSelection().primaryNodeId).toBe('a');
+    expect(ctx.scene.getSession().primaryNodeId).toBe('a');
   });
 });
 
@@ -286,8 +285,8 @@ describe('ScenePlugin embed template policy commands', () => {
     const cmd = new SetLayerShowInLayersCommand();
     const ctx = createContext([createLayer('a')], ['a'], 'a');
     cmd.execute(ctx, { showInLayers: false });
-    expect(ctx.scene.getSelection().primaryNodeId).toBeNull();
-    expect(ctx.scene.getSelection().selectedNodeIds).toEqual([]);
+    expect(ctx.scene.getSession().primaryNodeId).toBeNull();
+    expect(ctx.scene.getSession().selectedNodeIds).toEqual([]);
   });
 
   it('patches templatePolicy flags', () => {

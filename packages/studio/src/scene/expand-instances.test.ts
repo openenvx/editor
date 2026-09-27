@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildInstanceSurfaceLayerId,
-  getLayerChildrenForScene,
-  resolveInstanceDefinitionLayers,
+  getNodeChildrenForDocument,
+  resolveInstanceDefinitionNodes,
 } from './expand-instances';
 import type { DocumentNode, Document } from './types';
 
@@ -53,13 +53,13 @@ describe('expand-instances', () => {
       type: 'canvas.instance',
     };
 
-    const [surfaceChild] = getLayerChildrenForScene(instance, document);
+    const [surfaceChild] = getNodeChildrenForDocument(instance, document);
     expect(surfaceChild?.id).toBe(
       buildInstanceSurfaceLayerId('inst-1', 'rect-1')
     );
     expect(surfaceChild?.writeMode).toBe('locked');
     expect(
-      resolveInstanceDefinitionLayers(instance, document.components)[0]?.props
+      resolveInstanceDefinitionNodes(instance, document.components)[0]?.props
     ).toEqual({ fill: '#f00' });
   });
 
@@ -74,7 +74,7 @@ describe('expand-instances', () => {
     };
 
     expect(
-      resolveInstanceDefinitionLayers(instance, document.components)[0]?.props
+      resolveInstanceDefinitionNodes(instance, document.components)[0]?.props
     ).toEqual({ fill: '#0f0' });
   });
 
@@ -89,8 +89,8 @@ describe('expand-instances', () => {
       props: { componentId: 'badge' },
       type: 'canvas.instance',
     };
-    const [childA] = getLayerChildrenForScene(a, document);
-    const [childB] = getLayerChildrenForScene(b, document);
+    const [childA] = getNodeChildrenForDocument(a, document);
+    const [childB] = getNodeChildrenForDocument(b, document);
     expect(childA?.id).not.toBe(childB?.id);
   });
 });

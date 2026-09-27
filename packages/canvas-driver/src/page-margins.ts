@@ -1,18 +1,18 @@
-import type { Page } from '@openenvx/studio/schema';
+import type { Artboard } from '@openenvx/studio/schema';
 import {
-  computePagePrintBoxes,
-  isPrintEligiblePage,
+  computeArtboardPrintBoxes,
+  isPrintEligibleArtboard,
 } from '@openenvx/studio/schema';
 
 import type { CanvasRect } from './stage/canvas-stage-interaction';
 
-export function computePageSafeBounds(page: Page): CanvasRect | null {
-  return computePagePrintBoxes(page).safe;
+export function computePageSafeBounds(page: Artboard): CanvasRect | null {
+  return computeArtboardPrintBoxes(page).safe;
 }
 
 /** Trim-edge rect when bleed > 0 (marks bleed inner edge on the artboard). */
-export function computePageBleedEdgeBounds(page: Page): CanvasRect | null {
-  const boxes = computePagePrintBoxes(page);
+export function computePageBleedEdgeBounds(page: Artboard): CanvasRect | null {
+  const boxes = computeArtboardPrintBoxes(page);
   if (boxes.bleedPx <= 0) {
     return null;
   }
@@ -24,6 +24,6 @@ export function computePageBleedEdgeBounds(page: Page): CanvasRect | null {
   };
 }
 
-export function defaultShowMarginsForPage(page: Page): boolean {
-  return isPrintEligiblePage(page);
+export function defaultShowMarginsForPage(page: Artboard): boolean {
+  return isPrintEligibleArtboard(page);
 }

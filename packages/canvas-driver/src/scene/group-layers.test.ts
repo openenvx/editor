@@ -1,4 +1,4 @@
-import { getLayerChildren } from '@openenvx/studio';
+import { getChildNodes } from '@openenvx/studio';
 import { nodeTransform } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
@@ -62,7 +62,7 @@ describe('group-layers', () => {
       width: 120,
       height: 80,
     });
-    const children = getLayerChildren(group);
+    const children = getChildNodes(group);
     expect(children).toHaveLength(2);
     expect(nodeTransform(children[0]!)).toMatchObject({ x: 0, y: 0 });
     expect(nodeTransform(children[1]!)).toMatchObject({ x: 40, y: 20 });

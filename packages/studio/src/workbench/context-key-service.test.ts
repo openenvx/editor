@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { normalizeSceneForTest } from '../test/document-fixtures';
+import { normalizeDocumentForTest } from '../test/document-fixtures';
 import { createContextKeyService } from "./context-key-service";
 
 describe("ContextKeyService", () => {
   it("evaluates when expressions", () => {
-    const scene = normalizeSceneForTest({});
+    const scene = normalizeDocumentForTest({});
     const keys = createContextKeyService();
     keys.syncSceneKeys({
       hasActiveEditor: true,
@@ -26,7 +26,7 @@ describe("ContextKeyService", () => {
   });
 
   it("sets scene.primaryLayerType from the primary selection", () => {
-    const scene = normalizeSceneForTest({
+    const scene = normalizeDocumentForTest({
       pages: [
         {
           id: "a",
@@ -59,7 +59,7 @@ describe("ContextKeyService", () => {
   });
 
   it("sets scene.multiPage when more than one page exists", () => {
-    const scene = normalizeSceneForTest({
+    const scene = normalizeDocumentForTest({
       pages: [
         { id: "a", name: "A", layout: "flow", layers: [] },
         { id: "b", name: "B", layout: "flow", layers: [] },

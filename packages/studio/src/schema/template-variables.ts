@@ -33,9 +33,6 @@ export function documentVariables(document: Document): TemplateVariable[] {
   return document.variables ?? [];
 }
 
-/** @deprecated use documentVariables */
-export const sceneVariables = documentVariables;
-
 export type VariableKeyValidationReason = 'invalid' | 'duplicate';
 
 export function validateVariableKeyForCatalog(
@@ -213,9 +210,6 @@ export function rewriteVariableKeyInDocument(
   );
 }
 
-/** @deprecated use rewriteVariableKeyInDocument */
-export const rewriteVariableKeyInScene = rewriteVariableKeyInDocument;
-
 export function addVariableToDocument(
   document: Document,
   variable: TemplateVariable
@@ -225,9 +219,6 @@ export function addVariableToDocument(
     variables: [...documentVariables(document), variable],
   };
 }
-
-/** @deprecated use addVariableToDocument */
-export const addVariableToScene = addVariableToDocument;
 
 export function updateVariableInDocument(
   document: Document,
@@ -262,9 +253,6 @@ export function updateVariableInDocument(
   return nextDocument;
 }
 
-/** @deprecated use updateVariableInDocument */
-export const updateVariableInScene = updateVariableInDocument;
-
 export function removeVariableFromDocument(
   document: Document,
   id: string
@@ -274,9 +262,6 @@ export function removeVariableFromDocument(
     variables: documentVariables(document).filter((entry) => entry.id !== id),
   };
 }
-
-/** @deprecated use removeVariableFromDocument */
-export const removeVariableFromScene = removeVariableFromDocument;
 
 export function reorderVariablesInDocument(
   document: Document,
@@ -293,9 +278,6 @@ export function reorderVariablesInDocument(
   variables.splice(to, 0, moved!);
   return { ...document, variables };
 }
-
-/** @deprecated use reorderVariablesInDocument */
-export const reorderVariablesInScene = reorderVariablesInDocument;
 
 export function listVariableUsages(document: Document): string[] {
   const keys = new Set<string>();
@@ -435,6 +417,3 @@ export function resolvePrimaryTextPropPath(nodeType: string): string | null {
   }
   return null;
 }
-
-/** @deprecated use resolvePrimaryTextPropPath */
-export const resolvePrimaryTextDataPath = resolvePrimaryTextPropPath;

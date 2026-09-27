@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -10,7 +10,7 @@ import { createCanvasStageSnapshot } from '../stage/canvas-stage-snapshot';
 
 describe('canvas-stage-selectors', () => {
   it('selectLayerTransform prefers live override over base transform', () => {
-    const base = createDefaultTransform();
+    const base = createDefaultFrame();
     const override = { ...base, width: 240 };
     const snapshot = createCanvasStageSnapshot({
       liveTransforms: new Map([['layer-1', override]]),
@@ -54,7 +54,7 @@ describe('canvas-stage-selectors', () => {
   });
 
   it('selectLayerSlice composes transform and interaction flags', () => {
-    const base = createDefaultTransform();
+    const base = createDefaultFrame();
     const snapshot = createCanvasStageSnapshot({
       liveTransforms: new Map([['layer-1', { ...base, height: 120 }]]),
       mode: { type: 'idle' },
@@ -71,7 +71,7 @@ describe('canvas-stage-selectors', () => {
   });
 
   it('selectLayerSlice disables dragging during an imperative transform', () => {
-    const base = createDefaultTransform();
+    const base = createDefaultFrame();
     const snapshot = createCanvasStageSnapshot({
       mode: { anchor: 'middle-right', layerId: 'layer-1', type: 'transforming' },
     });
@@ -84,7 +84,7 @@ describe('canvas-stage-selectors', () => {
   });
 
   it('selectLayerSlice disables dragging when the layer is not selected', () => {
-    const base = createDefaultTransform();
+    const base = createDefaultFrame();
     const snapshot = createCanvasStageSnapshot({
       mode: { type: 'idle' },
     });
@@ -106,7 +106,7 @@ describe('canvas-stage-selectors', () => {
   });
 
   it('selectLayerSlice hides non-visible layers', () => {
-    const base = createDefaultTransform();
+    const base = createDefaultFrame();
     const snapshot = createCanvasStageSnapshot({
       mode: { type: 'idle' },
     });

@@ -5,17 +5,17 @@ import {
   Plugin,
 } from '../backbone';
 import type {
+  Artboard,
   ContributionBuildContext,
-  Layer,
+  DocumentNode,
   LayerPreviewContext,
-  Page,
   PluginContext,
   PropertySectionDescriptor,
 } from '../backbone';
 import { createLayerPreviewBuilder } from '../preview';
 import { describe, expect, it } from 'vitest';
 
-import { normalizeSceneForTest } from '../test/document-fixtures';
+import { normalizeDocumentForTest } from '../test/document-fixtures';
 
 import { PropertyPaneContribution } from '../contributions/property-pane-contribution';
 import { ViewContainerContribution } from '../contributions/view-contribution';
@@ -30,11 +30,11 @@ class TestLayer extends LayerDefinition<{ text: string }> {
   readonly treeIcon = 'text';
   readonly treeDisplayName = 'Test';
 
-  createDefault(id: string, _page: Page): Layer {
+  createDefault(id: string, _page: Artboard): DocumentNode {
     return { props: { text: 'hello' }, id, type: this.type };
   }
 
-  serialize(layer: Layer) {
+  serialize(layer: DocumentNode) {
     return layer.props as { text: string };
   }
 
@@ -73,7 +73,7 @@ class ContextPlugin extends Plugin {
 }
 
 function createSceneWithLayers() {
-  return normalizeSceneForTest({
+  return normalizeDocumentForTest({
     activeArtboardId: 'p1',
     pages: [
       {
@@ -133,7 +133,7 @@ class InspectorWorkbenchPlugin extends WorkbenchPlugin {
 }
 
 function createAbsoluteSceneWithoutSelection() {
-  return normalizeSceneForTest({
+  return normalizeDocumentForTest({
     activeArtboardId: 'p1',
     pages: [
       {

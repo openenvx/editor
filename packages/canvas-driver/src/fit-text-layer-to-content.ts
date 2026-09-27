@@ -1,4 +1,4 @@
-import { findNodeById, mapLayers, MIN_LAYER_SIZE } from '@openenvx/studio';
+import { findNodeById, mapNodes, MIN_LAYER_SIZE } from '@openenvx/studio';
 import {
   applyModifications,
   applyNodeTransform,
@@ -239,7 +239,7 @@ export function fitSceneCanvasTextToContent(scene: Document): Document {
     ...scene,
     artboards: scene.artboards.map((artboard) => ({
       ...artboard,
-      nodes: mapLayers(artboard.nodes, fitCanvasTextLayerToContent),
+      nodes: mapNodes(artboard.nodes, fitCanvasTextLayerToContent),
     })),
   };
 }

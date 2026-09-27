@@ -52,9 +52,6 @@ export function findPresetForArtboard(
   );
 }
 
-/** @deprecated use findPresetForArtboard */
-export const findPresetForPage = findPresetForArtboard;
-
 export function getDefaultPageDimensions(): { width: number; height: number } {
   return {
     width: DEFAULT_PAGE_SIZE_PRESET.width,

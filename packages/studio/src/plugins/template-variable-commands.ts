@@ -1,7 +1,7 @@
 import { Command } from '../contributions/command';
 import type { CommandContext } from '../runtime/types';
 import { WorkbenchEvents } from '../runtime/workbench-events';
-import { findLayerById, updateLayerByIdInScene } from '../scene/layer-tree';
+import { findNodeById, updateNodeByIdInDocument } from '../scene/layer-tree';
 import {
   addVariableToDocument,
   createVariableId,
@@ -49,7 +49,7 @@ function canResolveVariableInsertTarget(ctx: CommandContext): boolean {
   const selectedId =
     ctx.selection.primaryNodeId ?? ctx.selection.selectedNodeIds[0];
   if (selectedId) {
-    const layer = findLayerById(ctx.scene.getDocument(), selectedId);
+    const layer = findNodeById(ctx.scene.getDocument(), selectedId);
     if (layer && resolvePrimaryTextPropPath(layer.type)) {
       return true;
     }
@@ -244,16 +244,20 @@ export class InsertVariableCommand extends Command {
       ctx.selection.primaryNodeId ?? ctx.selection.selectedNodeIds[0];
     if (selectedId) {
       const scene = ctx.scene.getDocument();
-      const layer = findLayerById(scene, selectedId);
+      const layer = findNodeById(scene, selectedId);
       const dataPath = layer ? resolvePrimaryTextPropPath(layer.type) : null;
       if (layer && dataPath) {
         ctx.scene.apply({
           apply: (currentScene) =>
-            updateLayerByIdInScene(currentScene, selectedId, (targetLayer) => {
-              const next = { ...targetLayer };
-              appendTokenToNodeField(next, dataPath, token);
-              return next;
-            }),
+            updateNodeByIdInDocument(
+              currentScene,
+              selectedId,
+              (targetLayer) => {
+                const next = { ...targetLayer };
+                appendTokenToNodeField(next, dataPath, token);
+                return next;
+              }
+            ),
           label: 'Insert variable',
         });
         return;

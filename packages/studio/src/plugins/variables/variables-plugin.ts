@@ -83,7 +83,7 @@ export class CreateVariableCommand extends Command {
     const result = await dialogs.showForm(
       buildVariableFormOptions(
         ctx.services,
-        () => ctx.scene.getScene(),
+        () => ctx.scene.getDocument(),
         'create'
       )
     );
@@ -107,7 +107,7 @@ export class EditVariableCommand extends Command {
     if (!patch?.id) {
       return false;
     }
-    return documentVariables(ctx.scene.getScene()).some(
+    return documentVariables(ctx.scene.getDocument()).some(
       (entry) => entry.id === patch.id
     );
   }
@@ -117,7 +117,7 @@ export class EditVariableCommand extends Command {
     if (!patch?.id) {
       return;
     }
-    const scene = ctx.scene.getScene();
+    const scene = ctx.scene.getDocument();
     const variable = documentVariables(scene).find(
       (entry) => entry.id === patch.id
     );
@@ -131,7 +131,7 @@ export class EditVariableCommand extends Command {
     const result = await dialogs.showForm(
       buildVariableFormOptions(
         ctx.services,
-        () => ctx.scene.getScene(),
+        () => ctx.scene.getDocument(),
         'edit',
         variable
       )

@@ -1,8 +1,8 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 
-import { getActivePage, type Scene, type ViewDescriptor } from '#studio';
+import { getActiveArtboard, type Document, type ViewDescriptor } from '#studio';
 
-import { getLayerAncestorIds } from './get-layer-ancestor-ids';
+import { getNodeAncestorIds } from './get-layer-ancestor-ids';
 
 export function resolveViewHoveredIds(
   view: ViewDescriptor,
@@ -25,7 +25,7 @@ export function resolveViewHoveredIds(
 export function useViewTreeHoverExpand(
   view: ViewDescriptor,
   hoveredLayerId: string | null,
-  scene: Scene,
+  scene: Document,
   setCollapsed: Dispatch<SetStateAction<Set<string>>>
 ): void {
   const viewHover = view.viewHover;
@@ -34,8 +34,8 @@ export function useViewTreeHoverExpand(
     if (viewHover !== 'layer' || !hoveredLayerId) {
       return;
     }
-    const page = getActivePage(scene);
-    const ancestorIds = getLayerAncestorIds(page, hoveredLayerId);
+    const page = getActiveArtboard(scene);
+    const ancestorIds = getNodeAncestorIds(page, hoveredLayerId);
     if (ancestorIds.length === 0) {
       return;
     }

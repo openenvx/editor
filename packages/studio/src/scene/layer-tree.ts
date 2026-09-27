@@ -23,21 +23,12 @@ export function isContainerNode(node: DocumentNode): boolean {
   return node.type === CONTAINER_LAYER_TYPE;
 }
 
-/** @deprecated use isContainerNode */
-export const isContainerLayer = isContainerNode;
-
 export function getContainerChildren(node: DocumentNode): DocumentNode[] {
   if (!isContainerNode(node)) {
     return [];
   }
   return getChildNodes(node);
 }
-
-/** @deprecated use hasChildNodes */
-export const hasChildLayers = hasChildNodes;
-
-/** @deprecated use getChildNodes */
-export const getLayerChildren = getChildNodes;
 
 export function mapNodeChildren(
   node: DocumentNode,
@@ -52,9 +43,6 @@ export function mapNodeChildren(
   };
 }
 
-/** @deprecated use mapNodeChildren */
-export const mapLayerChildren = mapNodeChildren;
-
 export function walkNodes(
   nodes: DocumentNode[],
   visitor: (node: DocumentNode, path: DocumentNode[]) => void,
@@ -67,9 +55,6 @@ export function walkNodes(
     }
   }
 }
-
-/** @deprecated use walkNodes */
-export const walkLayers = walkNodes;
 
 export function findNodeById(
   document: Document,
@@ -89,9 +74,6 @@ export function findNodeById(
   return null;
 }
 
-/** @deprecated use findNodeById */
-export const findLayerById = findNodeById;
-
 export function findNodeArtboard(
   document: Document,
   nodeId: string
@@ -110,9 +92,6 @@ export function findNodeArtboard(
   return null;
 }
 
-/** @deprecated use findNodeArtboard */
-export const findLayerPage = findNodeArtboard;
-
 export function nodeExistsOnArtboard(
   artboard: Artboard,
   nodeId: string
@@ -126,9 +105,6 @@ export function nodeExistsOnArtboard(
   return exists;
 }
 
-/** @deprecated use nodeExistsOnArtboard */
-export const layerExistsOnPage = nodeExistsOnArtboard;
-
 export function mapNodes(
   nodes: DocumentNode[],
   mapper: (node: DocumentNode) => DocumentNode
@@ -139,16 +115,10 @@ export function mapNodes(
   });
 }
 
-/** @deprecated use mapNodes */
-export const mapLayers = mapNodes;
-
 export function createNodeId(type: string): string {
   const stem = type.replace(/^canvas\./, '') || 'node';
   return `${stem}-${crypto.randomUUID()}`;
 }
-
-/** @deprecated use createNodeId */
-export const createLayerId = createNodeId;
 
 export function cloneNodeTree(nodes: DocumentNode[]): DocumentNode[] {
   return nodes.map((node) => {
@@ -160,9 +130,6 @@ export function cloneNodeTree(nodes: DocumentNode[]): DocumentNode[] {
     return cloned;
   });
 }
-
-/** @deprecated use cloneNodeTree */
-export const cloneLayerTree = cloneNodeTree;
 
 export function updateNodeInTree(
   nodes: DocumentNode[],
@@ -178,9 +145,6 @@ export function updateNodeInTree(
     );
   });
 }
-
-/** @deprecated use updateNodeInTree */
-export const updateLayerInTree = updateNodeInTree;
 
 export function updateNodeByIdInDocument(
   document: Document,
@@ -206,9 +170,6 @@ export function updateNodeByIdInDocument(
   };
 }
 
-/** @deprecated use updateNodeByIdInDocument */
-export const updateLayerByIdInScene = updateNodeByIdInDocument;
-
 export function removeNodeFromTree(
   nodes: DocumentNode[],
   nodeId: string
@@ -219,9 +180,6 @@ export function removeNodeFromTree(
       mapNodeChildren(node, (children) => removeNodeFromTree(children, nodeId))
     );
 }
-
-/** @deprecated use removeNodeFromTree */
-export const removeLayerFromTree = removeNodeFromTree;
 
 export function insertNodeIntoContainer(
   nodes: DocumentNode[],
@@ -244,9 +202,6 @@ export function insertNodeIntoContainer(
     );
   });
 }
-
-/** @deprecated use insertNodeIntoContainer */
-export const insertLayerIntoContainer = insertNodeIntoContainer;
 
 export function moveNodeInTree(
   nodes: DocumentNode[],
@@ -281,9 +236,6 @@ export function moveNodeInTree(
   return result;
 }
 
-/** @deprecated use moveNodeInTree */
-export const moveLayerInTree = moveNodeInTree;
-
 interface NodeLocation {
   parentNodes: DocumentNode[];
   index: number;
@@ -310,9 +262,6 @@ export function findNodeLocation(
   }
   return null;
 }
-
-/** @deprecated use findNodeLocation */
-export const findLayerLocation = findNodeLocation;
 
 export function moveNodeRelativeToTarget(
   nodes: DocumentNode[],
@@ -360,9 +309,6 @@ export function moveNodeRelativeToTarget(
   return roots;
 }
 
-/** @deprecated use moveNodeRelativeToTarget */
-export const moveLayerRelativeToTarget = moveNodeRelativeToTarget;
-
 export function getNodeAncestorIds(
   artboard: Artboard,
   nodeId: string
@@ -375,9 +321,6 @@ export function getNodeAncestorIds(
   });
   return ancestorIds;
 }
-
-/** @deprecated use getNodeAncestorIds */
-export const getLayerAncestorIds = getNodeAncestorIds;
 
 export function isNodeDescendant(
   nodes: DocumentNode[],
@@ -399,6 +342,3 @@ export function isNodeDescendant(
   });
   return descendant;
 }
-
-/** @deprecated use isNodeDescendant */
-export const isLayerDescendant = isNodeDescendant;

@@ -7,7 +7,7 @@ import type {
 } from '@openenvx/studio';
 import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 import type { Artboard } from '@openenvx/studio/schema';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 const DEFAULT_SVG =
@@ -39,7 +39,7 @@ export class CanvasSvgLayer extends LayerDefinition<CanvasSvgModel> {
         viewBox: '0 0 24 24',
       },
       id,
-      frame: { ...createDefaultTransform(), height: 96, width: 96 },
+      frame: { ...createDefaultFrame(), height: 96, width: 96 },
       type: this.type,
     };
   }

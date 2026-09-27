@@ -1,9 +1,9 @@
 import type { DocumentNode, Transform } from '@openenvx/studio';
-import { getLayerChildren } from '@openenvx/studio';
+import { getChildNodes } from '@openenvx/studio';
 import {
   applyNodeTransform,
   artboardSpaceSize,
-  createDefaultTransform,
+  createDefaultFrame,
   nodeTransform,
 } from '@openenvx/studio/schema';
 import type { Artboard } from '@openenvx/studio/schema';
@@ -133,7 +133,7 @@ export function createGroupFromLayers(
     ...groupLayer,
     children,
     frame: {
-      ...(groupLayer.frame ?? createDefaultTransform()),
+      ...(groupLayer.frame ?? createDefaultFrame()),
       x: bounds.x,
       y: bounds.y,
       width: bounds.width,
@@ -181,7 +181,7 @@ export function ungroupLayer(
 
   const groupTransform = getLayerTransform(group);
   const groupOrigin = { x: groupTransform.x, y: groupTransform.y };
-  const children = getLayerChildren(group).map((child) =>
+  const children = getChildNodes(group).map((child) =>
     toAbsoluteTransform(child, groupOrigin)
   );
 

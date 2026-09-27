@@ -1,5 +1,5 @@
-import { computePageExportDimensions } from '@openenvx/studio/schema';
-import type { Page, Scene } from '@openenvx/studio/schema';
+import { computeArtboardExportDimensions } from '@openenvx/studio/schema';
+import type { Artboard, Document } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
@@ -24,7 +24,7 @@ import {
 import { createTrackedExportImageLoader } from './track-export-image-loader';
 
 export interface ExportRenderEncodeInput {
-  scene: Scene;
+  scene: Document;
   pageId: string;
   options: CanvasExportOptions;
   imageLoader: ExportImageLoader;
@@ -33,14 +33,14 @@ export interface ExportRenderEncodeInput {
 }
 
 function buildExportResult(
-  page: Page,
+  page: Artboard,
   options: CanvasExportOptions,
   data: Uint8Array,
   mimeType: string,
   missingImageSrcs: string[]
 ): CanvasExportResult {
   const rasterScale = resolveExportRasterScale(page, options);
-  const dimensions = computePageExportDimensions(page, {
+  const dimensions = computeArtboardExportDimensions(page, {
     dpi: options.dpi,
     scale: rasterScale,
   });

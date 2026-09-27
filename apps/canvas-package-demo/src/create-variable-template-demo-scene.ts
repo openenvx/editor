@@ -1,7 +1,7 @@
 import { getDefaultPageDimensions } from '@openenvx/canvas-driver';
 import {
   applyNodeTransform,
-  createDefaultTransform,
+  defaultTransform,
   formatVariableToken,
   normalizeDocument,
   withArtboardRulesLayout,
@@ -16,7 +16,7 @@ export function createVariableTemplateDemoScene(): Document {
   const margin = 48;
   const textWidth = pageWidth - margin * 2;
   const baseTransform = {
-    ...createDefaultTransform(),
+    ...defaultTransform(),
     opacity: 1,
     scaleX: 1,
     scaleY: 1,

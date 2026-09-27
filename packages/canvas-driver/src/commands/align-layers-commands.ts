@@ -3,7 +3,7 @@ import {
   findNodeById,
   getActiveArtboard,
   localize,
-  updateLayerInTree,
+  updateNodeInTree,
 } from '@openenvx/studio';
 import type { CommandContext } from '@openenvx/studio';
 import {
@@ -53,7 +53,7 @@ function applyTransforms(
               ...page,
               nodes: layerIds.reduce(
                 (nodes, layerId, index) =>
-                  updateLayerInTree(nodes, layerId, (layer) =>
+                  updateNodeInTree(nodes, layerId, (layer) =>
                     applyNodeTransform(
                       layer,
                       transforms[index] ?? nodeTransform(layer)

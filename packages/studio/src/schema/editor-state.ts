@@ -27,11 +27,3 @@ export function pruneEditorSession(
 
   return { activeArtboardId, primaryNodeId, selectedNodeIds };
 }
-
-/** @deprecated use pruneEditorSession */
-export function pruneEditorState(
-  document: Document,
-  session: EditorSession
-): EditorSession {
-  return pruneEditorSession(document, session);
-}

@@ -1,4 +1,4 @@
-import { getLayerChildrenForScene } from '@openenvx/studio';
+import { getNodeChildrenForDocument } from '@openenvx/studio';
 import type { Document, DocumentNode, LayerRegistry } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import { nodeProps } from '@openenvx/studio/schema';
@@ -22,7 +22,7 @@ function buildSurfaceItem(
       ? def.renderPreview(previewCtx)
       : { kind: 'placeholder', text: `Unknown: ${layer.type}` }
   ) as LayerPreviewDescriptor;
-  const childLayers = getLayerChildrenForScene(layer, scene);
+  const childLayers = getNodeChildrenForDocument(layer, scene);
   const children =
     childLayers.length > 0
       ? childLayers.map((child) => buildSurfaceItem(child, scene, registry))

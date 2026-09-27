@@ -1,12 +1,12 @@
 import {
-  moveLayerRelativeToTarget,
+  moveNodeRelativeToTarget,
   TreeDataProvider,
   ViewContainerContribution,
   ViewContribution,
   WorkbenchController,
   WorkbenchPlugin,
   type TreeItem,
-  type WorkbenchPluginContext,type CommandContext,type Layer
+  type WorkbenchPluginContext,type CommandContext,type DocumentNode
 } from '#studio';
 import { createDefaultFrame } from '#studio/schema';
 import type { Artboard } from '#studio/schema';
@@ -15,7 +15,7 @@ import { describe, expect, it } from 'vitest';
 import {
   asDocumentNode,
   flowArtboard,
-  normalizeSceneForTest,
+  normalizeDocumentForTest,
 } from '../test/document-fixtures';
 
 import {
@@ -24,22 +24,22 @@ import {
   WORKBENCH_PAGES_VIEW_ID,
 } from './workbench-chrome-contributions';
 
-class TestLayersTreeProvider extends TreeDataProvider<Layer> {
-  getRootChildren(ctx: CommandContext): Layer[] {
+class TestLayersTreeProvider extends TreeDataProvider<DocumentNode> {
+  getRootChildren(ctx: CommandContext): DocumentNode[] {
     return ctx.scene.getActiveArtboard().nodes;
   }
 
-  getChildren(): Layer[] {
+  getChildren(): DocumentNode[] {
     return [];
   }
 
-  getTreeItem(node: Layer): TreeItem {
+  getTreeItem(node: DocumentNode): TreeItem {
     return { id: node.id, label: node.type };
   }
 
   handleMove(
-    source: Layer,
-    target: Layer,
+    source: DocumentNode,
+    target: DocumentNode,
     position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
@@ -52,7 +52,7 @@ class TestLayersTreeProvider extends TreeDataProvider<Layer> {
           p.id === page.id
             ? {
                 ...p,
-                nodes: moveLayerRelativeToTarget(
+                nodes: moveNodeRelativeToTarget(
                   p.nodes,
                   source.id,
                   target.id,
@@ -113,7 +113,7 @@ class PagesPlugin extends WorkbenchPlugin {
 describe('moveViewItem', () => {
   it('delegates to tree provider handleMove', async () => {
     const controller = new WorkbenchController({
-      initialScene: normalizeSceneForTest({
+      initialScene: normalizeDocumentForTest({
         pages: [
           {
             id: 'p1',
@@ -167,7 +167,7 @@ describe('moveViewItem', () => {
 describe('PagesTreeProvider', () => {
   it('selects a page via setActivePage', async () => {
     const controller = new WorkbenchController({
-      initialScene: normalizeSceneForTest({
+      initialScene: normalizeDocumentForTest({
         pages: [
           { id: 'a', name: 'A', layout: 'flow', layers: [] },
           { id: 'b', name: 'B', layout: 'flow', layers: [] },
@@ -189,7 +189,7 @@ describe('PagesTreeProvider', () => {
 
   it('reorders pages via handleMove', async () => {
     const controller = new WorkbenchController({
-      initialScene: normalizeSceneForTest({
+      initialScene: normalizeDocumentForTest({
         pages: [
           { id: 'a', name: 'A', layout: 'flow', layers: [] },
           { id: 'b', name: 'B', layout: 'flow', layers: [] },
@@ -321,7 +321,7 @@ describe('LayersTreeProvider', () => {
       type: 'email.root',
       children: [section, text],
     });
-    let pageLayers: Layer[] = [root];
+    let pageLayers: DocumentNode[] = [root];
     const ctx = {
       scene: {
         getActiveArtboard: () => flowArtboard('p1', 'p1', pageLayers),
@@ -357,7 +357,7 @@ describe('LayersTreeProvider', () => {
         asDocumentNode({ id: 'b', type: 'email.section', children: [] }),
       ],
     });
-    let pageLayers: Layer[] = [root];
+    let pageLayers: DocumentNode[] = [root];
     const ctx = {
       scene: {
         getActiveArtboard: () => flowArtboard('p1', 'p1', pageLayers),
@@ -402,13 +402,13 @@ describe('LayersTreeProvider', () => {
       selection,
     } as unknown as CommandContext;
 
-    const a: Layer = {
+    const a: DocumentNode = {
       data: { fill: '#000' },
       id: 'a',
       transform: createDefaultFrame(),
       type: 'canvas.rect',
     };
-    const b: Layer = {
+    const b: DocumentNode = {
       data: { fill: '#fff' },
       id: 'b',
       transform: createDefaultFrame(),

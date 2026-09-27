@@ -16,7 +16,7 @@ import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
 import type { Artboard } from '@openenvx/studio/schema';
 import {
   clampTextCurve,
-  createDefaultTransform,
+  createDefaultFrame,
   MAX_TEXT_CURVE,
 } from '@openenvx/studio/schema';
 import { z } from 'zod';
@@ -118,7 +118,7 @@ export class CanvasTextLayer extends LayerDefinition<CanvasTextModel> {
       {
         props: { ...DEFAULT_MODEL },
         id,
-        frame: { ...createDefaultTransform(), height: 48, width: 240 },
+        frame: { ...createDefaultFrame(), height: 48, width: 240 },
         type: this.type,
       },
       { mode: 'box' }

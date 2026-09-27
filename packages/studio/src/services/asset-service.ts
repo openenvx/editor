@@ -1,4 +1,4 @@
-import type { Scene, SceneAsset } from '#studio/schema';
+import type { Document, DocumentAsset } from '#studio/schema';
 
 import type { Disposable } from '../runtime/emitter';
 import { collectAssetRefs } from './collect-asset-refs';
@@ -15,14 +15,14 @@ async function readFileAsBase64(file: File): Promise<string> {
 }
 
 function isInlineAsset(
-  asset: SceneAsset
+  asset: DocumentAsset
 ): asset is { encoding: 'base64'; data: string; mimeType: string } {
   return asset.encoding === 'base64';
 }
 
 /** In-memory asset service backed by base64 data URLs. */
 export class InMemoryAssetService implements AssetService, Disposable {
-  private readonly assets = new Map<string, SceneAsset>();
+  private readonly assets = new Map<string, DocumentAsset>();
 
   resolveUrl(ref: string): string {
     if (
@@ -43,14 +43,14 @@ export class InMemoryAssetService implements AssetService, Disposable {
     return ref;
   }
 
-  register(ref: string, asset: SceneAsset): void {
+  register(ref: string, asset: DocumentAsset): void {
     this.assets.set(ref, asset);
   }
 
   async upload(file: File): Promise<string> {
     const id = crypto.randomUUID();
     const data = await readFileAsBase64(file);
-    const asset: SceneAsset = {
+    const asset: DocumentAsset = {
       data,
       encoding: 'base64',
       mimeType: file.type || 'image/png',
@@ -59,7 +59,7 @@ export class InMemoryAssetService implements AssetService, Disposable {
     return `asset://${id}`;
   }
 
-  hydrate(assets: Record<string, SceneAsset> | undefined): void {
+  hydrate(assets: Record<string, DocumentAsset> | undefined): void {
     this.assets.clear();
     if (assets) {
       for (const [id, asset] of Object.entries(assets)) {
@@ -68,9 +68,9 @@ export class InMemoryAssetService implements AssetService, Disposable {
     }
   }
 
-  exportReferenced(scene: Scene): Record<string, SceneAsset> {
+  exportReferenced(scene: Document): Record<string, DocumentAsset> {
     const refs = collectAssetRefs(scene);
-    const exported: Record<string, SceneAsset> = {};
+    const exported: Record<string, DocumentAsset> = {};
     for (const id of refs) {
       const asset = this.assets.get(id);
       if (asset) {

@@ -1,6 +1,6 @@
 import type { ServiceId } from '../runtime/create-service-id';
-import { walkLayers } from '../scene/layer-tree';
-import type { SceneStore } from '../scene/scene-store';
+import type { DocumentStore } from '../scene/document-store';
+import { walkNodes } from '../scene/layer-tree';
 import { DocumentValidationError } from '../scene/scene-validation-error';
 import type { Document } from '../scene/types';
 import {
@@ -14,7 +14,7 @@ import { AssetServiceId, PersistenceServiceId } from '../tokens';
 import type { EditorInput, EditorService } from '../workbench/editor-service';
 
 export interface DocumentOpsDeps {
-  sceneStore: SceneStore;
+  sceneStore: DocumentStore;
   editorService: EditorService;
   getService: <T>(token: ServiceId<T>) => T | undefined;
 }
@@ -30,7 +30,7 @@ function layerIsUploading(data: unknown): boolean {
 export function sceneHasUploadingLayers(document: Document): boolean {
   for (const artboard of document.artboards) {
     let found = false;
-    walkLayers(artboard.nodes, (layer) => {
+    walkNodes(artboard.nodes, (layer) => {
       if (layerIsUploading(layer.props)) {
         found = true;
       }
@@ -43,7 +43,7 @@ export function sceneHasUploadingLayers(document: Document): boolean {
 }
 
 async function waitForUploadingLayers(
-  sceneStore: SceneStore,
+  sceneStore: DocumentStore,
   timeoutMs = 60_000
 ): Promise<void> {
   const started = Date.now();

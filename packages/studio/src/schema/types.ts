@@ -68,12 +68,6 @@ export const NODE_WRITE_MODES = [
 
 export type NodeWriteMode = (typeof NODE_WRITE_MODES)[number];
 
-/** @deprecated use NODE_WRITE_MODES */
-export const LAYER_WRITE_MODES = NODE_WRITE_MODES;
-
-/** @deprecated use NodeWriteMode */
-export type LayerWriteMode = NodeWriteMode;
-
 export const BUILTIN_NODE_TYPES = [
   'canvas.rect',
   'canvas.image',
@@ -88,19 +82,10 @@ export const BUILTIN_NODE_TYPES = [
 
 export type BuiltinNodeType = (typeof BUILTIN_NODE_TYPES)[number];
 
-/** @deprecated use BUILTIN_NODE_TYPES */
-export const BUILTIN_LAYER_TYPES = BUILTIN_NODE_TYPES;
-
-/** @deprecated use BuiltinNodeType */
-export type BuiltinLayerType = BuiltinNodeType;
-
 export interface FrozenNodeSnapshot {
   props?: unknown;
   frame?: Frame;
 }
-
-/** @deprecated use FrozenNodeSnapshot */
-export type FrozenLayerSnapshot = FrozenNodeSnapshot;
 
 export interface TemplatePolicy {
   version: 1;
@@ -122,9 +107,6 @@ export interface CanvasRectProps {
   flipV?: boolean;
 }
 
-/** @deprecated use CanvasRectProps */
-export type CanvasRectData = CanvasRectProps;
-
 export type ImageFit = 'cover' | 'contain' | 'fill';
 
 export interface FocalPoint {
@@ -140,18 +122,12 @@ export interface CanvasImageProps {
   [key: string]: unknown;
 }
 
-/** @deprecated use CanvasImageProps */
-export type CanvasImageData = CanvasImageProps;
-
 export interface CanvasSvgProps {
   svg: string;
   viewBox?: string;
   fill?: string;
   stroke?: string;
 }
-
-/** @deprecated use CanvasSvgProps */
-export type CanvasSvgData = CanvasSvgProps;
 
 export type QrErrorCorrection = 'L' | 'M' | 'Q' | 'H';
 
@@ -162,9 +138,6 @@ export interface CanvasQrProps {
   errorCorrection?: QrErrorCorrection;
   margin?: number;
 }
-
-/** @deprecated use CanvasQrProps */
-export type CanvasQrData = CanvasQrProps;
 
 export type TextAutoFit = 'none' | 'shrink' | 'hug';
 
@@ -187,17 +160,11 @@ export interface CanvasTextProps {
   minFontSize?: number;
 }
 
-/** @deprecated use CanvasTextProps */
-export type CanvasTextData = CanvasTextProps;
-
 export interface CanvasCircleProps {
   fill: string;
   stroke?: string;
   strokeWidth?: number;
 }
-
-/** @deprecated use CanvasCircleProps */
-export type CanvasCircleData = CanvasCircleProps;
 
 export interface DocumentNode {
   id: string;
@@ -217,25 +184,16 @@ export interface DocumentNode {
   showInLayers?: boolean;
 }
 
-/** @deprecated use DocumentNode */
-export type Layer = DocumentNode;
-
 export interface DocumentComponent {
   id: string;
   name?: string;
   nodes: DocumentNode[];
 }
 
-/** @deprecated use DocumentComponent */
-export type SceneComponent = DocumentComponent;
-
 export interface CanvasInstanceProps {
   componentId: string;
   overrides?: Record<string, Record<string, unknown>>;
 }
-
-/** @deprecated use CanvasInstanceProps */
-export type CanvasInstanceData = CanvasInstanceProps;
 
 export type WidgetFieldDef =
   | { kind: string; label: string }
@@ -267,22 +225,13 @@ export interface OpenEnvxWidgetProps {
   label?: string;
 }
 
-/** @deprecated use OpenEnvxWidgetProps */
-export type OpenEnvxWidgetData = OpenEnvxWidgetProps;
-
 export type ArtboardGuideOrientation = 'horizontal' | 'vertical';
-
-/** @deprecated use ArtboardGuideOrientation */
-export type PageGuideOrientation = ArtboardGuideOrientation;
 
 export interface ArtboardGuide {
   id: string;
   orientation: ArtboardGuideOrientation;
   position: number;
 }
-
-/** @deprecated use ArtboardGuide */
-export type PageGuide = ArtboardGuide;
 
 export interface ArtboardSpace {
   width?: number;
@@ -308,20 +257,11 @@ export interface Artboard {
   extensions?: Record<string, unknown>;
 }
 
-/** @deprecated use Artboard */
-export type Page = Artboard;
-
 export interface EditorSession {
   activeArtboardId: string;
   selectedNodeIds: string[];
   primaryNodeId: string | null;
 }
-
-/** @deprecated use EditorSession */
-export type EditorState = EditorSession;
-
-/** @deprecated use EditorSession */
-export type Selection = EditorSession;
 
 export interface DocumentAssetInline {
   mimeType: string;
@@ -330,12 +270,6 @@ export interface DocumentAssetInline {
 }
 
 export type DocumentAsset = DocumentAssetInline;
-
-/** @deprecated use DocumentAsset */
-export type SceneAsset = DocumentAsset;
-
-/** @deprecated use DocumentAssetInline */
-export type SceneAssetInline = DocumentAssetInline;
 
 export interface TemplateVariable {
   id: string;
@@ -351,31 +285,10 @@ export interface Document {
   variables?: TemplateVariable[];
 }
 
-/** @deprecated use Document */
-export type Scene = Document;
-
 export interface ProjectSnapshot {
   document: Document;
   session: EditorSession;
 }
 
-/** @deprecated use ProjectSnapshot */
-export interface SceneSnapshot {
-  scene: Document;
-  editorState: EditorSession;
-}
-
 export type EditorPaneKind = string;
 export type EditorSurfaceKind = string;
-
-/** @deprecated provider-defined layout string */
-export type PageLayout = string;
-
-/** @deprecated use NodeBorder */
-export type LayerBorder = NodeBorder;
-
-/** @deprecated use NodeShadow */
-export type LayerShadow = NodeShadow;
-
-/** @deprecated use NodeStyle */
-export type LayerStyle = NodeStyle;

@@ -1,11 +1,11 @@
 import {
-  moveLayerRelativeToTarget,
+  moveNodeRelativeToTarget,
 } from '../backbone';
-import type { CommandContext, Layer } from '../backbone';
+import type { CommandContext, DocumentNode } from '../backbone';
 import { createDefaultFrame } from '#studio/schema';
 import { describe, expect, it } from 'vitest';
 
-import { normalizeSceneForTest } from '../test/document-fixtures';
+import { normalizeDocumentForTest } from '../test/document-fixtures';
 
 import {
   TreeDataProvider,
@@ -17,22 +17,22 @@ import { WorkbenchController } from './workbench-controller';
 import { WorkbenchPlugin } from './workbench-plugin';
 import type { WorkbenchPluginContext } from './workbench-plugin-context';
 
-class LayersTreeProvider extends TreeDataProvider<Layer> {
-  getRootChildren(ctx: CommandContext): Layer[] {
+class LayersTreeProvider extends TreeDataProvider<DocumentNode> {
+  getRootChildren(ctx: CommandContext): DocumentNode[] {
     return ctx.scene.getActiveArtboard().nodes;
   }
 
-  getChildren(): Layer[] {
+  getChildren(): DocumentNode[] {
     return [];
   }
 
-  getTreeItem(node: Layer) {
+  getTreeItem(node: DocumentNode) {
     return { id: node.id, label: node.type };
   }
 
   handleMove(
-    source: Layer,
-    target: Layer,
+    source: DocumentNode,
+    target: DocumentNode,
     position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
@@ -45,7 +45,7 @@ class LayersTreeProvider extends TreeDataProvider<Layer> {
           p.id === page.id
             ? {
                 ...p,
-                nodes: moveLayerRelativeToTarget(
+                nodes: moveNodeRelativeToTarget(
                   p.nodes,
                   source.id,
                   target.id,
@@ -83,7 +83,7 @@ class LayersPlugin extends WorkbenchPlugin {
 describe('moveViewItem', () => {
   it('delegates to tree provider handleMove', async () => {
     const controller = new WorkbenchController({
-      initialScene: normalizeSceneForTest({
+      initialScene: normalizeDocumentForTest({
         pages: [
           {
             id: 'p1',
@@ -153,7 +153,7 @@ describe('view when clause', () => {
 
   it('omits views when when clause is false', async () => {
     const controller = new WorkbenchController({
-      initialScene: normalizeSceneForTest({
+      initialScene: normalizeDocumentForTest({
         pages: [
           {
             id: 'p1',
@@ -190,7 +190,7 @@ describe('registerTreeDataProvider primary and order', () => {
     }
 
     const controller = new WorkbenchController({
-      initialScene: normalizeSceneForTest({
+      initialScene: normalizeDocumentForTest({
         pages: [
           {
             id: 'p1',
@@ -225,7 +225,7 @@ describe('registerTreeDataProvider primary and order', () => {
     }
 
     const controller = new WorkbenchController({
-      initialScene: normalizeSceneForTest({
+      initialScene: normalizeDocumentForTest({
         pages: [
           {
             id: 'p1',

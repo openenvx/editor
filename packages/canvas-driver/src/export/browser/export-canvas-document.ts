@@ -1,4 +1,4 @@
-import type { Scene } from '@openenvx/studio/schema';
+import type { Document } from '@openenvx/studio/schema';
 
 import type {
   CanvasExportOptions,
@@ -10,7 +10,7 @@ import { loadBrowserExportImage } from '../load-export-image';
 import { assertBrowserExportFormat } from '../resolve-export-request';
 
 export async function exportCanvasDocument(
-  scene: Scene,
+  scene: Document,
   pageId: string,
   options: CanvasExportOptions
 ): Promise<CanvasExportResult> {

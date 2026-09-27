@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   applyNodeTransform,
-  createDefaultTransform,
+  createDefaultFrame,
   formatVariableToken,
   nodeTransform,
 } from '@openenvx/studio/schema';
@@ -16,7 +16,7 @@ import {
 
 function createSceneWithLayer() {
   const transform = {
-    ...createDefaultTransform(),
+    ...createDefaultFrame(),
     x: 10,
     y: 20,
     width: 100,
@@ -63,7 +63,7 @@ describe('createCanvasPropertyHostContext', () => {
               html: `<p>${token}</p>`,
             },
             transform: {
-              ...createDefaultTransform(),
+              ...createDefaultFrame(),
               x: 150,
               y: 200,
               width: 500,

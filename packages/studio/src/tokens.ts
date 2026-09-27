@@ -1,7 +1,7 @@
 import type { EditorDiagnosticsService } from './diagnostics/editor-diagnostics-service';
 import type { LayerRegistry } from './registries/registries';
 import { createServiceId } from './runtime/create-service-id';
-import type { SceneStore } from './scene/scene-store';
+import type { DocumentStore } from './scene/document-store';
 import type {
   AssetService,
   FontService,
@@ -15,7 +15,8 @@ export const FontServiceId = createServiceId<FontService>('fonts');
 export const PersistenceServiceId =
   createServiceId<PersistenceService>('persistence');
 export const LayerRegistryServiceId = createServiceId<LayerRegistry>('layers');
-export const SceneStoreServiceId = createServiceId<SceneStore>('sceneStore');
+export const DocumentStoreServiceId =
+  createServiceId<DocumentStore>('documentStore');
 export const EditorServiceId = createServiceId<EditorService>('editorService');
 export const ContextKeyServiceId =
   createServiceId<ContextKeyService>('contextKeyService');

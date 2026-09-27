@@ -2,7 +2,7 @@ import { canEditLayerData } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
 import type { DocumentNode, Transform } from '@openenvx/studio/schema';
 import {
-  createDefaultTransform,
+  createDefaultFrame,
   nodeProps,
   nodeTransform,
 } from '@openenvx/studio/schema';
@@ -99,7 +99,7 @@ export const CanvasRichTextOverlay = memo(
         { kind: 'richText' }
       >;
       const transform =
-        absoluteTransform ?? nodeTransform(layer) ?? createDefaultTransform();
+        absoluteTransform ?? nodeTransform(layer) ?? createDefaultFrame();
       const fontSize = richTextView.fontSize ?? DEFAULT_RICH_TEXT_FONT_SIZE;
       const fontFamily =
         richTextView.fontFamily ?? DEFAULT_RICH_TEXT_FONT_FAMILY;

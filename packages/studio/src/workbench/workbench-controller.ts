@@ -27,18 +27,14 @@ import { EditorRuntime } from '../runtime/editor-runtime';
 import type { Plugin } from '../runtime/plugin';
 import { PluginManager } from '../runtime/plugin-manager';
 import { WorkbenchEvents } from '../runtime/workbench-events';
+import { DocumentStore } from '../scene/document-store';
 import {
   canEditLayerData,
   canSelectLayer,
   setTemplatePolicyEnforced,
 } from '../scene/layer-editability';
-import {
-  findLayerById,
-  updateLayerInTree,
-  walkLayers,
-} from '../scene/layer-tree';
-import { SceneStore } from '../scene/scene-store';
-import type { Layer, Scene } from '../scene/types';
+import { findNodeById, updateNodeInTree, walkNodes } from '../scene/layer-tree';
+import type { DocumentNode, Document } from '../scene/types';
 import { buildChromeSlice } from '../state/chrome-slice-builder';
 import { buildCommandsSlice } from '../state/commands-slice-builder';
 import { EditorSliceBuilder } from '../state/editor-slice-builder';
@@ -141,7 +137,7 @@ export class WorkbenchController {
         })
       : createEmptyProjectSnapshot();
     this.runtime = new EditorRuntime(
-      new SceneStore(snapshot.document, snapshot.session),
+      new DocumentStore(snapshot.document, snapshot.session),
       new EditorService()
     );
     const diagnosticsEnabled = resolveEditorDiagnosticsFromBrowser(
@@ -289,7 +285,7 @@ export class WorkbenchController {
   private wireStateRefresh(): void {
     const events = this.runtime.getEvents();
     this.eventDisposables.push(
-      events.on(WorkbenchEvents.DidChangeScene, (snapshot) => {
+      events.on(WorkbenchEvents.DidChangeDocument, (snapshot) => {
         const prevContentRevision = this.lastSeenContentRevision;
         this.lastSeenContentRevision = snapshot.contentRevision;
         this.stateCache.onSceneContentRevision(snapshot.contentRevision);
@@ -363,8 +359,8 @@ export class WorkbenchController {
       saveAs: (uri) => this.saveAs(uri),
       openDocument: (uri) => this.openDocument(uri),
       scene: this.runtime.getDocument(),
-      selectLayers: (layerIds, primaryLayerId) =>
-        this.selectLayers(layerIds, primaryLayerId),
+      selectNodes: (layerIds, primaryLayerId) =>
+        this.selectNodes(layerIds, primaryLayerId),
       setHoveredLayer: (layerId) => this.setHoveredLayer(layerId),
       setActiveContainer: (location, containerId) =>
         this.setActiveContainer(location, containerId),
@@ -425,7 +421,7 @@ export class WorkbenchController {
         uri: this.options.editorUri ?? 'untitled://scene',
       },
       sceneStore.getContentRevision(),
-      sceneStore.getEditorState()
+      sceneStore.getSession()
     );
     this.detachKeybindings = attachWorkbenchKeybindings(
       this.manager.getRegistries(),
@@ -552,26 +548,22 @@ export class WorkbenchController {
     };
   }
 
-  selectLayers(layerIds: string[], primaryLayerId?: string | null): void {
+  selectNodes(layerIds: string[], primaryLayerId?: string | null): void {
     const sceneStore = this.runtime.getDocument();
     const currentScene = sceneStore.getDocument();
     const editableIds = layerIds.filter((id) => {
-      const targetLayer = findLayerById(currentScene, id);
+      const targetLayer = findNodeById(currentScene, id);
       return targetLayer && canSelectLayer(targetLayer);
     });
     if (editableIds.length === 0) {
-      sceneStore.selectLayers([], null);
+      sceneStore.selectNodes([], null);
       return;
     }
     const validPrimary =
       primaryLayerId && editableIds.includes(primaryLayerId)
         ? primaryLayerId
         : editableIds[0];
-    sceneStore.selectLayers(editableIds, validPrimary ?? null);
-  }
-
-  selectNodes(nodeIds: string[], primaryNodeId?: string | null): void {
-    this.selectLayers(nodeIds, primaryNodeId);
+    sceneStore.selectNodes(editableIds, validPrimary ?? null);
   }
 
   setHoveredLayer(layerId: string | null): void {
@@ -786,7 +778,7 @@ export class WorkbenchController {
 
     const sceneStore = this.runtime.getDocument();
     const currentScene = sceneStore.getDocument();
-    const targetLayer = findLayerById(currentScene, layerId);
+    const targetLayer = findNodeById(currentScene, layerId);
     if (!targetLayer) {
       return;
     }
@@ -818,10 +810,10 @@ export class WorkbenchController {
 
     const labelKeys = allowed.map(([key]) => key).join(', ');
     sceneStore.apply({
-      apply: (document: Scene) => {
+      apply: (document: Document) => {
         let artboards = document.artboards.map((artboard) => ({
           ...artboard,
-          nodes: updateLayerInTree(artboard.nodes, layerId, (layer) => {
+          nodes: updateNodeInTree(artboard.nodes, layerId, (layer) => {
             const props =
               typeof layer.props === 'object' && layer.props !== null
                 ? { ...(layer.props as Record<string, unknown>) }
@@ -840,7 +832,7 @@ export class WorkbenchController {
           const widgetId = widgetAncestor.id;
           artboards = artboards.map((artboard) => ({
             ...artboard,
-            nodes: updateLayerInTree(artboard.nodes, widgetId, (layer) => {
+            nodes: updateNodeInTree(artboard.nodes, widgetId, (layer) => {
               const props =
                 typeof layer.props === 'object' && layer.props !== null
                   ? { ...(layer.props as Record<string, unknown>) }
@@ -941,11 +933,11 @@ export class WorkbenchController {
     revertDocument(this.documentOpsDeps);
   }
 
-  serializeScene(): Scene {
-    return structuredClone(this.runtime.getDocument().getScene());
+  serializeScene(): Document {
+    return structuredClone(this.runtime.getDocument().getDocument());
   }
 
-  loadScene(scene: Scene): void {
+  loadScene(scene: Document): void {
     loadSceneDocument(this.documentOpsDeps, scene);
   }
 
@@ -1048,10 +1040,13 @@ function htmlToPlainText(html: string): string {
     .trim();
 }
 
-function findWidgetAncestor(scene: Scene, layerId: string): Layer | null {
+function findWidgetAncestor(
+  scene: Document,
+  layerId: string
+): DocumentNode | null {
   for (const artboard of scene.artboards) {
-    let found: Layer | null = null;
-    walkLayers(artboard.nodes, (layer, path) => {
+    let found: DocumentNode | null = null;
+    walkNodes(artboard.nodes, (layer, path) => {
       if (layer.id !== layerId) {
         return;
       }

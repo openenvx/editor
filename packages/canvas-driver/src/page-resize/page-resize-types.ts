@@ -1,5 +1,5 @@
-import type { Scene } from '@openenvx/studio/schema';
+import type { Document } from '@openenvx/studio/schema';
 
 export interface PageResizeService {
-  resizeSceneToPreset(scene: Scene, presetId: string): Scene | null;
+  resizeSceneToPreset(scene: Document, presetId: string): Document | null;
 }

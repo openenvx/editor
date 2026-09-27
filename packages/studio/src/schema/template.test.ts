@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { normalizeScene } from './normalize';
+import { normalizeDocument } from './normalize';
 import {
   applyModifications,
   extractTemplateManifest,
@@ -10,7 +10,7 @@ import {
 } from './template';
 
 function sampleScene() {
-  return normalizeScene({
+  return normalizeDocument({
     artboards: [
       {
         extensions: { layout: 'absolute' },
@@ -97,7 +97,7 @@ describe('template', () => {
   });
 
   it('validateTemplateNames reports duplicates', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [
         {
           extensions: { layout: 'absolute' },

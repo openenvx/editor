@@ -5,11 +5,11 @@ import {
   documentWith,
   flowArtboard,
 } from '../test/document-fixtures';
-import { moveLayerToIndex, reorderLayers, SceneStore } from './scene-store';
+import { moveNodeToIndex, reorderNodes, DocumentStore } from './document-store';
 
-describe(SceneStore, () => {
+describe(DocumentStore, () => {
   it('records history for successful node prop updates', () => {
-    const store = new SceneStore(
+    const store = new DocumentStore(
       documentWith([
         absoluteArtboard('p1', 'Page', 100, 100, [
           {
@@ -65,7 +65,7 @@ describe(SceneStore, () => {
   });
 
   it('applies transactions with undo', () => {
-    const store = new SceneStore();
+    const store = new DocumentStore();
     const pageId = store.getDocument().artboards[0]!.id;
 
     store.apply({
@@ -92,7 +92,7 @@ describe(SceneStore, () => {
   });
 
   it('replaceScene pushes history so undo restores the prior scene', () => {
-    const store = new SceneStore();
+    const store = new DocumentStore();
     const pageId = store.getDocument().artboards[0]!.id;
     store.apply({
       apply: (document) => ({
@@ -109,7 +109,7 @@ describe(SceneStore, () => {
       label: 'Seed',
     });
 
-    store.replaceScene(
+    store.replaceDocument(
       documentWith([
         {
           extensions: { layout: 'email' },
@@ -137,16 +137,16 @@ describe(SceneStore, () => {
   });
 
   it('setScene replaces without an extra history entry', () => {
-    const store = new SceneStore();
+    const store = new DocumentStore();
     const beforeName = store.getDocument().artboards[0]!.name;
-    store.setScene(documentWith([flowArtboard('p2', 'Replaced')]));
+    store.setDocument(documentWith([flowArtboard('p2', 'Replaced')]));
     expect(store.getDocument().artboards[0]!.name).toBe('Replaced');
     expect(store.canUndo()).toBe(false);
     expect(beforeName).not.toBe('Replaced');
   });
 
   it('commits scene.variables-only transactions', () => {
-    const store = new SceneStore();
+    const store = new DocumentStore();
     expect(store.getDocument().variables).toBeUndefined();
 
     store.apply({
@@ -166,7 +166,7 @@ describe(SceneStore, () => {
   });
 
   it('supports multi-select', () => {
-    const store = new SceneStore();
+    const store = new DocumentStore();
     const pageId = store.getDocument().artboards[0]!.id;
     store.apply({
       apply: (document) => ({
@@ -186,15 +186,15 @@ describe(SceneStore, () => {
       label: 'Add layers',
     });
     store.selectNodes(['a', 'b'], 'a');
-    expect(store.getSelection().selectedNodeIds).toStrictEqual(['a', 'b']);
-    expect(store.getSelection().primaryNodeId).toBe('a');
+    expect(store.getSession().selectedNodeIds).toStrictEqual(['a', 'b']);
+    expect(store.getSession().primaryNodeId).toBe('a');
   });
 
   it('keeps scene identity on selection-only changes', () => {
-    const store = new SceneStore();
+    const store = new DocumentStore();
     const before = store.getDocument();
     let notifiedScene: unknown;
-    store.onDidChangeScene((snapshot) => {
+    store.onDidChangeDocument((snapshot) => {
       notifiedScene = snapshot.document;
     });
     store.selectNodes([], null);
@@ -203,7 +203,7 @@ describe(SceneStore, () => {
   });
 
   it('shares page identity for untouched pages after apply', () => {
-    const store = new SceneStore(
+    const store = new DocumentStore(
       documentWith([
         absoluteArtboard('p1', 'One', 100, 100, [
           {
@@ -252,7 +252,7 @@ describe(SceneStore, () => {
   });
 
   it('commits page reorder when page refs are unchanged', () => {
-    const store = new SceneStore(
+    const store = new DocumentStore(
       documentWith([
         absoluteArtboard('p1', 'One', 100, 100),
         absoluteArtboard('p2', 'Two', 100, 100),
@@ -271,7 +271,7 @@ describe(SceneStore, () => {
   });
 
   it('prunes stale selection after apply removes layers', () => {
-    const store = new SceneStore();
+    const store = new DocumentStore();
     const pageId = store.getDocument().artboards[0]!.id;
     store.apply({
       apply: (document) => ({
@@ -305,12 +305,12 @@ describe(SceneStore, () => {
       }),
       label: 'Delete layer',
     });
-    expect(store.getSelection().selectedNodeIds).toStrictEqual(['b']);
-    expect(store.getSelection().primaryNodeId).toBe('b');
+    expect(store.getSession().selectedNodeIds).toStrictEqual(['b']);
+    expect(store.getSession().primaryNodeId).toBe('b');
   });
 
   it('applies activeArtboardId atomically with the scene transaction', () => {
-    const store = new SceneStore(
+    const store = new DocumentStore(
       documentWith([
         flowArtboard('a', 'A'),
         flowArtboard('b', 'B'),
@@ -332,14 +332,14 @@ describe(SceneStore, () => {
       label: 'Delete page',
     });
     expect(snapshots).toStrictEqual(['b']);
-    expect(store.getActivePageId()).toBe('b');
+    expect(store.getActiveArtboardId()).toBe('b');
     expect(store.getDocument().artboards.map((artboard) => artboard.id)).toStrictEqual(
       ['a', 'b']
     );
   });
 });
 
-describe(moveLayerToIndex, () => {
+describe(moveNodeToIndex, () => {
   const layers = [
     { id: 'a', props: {}, type: 'text' },
     { id: 'b', props: {}, type: 'text' },
@@ -347,29 +347,29 @@ describe(moveLayerToIndex, () => {
   ];
 
   it('moves layer to target index', () => {
-    const result = moveLayerToIndex(layers, 'c', 0);
+    const result = moveNodeToIndex(layers, 'c', 0);
     expect(result.map((l) => l.id)).toStrictEqual(['c', 'a', 'b']);
   });
 
   it('returns same array when layer not found', () => {
-    expect(moveLayerToIndex(layers, 'missing', 0)).toBe(layers);
+    expect(moveNodeToIndex(layers, 'missing', 0)).toBe(layers);
   });
 
   it('clamps target index', () => {
-    expect(moveLayerToIndex(layers, 'a', 99).map((l) => l.id)).toStrictEqual([
+    expect(moveNodeToIndex(layers, 'a', 99).map((l) => l.id)).toStrictEqual([
       'b',
       'c',
       'a',
     ]);
   });
 
-  it('reorderLayers up/down delegates to moveLayerToIndex', () => {
-    expect(reorderLayers(layers, 'b', 'up').map((l) => l.id)).toStrictEqual([
+  it('reorderNodes up/down delegates to moveNodeToIndex', () => {
+    expect(reorderNodes(layers, 'b', 'up').map((l) => l.id)).toStrictEqual([
       'b',
       'a',
       'c',
     ]);
-    expect(reorderLayers(layers, 'b', 'down').map((l) => l.id)).toStrictEqual([
+    expect(reorderNodes(layers, 'b', 'down').map((l) => l.id)).toStrictEqual([
       'a',
       'c',
       'b',
@@ -377,12 +377,12 @@ describe(moveLayerToIndex, () => {
   });
 });
 
-describe('SceneStore page rules', () => {
+describe('DocumentStore page rules', () => {
   it('rejects undimensioned absolute pages once page-rules lookup is wired', () => {
-    const store = new SceneStore();
+    const store = new DocumentStore();
     store.setPageRulesLookup(() => ({}));
     expect(() =>
-      store.setScene(
+      store.setDocument(
         documentWith([
           {
             extensions: { layout: 'absolute' },
@@ -398,8 +398,8 @@ describe('SceneStore page rules', () => {
   });
 
   it('accepts undimensioned absolute pages when lookup is unset', () => {
-    const store = new SceneStore();
-    store.setScene(
+    const store = new DocumentStore();
+    store.setDocument(
       documentWith([
         {
           extensions: { layout: 'absolute' },

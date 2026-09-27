@@ -1,6 +1,6 @@
-import type { Layer as SceneLayer } from '@openenvx/studio';
+import type { DocumentNode as SceneLayer } from '@openenvx/studio';
 import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { describe, expect, it } from 'vitest';
 
@@ -15,7 +15,7 @@ describe('resolveHandleDragTarget', () => {
   const layer: SceneLayer = {
     id: 'layer-1',
     name: 'Layer',
-    transform: createDefaultTransform(),
+    transform: createDefaultFrame(),
     type: 'canvasImage',
     visible: true,
   };
@@ -31,7 +31,7 @@ describe('resolveHandleDragTarget', () => {
       drag: {
         anchor: 'top-left',
         layerId: 'missing',
-        originTransform: createDefaultTransform(),
+        originTransform: createDefaultFrame(),
       },
       flattenedLayers,
       nodeRefs: { current: new Map() },
@@ -46,7 +46,7 @@ describe('resolveHandleDragTarget', () => {
       drag: {
         anchor: 'top-left',
         layerId: 'layer-1',
-        originTransform: createDefaultTransform(),
+        originTransform: createDefaultFrame(),
       },
       flattenedLayers,
       nodeRefs: { current: new Map() },
@@ -68,7 +68,7 @@ describe('resolveHandleDragTarget', () => {
       drag: {
         anchor: 'top-left',
         layerId: 'layer-1',
-        originTransform: createDefaultTransform(),
+        originTransform: createDefaultFrame(),
       },
       flattenedLayers,
       nodeRefs: { current: new Map([['layer-1', node]]) },
@@ -96,7 +96,7 @@ describe('resolveHandleDragTarget', () => {
       drag: {
         anchor: 'top-left',
         layerId: 'layer-1',
-        originTransform: createDefaultTransform(),
+        originTransform: createDefaultFrame(),
       },
       flattenedLayers,
       nodeRefs: { current: new Map([['layer-1', node]]) },

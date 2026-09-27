@@ -1,4 +1,4 @@
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -13,7 +13,7 @@ import {
 } from './rich-text-resize';
 
 const snapshot = {
-  ...createDefaultTransform(),
+  ...createDefaultFrame(),
   height: 80,
   width: 200,
   x: 10,

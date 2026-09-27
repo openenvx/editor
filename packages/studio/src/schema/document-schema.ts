@@ -229,7 +229,3 @@ export const leafSchemas = {
 export const frameSchema = leafSchemas.frame;
 export const nodeStyleShadowSchema = leafSchemas.nodeShadow;
 export const paddingSchema = leafSchemas.padding;
-/** @deprecated use frameSchema */
-export const transformSchema = frameSchema;
-/** @deprecated use nodeStyleShadowSchema */
-export const layerStyleShadowSchema = nodeStyleShadowSchema;

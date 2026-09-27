@@ -6,7 +6,7 @@ import type {
   PropertySectionDescriptor,
 } from '@openenvx/studio';
 import type { Artboard } from '@openenvx/studio/schema';
-import { createDefaultTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 import { getImagePastePreview } from '../clipboard/image-paste-preview';
@@ -47,7 +47,7 @@ export class CanvasImageLayer extends LayerDefinition<CanvasImageModel> {
         focalPoint: { x: 0.5, y: 0.5 },
       },
       id,
-      frame: { ...createDefaultTransform(), height: 240, width: 320 },
+      frame: { ...createDefaultFrame(), height: 240, width: 320 },
       type: this.type,
     };
   }

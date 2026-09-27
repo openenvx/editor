@@ -185,7 +185,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
   };
 
   const isGroupLayer = layer.type === CANVAS_GROUP_LAYER_TYPE;
-  const isContainerLayer = isCanvasContainerLayerType(layer.type);
+  const isContainerNode = isCanvasContainerLayerType(layer.type);
   const pointerDragCleanupRef = useRef<(() => void) | null>(null);
   const groupOutline = isGroupLayer
     ? computeGroupOutlineBounds(
@@ -285,7 +285,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
 
       const node = event.currentTarget as Konva.Group;
 
-      if (isContainerLayer && isSelected && draggable) {
+      if (isContainerNode && isSelected && draggable) {
         attachPointerDragThreshold({
           cleanupRef: pointerDragCleanupRef,
           node,
@@ -342,7 +342,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
     },
     [
       draggable,
-      isContainerLayer,
+      isContainerNode,
       isSelected,
       layer.id,
       layerSelectable,
@@ -464,7 +464,7 @@ export const CanvasStageLayerGroup = memo(function CanvasStageLayerGroup({
       x={transform.x}
       y={transform.y}
     >
-      {isContainerLayer ? (
+      {isContainerNode ? (
         <Rect
           dash={isGroupLayer ? [6, 4] : undefined}
           fill="transparent"

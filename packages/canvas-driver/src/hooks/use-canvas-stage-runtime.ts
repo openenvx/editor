@@ -1,5 +1,5 @@
-import type { Layer as SceneLayer } from '@openenvx/studio';
-import { canTransformLayer, getLayerChildren } from '@openenvx/studio';
+import type { DocumentNode as SceneLayer } from '@openenvx/studio';
+import { canTransformLayer, getChildNodes } from '@openenvx/studio';
 import { useStoreSelector } from '@openenvx/studio/react';
 import { nodeTransform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
@@ -287,7 +287,7 @@ export function useCanvasStageRuntime(
   const isNonEmptyGroupSelected =
     selectedLayer !== undefined &&
     isCanvasContainerLayerType(selectedLayer.layer.type) &&
-    getLayerChildren(selectedLayer.layer).length > 0;
+    getChildNodes(selectedLayer.layer).length > 0;
 
   const isRichTextSelected = selectedInteraction?.kind === 'richText';
 

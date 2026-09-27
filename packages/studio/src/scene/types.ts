@@ -19,12 +19,6 @@ export type {
   Transform,
 } from '#studio/schema';
 
-export type Page = Artboard;
-export type Scene = Document;
-export type Layer = DocumentNode;
-export type EditorState = EditorSession;
-export type Selection = EditorSession;
-
 /**
  * Document + editor snapshot for the live store.
  *
@@ -37,27 +31,19 @@ export interface LiveProjectSnapshot {
   contentRevision: number;
 }
 
-export type SceneSnapshot = LiveProjectSnapshot;
-
 export interface DocumentTransaction {
   label: string;
   apply(document: Document): Document;
   activeArtboardId?: string;
 }
 
-export type SceneTransaction = DocumentTransaction;
-
 export function cloneDocument(document: Document): Document {
   return structuredClone(document);
 }
 
-export const cloneScene = cloneDocument;
-
 export function cloneEditorSession(session: EditorSession): EditorSession {
   return structuredClone(session);
 }
-
-export const cloneEditorState = cloneEditorSession;
 
 export function getActiveArtboard(
   document: Document,
@@ -71,8 +57,6 @@ export function getActiveArtboard(
   }
   return document.artboards[0]!;
 }
-
-export const getActivePage = getActiveArtboard;
 
 export function getPrimaryNode(
   document: Document,
@@ -96,14 +80,10 @@ export function getPrimaryNode(
   return found;
 }
 
-export const getPrimaryLayer = getPrimaryNode;
-
 /** Host resolves editor surface from product configuration, not document JSON. */
 export function resolveEditorSurfaceKind(_surfaceKind: string): string {
   return _surfaceKind;
 }
-
-export type PageLayout = string;
 
 export function resolveEditorPaneKind(
   document: Document,

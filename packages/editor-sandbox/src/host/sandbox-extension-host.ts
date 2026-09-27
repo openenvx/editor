@@ -1,8 +1,8 @@
 import {
   Command,
   findNodeById,
-  updateLayerInTree,
-  walkLayers,
+  updateNodeInTree,
+  walkNodes,
 } from '@openenvx/studio';
 import type { WorkbenchApi } from '@openenvx/studio';
 import type { Document, DocumentNode } from '@openenvx/studio/schema';
@@ -59,7 +59,7 @@ function findWidgetClickInLayers(
     handlerId: string;
   } | null = null;
 
-  walkLayers(layers, (layer, path) => {
+  walkNodes(layers, (layer, path) => {
     if (result || layer.id !== targetLayerId) {
       return;
     }
@@ -244,7 +244,7 @@ export class SandboxExtensionHost {
       }
       const epoch = (faceEpoch.get(layerId) ?? 0) + 1;
       faceEpoch.set(layerId, epoch);
-      const layer = findNodeById(host.getScene(), layerId);
+      const layer = findNodeById(host.getDocument(), layerId);
       if (!layer || layer.type !== widgetLayerType) {
         return;
       }
@@ -279,11 +279,11 @@ export class SandboxExtensionHost {
           ...scene,
           artboards: scene.artboards.map((page) => ({
             ...page,
-            nodes: updateLayerInTree(page.nodes, layerId, () => next),
+            nodes: updateNodeInTree(page.nodes, layerId, () => next),
           })),
         }),
       });
-      const applied = findNodeById(host.getScene(), layerId);
+      const applied = findNodeById(host.getDocument(), layerId);
       if (applied) {
         lastValues.set(
           layerId,
@@ -366,11 +366,11 @@ export class SandboxExtensionHost {
     }
 
     const syncWidgets = () => {
-      const scene = host.getScene();
+      const scene = host.getDocument();
       const desired: { extensionId: string; layerId: string }[] = [];
       const seenLayerIds = new Set<string>();
       for (const page of scene.artboards) {
-        walkLayers(page.nodes, (layer) => {
+        walkNodes(page.nodes, (layer) => {
           if (layer.type !== widgetLayerType) {
             return;
           }
@@ -416,7 +416,7 @@ export class SandboxExtensionHost {
     };
 
     syncWidgets();
-    this.widgetWatchDispose = host.onDidChangeScene(() => {
+    this.widgetWatchDispose = host.onDidChangeDocument(() => {
       syncWidgets();
     });
     this.selectionWatchDispose = host.onDidChangeSelection(() => {
@@ -425,7 +425,7 @@ export class SandboxExtensionHost {
     if (this.bindWidgetClick) {
       this.widgetClickDispose = this.bindWidgetClick((targetLayerId) => {
         const resolved = resolveWidgetClickTarget(
-          host.getScene(),
+          host.getDocument(),
           targetLayerId,
           widgetLayerType
         );

@@ -8,7 +8,7 @@ import {
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import type {
-  Scene,
+  Document,
   ViewContainerDescriptor,
   ViewDescriptor,
   ViewTreeItem,
@@ -368,7 +368,7 @@ function ViewPanelBody({
   hoveredLayerId: string | null;
   activeArtboardId: string;
   layerSelectedIds: Set<string>;
-  scene: Scene;
+  scene: Document;
 }) {
   const { api } = useWorkbenchContext();
   const [renamingId, setRenamingId] = useState<string | null>(null);

@@ -2,7 +2,7 @@ import type { ComponentType } from 'react';
 import { useCallback, useMemo } from 'react';
 
 import {
-  findLayerById,
+  findNodeById,
   createPropertyHostContext,
   ContextKeyServiceId,
   evaluatePropertyLayoutWhen,
@@ -62,7 +62,7 @@ function usePropertiesHostContext(
     if (!scene || !primaryNodeId) {
       return null;
     }
-    const primaryLayer = findLayerById(scene, primaryNodeId);
+    const primaryLayer = findNodeById(scene, primaryNodeId);
     if (
       !primaryLayer ||
       typeof primaryLayer.props !== 'object' ||

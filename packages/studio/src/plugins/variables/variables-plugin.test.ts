@@ -3,19 +3,19 @@ import {
   LocalizationServiceId,
   WorkbenchNavigationServiceId,
 } from '#studio';
-import { normalizeScene } from '#studio/schema';
+import { normalizeDocument } from '#studio/schema';
 import { describe, expect, it, vi } from 'vitest';
 
 import { LocalizationServiceImpl } from '../../i18n/localization-service';
 import { registerWorkbenchLocalizationBundles } from '../../i18n/workbench-i18n';
 import { InstantiationService } from '../../runtime/instantiation-service';
-import { SceneStore } from '../../scene/scene-store';
+import { DocumentStore } from '../../scene/document-store';
 import { CreateVariableCommand, EditVariableCommand } from './variables-plugin';
 import { VARIABLE_FORM_DELETE_ACTION } from './variable-form';
 
 function createCommandContext(sceneOverrides: Record<string, unknown> = {}) {
-  const sceneStore = new SceneStore(
-    normalizeScene({
+  const sceneStore = new DocumentStore(
+    normalizeDocument({
       pages: [{ id: 'p1', name: 'Page', layout: 'absolute', layers: [] }],
       variables: [{ id: 'var-1', key: 'name' }],
       ...sceneOverrides,

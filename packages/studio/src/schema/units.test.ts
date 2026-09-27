@@ -1,9 +1,9 @@
-import { normalizeScene } from '#studio/schema';
+import { normalizeDocument } from '#studio/schema';
 import { describe, expect, it } from 'vitest';
 
 describe('schema units', () => {
   it('normalizes artboard unit and dpi', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [
         {
           extensions: { layout: 'absolute' },
@@ -20,7 +20,7 @@ describe('schema units', () => {
   });
 
   it('normalizes nested container children', () => {
-    const scene = normalizeScene({
+    const scene = normalizeDocument({
       artboards: [
         {
           extensions: { layout: 'flow' },

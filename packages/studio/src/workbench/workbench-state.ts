@@ -22,8 +22,8 @@ import type { ExternalStore } from '../runtime/external-store';
 import type { InteractionState } from '../runtime/interaction-state';
 import type { Plugin } from '../runtime/plugin';
 import type { EventBus } from '../runtime/workbench-events';
-import type { SceneStore } from '../scene/scene-store';
-import type { EditorState, Layer, Scene, Selection } from '../scene/types';
+import type { DocumentStore } from '../scene/document-store';
+import type { Document, DocumentNode, EditorSession } from '../scene/types';
 import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
 import type { EditorInput, EditorService } from '../workbench/editor-service';
 import type {
@@ -116,14 +116,14 @@ export interface ViewContainerDescriptor {
 }
 
 export interface LayerSurfaceItem {
-  layer: Layer;
+  layer: DocumentNode;
   view: LayerPreviewDescriptor;
 }
 
 export interface WorkbenchState {
   revision: number;
-  scene: Scene;
-  selection: Selection;
+  scene: Document;
+  selection: EditorSession;
   interaction: InteractionState;
   viewContainers: ViewContainerDescriptor[];
   viewLocations: Record<string, ViewContainerLocation>;
@@ -152,7 +152,7 @@ export interface WorkbenchState {
 
 export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   commands: CommandService;
-  scene: SceneStore;
+  scene: DocumentStore;
   editor: EditorService;
   events: EventBus;
   executeCommand: (commandId: string, args?: unknown) => Promise<boolean>;
@@ -176,7 +176,7 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
     target: unknown,
     position: 'before' | 'after' | 'inside'
   ) => void;
-  selectLayers: (layerIds: string[], primaryNodeId?: string | null) => void;
+  selectNodes: (layerIds: string[], primaryNodeId?: string | null) => void;
   setHoveredLayer: (layerId: string | null) => void;
   setActiveContainer: (
     location: ViewContainerLocation,
@@ -207,8 +207,8 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   saveAs: (uri: string) => Promise<void>;
   openDocument: (uri: string) => Promise<void>;
   revert: () => void;
-  serializeScene: () => Scene;
-  loadScene: (scene: Scene) => void;
+  serializeScene: () => Document;
+  loadScene: (scene: Document) => void;
   closeDialog: () => void;
   showConfirm: (options: ConfirmDialogOptions) => Promise<boolean>;
   /** Resolves a pending {@link showConfirm} dialog. No-op when none is active. */
@@ -225,8 +225,8 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
 
 export interface WorkbenchControllerOptions {
   plugins: Plugin[];
-  initialScene?: Scene;
-  initialEditorState?: EditorState;
+  initialScene?: Document;
+  initialEditorState?: EditorSession;
   editorUri?: string;
   editorTitle?: string;
   layout?: Partial<WorkbenchLayout>;

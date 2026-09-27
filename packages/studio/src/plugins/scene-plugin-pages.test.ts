@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { EditorService } from '../workbench/editor-service';
-import { SceneStore } from '../scene/scene-store';
+import { DocumentStore } from '../scene/document-store';
 import { WorkbenchEventService } from '../runtime/workbench-events';
 import { InstantiationService } from '../runtime/instantiation-service';
 import type { CommandContext } from '../runtime/types';
@@ -10,7 +10,7 @@ import {
   asDocumentNode,
   documentWith,
 } from '../test/document-fixtures';
-import type { Artboard, Document, Layer } from '../scene/types';
+import type { Artboard, Document, DocumentNode } from '../scene/types';
 import {
   AddPageCommand,
   DuplicatePageCommand,
@@ -24,7 +24,7 @@ function createPage(
   overrides: {
     id?: string;
     name?: string;
-    layers?: Layer[];
+    layers?: DocumentNode[];
   } = {}
 ): Artboard {
   const { id, name, layers, ...rest } = {
@@ -37,7 +37,7 @@ function createPage(
 }
 
 function createContext(scene: Document, activeArtboardId?: string): CommandContext {
-  const store = new SceneStore(scene);
+  const store = new DocumentStore(scene);
   if (activeArtboardId) {
     store.setActiveArtboard(activeArtboardId);
   }
@@ -54,14 +54,14 @@ function createContext(scene: Document, activeArtboardId?: string): CommandConte
   );
   return {
     scene: store,
-    selection: store.getSelection(),
+    selection: store.getSession(),
     services,
     events: new WorkbenchEventService(),
     editor,
   };
 }
 
-function nestedGroupLayer(): Layer {
+function nestedGroupLayer(): DocumentNode {
   return asDocumentNode({
     id: 'group-1',
     type: 'canvas.group',
@@ -94,7 +94,7 @@ describe('ScenePlugin page commands', () => {
       physical: { unit: 'px', dpi: 96 },
       nodes: [],
     });
-    expect(ctx.scene.getActivePageId()).toBe(pages[1]!.id);
+    expect(ctx.scene.getActiveArtboardId()).toBe(pages[1]!.id);
   });
 
   it('removePage cannot execute on the last page', () => {
@@ -117,7 +117,7 @@ describe('ScenePlugin page commands', () => {
       'a',
       'c',
     ]);
-    expect(ctx.scene.getActivePageId()).toBe('a');
+    expect(ctx.scene.getActiveArtboardId()).toBe('a');
   });
 
   it('duplicatePage clones layers with remapped nested ids', () => {
@@ -135,7 +135,7 @@ describe('ScenePlugin page commands', () => {
     expect(pages[1]!.nodes[0]!.id).not.toBe('group-1');
     const children = pages[1]!.nodes[0]!.children!;
     expect(children[0]!.id).not.toBe('child-1');
-    expect(ctx.scene.getActivePageId()).toBe(pages[1]!.id);
+    expect(ctx.scene.getActiveArtboardId()).toBe(pages[1]!.id);
   });
 
   it('undo after addPage restores pages and active page', () => {
@@ -144,7 +144,7 @@ describe('ScenePlugin page commands', () => {
     expect(ctx.scene.getDocument().artboards).toHaveLength(2);
     undo.execute(ctx);
     expect(ctx.scene.getDocument().artboards).toHaveLength(1);
-    expect(ctx.scene.getActivePageId()).toBe('page-1');
+    expect(ctx.scene.getActiveArtboardId()).toBe('page-1');
   });
 
   it('removePage cannot execute when template policy disallows delete', () => {
@@ -175,7 +175,7 @@ describe('ScenePlugin page commands', () => {
     activeIds.length = 0;
     addPage.execute(ctx);
     expect(activeIds).toHaveLength(1);
-    expect(activeIds[0]).toBe(ctx.scene.getActivePageId());
+    expect(activeIds[0]).toBe(ctx.scene.getActiveArtboardId());
     expect(ctx.scene.getDocument().artboards).toHaveLength(2);
   });
 });

@@ -1,4 +1,4 @@
-import { Command, updateLayerInTree } from '@openenvx/studio';
+import { Command, updateNodeInTree } from '@openenvx/studio';
 import type { CommandContext, DocumentNode } from '@openenvx/studio';
 import type { OpenEnvxWidgetProps } from '@openenvx/studio/schema';
 import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
@@ -62,7 +62,7 @@ export class DetachWidgetCommand extends Command {
   readonly title = 'Detach Widget';
 
   execute(ctx: CommandContext): void {
-    const primary = ctx.scene.getPrimaryLayer();
+    const primary = ctx.scene.getPrimaryNode();
     if (!primary || primary.type !== WIDGET_LAYER_TYPE) {
       return;
     }
@@ -78,7 +78,7 @@ export class DetachWidgetCommand extends Command {
           }
           return {
             ...page,
-            nodes: updateLayerInTree(page.nodes, primary.id, () => group),
+            nodes: updateNodeInTree(page.nodes, primary.id, () => group),
           };
         }),
       }),
