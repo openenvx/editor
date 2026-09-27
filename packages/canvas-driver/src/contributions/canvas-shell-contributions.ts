@@ -7,7 +7,7 @@ import {
   type ToolbarBuilder,
   type CommandContext,
 } from '@openenvx/studio';
-import { nodeTransform } from '@openenvx/studio/schema';
+import { formatVariableToken, nodeTransform } from '@openenvx/studio/schema';
 
 import { CANVAS_GRID_SIZE_PRESETS } from '../commands/canvas-grid-commands';
 
@@ -62,7 +62,9 @@ export class CanvasStatusBarContribution extends StatusBarContribution {
 }
 
 export class CanvasToolbarContribution extends ToolbarContribution {
-  contribute(builder: ToolbarBuilder, _ctx: CommandContext): void {
+  contribute(builder: ToolbarBuilder, ctx: CommandContext): void {
+    const variables = ctx.scene.getScene().variables ?? [];
+
     builder
       .placement('bottom-center')
       .command('canvas-toolbar-undo', {
@@ -95,6 +97,23 @@ export class CanvasToolbarContribution extends ToolbarContribution {
         icon: 'qr-code',
         labelKey: 'toolbar.qrTool',
         priority: 12,
+      })
+      .dropdown('canvas-toolbar-variables', {
+        icon: 'braces',
+        labelKey: 'toolbar.variables',
+        priority: 13,
+        when: 'page.layoutAbsolute',
+        items: [
+          ...variables.map((variable) => ({
+            commandId: 'scene.insertVariable',
+            args: { key: variable.key },
+            label: formatVariableToken(variable.key),
+          })),
+          {
+            commandId: 'variables.create',
+            labelKey: 'toolbar.createVariable',
+          },
+        ],
       })
       .dropdown('canvas-toolbar-grid-size', {
         items: CANVAS_GRID_SIZE_DROPDOWN_ITEMS,

@@ -423,6 +423,9 @@ export function resolvePrimaryTextPropPath(nodeType: string): string | null {
   if (nodeType === 'email.button') {
     return 'label';
   }
+  if (nodeType === 'canvas.qr') {
+    return 'url';
+  }
   if (
     nodeType === 'canvas.text' ||
     nodeType.endsWith('.text') ||

@@ -62,6 +62,33 @@ describe('template-variables', () => {
     });
   });
 
+  it('does not escape canvas.qr url payloads', () => {
+    const scene = normalizeScene({
+      artboards: [
+        {
+          extensions: { layout: 'absolute' },
+          id: 'p1',
+          name: 'Page',
+          nodes: [
+            {
+              id: 'qr1',
+              props: { url: '{{{eventUrl}}}' },
+              type: 'canvas.qr',
+            },
+          ],
+          space: {},
+        },
+      ],
+      variables: [{ id: 'v1', key: 'eventUrl' }],
+    });
+    const resolved = applyTemplateVariables(scene, {
+      eventUrl: 'https://example.com?a=1&b=2',
+    });
+    expect(resolved.artboards[0]!.nodes[0]!.props).toMatchObject({
+      url: 'https://example.com?a=1&b=2',
+    });
+  });
+
   it('leaves unknown tokens intact', () => {
     const scene = normalizeScene({
       artboards: [

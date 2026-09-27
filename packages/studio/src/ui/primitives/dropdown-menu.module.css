@@ -3,9 +3,18 @@
   display: inline-flex;
 }
 
+/* Floating UI positions these with transform, which traps a child z-index.
+   Editor chrome slots are z-index 10, so the menu layer has to live here. */
+.positioner {
+  z-index: 50;
+}
+
+.subPositioner {
+  z-index: 51;
+}
+
 .content,
 .subContent {
-  z-index: 50;
   display: flex;
   flex-direction: column;
   min-width: 180px;
@@ -19,7 +28,6 @@
 }
 
 .subContent {
-  z-index: 51;
   min-width: 140px;
 }
 

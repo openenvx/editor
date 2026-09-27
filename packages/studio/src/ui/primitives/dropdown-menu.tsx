@@ -101,7 +101,12 @@ export function DropdownMenuContent({
 
   return (
     <Menu.Portal>
-      <Menu.Positioner align={align} side={side} sideOffset={SIDE_OFFSET}>
+      <Menu.Positioner
+        align={align}
+        className={styles.positioner}
+        side={side}
+        sideOffset={SIDE_OFFSET}
+      >
         <Menu.Popup
           {...themeScope}
           className={cn(styles.content, overlaySurface.surface, className)}
@@ -191,7 +196,12 @@ export function DropdownMenuSubContent({
 
   return (
     <Menu.Portal>
-      <Menu.Positioner align="start" side="inline-end" sideOffset={SUB_OFFSET}>
+      <Menu.Positioner
+        align="start"
+        className={styles.subPositioner}
+        side="inline-end"
+        sideOffset={SUB_OFFSET}
+      >
         <Menu.Popup
           {...themeScope}
           className={cn(styles.subContent, overlaySurface.surface, className)}

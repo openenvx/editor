@@ -108,4 +108,34 @@ describe('resolveCanvasExportScene', () => {
     expect(nodeTransform(layer).x).toBe(150);
     expect(nodeTransform(layer).width).toBeLessThan(500);
   });
+
+  it('substitutes canvas.qr url payloads', () => {
+    const token = formatVariableToken('ticketUrl');
+    const scene = testDocument([
+      testArtboard({
+        id: 'page-1',
+        nodes: [
+          legacyLayer({
+            data: { url: token },
+            id: 'qr-1',
+            transform: {
+              height: 200,
+              opacity: 1,
+              rotation: 0,
+              width: 200,
+              x: 0,
+              y: 0,
+            },
+            type: 'canvas.qr',
+          }),
+        ],
+      }),
+    ]);
+    const resolved = resolveCanvasExportScene(scene, {
+      variables: { ticketUrl: 'https://example.com/t/42' },
+    });
+    expect(resolved.artboards[0]!.nodes[0]!.props).toMatchObject({
+      url: 'https://example.com/t/42',
+    });
+  });
 });

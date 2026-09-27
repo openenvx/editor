@@ -74,7 +74,12 @@ export class CanvasQrLayer extends LayerDefinition<CanvasQrModel> {
   ): PropertySectionDescriptor[] {
     return createPropertyBuilder()
       .section('qr')
-      .text('url', 'URL / payload', { debounceMs: URL_DEBOUNCE_MS })
+      .text('url', 'URL / payload', {
+        debounceMs: URL_DEBOUNCE_MS,
+        description:
+          'Website, text to encode, or a template variable like {{{key}}}. Mixed literals and variables are supported.',
+        placeholder: 'https://example.com or {{{eventUrl}}}',
+      })
       .color('foreground', 'Foreground')
       .color('background', 'Background')
       .select(

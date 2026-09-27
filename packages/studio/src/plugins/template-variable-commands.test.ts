@@ -13,6 +13,7 @@ import {
   type TextBlockInsertService,
 } from '../services/text-block-insert-service';
 import { WorkbenchEvents } from '../runtime/workbench-events';
+import { formatVariableToken } from '../schema/template-variables';
 import {
   AddVariableCommand,
   executeSceneVariableCommand,
@@ -142,5 +143,52 @@ describe('template-variable-commands', () => {
       insert: () => true,
     } satisfies TextBlockInsertService);
     expect(command.canExecute(ctx, { key: 'name' })).toBe(true);
+  });
+
+  it('insertVariable appends token to selected canvas.qr url', () => {
+    const scene = normalizeSceneForTest({
+      pages: [
+        {
+          id: 'p1',
+          layout: 'absolute',
+          layers: [
+            {
+              id: 'qr1',
+              type: 'canvas.qr',
+              data: { url: 'https://example.com/' },
+            },
+          ],
+        },
+      ],
+      variables: [{ id: 'v1', key: 'eventId' }],
+    });
+    const apply = vi.fn((op: { apply: (s: typeof scene) => typeof scene }) => {
+      const next = op.apply(scene);
+      scene.artboards = next.artboards;
+    });
+    const ctx = createCommandContext({
+      apply,
+      canRedo: () => false,
+      canUndo: () => false,
+      getActivePage: () => scene.artboards[0]!,
+      getDocument: () => scene,
+      redo: () => {},
+      selectLayers: () => {},
+      undo: () => {},
+    } as never);
+    ctx.selection = {
+      activeArtboardId: 'p1',
+      primaryNodeId: 'qr1',
+      selectedNodeIds: ['qr1'],
+    };
+    const command = new InsertVariableCommand();
+    expect(command.canExecute(ctx, { key: 'eventId' })).toBe(true);
+    command.execute(ctx, { key: 'eventId' });
+    expect(apply).toHaveBeenCalled();
+    const qr = scene.artboards[0]!.nodes[0]!;
+    const url = (qr.props as { url: string }).url;
+    expect(url).toBe(
+      `https://example.com/${formatVariableToken('eventId')}`
+    );
   });
 });

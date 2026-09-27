@@ -19,7 +19,7 @@ Names are unique per scene (across all pages and nested groups). The editor warn
 
 ## Inline template variables (catalog + tokens)
 
-Separate from named-layer modifications: a per-scene catalog `scene.variables` and `{{{key}}}` tokens stored in layer `data` string fields (text html, button labels, hrefs, …).
+Separate from named-layer modifications: a per-scene catalog `scene.variables` and `{{{key}}}` tokens stored in layer `data` string fields (text html, button labels, hrefs, `canvas.qr` `url`, …). QR payloads may be a full URL, any string to encode, a single variable token, or a mix (e.g. `https://example.com/e/{{{id}}}`).
 
 | Piece | API |
 | --- | --- |
@@ -27,8 +27,9 @@ Separate from named-layer modifications: a per-scene catalog `scene.variables` a
 | Substitute at render | `applyTemplateVariables(scene, values)` - HTML-escapes values; unknown keys stay as tokens |
 | Editor preview | `applyTemplateVariablesForPreview(scene)` uses each variable's `sample` |
 | Email export | `renderEmailHtml(scene, { variables?: Record<string, string> })` |
-| Canvas export | `exportCanvasDocument(scene, pageId, { format, variables?: Record<string, string> })` (browser PNG/JPG; Node PNG/JPG/PDF via `@openenvx/canvas-driver/export/node`). Substitutes `{{{key}}}` then remasures eligible `canvas.text` layers (`autoFit: 'hug'` hugs the box to glyphs at fixed x/y; `none` keeps width and remasures height). Skips `autoFit: 'shrink'`. `align` is text-align inside the transform box. |
-| Editor catalog UI | Opt-in `@openenvx/studio/plugins/variables` `VariablesPlugin` (secondary sidebar + create/edit dialog); TipTap chips/suggest via `@openenvx/studio/plugins/variables/tiptap` in html/email/canvas rich text |
+| Canvas export | `exportCanvasDocument(scene, pageId, { format, variables?: Record<string, string> })` (browser PNG/JPG; Node PNG/JPG/PDF via `@openenvx/canvas-driver/export/node`). Substitutes `{{{key}}}` (including `canvas.qr` `url`, without HTML-escaping) then remasures eligible `canvas.text` layers (`autoFit: 'hug'` hugs the box to glyphs at fixed x/y; `none` keeps width and remasures height). Skips `autoFit: 'shrink'`. `align` is text-align inside the transform box. QR layers are re-encoded from the resolved `url` after substitution. |
+| Editor catalog UI | Opt-in `@openenvx/studio/plugins/variables` `VariablesPlugin` (secondary sidebar + create/edit dialog); TipTap chips/suggest via `@openenvx/studio/plugins/variables/tiptap` in html/email/canvas rich text; canvas toolbar variable insert for selected layers (including `canvas.qr` `url`) |
+| Canvas QR preview | Konva preview substitutes catalog `sample` values into `url` and re-encodes the QR SVG (stored scene keeps tokens) |
 
 Bannerbear `Modification[]` and inline tokens can coexist on the same scene. Compose `VariablesPlugin` per product (`canvas-driver/studio`, `email-driver/studio`) — not a workbench default.
 
