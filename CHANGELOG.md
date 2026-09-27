@@ -3,6 +3,22 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
 
+## [0.3.9] - 2026-09-27
+
+### Other
+
+- Enhance design documentation and implement shell dropdown functionality
+
+- Updated design documentation in `Design.md` for clarity on Codex light/dark themes and token usage.
+- Introduced `shellDropdownMenuItemId` function to ensure unique identifiers for dropdown items based on command arguments.
+- Added unit tests for the shell dropdown functionality to validate command ID disambiguation and fallback mechanisms.
+- Refined CSS comments in `tokens.css` and `switch.module.css` for improved readability and consistency.
+
+- Migrate shell dropdown tests to use Vitest
+
+- Replaced Bun test framework with Vitest for unit tests in `shell-dropdown.test.ts`.
+- Updated test cases to use `it` instead of `test` for consistency with Vitest conventions.
+
 ## [0.3.8] - 2026-09-22
 
 ### Other
@@ -56,6 +72,8 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 - Created `headless-exports.ts` to consolidate headless module exports for better organization.
 - Developed tests for various components, including command palette and property evaluation, ensuring robust functionality and reliability.
 - Introduced new builders for menus and popup fields to enhance UI component flexibility and usability.
+
+- V0.3.8
 
 ## [0.3.7] - 2026-09-20
 
