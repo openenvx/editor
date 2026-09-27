@@ -1,9 +1,9 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, it } from 'vitest';
 
 import { shellDropdownMenuItemId } from './shell-dropdown';
 
 describe('shellDropdownMenuItemId', () => {
-  test('disambiguates repeated commandId via args', () => {
+  it('disambiguates repeated commandId via args', () => {
     const dropdownId = 'canvas-toolbar-grid-size';
     const commandId = 'canvas.setGridSize';
     const ids = [4, 8, 16].map((size) =>
@@ -16,7 +16,7 @@ describe('shellDropdownMenuItemId', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  test('falls back to index when commandId alone is ambiguous', () => {
+  it('falls back to index when commandId alone is ambiguous', () => {
     const dropdownId = 'zoom';
     const commandId = 'canvas.zoomIn';
     expect(
