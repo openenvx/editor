@@ -198,42 +198,6 @@
         "use-sync-external-store"
       ]
     },
-    "apps/html-package-demo": {
-      "entry": [
-        "src/main.tsx",
-        "src/app.tsx",
-        "index.html",
-        "vite.config.ts"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "vite.config.ts",
-        "../host-react-runtime-vite-aliases.ts"
-      ],
-      "ignoreDependencies": [
-        "react-reconciler",
-        "scheduler",
-        "use-sync-external-store"
-      ]
-    },
-    "apps/email-package-demo": {
-      "entry": [
-        "src/main.tsx",
-        "src/app.tsx",
-        "index.html",
-        "vite.config.ts"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "vite.config.ts",
-        "../host-react-runtime-vite-aliases.ts"
-      ],
-      "ignoreDependencies": [
-        "react-reconciler",
-        "scheduler",
-        "use-sync-external-store"
-      ]
-    },
     "apps/canvas-next-demo": {
       "entry": [
         "app/layout.tsx",

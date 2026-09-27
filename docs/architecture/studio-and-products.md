@@ -1,26 +1,24 @@
 # Studio & products
 
-**Audience:** Contributors and integrators. Packages: `@openenvx/studio`, `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/html-driver`, `@openenvx/email-driver`, and the apps that consume them.
+**Audience:** Contributors and integrators. Packages: `@openenvx/studio`, `@openenvx/canvas-driver`, and the apps that consume them.
 
 Hub: [Architecture.md](../../Architecture.md) · Overview: [overview.md](overview.md).
 
 ## Composable publish stack
 
-Host product apps install a shared shell plus only the artboard engines they need:
+Host product apps install a shared shell plus the canvas engine:
 
 | Package | Role |
 | --- | --- |
 | `@openenvx/studio` | Scene, `Plugin`, runtime, contributions (package root `.`) |
 | `@openenvx/studio/shell` | `WorkbenchShell`, chrome defaults, `./theme.css` / `./styles.css` |
 | `@openenvx/canvas-driver` | Canvas engine (`.`) |
-| `@openenvx/html-driver` | HTML engine (`.`) |
-| `@openenvx/email-driver` | Email engine (`.`) |
 
 **Hard rules:**
 
-- `@openenvx/studio` never imports canvas/html/email.
-- Artboard drivers never import `@openenvx/studio/shell`. They use `@openenvx/studio` + `./schema` / `./preview` / `./react`.
-- The host app wires `WorkbenchShell` (`@openenvx/studio/shell`) to each driver's `default*Workbench` (or a custom plugin list).
+- `@openenvx/studio` never imports canvas rendering.
+- `@openenvx/canvas-driver` never imports `@openenvx/studio/shell`. It uses `@openenvx/studio` + `./schema` / `./preview` / `./react`.
+- The host app wires `WorkbenchShell` (`@openenvx/studio/shell`) to `defaultCanvasWorkbench` (or a custom plugin list).
 
 Publishing details: [PUBLISHING.md](../../PUBLISHING.md).
 
@@ -57,30 +55,6 @@ import '@openenvx/canvas-driver/fonts.css';
 
 Published npm: `@openenvx/canvas-driver` (minified `.` entry). Monorepo HMR uses the same package root + `@openenvx/studio/internal`. `apps/canvas-package-demo` exercises the composable stack (`bun run dev:canvas-package`).
 
-## HTML product host
-
-```ts
-import { WorkbenchShell } from '@openenvx/studio/shell';
-import { defaultHtmlWorkbench } from '@openenvx/html-driver';
-import { createHtmlScene } from '@openenvx/html-driver';
-import '@openenvx/studio/styles.css';
-
-const plugins = [...defaultHtmlWorkbench.plugins, new MyEventPagePlugin()];
-```
-
-Published npm: `@openenvx/html-driver`. `apps/html-package-demo` (`bun run dev:html-package`).
-
-## Email product host
-
-```ts
-import { WorkbenchShell } from '@openenvx/studio/shell';
-import { defaultEmailWorkbench } from '@openenvx/email-driver';
-import { createEmailScene } from '@openenvx/email-driver';
-import '@openenvx/studio/styles.css';
-```
-
-Headless HTML export is `renderEmailHtml` from `@openenvx/email-driver` so Node/SSR can skip shell CSS. `apps/email-package-demo` (`bun run dev:email-package`).
-
 ## What hosts must not do
 
 Per AGENTS.md product-host rules:
@@ -95,11 +69,10 @@ Per AGENTS.md product-host rules:
 | App | Role |
 | --- | --- |
 | `apps/canvas-package-demo` | Composable publish stack: `@openenvx/studio` + `defaultCanvasWorkbench` |
-| `apps/html-package-demo` | Composable publish stack: `@openenvx/studio` + `defaultHtmlWorkbench` |
-| `apps/email-package-demo` | Composable publish stack: `@openenvx/studio` + `defaultEmailWorkbench` |
+| `apps/canvas-next-demo` | Next.js consumer smoke reference |
 | `apps/demo-playground` | Custom shell / integration experiments |
 | `apps/docs` | Extension guide and contracts |
 
 ## Related
 
-- [canvas.md](canvas.md) · [html.md](html.md) · [extensions.md](extensions.md)
+- [canvas.md](canvas.md) · [extensions.md](extensions.md)

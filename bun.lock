@@ -211,9 +211,6 @@
       "version": "0.0.0",
     },
   },
-  "overrides": {
-    "@openenvx/html-driver": "^0.3.9",
-  },
   "catalogs": {
     "dev": {
       "@typescript/typescript6": "^6.0.2",

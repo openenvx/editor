@@ -51,7 +51,6 @@ See `apps/canvas-demo` / `apps/demo-playground` and [studio-and-products.md](stu
 - Generic workbench chrome (Pages/Layers)
 - Headless contribution base classes (those stay in headless)
 - Embed protocol vocabulary (plugin-protocol)
-- HTML block editing (`@openenvx/html-driver`)
 
 ## Related
 

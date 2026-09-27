@@ -9,9 +9,6 @@ These chapters explain how OpenEnvx is structured for contributors and integrato
 | [workbench-and-headless.md](workbench-and-headless.md) | Controller, contributions, shell, property panes |
 | [property-fields.md](property-fields.md) | `PropertyFieldDescriptor`, field kinds, `layout`, pane authoring |
 | [canvas.md](canvas.md) | `@openenvx/canvas-driver` engine and `CanvasPlugin` |
-| [html.md](html.md) | HTML block editor and slots |
-| [html-editor-surfaces.md](html-editor-surfaces.md) | Stage / artboard / page-root naming + click selection |
-| [email-driver.md](email-driver.md) | Email block editor (React-Email) |
 | [studio-and-products.md](studio-and-products.md) | `@openenvx/studio` + driver `./studio` presets |
 | [extensions.md](extensions.md) | Internal vs sandbox (summary) |
 | [extensions-sandbox-guide.md](extensions-sandbox-guide.md) | Sandbox widget/plugin authoring |

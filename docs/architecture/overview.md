@@ -14,46 +14,34 @@ Scene JSON (@openenvx/studio/schema)
         ▼
 EditorRuntime + PluginManager + WorkbenchController (@openenvx/studio)
         │
-        ├── domain engines: canvas / html / email
+        ├── domain engine: canvas
         │
         ▼
 WorkbenchShell (@openenvx/studio/shell)
         │
-        ├── canvas workbench  (@openenvx/canvas-driver)
-        ├── html workbench    (@openenvx/html-driver)
-        └── email workbench   (@openenvx/email-driver)
+        └── canvas workbench (@openenvx/canvas-driver)
 ```
 
 | Layer | Job |
 | --- | --- |
 | **Schema** | Canonical Scene / EditorState / SceneSnapshot |
 | **Core** | Plugin host, commands, layers, DI, scene store, workbench runtime |
-| **Domain** | Canvas Konva engine, HTML block editor, or email driver (pick one surface per page via `page.layout`) |
+| **Domain** | Canvas Konva engine (page surface via `page.layout` and registered editor panes) |
 | **Shell** | React chrome that renders contribution descriptors (`@openenvx/studio`) |
-| **Product** | Host app wires shell + driver `default*Workbench` |
+| **Product** | Host app wires shell + driver `defaultCanvasWorkbench` (or custom plugins) |
 
 ## Choose a client tier
 
 | You want… | Use |
 | --- | --- |
 | Stage only, own state | `@openenvx/studio/schema` + `@openenvx/canvas-driver` (`CanvasStage`) |
-| Full editor, custom UI | `@openenvx/studio` + `@openenvx/studio` + `canvas` / `html` / `email` |
+| Full editor, custom UI | `@openenvx/studio` + `@openenvx/studio/shell` + `@openenvx/canvas-driver` |
 | Full canvas product | `@openenvx/studio` + `@openenvx/canvas-driver` |
-| HTML block product | `@openenvx/studio` + `@openenvx/html-driver` |
-| Email block editor | `@openenvx/studio` + `@openenvx/email-driver` |
 | Untrusted scripts / widgets | Sandbox QuickJS Worker path (never main-world JS) |
 
-## Two editor surfaces, one workbench
+## Editor surface and workbench
 
-`page.layout` is a provider-defined string. Built-ins:
-
-| `page.layout` | Engine package            | Editor pane                    |
-| ------------- | ------------------------- | ------------------------------ |
-| `'absolute'`  | `@openenvx/canvas-driver` | `CanvasEditor` via canvas host |
-| `'html'`      | `@openenvx/html-driver`   | `HtmlEditorPane`               |
-| `'email'`     | `@openenvx/email-driver`  | `EmailEditorPane`              |
-
-Scene-generic chrome (Pages, Layers, dirty status, Inspector container) lives in workbench defaults. Canvas-only chrome (zoom, transform panes, floating toolbar) is registered by `CanvasPlugin`. HTML and email each own a Blocks activity sidebar.
+`page.layout` is a provider-defined string. The built-in canvas product uses `'absolute'` with `CanvasEditor` via the canvas host. Scene-generic chrome (Pages, Layers, dirty status, Inspector container) lives in workbench defaults. Canvas-only chrome (zoom, transform panes, floating toolbar) is registered by `CanvasPlugin`.
 
 ## Commands are the mutation hub
 
@@ -63,7 +51,7 @@ Trusted code mutates the scene through **commands** on the shared command servic
 
 1. [Runtime & core](runtime-and-core.md) - host primitives
 2. [Workbench & headless](workbench-and-headless.md) - UI contribution system
-3. [Canvas](canvas.md) / [HTML](html.md) / [Email driver](email-driver.md) - domain engines
+3. [Canvas](canvas.md) - domain engine
 4. [Studio & products](studio-and-products.md) - what apps import
 5. [Extensions](extensions.md) - trust boundaries summary
 6. [Packages & public API](packages-and-api.md) - exports and stability

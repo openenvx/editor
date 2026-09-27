@@ -12,19 +12,17 @@ extensions (protocol subpath)
         ▼
 @openenvx/studio  (headless: schema + preview + runtime + workbench controller)
         │
-        ├── canvas / html / email / agent
+        ├── canvas / agent
         ▼
 @openenvx/studio/shell  (React WorkbenchShell)
         ▲
-        └── host app wires shell + artboard ./workbench presets
+        └── host app wires shell + canvas ./workbench presets
 ```
 
 Hard rules:
 
 - **Canvas never imports `@openenvx/studio/shell`.** Drivers use `@openenvx/studio` + `./schema` / `./preview` / `./react`. `create-canvas-sandbox-extension-host.ts` wires canvas into sandbox (optional; needs `@openenvx/editor-sandbox`; not on the main barrel — avoids a package cycle with `editor-sandbox`).
-- **HTML never depends on `@openenvx/canvas-driver`.**
-- **Email** (`@openenvx/email-driver`) may depend on `@openenvx/html-driver` for shared block machinery; engine entries must not depend on workbench.
-- **Hosts prefer `@openenvx/studio` + driver `default*Workbench`**, not a hand-wired private stack (unless custom shell - see `apps/demo-playground`).
+- **Hosts prefer `@openenvx/studio` + `defaultCanvasWorkbench`**, not a hand-wired private stack (unless custom shell - see `apps/demo-playground`).
 - **Untrusted code** never loads in the editor main world - protocol trees + sandbox Worker only.
 
 ## Who imports what
@@ -32,9 +30,7 @@ Hard rules:
 | Consumer | Prefer importing |
 | --- | --- |
 | Canvas product host | `@openenvx/studio/shell` + `@openenvx/canvas-driver` (`defaultCanvasWorkbench`) or `@openenvx/studio/internal` (monorepo HMR) |
-| HTML product host | `@openenvx/studio/shell` + `@openenvx/html-driver` (`defaultHtmlWorkbench`) or `@openenvx/studio/internal` (monorepo HMR) |
-| Email product host | `@openenvx/studio/shell` + `@openenvx/email-driver` (`defaultEmailWorkbench`) or `@openenvx/studio/internal` (monorepo) |
-| Custom shell / playground | `@openenvx/studio` + `@openenvx/studio/shell` (+ canvas or html) |
+| Custom shell / playground | `@openenvx/studio` + `@openenvx/studio/shell` + `@openenvx/canvas-driver` |
 | Sandbox widget / plugin author | `@openenvx/editor-sandbox` |
 | Scene / preview / Render IR | `@openenvx/studio/schema`, `@openenvx/studio/preview` |
 
@@ -44,8 +40,6 @@ Hard rules:
 | --- | --- | --- | --- |
 | `@openenvx/studio` | yes | Headless runtime + shell | `.`, `./shell`, `./theme.css`, `./schema`, `./preview`, `./react` |
 | `@openenvx/canvas-driver` | yes | Konva engine + published `.` preset surface | `.`, `./theme.css`, `./fonts.css` |
-| `@openenvx/html-driver` | yes | HTML blocks + published `.` preset surface | `.`, `./theme.css` |
-| `@openenvx/email-driver` | yes | Email blocks + published `.` preset surface | `.`, `./theme.css` |
 | `@openenvx/editor-sandbox` | yes | Author SDK | `.`, `./protocol`, `./host`, … |
 | `@openenvx/studio/plugins/variables` | workspace | Variables plugin | `.`, `./tiptap` |
 | `@openenvx/agent` | workspace | Agent chat sidebar | `.`, `./schemas` |
@@ -58,23 +52,19 @@ Hard rules:
 
 **`@openenvx/canvas-driver`** - npm `.` + `./theme.css` + `./fonts.css` (artboard editor surface; not the workbench shell). Published `.` bundles engine deps; peers: `@openenvx/studio`, `react`, `react-dom`. Workspace `.` (`src/index.ts`) is the full engine API; Node PDF uses `exportCanvasDocumentNode`. Hosts also import `@openenvx/studio/theme.css`.
 
-**`@openenvx/html-driver`** - npm `.` + `./theme.css`. Published `.` bundles block-editor deps. Workspace `.` is the full block editor API.
-
-**`@openenvx/email-driver`** - npm `.` + `./theme.css`. Published `.` bundles email editor deps (including inlined `@openenvx/html-driver` publish surface). Workspace `.` is the full email editor API.
-
 **`@openenvx/editor-sandbox`** - protocol, host, canvas-widget, element subpaths.
 
 ### Workspace-only
 
-**`@openenvx/studio/internal`** - workspace-only shell barrel; npm hosts use `@openenvx/studio/shell` + driver `./workbench` or `.`.
+**`@openenvx/studio/internal`** - workspace-only shell barrel; npm hosts use `@openenvx/studio/shell` + driver `.` presets.
 
-**`@openenvx/studio/plugins/variables`** - `VariablesPlugin`; included in `default*Workbench.plugins`.
+**`@openenvx/studio/plugins/variables`** - `VariablesPlugin`; included in `defaultCanvasWorkbench.plugins`.
 
 ## Stability rules (pre-1.0)
 
 | Surface | Stability expectation |
 | --- | --- |
-| **Published** (`studio`, `canvas`, `html`, `email`, `editor-sandbox`) | External contract. Prefer additive changes. Bump version on every publish. |
+| **Published** (`studio`, `canvas`, `editor-sandbox`) | External contract. Prefer additive changes. Bump version on every publish. |
 | **Studio host allowlist** (`packages/studio/src/shell/index.ts`) | Host apps depend on this list. |
 | **Private workspace libs** (`variables`, …) | Free to break inside the monorepo in one PR. |
 | **Scene JSON / protocol wire** | Highest external cost. |

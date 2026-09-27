@@ -12,7 +12,6 @@ Inspector and sidebar form fields are **descriptors** (`PropertyFieldDescriptor`
 
 - `PropertyPaneContribution` + `createPropertyPane()` (`@openenvx/studio`)
 - `PropertyBuilder` on `LayerDefinition.properties()` (`@openenvx/studio`)
-- HTML `BlockConfig.fields` → mapped to the same descriptors in `@openenvx/html-driver`
 
 Types and JSDoc source of truth: `packages/core/src/builders/property-builder.ts`, `packages/core/src/builders/field-config.ts`.
 
@@ -74,10 +73,10 @@ Register custom kinds with `registerFieldRenderer` (`@openenvx/studio`); default
 | `align` | Icon segmented control | Horizontal alignment |
 | `font` | Font combobox | Canvas typography (`FontService`) |
 | `repeater` | Full-width list | Plain object rows |
-| `slotList` | Full-width part layers | HTML slot parts |
+| `slotList` | Full-width part layers | Composite slot parts |
 | `border` / `cornerRadius` / `padding` / `shadow` | Scrub + popup | Canvas style |
 
-HTML `FieldDef` in `@openenvx/html-driver` supports a subset; map advanced kinds via custom property panes or layer `properties()`.
+Map advanced field kinds via custom property panes or layer `properties()` when a product layer definition needs them.
 
 ## Pane layout (`PropertyPaneBuilder`)
 
@@ -158,10 +157,9 @@ Example - `numeric` on `segmented` is ignored at render time; with diagnostics o
 
 **Bind vs `when`:** row `path` (3rd arg) is where data is read/written; `field.key` is the control id and defaults to `selection.layer.data.{key}` only when `path` is omitted. For `PropertyPath.layerById('event-gallery', 'layoutPreset')`, use that path on the row and `PropertyPath.when(...)` in `{ when }`.
 
-Layer `properties()` sections (`PropertyBuilder` on canvas/HTML layer definitions) support per-field `when` via the optional config on each field method (same expression language). The factory maps `field.when` onto synthesized `PropertyRowNode` instances.
+Layer `properties()` sections (`PropertyBuilder` on canvas layer definitions) support per-field `when` via the optional config on each field method (same expression language). The factory maps `field.when` onto synthesized `PropertyRowNode` instances.
 
 ## Related
 
 - [workbench-and-headless.md](workbench-and-headless.md) - contribution flow, host rules
-- [html.md](html.md) - block `FieldDef` mapping
 - [packages/workbench/Design.md](../../packages/workbench/Design.md) - visual design tokens only

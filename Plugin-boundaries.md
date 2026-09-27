@@ -142,7 +142,7 @@ The protocol shape is enough as the **interaction model**. Seal these before tre
 4. **Mandatory origin checks** on the transport.
 5. **Capability negotiation** - grow beyond `v: 1` with an explicit capabilities list so the surface can evolve without silent breakage.
 
-Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/public/embed-parent.html) at `/embed-parent.html`; the iframe loads `/?embed=1` with `EmbedPanelHost` via `WorkbenchShell` `mountExternalHosts` (`contextScope: 'selection'`, empty `allowedCommands`). Sandbox demos: canvas-demo seating / save-the-date; html-demo countdown / RSVP.
+Demo: Vite serves [apps/canvas-demo/public/embed-parent.html](apps/canvas-demo/public/embed-parent.html) at `/embed-parent.html`; the iframe loads `/?embed=1` with `EmbedPanelHost` via `WorkbenchShell` `mountExternalHosts` (`contextScope: 'selection'`, empty `allowedCommands`).
 
 ## QuickJS sandbox (Phase V.1 / V.1.1)
 

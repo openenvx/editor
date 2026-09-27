@@ -17,7 +17,7 @@ import { mapWidgetTreeToLayers } from './map-widget-tree-to-layers';
  * Unwraps a single root `canvas.group` into `children`, syncs
  * widget width/height to the laid-out face, and persists click handlers.
  * Face children are ordinary editable layers under the widget (group UX).
- * HTML faces use `@openenvx/html-driver` `applyHtmlWidgetFace`.
+ * Hosts may supply a custom applicator for non-canvas widget faces.
  */
 export function applyWidgetFace(
   widgetLayer: DocumentNode,

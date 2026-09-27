@@ -13,7 +13,7 @@ Instructions for coding agents working in the OpenEnvx monorepo.
 
 When using thermos skills (thermo-nuclear review, thermo-nuclear code-quality review, or similar) to review code, go beyond bugs and style.
 
-**Architecture docs check (required):** Before scoring the diff, read [Architecture.md](Architecture.md) and the relevant chapters under [docs/architecture/](docs/architecture/overview.md) (pick by what the change touches - e.g. workbench → `workbench-and-headless.md`, canvas → `canvas.md`, html/email → `html.md` / `email-driver.md`, packages/exports → `packages-and-api.md`). Verify the change **follows** those docs: package tiers, placement cheat sheet, contribution flow, public API boundaries, and hard rules (canvas not in `core`, host sidebars via contributions, etc.). Flag drifts from the written architecture as first-class findings, not nits. Also use [Plugin-boundaries.md](Plugin-boundaries.md) when the diff touches embed/sandbox/external plugins.
+**Architecture docs check (required):** Before scoring the diff, read [Architecture.md](Architecture.md) and the relevant chapters under [docs/architecture/](docs/architecture/overview.md) (pick by what the change touches - e.g. workbench → `workbench-and-headless.md`, canvas → `canvas.md`, packages/exports → `packages-and-api.md`). Verify the change **follows** those docs: package tiers, placement cheat sheet, contribution flow, public API boundaries, and hard rules (canvas not in `core`, host sidebars via contributions, etc.). Flag drifts from the written architecture as first-class findings, not nits. Also use [Plugin-boundaries.md](Plugin-boundaries.md) when the diff touches embed/sandbox/external plugins.
 
 **Especially** look for:
 
@@ -38,7 +38,7 @@ OpenEnvx is a composable visual editor framework: plugins register layers, comma
 | Document | Use when |
 | --- | --- |
 | [Architecture.md](Architecture.md) | Hub: package tiers, placement cheat sheet, links to deep chapters |
-| [docs/architecture/](docs/architecture/overview.md) | Under-the-hood chapters (runtime, workbench, canvas, html, studio, extensions) |
+| [docs/architecture/](docs/architecture/overview.md) | Under-the-hood chapters (runtime, workbench, canvas, studio, extensions) |
 | [docs/architecture/packages-and-api.md](docs/architecture/packages-and-api.md) | Package map, public exports, who imports what, pre-1.0 stability |
 | [Plugin-boundaries.md](Plugin-boundaries.md) | Internal vs external plugins, protocol trust boundary, marketplace runners |
 | [FEATURES.md](FEATURES.md) | Product capability matrix and Polotno gap tracking |
@@ -85,7 +85,6 @@ Published packages:
 
 - **`@openenvx/editor-sandbox`** - published sandbox SDK: `./protocol`, `./host`, `./canvas-widget`, `/canvas` `/html` `/panel`, `defineExtension`, Vite. Hosts opt in via **`@openenvx/editor-sandbox/host`** on `mountExternalHosts`; canvas faces map via **`@openenvx/editor-sandbox/canvas-widget`** (`applyWidgetFace`).
 - **`@openenvx/studio`** - published editor studio (public npm, MPL-2.0). `.` (headless), `./shell` + `./theme.css` / `./styles.css`, `./schema`, `./preview`, `./react`. See [PUBLISHING.md](PUBLISHING.md).
-- **`@openenvx/html-driver`** / **`@openenvx/email-driver`** - published from the sibling [openenvx-html](https://github.com/openenvx/openenvx-html) repo (not this monorepo). Package demos here consume them from npm (`apps/*-package-demo`).
 - **`@openenvx/canvas-driver`** - published canvas engine (public npm, MPL-2.0). `.` + `./theme.css` + `./fonts.css`. See [PUBLISHING.md](PUBLISHING.md).
 
 ## Host sidebar panels (product hosts)
@@ -147,12 +146,11 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) for every commi
 | `chore` | Tooling, deps, repo hygiene (not `chore(release)` - reserved for the release workflow) |
 | `ci` | CI / GitHub Actions |
 
-**Scope** (optional but preferred): package or area - e.g. `canvas-driver`, `html-driver`, `studio`, `workbench`, `extensions`, `release`.
+**Scope** (optional but preferred): package or area - e.g. `canvas-driver`, `studio`, `workbench`, `extensions`, `release`.
 
 **Examples:**
 
 ```
-feat(html-driver): add theme prop to HtmlEditor
 fix(canvas): correct snap guide offset at high zoom
 refactor(core): extract property path resolver
 docs: document MPL-2.0 license
@@ -229,7 +227,7 @@ bun run changelog     # preview unreleased changelog (git-cliff)
 
 ## Publishing
 
-`@openenvx/studio`, `@openenvx/canvas-driver`, and `@openenvx/editor-sandbox` are published via the GitHub Actions **Release** workflow in this repo (see [PUBLISHING.md](PUBLISHING.md)). `@openenvx/html-driver` and `@openenvx/email-driver` publish from **openenvx-html**. Headless/runtime imports use `@openenvx/studio` (package root); hosts import `WorkbenchShell` from `@openenvx/studio/shell`.
+`@openenvx/studio`, `@openenvx/canvas-driver`, and `@openenvx/editor-sandbox` are published via the GitHub Actions **Release** workflow in this repo (see [PUBLISHING.md](PUBLISHING.md)). Headless/runtime imports use `@openenvx/studio` (package root); hosts import `WorkbenchShell` from `@openenvx/studio/shell`.
 
 ## Before you finish
 

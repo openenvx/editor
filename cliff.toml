@@ -6,7 +6,7 @@ header = """
 # Changelog
 
 All notable changes to this project are documented here.
-Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
+Published npm packages (`@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/editor-sandbox`) share one version per GitHub Release.
 
 """
 body = """

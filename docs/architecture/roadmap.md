@@ -21,9 +21,9 @@ Companion to [Architecture.md](../../Architecture.md). This tracks intentional f
 
 ## Phase 4 - Done
 
-- `@openenvx/html-driver/studio` published on public npm (minified bundle + drop-in `HtmlEditor` + host composition API)
 - Legacy fat `*-studio` bundles removed from this repo
+- Composable `@openenvx/studio` + `@openenvx/canvas-driver` publish stack documented for OSS hosts
 
 ## Publish note
 
-When cutting a release: publish `@openenvx/studio`, `@openenvx/studio`, `@openenvx/html-driver`, `@openenvx/email-driver`, and `@openenvx/canvas-driver`. Bump product repos in the same window.
+When cutting a release: publish `@openenvx/studio`, `@openenvx/canvas-driver`, and `@openenvx/editor-sandbox` together from this repo.

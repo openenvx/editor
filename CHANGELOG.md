@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project are documented here.
-Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@openenvx/canvas-studio`) share one version per GitHub Release.
+Published npm packages (`@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/editor-sandbox`) share one version per GitHub Release.
 
 ## [0.3.9] - 2026-09-27
 
@@ -108,11 +108,11 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 
 - Update dependencies and improve UI components
 
-- Bumped version of multiple packages to 0.3.5 for canvas-driver, editor-sandbox, email-driver, html-driver, and studio.
+- Bumped version of multiple packages to 0.3.5 for canvas-driver, editor-sandbox, and studio.
 - Added `@tabler/icons-react` as a dependency across several packages, replacing `lucide-react` icons for a more consistent icon set.
 - Updated the template API contract to remove the optional `label` field from `scene.variables`.
 - Enhanced the rich text bubble menu and block selection menu to utilize Tabler icons instead of Lucide icons.
-- Introduced theme settings menu item in top bar contributions for canvas and email drivers.
+- Introduced theme settings menu item in top bar contributions for canvas.
 - Refactored variable handling in the studio package to remove the `label` field from variable definitions, streamlining the API.
 
 - Update theme tokens and improve UI consistency
@@ -148,7 +148,7 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 
 - Integrate esmExternalRequirePlugin into rolldown configurations
 
-- Added `esmExternalRequirePlugin` to `rolldown.publish.config.ts` files for canvas, email, and html drivers to ensure proper handling of ESM imports for React dependencies.
+- Added `esmExternalRequirePlugin` to `rolldown.publish.config.ts` for canvas-driver to ensure proper handling of ESM imports for React dependencies.
 - Updated external dependency management to filter out specific React packages from peer dependencies, enhancing compatibility with Next.js and Turbopack.
 - Introduced a new function in `smoke-next-consumer.ts` to assert the absence of runtime require stubs, improving validation for published packages.
 
@@ -177,7 +177,7 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 
 - Replaced `tsup.core.config.ts` with `tsup.core.publish.config.ts` to streamline the build process for the studio package.
 - Updated `PUBLISHING.md` to clarify the dependencies required for host applications and the publishing structure.
-- Enhanced the `verify-pack.ts` scripts for canvas, email, and html drivers to ensure proper bundling of dependencies.
+- Enhanced the `verify-pack.ts` script for canvas-driver to ensure proper bundling of dependencies.
 - Introduced `verify-next-consumer.ts` to validate the integration of published packages in a Next.js environment.
 - Added new external patterns in the `typescript-config` package to improve dependency management during publishing.
 
@@ -226,9 +226,9 @@ Published npm packages (`@openenvx/html-studio`, `@openenvx/email-studio`, `@ope
 
 ### Other
 
-- Update canvas and email drivers to use new workbench structure
+- Update canvas driver to use new workbench structure
 
-- Replaced references to `@openenvx/canvas-driver/studio` and `@openenvx/email-driver/studio` with `@openenvx/canvas-driver` and `@openenvx/email-driver`, respectively, to align with the new composable architecture.
+- Replaced references to `@openenvx/canvas-driver/studio` with `@openenvx/canvas-driver` to align with the new composable architecture.
 - Updated documentation and examples to reflect the new usage patterns, including the introduction of `default*Workbench` for each driver.
 - Enhanced the build process by consolidating entry points and improving type declaration generation, ensuring a more streamlined development experience.
 
@@ -293,7 +293,7 @@ These changes ensure the project is using the latest tools and libraries, enhanc
 
 - Rename and restructure canvas and email packages
 
-- Renamed `@openenvx/canvas-studio` to `@openenvx/canvas-driver` and `@openenvx/email-studio` to `@openenvx/email-driver`, consolidating the canvas and email functionalities under new package names for clarity and consistency.
+- Renamed `@openenvx/canvas-studio` to `@openenvx/canvas-driver`, consolidating the canvas functionality under a clearer package name.
 - Updated all relevant documentation and references throughout the codebase to reflect the new package names and structures, ensuring a cohesive development experience.
 - Adjusted package dependencies and build scripts to accommodate the new package names, enhancing modularity and maintainability.
 
@@ -334,7 +334,7 @@ These changes improve the CI process and enhance type safety in the project.
 
 - Bump package versions to 0.1.4 for canvas, core, email, html, and studio drivers
 
-- Updated the version of `@openenvx/canvas-driver`, `@openenvx/core`, `@openenvx/email-driver`, `@openenvx/html-driver`, and `@openenvx/studio` packages to `0.1.4`, ensuring consistency across the project.
+- Updated the version of `@openenvx/canvas-driver`, `@openenvx/core`, and `@openenvx/studio` packages to `0.1.4`, ensuring consistency across the project.
 - This version bump reflects ongoing development and prepares the packages for upcoming features and improvements.
 
 ## [0.1.3] - 2026-09-13
@@ -1173,7 +1173,7 @@ These changes improve user experience by providing visual feedback during handle
 - Added a new package `@openenvx/driver-email` for the email block editor, including components for rendering and managing email blocks.
 - Implemented the `EmailBlocksPlugin` and `EmailEditorPane` for editing email layouts, utilizing React-Email for rendering.
 - Created a demo application `apps/email-demo` to showcase the email block editor functionality.
-- Updated architecture documentation to include the new email driver, detailing its role and integration with existing components.
+- Updated architecture documentation for artboard drivers and integration with existing components.
 - Enhanced `FEATURES.md` to reflect the capabilities of the email block editor, including live editing and export features.
 
 These changes expand the platform's capabilities by introducing a dedicated email editing experience, improving usability for users creating email content.

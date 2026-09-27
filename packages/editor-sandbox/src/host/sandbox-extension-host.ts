@@ -37,7 +37,7 @@ function resolveWidgetFaceKind(
   return 'canvas';
 }
 
-/** Host-injected face applicator (studio / html-driver). */
+/** Host-injected face applicator (e.g. canvas-driver `applyWidgetFace`). */
 export type ApplyWidgetFaceFn = (
   widgetLayer: DocumentNode,
   tree: RenderNode,

@@ -31,7 +31,7 @@ Separate from named-layer modifications: a per-scene catalog `scene.variables` a
 | Editor catalog UI | Opt-in `@openenvx/studio/plugins/variables` `VariablesPlugin` (secondary sidebar + create/edit dialog); TipTap chips/suggest via `@openenvx/studio/plugins/variables/tiptap` in html/email/canvas rich text; canvas toolbar variable insert for selected layers (including `canvas.qr` `url`) |
 | Canvas QR preview | Konva preview substitutes catalog `sample` values into `url` and re-encodes the QR SVG (stored scene keeps tokens) |
 
-Bannerbear `Modification[]` and inline tokens can coexist on the same scene. Compose `VariablesPlugin` per product (`canvas-driver/studio`, `email-driver/studio`) — not a workbench default.
+Bannerbear `Modification[]` and inline tokens can coexist on the same scene. Compose `VariablesPlugin` per product (e.g. canvas workbench preset) — not a workbench default.
 
 ## TemplateManifest
 

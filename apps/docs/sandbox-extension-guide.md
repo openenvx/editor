@@ -71,9 +71,6 @@ Rules:
 - `onClick` / other `on*` handlers become handler IDs on the host; never pass live functions across the boundary.
 - Use `bind="propName"` or dotted paths (e.g. `bind="sections.0.title"`) on face elements when inline edit should write back into `values`.
 
-HTML examples: [`countdown.widget.tsx`](../html-demo/src/extensions/countdown.widget.tsx) (bind), [`menu.widget.tsx`](../html-demo/src/extensions/menu.widget.tsx) (bind + `onClick` + `setProps` for a full in-face editor).  
-Canvas example: [`seating.widget.tsx`](../canvas-demo/src/extensions/seating.widget.tsx).
-
 ### 2. Declare the extension manifest
 
 ```tsx

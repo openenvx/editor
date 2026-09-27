@@ -25,7 +25,7 @@
 | Comments product | Own implementation (async review pins); **not** Liveblocks Comments |
 | Sync model | **Whole-scene sync** - room holds scene JSON; local `SceneStore.apply` pushes; remote updates apply via controlled replace/apply |
 | Portability | DI ports + adapters (`CollaborationPort`, `CommentPort`); Liveblocks = collab adapter only |
-| Editor coverage | Ports editor-agnostic; first product wire = email (`email-driver` / email host) |
+| Editor coverage | Ports editor-agnostic; first product wire = canvas host |
 | Pricing intent | Pay Liveblocks for presence + storage/collab minutes only; comments stay on our backend |
 
 ## Open (decide when picking up)
@@ -33,7 +33,7 @@
 - **Auth + durable comments backend:** lean toward ports/adapters in editor-core + Liveblocks auth + comment API in the product host (not decided). Demo-only stub is fine for a first spike.
 - Undo/redo under multiplayer (per-client local stack vs shared).
 - Presence payload (cursor, selection, viewport).
-- Comment anchor model (node/block id + page-relative x/y; email vs canvas specifics).
+- Comment anchor model (node/block id + page-relative x/y; canvas specifics).
 
 ## Package sketch
 
@@ -41,10 +41,10 @@
 packages/collab/              # ports + SceneStore bridge (provider-agnostic)
 packages/collab-liveblocks/   # Liveblocks CollaborationPort adapter (optional dep)
 product host (later)            # room auth endpoint + CommentPort HTTP/DB
-host (email-demo → product)     # wire adapters; CollabPlugin UI
+host (canvas package demo → product)     # wire adapters; CollabPlugin UI
 ```
 
-Mutation hub stays in core: remote updates must go through `SceneStore` (`apply` / controlled restore), not ad-hoc UI writes. Presence UI overlays live in the engine/shell that owns the surface (email pane / canvas) - not in `core`.
+Mutation hub stays in core: remote updates must go through `SceneStore` (`apply` / controlled restore), not ad-hoc UI writes. Presence UI overlays live in the engine/shell that owns the surface (canvas) - not in `core`.
 
 ```text
 Host
@@ -74,7 +74,7 @@ Product wants Figma-like pins that work async (offline other user, review/approv
 
 1. Confirm product vs demo auth/comments backend.
 2. Add `packages/collab` ports + whole-scene `SceneStore` bridge.
-3. Add Liveblocks adapter package; wire `email-demo` (then product email host).
-4. Ship CommentPort + pin UI (email first).
-5. Reuse same ports for canvas / HTML hosts.
+3. Add Liveblocks adapter package; wire `canvas-package-demo` (then product canvas host).
+4. Ship CommentPort + pin UI (canvas first).
+5. Reuse same ports for other artboard hosts when they exist.
 6. Update FEATURES.md status when shipping; consider CRDT upgrade path later without changing host APIs.
