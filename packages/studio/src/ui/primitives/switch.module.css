@@ -1,4 +1,4 @@
-/* Synara accent switch: blue track when on, white thumb. */
+/* Accent switch: blue track when on, white thumb. */
 .root {
   --wb-switch-thumb: 16px;
   position: relative;

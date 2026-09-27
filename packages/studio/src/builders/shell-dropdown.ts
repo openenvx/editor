@@ -21,6 +21,25 @@ export function isShellDropdownCommandMenuItem(
   return item.kind === undefined || item.kind === 'command';
 }
 
+/** Stable React key for shell dropdown command rows (commandId may repeat with different args). */
+export function shellDropdownMenuItemId(
+  dropdownId: string,
+  item: ShellDropdownCommandMenuItemDescriptor,
+  index: number
+): string {
+  const base = `${dropdownId}-${item.commandId}`;
+  if (item.args !== undefined) {
+    return `${base}-${JSON.stringify(item.args)}`;
+  }
+  if (item.labelKey) {
+    return `${base}-${item.labelKey}`;
+  }
+  if (item.label) {
+    return `${base}-${item.label}`;
+  }
+  return `${base}-${index}`;
+}
+
 export interface ShellDropdownItemBase extends DescriptorItemBase {
   kind: 'dropdown';
   label?: string;

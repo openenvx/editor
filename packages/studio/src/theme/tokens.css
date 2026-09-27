@@ -18,7 +18,7 @@
   --wb-space-5: 20px;
   --wb-space-6: 24px;
 
-  /* Radius - Synara rounded-lg / rounded-2xl / rounded-3xl */
+  /* Radius - control / popup / dialog steps */
   --wb-radius-sm: 6px;
   --wb-radius-control: 10px;
   --wb-radius-md: 8px;
@@ -66,7 +66,7 @@
 [data-owb-theme='light'] {
   color-scheme: light;
 
-  /* Synara DEFAULT_THEME_STATE Codex light (buildThemeCssVariables). */
+  /* Codex light chrome. */
   --wb-background: #ffffff;
   --wb-canvas-field: rgba(13, 13, 13, 0.03);
   --wb-card: #ffffff;
@@ -82,8 +82,8 @@
   --wb-surface-divider: color-mix(in srgb, var(--wb-border) 60%, transparent);
   --wb-chrome-button: rgba(13, 13, 13, 0.03);
   --wb-sidebar-segment-active: #ffffff;
-  /* Synara light sidebar is 38% white over macOS vibrancy. Web has no
-     desktop behind the rail, so mix against a Finder-gray plate. */
+  /* Light sidebar: 38% white over macOS vibrancy. Web has no desktop behind
+     the rail, so mix against a Finder-gray plate. */
   --wb-sidebar-surface: color-mix(in srgb, #ffffff 38%, #e0e0e0);
   --wb-sidebar-row-selected: rgba(13, 13, 13, 0.03);
   --wb-sidebar-row-hovered: rgba(13, 13, 13, 0.03);
@@ -161,7 +161,7 @@
 [data-owb-theme='dark'] {
   color-scheme: dark;
 
-  /* Synara DEFAULT_THEME_STATE Codex dark (buildThemeCssVariables). */
+  /* Codex dark chrome. */
   --wb-background: #101010;
   --wb-canvas-field: #101010;
   --wb-card: #131313;
@@ -177,8 +177,8 @@
   --wb-surface-divider: color-mix(in srgb, var(--wb-border) 60%, transparent);
   --wb-chrome-button: rgba(252, 252, 252, 0.026);
   --wb-sidebar-segment-active: rgba(252, 252, 252, 0.026);
-  /* Synara dark glass: #111111 mixed 80% toward black (skip the extra
-     72% transparent, which vanished into --wb-background on web). */
+  /* Dark sidebar glass: #111111 mixed 80% toward black (skip extra
+     transparency that vanished into --wb-background on web). */
   --wb-sidebar-surface: color-mix(in srgb, #111111 80%, #000000);
   --wb-sidebar-row-selected: rgba(252, 252, 252, 0.026);
   --wb-sidebar-row-hovered: rgba(252, 252, 252, 0.039);

@@ -1,7 +1,4 @@
-/**
- * Locks `--wb-*` chrome to Synara Codex (DEFAULT_THEME_STATE).
- * Reference: apps/web `buildThemeCssVariables` in github.com/Emanuele-web04/synara.
- */
+/** Locks `--wb-*` chrome to the Codex light/dark theme in tokens.css. */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -31,7 +28,7 @@ function readToken(block: string, name: string): string {
   return match[1].replaceAll(/\s+/g, ' ').trim();
 }
 
-describe('Synara Codex token lock', () => {
+describe('Codex token lock', () => {
   const light = readThemeBlock('light');
   const dark = readThemeBlock('dark');
 

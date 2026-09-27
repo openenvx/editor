@@ -7,6 +7,7 @@ import type {
 } from '#studio';
 import { isShellDropdownCommandMenuItem, isToolbarTopPlacement } from '#studio';
 
+import { shellDropdownMenuItemId } from '../../builders/shell-dropdown';
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useContextKeyValue } from '../../hooks/use-context-key';
 import { useWorkbenchContextSelector } from '../../hooks/use-workbench-selector';
@@ -126,9 +127,9 @@ export const ShellDropdownControl = memo(
 
     const groups = useMemo(
       () => [
-        items.filter(isShellDropdownCommandMenuItem).map((item) => ({
+        items.filter(isShellDropdownCommandMenuItem).map((item, index) => ({
           disabled: !(commandStates?.[item.commandId]?.canExecute ?? true),
-          id: `${id}-${item.commandId}`,
+          id: shellDropdownMenuItemId(id, item, index),
           label: item.labelKey
             ? t(item.labelKey)
             : (item.label ?? item.commandId),

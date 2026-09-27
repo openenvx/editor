@@ -6,13 +6,13 @@ Product role lives in [Architecture.md](../../Architecture.md) and [docs/archite
 
 ## Look
 
-1:1 with Synara's default **Codex** pack (`DEFAULT_THEME_STATE` in [synara `theme.logic.ts`](https://github.com/Emanuele-web04/synara)). White / charcoal desktop chrome, 12px system UI, frosted sidebar, opaque inset stage, 5% content seam, 28px rounded rows. Controls are bordered and flat (no inset highlights). Floating menus use Synara popup chrome: 70% fill, `blur(40px) saturate(150%)`, 16px radius, soft lift shadow.
+**Codex** light/dark chrome: white / charcoal desktop shell, 12px system UI, frosted sidebar, opaque inset stage, 5% content seam, 28px rounded rows. Controls are bordered and flat (no inset highlights). Floating menus: 70% fill, `blur(40px) saturate(150%)`, 16px radius, soft lift shadow.
 
 Reject Inter, Geist, Cal Sans as loaded families, warm cream dark type, lit inset-highlight controls, 11px Figma density, solid blue chrome fills, Lucide, Radix.
 
 ## Tokens
 
-Source of truth: [`src/theme/tokens.css`](src/theme/tokens.css). Values are the Synara `buildThemeCssVariables` output for Codex light/dark (macOS translucent sidebar). Scopes: `[data-owb-theme="light"]` (default) and `[data-owb-theme="dark"]`. Theme switching via `ThemeProvider` / `data-owb-theme` on the shell root.
+Source of truth: [`src/theme/tokens.css`](src/theme/tokens.css). Codex light/dark values (macOS translucent sidebar stand-ins on web). Scopes: `[data-owb-theme="light"]` (default) and `[data-owb-theme="dark"]`. Theme switching via `ThemeProvider` / `data-owb-theme` on the shell root.
 
 | Token | Light | Dark | Role |
 | --- | --- | --- | --- |
@@ -27,7 +27,7 @@ Source of truth: [`src/theme/tokens.css`](src/theme/tokens.css). Values are the 
 | `--wb-input-fill` | `rgb(255,255,255)` | `rgb(23,23,23)` | Inputs, selects |
 | `--wb-seam-line` | `rgba(0,0,0,0.05)` | `rgba(255,255,255,0.05)` | Sidebar ↔ stage inset seam |
 | `--wb-surface-divider` | 60% of border | 60% of border | Internal header / pane splits |
-| `--wb-sidebar-surface` | 38% white on `#e0e0e0` | `#111111` 80% toward black | Activity bar only (opaque stand-in for Synara vibrancy) |
+| `--wb-sidebar-surface` | 38% white on `#e0e0e0` | `#111111` 80% toward black | Activity bar only (opaque stand-in for macOS sidebar vibrancy) |
 | `--wb-surface-blur` | `blur(4px) saturate(130%)` | same | Sidebar glass |
 | `--wb-popup-blur` | `blur(40px) saturate(150%)` | same | Menus, tooltips |
 | `--wb-font` | `-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif` | same | All UI copy |
@@ -61,7 +61,7 @@ Three columns: activity + layers rail | canvas stage | inspector.
 - Layers + inspector: `--wb-card`, 1px `--wb-surface-divider` against the artboard, 28px `rounded-md` rows
 - Inspector / headers: `--wb-surface-divider` (not the outer seam)
 - Top bar: 46px, flat `chrome` / `ghost` controls, 12px, hover fill
-- Status bar: window-wide bottom chrome (same span as the top bar), 32px, 12px system UI, muted chips with hover fill — Synara look, not VS Code density
+- Status bar: window-wide bottom chrome (same span as the top bar), 32px, 12px system UI, muted chips with hover fill — native desktop density, not VS Code compactness
 - Menus: 70% fill, `--wb-popup-blur`, 16px radius, `--wb-shadow-popup`
 - Dialogs: opaque popover fill, 24px radius, `--wb-shadow-dialog`
 - Floating canvas toolbar: compact pill on the artboard (not a full-width chrome row)
@@ -80,10 +80,10 @@ Kit lives in [`src/ui/primitives`](src/ui/primitives) on **Base UI** headless pr
 | Quiet / toolbar | `ghost` / `chrome` — muted text, hover fill |
 | Card / panel | hairline + `--wb-card` only |
 | Input / select | hairline border, `--wb-input-fill`, 10px radius, 12px |
-| Switch | Synara accent track (`--wb-focus`) when on, white thumb |
+| Switch | Accent track (`--wb-focus`) when on, white thumb |
 | Menu | frosted `--wb-menu`, 16px shell, 10px option rows |
 
-Command palette uses `cmdk`, same 16px frosted/opaque popup language as Synara's command menu.
+Command palette uses `cmdk`, same 16px frosted/opaque popup language as other floating menus.
 
 ## Layout files
 
