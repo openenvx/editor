@@ -11,6 +11,7 @@ import {
   isReactEsmExternalId,
   reactEsmExternals,
 } from '../studio/rolldown-react-esm-externals';
+import { studioInternalToPublishedPlugin } from '../studio/studio-internal-imports';
 import { createCssModuleRolldownPlugin } from './css-modules-plugin';
 
 const packageRoot = import.meta.dirname;
@@ -68,6 +69,9 @@ export default defineConfig({
   tsconfig: 'tsconfig.publish.json',
   external: bundleExternal(artboardExternals, (id) => inlineOpenenvx.test(id)),
   plugins: [
+    // Inlined variables plugin must call host getService with @openenvx/studio
+    // tokens. A copied createServiceId() is a different Symbol and misses.
+    studioInternalToPublishedPlugin(),
     esmExternalRequirePlugin({ external: reactEsmExternals }),
     plugin,
     {
@@ -94,6 +98,11 @@ export default defineConfig({
         await assertPublishBundle(distRoot, {
           requireHostReactReconciler: true,
         });
+        if (indexJs.includes('serviceDebugName')) {
+          throw new Error(
+            'canvas publish bundle inlined studio service ids (serviceDebugName)'
+          );
+        }
       },
     },
   ],
