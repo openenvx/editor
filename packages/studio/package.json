@@ -68,11 +68,13 @@
     "./internal": "./src/workbench-barrel.ts",
     "./plugins": "./src/plugins/index.ts",
     "./plugins/variables": {
+      "development": "./src/plugins/variables/index.ts",
       "types": "./dist/plugins/variables/index.d.ts",
       "import": "./dist/plugins/variables/index.js",
       "default": "./dist/plugins/variables/index.js"
     },
     "./plugins/variables/tiptap": {
+      "development": "./src/plugins/variables/tiptap/index.ts",
       "types": "./dist/plugins/variables/tiptap/index.d.ts",
       "import": "./dist/plugins/variables/tiptap/index.js",
       "default": "./dist/plugins/variables/tiptap/index.js"
