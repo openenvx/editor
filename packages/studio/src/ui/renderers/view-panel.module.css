@@ -1,3 +1,5 @@
+@reference '../../theme/tailwind.css';
+
 /* Keyframes co-located so Vite scopes name + definition together. */
 @keyframes fadeIn {
   from {
@@ -16,38 +18,38 @@
 }
 
 .treeBody {
-  padding-left: var(--wb-space-1);
-  padding-right: var(--wb-space-1);
+  padding-left: --spacing(1);
+  padding-right: --spacing(1);
 }
 
 .treeItem {
   display: flex;
   align-items: center;
-  gap: var(--wb-space-2);
-  height: var(--wb-layer-row-height);
+  gap: --spacing(2);
+  height: var(--app-density-row-height);
   width: 100%;
-  padding: 0 var(--wb-space-2);
+  padding: 0 --spacing(2);
   border: none;
-  border-radius: var(--wb-radius-md);
+  border-radius: calc(var(--radius) * 0.8);
   background: transparent;
   text-align: left;
-  font-size: var(--wb-text-sm);
-  color: var(--wb-foreground);
+  font-size: var(--app-font-size-ui-sm);
+  color: var(--foreground);
   cursor: grab;
   content-visibility: auto;
-  contain-intrinsic-size: auto var(--wb-layer-row-height);
+  contain-intrinsic-size: auto var(--app-density-row-height);
   transition:
-    background var(--wb-duration-fast) ease,
-    color var(--wb-duration-fast) ease;
+    background var(--app-duration-fast) ease,
+    color var(--app-duration-fast) ease;
 }
 
 .treeItem:hover {
-  background: var(--wb-hover-overlay);
+  background: var(--color-background-button-secondary-hover);
 }
 
 .treeItemSelected {
-  background: var(--wb-sidebar-row-selected);
-  color: var(--wb-foreground);
+  background: var(--sidebar-selected);
+  color: var(--foreground);
 }
 
 .treeItemSelected .treeItemLabel {
@@ -55,20 +57,20 @@
 }
 
 .treeItemSelected:hover {
-  background: var(--wb-sidebar-row-selected);
+  background: var(--sidebar-selected);
 }
 
 .treeItemHovered {
-  background: var(--wb-sidebar-row-hovered, var(--wb-hover-overlay));
+  background: var(--sidebar-accent);
 }
 
 .treeItemHovered:hover {
-  background: var(--wb-sidebar-row-hovered, var(--wb-hover-overlay));
+  background: var(--sidebar-accent);
 }
 
 .treeItemSelected.treeItemHovered,
 .treeItemSelected.treeItemHovered:hover {
-  background: var(--wb-sidebar-row-selected);
+  background: var(--sidebar-selected);
 }
 
 .treeToggle,
@@ -80,20 +82,20 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--wb-radius-sm);
+  border-radius: calc(var(--radius) * 0.6);
   background: transparent;
   cursor: pointer;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
   padding: 0;
-  transition: color var(--wb-duration-fast) ease;
+  transition: color var(--app-duration-fast) ease;
 }
 
 .treeToggle:hover {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 .treeChevron {
-  transition: transform var(--wb-duration-fast) var(--wb-ease-out);
+  transition: transform var(--app-duration-fast) var(--app-ease-out);
 }
 
 .treeChevronCollapsed {
@@ -109,7 +111,7 @@
   border: none;
   background: transparent;
   text-align: left;
-  font-size: var(--wb-text-sm);
+  font-size: var(--app-font-size-ui-sm);
   cursor: pointer;
   color: inherit;
   padding: 0;
@@ -118,11 +120,11 @@
 .treeItemRenameInput {
   flex: 1;
   min-width: 0;
-  border: 1px solid var(--wb-border);
-  border-radius: var(--wb-radius-sm, 2px);
-  background: var(--wb-background);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.6);
+  background: var(--background);
   color: inherit;
-  font-size: var(--wb-text-sm);
+  font-size: var(--app-font-size-ui-sm);
   font-family: inherit;
   line-height: inherit;
   padding: 0 2px;
@@ -132,23 +134,23 @@
 
 .treeItemIcon {
   flex-shrink: 0;
-  color: var(--wb-muted-foreground);
-  transition: color var(--wb-duration-fast) ease;
+  color: var(--muted-foreground);
+  transition: color var(--app-duration-fast) ease;
 }
 
 .treeItemSelected .treeItemIcon {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 .treeItemTrailing {
   flex-shrink: 0;
   margin-left: auto;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
 }
 
 .treeListContainer {
   position: relative;
-  animation: fadeIn var(--wb-duration) var(--wb-ease-out);
+  animation: fadeIn var(--app-duration) var(--app-ease-out);
 }
 
 .treeListDragging .treeItemPassive {
@@ -160,14 +162,14 @@
 }
 
 .treeListDragging .treeItemPassive.treeItemSelected:hover {
-  background: var(--wb-sidebar-row-selected);
+  background: var(--sidebar-selected);
 }
 
 .treeItemDropNest,
 .treeListDragging .treeItemPassive.treeItemDropNest,
 .treeListDragging .treeItemPassive.treeItemDropNest:hover {
-  background: color-mix(in srgb, var(--wb-foreground) 12%, transparent);
-  outline: 1px solid color-mix(in srgb, var(--wb-foreground) 35%, transparent);
+  background: color-mix(in srgb, var(--foreground) 12%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--foreground) 35%, transparent);
   outline-offset: -1px;
 }
 
@@ -175,7 +177,7 @@
   position: absolute;
   right: 0;
   height: 2px;
-  background: var(--wb-foreground);
+  background: var(--foreground);
   pointer-events: none;
   z-index: 1;
   border-radius: 1px;
@@ -204,15 +206,15 @@
   width: 18px;
   height: 18px;
   border: none;
-  border-radius: var(--wb-radius-sm);
+  border-radius: calc(var(--radius) * 0.6);
   background: transparent;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
   cursor: pointer;
   padding: 0;
   opacity: 0;
   transition:
-    opacity var(--wb-duration-fast) ease,
-    color var(--wb-duration-fast) ease;
+    opacity var(--app-duration-fast) ease,
+    color var(--app-duration-fast) ease;
 }
 
 .treeItem:hover .treeLockButton,
@@ -221,10 +223,10 @@
 }
 
 .treeItem:hover .treeLockButton {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 .treeLockButton:hover,
 .treeItem:hover .treeLockButton:hover {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }

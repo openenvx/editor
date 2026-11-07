@@ -1,3 +1,5 @@
+@reference '../theme/tailwind.css';
+
 /* Keyframes co-located so Vite scopes name + definition together. */
 @keyframes slideInLeft {
   from {
@@ -22,10 +24,10 @@
   flex-shrink: 0;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--wb-space-3);
-  width: var(--wb-activity-bar-width);
-  padding: var(--wb-space-3) var(--wb-space-1);
-  background: var(--wb-sidebar-surface);
+  gap: --spacing(3);
+  width: var(--app-rail-width);
+  padding: --spacing(3) --spacing(1);
+  background: var(--app-sidebar-surface);
 }
 
 .activityDropdown {
@@ -36,31 +38,31 @@
 .activitySeparator {
   flex-shrink: 0;
   height: 1px;
-  margin: 0 var(--wb-space-3);
-  background: var(--wb-divider-color);
+  margin: 0 --spacing(3);
+  background: var(--app-surface-divider);
 }
 
 .activityItem {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
   width: 100%;
   padding: 0;
   border: none;
-  border-radius: var(--wb-radius-md);
+  border-radius: calc(var(--radius) * 0.8);
   background: transparent;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
   cursor: pointer;
-  transition: color var(--wb-duration-fast) ease;
+  transition: color var(--app-duration-fast) ease;
 }
 
 .activityItem:hover {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 .activityItem:hover .activityIconWrap {
-  background: var(--wb-hover-overlay);
+  background: var(--color-background-button-secondary-hover);
 }
 
 .activityItem:active .activityIconWrap {
@@ -68,17 +70,17 @@
 }
 
 .activityItemActive {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 .activityItemActive .activityIconWrap,
 .activityItemActive:hover .activityIconWrap {
-  background: var(--wb-sidebar-segment-active);
-  color: var(--wb-foreground);
+  background: var(--color-background-elevated-primary-opaque);
+  color: var(--foreground);
 }
 
 .activityItemActive .activityLabel {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 .activityIconWrap {
@@ -87,40 +89,40 @@
   justify-content: center;
   width: 38px;
   height: 34px;
-  border-radius: var(--wb-radius-lg);
+  border-radius: var(--radius);
   color: inherit;
   transition:
-    background var(--wb-duration-fast) ease,
-    color var(--wb-duration-fast) ease,
-    transform var(--wb-duration-fast) var(--wb-ease-out);
+    background var(--app-duration-fast) ease,
+    color var(--app-duration-fast) ease,
+    transform var(--app-duration-fast) var(--app-ease-out);
 }
 
 .activityLabel {
   max-width: 100%;
   overflow: hidden;
-  font-size: var(--wb-text-xs);
+  font-size: var(--app-font-size-ui-xs);
   font-weight: 500;
   line-height: 1.2;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--wb-muted-foreground);
-  transition: color var(--wb-duration-fast) ease;
+  color: var(--muted-foreground);
+  transition: color var(--app-duration-fast) ease;
 }
 
 .activityItem:hover .activityLabel {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 .sidePanel {
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
-  width: var(--wb-sidebar-width);
+  width: var(--sidebar-width);
   min-height: 0;
-  background: var(--wb-card);
-  border-right: 1px solid var(--wb-surface-divider);
-  animation: slideInLeft var(--wb-duration) var(--wb-ease-out);
+  background: var(--card);
+  border-right: 1px solid var(--app-surface-divider);
+  animation: slideInLeft var(--app-duration) var(--app-ease-out);
 }
 
 .sidePanelContent {

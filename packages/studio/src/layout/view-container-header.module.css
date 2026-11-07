@@ -1,13 +1,15 @@
+@reference '../theme/tailwind.css';
+
 .header {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
   height: 44px;
-  padding: 0 var(--wb-space-2) 0 var(--wb-space-3);
+  padding: 0 --spacing(2) 0 --spacing(3);
   background-image: linear-gradient(
-    var(--wb-surface-divider),
-    var(--wb-surface-divider)
+    var(--app-surface-divider),
+    var(--app-surface-divider)
   );
   background-repeat: no-repeat;
   background-position: left bottom;
@@ -26,30 +28,30 @@
   width: 100%;
   min-width: 0;
   align-items: center;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
   height: 28px;
-  padding: 0 var(--wb-space-2);
+  padding: 0 --spacing(2);
   border: none;
-  border-radius: var(--wb-radius-sm);
+  border-radius: calc(var(--radius) * 0.6);
   background: transparent;
-  color: var(--wb-foreground);
+  color: var(--foreground);
   font: inherit;
   cursor: pointer;
 }
 
 .titleButton:hover {
-  background: var(--wb-hover-overlay);
+  background: var(--color-background-button-secondary-hover);
 }
 
 .titleButton:focus-visible {
   outline: none;
-  box-shadow: var(--wb-shadow-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
 }
 
 .title {
   flex: 1;
   overflow: hidden;
-  font-size: var(--wb-text-sm);
+  font-size: var(--app-font-size-ui-sm);
   font-weight: 500;
   letter-spacing: normal;
   text-align: left;
@@ -59,7 +61,7 @@
 
 .titleChevron {
   flex-shrink: 0;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
 }
 
 .actions {
@@ -72,14 +74,14 @@
 .actionButton {
   width: 28px;
   height: 28px;
-  border-radius: var(--wb-radius-sm);
+  border-radius: calc(var(--radius) * 0.6);
   background: transparent;
   box-shadow: none;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
 }
 
 .actionButton:hover:not(:disabled) {
-  background: var(--wb-hover-overlay);
+  background: var(--color-background-button-secondary-hover);
   box-shadow: none;
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }

@@ -1,26 +1,30 @@
+@reference '../../theme/tailwind.css';
+
 .backdrop {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: var(--wb-backdrop-overlay);
+  background: var(--app-backdrop);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .dialog {
-  background: var(--wb-popover);
-  border: var(--wb-hairline);
-  border-radius: var(--wb-radius-dialog);
-  box-shadow: var(--wb-shadow-dialog);
-  padding: var(--wb-space-5);
+  background: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 1.8);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  padding: --spacing(5);
   min-width: 280px;
   max-width: 90vw;
 }
 
 .title {
-  margin: 0 0 var(--wb-space-2);
-  font-size: var(--wb-text-base);
+  margin: 0 0 --spacing(2);
+  font-size: var(--app-font-size-ui);
   font-weight: 500;
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }

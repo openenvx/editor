@@ -154,6 +154,6 @@ Most product apps skip this and use `WorkbenchShell` from `@openenvx/studio` or 
 
 ## Related
 
-- Visual shell design notes (tokens, Base UI primitives, Tabler icons): [packages/studio/Design.md](../../packages/studio/Design.md)
+- Visual shell design notes (Synara/Neroli tokens, Base UI primitives, Tabler icons): [packages/studio/Design.md](../../packages/studio/Design.md). Chrome tokens use Synara names (`--background`, `--foreground`, `--color-border-focus`, …) scoped to `[data-owb-theme]`. The previous `--wb-*` names are gone; hosts that overrode them must retarget the Synara names. Canvas colors the driver reads are `--canvas-*`.
 - Property field API: [property-fields.md](property-fields.md)
 - Extension trust: [Plugin-boundaries.md](../../Plugin-boundaries.md)

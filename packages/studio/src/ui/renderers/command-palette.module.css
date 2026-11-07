@@ -1,8 +1,10 @@
+@reference '../../theme/tailwind.css';
+
 .backdrop {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: var(--wb-backdrop-overlay);
+  background: var(--app-backdrop);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -12,12 +14,14 @@
 .panel {
   width: min(480px, 92vw);
   overflow: hidden;
-  border: var(--wb-hairline);
-  border-radius: var(--wb-radius-popup);
-  background: var(--wb-popover);
-  box-shadow: var(--wb-shadow-dialog);
-  color: var(--wb-foreground);
-  font-family: var(--wb-font);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 1.8);
+  background: var(--popover);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  color: var(--foreground);
+  font-family: var(--font-ui-family);
 }
 
 .command {
@@ -27,25 +31,25 @@
 }
 
 .command :global([cmdk-input-wrapper]) {
-  margin: var(--wb-space-2);
-  padding: 0 var(--wb-space-3);
-  border: 1px solid var(--wb-border);
-  border-radius: var(--wb-radius-lg);
-  background: var(--wb-input-fill);
+  margin: --spacing(2);
+  padding: 0 --spacing(3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input);
 }
 
 .searchInput {
   height: 32px;
-  font-size: var(--wb-text-sm);
+  font-size: var(--app-font-size-ui-sm);
 }
 
 .tabs {
   display: flex;
   align-items: center;
-  gap: var(--wb-space-1);
-  margin: 0 var(--wb-space-2) var(--wb-space-2);
-  padding: var(--wb-space-0-5);
-  border-radius: var(--wb-radius-control);
+  gap: --spacing(1);
+  margin: 0 --spacing(2) --spacing(2);
+  padding: --spacing(0.5);
+  border-radius: var(--radius);
   background: transparent;
 }
 
@@ -54,13 +58,13 @@
   flex: 0 1 auto;
   min-width: 0;
   height: 28px;
-  padding: 0 var(--wb-space-3);
+  padding: 0 --spacing(3);
   border: none;
-  border-radius: var(--wb-radius-sm);
+  border-radius: calc(var(--radius) * 0.6);
   background: transparent;
-  color: var(--wb-muted-foreground);
-  font-family: var(--wb-font);
-  font-size: var(--wb-text-sm);
+  color: var(--muted-foreground);
+  font-family: var(--font-ui-family);
+  font-size: var(--app-font-size-ui-sm);
   line-height: 1;
   white-space: nowrap;
   cursor: default;
@@ -68,23 +72,23 @@
 }
 
 .tab:hover {
-  color: var(--wb-foreground);
-  background: var(--wb-hover-overlay);
+  color: var(--foreground);
+  background: var(--color-background-button-secondary-hover);
 }
 
 .tabActive {
-  background: var(--wb-muted);
-  color: var(--wb-foreground);
-  box-shadow: var(--wb-shadow-xs);
+  background: var(--muted);
+  color: var(--foreground);
+  box-shadow: 0 0 0 1px var(--border);
 }
 
 .list {
   max-height: min(360px, 52vh);
-  padding: 0 var(--wb-space-2) var(--wb-space-2);
+  padding: 0 --spacing(2) --spacing(2);
 }
 
 .empty {
-  padding: var(--wb-space-4) var(--wb-space-2);
+  padding: --spacing(4) --spacing(2);
 }
 
 .group {
@@ -92,30 +96,30 @@
 }
 
 .group :global([cmdk-group-heading]) {
-  padding: var(--wb-space-2) var(--wb-space-2) var(--wb-space-1);
-  font-size: var(--wb-text-xs);
+  padding: --spacing(2) --spacing(2) --spacing(1);
+  font-size: var(--app-font-size-ui-xs);
   font-weight: 500;
   letter-spacing: 0.01em;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
   user-select: none;
 }
 
 .group:not(:first-child) :global([cmdk-group-heading]) {
-  padding-top: var(--wb-space-3);
+  padding-top: --spacing(3);
 }
 
 .item {
   min-height: 32px;
-  margin-bottom: var(--wb-space-0-5);
-  padding: 0 var(--wb-space-2);
-  border-radius: var(--wb-radius-sm);
+  margin-bottom: --spacing(0.5);
+  padding: 0 --spacing(2);
+  border-radius: calc(var(--radius) * 0.6);
 }
 
 .itemRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--wb-space-4);
+  gap: --spacing(4);
   width: 100%;
 }
 
@@ -125,16 +129,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--wb-text-sm);
+  font-size: var(--app-font-size-ui-sm);
   /* Clears descenders; the label clips overflow. */
   line-height: 16px;
 }
 
 .shortcut {
   flex-shrink: 0;
-  color: var(--wb-muted-foreground);
-  font-family: var(--wb-font);
-  font-size: var(--wb-text-xs);
+  color: var(--muted-foreground);
+  font-family: var(--font-ui-family);
+  font-size: var(--app-font-size-ui-xs);
   letter-spacing: 0.02em;
   white-space: nowrap;
 }

@@ -13,7 +13,7 @@
 }
 
 .label {
-  color: var(--wb-muted-foreground, #6b7280);
+  color: var(--muted-foreground);
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -26,22 +26,22 @@
   min-width: 0;
   height: 28px;
   padding: 0 8px;
-  border: 1px solid var(--wb-border, #e5e7eb);
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--wb-background, #fff);
-  color: var(--wb-foreground, #111827);
+  background: var(--background);
+  color: var(--foreground);
   font: inherit;
   font-size: 12px;
 }
 
 .control:focus {
-  outline: 2px solid var(--wb-ring, #93c5fd);
+  outline: 2px solid var(--ring);
   outline-offset: 1px;
 }
 
 .empty {
   margin: 0;
-  color: var(--wb-muted-foreground, #6b7280);
+  color: var(--muted-foreground);
   font-size: 12px;
   line-height: 1.4;
 }

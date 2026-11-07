@@ -1,4 +1,3 @@
-import { IconCheck } from '@tabler/icons-react';
 import type { ButtonHTMLAttributes } from 'react';
 
 import { cn } from '../../lib/cn';
@@ -13,7 +12,7 @@ export interface CheckboxProps extends Omit<
   onChange: (checked: boolean) => void;
 }
 
-/** shadcn-style checkbox - square control with check indicator. */
+/** Synara checkbox box: light border, primary fill, check glyph. */
 export function Checkbox({
   checked,
   onChange,
@@ -24,7 +23,9 @@ export function Checkbox({
   return (
     <button
       aria-checked={checked}
-      className={cn(styles.root, checked && styles.checked, className)}
+      className={cn(styles.root, className)}
+      data-checked={checked ? '' : undefined}
+      data-slot="checkbox"
       disabled={disabled}
       role="checkbox"
       type="button"
@@ -37,14 +38,20 @@ export function Checkbox({
       }}
       {...props}
     >
-      {checked ? (
-        <IconCheck
+      <span className={styles.indicator} data-slot="checkbox-indicator">
+        <svg
           aria-hidden
-          className={styles.indicator}
-          size={12}
-          stroke={3}
-        />
-      ) : null}
+          className={styles.glyph}
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="3"
+          viewBox="0 0 24 24"
+        >
+          <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
+        </svg>
+      </span>
     </button>
   );
 }

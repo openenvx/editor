@@ -1,4 +1,4 @@
-/** Locks `--wb-*` chrome to the Codex light/dark theme in tokens.css. */
+/** Locks tokens.css to Synara's resolved Codex pack (theme.logic.ts output). */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -12,7 +12,9 @@ function readThemeBlock(theme: 'light' | 'dark'): string {
     throw new Error(`${theme} theme block not found`);
   }
   const nextTheme = theme === 'light' ? 'dark' : null;
-  const endMarker = nextTheme ? `\n[data-owb-theme='${nextTheme}']` : '\n[data-owb-theme],';
+  const endMarker = nextTheme
+    ? `\n[data-owb-theme='${nextTheme}']`
+    : '\n:where([data-owb-theme])';
   const end = css.indexOf(endMarker, start + 1);
   if (end === -1) {
     throw new Error(`${theme} theme block end not found`);
@@ -28,47 +30,39 @@ function readToken(block: string, name: string): string {
   return match[1].replaceAll(/\s+/g, ' ').trim();
 }
 
-describe('Codex token lock', () => {
+describe('Synara Codex token lock', () => {
   const light = readThemeBlock('light');
   const dark = readThemeBlock('dark');
 
-  it('matches Codex light chrome', () => {
-    expect(readToken(light, '--wb-background')).toBe('#ffffff');
-    expect(readToken(light, '--wb-card')).toBe('#ffffff');
-    expect(readToken(light, '--wb-foreground')).toBe('#0d0d0d');
-    expect(readToken(light, '--wb-muted-foreground')).toBe('rgba(13, 13, 13, 0.598)');
-    expect(readToken(light, '--wb-border')).toBe('rgba(13, 13, 13, 0.069)');
-    expect(readToken(light, '--wb-muted')).toBe('rgba(13, 13, 13, 0.04)');
-    expect(readToken(light, '--wb-hover-overlay')).toBe('rgba(13, 13, 13, 0.03)');
-    expect(readToken(light, '--wb-sidebar-row-selected')).toBe('rgba(13, 13, 13, 0.03)');
-    expect(readToken(light, '--wb-seam-line')).toBe('rgba(0, 0, 0, 0.05)');
-    expect(readToken(light, '--wb-menu')).toBe('rgba(255, 255, 255, 0.7)');
-    expect(readToken(light, '--wb-primary')).toBe('#0d0d0d');
-    expect(readToken(light, '--wb-focus')).toBe('#0169cc');
-    expect(readToken(light, '--wb-destructive')).toBe('#e02e2a');
-    expect(readToken(light, '--wb-accent')).toBe('#e8f2fa');
-    expect(readToken(light, '--wb-sidebar-surface')).toBe(
-      'color-mix(in srgb, #ffffff 38%, #e0e0e0)'
+  it('matches Synara Codex light', () => {
+    expect(readToken(light, '--background')).toBe('#ffffff');
+    expect(readToken(light, '--foreground')).toBe('#0d0d0d');
+    expect(readToken(light, '--muted-foreground')).toBe(
+      'rgba(13, 13, 13, 0.598)'
+    );
+    expect(readToken(light, '--border')).toBe('rgba(13, 13, 13, 0.069)');
+    expect(readToken(light, '--primary')).toBe('#0d0d0d');
+    expect(readToken(light, '--ring')).toBe('#0169cc');
+    expect(readToken(light, '--color-border-focus')).toBe('#0169cc');
+    expect(readToken(light, '--color-background-elevated-secondary')).toBe(
+      'rgba(13, 13, 13, 0.04)'
+    );
+    expect(readToken(light, '--color-text-foreground-secondary')).toBe(
+      'rgba(13, 13, 13, 0.598)'
     );
   });
 
-  it('matches Codex dark chrome', () => {
-    expect(readToken(dark, '--wb-background')).toBe('#101010');
-    expect(readToken(dark, '--wb-card')).toBe('#131313');
-    expect(readToken(dark, '--wb-foreground')).toBe('#fcfcfc');
-    expect(readToken(dark, '--wb-muted-foreground')).toBe('rgba(252, 252, 252, 0.58)');
-    expect(readToken(dark, '--wb-border')).toBe('rgba(252, 252, 252, 0.072)');
-    expect(readToken(dark, '--wb-muted')).toBe('rgba(252, 252, 252, 0.026)');
-    expect(readToken(dark, '--wb-hover-overlay')).toBe('rgba(252, 252, 252, 0.039)');
-    expect(readToken(dark, '--wb-sidebar-row-selected')).toBe('rgba(252, 252, 252, 0.026)');
-    expect(readToken(dark, '--wb-input-fill')).toBe('rgb(23, 23, 23)');
-    expect(readToken(dark, '--wb-menu')).toBe('rgba(23, 23, 23, 0.7)');
-    expect(readToken(dark, '--wb-primary')).toBe('#fcfcfc');
-    expect(readToken(dark, '--wb-primary-foreground')).toBe('#111111');
-    expect(readToken(dark, '--wb-focus')).toBe('rgba(51, 134, 214, 0.63)');
-    expect(readToken(dark, '--wb-destructive')).toBe('#e02e2a');
-    expect(readToken(dark, '--wb-sidebar-surface')).toBe(
-      'color-mix(in srgb, #111111 80%, #000000)'
+  it('matches Synara Codex dark', () => {
+    expect(readToken(dark, '--background')).toBe('#101010');
+    expect(readToken(dark, '--card')).toBe('#131313');
+    expect(readToken(dark, '--foreground')).toBe('#fcfcfc');
+    expect(readToken(dark, '--border')).toBe('rgba(252, 252, 252, 0.072)');
+    expect(readToken(dark, '--input')).toBe('rgb(23, 23, 23)');
+    expect(readToken(dark, '--primary-foreground')).toBe('#111111');
+    expect(readToken(dark, '--ring')).toBe('rgba(51, 134, 214, 0.63)');
+    expect(readToken(dark, '--color-background-button-secondary-hover')).toBe(
+      'rgba(252, 252, 252, 0.039)'
     );
+    expect(readToken(dark, '--color-background-surface')).toBe('#111111');
   });
 });

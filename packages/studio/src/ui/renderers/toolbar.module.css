@@ -1,20 +1,22 @@
+@reference '../../theme/tailwind.css';
+
 /* Floating pill - Design.md FloatingToolbarRenderer (popover + float shadow). */
 .toolbar {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: var(--wb-space-2);
-  padding-block: var(--wb-space-2);
-  padding-inline: var(--wb-space-2);
-  border-radius: var(--wb-radius-lg);
-  background: var(--wb-popover);
-  box-shadow: var(--wb-shadow-float);
+  gap: --spacing(2);
+  padding-block: --spacing(2);
+  padding-inline: --spacing(2);
+  border-radius: var(--radius);
+  background: var(--popover);
+  box-shadow: 0 0 0 1px var(--border);
 }
 
 .section {
   display: flex;
   align-items: center;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
 }
 
 .divider {
@@ -22,5 +24,5 @@
   align-self: center;
   width: 1px;
   height: 20px;
-  background: var(--wb-divider-color);
+  background: var(--app-surface-divider);
 }

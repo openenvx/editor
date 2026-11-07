@@ -32,18 +32,24 @@ function readCanvasThemeColors(element: Element): CanvasThemeColors {
     return value || fallback;
   };
   return {
-    artboard: read('--wb-artboard', DEFAULT_COLORS.artboard),
-    artboardBorder: read('--wb-artboard-border', DEFAULT_COLORS.artboardBorder),
+    artboard: read('--canvas-artboard', DEFAULT_COLORS.artboard),
+    artboardBorder: read(
+      '--canvas-artboard-border',
+      DEFAULT_COLORS.artboardBorder
+    ),
     artboardShadow: read(
-      '--wb-artboard-shadow-color',
+      '--canvas-artboard-shadow-color',
       DEFAULT_COLORS.artboardShadow
     ),
-    foreground: read('--wb-foreground', DEFAULT_COLORS.foreground),
-    grid: read('--wb-grid', DEFAULT_COLORS.grid),
-    pageMargin: read('--wb-page-margin', DEFAULT_COLORS.pageMargin),
-    selection: read('--wb-selection', DEFAULT_COLORS.selection),
-    selectionMuted: read('--wb-selection-muted', DEFAULT_COLORS.selectionMuted),
-    smartGuide: read('--wb-smart-guide', DEFAULT_COLORS.smartGuide),
+    foreground: read('--foreground', DEFAULT_COLORS.foreground),
+    grid: read('--canvas-grid', DEFAULT_COLORS.grid),
+    pageMargin: read('--canvas-page-margin', DEFAULT_COLORS.pageMargin),
+    selection: read('--canvas-selection', DEFAULT_COLORS.selection),
+    selectionMuted: read(
+      '--canvas-selection-muted',
+      DEFAULT_COLORS.selectionMuted
+    ),
+    smartGuide: read('--canvas-smart-guide', DEFAULT_COLORS.smartGuide),
   };
 }
 

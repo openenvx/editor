@@ -1,7 +1,7 @@
 .frame {
   display: block;
   border: none;
-  border-radius: var(--wb-radius-md);
-  background: var(--wb-muted);
-  box-shadow: var(--wb-shadow-xs);
+  border-radius: calc(var(--radius) * 0.8);
+  background: var(--muted);
+  box-shadow: 0 0 0 1px var(--border);
 }

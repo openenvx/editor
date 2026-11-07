@@ -3,7 +3,7 @@
 }
 
 .placeholder {
-  color: var(--wb-muted-foreground, #6b7280);
+  color: var(--muted-foreground);
   font-size: 14px;
   margin: 0;
 }

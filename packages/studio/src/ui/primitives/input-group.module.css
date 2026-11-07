@@ -1,9 +1,11 @@
+@reference '../../theme/tailwind.css';
+
 /* Paired numeric fields (X/Y, W/H) - separate fields side by side. */
 .group {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
-  gap: var(--wb-space-2);
+  gap: --spacing(2);
   width: 100%;
 }
 
@@ -11,21 +13,21 @@
   display: flex;
   flex: 1;
   align-items: center;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
   min-width: 0;
-  height: var(--wb-control-height);
-  padding: 0 var(--wb-space-1) 0 var(--wb-space-2);
-  background: var(--wb-input-fill);
-  border: 1px solid var(--wb-border);
-  border-radius: var(--wb-radius-lg);
+  height: var(--app-density-row-height);
+  padding: 0 --spacing(1) 0 --spacing(2);
+  background: var(--input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   transition:
-    border-color var(--wb-duration-fast) var(--wb-ease-out),
-    box-shadow var(--wb-duration-fast) ease;
+    border-color var(--app-duration-fast) var(--app-ease-out),
+    box-shadow var(--app-duration-fast) ease;
 }
 
 .cell:focus-within {
-  border-color: var(--wb-focus);
-  box-shadow: var(--wb-shadow-control-focus);
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
 }
 
 .cell input {
@@ -34,7 +36,7 @@
 
 .label {
   flex-shrink: 0;
-  font-size: var(--wb-text-sm);
+  font-size: var(--app-font-size-ui-sm);
   font-weight: 500;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
 }

@@ -1,3 +1,5 @@
+@reference '../../theme/tailwind.css';
+
 .bar {
   display: flex;
   align-items: center;
@@ -5,9 +7,9 @@
   width: 100%;
   min-width: 0;
   height: 100%;
-  padding: 0 var(--wb-space-2);
+  padding: 0 --spacing(2);
   overflow: hidden;
-  font-size: var(--wb-text-sm);
+  font-size: var(--app-font-size-ui-sm);
 }
 
 .left,
@@ -21,40 +23,40 @@
 .item {
   display: inline-flex;
   align-items: center;
-  height: var(--wb-control-height);
-  padding: 0 var(--wb-space-2);
+  height: var(--app-density-row-height);
+  padding: 0 --spacing(2);
   border: 1px solid transparent;
-  border-radius: var(--wb-radius-md);
+  border-radius: calc(var(--radius) * 0.8);
   background: transparent;
-  color: var(--wb-muted-foreground);
-  font-family: var(--wb-font);
-  font-size: var(--wb-text-sm);
+  color: var(--muted-foreground);
+  font-family: var(--font-ui-family);
+  font-size: var(--app-font-size-ui-sm);
   font-weight: 400;
   line-height: 1;
   cursor: pointer;
   white-space: nowrap;
   transition:
-    color var(--wb-duration-fast) var(--wb-ease-out),
-    background-color var(--wb-duration-fast) var(--wb-ease-out);
+    color var(--app-duration-fast) var(--app-ease-out),
+    background-color var(--app-duration-fast) var(--app-ease-out);
 }
 
 .item:hover {
-  background: var(--wb-hover-overlay);
-  color: var(--wb-foreground);
+  background: var(--color-background-button-secondary-hover);
+  color: var(--foreground);
 }
 
 .item:focus-visible {
   outline: none;
-  box-shadow: var(--wb-shadow-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
 }
 
 .selection {
   display: inline-flex;
   align-items: center;
-  height: var(--wb-control-height);
-  padding: 0 var(--wb-space-2);
-  color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-sm);
+  height: var(--app-density-row-height);
+  padding: 0 --spacing(2);
+  color: var(--muted-foreground);
+  font-size: var(--app-font-size-ui-sm);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

@@ -18,9 +18,9 @@
 
 .rulerCorner {
   grid-area: corner;
-  background: var(--wb-popover, #1a1a1a);
-  border-right: 1px solid var(--wb-border, rgb(255 255 255 / 8%));
-  border-bottom: 1px solid var(--wb-border, rgb(255 255 255 / 8%));
+  background: var(--popover);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   z-index: 4;
   overflow: hidden;
 }
@@ -29,8 +29,8 @@
   grid-area: top;
   position: relative;
   overflow: hidden;
-  background: var(--wb-popover, #1a1a1a);
-  border-bottom: 1px solid var(--wb-border, rgb(255 255 255 / 8%));
+  background: var(--popover);
+  border-bottom: 1px solid var(--border);
   cursor: ns-resize;
   z-index: 4;
   user-select: none;
@@ -40,8 +40,8 @@
   grid-area: left;
   position: relative;
   overflow: hidden;
-  background: var(--wb-popover, #1a1a1a);
-  border-right: 1px solid var(--wb-border, rgb(255 255 255 / 8%));
+  background: var(--popover);
+  border-right: 1px solid var(--border);
   cursor: ew-resize;
   z-index: 4;
   user-select: none;
@@ -70,7 +70,7 @@
   position: absolute;
   top: 0;
   width: 1px;
-  background: var(--wb-border, rgb(255 255 255 / 8%));
+  background: var(--border);
   pointer-events: none;
 }
 
@@ -82,7 +82,7 @@
 .tickMajorH {
   height: 10px;
   top: 10px;
-  background: var(--wb-foreground-muted, #a1a1aa);
+  background: var(--muted-foreground);
 }
 
 .tickLabelH {
@@ -91,7 +91,7 @@
   left: 3px;
   font-size: 9px;
   line-height: 1;
-  color: var(--wb-foreground-muted, #a1a1aa);
+  color: var(--muted-foreground);
   white-space: nowrap;
 }
 
@@ -100,7 +100,7 @@
   position: absolute;
   left: 0;
   height: 1px;
-  background: var(--wb-border, rgb(255 255 255 / 8%));
+  background: var(--border);
   pointer-events: none;
 }
 
@@ -112,7 +112,7 @@
 .tickMajorV {
   width: 10px;
   left: 10px;
-  background: var(--wb-foreground-muted, #a1a1aa);
+  background: var(--muted-foreground);
 }
 
 .tickLabelV {
@@ -121,7 +121,7 @@
   top: -10px;
   font-size: 9px;
   line-height: 1;
-  color: var(--wb-foreground-muted, #a1a1aa);
+  color: var(--muted-foreground);
   white-space: nowrap;
   transform: rotate(-90deg);
   transform-origin: left top;
@@ -132,7 +132,7 @@
   top: 0;
   bottom: 0;
   width: 1px;
-  background: var(--wb-selection, #3b82f6);
+  background: var(--canvas-selection);
   pointer-events: none;
 }
 
@@ -141,7 +141,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: var(--wb-selection, #3b82f6);
+  background: var(--canvas-selection);
   pointer-events: none;
 }
 
@@ -177,7 +177,7 @@
   bottom: 0;
   left: 2.5px;
   width: 1px;
-  background: var(--wb-smart-guide, #ec4899);
+  background: var(--canvas-smart-guide);
 }
 
 .guideH {
@@ -193,7 +193,7 @@
   right: 0;
   top: 2.5px;
   height: 1px;
-  background: var(--wb-smart-guide, #ec4899);
+  background: var(--canvas-smart-guide);
 }
 
 .guideV:active,
@@ -205,7 +205,7 @@
 .guidePreviewH {
   position: absolute;
   pointer-events: none;
-  background: var(--wb-smart-guide, #ec4899);
+  background: var(--canvas-smart-guide);
 }
 
 .guidePreviewV {

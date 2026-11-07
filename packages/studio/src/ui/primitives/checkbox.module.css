@@ -1,41 +1,17 @@
+@reference '../../theme/tailwind.css';
+
 .root {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  padding: 0;
-  border: 1px solid var(--wb-border);
-  border-radius: 4px;
-  background: var(--wb-background);
-  color: var(--wb-primary-foreground);
-  cursor: pointer;
-  outline: none;
-  transition:
-    background-color var(--wb-duration-fast) var(--wb-ease-out),
-    border-color var(--wb-duration-fast) var(--wb-ease-out);
-}
-
-.root:hover:not(:disabled) {
-  border-color: var(--wb-switch-track-border-hover);
-}
-
-.root:focus-visible {
-  box-shadow: var(--wb-shadow-focus);
-}
-
-.root:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.checked {
-  border-color: var(--wb-primary);
-  background: var(--wb-primary);
+  @apply bg-background focus-visible:ring-ring focus-visible:ring-offset-background dark:not-data-checked:bg-input/32 relative inline-flex size-4.5 shrink-0 items-center justify-center rounded-[.25rem] border border-[color:var(--color-border-light)] outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-64 sm:size-4;
 }
 
 .indicator {
-  display: block;
-  pointer-events: none;
+  @apply bg-primary text-primary-foreground absolute -inset-px hidden items-center justify-center rounded-[.25rem];
+}
+
+.root[aria-checked='true'] .indicator {
+  display: flex;
+}
+
+.glyph {
+  @apply size-3.5 sm:size-3;
 }

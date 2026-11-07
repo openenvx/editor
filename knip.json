@@ -44,14 +44,12 @@
         "src/create-canvas-sandbox-extension-host.ts!",
         "src/plugin/canvas-plugin.ts!",
         "rolldown.publish.config.ts!",
-        "css-modules-plugin.ts!",
         "build-dts.ts!",
       ],
       "project": [
         "src/**/*.{ts,tsx}",
         "!src/**/*.test.ts",
         "rolldown.publish.config.ts",
-        "css-modules-plugin.ts",
         "build-dts.ts",
       ],
       "ignoreIssues": {
@@ -132,7 +130,8 @@
         "rolldown-react-esm-externals.ts"
       ],
       "ignoreDependencies": [
-        "zod"
+        "zod",
+        "tailwindcss"
       ],
       "ignoreIssues": {
         "src/schema/**": ["duplicates", "exports"],

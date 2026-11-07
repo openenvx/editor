@@ -24,12 +24,12 @@ afterEach(cleanup);
 describe('useCanvasThemeColors', () => {
   it('reads theme colors from CSS variables', () => {
     const variables: Record<string, string> = {
-      '--wb-artboard': '#fafafa',
-      '--wb-artboard-border': '#d4d4d8',
-      '--wb-artboard-shadow-color': 'rgba(0, 0, 0, 0.2)',
-      '--wb-selection': '#2563eb',
-      '--wb-selection-muted': 'rgba(37, 99, 235, 0.5)',
-      '--wb-foreground': '#18181b',
+      '--canvas-artboard': '#fafafa',
+      '--canvas-artboard-border': '#d4d4d8',
+      '--canvas-artboard-shadow-color': 'rgba(0, 0, 0, 0.2)',
+      '--canvas-selection': '#2563eb',
+      '--canvas-selection-muted': 'rgba(37, 99, 235, 0.5)',
+      '--foreground': '#18181b',
     };
     vi.spyOn(window, 'getComputedStyle').mockReturnValue({
       getPropertyValue: (name: string) => variables[name] || '',

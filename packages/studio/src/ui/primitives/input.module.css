@@ -1,37 +1,22 @@
+@reference '../../theme/tailwind.css';
+
+/* Synara `ui/input.tsx` control + field. */
+.control {
+  @apply border-border bg-background text-ui text-foreground has-focus-visible:border-foreground/30 sm:text-ui dark:bg-input/32 relative inline-flex min-h-9 w-full items-center rounded-lg border has-disabled:opacity-64 sm:min-h-8;
+}
+
+.controlSm {
+  @apply min-h-8 sm:min-h-7;
+}
+
 .root {
-  width: 100%;
-  height: var(--wb-control-height);
-  padding: 0 var(--wb-control-padding-x);
-  border: 1px solid var(--wb-border);
-  border-radius: var(--wb-radius-lg);
-  background: var(--wb-input-fill);
-  color: var(--wb-foreground);
-  font-size: var(--wb-text-sm);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  transition: border-color var(--wb-duration-fast) var(--wb-ease-out);
+  @apply text-ui placeholder:text-muted-foreground/72 sm:text-ui h-full w-full min-w-0 rounded-[inherit] border-0 bg-transparent px-3 py-1.5 leading-normal outline-none;
 }
 
-.root:focus-visible {
-  outline: none;
-  border-color: var(--wb-focus);
-  box-shadow: var(--wb-shadow-control-focus);
-}
-
-.root::placeholder {
-  color: var(--wb-muted-foreground);
-}
-
-.color {
-  height: var(--wb-control-height);
-  padding: var(--wb-space-1);
-  cursor: pointer;
+.rootSm {
+  @apply text-ui-sm sm:text-ui-sm px-2.5 py-1;
 }
 
 .textarea {
-  height: auto;
-  min-height: 64px;
-  padding: var(--wb-space-2);
-  resize: vertical;
+  @apply field-sizing-content min-h-17.5 resize-none px-[calc(--spacing(3)-1px)] py-[calc(--spacing(1.5)-1px)];
 }

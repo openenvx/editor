@@ -1,16 +1,18 @@
+@reference '../../theme/tailwind.css';
+
 .fieldBlock {
-  margin-bottom: var(--wb-space-2);
+  margin-bottom: --spacing(2);
 }
 
 .fieldBlock > .label {
   display: block;
-  margin-bottom: var(--wb-space-1);
+  margin-bottom: --spacing(1);
 }
 
 .label {
-  font-size: var(--wb-text-sm);
+  font-size: var(--app-font-size-ui-sm);
   font-weight: 500;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
 }
 
 .control {
@@ -20,7 +22,7 @@
 .controlRow {
   display: flex;
   align-items: center;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
   min-width: 0;
 }
 
@@ -30,19 +32,19 @@
 }
 
 .fieldRowFull {
-  margin-bottom: var(--wb-space-3);
+  margin-bottom: --spacing(3);
 }
 
 .imageRow {
   display: flex;
   flex-direction: column;
-  gap: var(--wb-space-2);
+  gap: --spacing(2);
 }
 
 .cornerRow {
   display: flex;
   align-items: center;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
 }
 
 .cornerInput {

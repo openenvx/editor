@@ -5,10 +5,10 @@
   height: 28px;
   padding: 0 10px;
   border: none;
-  border-radius: var(--wb-radius-control);
+  border-radius: var(--radius);
   background: transparent;
-  color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-sm);
+  color: var(--muted-foreground);
+  font-size: var(--app-font-size-ui-sm);
   font-weight: 400;
   cursor: pointer;
   transition:
@@ -17,13 +17,13 @@
 }
 
 .button:hover:not(:disabled) {
-  background: var(--wb-hover-overlay);
-  color: var(--wb-foreground);
+  background: var(--color-background-button-secondary-hover);
+  color: var(--foreground);
 }
 
 .buttonActive {
-  background: var(--wb-active-overlay);
-  color: var(--wb-foreground);
+  background: var(--color-background-button-secondary-active);
+  color: var(--foreground);
 }
 
 .button:disabled {

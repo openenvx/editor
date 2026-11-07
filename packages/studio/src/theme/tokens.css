@@ -1,55 +1,57 @@
-/* Theme-agnostic tokens - shared by every [data-owb-theme] scope. */
+/* Synara design tokens (Codex pack), resolved to static values and scoped to
+   [data-owb-theme] so the editor never leaks variables into the host page.
+   Names match Synara `apps/web/src/index.css` + `theme.logic.ts` output. */
 [data-owb-theme] {
-  /* Typography - 12px workhorse (native desktop density) */
-  --wb-text-xs: 11px;
-  --wb-text-sm: 12px;
-  --wb-text-base: 13px;
-  --wb-text-mono: 12px;
-  --wb-font:
+  --radius: 0.625rem;
+  --scroll-edge-fade-size: 1.5rem;
+  --font-ui-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --wb-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  --font-mono-family:
+    'JetBrains Mono Variable', 'JetBrains Mono', 'SF Mono', 'SFMono-Regular',
+    Consolas, 'Liberation Mono', Menlo, monospace;
 
-  /* Spacing */
-  --wb-space-0-5: 2px;
-  --wb-space-1: 4px;
-  --wb-space-2: 8px;
-  --wb-space-3: 12px;
-  --wb-space-4: 16px;
-  --wb-space-5: 20px;
-  --wb-space-6: 24px;
+  /* Synara typography scale at the default 13px base (appTypography.ts). */
+  --app-font-size-ui: 13px;
+  --app-font-size-ui-lg: 14px;
+  --app-font-size-ui-sm: 12px;
+  --app-font-size-ui-xs: 11px;
+  --app-font-size-ui-2xs: 10px;
+  --app-font-size-ui-meta: 11px;
+  --app-font-size-ui-timestamp: 9px;
 
-  /* Radius - control / popup / dialog steps */
-  --wb-radius-sm: 6px;
-  --wb-radius-control: 10px;
-  --wb-radius-md: 8px;
-  --wb-radius-lg: 10px;
-  --wb-radius-popup: 16px;
-  --wb-radius-dialog: 24px;
-  --wb-radius-full: 9999px;
+  /* Synara "comfortable" density (appDensity.ts). */
+  --density-scale: 1;
+  --app-density-row-height: 1.75rem;
+  --app-density-row-padding-y: 0.125rem;
+  --app-density-row-gap: 0.5rem;
 
-  /* Control sizes - 1.75rem rows */
-  --wb-control-height: 28px;
-  --wb-control-padding-x: 10px;
-  --wb-icon-button-size: 28px;
-  --wb-icon-button-size-lg: 32px;
-  --wb-menu-item-height: 28px;
+  --sidebar-width: 16rem;
+  --sidebar-width-icon: 3rem;
+  --app-rail-width: calc(3.25rem - 1px);
+  --app-chrome-divider-height: 1.25rem;
+  --app-chrome-divider-color: var(--color-border);
+  --app-surface-divider: color-mix(
+    in srgb,
+    var(--color-border) 60%,
+    transparent
+  );
+  /* Theme vars Synara classes read directly through `var(--color-*)`. */
+  --color-white: #fff;
+  --color-black: #000;
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-muted: var(--muted);
+  --popup-blur: blur(40px) saturate(150%);
+  --app-sidebar-backdrop-filter: blur(4px) saturate(130%);
 
-  /* Layout */
-  --wb-topbar-height: 46px;
-  --wb-status-bar-height: 32px;
-  --wb-activity-bar-width: 56px;
-  --wb-sidebar-width: 240px;
-  --wb-secondary-sidebar-width: 280px;
-  --wb-layer-row-height: 28px;
-
-  /* Material - frosted sidebar / menus */
-  --wb-surface-blur: blur(4px) saturate(130%);
-  --wb-popup-blur: blur(40px) saturate(150%);
-
-  /* Motion */
-  --wb-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --wb-duration-fast: 140ms;
-  --wb-duration: 200ms;
+  /* Editor-only workbench geometry (no Synara equivalent). */
+  --app-topbar-height: 46px;
+  --app-status-bar-height: 32px;
+  --inspector-width: 320px;
+  --app-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --app-duration-fast: 140ms;
+  --app-duration: 200ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -66,208 +68,245 @@
 [data-owb-theme='light'] {
   color-scheme: light;
 
-  /* Codex light chrome. */
-  --wb-background: #ffffff;
-  --wb-canvas-field: rgba(13, 13, 13, 0.03);
-  --wb-card: #ffffff;
-  --wb-popover: rgb(255, 255, 255);
-  --wb-popover-foreground: #0d0d0d;
-  --wb-property-popover: rgb(255, 255, 255);
-  --wb-menu: rgba(255, 255, 255, 0.7);
-  --wb-popup-header: rgba(13, 13, 13, 0.04);
-  --wb-muted: rgba(13, 13, 13, 0.04);
-  --wb-border: rgba(13, 13, 13, 0.069);
-  --wb-input-fill: rgb(255, 255, 255);
-  --wb-seam-line: rgba(0, 0, 0, 0.05);
-  --wb-surface-divider: color-mix(in srgb, var(--wb-border) 60%, transparent);
-  --wb-chrome-button: rgba(13, 13, 13, 0.03);
-  --wb-sidebar-segment-active: #ffffff;
-  /* Light sidebar: 38% white over macOS vibrancy. Web has no desktop behind
-     the rail, so mix against a Finder-gray plate. */
-  --wb-sidebar-surface: color-mix(in srgb, #ffffff 38%, #e0e0e0);
-  --wb-sidebar-row-selected: rgba(13, 13, 13, 0.03);
-  --wb-sidebar-row-hovered: rgba(13, 13, 13, 0.03);
+  --background: #ffffff;
+  --foreground: #0d0d0d;
+  --card: #ffffff;
+  --card-foreground: #0d0d0d;
+  --popover: rgb(255, 255, 255);
+  --popover-foreground: #0d0d0d;
+  --primary: #0d0d0d;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(13, 13, 13, 0.03);
+  --secondary-foreground: #0d0d0d;
+  --muted: rgba(13, 13, 13, 0.04);
+  --muted-foreground: rgba(13, 13, 13, 0.598);
+  --accent: #e8f2fa;
+  --accent-foreground: #0d0d0d;
+  --destructive: #e02e2a;
+  --destructive-foreground: #ffffff;
+  --border: rgba(13, 13, 13, 0.069);
+  --input: rgb(255, 255, 255);
+  --ring: #0169cc;
+  --info: #0169cc;
+  --info-foreground: #0169cc;
+  --success: #00a240;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
 
-  --wb-foreground: #0d0d0d;
-  --wb-muted-foreground: rgba(13, 13, 13, 0.598);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0d0d0d;
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: rgba(13, 13, 13, 0.03);
+  --sidebar-accent-active: rgba(13, 13, 13, 0.03);
+  --sidebar-selected: rgba(13, 13, 13, 0.03);
+  --sidebar-accent-foreground: #0d0d0d;
+  --sidebar-border: rgba(13, 13, 13, 0.069);
+  --sidebar-ring: var(--ring);
 
-  --wb-primary: #0d0d0d;
-  --wb-primary-foreground: #ffffff;
-  --wb-primary-hover: color-mix(in srgb, var(--wb-primary) 90%, transparent);
-  --wb-accent: #e8f2fa;
-  --wb-accent-foreground: #0d0d0d;
-  --wb-focus: #0169cc;
-  --wb-menu-highlight: rgba(13, 13, 13, 0.03);
-  --wb-menu-highlight-foreground: #0d0d0d;
-  --wb-destructive: #e02e2a;
+  --color-background-accent: #e8f2fa;
+  --color-background-button-primary: #0d0d0d;
+  --color-background-button-secondary: rgba(13, 13, 13, 0.03);
+  --color-background-button-secondary-active: rgba(13, 13, 13, 0.019);
+  --color-background-button-secondary-hover: rgba(13, 13, 13, 0.03);
+  --color-background-button-tertiary-hover: rgba(13, 13, 13, 0.059);
+  --color-background-control: rgba(255, 255, 255, 0.96);
+  --color-background-control-opaque: rgb(255, 255, 255);
+  --color-background-elevated-primary: rgba(255, 255, 255, 0.96);
+  --color-background-elevated-primary-opaque: rgb(255, 255, 255);
+  --color-background-elevated-secondary: rgba(13, 13, 13, 0.04);
+  --color-background-elevated-secondary-opaque: rgb(255, 255, 255);
+  --color-background-panel: #ffffff;
+  --color-background-surface: #ffffff;
+  --color-background-surface-under: #ffffff;
+  --color-border-focus: #0169cc;
+  --color-border-heavy: rgba(13, 13, 13, 0.059);
+  --color-border-light: rgba(13, 13, 13, 0.06);
+  --color-icon-secondary: rgba(13, 13, 13, 0.598);
+  --color-icon-tertiary: rgba(13, 13, 13, 0.398);
+  --color-simple-scrim: rgba(0, 0, 0, 0.059);
+  --color-text-accent: #0169cc;
+  --color-text-foreground: #0d0d0d;
+  --color-text-foreground-secondary: rgba(13, 13, 13, 0.598);
+  --color-text-foreground-tertiary: rgba(13, 13, 13, 0.398);
 
-  --wb-selection: #3b82f6;
-  --wb-selection-muted: rgba(59, 130, 246, 0.5);
-  --wb-smart-guide: #ec4899;
-  --wb-page-margin: #a855f7;
-  --wb-grid: rgba(0, 0, 0, 0.1);
-  --wb-artboard: #ffffff;
-  --wb-artboard-border: #e5e5e5;
-  --wb-artboard-shadow-color: rgba(0, 0, 0, 0.12);
+  --canvas-field: rgba(13, 13, 13, 0.03);
+  --app-shell-background: #ffffff;
+  --app-content-surface: #ffffff;
+  /* Activity rail: same tint as the canvas workbench (.chrome). */
+  --app-sidebar-surface: var(--canvas-field);
+  --app-overlay-surface: color-mix(in srgb, var(--popover) 55%, transparent);
+  --seam-line: rgba(0, 0, 0, 0.05);
+  --app-scrollbar-thumb: rgba(0, 0, 0, 0.1);
+  --app-scrollbar-thumb-hover: rgba(0, 0, 0, 0.18);
+  --app-backdrop: rgba(0, 0, 0, 0.32);
 
-  --wb-tooltip: rgba(23, 23, 23, 0.94);
-  --wb-tooltip-foreground: rgba(255, 255, 255, 0.92);
-  --wb-tooltip-border: transparent;
-  --wb-tooltip-shadow: none;
-
-  --wb-hover-overlay: rgba(13, 13, 13, 0.03);
-  --wb-active-overlay: rgba(13, 13, 13, 0.059);
-  --wb-switch-track: color-mix(
-    in srgb,
-    var(--wb-foreground) 20%,
-    var(--wb-input-fill)
-  );
-  --wb-switch-track-border: color-mix(
-    in srgb,
-    var(--wb-foreground) 14%,
-    transparent
-  );
-  --wb-switch-track-border-hover: color-mix(
-    in srgb,
-    var(--wb-foreground) 22%,
-    transparent
-  );
-  --wb-divider-color: var(--wb-surface-divider);
-  --wb-border-subtle: rgba(13, 13, 13, 0.06);
-  --wb-backdrop-overlay: rgba(10, 10, 10, 0.4);
-
-  /* Flat chrome - hairlines only, no lit controls */
-  --wb-shadow-xs: 0 0 0 1px var(--wb-border);
-  --wb-shadow-sm: 0 0 0 1px var(--wb-border);
-  --wb-segment-active-ring: 0 0 0 1px var(--wb-border);
-  --wb-shadow-md: 0 0 0 1px var(--wb-border);
-  --wb-shadow-float: 0 0 0 1px var(--wb-border);
-  --wb-shadow-control: 0 0 0 1px var(--wb-border);
-  --wb-shadow-control-hover: 0 0 0 1px rgba(13, 13, 13, 0.059);
-  --wb-shadow-control-focus: 0 0 0 1px var(--wb-focus);
-  --wb-shadow-focus: 0 0 0 1px var(--wb-focus);
-  --wb-shadow-artboard: 0 0 0 1px var(--wb-artboard-border);
-  --wb-shadow-popup: 0 4px 18px -6px
-    color-mix(in srgb, var(--wb-foreground) 7%, transparent);
-  --wb-shadow-dialog: 0 16px 50px -12px rgba(0, 0, 0, 0.34);
-
-  --wb-hairline: 1px solid var(--wb-border);
-  --wb-divider: 1px solid var(--wb-border);
-
-  --wb-scrollbar-thumb: rgba(13, 13, 13, 0.06);
-  --wb-scrollbar-thumb-hover: rgba(13, 13, 13, 0.069);
+  /* Editor-only canvas colors. */
+  --canvas-selection: #3b82f6;
+  --canvas-selection-muted: rgba(59, 130, 246, 0.5);
+  --canvas-smart-guide: #ec4899;
+  --canvas-page-margin: #a855f7;
+  --canvas-grid: rgba(0, 0, 0, 0.1);
+  --canvas-artboard: #ffffff;
+  --canvas-artboard-border: #e5e5e5;
+  --canvas-artboard-shadow-color: rgba(0, 0, 0, 0.12);
 }
 
 [data-owb-theme='dark'] {
   color-scheme: dark;
 
-  /* Codex dark chrome. */
-  --wb-background: #101010;
-  --wb-canvas-field: #101010;
-  --wb-card: #131313;
-  --wb-popover: rgb(23, 23, 23);
-  --wb-popover-foreground: #fcfcfc;
-  --wb-property-popover: rgb(23, 23, 23);
-  --wb-menu: rgba(23, 23, 23, 0.7);
-  --wb-popup-header: #121212;
-  --wb-muted: rgba(252, 252, 252, 0.026);
-  --wb-border: rgba(252, 252, 252, 0.072);
-  --wb-input-fill: rgb(23, 23, 23);
-  --wb-seam-line: rgba(255, 255, 255, 0.05);
-  --wb-surface-divider: color-mix(in srgb, var(--wb-border) 60%, transparent);
-  --wb-chrome-button: rgba(252, 252, 252, 0.026);
-  --wb-sidebar-segment-active: rgba(252, 252, 252, 0.026);
-  /* Dark sidebar glass: #111111 mixed 80% toward black (skip extra
-     transparency that vanished into --wb-background on web). */
-  --wb-sidebar-surface: color-mix(in srgb, #111111 80%, #000000);
-  --wb-sidebar-row-selected: rgba(252, 252, 252, 0.026);
-  --wb-sidebar-row-hovered: rgba(252, 252, 252, 0.039);
+  --background: #101010;
+  --foreground: #fcfcfc;
+  --card: #131313;
+  --card-foreground: #fcfcfc;
+  --popover: rgb(23, 23, 23);
+  --popover-foreground: #fcfcfc;
+  --primary: #fcfcfc;
+  --primary-foreground: #111111;
+  --secondary: rgba(252, 252, 252, 0.026);
+  --secondary-foreground: #686868;
+  --muted: rgba(252, 252, 252, 0.006);
+  --muted-foreground: rgba(252, 252, 252, 0.58);
+  --accent: #000f1d;
+  --accent-foreground: #fcfcfc;
+  --destructive: #e02e2a;
+  --destructive-foreground: #111111;
+  --border: rgba(252, 252, 252, 0.072);
+  --input: rgb(23, 23, 23);
+  --ring: rgba(51, 134, 214, 0.63);
+  --info: #0169cc;
+  --info-foreground: rgb(51, 134, 214);
+  --success: #00a240;
+  --success-foreground: #111111;
+  --warning: #f5b44a;
+  --warning-foreground: #111111;
 
-  --wb-foreground: #fcfcfc;
-  --wb-muted-foreground: rgba(252, 252, 252, 0.58);
+  --sidebar: #111111;
+  --sidebar-foreground: #fcfcfc;
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: rgba(252, 252, 252, 0.039);
+  --sidebar-accent-active: rgba(252, 252, 252, 0.039);
+  --sidebar-selected: rgba(252, 252, 252, 0.026);
+  --sidebar-accent-foreground: #fcfcfc;
+  --sidebar-border: rgba(252, 252, 252, 0.072);
+  --sidebar-ring: var(--ring);
 
-  --wb-primary: #fcfcfc;
-  --wb-primary-foreground: #111111;
-  --wb-primary-hover: color-mix(in srgb, var(--wb-primary) 90%, transparent);
-  --wb-accent: #000f1d;
-  --wb-accent-foreground: #fcfcfc;
-  --wb-focus: rgba(51, 134, 214, 0.63);
-  --wb-menu-highlight: rgba(252, 252, 252, 0.039);
-  --wb-menu-highlight-foreground: #fcfcfc;
-  --wb-destructive: #e02e2a;
+  --color-background-accent: #000f1d;
+  --color-background-button-primary: #fcfcfc;
+  --color-background-button-secondary: rgba(252, 252, 252, 0.026);
+  --color-background-button-secondary-active: rgba(252, 252, 252, 0.055);
+  --color-background-button-secondary-hover: rgba(252, 252, 252, 0.039);
+  --color-background-button-tertiary-hover: rgba(252, 252, 252, 0.029);
+  --color-background-control: rgba(23, 23, 23, 0.96);
+  --color-background-control-opaque: rgb(23, 23, 23);
+  --color-background-elevated-primary: rgba(23, 23, 23, 0.96);
+  --color-background-elevated-primary-opaque: rgb(23, 23, 23);
+  --color-background-elevated-secondary: rgba(252, 252, 252, 0.006);
+  --color-background-elevated-secondary-opaque: #121212;
+  --color-background-panel: #131313;
+  --color-background-surface: #111111;
+  --color-background-surface-under: #101010;
+  --color-border-focus: rgba(51, 134, 214, 0.63);
+  --color-border-heavy: rgba(252, 252, 252, 0.118);
+  --color-border-light: rgba(252, 252, 252, 0.046);
+  --color-icon-secondary: rgba(252, 252, 252, 0.58);
+  --color-icon-tertiary: rgba(252, 252, 252, 0.38);
+  --color-simple-scrim: rgba(252, 252, 252, 0.052);
+  --color-text-accent: rgb(51, 134, 214);
+  --color-text-foreground: #fcfcfc;
+  --color-text-foreground-secondary: rgba(252, 252, 252, 0.58);
+  --color-text-foreground-tertiary: rgba(252, 252, 252, 0.329);
 
-  --wb-selection: #3b82f6;
-  --wb-selection-muted: rgba(59, 130, 246, 0.5);
-  --wb-smart-guide: #ec4899;
-  --wb-page-margin: #a855f7;
-  --wb-grid: rgba(255, 255, 255, 0.06);
-  --wb-artboard: #ffffff;
-  --wb-artboard-border: #e5e7eb;
-  --wb-artboard-shadow-color: rgba(0, 0, 0, 0.45);
+  --app-shell-background: #101010;
+  --app-content-surface: #111111;
+  --app-sidebar-surface: color-mix(in srgb, #111111 80%, #000000);
+  --app-overlay-surface: color-mix(in srgb, var(--popover) 55%, transparent);
+  --seam-line: rgba(255, 255, 255, 0.05);
+  --app-scrollbar-thumb: rgba(255, 255, 255, 0.07);
+  --app-scrollbar-thumb-hover: rgba(255, 255, 255, 0.12);
+  --app-backdrop: rgba(0, 0, 0, 0.55);
 
-  --wb-tooltip: rgba(15, 15, 15, 0.94);
-  --wb-tooltip-foreground: rgba(252, 252, 252, 0.92);
-  --wb-tooltip-border: var(--wb-border);
-  --wb-tooltip-shadow: none;
-
-  --wb-hover-overlay: rgba(252, 252, 252, 0.039);
-  --wb-active-overlay: rgba(252, 252, 252, 0.029);
-  --wb-switch-track: color-mix(
-    in srgb,
-    var(--wb-foreground) 20%,
-    var(--wb-input-fill)
-  );
-  --wb-switch-track-border: color-mix(
-    in srgb,
-    var(--wb-foreground) 14%,
-    transparent
-  );
-  --wb-switch-track-border-hover: color-mix(
-    in srgb,
-    var(--wb-foreground) 22%,
-    transparent
-  );
-  --wb-divider-color: var(--wb-surface-divider);
-  --wb-border-subtle: rgba(252, 252, 252, 0.046);
-  --wb-backdrop-overlay: rgba(0, 0, 0, 0.72);
-
-  --wb-shadow-xs: 0 0 0 1px var(--wb-border);
-  --wb-shadow-sm: 0 0 0 1px var(--wb-border);
-  --wb-segment-active-ring: 0 0 0 1px var(--wb-border);
-  --wb-shadow-md: 0 0 0 1px var(--wb-border);
-  --wb-shadow-float: 0 0 0 1px var(--wb-border);
-  --wb-shadow-control: 0 0 0 1px var(--wb-border);
-  --wb-shadow-control-hover: 0 0 0 1px rgba(252, 252, 252, 0.118);
-  --wb-shadow-control-focus: 0 0 0 1px var(--wb-focus);
-  --wb-shadow-focus: 0 0 0 1px var(--wb-focus);
-  --wb-shadow-artboard: 0 0 0 1px var(--wb-artboard-border);
-  --wb-shadow-popup: 0 6px 24px -10px rgba(0, 0, 0, 0.3);
-  --wb-shadow-dialog: 0 16px 50px -12px rgba(0, 0, 0, 0.7);
-
-  --wb-hairline: 1px solid var(--wb-border);
-  --wb-divider: 1px solid var(--wb-border);
-
-  --wb-scrollbar-thumb: rgba(252, 252, 252, 0.046);
-  --wb-scrollbar-thumb-hover: rgba(252, 252, 252, 0.072);
+  --canvas-field: #101010;
+  --canvas-selection: #3b82f6;
+  --canvas-selection-muted: rgba(59, 130, 246, 0.5);
+  --canvas-smart-guide: #ec4899;
+  --canvas-page-margin: #a855f7;
+  --canvas-grid: rgba(255, 255, 255, 0.06);
+  --canvas-artboard: #ffffff;
+  --canvas-artboard-border: #e5e7eb;
+  --canvas-artboard-shadow-color: rgba(0, 0, 0, 0.45);
 }
 
-[data-owb-theme],
-[data-owb-theme] * {
+/* Tailwind preflight subset (Synara classes assume it), scoped to the editor at
+   zero specificity so the host page is untouched and module classes always win. */
+:where([data-owb-theme]),
+:where([data-owb-theme]) *,
+:where([data-owb-theme]) ::before,
+:where([data-owb-theme]) ::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid var(--border);
+}
+
+:where([data-owb-theme]) :is(button, input, select, optgroup, textarea),
+:where([data-owb-theme]) ::file-selector-button {
+  font: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  border-radius: 0;
+  background-color: transparent;
+  opacity: 1;
+}
+
+:where([data-owb-theme])
+  :is(button, input:where([type='button'], [type='reset'], [type='submit'])),
+:where([data-owb-theme]) ::file-selector-button {
+  appearance: button;
+}
+
+:where([data-owb-theme]) :is(h1, h2, h3, h4, h5, h6) {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+:where([data-owb-theme]) :is(ol, ul, menu) {
+  list-style: none;
+}
+
+:where([data-owb-theme])
+  :is(img, svg, video, canvas, audio, iframe, embed, object) {
+  display: block;
+  vertical-align: middle;
+}
+
+:where([data-owb-theme]) :is(img, video) {
+  max-width: 100%;
+  height: auto;
+}
+
+:where([data-owb-theme]) ::placeholder {
+  opacity: 1;
+  color: color-mix(in oklab, currentcolor 50%, transparent);
 }
 
 [data-owb-theme] {
-  font-family: var(--wb-font);
-  font-size: var(--wb-text-sm);
+  color: var(--foreground);
+  font-family: var(--font-ui-family);
+  font-size: var(--app-font-size-ui);
   letter-spacing: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  scrollbar-color: var(--wb-scrollbar-thumb) transparent;
+  scrollbar-color: var(--app-scrollbar-thumb) transparent;
   scrollbar-width: thin;
 }
 
 [data-owb-theme] ::selection {
-  background: var(--wb-selection-muted);
+  background: var(--canvas-selection-muted);
 }
 
 [data-owb-theme] ::-webkit-scrollbar {
@@ -280,31 +319,20 @@
 }
 
 [data-owb-theme] ::-webkit-scrollbar-thumb {
-  border: 3px solid transparent;
-  border-radius: var(--wb-radius-full);
-  background: var(--wb-scrollbar-thumb);
-  background-clip: content-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-color: var(--app-scrollbar-thumb);
+  background-clip: padding-box;
 }
 
 [data-owb-theme] ::-webkit-scrollbar-thumb:hover {
-  background: var(--wb-scrollbar-thumb-hover);
-  background-clip: content-box;
+  background-color: var(--app-scrollbar-thumb-hover);
 }
 
 [data-owb-theme] ::-webkit-scrollbar-corner {
   background: transparent;
 }
 
-[data-owb-theme] button,
-[data-owb-theme] input,
-[data-owb-theme] select,
-[data-owb-theme] textarea {
-  font-family: inherit;
-  font-size: var(--wb-text-sm);
-  letter-spacing: normal;
-}
-
-[data-owb-theme] input,
-[data-owb-theme] select {
+:where([data-owb-theme]) :is(input, select) {
   font-variant-numeric: tabular-nums;
 }

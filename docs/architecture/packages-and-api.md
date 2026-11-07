@@ -48,7 +48,7 @@ Hard rules:
 
 ### Published
 
-**`@openenvx/studio`** - `.`: plugin host, scene store, workbench controller, contributions. `./shell`: `WorkbenchShell` + shell CSS (`./shell.css`, `./styles.css`). `./schema`, `./preview`, `./react`: document model, Render IR, React workbench context. `./internal` (workspace only): full shell barrel for monorepo plugins. No artboard plugins on `.` or `./shell`. **npm `dist/`** is built with [Rolldown](https://rolldown.rs/): browser-bundled ESM with third-party deps inlined; integrators do not mirror Studio’s `dependencies` in the host app.
+**`@openenvx/studio`** - `.`: plugin host, scene store, workbench controller, contributions. `./shell`: `WorkbenchShell` + shell CSS (`./shell.css`, `./styles.css`). `./theme.css` is the Synara token set scoped to `[data-owb-theme]` (see [packages/studio/Design.md](../../packages/studio/Design.md)). `./schema`, `./preview`, `./react`: document model, Render IR, React workbench context. `./internal` (workspace only): full shell barrel for monorepo plugins. No artboard plugins on `.` or `./shell`. **npm `dist/`** is built with [Rolldown](https://rolldown.rs/): browser-bundled ESM with third-party deps inlined; integrators do not mirror Studio’s `dependencies` in the host app. Shell CSS modules may use Tailwind `@apply`; the publish build compiles that to plain CSS, so hosts do not install Tailwind.
 
 **`@openenvx/canvas-driver`** - npm `.` + `./theme.css` + `./fonts.css` (artboard editor surface; not the workbench shell). Published `.` bundles engine deps; peers: `@openenvx/studio`, `react`, `react-dom`. Workspace `.` (`src/index.ts`) is the full engine API; Node PDF uses `exportCanvasDocumentNode`. Hosts also import `@openenvx/studio/theme.css`.
 

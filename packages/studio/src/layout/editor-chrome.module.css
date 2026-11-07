@@ -1,3 +1,5 @@
+@reference '../theme/tailwind.css';
+
 .chrome {
   position: relative;
   display: flex;
@@ -7,7 +9,7 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  background: var(--wb-canvas-field);
+  background: var(--canvas-field);
 }
 
 .content {
@@ -30,33 +32,33 @@
 }
 
 .topLeft {
-  top: var(--wb-space-3);
-  left: var(--wb-space-3);
+  top: --spacing(3);
+  left: --spacing(3);
 }
 
 .topCenter {
-  top: var(--wb-space-3);
+  top: --spacing(3);
   left: 50%;
   transform: translateX(-50%);
 }
 
 .topRight {
-  top: var(--wb-space-3);
-  right: var(--wb-space-3);
+  top: --spacing(3);
+  right: --spacing(3);
 }
 
 .bottomLeft {
-  bottom: var(--wb-space-3);
-  left: var(--wb-space-3);
+  bottom: --spacing(3);
+  left: --spacing(3);
 }
 
 .bottomCenter {
-  bottom: var(--wb-space-3);
+  bottom: --spacing(3);
   left: 50%;
   transform: translateX(-50%);
 }
 
 .bottomRight {
-  bottom: var(--wb-space-3);
-  right: var(--wb-space-3);
+  bottom: --spacing(3);
+  right: --spacing(3);
 }

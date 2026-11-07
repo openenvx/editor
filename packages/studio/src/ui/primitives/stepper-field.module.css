@@ -1,39 +1,41 @@
+@reference '../../theme/tailwind.css';
+
 .row {
   display: grid;
   grid-template-columns: 96px minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--wb-space-2);
+  gap: --spacing(2);
 }
 
 .row + .row {
-  margin-top: var(--wb-space-2);
+  margin-top: --spacing(2);
 }
 
 .label {
-  font-size: var(--wb-text-sm);
-  color: var(--wb-muted-foreground);
+  font-size: var(--app-font-size-ui-sm);
+  color: var(--muted-foreground);
 }
 
 .field {
   display: flex;
   align-items: center;
-  gap: var(--wb-space-2);
+  gap: --spacing(2);
   min-width: 0;
-  height: var(--wb-control-height);
-  padding: 0 var(--wb-control-padding-x);
-  border: 1px solid var(--wb-border);
-  border-radius: var(--wb-radius-lg);
-  background: var(--wb-input-fill);
+  height: var(--app-density-row-height);
+  padding: 0 --spacing(2.5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input);
 }
 
 .field:focus-within {
-  border-color: var(--wb-focus);
-  box-shadow: var(--wb-shadow-control-focus);
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
 }
 
 .icon {
   flex-shrink: 0;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
 }
 
 .input {
@@ -43,9 +45,9 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--wb-foreground);
-  font-family: var(--wb-font-mono);
-  font-size: var(--wb-text-mono);
+  color: var(--foreground);
+  font-family: var(--font-mono-family);
+  font-size: var(--app-font-size-ui-sm);
   text-align: left;
 }
 
@@ -55,30 +57,30 @@
 
 .steppers {
   display: flex;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
 }
 
 .stepper {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--wb-control-height);
-  height: var(--wb-control-height);
+  width: var(--app-density-row-height);
+  height: var(--app-density-row-height);
   padding: 0;
-  border: 1px solid var(--wb-border);
-  border-radius: var(--wb-radius-lg);
-  background: var(--wb-input-fill);
-  color: var(--wb-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input);
+  color: var(--foreground);
   cursor: pointer;
 }
 
 .stepper:hover {
-  background: var(--wb-hover-overlay);
+  background: var(--color-background-button-secondary-hover);
 }
 
 .stepper:focus-visible {
   outline: none;
-  box-shadow: var(--wb-shadow-control-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
 }
 
 /* Popup action row - matches shadcn/designer inspector popover */
@@ -86,27 +88,27 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--wb-space-2);
+  gap: --spacing(2);
   min-width: 0;
 }
 
 .popupLabel {
   flex-shrink: 0;
   width: 72px;
-  height: var(--wb-control-height);
+  height: var(--app-density-row-height);
   display: flex;
   align-items: center;
-  font-size: var(--wb-text-xs);
+  font-size: var(--app-font-size-ui-xs);
   font-weight: 500;
   line-height: 1;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
 }
 
 .popupControls {
   display: flex;
   flex: 1;
   justify-content: flex-end;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
   min-width: 0;
 }
 
@@ -126,9 +128,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(var(--wb-control-height) - 2px);
-  height: calc(var(--wb-control-height) - 2px);
-  color: var(--wb-muted-foreground);
+  width: calc(var(--app-density-row-height) - 2px);
+  height: calc(var(--app-density-row-height) - 2px);
+  color: var(--muted-foreground);
   pointer-events: none;
 }
 
@@ -140,58 +142,58 @@
 .popupNumber {
   display: flex;
   align-items: center;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
 }
 
 .popupField {
   width: 56px;
   max-width: 56px;
   flex-shrink: 0;
-  height: var(--wb-control-height);
-  padding: 0 var(--wb-space-2);
-  border: 1px solid var(--wb-border);
-  border-radius: var(--wb-radius-lg);
-  background: var(--wb-input-fill);
-  color: var(--wb-foreground);
-  font-size: var(--wb-text-sm);
+  height: var(--app-density-row-height);
+  padding: 0 --spacing(2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input);
+  color: var(--foreground);
+  font-size: var(--app-font-size-ui-sm);
 }
 
 .popupFieldWithIcon {
   width: 84px;
   max-width: 84px;
-  padding-left: calc(var(--wb-control-height) + 2px);
+  padding-left: calc(var(--app-density-row-height) + 2px);
 }
 
 .popupField:focus-visible {
   outline: none;
-  border-color: var(--wb-focus);
-  box-shadow: var(--wb-shadow-control-focus);
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
 }
 
 .popupSteppers {
   display: flex;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
 }
 
 .popupStepper {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--wb-control-height);
-  height: var(--wb-control-height);
+  width: var(--app-density-row-height);
+  height: var(--app-density-row-height);
   padding: 0;
-  border: 1px solid var(--wb-border);
-  border-radius: var(--wb-radius-lg);
-  background: var(--wb-input-fill);
-  color: var(--wb-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input);
+  color: var(--foreground);
   cursor: pointer;
 }
 
 .popupStepper:hover {
-  background: var(--wb-hover-overlay);
+  background: var(--color-background-button-secondary-hover);
 }
 
 .popupStepper:focus-visible {
   outline: none;
-  box-shadow: var(--wb-shadow-control-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
 }

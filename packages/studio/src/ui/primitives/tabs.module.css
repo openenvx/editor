@@ -1,41 +1,17 @@
+@reference '../../theme/tailwind.css';
+
 /* Flat tab chips (inspector / dock strip) — not a recessed segmented track. */
+/* coss ui tabs: muted track, active chip. */
 .list {
-  display: flex;
-  width: 100%;
-  max-width: 100%;
-  height: var(--wb-control-height);
-  align-items: center;
-  gap: var(--wb-space-1);
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  color: inherit;
+  @apply bg-muted text-muted-foreground relative z-0 flex w-full items-center justify-center gap-x-0.5 rounded-lg p-0.5;
 }
 
 .trigger {
-  display: inline-flex;
-  flex: 1 1 0;
-  min-width: 0;
-  height: var(--wb-control-height);
-  align-items: center;
-  justify-content: center;
-  gap: var(--wb-space-1);
-  padding: 0 var(--wb-space-2);
-  border: 0;
-  border-radius: var(--wb-radius-control);
-  background: transparent;
-  color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-sm);
-  font-weight: 400;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    color var(--wb-duration-fast) var(--wb-ease-out),
-    background var(--wb-duration-fast) var(--wb-ease-out);
+  @apply text-ui text-muted-foreground relative flex h-8 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-3 font-medium whitespace-nowrap transition-colors outline-none data-disabled:pointer-events-none data-disabled:opacity-64;
 }
 
 .trigger:focus-visible {
-  outline: 1px solid var(--wb-focus);
+  outline: 1px solid var(--color-border-focus);
   outline-offset: 0;
 }
 
@@ -45,16 +21,14 @@
 }
 
 .trigger:hover:not([data-active]):not([aria-selected='true']) {
-  background: var(--wb-hover-overlay);
-  color: var(--wb-foreground);
+  background: var(--color-background-button-secondary-hover);
+  color: var(--foreground);
 }
 
 /* Base UI Tabs.Tab — Radix used data-state="active". */
 .trigger[data-active],
 .trigger[aria-selected='true'] {
-  background: var(--wb-chrome-button);
-  color: var(--wb-foreground);
-  font-weight: 500;
+  @apply bg-background text-foreground shadow-sm;
 }
 
 .content {

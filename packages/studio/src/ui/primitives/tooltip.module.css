@@ -1,24 +1,21 @@
+@reference '../../theme/tailwind.css';
+
+/* Synara default tooltip: frosted popup, rounded-lg, ui-sm. */
 .content {
-  z-index: 100;
-  display: inline-flex;
-  align-items: center;
+  @apply border-border bg-popover/70 text-ui-sm text-popover-foreground relative z-50 flex origin-(--transform-origin) items-center overflow-hidden rounded-lg border px-2 py-1 text-balance shadow-xl transition-[scale,opacity] data-ending-style:scale-98 data-ending-style:opacity-0 data-starting-style:scale-98 data-starting-style:opacity-0;
+  background:
+    linear-gradient(var(--app-overlay-surface), var(--app-overlay-surface)),
+    var(--popover);
   max-width: 240px;
-  min-height: 22px;
-  padding: var(--wb-space-1) 6px;
-  border: 1px solid var(--wb-tooltip-border);
-  border-radius: var(--wb-radius-lg);
-  background: var(--wb-tooltip);
-  backdrop-filter: var(--wb-popup-blur);
-  box-shadow: var(--wb-shadow-popup);
-  font-family: var(--wb-font);
-  font-size: var(--wb-text-sm);
-  font-weight: 400;
-  line-height: 1.4;
-  color: var(--wb-tooltip-foreground);
   pointer-events: none;
-  user-select: none;
 }
 
-.arrow {
-  fill: var(--wb-tooltip);
+.content::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  backdrop-filter: blur(40px) saturate(1.5);
 }

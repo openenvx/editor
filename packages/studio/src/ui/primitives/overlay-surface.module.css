@@ -11,32 +11,32 @@
 
 @keyframes enter {
   from {
-    opacity: var(--wb-enter-opacity, 1);
+    opacity: var(--app-enter-opacity, 1);
     transform: translate3d(
-        var(--wb-enter-translate-x, 0),
-        var(--wb-enter-translate-y, 0),
+        var(--app-enter-translate-x, 0),
+        var(--app-enter-translate-y, 0),
         0
       )
       scale3d(
-        var(--wb-enter-scale, 1),
-        var(--wb-enter-scale, 1),
-        var(--wb-enter-scale, 1)
+        var(--app-enter-scale, 1),
+        var(--app-enter-scale, 1),
+        var(--app-enter-scale, 1)
       );
   }
 }
 
 @keyframes exit {
   to {
-    opacity: var(--wb-exit-opacity, 1);
+    opacity: var(--app-exit-opacity, 1);
     transform: translate3d(
-        var(--wb-exit-translate-x, 0),
-        var(--wb-exit-translate-y, 0),
+        var(--app-exit-translate-x, 0),
+        var(--app-exit-translate-y, 0),
         0
       )
       scale3d(
-        var(--wb-exit-scale, 1),
-        var(--wb-exit-scale, 1),
-        var(--wb-exit-scale, 1)
+        var(--app-exit-scale, 1),
+        var(--app-exit-scale, 1),
+        var(--app-exit-scale, 1)
       );
   }
 }
@@ -59,8 +59,8 @@
 
 /* animate-in + fade-in-0 + zoom-in-95 */
 .surface[data-state='open'] {
-  --wb-enter-opacity: 0;
-  --wb-enter-scale: 0.95;
+  --app-enter-opacity: 0;
+  --app-enter-scale: 0.95;
   animation-name: enter;
   animation-duration: 150ms;
   animation-timing-function: ease;
@@ -68,8 +68,8 @@
 
 /* animate-out + fade-out-0 + zoom-out-95 */
 .surface[data-state='closed'] {
-  --wb-exit-opacity: 0;
-  --wb-exit-scale: 0.95;
+  --app-exit-opacity: 0;
+  --app-exit-scale: 0.95;
   animation-name: exit;
   animation-duration: 150ms;
   animation-timing-function: ease;
@@ -78,19 +78,19 @@
 
 /* data-[side=*]:slide-in-from-*-2 - enter only, like shadcn */
 .surface[data-side='bottom'][data-state='open'] {
-  --wb-enter-translate-y: -0.5rem;
+  --app-enter-translate-y: -0.5rem;
 }
 
 .surface[data-side='top'][data-state='open'] {
-  --wb-enter-translate-y: 0.5rem;
+  --app-enter-translate-y: 0.5rem;
 }
 
 .surface[data-side='left'][data-state='open'] {
-  --wb-enter-translate-x: 0.5rem;
+  --app-enter-translate-x: 0.5rem;
 }
 
 .surface[data-side='right'][data-state='open'] {
-  --wb-enter-translate-x: -0.5rem;
+  --app-enter-translate-x: -0.5rem;
 }
 
 /* Dialog overlay: fade-in-0 / fade-out-0 only */

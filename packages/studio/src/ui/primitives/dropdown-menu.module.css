@@ -1,3 +1,5 @@
+@reference '../../theme/tailwind.css';
+
 .root {
   position: relative;
   display: inline-flex;
@@ -15,50 +17,36 @@
 
 .content,
 .subContent {
-  display: flex;
-  flex-direction: column;
-  min-width: 180px;
-  padding: var(--wb-space-1);
-  border: var(--wb-hairline);
-  border-radius: var(--wb-radius-popup);
-  background: var(--wb-menu);
-  backdrop-filter: var(--wb-popup-blur);
-  box-shadow: var(--wb-shadow-popup);
-  font-family: var(--wb-font);
+  @apply border-border relative flex min-w-32 origin-(--transform-origin) flex-col overflow-hidden rounded-2xl border p-1 text-[var(--color-text-foreground)] shadow-xl outline-none;
+  background:
+    linear-gradient(var(--app-overlay-surface), var(--app-overlay-surface)),
+    var(--popover);
 }
 
 .subContent {
   min-width: 140px;
 }
 
+.content::before,
+.subContent::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  backdrop-filter: blur(40px) saturate(1.5);
+}
+
 .item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--wb-space-4);
-  width: 100%;
-  min-height: var(--wb-menu-item-height);
-  padding: 0 var(--wb-space-2);
-  border: none;
-  border-radius: var(--wb-radius-lg);
-  background: transparent;
-  color: var(--wb-foreground);
-  font-size: var(--wb-text-sm);
-  font-weight: 400;
-  /* Must clear ascenders + descenders: the label clips overflow, so a
-     line-height of 1 shears the tails off g/y/p. */
-  line-height: 16px;
-  cursor: default;
-  text-align: left;
-  outline: none;
-  user-select: none;
+  @apply text-ui flex min-h-7 w-full cursor-default items-center justify-between gap-2 rounded-[0.625rem] px-2.5 py-1 text-left text-[var(--color-text-foreground)] outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-64;
 }
 
 /* Highlighted rows: quiet 4% fill. */
 .item[data-highlighted],
 .item:hover:not(:disabled):not([data-disabled]) {
-  background: var(--wb-menu-highlight);
-  color: var(--wb-menu-highlight-foreground);
+  background: var(--color-background-button-secondary-hover);
+  color: var(--foreground);
 }
 
 .item:disabled,
@@ -77,8 +65,8 @@
 
 .shortcut {
   flex-shrink: 0;
-  color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-xs);
+  color: var(--muted-foreground);
+  font-size: var(--app-font-size-ui-xs);
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
@@ -87,24 +75,24 @@
 .separator {
   flex-shrink: 0;
   height: 1px;
-  margin: var(--wb-space-1) 0;
-  background: var(--wb-divider-color);
+  margin: --spacing(1) 0;
+  background: var(--app-surface-divider);
 }
 
 .subTrigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--wb-space-2);
+  gap: --spacing(2);
 }
 
 .subTriggerIcon {
   flex-shrink: 0;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
 }
 
 .itemSelected {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 /* Leading check gutter - reserved so labels align whether checked or not. */

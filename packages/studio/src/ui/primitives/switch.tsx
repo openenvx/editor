@@ -12,7 +12,7 @@ export interface SwitchProps extends Omit<
   onChange: (checked: boolean) => void;
 }
 
-/** shadcn-style pill switch - property toggles and section header enables. */
+/** Synara switch: accent track, white thumb. */
 export function Switch({
   checked,
   onChange,
@@ -23,7 +23,8 @@ export function Switch({
   return (
     <button
       aria-checked={checked}
-      className={cn(styles.root, checked && styles.checked, className)}
+      className={cn(styles.root, className)}
+      data-slot="switch"
       disabled={disabled}
       role="switch"
       type="button"
@@ -36,10 +37,7 @@ export function Switch({
       }}
       {...props}
     >
-      <span
-        className={styles.thumb}
-        data-state={checked ? 'checked' : 'unchecked'}
-      />
+      <span className={styles.thumb} data-slot="switch-thumb" />
     </button>
   );
 }

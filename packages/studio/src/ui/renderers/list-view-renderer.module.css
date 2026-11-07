@@ -1,9 +1,11 @@
+@reference '../../theme/tailwind.css';
+
 .panel {
-  --wb-list-gutter: var(--wb-space-4);
+  --app-list-gutter: --spacing(4);
 
   display: flex;
   flex-direction: column;
-  gap: var(--wb-space-2);
+  gap: --spacing(2);
   min-height: 0;
   flex: 1;
 }
@@ -25,49 +27,49 @@
   border: none;
   padding: 0;
   background: transparent;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
   cursor: grab;
   touch-action: none;
 }
 
 .dragHandle:focus-visible {
   outline: none;
-  box-shadow: var(--wb-shadow-control-focus);
-  border-radius: var(--wb-radius-sm);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
+  border-radius: calc(var(--radius) * 0.6);
 }
 
 .labelStack {
   display: flex;
   flex-direction: column;
-  gap: var(--wb-space-0-5);
+  gap: --spacing(0.5);
   min-width: 0;
 }
 
 .label {
-  font-size: var(--wb-text-sm);
+  font-size: var(--app-font-size-ui-sm);
   color: inherit;
 }
 
 .labelMono {
-  font-family: var(--wb-font-mono);
+  font-family: var(--font-mono-family);
 }
 
 .description {
   display: block;
   margin: 0;
-  font-size: var(--wb-text-xs);
-  color: var(--wb-muted-foreground);
+  font-size: var(--app-font-size-ui-xs);
+  color: var(--muted-foreground);
 }
 
 .empty {
   margin: 0;
-  padding: 0 var(--wb-space-4);
-  color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-sm);
+  padding: 0 --spacing(4);
+  color: var(--muted-foreground);
+  font-size: var(--app-font-size-ui-sm);
 }
 
 .addRow {
-  padding: 0 var(--wb-list-gutter);
+  padding: 0 var(--app-list-gutter);
 }
 
 .addRow .add {
@@ -84,10 +86,10 @@
   height: 24px;
   padding: 0;
   border: none;
-  border-radius: var(--wb-radius-sm);
+  border-radius: calc(var(--radius) * 0.6);
   background: transparent;
   box-shadow: none;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
   cursor: pointer;
   transition: color 0.12s ease;
 }
@@ -95,10 +97,10 @@
 .rowAction:hover:not(:disabled) {
   background: transparent;
   box-shadow: none;
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 .rowAction:focus-visible {
   outline: none;
-  box-shadow: var(--wb-shadow-control-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
 }

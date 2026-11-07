@@ -1,18 +1,13 @@
+@reference '../../theme/tailwind.css';
+
+/* Synara input control, with the editor's scrub handle. */
 .root {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: var(--wb-control-height);
-  border: 1px solid var(--wb-border);
-  border-radius: var(--wb-radius-lg);
-  background: var(--wb-input-fill);
-  overflow: hidden;
+  @apply border-border bg-background text-ui text-foreground dark:bg-input/32 relative flex min-h-8 w-full items-center overflow-hidden rounded-lg border sm:min-h-7;
 }
 
 .root:focus-within,
 .root[data-scrubbing] {
-  border-color: var(--wb-focus);
-  box-shadow: var(--wb-shadow-control-focus);
+  border-color: color-mix(in srgb, var(--foreground) 30%, transparent);
 }
 
 .handle {
@@ -25,7 +20,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
   cursor: ew-resize;
   touch-action: none;
   user-select: none;
@@ -33,19 +28,19 @@
 
 .handle:hover,
 .handleActive {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 .input {
   flex: 1;
   min-width: 0;
   height: 100%;
-  padding: 0 var(--wb-control-padding-x) 0 0;
+  padding: 0 --spacing(2.5) 0 0;
   border: none;
   background: transparent;
-  color: var(--wb-foreground);
-  font-family: var(--wb-font-mono);
-  font-size: var(--wb-text-mono);
+  color: var(--foreground);
+  font-family: var(--font-mono-family);
+  font-size: var(--app-font-size-ui-sm);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -56,9 +51,9 @@
 
 .unit {
   flex-shrink: 0;
-  padding-right: var(--wb-control-padding-x);
-  font-size: var(--wb-text-xs);
-  color: var(--wb-muted-foreground);
+  padding-right: --spacing(2.5);
+  font-size: var(--app-font-size-ui-xs);
+  color: var(--muted-foreground);
 }
 
 .compact {
@@ -81,7 +76,7 @@
 }
 
 .scrubGrip {
-  font-size: var(--wb-text-xs);
-  color: var(--wb-muted-foreground);
+  font-size: var(--app-font-size-ui-xs);
+  color: var(--muted-foreground);
   letter-spacing: -0.05em;
 }

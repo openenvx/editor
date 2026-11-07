@@ -1,7 +1,7 @@
 import { memo } from 'react';
 
 import { useWorkbenchTranslation } from '../../i18n/use-workbench-translation';
-import { Button } from './button';
+import { Button, dialogActionButtonClassName } from './button';
 import { ModalDialog } from './modal-dialog';
 
 import styles from './confirm-dialog.module.css';
@@ -37,10 +37,19 @@ export const ConfirmDialog = memo(
       >
         <p className={styles.description}>{description}</p>
         <div className={styles.actions}>
-          <Button onClick={onCancel} size="sm" variant="outline">
+          <Button
+            className={dialogActionButtonClassName}
+            onClick={onCancel}
+            size="sm"
+            variant="outline"
+          >
             {cancelLabel ?? t('confirm.cancel')}
           </Button>
-          <Button onClick={onConfirm} size="sm">
+          <Button
+            className={dialogActionButtonClassName}
+            onClick={onConfirm}
+            size="sm"
+          >
             {confirmLabel ?? t('confirm.confirm')}
           </Button>
         </div>

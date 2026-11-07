@@ -6,13 +6,13 @@ import { defineConfig } from 'rolldown';
 import { esmExternalRequirePlugin } from 'rolldown/plugins';
 
 import { assertPublishBundle } from '../studio/assert-publish-bundle';
+import { createCssModuleRolldownPlugin } from '../studio/css-modules-plugin';
 import {
   isHostReactRuntimePackageExternal,
   isReactEsmExternalId,
   reactEsmExternals,
 } from '../studio/rolldown-react-esm-externals';
 import { studioInternalToPublishedPlugin } from '../studio/studio-internal-imports';
-import { createCssModuleRolldownPlugin } from './css-modules-plugin';
 
 const packageRoot = import.meta.dirname;
 const packagesRoot = path.resolve(packageRoot, '..');

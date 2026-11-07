@@ -114,14 +114,14 @@ function studioDistPath(workDir: string, file: string) {
 
 async function assertStudioThemeTokens(workDir: string) {
   const theme = await readFile(studioDistPath(workDir, 'theme.css'), 'utf-8');
-  if (!theme.includes('--wb-text-xs')) {
+  if (!theme.includes('--app-font-size-ui-xs')) {
     fail('@openenvx/studio dist/theme.css is missing design tokens');
   }
 }
 
 async function assertStudioStylesBundle(workDir: string) {
   const styles = await readFile(studioDistPath(workDir, 'styles.css'), 'utf-8');
-  if (!styles.includes('--wb-text-xs')) {
+  if (!styles.includes('--app-font-size-ui-xs')) {
     fail('@openenvx/studio dist/styles.css is missing design tokens');
   }
   if (!includesCompiledShellCssModules(styles)) {
@@ -147,7 +147,7 @@ async function assertNextBuildIncludesWorkbenchCss(workDir: string) {
         continue;
       }
       const content = await readFile(fullPath, 'utf-8');
-      if (content.includes('--wb-text-xs')) {
+      if (content.includes('--app-font-size-ui-xs')) {
         hasTokens = true;
       }
       if (includesCompiledShellCssModules(content)) {

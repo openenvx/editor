@@ -1,11 +1,13 @@
+@reference '../theme/tailwind.css';
+
 .pane {
   height: 100%;
   overflow: auto;
 }
 
 .empty {
-  padding: var(--wb-space-4);
-  color: var(--wb-muted-foreground);
-  font-size: var(--wb-text-sm);
+  padding: --spacing(4);
+  color: var(--muted-foreground);
+  font-size: var(--app-font-size-ui-sm);
   text-align: center;
 }

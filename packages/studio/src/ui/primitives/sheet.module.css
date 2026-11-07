@@ -47,15 +47,15 @@
   position: fixed;
   inset: 0;
   z-index: 120;
-  background: var(--wb-backdrop-overlay, rgb(0 0 0 / 60%));
+  background: var(--app-backdrop);
 }
 
 .overlay[data-state='open'] {
-  animation: sheet-fade-in var(--wb-duration-fast, 140ms) ease;
+  animation: sheet-fade-in var(--app-duration-fast) ease;
 }
 
 .overlay[data-state='closed'] {
-  animation: sheet-fade-out var(--wb-duration-fast, 140ms) ease;
+  animation: sheet-fade-out var(--app-duration-fast) ease;
 }
 
 .content {
@@ -65,11 +65,11 @@
   flex-direction: column;
   gap: 0;
   padding: 0;
-  background: var(--wb-background, #09090b);
-  color: var(--wb-foreground, rgba(255, 255, 255, 0.9));
-  font-family: var(--wb-font);
-  font-size: var(--wb-text-sm);
-  box-shadow: var(--wb-shadow-float, 0 0 0 1px rgb(255 255 255 / 8%));
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-ui-family);
+  font-size: var(--app-font-size-ui-sm);
+  box-shadow: 0 0 0 1px var(--border);
   outline: none;
 }
 
@@ -78,7 +78,7 @@
   inset-inline-start: 0;
   width: min(100%, 32rem);
   height: 100%;
-  border-inline-end: 1px solid var(--wb-border-subtle, rgb(255 255 255 / 12%));
+  border-inline-end: 1px solid var(--color-border-light);
 }
 
 .content[data-side='right'] {
@@ -86,23 +86,23 @@
   inset-inline-end: 0;
   width: min(100%, 32rem);
   height: 100%;
-  border-inline-start: 1px solid var(--wb-border-subtle, rgb(255 255 255 / 12%));
+  border-inline-start: 1px solid var(--color-border-light);
 }
 
 .content[data-side='left'][data-state='open'] {
-  animation: sheet-slide-in-left var(--wb-duration-fast, 140ms) ease;
+  animation: sheet-slide-in-left var(--app-duration-fast) ease;
 }
 
 .content[data-side='left'][data-state='closed'] {
-  animation: sheet-slide-out-left var(--wb-duration-fast, 140ms) ease;
+  animation: sheet-slide-out-left var(--app-duration-fast) ease;
 }
 
 .content[data-side='right'][data-state='open'] {
-  animation: sheet-slide-in-right var(--wb-duration-fast, 140ms) ease;
+  animation: sheet-slide-in-right var(--app-duration-fast) ease;
 }
 
 .content[data-side='right'][data-state='closed'] {
-  animation: sheet-slide-out-right var(--wb-duration-fast, 140ms) ease;
+  animation: sheet-slide-out-right var(--app-duration-fast) ease;
 }
 
 .header {
@@ -126,9 +126,9 @@
 
 .title {
   margin: 0;
-  color: var(--wb-foreground, rgba(255, 255, 255, 0.9));
+  color: var(--foreground);
   font-family: inherit;
-  font-size: var(--wb-text-base, 12px);
+  font-size: var(--app-font-size-ui);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.3;
@@ -136,9 +136,9 @@
 
 .description {
   margin: 0;
-  color: var(--wb-muted-foreground, #a1a1aa);
+  color: var(--muted-foreground);
   font-family: inherit;
-  font-size: var(--wb-text-sm, 12px);
+  font-size: var(--app-font-size-ui-sm);
   font-weight: 400;
   line-height: 1.4;
 }

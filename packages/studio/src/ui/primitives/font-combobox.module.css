@@ -1,3 +1,5 @@
+@reference '../../theme/tailwind.css';
+
 .root {
   width: 100%;
 }
@@ -6,25 +8,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--wb-space-2);
+  gap: --spacing(2);
   width: 100%;
-  height: var(--wb-icon-button-size);
-  padding: var(--wb-space-1) 10px;
-  border: 1px solid var(--wb-border);
-  border-radius: var(--wb-radius-lg);
-  background: var(--wb-input-fill);
-  color: var(--wb-foreground);
-  font-size: var(--wb-text-sm);
+  height: --spacing(7);
+  padding: --spacing(1) 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input);
+  color: var(--foreground);
+  font-size: var(--app-font-size-ui-sm);
   cursor: pointer;
 }
 
 .trigger:hover {
-  background: var(--wb-hover-overlay);
+  background: var(--color-background-button-secondary-hover);
 }
 
 .trigger:focus-visible {
   outline: none;
-  box-shadow: var(--wb-shadow-control-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
 }
 
 .value {
@@ -40,7 +42,7 @@
 
 .chevron {
   flex-shrink: 0;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
 }
 
 .command {
@@ -51,7 +53,7 @@
   height: min(360px, 50vh);
   max-height: min(360px, 50vh);
   overflow: auto;
-  padding: var(--wb-space-1) 0 0;
+  padding: --spacing(1) 0 0;
 }
 
 .virtualViewport {

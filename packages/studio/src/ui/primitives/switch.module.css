@@ -1,53 +1,28 @@
-/* Accent switch: blue track when on, white thumb. */
+@reference '../../theme/tailwind.css';
+
 .root {
-  --wb-switch-thumb: 16px;
-  position: relative;
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  width: calc(var(--wb-switch-thumb) * 2);
-  height: calc(var(--wb-switch-thumb) + 4px);
-  padding: 1px;
-  border: 1px solid var(--wb-switch-track-border);
-  border-radius: var(--wb-radius-full);
-  background: var(--wb-switch-track);
-  cursor: pointer;
-  outline: none;
-  transition:
-    background-color 200ms ease,
-    border-color 200ms ease;
+  @apply focus-visible:ring-offset-background inline-flex h-[calc(var(--thumb-size)+4px)] w-[calc(var(--thumb-size)*2)] shrink-0 cursor-pointer items-center rounded-full border p-px transition-[background-color,box-shadow,border-color] duration-200 outline-none [--thumb-size:--spacing(4)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-border-focus)]/60 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-64;
+  border-color: color-mix(
+    in srgb,
+    var(--color-text-foreground) 14%,
+    transparent
+  );
+  background: color-mix(
+    in srgb,
+    var(--color-text-foreground) 20%,
+    var(--color-background-control-opaque)
+  );
 }
 
-.root:hover:not(:disabled) {
-  border-color: var(--wb-switch-track-border-hover);
-}
-
-.root:focus-visible {
-  box-shadow: var(--wb-shadow-focus);
-}
-
-.root:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.checked {
-  border-color: var(--wb-focus);
-  background: var(--wb-focus);
+.root[aria-checked='true'] {
+  border-color: var(--color-text-accent);
+  background: var(--color-text-accent);
 }
 
 .thumb {
-  display: block;
-  width: var(--wb-switch-thumb);
-  height: var(--wb-switch-thumb);
-  border-radius: var(--wb-radius-full);
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
-  transform: translateX(0);
-  transition: transform 200ms ease-out;
-  pointer-events: none;
+  @apply pointer-events-none block aspect-square h-full origin-left translate-x-0 rounded-full bg-white shadow-sm ring-1 ring-black/5 transition-transform duration-200;
 }
 
-.checked .thumb {
-  transform: translateX(calc(var(--wb-switch-thumb) - 4px));
+.root[aria-checked='true'] .thumb {
+  transform: translateX(calc(var(--thumb-size) - 4px));
 }

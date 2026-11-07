@@ -1,21 +1,23 @@
+@reference '../../theme/tailwind.css';
+
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--wb-space-2);
+  gap: --spacing(2);
 }
 
 .row {
-  border-radius: var(--wb-radius-md);
+  border-radius: calc(var(--radius) * 0.8);
 }
 
 .rowCard {
-  padding: var(--wb-space-2);
-  background: var(--wb-muted);
-  box-shadow: var(--wb-shadow-control);
+  padding: --spacing(2);
+  background: var(--muted);
+  box-shadow: 0 0 0 1px var(--border);
 }
 
 .rowPlain {
-  padding: 0 var(--wb-space-4);
+  padding: 0 --spacing(4);
   background: transparent;
   box-shadow: none;
 }
@@ -23,32 +25,32 @@
 .rowPlainSurface {
   display: flex;
   flex-direction: column;
-  gap: var(--wb-space-1);
-  min-height: var(--wb-layer-row-height);
-  padding: 0 var(--wb-space-3);
-  border-radius: var(--wb-radius-md);
+  gap: --spacing(1);
+  min-height: var(--app-density-row-height);
+  padding: 0 --spacing(3);
+  border-radius: calc(var(--radius) * 0.8);
   background: transparent;
-  transition: background var(--wb-duration-fast) ease;
+  transition: background var(--app-duration-fast) ease;
 }
 
 .rowPlainSurface .rowHeaderNoBody {
   flex: 1;
   align-items: center;
-  min-height: var(--wb-layer-row-height);
+  min-height: var(--app-density-row-height);
 }
 
 .rowPlainSurface .rowLabel {
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
   font-weight: 400;
-  transition: color var(--wb-duration-fast) ease;
+  transition: color var(--app-duration-fast) ease;
 }
 
 .rowPlainSurface:hover .rowLabel {
-  color: var(--wb-foreground);
+  color: var(--foreground);
 }
 
 .rowPlainSurface:hover {
-  background: var(--wb-sidebar-row-hovered);
+  background: var(--sidebar-accent);
 }
 
 .rowPlainSurfaceClickable {
@@ -62,8 +64,8 @@
 .rowHeader {
   display: flex;
   align-items: center;
-  gap: var(--wb-space-2);
-  margin-bottom: var(--wb-space-1);
+  gap: --spacing(2);
+  margin-bottom: --spacing(1);
 }
 
 .rowHeaderNoBody {
@@ -86,26 +88,26 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--wb-text-sm);
+  font-size: var(--app-font-size-ui-sm);
   font-weight: 500;
-  color: var(--wb-muted-foreground);
+  color: var(--muted-foreground);
 }
 
 .rowActions {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
 }
 
 .rowBody {
   display: flex;
   flex-direction: column;
-  gap: var(--wb-space-1);
+  gap: --spacing(1);
 }
 
 .add {
   align-self: flex-start;
-  gap: var(--wb-space-1);
-  color: var(--wb-muted-foreground);
+  gap: --spacing(1);
+  color: var(--muted-foreground);
 }
