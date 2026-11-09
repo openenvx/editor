@@ -3,6 +3,30 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/editor-sandbox`) share one version per GitHub Release.
 
+## [0.3.11] - 2026-11-09
+
+### Other
+
+- Update CSS variable references and integrate Tailwind CSS
+
+- Replaced `--wb-*` CSS variable references with new `--canvas-*` and `--app-*` naming conventions across various components for consistency with the updated design system.
+- Integrated Tailwind CSS into the project, allowing for utility classes to be used within CSS modules via `@reference` and `@apply`.
+- Removed the deprecated `css-modules-plugin.ts` and adjusted related configurations to streamline the CSS processing workflow.
+- Updated documentation to reflect changes in design tokens and CSS structure, ensuring clarity for future development.
+
+- Add floating toolbar and chrome components for enhanced editing experience
+
+- Introduced a new floating toolbar and selection toolbar for improved user interaction during editing.
+- Implemented a hidden file input for file selection within the toolbar.
+- Added CSS styles for the floating toolbar to ensure a consistent and visually appealing design.
+- Updated package.json to include new entry points and build configurations for the chrome components.
+- Created a new rolldown configuration for building the chrome components, ensuring proper bundling and external dependencies management.
+- Enhanced the icon set with additional icons for better functionality within the toolbar.
+
+- Update regex for CSS module hash matching to accommodate Linux CI paths
+
+- Modified the regex in `includesCompiledShellCssModules` to allow for underscores in hashes, ensuring compatibility with Linux CI environments.
+
 ## [0.3.10] - 2026-10-25
 
 ### Other
@@ -59,6 +83,8 @@ Published npm packages (`@openenvx/studio`, `@openenvx/canvas-driver`, `@openenv
 
 - Introduced development paths for the `variables` and `variables/tiptap` plugins in package.json to facilitate local development and testing.
 - Updated the structure to ensure proper resolution of source files during development.
+
+- V0.3.10
 
 ## [0.3.9] - 2026-09-27
 
