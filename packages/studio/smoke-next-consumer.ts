@@ -98,7 +98,8 @@ async function packPackage(relPath: string) {
 
 /** Studio publish CSS modules use `e_[hash]_[local]`; hash is path-dependent (see css-modules-plugin). */
 function includesCompiledShellCssModules(css: string): boolean {
-  return /\.e_[A-Za-z0-9]+_chrome\b/.test(css);
+  // Linux CI paths can yield hashes with underscores (e.g. `.e_XmG_mG_chrome`).
+  return /\.e_[A-Za-z0-9_-]+_chrome\b/.test(css);
 }
 
 function studioDistPath(workDir: string, file: string) {
