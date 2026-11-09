@@ -55,11 +55,11 @@
   "devDependencies": {
     "@openenvx/studio": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
-    "@testing-library/react": "16.3.2",
+    "@testing-library/react": "16.3.3",
     "@types/react": "^19.2.3",
     "@types/react-dom": "^19.2.3",
     "@typescript/typescript6": "catalog:dev",
-    "jsdom": "29.1.1",
+    "jsdom": "31.0.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "rolldown": "catalog:dev",
