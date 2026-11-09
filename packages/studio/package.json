@@ -1,6 +1,6 @@
 {
   "name": "@openenvx/studio",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "description": "OpenEnvx editor studio - workbench shell and headless runtime",
   "license": "MPL-2.0",
   "type": "module",
@@ -65,6 +65,17 @@
       "import": "./dist/react/workbench-context.js",
       "default": "./dist/react/workbench-context.js"
     },
+    "./chrome": {
+      "development": "./src/chrome/index.ts",
+      "types": "./dist/chrome.d.ts",
+      "import": "./dist/chrome.js",
+      "default": "./dist/chrome.js"
+    },
+    "./chrome.css": {
+      "development": "./src/chrome/floating-toolbar.module.css",
+      "import": "./dist/chrome.css",
+      "default": "./dist/chrome.css"
+    },
     "./internal": "./src/workbench-barrel.ts",
     "./plugins": "./src/plugins/index.ts",
     "./plugins/variables": {
@@ -83,7 +94,7 @@
   },
   "scripts": {
     "generate:json-schema": "bun run src/schema/generate-json-schema.ts",
-    "build": "bun ./clean-dist.ts && rolldown -c rolldown.core.publish.config.ts && rolldown -c rolldown.variables-plugin.config.ts && rolldown -c rolldown.shell.config.ts && node ./build-dts.ts",
+    "build": "bun ./clean-dist.ts && rolldown -c rolldown.core.publish.config.ts && rolldown -c rolldown.variables-plugin.config.ts && rolldown -c rolldown.shell.config.ts && rolldown -c rolldown.chrome.config.ts && node ./build-dts.ts",
     "build:debug": "STUDIO_SOURCEMAP=1 bun run build",
     "prepack": "bun run build",
     "test": "vitest run",
@@ -93,6 +104,8 @@
   },
   "sideEffects": [
     "./dist/shell.js",
+    "./dist/chrome.js",
+    "./dist/chrome.css",
     "./dist/theme.css",
     "./dist/shell.css",
     "./dist/styles.css",

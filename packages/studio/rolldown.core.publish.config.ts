@@ -12,6 +12,7 @@ const STUDIO_SUBPATHS = [
   '@openenvx/studio/schema',
   '@openenvx/studio/preview',
   '@openenvx/studio/react',
+  '@openenvx/studio/chrome',
 ];
 
 const headlessEntryExternals = [
