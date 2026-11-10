@@ -1,8 +1,10 @@
 import { useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import type { MenuItemDescriptor } from '#studio';
 import { isCommandMenuItem } from '#studio';
 
+import { usePortalThemeScope } from '../../context/theme-context';
 import { useWorkbenchContext } from '../../context/workbench-context';
 import { useMountEffect } from '../../hooks/use-mount-effect';
 import { usePresence } from '../../hooks/use-presence';
@@ -32,6 +34,8 @@ function ContextMenuOverlay({
   onClose: () => void;
   onExecute: (commandId: string) => void;
 }) {
+  const themeScope = usePortalThemeScope();
+
   useMountEffect(() => {
     const close = () => onClose();
     window.addEventListener('click', close);
@@ -52,7 +56,13 @@ function ContextMenuOverlay({
       )}
       data-state={state}
       role="menu"
-      style={{ left: position.x, top: position.y }}
+      style={{
+        left: position.x,
+        position: 'fixed',
+        top: position.y,
+        zIndex: 50,
+      }}
+      {...themeScope}
     >
       {menuItems.map((item) => {
         if (!isCommandMenuItem(item)) {
@@ -118,18 +128,21 @@ export function ContextMenuRenderer({ items, children }: Props) {
       <div className={styles.target} onContextMenu={handleContextMenu}>
         {children}
       </div>
-      {present ? (
-        <ContextMenuOverlay
-          commandStates={commandStates}
-          menuItems={menuItems}
-          onClose={() => setOpen(false)}
-          onExecute={(commandId) => {
-            void executeCommand(commandId);
-          }}
-          position={position}
-          state={state}
-        />
-      ) : null}
+      {present
+        ? createPortal(
+            <ContextMenuOverlay
+              commandStates={commandStates}
+              menuItems={menuItems}
+              onClose={() => setOpen(false)}
+              onExecute={(commandId) => {
+                void executeCommand(commandId);
+              }}
+              position={position}
+              state={state}
+            />,
+            document.body
+          )
+        : null}
     </>
   );
 }

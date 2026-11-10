@@ -1,10 +1,8 @@
 @reference '../../theme/tailwind.css';
 
-/* Segmented track — same radius family as tabs / inputs / dropdown rows. */
-/* Outer `rounded-lg` (= `--radius`, 10px), inner `rounded-md` (= 8px) so the
-   active chip stays concentric with 2px track padding. */
+/* Outer rounded-lg track, inner rounded-md chips — Synara track colors. */
 .root {
-  @apply relative isolate inline-flex rounded-lg bg-black/5 p-0.5 dark:bg-white/[0.07];
+  @apply relative isolate inline-flex w-full rounded-lg bg-black/5 p-0.5 dark:bg-white/[0.07];
 }
 
 .compact {
@@ -15,12 +13,11 @@
 
 .option {
   @apply text-ui text-muted-foreground hover:text-foreground focus-visible:ring-ring relative z-10 flex min-w-0 items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-2 font-medium whitespace-nowrap transition-colors duration-200 focus-visible:ring-1 focus-visible:outline-none disabled:opacity-50;
-  height: 2rem;
+  height: calc(var(--control-height) - 5px);
 }
 
 .compact .option {
   flex: 1;
-  height: 26px;
   padding: 0 8px;
 }
 

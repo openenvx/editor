@@ -13,7 +13,7 @@ Product role lives in [Architecture.md](../../Architecture.md) and [docs/archite
 
 ## Look
 
-Codex light/dark, resolved from Synara's theme pack: white / `#101010` shell, 13px system UI, frosted menus (`blur(40px) saturate(150%)`, `rounded-2xl`), flat controls. Switch-on and focus use the Codex accent (`#0169cc` light, blue at 63% dark). Menus, selects, popovers, context menus, and the command palette share one overlay shell.
+Codex light/dark, resolved from Synara's theme pack: white / `#101010` shell, 13px system UI, frosted menus (`blur(40px) saturate(150%)`, `rounded-2xl`), flat controls. **Buttons** use the same corner radius as popover shells (`rounded-2xl` / `--radius-popup`); capsule and circle variants stay `rounded-full`. Switch-on and focus use the Codex accent (`#0169cc` light, blue at 63% dark). Menus, selects, popovers, context menus, and the command palette share one overlay shell.
 
 ## Tokens
 
@@ -21,7 +21,9 @@ Source of truth: [`src/theme/tokens.css`](src/theme/tokens.css). Names match Syn
 
 Tailwind utilities are allowed only inside CSS modules, via `@reference` of [`src/theme/tailwind.css`](src/theme/tailwind.css) and `@apply`. Published CSS is compiled to plain rules; consumers do not install Tailwind. There is no preflight on the host page. A scoped reset lives in `tokens.css` under `:where([data-owb-theme])`.
 
-Editor-only layout vars keep Synara-style names: `--app-topbar-height`, `--app-status-bar-height`, `--inspector-width`, `--app-rail-width`. Canvas colors read by Konva use `--canvas-*` (hex / classic `rgba` only).
+Editor-only layout vars keep Synara-style names: `--app-topbar-height`, `--app-status-bar-height`, `--inspector-width`, `--app-rail-width`, `--control-height` (32px unified inspector control height). Canvas colors read by Konva use `--canvas-*` (hex / classic `rgba` only).
+
+Inspector fields keep Synara colors (hairline `--border`, `--background` / `dark:bg-input/32`, control-opaque selects). Shape tweaks: outer `rounded-lg` (`--radius`), tab/segmented tracks at `--control-height` with inner `rounded-md` chips (`bg-muted` / `bg-black/5` tracks; active white or `bg-background`). Menus stay Synara frost at `rounded-2xl`.
 
 | Token | Light | Dark | Role |
 | --- | --- | --- | --- |
@@ -36,7 +38,8 @@ Editor-only layout vars keep Synara-style names: `--app-topbar-height`, `--app-s
 | `--color-border-focus` | `#0169cc` | `rgba(51,134,214,0.63)` | Focus |
 | `--radius` | `0.625rem` | same | Control radius |
 | `--app-font-size-ui` | `13px` | same | UI copy |
-| `--app-density-row-height` | `1.75rem` | same | Rows and controls |
+| `--app-density-row-height` | `1.75rem` | same | Legacy row metric |
+| `--control-height` | `2rem` | same | Inspector control height |
 
 ## Components
 

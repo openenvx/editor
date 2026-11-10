@@ -38,7 +38,15 @@ function defaultPropertyFieldRowVariant(
   if (field.kind === 'toggle' || field.kind === 'checkbox') {
     return 'switch';
   }
-  if (field.kind === 'select' || field.kind === 'segmented') {
+  if (
+    field.kind === 'select' ||
+    field.kind === 'segmented' ||
+    field.kind === 'text' ||
+    field.kind === 'number' ||
+    field.kind === 'color' ||
+    field.kind === 'font' ||
+    field.kind === 'align'
+  ) {
     return 'inline';
   }
   return 'default';

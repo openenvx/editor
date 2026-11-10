@@ -501,7 +501,6 @@ export function createCanvasDemoScene() {
               {
                 id: 'demo-heading',
                 type: 'canvas.text',
-                writeMode: 'content',
                 props: {
                   html: '<p>Canvas demo</p>',
                   fontSize: 48,

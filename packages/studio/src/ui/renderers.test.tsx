@@ -41,8 +41,10 @@ describe(ContextMenuRenderer, () => {
       keys: '[MouseRight>]',
       target: screen.getByText('Target'),
     });
-    expect(screen.getByRole('menu')).toBeTruthy();
+    const menu = screen.getByRole('menu');
+    expect(menu).toBeTruthy();
     expect(screen.getByText('Delete')).toBeTruthy();
+    expect(menu.style.position).toBe('fixed');
   });
 });
 

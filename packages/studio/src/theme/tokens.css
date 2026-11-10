@@ -46,6 +46,9 @@
   --app-sidebar-backdrop-filter: blur(4px) saturate(130%);
 
   /* Editor-only workbench geometry (no Synara equivalent). */
+  --control-height: 2rem;
+  /* Matches Tailwind `rounded-2xl` / frosted `.popup` shells. */
+  --radius-popup: calc(var(--radius) * 1.8);
   --app-topbar-height: 46px;
   --app-status-bar-height: 32px;
   --inspector-width: 320px;

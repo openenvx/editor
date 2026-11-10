@@ -38,19 +38,17 @@
   justify-content: flex-end;
 }
 
-/* Label + growing control (select / settings rows) */
+/* Label 1 / control 2 (ycode-style inspector rows) */
 .fieldRowInline {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   align-items: center;
-  gap: --spacing(3);
-  min-height: 36px;
+  gap: --spacing(2);
+  min-height: var(--control-height);
   margin-bottom: --spacing(2);
 }
 
 .fieldRowInline .label {
-  flex: 0 1 auto;
-  max-width: 40%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -61,7 +59,6 @@
 }
 
 .fieldRowInline .control {
-  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;

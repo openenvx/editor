@@ -46,7 +46,6 @@ export function createVariableTemplateDemoScene(): Document {
               {
                 id: 'demo-name',
                 type: 'canvas.text',
-                writeMode: 'content',
                 props: {
                   html: `<p>${NAME_TOKEN}</p>`,
                   fontSize: 56,
@@ -67,7 +66,6 @@ export function createVariableTemplateDemoScene(): Document {
               {
                 id: 'demo-title',
                 type: 'canvas.text',
-                writeMode: 'content',
                 props: {
                   html: `<p>${TITLE_TOKEN}</p>`,
                   fontSize: 28,

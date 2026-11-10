@@ -15,19 +15,16 @@
   align-items: center;
   gap: --spacing(1);
   min-width: 0;
-  height: var(--app-density-row-height);
+  height: var(--control-height);
   padding: 0 --spacing(1) 0 --spacing(2);
-  background: var(--input);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  transition:
-    border-color var(--app-duration-fast) var(--app-ease-out),
-    box-shadow var(--app-duration-fast) ease;
+  background: var(--input);
+  transition: border-color var(--app-duration-fast) var(--app-ease-out);
 }
 
 .cell:focus-within {
-  border-color: var(--color-border-focus);
-  box-shadow: 0 0 0 1px var(--color-border-focus);
+  border-color: color-mix(in srgb, var(--foreground) 30%, transparent);
 }
 
 .cell input {
