@@ -12,7 +12,6 @@ import {
   type Plugin,
   type PropertyHostContext,
   type PropertyPathContextOptions,
-  type LayerSurfaceItem,
   type ToolbarPlacement,
   type WorkbenchApi,
   type WorkbenchControllerOptions,
@@ -81,10 +80,7 @@ export interface WorkbenchShellProps {
       executeCommand: (commandId: string) => Promise<boolean>;
     }
   ) => PropertyHostContext;
-  renderEditorPane?: (ctx: {
-    layerSurface: LayerSurfaceItem[];
-    editorPaneKind: string;
-  }) => ReactNode;
+  renderEditorPane?: (ctx: { editorPaneKind: string }) => ReactNode;
   /**
    * Mount external hosts (e.g. `@openenvx/editor-sandbox/host`) after start -
    * off PluginManager. Memoize the callback; shell mounts once.
@@ -136,9 +132,6 @@ const EditorRegion = memo(
     showEditorArea: boolean;
     renderEditorPane?: WorkbenchShellProps['renderEditorPane'];
   }) => {
-    const layerSurface = useWorkbenchContextSelector(
-      (state) => state.layerSurface
-    );
     const editorPaneKind = useWorkbenchContextSelector(
       (state) => state.editorPaneKind
     );
@@ -154,7 +147,6 @@ const EditorRegion = memo(
     );
 
     if (
-      !layerSurface ||
       !editorPaneKind ||
       !editorPanes ||
       !layout ||
@@ -169,12 +161,11 @@ const EditorRegion = memo(
     }
 
     const editorPane = renderEditorPane ? (
-      renderEditorPane({ editorPaneKind, layerSurface })
+      renderEditorPane({ editorPaneKind })
     ) : (
       <EditorPaneRenderer
         editorPaneKind={editorPaneKind}
         editorPanes={editorPanes}
-        layerSurface={layerSurface}
         onContainerResize={() => {}}
       />
     );

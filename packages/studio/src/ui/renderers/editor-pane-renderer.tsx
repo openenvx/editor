@@ -1,18 +1,13 @@
 import type { ComponentType } from 'react';
 import { memo } from 'react';
 
-import type {
-  EditorPaneHostProps,
-  EditorPaneRegistration,
-  LayerSurfaceItem,
-} from '#studio';
+import type { EditorPaneHostProps, EditorPaneRegistration } from '#studio';
 
 import { useEditorViewportBridge } from '../../context/editor-viewport-context';
 
 export interface EditorPaneRendererProps {
   editorPanes: EditorPaneRegistration[];
   editorPaneKind: string;
-  layerSurface: LayerSurfaceItem[];
   onZoomChange?: (zoomPercent: number) => void;
   onContainerResize?: (size: { width: number; height: number }) => void;
   onViewportApiReady?: EditorPaneHostProps['onViewportApiReady'];
@@ -22,7 +17,6 @@ export const EditorPaneRenderer = memo(
   ({
     editorPanes,
     editorPaneKind,
-    layerSurface,
     onZoomChange: onZoomChangeProp,
     onContainerResize,
     onViewportApiReady: onViewportApiReadyProp,
@@ -45,7 +39,6 @@ export const EditorPaneRenderer = memo(
 
     return (
       <Component
-        layerSurface={layerSurface}
         onContainerResize={onContainerResize}
         onViewportApiReady={onViewportApiReady}
         onZoomChange={onZoomChange}

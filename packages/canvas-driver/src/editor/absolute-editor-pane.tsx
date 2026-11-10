@@ -24,7 +24,6 @@ import { CanvasEditor, type CanvasEditorProps } from './canvas-editor';
 
 export const AbsoluteEditorPane = memo(
   ({
-    layerSurface,
     onZoomChange,
     onContainerResize,
     onViewportApiReady,
@@ -32,6 +31,9 @@ export const AbsoluteEditorPane = memo(
     const { api, executeCommand } = useWorkbenchContext();
     const scene = useWorkbenchContextSelector((state) => state.scene);
     const selection = useWorkbenchContextSelector((state) => state.selection);
+    const layerSurface = useWorkbenchContextSelector(
+      (state) => state.layerSurface
+    );
     const hoveredLayerId = useWorkbenchContextSelector(
       (state) => state.interaction.hoveredLayerId
     );
@@ -51,7 +53,7 @@ export const AbsoluteEditorPane = memo(
       [api, executeCommand]
     );
 
-    if (!scene || !selection) {
+    if (!scene || !selection || !layerSurface) {
       return null;
     }
 
