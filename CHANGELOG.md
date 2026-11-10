@@ -3,6 +3,23 @@
 All notable changes to this project are documented here.
 Published npm packages (`@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/editor-sandbox`) share one version per GitHub Release.
 
+## [0.3.12] - 2026-11-10
+
+### Other
+
+- Remove layerSurface prop from editor components
+
+- Eliminated the `layerSurface` prop from `AbsoluteEditorPane`, `EditorRegion`, and `EditorPaneRenderer` components to streamline the API.
+- Updated related interfaces and context selectors to reflect the removal, ensuring consistency across the codebase.
+- Adjusted conditional rendering logic to account for the absence of `layerSurface`, enhancing component clarity and maintainability.
+
+- Enhance theme scoping and overlay components for improved UI consistency
+
+- Introduced `data-owb-chrome` attributes across various components to ensure proper theme scoping for Synara preflight in the workbench chrome.
+- Updated CSS styles to integrate Tailwind utilities and enhance the visual consistency of overlays, popups, and tooltips.
+- Refactored theme context hooks to support both theme and chrome scoping, improving the overall styling mechanism for portaled UI elements.
+- Added tests to validate the new overlay surface styles and ensure proper functionality within the theme context.
+
 ## [0.3.11] - 2026-11-09
 
 ### Other
@@ -26,6 +43,8 @@ Published npm packages (`@openenvx/studio`, `@openenvx/canvas-driver`, `@openenv
 - Update regex for CSS module hash matching to accommodate Linux CI paths
 
 - Modified the regex in `includesCompiledShellCssModules` to allow for underscores in hashes, ensuring compatibility with Linux CI environments.
+
+- V0.3.11
 
 ## [0.3.10] - 2026-10-25
 
