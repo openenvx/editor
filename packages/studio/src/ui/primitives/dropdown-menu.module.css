@@ -17,25 +17,11 @@
 
 .content,
 .subContent {
-  @apply border-border relative flex min-w-32 origin-(--transform-origin) flex-col overflow-hidden rounded-2xl border p-1 text-[var(--color-text-foreground)] shadow-xl outline-none;
-  background:
-    linear-gradient(var(--app-overlay-surface), var(--app-overlay-surface)),
-    var(--popover);
+  @apply relative flex min-w-32 origin-(--transform-origin) flex-col overflow-hidden p-1 text-[var(--color-text-foreground)] outline-none;
 }
 
 .subContent {
   min-width: 140px;
-}
-
-.content::before,
-.subContent::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  backdrop-filter: blur(40px) saturate(1.5);
 }
 
 .item {

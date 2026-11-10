@@ -19,18 +19,28 @@ export function EditorLayout({
 }: EditorLayoutProps) {
   return (
     <div className={styles.root}>
-      {topBar ? <header className={styles.topBar}>{topBar}</header> : null}
+      {topBar ? (
+        <header className={styles.topBar} data-owb-chrome="">
+          {topBar}
+        </header>
+      ) : null}
       <div className={styles.body}>
         {primarySidebar ? (
-          <aside className={styles.primarySidebar}>{primarySidebar}</aside>
+          <aside className={styles.primarySidebar} data-owb-chrome="">
+            {primarySidebar}
+          </aside>
         ) : null}
         {editor ? <main className={styles.editor}>{editor}</main> : null}
         {secondarySidebar ? (
-          <aside className={styles.secondarySidebar}>{secondarySidebar}</aside>
+          <aside className={styles.secondarySidebar} data-owb-chrome="">
+            {secondarySidebar}
+          </aside>
         ) : null}
       </div>
       {statusBar ? (
-        <footer className={styles.statusBar}>{statusBar}</footer>
+        <footer className={styles.statusBar} data-owb-chrome="">
+          {statusBar}
+        </footer>
       ) : null}
     </div>
   );

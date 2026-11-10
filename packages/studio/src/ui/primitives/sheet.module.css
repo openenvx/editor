@@ -1,6 +1,6 @@
 /*
  * Sheet chrome - Design.md: achromatic, inset rings, compact type.
- * Portal surfaces set data-owb-theme so tokens resolve.
+ * Portal surfaces set data-owb-theme + data-owb-chrome so tokens and preflight resolve.
  */
 
 @keyframes sheet-fade-in {

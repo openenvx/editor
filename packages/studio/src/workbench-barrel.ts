@@ -14,6 +14,8 @@ export {
   useTheme,
   useSetTheme,
   useThemeScope,
+  useChromeScope,
+  usePortalThemeScope,
   DEFAULT_THEME,
   BUILT_IN_THEMES,
   THEME_LABELS,

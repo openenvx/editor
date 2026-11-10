@@ -14,12 +14,6 @@
 .panel {
   width: min(480px, 92vw);
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) * 1.8);
-  background: var(--popover);
-  box-shadow:
-    0 10px 15px -3px rgb(0 0 0 / 0.1),
-    0 4px 6px -4px rgb(0 0 0 / 0.1);
   color: var(--foreground);
   font-family: var(--font-ui-family);
 }
@@ -30,24 +24,16 @@
   background: transparent;
 }
 
-.command :global([cmdk-input-wrapper]) {
-  margin: --spacing(2);
-  padding: 0 --spacing(3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--input);
-}
-
 .searchInput {
-  height: 32px;
-  font-size: var(--app-font-size-ui-sm);
+  height: var(--app-density-row-height);
+  font-size: var(--app-font-size-ui);
 }
 
 .tabs {
   display: flex;
   align-items: center;
   gap: --spacing(1);
-  margin: 0 --spacing(2) --spacing(2);
+  margin: 0 --spacing(1) --spacing(1);
   padding: --spacing(0.5);
   border-radius: var(--radius);
   background: transparent;
@@ -57,14 +43,14 @@
 .tabActive {
   flex: 0 1 auto;
   min-width: 0;
-  height: 28px;
-  padding: 0 --spacing(3);
+  height: var(--app-density-row-height);
+  padding: 0 --spacing(2.5);
   border: none;
-  border-radius: calc(var(--radius) * 0.6);
+  border-radius: var(--radius);
   background: transparent;
   color: var(--muted-foreground);
   font-family: var(--font-ui-family);
-  font-size: var(--app-font-size-ui-sm);
+  font-size: var(--app-font-size-ui);
   line-height: 1;
   white-space: nowrap;
   cursor: default;
@@ -84,7 +70,7 @@
 
 .list {
   max-height: min(360px, 52vh);
-  padding: 0 --spacing(2) --spacing(2);
+  padding: --spacing(1);
 }
 
 .empty {
@@ -109,10 +95,10 @@
 }
 
 .item {
-  min-height: 32px;
+  min-height: var(--app-density-row-height);
   margin-bottom: --spacing(0.5);
-  padding: 0 --spacing(2);
-  border-radius: calc(var(--radius) * 0.6);
+  padding: --spacing(1) --spacing(2.5);
+  border-radius: var(--radius);
 }
 
 .itemRow {
@@ -129,7 +115,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--app-font-size-ui-sm);
+  font-size: var(--app-font-size-ui);
   /* Clears descenders; the label clips overflow. */
   line-height: 16px;
 }

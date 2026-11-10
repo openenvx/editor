@@ -116,81 +116,83 @@ export function CommandPaletteRenderer({
       <div
         aria-label={t('commandPalette.title')}
         aria-modal="true"
-        className={cn(styles.panel, overlaySurface.surface)}
+        className={overlaySurface.surface}
         data-state={state}
         role="dialog"
       >
-        <Command className={styles.command}>
-          <CommandInput
-            autoFocus
-            className={styles.searchInput}
-            placeholder={t('commandPalette.search')}
-          />
-          {showTabs ? (
-            <div
-              aria-label={t('commandPalette.filters')}
-              className={styles.tabs}
-              role="tablist"
-            >
-              {commandPalette.tabs.map((tab) => {
-                const selected = tab.id === activeTabId;
-
-                return (
-                  <button
-                    aria-selected={selected}
-                    className={selected ? styles.tabActive : styles.tab}
-                    key={tab.id}
-                    onClick={() => setActiveTabId(tab.id)}
-                    role="tab"
-                    type="button"
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
-          <CommandList className={styles.list}>
-            <CommandEmpty className={styles.empty}>
-              {t('commandPalette.noResults')}
-            </CommandEmpty>
-            {groupedItems.map((group) => (
-              <CommandGroup
-                className={styles.group}
-                heading={group.heading}
-                key={group.id}
+        <div className={cn(styles.panel, overlaySurface.popup)}>
+          <Command className={styles.command}>
+            <CommandInput
+              autoFocus
+              className={styles.searchInput}
+              placeholder={t('commandPalette.search')}
+            />
+            {showTabs ? (
+              <div
+                aria-label={t('commandPalette.filters')}
+                className={styles.tabs}
+                role="tablist"
               >
-                {group.items.map((item) => {
-                  const canExecute =
-                    commandStates[item.commandId]?.canExecute ?? true;
+                {commandPalette.tabs.map((tab) => {
+                  const selected = tab.id === activeTabId;
 
                   return (
-                    <CommandItem
-                      className={styles.item}
-                      disabled={!canExecute}
-                      key={item.commandId}
-                      keywords={[item.commandId, ...(item.keywords ?? [])]}
-                      onSelect={() => {
-                        void executeCommand(item.commandId);
-                        closePalette();
-                      }}
-                      value={`${item.label} ${item.commandId}`}
+                    <button
+                      aria-selected={selected}
+                      className={selected ? styles.tabActive : styles.tab}
+                      key={tab.id}
+                      onClick={() => setActiveTabId(tab.id)}
+                      role="tab"
+                      type="button"
                     >
-                      <span className={styles.itemRow}>
-                        <span className={styles.itemLabel}>{item.label}</span>
-                        {item.shortcut ? (
-                          <span className={styles.shortcut}>
-                            {formatShortcut(item.shortcut)}
-                          </span>
-                        ) : null}
-                      </span>
-                    </CommandItem>
+                      {tab.label}
+                    </button>
                   );
                 })}
-              </CommandGroup>
-            ))}
-          </CommandList>
-        </Command>
+              </div>
+            ) : null}
+            <CommandList className={styles.list}>
+              <CommandEmpty className={styles.empty}>
+                {t('commandPalette.noResults')}
+              </CommandEmpty>
+              {groupedItems.map((group) => (
+                <CommandGroup
+                  className={styles.group}
+                  heading={group.heading}
+                  key={group.id}
+                >
+                  {group.items.map((item) => {
+                    const canExecute =
+                      commandStates[item.commandId]?.canExecute ?? true;
+
+                    return (
+                      <CommandItem
+                        className={styles.item}
+                        disabled={!canExecute}
+                        key={item.commandId}
+                        keywords={[item.commandId, ...(item.keywords ?? [])]}
+                        onSelect={() => {
+                          void executeCommand(item.commandId);
+                          closePalette();
+                        }}
+                        value={`${item.label} ${item.commandId}`}
+                      >
+                        <span className={styles.itemRow}>
+                          <span className={styles.itemLabel}>{item.label}</span>
+                          {item.shortcut ? (
+                            <span className={styles.shortcut}>
+                              {formatShortcut(item.shortcut)}
+                            </span>
+                          ) : null}
+                        </span>
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              ))}
+            </CommandList>
+          </Command>
+        </div>
       </div>
     </div>
   );

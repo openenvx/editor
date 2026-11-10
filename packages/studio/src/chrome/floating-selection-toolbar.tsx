@@ -47,6 +47,7 @@ export function FloatingSelectionToolbarShell({
     <div
       aria-label={ariaLabel}
       className={`${styles.floatingToolbar} ${styles.floatingToolbarTransform}`}
+      data-owb-chrome=""
       data-owb-theme={theme}
       onPointerDown={onPointerDown}
       ref={menuRef}

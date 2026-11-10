@@ -1,8 +1,10 @@
 @reference '../../theme/tailwind.css';
 
-/* Synara SegmentedPicker capsule track. */
+/* Segmented track — same radius family as tabs / inputs / dropdown rows. */
+/* Outer `rounded-lg` (= `--radius`, 10px), inner `rounded-md` (= 8px) so the
+   active chip stays concentric with 2px track padding. */
 .root {
-  @apply relative isolate inline-flex rounded-full bg-black/5 p-1 dark:bg-white/[0.07];
+  @apply relative isolate inline-flex rounded-lg bg-black/5 p-0.5 dark:bg-white/[0.07];
 }
 
 .compact {
@@ -12,17 +14,18 @@
 }
 
 .option {
-  @apply text-ui text-muted-foreground hover:text-foreground focus-visible:ring-ring relative z-10 flex min-w-0 items-center justify-center gap-1.5 rounded-full border-0 bg-transparent px-3 font-medium transition-colors duration-200 focus-visible:ring-1 focus-visible:outline-none disabled:opacity-50;
+  @apply text-ui text-muted-foreground hover:text-foreground focus-visible:ring-ring relative z-10 flex min-w-0 items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-2 font-medium whitespace-nowrap transition-colors duration-200 focus-visible:ring-1 focus-visible:outline-none disabled:opacity-50;
   height: 2rem;
 }
 
 .compact .option {
   flex: 1;
   height: 26px;
-  padding: 0;
+  padding: 0 8px;
 }
 
-.option:hover {
+.option:hover:not(.optionActive) {
+  background: var(--color-background-button-secondary-hover);
   color: var(--foreground);
 }
 

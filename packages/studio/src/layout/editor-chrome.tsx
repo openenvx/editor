@@ -33,6 +33,7 @@ export function EditorChrome({ children, toolbars }: EditorChromeProps) {
         return (
           <div
             className={[styles.slot, PLACEMENT_CLASS[placement]].join(' ')}
+            data-owb-chrome=""
             key={placement}
           >
             {node}

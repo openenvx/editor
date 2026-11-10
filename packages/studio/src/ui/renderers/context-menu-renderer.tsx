@@ -46,6 +46,7 @@ function ContextMenuOverlay({
     <div
       className={cn(
         dropdownStyles.content,
+        overlaySurface.popup,
         styles.menu,
         overlaySurface.surface
       )}

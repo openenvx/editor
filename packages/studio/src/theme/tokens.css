@@ -239,20 +239,21 @@
   --canvas-artboard-shadow-color: rgba(0, 0, 0, 0.45);
 }
 
-/* Tailwind preflight subset (Synara classes assume it), scoped to the editor at
-   zero specificity so the host page is untouched and module classes always win. */
-:where([data-owb-theme]),
-:where([data-owb-theme]) *,
-:where([data-owb-theme]) ::before,
-:where([data-owb-theme]) ::after {
+/* Tailwind preflight subset (Synara classes assume it), scoped to workbench
+   chrome via [data-owb-chrome] at zero specificity so host document preview
+   (e.g. [data-html-page-root]) keeps layered Tailwind utilities. */
+:where([data-owb-chrome]),
+:where([data-owb-chrome]) *,
+:where([data-owb-chrome]) ::before,
+:where([data-owb-chrome]) ::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   border: 0 solid var(--border);
 }
 
-:where([data-owb-theme]) :is(button, input, select, optgroup, textarea),
-:where([data-owb-theme]) ::file-selector-button {
+:where([data-owb-chrome]) :is(button, input, select, optgroup, textarea),
+:where([data-owb-chrome]) ::file-selector-button {
   font: inherit;
   font-feature-settings: inherit;
   font-variation-settings: inherit;
@@ -263,33 +264,33 @@
   opacity: 1;
 }
 
-:where([data-owb-theme])
+:where([data-owb-chrome])
   :is(button, input:where([type='button'], [type='reset'], [type='submit'])),
-:where([data-owb-theme]) ::file-selector-button {
+:where([data-owb-chrome]) ::file-selector-button {
   appearance: button;
 }
 
-:where([data-owb-theme]) :is(h1, h2, h3, h4, h5, h6) {
+:where([data-owb-chrome]) :is(h1, h2, h3, h4, h5, h6) {
   font-size: inherit;
   font-weight: inherit;
 }
 
-:where([data-owb-theme]) :is(ol, ul, menu) {
+:where([data-owb-chrome]) :is(ol, ul, menu) {
   list-style: none;
 }
 
-:where([data-owb-theme])
+:where([data-owb-chrome])
   :is(img, svg, video, canvas, audio, iframe, embed, object) {
   display: block;
   vertical-align: middle;
 }
 
-:where([data-owb-theme]) :is(img, video) {
+:where([data-owb-chrome]) :is(img, video) {
   max-width: 100%;
   height: auto;
 }
 
-:where([data-owb-theme]) ::placeholder {
+:where([data-owb-chrome]) ::placeholder {
   opacity: 1;
   color: color-mix(in oklab, currentcolor 50%, transparent);
 }
@@ -333,6 +334,6 @@
   background: transparent;
 }
 
-:where([data-owb-theme]) :is(input, select) {
+:where([data-owb-chrome]) :is(input, select) {
   font-variant-numeric: tabular-nums;
 }

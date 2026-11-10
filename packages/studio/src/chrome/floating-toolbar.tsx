@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react';
 
+import { cn } from '../lib/cn';
 import { WorkbenchIcon } from '../ui/icons/workbench-icon';
 import { Button } from '../ui/primitives/button';
 import { IconButton } from '../ui/primitives/icon-button';
@@ -19,6 +20,7 @@ import {
   type HiddenFileInputHandle,
 } from './hidden-file-input';
 
+import overlaySurface from '../ui/primitives/overlay-surface.module.css';
 import styles from './floating-toolbar.module.css';
 
 export interface FloatingToolbarProps {
@@ -47,6 +49,7 @@ export function FloatingToolbarSurface({
       aria-label={ariaLabel}
       className={styles.formatToolbar}
       data-openenvx-rich-text-bubble=""
+      data-owb-chrome=""
       data-owb-theme={theme}
       onMouseDown={onMouseDown}
       role="toolbar"
@@ -182,7 +185,10 @@ export function FloatingToolbar({
                 <IconChevronDown size={14} stroke={1.5} />
               </Button>
               {openMenuId === item.id ? (
-                <div className={styles.blockTypeMenu} role="menu">
+                <div
+                  className={cn(styles.blockTypeMenu, overlaySurface.popup)}
+                  role="menu"
+                >
                   {item.options.map((option) => {
                     const isSelected = option.value === item.value;
                     return (
@@ -242,7 +248,7 @@ export function FloatingToolbar({
               </IconButton>
               {openPopoverId === item.id ? (
                 <form
-                  className={styles.linkPopover}
+                  className={cn(styles.linkPopover, overlaySurface.popup)}
                   onSubmit={(event) => submitPopover(event, item)}
                 >
                   <Input

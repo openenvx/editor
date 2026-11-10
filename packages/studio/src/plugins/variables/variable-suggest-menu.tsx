@@ -3,8 +3,10 @@ import { memo, useCallback, useEffect, useRef } from 'react';
 
 import { formatVariableToken, type TemplateVariable } from '#studio/schema';
 
+import { cn } from '../../lib/cn';
 import type { VariableSuggestAnchor } from './tiptap/variable-suggest-state';
 
+import overlaySurface from '../../ui/primitives/overlay-surface.module.css';
 import styles from './variable-suggest-menu.module.css';
 
 export interface VariableSuggestMenuProps {
@@ -53,7 +55,7 @@ export const VariableSuggestMenu = memo(
 
     return (
       <div
-        className={styles.menu}
+        className={cn(styles.menu, overlaySurface.popup)}
         data-openenvx-variable-suggest=""
         style={{ top: anchor.top, left: anchor.left }}
       >

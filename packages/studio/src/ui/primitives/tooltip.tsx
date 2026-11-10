@@ -3,7 +3,7 @@ import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
 import { cloneElement } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 
-import { useThemeScope } from '../../context/theme-context';
+import { usePortalThemeScope } from '../../context/theme-context';
 import { cn } from '../../lib/cn';
 
 import overlaySurface from './overlay-surface.module.css';
@@ -24,7 +24,7 @@ export function Tooltip({
   align = 'center',
   className,
 }: TooltipProps) {
-  const themeScope = useThemeScope();
+  const themeScope = usePortalThemeScope();
   return (
     <TooltipPrimitive.Provider delay={150}>
       <TooltipPrimitive.Root>
@@ -38,7 +38,13 @@ export function Tooltip({
           <TooltipPrimitive.Positioner align={align} side={side} sideOffset={4}>
             <TooltipPrimitive.Popup
               {...themeScope}
-              className={cn(styles.content, overlaySurface.surface, className)}
+              className={cn(
+                styles.content,
+                overlaySurface.popup,
+                overlaySurface.popupCompact,
+                overlaySurface.surface,
+                className
+              )}
             >
               <TooltipPrimitive.Viewport>{content}</TooltipPrimitive.Viewport>
             </TooltipPrimitive.Popup>

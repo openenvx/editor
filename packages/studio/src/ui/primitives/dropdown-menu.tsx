@@ -4,7 +4,7 @@ import { IconCheck, IconChevronRight } from '@tabler/icons-react';
 import { cloneElement, useCallback, useState } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 
-import { useThemeScope } from '../../context/theme-context';
+import { usePortalThemeScope } from '../../context/theme-context';
 import { cn } from '../../lib/cn';
 import { formatShortcut } from '../../lib/format-shortcut';
 
@@ -97,7 +97,7 @@ export function DropdownMenuContent({
   side = 'bottom',
   className,
 }: DropdownMenuContentProps) {
-  const themeScope = useThemeScope();
+  const themeScope = usePortalThemeScope();
 
   return (
     <Menu.Portal>
@@ -109,7 +109,12 @@ export function DropdownMenuContent({
       >
         <Menu.Popup
           {...themeScope}
-          className={cn(styles.content, overlaySurface.surface, className)}
+          className={cn(
+            styles.content,
+            overlaySurface.popup,
+            overlaySurface.surface,
+            className
+          )}
         >
           {children}
         </Menu.Popup>
@@ -192,7 +197,7 @@ export function DropdownMenuSubContent({
   children,
   className,
 }: DropdownMenuSubContentProps) {
-  const themeScope = useThemeScope();
+  const themeScope = usePortalThemeScope();
 
   return (
     <Menu.Portal>
@@ -204,7 +209,12 @@ export function DropdownMenuSubContent({
       >
         <Menu.Popup
           {...themeScope}
-          className={cn(styles.subContent, overlaySurface.surface, className)}
+          className={cn(
+            styles.subContent,
+            overlaySurface.popup,
+            overlaySurface.surface,
+            className
+          )}
         >
           {children}
         </Menu.Popup>

@@ -155,5 +155,6 @@ Most product apps skip this and use `WorkbenchShell` from `@openenvx/studio` or 
 ## Related
 
 - Visual shell design notes (Synara/Neroli tokens, Base UI primitives, Tabler icons): [packages/studio/Design.md](../../packages/studio/Design.md). Chrome tokens use Synara names (`--background`, `--foreground`, `--color-border-focus`, …) scoped to `[data-owb-theme]`. The previous `--wb-*` names are gone; hosts that overrode them must retarget the Synara names. Canvas colors the driver reads are `--canvas-*`.
+- **Host document preview:** Synara preflight in `theme.css` / `styles.css` applies only under `[data-owb-chrome]` (layout sidebars, top bar, status bar, editor toolbar slots, portaled menus/dialogs). The editor pane / artboard is **not** chrome-scoped so host Tailwind utilities apply on the preview root (e.g. `data-html-page-root` from an HTML driver). Mark custom studio surfaces with `data-owb-chrome`; portaled UI should use `usePortalThemeScope()` (`data-owb-theme` + `data-owb-chrome`).
 - Property field API: [property-fields.md](property-fields.md)
 - Extension trust: [Plugin-boundaries.md](../../Plugin-boundaries.md)

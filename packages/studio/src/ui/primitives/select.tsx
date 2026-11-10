@@ -2,7 +2,7 @@ import { Select as SelectPrimitive } from '@base-ui/react/select';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useState } from 'react';
 
-import { useThemeScope } from '../../context/theme-context';
+import { usePortalThemeScope } from '../../context/theme-context';
 import { cn } from '../../lib/cn';
 
 import menuStyles from './dropdown-menu.module.css';
@@ -32,7 +32,7 @@ export function Select({
   options,
   className,
 }: SelectProps) {
-  const themeScope = useThemeScope();
+  const themeScope = usePortalThemeScope();
   const [open, setOpen] = useState(false);
 
   return (
@@ -71,8 +71,9 @@ export function Select({
               {...themeScope}
               className={cn(
                 menuStyles.content,
-                styles.panel,
-                overlaySurface.surface
+                overlaySurface.popup,
+                overlaySurface.surface,
+                styles.panel
               )}
             >
               <SelectPrimitive.List className={styles.viewport}>

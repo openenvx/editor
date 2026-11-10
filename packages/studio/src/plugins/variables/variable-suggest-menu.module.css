@@ -6,11 +6,8 @@
   min-width: 220px;
   max-width: 320px;
   padding: --spacing(1);
-  border-radius: var(--radius);
-  background: var(--popover);
   color: var(--foreground);
   font-family: var(--font-ui-family);
-  @apply shadow-xl;
 }
 
 .header {

@@ -1,3 +1,5 @@
+@reference '../../theme/tailwind.css';
+
 /*
  * shadcn overlay motion (tailwindcss-animate enter/exit), as CSS modules.
  * Registry classes mirrored:
@@ -7,6 +9,10 @@
  *
  * Keyframes live in this module so Vite scopes animation-name + @keyframes
  * together - global token keyframes left Presence waiting on animationend forever.
+ *
+ * `.popup` is the Synara frosted shell (menus, selects, popovers, command
+ * palette). Put enter/exit transforms on `.surface` so they don't flatten
+ * `backdrop-filter` on the painted node.
  */
 
 @keyframes enter {
@@ -55,6 +61,23 @@
 
 .surface {
   transform-origin: center;
+}
+
+/* Synara `APP_TRANSLUCENT_POPUP_SURFACE_CLASS_NAME`: 55% popover fill, 40px frost, 2xl radius. */
+.popup {
+  @apply border-border relative overflow-hidden rounded-2xl border shadow-xl;
+  background:
+    linear-gradient(var(--app-overlay-surface), var(--app-overlay-surface)),
+    var(--app-overlay-backing, transparent);
+  color: var(--popover-foreground);
+  /* Hardcoded: Lightning CSS drops `backdrop-filter: var(--popup-blur)`. */
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  backdrop-filter: blur(40px) saturate(150%);
+}
+
+/* Tooltips stay on Synara's tighter `rounded-lg` (= `--radius`). */
+.popupCompact {
+  border-radius: var(--radius);
 }
 
 /* animate-in + fade-in-0 + zoom-in-95 */

@@ -104,6 +104,7 @@ describe('portal theme propagation', () => {
     await user.click(screen.getByRole('button', { name: 'Open' }));
     const menu = await screen.findByRole('menu');
     expect(menu.dataset.owbTheme).toBe('dark');
+    expect(menu.dataset.owbChrome).toBe('');
   });
 });
 

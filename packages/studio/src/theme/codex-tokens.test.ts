@@ -14,7 +14,7 @@ function readThemeBlock(theme: 'light' | 'dark'): string {
   const nextTheme = theme === 'light' ? 'dark' : null;
   const endMarker = nextTheme
     ? `\n[data-owb-theme='${nextTheme}']`
-    : '\n:where([data-owb-theme])';
+    : '\n/* Tailwind preflight subset';
   const end = css.indexOf(endMarker, start + 1);
   if (end === -1) {
     throw new Error(`${theme} theme block end not found`);

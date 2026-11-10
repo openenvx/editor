@@ -53,3 +53,17 @@ export function useSetTheme(): (theme: string) => void {
 export function useThemeScope(): { 'data-owb-theme': string } {
   return { 'data-owb-theme': useTheme() };
 }
+
+/** Marks studio workbench chrome for Synara preflight in `tokens.css`. */
+export function useChromeScope(): { 'data-owb-chrome': '' } {
+  return { 'data-owb-chrome': '' };
+}
+
+/** Theme + preflight scope for UI portaled outside the shell DOM tree. */
+export function usePortalThemeScope(): {
+  'data-owb-theme': string;
+  'data-owb-chrome': '';
+} {
+  const theme = useTheme();
+  return { 'data-owb-theme': theme, 'data-owb-chrome': '' };
+}

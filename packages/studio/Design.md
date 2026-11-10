@@ -13,7 +13,7 @@ Product role lives in [Architecture.md](../../Architecture.md) and [docs/archite
 
 ## Look
 
-Codex light/dark, resolved from Synara's theme pack: white / `#101010` shell, 13px system UI, frosted menus (`blur(40px) saturate(150%)`, 16px radius), flat controls. Switch-on and focus use the Codex accent (`#0169cc` light, blue at 63% dark).
+Codex light/dark, resolved from Synara's theme pack: white / `#101010` shell, 13px system UI, frosted menus (`blur(40px) saturate(150%)`, `rounded-2xl`), flat controls. Switch-on and focus use the Codex accent (`#0169cc` light, blue at 63% dark). Menus, selects, popovers, context menus, and the command palette share one overlay shell.
 
 ## Tokens
 
@@ -44,7 +44,8 @@ Kit: [`src/ui/primitives`](src/ui/primitives). Headless behavior is Base UI. Vis
 
 | Primitive | Source |
 | --- | --- |
-| Button, input, checkbox, switch, select, menu, popover, tooltip | Synara `components/ui` |
+| Button, input, checkbox, switch | Synara `components/ui` |
+| Menu, select, popover, tooltip, command palette | Synara translucent popup (`.popup` in `overlay-surface.module.css`) |
 | Segmented control | Synara `SegmentedPicker` |
 | Tabs | coss ui tabs |
 | Numeric input | Synara input chrome; editor scrub behavior |

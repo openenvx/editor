@@ -2,7 +2,7 @@ import { Dialog } from '@base-ui/react/dialog';
 import { mergeProps } from '@base-ui/react/merge-props';
 import type { ComponentProps, ComponentPropsWithoutRef } from 'react';
 
-import { useThemeScope } from '../../context/theme-context';
+import { usePortalThemeScope } from '../../context/theme-context';
 import { cn } from '../../lib/cn';
 import { WorkbenchIcon } from '../icons/workbench-icon';
 import { Button } from './button';
@@ -31,7 +31,7 @@ function SheetOverlay({
   className,
   ...props
 }: ComponentPropsWithoutRef<typeof Dialog.Backdrop>) {
-  const themeScope = useThemeScope();
+  const themeScope = usePortalThemeScope();
   return (
     <Dialog.Backdrop
       {...props}
@@ -52,7 +52,7 @@ export function SheetContent({
   side?: SheetSide;
   showCloseButton?: boolean;
 }) {
-  const themeScope = useThemeScope();
+  const themeScope = usePortalThemeScope();
   return (
     <Dialog.Portal>
       <SheetOverlay />

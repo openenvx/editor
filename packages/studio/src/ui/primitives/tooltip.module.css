@@ -1,21 +1,8 @@
 @reference '../../theme/tailwind.css';
 
-/* Synara default tooltip: frosted popup, rounded-lg, ui-sm. */
+/* Synara default tooltip: frosted popup at `rounded-lg`, ui-sm. */
 .content {
-  @apply border-border bg-popover/70 text-ui-sm text-popover-foreground relative z-50 flex origin-(--transform-origin) items-center overflow-hidden rounded-lg border px-2 py-1 text-balance shadow-xl transition-[scale,opacity] data-ending-style:scale-98 data-ending-style:opacity-0 data-starting-style:scale-98 data-starting-style:opacity-0;
-  background:
-    linear-gradient(var(--app-overlay-surface), var(--app-overlay-surface)),
-    var(--popover);
+  @apply text-ui-sm text-popover-foreground relative z-50 flex origin-(--transform-origin) items-center overflow-hidden px-2 py-1 text-balance transition-[scale,opacity] data-ending-style:scale-98 data-ending-style:opacity-0 data-starting-style:scale-98 data-starting-style:opacity-0;
   max-width: 240px;
   pointer-events: none;
-}
-
-.content::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  backdrop-filter: blur(40px) saturate(1.5);
 }

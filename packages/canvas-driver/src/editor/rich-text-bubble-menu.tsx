@@ -71,6 +71,7 @@ export function RichTextBubbleMenuToolbar({ editor }: { editor: Editor }) {
     <div
       className={styles.bubbleMenu}
       data-openenvx-rich-text-bubble=""
+      data-owb-chrome=""
       data-owb-theme={theme}
     >
       <FormatButton

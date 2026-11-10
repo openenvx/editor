@@ -10,7 +10,7 @@ import {
 } from 'react';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 
-import { useThemeScope } from '../../context/theme-context';
+import { usePortalThemeScope } from '../../context/theme-context';
 import { cn } from '../../lib/cn';
 
 import overlaySurface from './overlay-surface.module.css';
@@ -165,7 +165,7 @@ export function PopoverContent({
   avoidCollisions = true,
   collisionPadding = DEFAULT_COLLISION_PADDING,
 }: PopoverContentProps) {
-  const themeScope = useThemeScope();
+  const themeScope = usePortalThemeScope();
   const anchorCtx = useContext(PopoverAnchorContext);
 
   const isPropertyPopover = variant === 'property';
@@ -190,6 +190,7 @@ export function PopoverContent({
           {...themeScope}
           className={cn(
             styles.panel,
+            overlaySurface.popup,
             overlaySurface.surface,
             isPropertyPopover && styles.propertyPanel,
             className

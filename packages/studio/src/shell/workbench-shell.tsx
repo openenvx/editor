@@ -106,7 +106,7 @@ const ChromeRegion = memo(
     const { api } = useWorkbenchContext();
 
     return (
-      <>
+      <div data-owb-chrome="">
         {overlays ? <OverlayRenderer overlays={overlays} /> : null}
         <CommandSheetHost />
         <DialogHost />
@@ -119,7 +119,7 @@ const ChromeRegion = memo(
             open={paletteOpen}
           />
         ) : null}
-      </>
+      </div>
     );
   }
 );
@@ -558,7 +558,11 @@ export function WorkbenchShell({
   if (!ready || !api) {
     return (
       <ThemeProvider onThemeChange={handleThemeChange} theme={activeTheme}>
-        <div className={className} data-owb-theme={activeTheme}>
+        <div
+          className={className}
+          data-owb-chrome=""
+          data-owb-theme={activeTheme}
+        >
           {workbenchI18n.t('loading')}
         </div>
       </ThemeProvider>
