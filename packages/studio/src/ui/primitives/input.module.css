@@ -1,10 +1,9 @@
 @reference '../../theme/tailwind.css';
 
-/* Synara `ui/input.tsx` control + field. */
+/* Synara field inside ycode well (outer well via control-well.module.css). */
 .control {
-  @apply border-border bg-background text-ui text-foreground has-focus-visible:border-foreground/30 sm:text-ui dark:bg-input/32 relative inline-flex w-full items-center rounded-lg border has-disabled:opacity-64;
-  min-height: var(--control-height);
-  height: var(--control-height);
+  @apply text-ui text-foreground sm:text-ui relative inline-flex w-full items-center has-disabled:opacity-64;
+  composes: well from './control-well.module.css';
 }
 
 .controlSm {

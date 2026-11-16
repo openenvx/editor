@@ -15,16 +15,8 @@
   align-items: center;
   gap: --spacing(1);
   min-width: 0;
-  height: var(--control-height);
   padding: 0 --spacing(1) 0 --spacing(2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--input);
-  transition: border-color var(--app-duration-fast) var(--app-ease-out);
-}
-
-.cell:focus-within {
-  border-color: color-mix(in srgb, var(--foreground) 30%, transparent);
+  composes: well from './control-well.module.css';
 }
 
 .cell input {

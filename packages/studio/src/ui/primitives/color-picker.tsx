@@ -278,9 +278,31 @@ export function ColorPickerPopover({
     : formatColorValue(color, detectFormat(value));
 
   return (
-    <div className={cn(styles.triggerRow, className)}>
-      <Input
-        className={styles.input}
+    <div className={cn(styles.inspectorWell, className)}>
+      <PropertyAnchoredPopover
+        onOpenChange={setOpen}
+        open={open}
+        trigger={
+          <button
+            aria-label="Open color picker"
+            className={cn(
+              styles.inspectorSwatch,
+              isEmpty && styles.inspectorSwatchEmpty
+            )}
+            style={isEmpty ? undefined : { background: value }}
+            type="button"
+          />
+        }
+      >
+        <ColorPickerPanel
+          id={id ? `${id}-panel` : undefined}
+          onChange={onChange}
+          placeholder={placeholder}
+          value={value}
+        />
+      </PropertyAnchoredPopover>
+      <input
+        className={styles.inspectorInput}
         id={id}
         onChange={(event) => {
           const next = event.target.value.trim();
@@ -294,27 +316,6 @@ export function ColorPickerPopover({
         placeholder={placeholder}
         value={inlineValue}
       />
-      <PropertyAnchoredPopover
-        onOpenChange={setOpen}
-        open={open}
-        trigger={
-          <button
-            aria-label="Open color picker"
-            className={styles.swatchButton}
-            style={{
-              background: isEmpty ? 'transparent' : value,
-            }}
-            type="button"
-          />
-        }
-      >
-        <ColorPickerPanel
-          id={id ? `${id}-panel` : undefined}
-          onChange={onChange}
-          placeholder={placeholder}
-          value={value}
-        />
-      </PropertyAnchoredPopover>
     </div>
   );
 }

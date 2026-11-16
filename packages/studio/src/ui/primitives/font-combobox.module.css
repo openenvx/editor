@@ -10,15 +10,11 @@
   justify-content: space-between;
   gap: --spacing(2);
   width: 100%;
-  height: var(--control-height);
-  min-height: var(--control-height);
   padding: --spacing(1) 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--input);
   color: var(--foreground);
   font-size: var(--app-font-size-ui-sm);
   cursor: pointer;
+  composes: well from './control-well.module.css';
 }
 
 .trigger:hover {
@@ -27,64 +23,23 @@
 
 .trigger:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 1px var(--color-border-focus);
+  border-color: var(--color-border-focus);
 }
 
 .value {
   flex: 1;
   min-width: 0;
-  min-height: 1em;
   overflow: hidden;
-  line-height: 1.2;
-  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: left;
+}
+
+.placeholder {
+  color: var(--muted-foreground);
 }
 
 .chevron {
   flex-shrink: 0;
-  color: var(--muted-foreground);
   opacity: 0.5;
-}
-
-.command {
-  background: transparent;
-}
-
-.list {
-  height: min(360px, 50vh);
-  max-height: min(360px, 50vh);
-  overflow: auto;
-  padding: --spacing(1) 0 0;
-}
-
-.virtualViewport {
-  position: relative;
-  width: 100%;
-}
-
-.virtualRow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.itemCheck {
-  flex-shrink: 0;
-  color: inherit;
-  opacity: 0;
-}
-
-.itemCheckVisible {
-  opacity: 1;
-}
-
-.itemLabel {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }

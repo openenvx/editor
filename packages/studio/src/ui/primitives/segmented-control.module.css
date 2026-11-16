@@ -1,14 +1,14 @@
 @reference '../../theme/tailwind.css';
 
-/* Outer rounded-lg track, inner rounded-md chips — Synara track colors. */
+/* Outer rounded-lg track, inner rounded-md chips — ycode control well. */
 .root {
-  @apply relative isolate inline-flex w-full rounded-lg bg-black/5 p-0.5 dark:bg-white/[0.07];
+  @apply relative isolate inline-flex w-full;
+  composes: track from './control-well.module.css';
 }
 
 .compact {
   width: 100%;
   gap: 2px;
-  padding: 2px;
 }
 
 .option {

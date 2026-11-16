@@ -14,11 +14,11 @@
 
 .swatch {
   flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   padding: 0;
   border: none;
-  border-radius: calc(var(--radius) * 0.6);
+  border-radius: calc(var(--radius) - 2px);
   box-shadow: 0 0 0 1px var(--border);
   cursor: pointer;
 }

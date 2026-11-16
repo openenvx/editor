@@ -2,8 +2,8 @@
 
 /* coss ui tabs: muted track, active chip — Synara colors, ycode track height. */
 .list {
-  @apply bg-muted text-muted-foreground relative z-0 flex w-full items-center justify-center gap-x-0.5 rounded-lg p-0.5;
-  min-height: var(--control-height);
+  @apply text-muted-foreground relative z-0 flex w-full items-center justify-center gap-x-0.5;
+  composes: track from './control-well.module.css';
 }
 
 .trigger {

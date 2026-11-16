@@ -1,0 +1,37 @@
+@reference '../../theme/tailwind.css';
+
+/* ycode-style inspector control well (fill, transparent hairline, lg radius). */
+.well {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--control-height);
+  height: var(--control-height);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: var(--control-well);
+  transition: border-color var(--app-duration-fast) var(--app-ease-out);
+}
+
+.well:focus-within {
+  border-color: var(--color-border-focus);
+  outline: none;
+}
+
+/* Tab / segmented outer track (recessed well + inner chips). */
+.track {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-sizing: border-box;
+  min-height: var(--control-height);
+  padding: 2px 3px 3px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: var(--control-well);
+}
+
+.track:focus-within {
+  border-color: var(--color-border-focus);
+}

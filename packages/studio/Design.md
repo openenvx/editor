@@ -23,7 +23,7 @@ Tailwind utilities are allowed only inside CSS modules, via `@reference` of [`sr
 
 Editor-only layout vars keep Synara-style names: `--app-topbar-height`, `--app-status-bar-height`, `--inspector-width`, `--app-rail-width`, `--control-height` (32px unified inspector control height). Canvas colors read by Konva use `--canvas-*` (hex / classic `rgba` only).
 
-Inspector fields keep Synara colors (hairline `--border`, `--background` / `dark:bg-input/32`, control-opaque selects). Shape tweaks: outer `rounded-lg` (`--radius`), tab/segmented tracks at `--control-height` with inner `rounded-md` chips (`bg-muted` / `bg-black/5` tracks; active white or `bg-background`). Menus stay Synara frost at `rounded-2xl`.
+Inspector fields use a shared **control well** (`--control-well`: muted fill in light, `rgba(252,252,252,0.07)` in dark) at `--control-height` (32px), `rounded-lg` (`--radius`), and a transparent 1px border that only picks up `--color-border-focus` on focus—no hairline at rest. Tab/segmented **tracks** use the same well with `2px 3px 3px` padding; active chips are inner `rounded-md` with `shadow-sm`. Property rows default to **1:2** label/control (`PropertyFieldRow` `inline`). Color inspector triggers are full-width wells with a 20px `rounded-md` swatch. Buttons stay Synara; **menus, selects, popovers** keep frosted `rounded-2xl` overlays (`overlay-surface.module.css`).
 
 | Token | Light | Dark | Role |
 | --- | --- | --- | --- |
@@ -40,6 +40,7 @@ Inspector fields keep Synara colors (hairline `--border`, `--background` / `dark
 | `--app-font-size-ui` | `13px` | same | UI copy |
 | `--app-density-row-height` | `1.75rem` | same | Legacy row metric |
 | `--control-height` | `2rem` | same | Inspector control height |
+| `--control-well` | `rgba(13,13,13,0.04)` | `rgba(252,252,252,0.07)` | Inspector field fill |
 
 ## Components
 

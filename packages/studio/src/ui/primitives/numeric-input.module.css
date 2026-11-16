@@ -2,14 +2,13 @@
 
 /* Synara input control, with the editor's scrub handle. */
 .root {
-  @apply border-border bg-background text-ui text-foreground dark:bg-input/32 relative flex w-full items-center overflow-hidden rounded-lg border;
-  min-height: var(--control-height);
-  height: var(--control-height);
+  @apply text-ui text-foreground relative flex w-full items-center overflow-hidden;
+  composes: well from './control-well.module.css';
 }
 
 .root:focus-within:not(.compact),
 .root[data-scrubbing]:not(.compact) {
-  border-color: color-mix(in srgb, var(--foreground) 30%, transparent);
+  border-color: var(--color-border-focus);
 }
 
 .handle {
