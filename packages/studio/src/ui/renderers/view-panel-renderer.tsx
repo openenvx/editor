@@ -8,7 +8,6 @@ import {
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import type {
-  Document,
   ViewContainerDescriptor,
   ViewDescriptor,
   ViewTreeItem,
@@ -34,6 +33,10 @@ import { treeItemClassName } from './tree-item-class-name';
 
 import panelSectionStyles from '../primitives/panel-section.module.css';
 import styles from './view-panel.module.css';
+
+interface SceneView {
+  artboards: { id: string; nodes: unknown[] }[];
+}
 
 const EMPTY_ID_SET = new Set<string>();
 
@@ -368,7 +371,7 @@ function ViewPanelBody({
   hoveredLayerId: string | null;
   activeArtboardId: string;
   layerSelectedIds: Set<string>;
-  scene: Document;
+  scene: SceneView;
 }) {
   const { api } = useWorkbenchContext();
   const [renamingId, setRenamingId] = useState<string | null>(null);
@@ -378,11 +381,17 @@ function ViewPanelBody({
     if (view.viewSelection !== 'layer' || layerSelectedIds.size === 0) {
       return EMPTY_ID_SET;
     }
-    return getSelectionExpandIds(scene, layerSelectedIds);
-  }, [layerSelectedIds, scene, view.viewSelection]);
+    return getSelectionExpandIds(scene, layerSelectedIds, activeArtboardId);
+  }, [activeArtboardId, layerSelectedIds, scene, view.viewSelection]);
 
   useViewTreeCollapseSeed(items, setCollapsed, selectionExpandIds);
-  useViewTreeSelectionSync(view, layerSelectedIds, scene, setCollapsed);
+  useViewTreeSelectionSync(
+    view,
+    layerSelectedIds,
+    scene,
+    activeArtboardId,
+    setCollapsed
+  );
   useViewTreeHoverExpand(view, hoveredLayerId, scene, setCollapsed);
 
   const selectedIds =
@@ -569,7 +578,9 @@ function ViewPanelBody({
 export const ViewPanelRenderer = memo(({ viewContainers }: Props) => {
   const { api } = useWorkbenchContext();
   const selection = useWorkbenchContextSelector((state) => state.selection);
-  const scene = useWorkbenchContextSelector((state) => state.scene);
+  const scene = useWorkbenchContextSelector(
+    (state) => state.scene
+  ) as SceneView;
   const hoveredLayerId = useWorkbenchContextSelector(
     (state) => state.interaction.hoveredLayerId
   );

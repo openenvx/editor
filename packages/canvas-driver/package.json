@@ -40,6 +40,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@openenvx/editor": "workspace:*",
     "@tabler/icons-react": "^3.44.0",
     "@tiptap/extension-color": "^3.27.3",
     "@tiptap/extension-font-family": "^3.27.3",

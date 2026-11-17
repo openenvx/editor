@@ -1,8 +1,6 @@
 import { evaluateContextKeyWhenExpression } from '../evaluate-when-expression';
 import { Emitter } from '../runtime/emitter';
 import type { Event } from '../runtime/emitter';
-import { findNodeById } from '../scene/layer-tree';
-import type { Document, EditorSession } from '../scene/types';
 
 export class ContextKeyService {
   private readonly keys = new Map<string, boolean | string | number>();
@@ -34,55 +32,6 @@ export class ContextKeyService {
 
   snapshot(): Record<string, boolean | string | number> {
     return Object.fromEntries(this.keys);
-  }
-
-  syncSceneKeys(input: {
-    scene: Document;
-    selection: EditorSession;
-    isDirty: boolean;
-    hasActiveEditor: boolean;
-    customKeys?: Record<string, boolean | string | number>;
-  }): boolean {
-    const page =
-      input.scene.artboards.find(
-        (entry) => entry.id === input.selection.activeArtboardId
-      ) ?? input.scene.artboards[0]!;
-    const { selectedNodeIds } = input.selection;
-
-    let changed = false;
-    const set = (key: string, value: boolean | string | number) => {
-      if (this.setContext(key, value)) {
-        changed = true;
-      }
-    };
-
-    const primaryNodeId =
-      input.selection.primaryNodeId ?? selectedNodeIds[0] ?? null;
-    const primaryLayer = primaryNodeId
-      ? findNodeById(input.scene, primaryNodeId)
-      : null;
-
-    set('scene.layerSelected', selectedNodeIds.length > 0);
-    set('scene.multiSelect', selectedNodeIds.length > 1);
-    set('scene.multiPage', input.scene.artboards.length > 1);
-    set('scene.primaryLayerType', primaryLayer?.type ?? '');
-    const layout =
-      typeof page.extensions?.layout === 'string'
-        ? page.extensions.layout
-        : 'flow';
-    set('page.layout', layout);
-    set('page.layoutAbsolute', layout === 'absolute');
-    set('page.layoutFlow', layout === 'flow');
-    set('editor.dirty', input.isDirty);
-    set('editor.hasActiveEditor', input.hasActiveEditor);
-
-    if (input.customKeys) {
-      for (const [key, value] of Object.entries(input.customKeys)) {
-        set(key, value);
-      }
-    }
-
-    return changed;
   }
 
   dispose(): void {

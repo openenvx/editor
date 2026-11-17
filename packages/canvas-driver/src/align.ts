@@ -1,4 +1,4 @@
-import type { Transform } from '@openenvx/studio/schema';
+import type { Transform } from '@openenvx/editor/schema';
 
 export interface AlignBounds {
   x: number;

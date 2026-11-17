@@ -1,5 +1,5 @@
 import { WorkbenchProvider } from '@openenvx/studio/react';
-import { normalizeDocument } from '@openenvx/studio/schema';
+import { normalizeDocument } from '@openenvx/editor/schema';
 import { createMockWorkbenchApi } from '@openenvx/studio/internal';
 import { cleanup, render, waitFor } from '@testing-library/react';
 import type { ComponentProps, ReactNode } from 'react';
@@ -23,6 +23,7 @@ function renderRichTextEditor(
   const { api } = createMockWorkbenchApi({
     scene: normalizeDocument({
       pages: [{ id: 'p1', name: 'Page', layout: 'flow', layers: [] }],
+      variables: [],
     }),
   });
   const view = render(

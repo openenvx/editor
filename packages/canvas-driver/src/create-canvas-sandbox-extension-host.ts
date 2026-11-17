@@ -1,9 +1,9 @@
+import type { DocumentNode } from '@openenvx/editor';
 import { applyWidgetFace } from '@openenvx/editor-sandbox/canvas-widget';
 import {
   SandboxExtensionHost,
   type SandboxExtensionHostOptions,
 } from '@openenvx/editor-sandbox/host';
-import type { DocumentNode } from '@openenvx/studio';
 
 import { setOpenEnvxWidgetClickHandler } from './interactions/widget-click-handler';
 

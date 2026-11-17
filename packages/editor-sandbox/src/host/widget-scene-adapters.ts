@@ -1,5 +1,5 @@
-import { findNodeById, updateNodeInTree } from '@openenvx/studio';
-import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
+import { findNodeById, updateNodeInTree } from '@openenvx/editor/host-surface';
+import { applyNodeTransform, nodeTransform } from '@openenvx/editor/schema';
 
 import type { SandboxHostSurface } from './sandbox-host-surface';
 

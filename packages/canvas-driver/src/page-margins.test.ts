@@ -1,4 +1,4 @@
-import { toPx } from '@openenvx/studio/schema';
+import { toPx } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

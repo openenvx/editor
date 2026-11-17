@@ -1,13 +1,12 @@
-import { CANVAS_INSTANCE_LAYER_TYPE, LayerDefinition } from '@openenvx/studio';
+import { CANVAS_INSTANCE_LAYER_TYPE, LayerDefinition } from '@openenvx/editor';
+import type { DocumentNode, LayerPreviewContext } from '@openenvx/editor';
+import { createLayerPreviewBuilder } from '@openenvx/editor/preview';
+import type { Artboard } from '@openenvx/editor/schema';
+import { artboardSpaceSize, createDefaultFrame } from '@openenvx/editor/schema';
 import type {
   CommandContext,
-  DocumentNode,
-  LayerPreviewContext,
   PropertySectionDescriptor,
 } from '@openenvx/studio';
-import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
-import type { Artboard } from '@openenvx/studio/schema';
-import { artboardSpaceSize, createDefaultFrame } from '@openenvx/studio/schema';
 import { z } from 'zod';
 
 const canvasInstanceSchema = z.object({

@@ -1,4 +1,4 @@
-import type { FocalPoint, ImageFit } from '@openenvx/studio/schema';
+import type { FocalPoint, ImageFit } from '@openenvx/editor/schema';
 
 export interface ImageFitBox {
   width: number;

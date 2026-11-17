@@ -1,14 +1,14 @@
 import { downloadBytes, exportCanvasDocument } from '@openenvx/canvas-driver';
+import { getActiveArtboard, requireDocumentStore } from '@openenvx/editor';
+import { buildSampleVariableValues } from '@openenvx/editor/schema';
 import {
   Command,
-  getActiveArtboard,
   TopBarContribution,
   WorkbenchPlugin,
   type CommandContext,
   type TopBarBuilder,
   type WorkbenchPluginContext,
 } from '@openenvx/studio';
-import { buildSampleVariableValues } from '@openenvx/studio/schema';
 
 type ExportFormat = 'png' | 'jpg';
 
@@ -19,7 +19,7 @@ abstract class DownloadCanvasExportCommand extends Command {
   abstract readonly format: ExportFormat;
 
   async execute(ctx: CommandContext): Promise<void> {
-    const scene = ctx.scene.getDocument();
+    const scene = requireDocumentStore(ctx).getDocument();
     const page = getActiveArtboard(scene);
     const format = this.format;
     try {

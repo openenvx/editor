@@ -1,7 +1,7 @@
-import type { DocumentNode as SceneLayer } from '@openenvx/studio';
-import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import { nodeTransform } from '@openenvx/studio/schema';
-import type { Transform } from '@openenvx/studio/schema';
+import type { DocumentNode as SceneLayer } from '@openenvx/editor';
+import type { LayerPreviewDescriptor } from '@openenvx/editor/preview';
+import { nodeTransform } from '@openenvx/editor/schema';
+import type { Transform } from '@openenvx/editor/schema';
 import type Konva from 'konva';
 import type { RefObject } from 'react';
 

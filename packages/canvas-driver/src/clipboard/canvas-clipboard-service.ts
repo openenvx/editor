@@ -1,9 +1,9 @@
-import type { AssetService } from '@openenvx/studio';
-import type { Artboard, DocumentNode } from '@openenvx/studio/schema';
+import type { AssetService } from '@openenvx/editor';
+import type { Artboard, DocumentNode } from '@openenvx/editor/schema';
 import {
   applyNodeTransform,
   createDefaultFrame,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 import { computeArtboardOffset } from '../artboard-offset';
 import { CanvasImageLayer } from '../layers/canvas-image-layer';

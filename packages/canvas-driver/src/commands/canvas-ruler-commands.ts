@@ -1,9 +1,10 @@
-import { Command, localize } from '@openenvx/studio';
-import type { CommandContext } from '@openenvx/studio';
+import { requireDocumentStore } from '@openenvx/editor';
 import type {
   ArtboardGuide,
   ArtboardGuideOrientation,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
+import { Command, localize } from '@openenvx/studio';
+import type { CommandContext } from '@openenvx/studio';
 
 import { CanvasRulerGuidesSettingsServiceId } from '../canvas-service-tokens';
 
@@ -19,8 +20,8 @@ function mapActivePageGuides(
   nextGuides: ArtboardGuide[] | undefined,
   label: string
 ): void {
-  const activeArtboardId = ctx.scene.getActiveArtboardId();
-  ctx.scene.apply({
+  const activeArtboardId = requireDocumentStore(ctx).getActiveArtboardId();
+  requireDocumentStore(ctx).apply({
     apply: (scene) => ({
       ...scene,
       artboards: scene.artboards.map((page) =>
@@ -53,7 +54,9 @@ export class ClearCanvasGuidesCommand extends Command {
   readonly id = 'canvas.clearGuides';
 
   canExecute(ctx: CommandContext): boolean {
-    return (ctx.scene.getActiveArtboard().guides?.length ?? 0) > 0;
+    return (
+      (requireDocumentStore(ctx).getActiveArtboard().guides?.length ?? 0) > 0
+    );
   }
 
   execute(ctx: CommandContext): void {
@@ -94,7 +97,7 @@ export class AddCanvasGuideCommand extends Command {
     ) {
       return;
     }
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const guide: ArtboardGuide = {
       id: input.id ?? crypto.randomUUID(),
       orientation: input.orientation,
@@ -118,7 +121,7 @@ export class MoveCanvasGuideCommand extends Command {
     if (!guideId) {
       return false;
     }
-    return (ctx.scene.getActiveArtboard().guides ?? []).some(
+    return (requireDocumentStore(ctx).getActiveArtboard().guides ?? []).some(
       (g) => g.id === guideId
     );
   }
@@ -132,7 +135,7 @@ export class MoveCanvasGuideCommand extends Command {
     ) {
       return;
     }
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const guides = page.guides ?? [];
     if (!guides.some((g) => g.id === input.guideId)) {
       return;
@@ -159,7 +162,7 @@ export class RemoveCanvasGuideCommand extends Command {
     if (!guideId) {
       return false;
     }
-    return (ctx.scene.getActiveArtboard().guides ?? []).some(
+    return (requireDocumentStore(ctx).getActiveArtboard().guides ?? []).some(
       (g) => g.id === guideId
     );
   }
@@ -169,7 +172,7 @@ export class RemoveCanvasGuideCommand extends Command {
     if (!guideId) {
       return;
     }
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const guides = page.guides ?? [];
     if (!guides.some((g) => g.id === guideId)) {
       return;

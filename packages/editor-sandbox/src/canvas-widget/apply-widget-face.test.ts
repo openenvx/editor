@@ -4,7 +4,7 @@ import {
   defaultTransform,
   nodeTransform,
   type OpenEnvxWidgetProps,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 import { applyWidgetFace } from './apply-widget-face';
 

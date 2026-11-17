@@ -1,10 +1,7 @@
+import { canEditLayerData, canSelectLayer } from '@openenvx/editor';
+import type { Artboard, Document } from '@openenvx/editor/schema';
 import type { EditorViewportApi } from '@openenvx/studio';
-import {
-  canEditLayerData,
-  canSelectLayer,
-  isTypingTarget,
-} from '@openenvx/studio';
-import type { Artboard, Document } from '@openenvx/studio/schema';
+import { isTypingTarget } from '@openenvx/studio';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useCanvasHost } from '../canvas-host-context';

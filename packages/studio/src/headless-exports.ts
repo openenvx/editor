@@ -1,7 +1,7 @@
 export { WorkbenchController } from './workbench/workbench-controller';
 export { bootstrapWorkbenchServices } from './workbench/bootstrap-workbench-services';
-export type { WorkbenchServiceDeps } from './workbench/bootstrap-workbench-services';
 export {
+  type DocumentSliceBuilders,
   type WorkbenchApi,
   type WorkbenchControllerOptions,
   type WorkbenchState,
@@ -68,11 +68,6 @@ export {
   type FormDialogResult,
   type ShowFormOptions,
 } from './workbench/dialog-registrations';
-export {
-  RichTextInsertServiceId,
-  RichTextInsertServiceImpl,
-  type RichTextInsertService,
-} from './services/rich-text-insert-service';
 export {
   TextBlockInsertServiceId,
   type TextBlockInsertService,
@@ -272,14 +267,12 @@ export type {
 } from './workbench/panel-registrations';
 export type { StatusBarItemRendererRegistration } from './workbench/status-bar-item-renderer-registration';
 
-export type {
-  DocumentVersion,
-  VersionAuthor,
-  VersionHistoryProvider,
-} from './version-history/version-history-types';
-export { VersionHistoryProviderId } from './version-history/version-history-service-id';
-
 export { getNestedValue, setNestedValue } from './utils/nested-value';
+export type {
+  SceneSlice,
+  EditorSlice,
+  SliceBuilders,
+} from './workbench/workbench-state';
 export { isTypingTarget } from './utils/is-typing-target';
 
 export type { WorkbenchContributionDisposable } from './registries/workbench-registries';

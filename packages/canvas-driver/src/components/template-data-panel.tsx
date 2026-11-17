@@ -1,20 +1,25 @@
-import {
-  useWorkbenchContext,
-  useWorkbenchContextSelector,
-} from '@openenvx/studio/react';
 import type {
   Document,
   Modification,
   TemplateField,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 import {
   createEmptyDocument,
   extractTemplateManifest,
   validateTemplateNames,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
+import {
+  useWorkbenchContext,
+  useWorkbenchContextSelector,
+} from '@openenvx/studio/react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 import { applyModificationsWithTextFit } from '../fit-text-layer-to-content';
+import {
+  getWorkbenchContentRevision,
+  readWorkbenchDocument,
+  setWorkbenchDocument,
+} from '../workbench-document-api';
 
 import styles from './template-data-panel.module.css';
 
@@ -47,13 +52,15 @@ function valuesEqualDocument(a: Document, b: Document): boolean {
 
 export const TemplateDataPanel = memo(() => {
   const { api } = useWorkbenchContext();
-  const selectedScene = useWorkbenchContextSelector((state) => state.scene);
+  const selectedScene = useWorkbenchContextSelector((state) => state.scene) as
+    | Document
+    | undefined;
   const scene =
-    selectedScene ?? api.scene.getDocument() ?? createEmptyDocument();
+    selectedScene ?? readWorkbenchDocument(api) ?? createEmptyDocument();
 
   const baseSceneRef = useRef<Document>(structuredClone(scene));
   const previewingRef = useRef(false);
-  const lastContentRevisionRef = useRef(api.scene.getContentRevision());
+  const lastContentRevisionRef = useRef(getWorkbenchContentRevision(api));
   const [values, setValues] = useState<FieldValues>({});
   const [previewing, setPreviewing] = useState(false);
   const [baseEpoch, setBaseEpoch] = useState(0);
@@ -68,7 +75,7 @@ export const TemplateDataPanel = memo(() => {
     if (!selectedScene) {
       return;
     }
-    const contentRevision = api.scene.getContentRevision();
+    const contentRevision = getWorkbenchContentRevision(api);
     if (previewingRef.current) {
       lastContentRevisionRef.current = contentRevision;
       return;
@@ -82,7 +89,7 @@ export const TemplateDataPanel = memo(() => {
     setBaseManifest(extractTemplateManifest(nextBase));
     setNameValidation(validateTemplateNames(nextBase));
     setBaseEpoch((epoch) => epoch + 1);
-  }, [api.scene, baseEpoch, selectedScene]);
+  }, [api, baseEpoch, selectedScene]);
 
   const applyPreview = useCallback(
     (nextValues: FieldValues) => {
@@ -101,19 +108,19 @@ export const TemplateDataPanel = memo(() => {
       );
       previewingRef.current = true;
       setPreviewing(true);
-      if (!valuesEqualDocument(api.scene.getDocument(), resolved)) {
-        api.scene.setDocument(resolved);
+      if (!valuesEqualDocument(readWorkbenchDocument(api), resolved)) {
+        setWorkbenchDocument(api, resolved);
       }
     },
-    [api.scene]
+    [api]
   );
 
   const clearPreview = useCallback(() => {
     previewingRef.current = false;
     setPreviewing(false);
     setValues({});
-    api.scene.setDocument(structuredClone(baseSceneRef.current));
-  }, [api.scene]);
+    setWorkbenchDocument(api, structuredClone(baseSceneRef.current));
+  }, [api]);
 
   const updateField = useCallback(
     (name: string, patch: Partial<Modification>) => {

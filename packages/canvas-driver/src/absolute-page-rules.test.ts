@@ -1,4 +1,4 @@
-import { artboardSpaceSize, withArtboardRulesLayout } from '@openenvx/studio/schema';
+import { artboardSpaceSize, withArtboardRulesLayout } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import { AbsolutePageRules } from './absolute-page-rules';

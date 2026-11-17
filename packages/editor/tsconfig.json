@@ -1,0 +1,20 @@
+{
+  "extends": "@openenvx/typescript-config/base.json",
+  "include": ["src", "../typescript-config/css-modules.d.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/schema/generate-json-schema.ts"],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM"],
+    "strictNullChecks": true,
+    "paths": {
+      "#editor": ["./src/index.ts"],
+      "#editor/schema": ["./src/schema/index.ts"],
+      "#editor/preview": ["./src/preview/index.ts"],
+      "@openenvx/studio": ["../studio/src/index.ts"],
+      "@openenvx/studio/shell": ["../studio/src/shell/index.ts"],
+      "@openenvx/studio/react": ["../studio/src/react/workbench-context.tsx"],
+      "@openenvx/studio/internal": ["../studio/src/workbench-barrel.ts"],
+      "#/*": ["./src/*"]
+    }
+  }
+}

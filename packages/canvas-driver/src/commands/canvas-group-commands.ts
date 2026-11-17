@@ -1,7 +1,8 @@
-import { Command, localize, getChildNodes } from '@openenvx/studio';
+import { getChildNodes, requireDocumentStore } from '@openenvx/editor';
+import type { DocumentNode } from '@openenvx/editor/schema';
+import { artboardRulesLayout } from '@openenvx/editor/schema';
+import { Command, localize } from '@openenvx/studio';
 import type { CommandContext } from '@openenvx/studio';
-import type { DocumentNode } from '@openenvx/studio/schema';
-import { artboardRulesLayout } from '@openenvx/studio/schema';
 
 import { CanvasGroupLayer } from '../layers/canvas-group-layer';
 import {
@@ -23,8 +24,8 @@ function applyPageLayers(
     primaryNodeId: string | null;
   }
 ): void {
-  const page = ctx.scene.getActiveArtboard();
-  ctx.scene.apply({
+  const page = requireDocumentStore(ctx).getActiveArtboard();
+  requireDocumentStore(ctx).apply({
     apply: (scene) => ({
       ...scene,
       artboards: scene.artboards.map((p) =>
@@ -35,7 +36,7 @@ function applyPageLayers(
       defaultValue: 'Group layers',
     }),
   });
-  ctx.scene.setSession({
+  requireDocumentStore(ctx).setSession({
     activeArtboardId: page.id,
     ...selection,
   });
@@ -45,12 +46,12 @@ export class InsertCanvasGroupCommand extends Command {
   readonly id = 'canvas.insertGroup';
 
   canExecute(ctx: CommandContext): boolean {
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     return artboardRulesLayout(page) === 'absolute';
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const layer = new CanvasGroupLayer().createDefault(
       createNodeId('group'),
       page
@@ -66,8 +67,8 @@ export class GroupSelectionCommand extends Command {
   readonly id = 'canvas.groupSelection';
 
   canExecute(ctx: CommandContext): boolean {
-    const page = ctx.scene.getActiveArtboard();
-    const { selectedNodeIds } = ctx.selection;
+    const page = requireDocumentStore(ctx).getActiveArtboard();
+    const { selectedNodeIds } = requireDocumentStore(ctx).getSession();
     return (
       artboardRulesLayout(page) === 'absolute' &&
       selectedNodeIds.length >= 2 &&
@@ -76,8 +77,8 @@ export class GroupSelectionCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActiveArtboard();
-    const { selectedNodeIds } = ctx.selection;
+    const page = requireDocumentStore(ctx).getActiveArtboard();
+    const { selectedNodeIds } = requireDocumentStore(ctx).getSession();
     const groupId = createNodeId('group');
     const nextLayers = groupRootLayers(
       page.nodes,
@@ -96,14 +97,14 @@ export class UngroupSelectionCommand extends Command {
   readonly id = 'canvas.ungroup';
 
   canExecute(ctx: CommandContext): boolean {
-    const page = ctx.scene.getActiveArtboard();
-    const { selectedNodeIds } = ctx.selection;
+    const page = requireDocumentStore(ctx).getActiveArtboard();
+    const { selectedNodeIds } = requireDocumentStore(ctx).getSession();
     return findSelectedRootGroup(page.nodes, selectedNodeIds) !== null;
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActiveArtboard();
-    const { selectedNodeIds } = ctx.selection;
+    const page = requireDocumentStore(ctx).getActiveArtboard();
+    const { selectedNodeIds } = requireDocumentStore(ctx).getSession();
     const group = findSelectedRootGroup(page.nodes, selectedNodeIds);
     if (!group) {
       return;

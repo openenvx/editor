@@ -1,4 +1,4 @@
-import { defaultCanvasWorkbench } from '@openenvx/canvas-driver';
+import { createDefaultCanvasWorkbench } from '@openenvx/canvas-driver';
 import { WorkbenchShell } from '@openenvx/studio/shell';
 import { useMemo } from 'react';
 
@@ -7,27 +7,31 @@ import { createVariableTemplateDemoScene } from './create-variable-template-demo
 
 import '@openenvx/canvas-driver/fonts.css';
 import '@openenvx/canvas-driver/theme.css';
-import '@openenvx/studio/theme.css';
+import '@openenvx/studio/styles.css';
 
 export function App() {
-  const initialScene = useMemo(() => createVariableTemplateDemoScene(), []);
-  const plugins = useMemo(
-    () => [...defaultCanvasWorkbench.plugins, canvasPackageDemoExportPlugin],
+  const workbench = useMemo(
+    () =>
+      createDefaultCanvasWorkbench({
+        document: createVariableTemplateDemoScene(),
+        editorTitle: 'Artboard',
+        editorUri: 'openenvx://canvas/editor',
+      }),
     []
+  );
+  const plugins = useMemo(
+    () => [...workbench.plugins, canvasPackageDemoExportPlugin],
+    [workbench.plugins]
   );
 
   return (
     <div className="canvas-package-demo">
       <WorkbenchShell
         className="canvas-package-demo-editor openenvx-canvas-editor"
-        createPropertyHostContext={
-          defaultCanvasWorkbench.createPropertyHostContext
-        }
-        editorTitle="Artboard"
-        editorUri="openenvx://canvas/editor"
-        initialScene={initialScene}
-        layout={defaultCanvasWorkbench.layout}
+        createPropertyHostContext={workbench.createPropertyHostContext}
+        layout={workbench.layout}
         plugins={plugins}
+        sliceBuilders={workbench.sliceBuilders}
         theme="dark"
       />
       <style>{`

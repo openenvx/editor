@@ -1,4 +1,4 @@
-import type { Document } from '@openenvx/studio/schema';
+import type { Document } from '@openenvx/editor/schema';
 import { useMemo } from 'react';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
