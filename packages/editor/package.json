@@ -87,7 +87,7 @@
   "dependencies": {
     "@openenvx/studio": "workspace:*",
     "@tabler/icons-react": "^3.44.0",
-    "@tiptap/core": "^3.27.3",
+    "@tiptap/core": "^3.34.0",
     "@tiptap/pm": "^3.27.3",
     "@tiptap/react": "^3.27.3",
     "clsx": "2.1.1",
