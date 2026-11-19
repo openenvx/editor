@@ -19,7 +19,7 @@ const sourcemap = process.env.STUDIO_SOURCEMAP === '1';
 const shellExternals = [
   '@openenvx/studio',
   '@openenvx/studio/shell',
-  '@openenvx/studio/schema',
+  '@openenvx/editor/schema',
   '@openenvx/studio/preview',
   '@openenvx/studio/react',
   '@openenvx/editor-sandbox',

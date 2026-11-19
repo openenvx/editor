@@ -1,4 +1,4 @@
-import type { Document } from '@openenvx/studio/schema';
+import type { Document } from '@openenvx/editor/schema';
 
 import type {
   CanvasDocumentExportService,

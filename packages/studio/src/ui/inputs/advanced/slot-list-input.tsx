@@ -1,6 +1,6 @@
 import { IconTrash } from '@tabler/icons-react';
 
-import type { DocumentNode, SlotListFieldConfig } from '#studio';
+import type { SlotListFieldConfig } from '#studio';
 
 import { IconButton } from '../../primitives/icon-button';
 import { PropertyFieldRow } from '../../primitives/property-field-row';
@@ -11,6 +11,12 @@ import {
 } from '../../primitives/property-list';
 import type { PropertyFieldRendererProps } from '../../renderers/property-field-types';
 import { getFieldId } from '../../renderers/property-field-types';
+
+interface DocumentNode {
+  id: string;
+  type: string;
+  [key: string]: unknown;
+}
 
 export interface SlotListInputProps {
   fieldKey: string;

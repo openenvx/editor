@@ -1,9 +1,20 @@
 import {
-  Command,
+  requireDocumentStore,
   canInsertLayers,
   InMemoryAssetService,
-  localize,
   AssetServiceId,
+} from '@openenvx/editor';
+import type { DocumentNode } from '@openenvx/editor';
+import {
+  applyNodeTransform,
+  artboardRulesLayout,
+  createDefaultFrame,
+  normalizeDocument,
+  withArtboardRulesLayout,
+} from '@openenvx/editor/schema';
+import {
+  Command,
+  localize,
   FontServiceId,
   Plugin,
   SimpleServiceContribution,
@@ -11,17 +22,9 @@ import {
 } from '@openenvx/studio';
 import type {
   CommandContext,
-  DocumentNode,
   PluginContext,
   WorkbenchPluginContext,
 } from '@openenvx/studio';
-import {
-  applyNodeTransform,
-  artboardRulesLayout,
-  createDefaultFrame,
-  normalizeDocument,
-  withArtboardRulesLayout,
-} from '@openenvx/studio/schema';
 
 import { AbsolutePageRules } from '../absolute-page-rules';
 import {
@@ -144,8 +147,8 @@ function createNodeId(type: string): string {
 }
 
 function insertCanvasLayer(ctx: CommandContext, layer: DocumentNode): void {
-  const page = ctx.scene.getActiveArtboard();
-  ctx.scene.apply({
+  const page = requireDocumentStore(ctx).getActiveArtboard();
+  requireDocumentStore(ctx).apply({
     apply: (scene) => ({
       ...scene,
       artboards: scene.artboards.map((p) =>
@@ -156,7 +159,7 @@ function insertCanvasLayer(ctx: CommandContext, layer: DocumentNode): void {
       defaultValue: 'Insert layer',
     }),
   });
-  ctx.scene.setSession({
+  requireDocumentStore(ctx).setSession({
     activeArtboardId: page.id,
     primaryNodeId: layer.id,
     selectedNodeIds: [layer.id],
@@ -164,10 +167,10 @@ function insertCanvasLayer(ctx: CommandContext, layer: DocumentNode): void {
 }
 
 function canInsertOnActivePage(ctx: CommandContext): boolean {
-  const scene = ctx.scene.getDocument();
+  const scene = requireDocumentStore(ctx).getDocument();
   return (
-    artboardRulesLayout(ctx.scene.getActiveArtboard()) === 'absolute' &&
-    canInsertLayers(scene)
+    artboardRulesLayout(requireDocumentStore(ctx).getActiveArtboard()) ===
+      'absolute' && canInsertLayers(scene)
   );
 }
 
@@ -179,7 +182,7 @@ export class InsertCanvasTextCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const layer = new CanvasTextLayer().createDefault(
       createNodeId('text'),
       page
@@ -196,7 +199,7 @@ export class InsertOpenEnvxWidgetCommand extends Command {
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const layer = new OpenEnvxWidgetLayer().createDefault(
       createNodeId('widget'),
       page
@@ -229,7 +232,7 @@ export class InsertCanvasImageCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const layer = new CanvasImageLayer().createDefault(
       createNodeId('image'),
       page
@@ -246,7 +249,7 @@ export class InsertCanvasSvgCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const layer = new CanvasSvgLayer().createDefault(createNodeId('svg'), page);
     insertCanvasLayer(ctx, layer);
   }
@@ -260,7 +263,7 @@ export class InsertCanvasQrCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const layer = new CanvasQrLayer().createDefault(createNodeId('qr'), page);
     insertCanvasLayer(ctx, layer);
   }
@@ -274,7 +277,7 @@ export class InsertCanvasRectCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const layer = new CanvasRectLayer().createDefault(
       createNodeId('rect'),
       page
@@ -291,7 +294,7 @@ export class InsertCanvasCircleCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const layer = new CanvasCircleLayer().createDefault(
       createNodeId('circle'),
       page
@@ -335,7 +338,7 @@ export class UploadAssetCommand extends Command {
           return;
         }
         const assetRef = await assets.upload!(file);
-        const page = ctx.scene.getActiveArtboard();
+        const page = requireDocumentStore(ctx).getActiveArtboard();
         const layer = new CanvasImageLayer().createDefault(
           createNodeId('image'),
           page

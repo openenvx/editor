@@ -1,10 +1,11 @@
+import type { Document, Transform } from '@openenvx/editor/schema';
 import type {
   PropertyPathContextOptions,
   WorkbenchApi,
 } from '@openenvx/studio';
-import type { Transform } from '@openenvx/studio/schema';
 
 import { resolveTextBoxFitPropertyUpdate } from '../fit-text-layer-to-content';
+import { updatePropertyViaApi } from '../workbench-document-api';
 import { createCanvasPropertyHostContext } from './canvas-property-path-context';
 import type { CanvasPropertyPathContextOptions } from './canvas-property-path-context';
 
@@ -19,13 +20,13 @@ export function createCanvasPropertyHostContextWithApi(
 ): ReturnType<typeof createCanvasPropertyHostContext> {
   const updateProperty = (layerId: string, key: string, value: unknown) => {
     const fit = resolveTextBoxFitPropertyUpdate(
-      options.scene,
+      options.scene as Document,
       layerId,
       key,
       value
     );
     if (!fit) {
-      options.updateProperty(layerId, key, value);
+      updatePropertyViaApi(helpers.api, layerId, key, value);
       return;
     }
 

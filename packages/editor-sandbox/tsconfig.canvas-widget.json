@@ -4,7 +4,10 @@
   "exclude": ["src/canvas-widget/**/*.test.ts"],
   "compilerOptions": {
     "strictNullChecks": true,
+    "jsx": "react-jsx",
     "paths": {
+      "@openenvx/editor/host-surface": ["../editor/src/host-surface.ts"],
+      "@openenvx/editor/schema": ["../editor/src/schema/index.ts"],
       "@openenvx/studio": ["../studio/src/index.ts"],
       "@openenvx/studio/shell": ["../studio/src/shell/index.ts"],
       "@openenvx/studio/schema": ["../studio/src/schema/index.ts"],

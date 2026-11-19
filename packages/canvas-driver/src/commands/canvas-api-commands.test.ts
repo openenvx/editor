@@ -1,12 +1,7 @@
-import {
-  EditorService,
-  getChildNodes,
-  InstantiationService,
-  DocumentStore,
-  WorkbenchEventService,
-  type CommandContext,
-} from '@openenvx/studio';
-import { createDefaultFrame, nodeTransform } from '@openenvx/studio/schema';
+import type { CommandContext } from '@openenvx/studio';
+import { createCanvasCommandContextFromStore } from '../test/mock-command-context';
+import { getChildNodes, DocumentStore } from '@openenvx/editor';
+import { createDefaultFrame, nodeTransform } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -21,13 +16,7 @@ import {
 } from '../test/canvas-document-fixtures';
 
 function createContext(sceneStore: DocumentStore): CommandContext {
-  return {
-    editor: new EditorService(),
-    events: new WorkbenchEventService(),
-    scene: sceneStore,
-    selection: sceneStore.getSession(),
-    services: new InstantiationService(),
-  };
+  return createCanvasCommandContextFromStore(sceneStore);
 }
 
 describe('UpdateLayerTransformCommand dataPatch', () => {

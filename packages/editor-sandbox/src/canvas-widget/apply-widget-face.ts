@@ -8,7 +8,7 @@ import {
   nodeTransform,
   type DocumentNode,
   type OpenEnvxWidgetProps,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 import { mapWidgetTreeToLayers } from './map-widget-tree-to-layers';
 

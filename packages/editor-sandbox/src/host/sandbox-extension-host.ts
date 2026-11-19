@@ -1,12 +1,12 @@
 import {
-  Command,
   findNodeById,
   updateNodeInTree,
   walkNodes,
-} from '@openenvx/studio';
+} from '@openenvx/editor/host-surface';
+import type { Document, DocumentNode } from '@openenvx/editor/schema';
+import { nodeProps } from '@openenvx/editor/schema';
+import { Command } from '@openenvx/studio';
 import type { WorkbenchApi } from '@openenvx/studio';
-import type { Document, DocumentNode } from '@openenvx/studio/schema';
-import { nodeProps } from '@openenvx/studio/schema';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 

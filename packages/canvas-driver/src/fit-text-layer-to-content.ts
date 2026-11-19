@@ -1,4 +1,8 @@
-import { findNodeById, mapNodes, MIN_LAYER_SIZE } from '@openenvx/studio';
+import {
+  findNodeById,
+  mapNodes,
+  MIN_LAYER_SIZE,
+} from '@openenvx/editor/host-surface';
 import {
   applyModifications,
   applyNodeTransform,
@@ -7,7 +11,7 @@ import {
   type Modification,
   nodeTransform,
   type Transform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 import {
   isCurvedText,

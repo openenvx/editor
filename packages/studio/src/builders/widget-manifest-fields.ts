@@ -1,6 +1,11 @@
-import type { WidgetFieldDef } from '#studio/schema';
-
 import type { createPropertyBuilder } from './property-builder';
+
+interface WidgetFieldDef {
+  kind: string;
+  label?: string;
+  options?: { value: string; label: string }[];
+  [key: string]: unknown;
+}
 
 type SectionBuilder = ReturnType<
   ReturnType<typeof createPropertyBuilder>['section']
@@ -39,7 +44,7 @@ export function appendWidgetManifestField(
     }
     case 'select': {
       if ('options' in field) {
-        section.select(path, field.options, label);
+        section.select(path, field.options ?? [], label);
       } else {
         section.text(path, label);
       }

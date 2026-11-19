@@ -2,7 +2,7 @@ import {
   applyTemplateVariables,
   applyTemplateVariablesForPreview,
   type Document,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 import type { CanvasExportOptions } from './export/canvas-document-export-service';
 import { fitSceneCanvasTextToContent } from './fit-text-layer-to-content';

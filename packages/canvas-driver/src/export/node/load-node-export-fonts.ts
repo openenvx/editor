@@ -1,7 +1,7 @@
 import { GlobalFonts } from '@napi-rs/canvas';
 import type { FontDescriptor } from '@openenvx/studio';
 
-import { canvasFontService } from '../../fonts/canvas-font-service';
+import { resolveCanvasFont } from '../../fonts/canvas-font-service';
 import {
   buildGoogleFontsCss2Href,
   pickGoogleFontLoadVariants,
@@ -55,7 +55,7 @@ export async function loadNodeExportFonts(families: string[]): Promise<void> {
     if (!family || loadedFamilies.has(family)) {
       continue;
     }
-    const descriptor = canvasFontService.resolve(family);
+    const descriptor = resolveCanvasFont(family);
     if (!descriptor) {
       continue;
     }

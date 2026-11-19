@@ -1,7 +1,12 @@
-import { getNodeChildrenForDocument } from '@openenvx/studio';
-import type { Document, DocumentNode, LayerRegistry } from '@openenvx/studio';
-import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import { nodeProps } from '@openenvx/studio/schema';
+import {
+  getNodeChildrenForDocument,
+  type LayerDefinition,
+  type Document,
+  type DocumentNode,
+} from '@openenvx/editor';
+import type { LayerPreviewDescriptor } from '@openenvx/editor/preview';
+import { nodeProps } from '@openenvx/editor/schema';
+import type { LayerRegistry } from '@openenvx/studio';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
 
@@ -10,7 +15,7 @@ function buildSurfaceItem(
   scene: Document,
   registry: LayerRegistry
 ): CanvasLayerSurfaceItem {
-  const def = registry.get(layer.type);
+  const def = registry.get(layer.type) as LayerDefinition | undefined;
   const previewCtx = {
     isSelected: false,
     layerId: layer.id,

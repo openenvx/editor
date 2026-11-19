@@ -53,7 +53,8 @@
         "build-dts.ts",
       ],
       "ignoreIssues": {
-        "src/page-presets.ts": ["duplicates"]
+        "src/page-presets.ts": ["duplicates"],
+        "src/workbench-document-api.ts": ["exports"]
       }
     },
     "packages/editor-sandbox": {
@@ -95,26 +96,52 @@
         "!src/**/*.test.ts"
       ]
     },
+    "packages/editor": {
+      "ignoreDependencies": [
+        "clsx",
+        "i18next",
+        "react-i18next",
+        "@testing-library/react"
+      ],
+      "entry": [
+        "src/index.ts!",
+        "src/schema/index.ts!",
+        "src/preview/index.ts!",
+        "src/chrome/index.ts!",
+        "src/create-editor-plugins.ts!",
+        "src/test/document-fixtures.ts!",
+        "src/workbench/workbench-document-ops.ts!",
+        "src/host-surface.ts!"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "!src/**/*.test.ts",
+        "!src/**/*.test.tsx"
+      ],
+      "ignoreIssues": {
+        "src/scene/layer-editability.ts": ["duplicates"],
+        "src/scene/page-ops.ts": ["duplicates"],
+        "src/scene/types.ts": ["types"],
+        "src/services/types.ts": ["types"]
+      }
+    },
     "packages/studio": {
       "entry": [
         "src/index.ts!",
-        "src/index.ts!",
         "src/shell/index.ts!",
-        "src/schema/index.ts!",
-        "src/preview/index.ts!",
         "src/react/workbench-context.tsx!",
-        "src/plugins/scene-plugin.ts!",
         "src/workbench-barrel.ts!",
         "rolldown.shell.config.ts!",
         "rolldown.core.publish.config.ts!",
-        "rolldown.variables-plugin.config.ts!",
-        "src/plugins/variables/index.ts!",
-        "src/plugins/variables/tiptap/index.ts!",
         "css-modules-plugin.ts!",
         "build-dts.ts!",
         "smoke-next-consumer.ts!",
         "assert-publish-bundle.ts!",
-        "rolldown-react-esm-externals.ts!"
+        "rolldown-react-esm-externals.ts!",
+        "src/test/create-workbench-with-editor.ts!",
+        "src/test/studio-boundary.test.ts!",
+        "src/ui/renderers/view-panel-renderer.test.tsx!",
+        "src/workbench/workbench-controller.test.ts!"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
@@ -122,7 +149,6 @@
         "!src/**/*.test.tsx",
         "rolldown.shell.config.ts",
         "rolldown.core.publish.config.ts",
-        "rolldown.variables-plugin.config.ts",
         "css-modules-plugin.ts",
         "build-dts.ts",
         "smoke-next-consumer.ts",
@@ -131,22 +157,23 @@
       ],
       "ignoreDependencies": [
         "zod",
-        "tailwindcss"
+        "tailwindcss",
+        "@tiptap/core",
+        "@tiptap/pm",
+        "@tiptap/react",
+        "uqr"
       ],
       "ignoreIssues": {
-        "src/schema/**": ["duplicates", "exports"],
-        "src/scene/**": ["duplicates"],
-        "src/scene/layer-tree.ts": ["exports"],
-        "src/scene/scene-store.ts": ["types"],
-        "src/scene/types.ts": ["types"],
-        "src/schema/types.ts": ["types"]
+        "src/backbone.ts": ["exports", "types"],
+        "src/runtime/workbench-runtime.ts": ["exports", "duplicates"]
       },
       "ignore": [
         "src/ui/primitives/combobox.tsx",
         "src/plugins/version-history/**",
         "src/layout/editor-layout-styles.ts",
         "src/layout/local-storage-workbench-layout-store.ts",
-        "src/ui/primitives/confirm-dialog.tsx"
+        "src/ui/primitives/confirm-dialog.tsx",
+        "src/plugins/index.ts"
       ]
     },
     "apps/demo-playground": {

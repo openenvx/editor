@@ -1,5 +1,3 @@
-import type { CommandContext } from '../backbone';
-import { createContributionBuildContext } from '../backbone';
 import {
   createMenuBuilder,
   filterMenuByCanExecute,
@@ -12,7 +10,9 @@ import type {
   TreeDataProvider,
   ViewContainerLocation,
 } from '../contributions/view-contribution';
+import { createContributionBuildContext } from '../i18n/localize';
 import type { ViewProviderRegistry } from '../registries/view-provider-registry';
+import type { CommandContext } from '../runtime/types';
 import type { ViewLocationService } from '../workbench/view-location-service';
 import type {
   ViewContainerDescriptor,

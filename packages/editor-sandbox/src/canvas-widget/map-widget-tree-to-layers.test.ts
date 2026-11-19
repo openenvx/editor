@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyNodeTransform, defaultTransform } from '@openenvx/studio/schema';
+import { applyNodeTransform, defaultTransform } from '@openenvx/editor/schema';
 
 import { mapWidgetTreeToLayers } from './map-widget-tree-to-layers';
 import { readLayoutIntent, resolveAutoLayout } from './resolve-auto-layout';

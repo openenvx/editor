@@ -1,8 +1,8 @@
-import type { Artboard } from '@openenvx/studio/schema';
+import type { Artboard } from '@openenvx/editor/schema';
 import {
   computeArtboardPrintBoxes,
   isPrintEligibleArtboard,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 import type { CanvasRect } from './stage/canvas-stage-interaction';
 

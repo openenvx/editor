@@ -1,6 +1,6 @@
-import { findNodeById } from '@openenvx/studio';
-import type { Document, Transform } from '@openenvx/studio/schema';
-import { nodeTransform } from '@openenvx/studio/schema';
+import { findNodeById } from '@openenvx/editor';
+import type { Document, Transform } from '@openenvx/editor/schema';
+import { nodeTransform } from '@openenvx/editor/schema';
 
 import { prepareCanvasSceneForRender } from './prepare-canvas-scene-for-render';
 

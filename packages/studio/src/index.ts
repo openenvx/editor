@@ -1,4 +1,3 @@
-export { DocumentValidationError } from './scene/scene-validation-error';
 export {
   escapeAttr,
   escapeHtml,
@@ -9,15 +8,9 @@ export { ContributionPoint } from './runtime/contribution-point';
 export { Contribution } from './runtime/contribution';
 export { Plugin } from './runtime/plugin';
 export { PluginManager, type PluginContext } from './runtime/plugin-manager';
-export { EditorRuntime } from './runtime/editor-runtime';
+export { EditorRuntime, WorkbenchRuntime } from './runtime/editor-runtime';
 
 export { Command } from './contributions/command';
-export { LayerDefinition } from './contributions/layer-definition';
-export { NodeCompilerContribution } from './contributions/node-compiler-contribution';
-export { NodeDefinition } from './contributions/node-definition';
-export { NodeInspectorContribution } from './contributions/node-inspector-contribution';
-export { NodeTreeContribution } from './contributions/node-tree-contribution';
-export { PageRulesContribution } from './contributions/page-rules-contribution';
 export { ShortcutContribution } from './contributions/shortcut-contribution';
 export { ContextKeyContribution } from './contributions/context-key-contribution';
 export {
@@ -25,96 +18,6 @@ export {
   SimpleServiceContribution,
   SingletonServiceContribution,
 } from './contributions/service-contribution';
-
-export {
-  DocumentStore,
-  DEFAULT_ARTBOARD_RULES_LAYOUT_KEY,
-  moveNodeToIndex,
-  reorderNodes,
-  type PageRulesLookup,
-} from './scene/document-store';
-export { HistoryStack } from './scene/history-stack';
-export type {
-  Artboard,
-  Document,
-  DocumentNode,
-  DocumentTransaction,
-  EditorPaneKind,
-  EditorSession,
-  EditorSurfaceKind,
-  Frame,
-  LiveProjectSnapshot,
-  Transform,
-} from './scene/types';
-export {
-  cloneDocument,
-  cloneEditorSession,
-  getActiveArtboard,
-  getPrimaryNode,
-  resolveEditorSurfaceKind,
-  resolveEditorPaneKind,
-} from './scene/types';
-export {
-  applyFrozenLayerPolicy,
-  buildFrozenLayerSnapshot,
-  canDeleteLayer,
-  canDuplicateLayer,
-  canEditLayerData,
-  canInsertLayers,
-  canReorderLayer,
-  canResizePage,
-  canSelectLayer,
-  canTransformLayer,
-  getLayerWriteMode,
-  isLayerEditable,
-  isLayerLocked,
-  isLayerShownInLayers,
-  isLayerVisible,
-  isLayerWritable,
-  isLayoutRootLayer,
-  isTemplatePolicyEnforced,
-  setTemplatePolicyEnforced,
-  withFrozenLayerSnapshots,
-} from './scene/layer-editability';
-export { clampTransformSize, MIN_LAYER_SIZE } from './scene/transform-utils';
-export {
-  CANVAS_INSTANCE_LAYER_TYPE,
-  getInstanceComponentId,
-  getNodeChildrenForDocument,
-  isCanvasInstanceNode,
-  resolveInstanceDefinitionNodes,
-} from './scene/expand-instances';
-export {
-  CONTAINER_LAYER_TYPE,
-  type ContainerLayoutModel,
-  cloneNodeTree,
-  createNodeId,
-  findNodeById,
-  findNodeArtboard,
-  findNodeLocation,
-  getNodeAncestorIds,
-  getContainerChildren,
-  getChildNodes,
-  hasChildNodes,
-  insertNodeIntoContainer,
-  isContainerNode,
-  isNodeDescendant,
-  mapNodeChildren,
-  mapNodes,
-  moveNodeInTree,
-  moveNodeRelativeToTarget,
-  nodeExistsOnArtboard,
-  removeNodeFromTree,
-  updateNodeByIdInDocument,
-  updateNodeInTree,
-  walkNodes,
-} from './scene/layer-tree';
-export {
-  createBlankPageLike,
-  createPageId,
-  duplicatePageModel,
-  movePageRelativeToTarget,
-} from './scene/page-ops';
 
 export { CommandService } from './runtime/command-service';
 export type { CommandExecutionResult } from './runtime/command-result';
@@ -185,13 +88,6 @@ export {
   type ShadowValue,
 } from './builders/property-builder';
 export { appendWidgetManifestField } from './builders/widget-manifest-fields';
-export {
-  OpenEnvxWidgetLayer,
-  WIDGET_LAYER_TYPE,
-  openenvxWidgetSchema,
-  type OpenEnvxWidgetModel,
-} from './layers/openenvx-widget-layer';
-export { type LayerPreviewContext } from './contributions/layer-preview-context';
 
 export { I18nContribution } from './i18n/i18n-contribution';
 export { I18nBundleRegistry } from './i18n/i18n-bundle-registry';
@@ -207,9 +103,9 @@ export {
   createContributionBuildContext,
   type ContributionBuildContext,
 } from './i18n/localize';
+export { localizeWorkbench } from './i18n/localize-workbench';
 
 export { CoreI18nPlugin } from './plugins/core-i18n-plugin';
-export { ScenePlugin } from './plugins/scene-plugin';
 export {
   Registries,
   LayerRegistry,
@@ -221,7 +117,6 @@ export {
   ContextKeyService,
   createContextKeyService,
 } from './workbench/context-key-service';
-export { EditorService, type EditorInput } from './workbench/editor-service';
 export type { EditorViewportApi } from './workbench/editor-viewport-api';
 export {
   EditorHostKeys,
@@ -239,15 +134,6 @@ export {
   IconRegistryImpl,
   type IconRegistry,
 } from './workbench/icon-registry-service';
-export { DocumentHostServiceId } from './workbench/document-host-service-id';
-export {
-  MutableDocumentHostService,
-  type DocumentHostService,
-  type DocumentHostBindings,
-  type DocumentHostConfiguration,
-} from './workbench/document-host-service';
-export { DocumentOperationsServiceId } from './workbench/document-operations-service-id';
-export { type DocumentOperationsService } from './workbench/document-operations-service';
 
 export {
   type MenuChoice,
@@ -267,23 +153,11 @@ export {
 export { WORKBENCH_THEME_SETTINGS_MENU_ITEM } from './menu/workbench-settings-menu-items';
 
 export {
-  AssetServiceId,
   ContextKeyServiceId,
   EditorDiagnosticsServiceId,
-  EditorServiceId,
   FontServiceId,
   LayerRegistryServiceId,
-  PersistenceServiceId,
-  DocumentStoreServiceId,
 } from './tokens';
-export { InMemoryAssetService } from './services/asset-service';
-export { collectAssetRefs } from './services/collect-asset-refs';
-export { InMemoryPersistenceService } from './services/in-memory-persistence-service';
-export { LocalStoragePersistenceService } from './services/local-storage-persistence-service';
-export type {
-  AssetService,
-  FontDescriptor,
-  FontService,
-  PersistenceService,
-} from './services/types';
+export type { FontDescriptor, FontService } from './services/font-service-id';
+
 export * from './headless-exports';

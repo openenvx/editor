@@ -10,7 +10,10 @@ Hub: [Architecture.md](../../Architecture.md) · How pieces connect: [overview.m
 extensions (protocol subpath)
         │
         ▼
-@openenvx/studio  (headless: schema + preview + runtime + workbench controller)
+@openenvx/editor  (document, scene, schema, preview, default editor plugins)
+        │
+        ▼
+@openenvx/studio  (workbench controller, contributions, react context)
         │
         ├── canvas / agent
         ▼
@@ -21,7 +24,7 @@ extensions (protocol subpath)
 
 Hard rules:
 
-- **Canvas never imports `@openenvx/studio/shell`.** Drivers use `@openenvx/studio` + `./schema` / `./preview` / `./react`. `create-canvas-sandbox-extension-host.ts` wires canvas into sandbox (optional; needs `@openenvx/editor-sandbox`; not on the main barrel — avoids a package cycle with `editor-sandbox`).
+- **Canvas never imports `@openenvx/studio/shell`.** Drivers use `@openenvx/studio`, `@openenvx/editor` (+ `./schema` / `./preview` where needed), and `./react`. `create-canvas-sandbox-extension-host.ts` wires canvas into sandbox (optional; needs `@openenvx/editor-sandbox`; not on the main barrel — avoids a package cycle with `editor-sandbox`).
 - **Hosts prefer `@openenvx/studio` + `defaultCanvasWorkbench`**, not a hand-wired private stack (unless custom shell - see `apps/demo-playground`).
 - **Untrusted code** never loads in the editor main world - protocol trees + sandbox Worker only.
 
@@ -32,13 +35,14 @@ Hard rules:
 | Canvas product host | `@openenvx/studio/shell` + `@openenvx/canvas-driver` (`defaultCanvasWorkbench`) or `@openenvx/studio/internal` (monorepo HMR) |
 | Custom shell / playground | `@openenvx/studio` + `@openenvx/studio/shell` + `@openenvx/canvas-driver` |
 | Sandbox widget / plugin author | `@openenvx/editor-sandbox` |
-| Scene / preview / Render IR | `@openenvx/studio/schema`, `@openenvx/studio/preview` |
+| Scene / preview / Render IR | `@openenvx/editor/schema`, `@openenvx/editor/preview` |
 
 ## Package catalog
 
 | Package | Publish | Owns | Entry points |
 | --- | --- | --- | --- |
-| `@openenvx/studio` | yes | Headless runtime + shell | `.`, `./shell`, `./theme.css`, `./schema`, `./preview`, `./react` |
+| `@openenvx/editor` | workspace | Document store, scene plugins, schema, preview | `.`, `./schema`, `./preview`, `./plugins/variables`, … |
+| `@openenvx/studio` | yes | Workbench runtime + shell | `.`, `./shell`, `./theme.css`, `./react` |
 | `@openenvx/canvas-driver` | yes | Konva engine + published `.` preset surface | `.`, `./theme.css`, `./fonts.css` |
 | `@openenvx/editor-sandbox` | yes | Author SDK | `.`, `./protocol`, `./host`, … |
 | `@openenvx/studio/plugins/variables` | workspace | Variables plugin | `.`, `./tiptap` |
@@ -48,7 +52,9 @@ Hard rules:
 
 ### Published
 
-**`@openenvx/studio`** - `.`: plugin host, scene store, workbench controller, contributions. `./shell`: `WorkbenchShell` + shell CSS (`./shell.css`, `./styles.css`). `./theme.css` is the Synara token set scoped to `[data-owb-theme]` (see [packages/studio/Design.md](../../packages/studio/Design.md)). `./schema`, `./preview`, `./react`: document model, Render IR, React workbench context. `./internal` (workspace only): full shell barrel for monorepo plugins. No artboard plugins on `.` or `./shell`. **npm `dist/`** is built with [Rolldown](https://rolldown.rs/): browser-bundled ESM with third-party deps inlined; integrators do not mirror Studio’s `dependencies` in the host app. Shell CSS modules may use Tailwind `@apply`; the publish build compiles that to plain CSS, so hosts do not install Tailwind.
+**`@openenvx/editor`** - document model (`./schema`), `DocumentStore`, default scene/editor plugins (`createEditorPlugins`), preview IR (`./preview`). Consumed by `@openenvx/studio` and drivers; not a separate npm release yet (workspace `src/` exports).
+
+**`@openenvx/studio`** - `.`: plugin host, workbench controller, contributions (document paths delegate to `@openenvx/editor`). `./shell`: `WorkbenchShell` + shell CSS (`./shell.css`, `./styles.css`). `./theme.css` is the Synara token set scoped to `[data-owb-theme]` (see [packages/studio/Design.md](../../packages/studio/Design.md)). `./react`: React workbench context. `./internal` (workspace only): full shell barrel for monorepo plugins. No artboard plugins on `.` or `./shell`. **npm `dist/`** is built with [Rolldown](https://rolldown.rs/): browser-bundled ESM with third-party deps inlined; integrators do not mirror Studio’s `dependencies` in the host app. Shell CSS modules may use Tailwind `@apply`; the publish build compiles that to plain CSS, so hosts do not install Tailwind.
 
 **`@openenvx/canvas-driver`** - npm `.` + `./theme.css` + `./fonts.css` (artboard editor surface; not the workbench shell). Published `.` bundles engine deps; peers: `@openenvx/studio`, `react`, `react-dom`. Workspace `.` (`src/index.ts`) is the full engine API; Node PDF uses `exportCanvasDocumentNode`. Hosts also import `@openenvx/studio/theme.css`.
 

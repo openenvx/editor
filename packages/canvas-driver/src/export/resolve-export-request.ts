@@ -1,5 +1,5 @@
-import { resolveArtboardBackground } from '@openenvx/studio/schema';
-import type { Artboard, Document } from '@openenvx/studio/schema';
+import { resolveArtboardBackground } from '@openenvx/editor/schema';
+import type { Artboard, Document } from '@openenvx/editor/schema';
 
 import type {
   CanvasExportFormat,

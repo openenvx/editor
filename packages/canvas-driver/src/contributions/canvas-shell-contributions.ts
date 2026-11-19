@@ -1,5 +1,6 @@
+import { requireDocumentStore, findNodeById } from '@openenvx/editor';
+import { formatVariableToken, nodeTransform } from '@openenvx/editor/schema';
 import {
-  findNodeById,
   StatusBarContribution,
   ToolbarContribution,
   type ShellDropdownMenuItemDescriptor,
@@ -7,7 +8,6 @@ import {
   type ToolbarBuilder,
   type CommandContext,
 } from '@openenvx/studio';
-import { formatVariableToken, nodeTransform } from '@openenvx/studio/schema';
 
 import { CANVAS_GRID_SIZE_PRESETS } from '../commands/canvas-grid-commands';
 
@@ -35,8 +35,9 @@ export class CanvasStatusBarContribution extends StatusBarContribution {
       priority: -10,
     });
 
-    const scene = ctx.scene.getDocument();
-    const { selectedNodeIds, primaryNodeId } = ctx.selection;
+    const scene = requireDocumentStore(ctx).getDocument();
+    const { selectedNodeIds, primaryNodeId } =
+      requireDocumentStore(ctx).getSession();
     if (selectedNodeIds.length !== 1 || !primaryNodeId) {
       return;
     }
@@ -63,7 +64,7 @@ export class CanvasStatusBarContribution extends StatusBarContribution {
 
 export class CanvasToolbarContribution extends ToolbarContribution {
   contribute(builder: ToolbarBuilder, ctx: CommandContext): void {
-    const variables = ctx.scene.getDocument().variables ?? [];
+    const variables = requireDocumentStore(ctx).getDocument().variables ?? [];
 
     builder
       .placement('bottom-center')

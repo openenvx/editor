@@ -2,26 +2,30 @@
 
 import {
   createCanvasScene,
-  defaultCanvasWorkbench,
+  createDefaultCanvasWorkbench,
 } from '@openenvx/canvas-driver';
 import { WorkbenchShell } from '@openenvx/studio/shell';
 import { useMemo } from 'react';
 
 export function CanvasNextDemoEditor() {
-  const initialScene = useMemo(() => createCanvasScene(), []);
+  const workbench = useMemo(
+    () =>
+      createDefaultCanvasWorkbench({
+        document: createCanvasScene(),
+        editorTitle: 'Artboard',
+        editorUri: 'openenvx://canvas/next-demo',
+      }),
+    []
+  );
 
   return (
     <div className="canvas-next-demo">
       <WorkbenchShell
         className="canvas-next-demo-editor openenvx-canvas-editor"
-        createPropertyHostContext={
-          defaultCanvasWorkbench.createPropertyHostContext
-        }
-        editorTitle="Artboard"
-        editorUri="openenvx://canvas/next-demo"
-        initialScene={initialScene}
-        layout={defaultCanvasWorkbench.layout}
-        plugins={defaultCanvasWorkbench.plugins}
+        createPropertyHostContext={workbench.createPropertyHostContext}
+        layout={workbench.layout}
+        plugins={workbench.plugins}
+        sliceBuilders={workbench.sliceBuilders}
         theme="dark"
       />
       <style>{`

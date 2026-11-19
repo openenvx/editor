@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   canvasFontService,
+  resolveCanvasFont,
   resetCanvasFontServiceForTests,
 } from './canvas-font-service';
 
@@ -24,10 +25,8 @@ describe('canvasFontService', () => {
 
   it('resolves family stacks and bare ids', () => {
     resetCanvasFontServiceForTests();
-    expect(canvasFontService.resolve('Roboto, sans-serif')?.id).toBe('Roboto');
-    expect(canvasFontService.resolve('"Open Sans", sans-serif')?.id).toBe(
-      'Open Sans'
-    );
+    expect(resolveCanvasFont('Roboto, sans-serif')?.id).toBe('Roboto');
+    expect(resolveCanvasFont('"Open Sans", sans-serif')?.id).toBe('Open Sans');
   });
 
   it('register upserts a custom font', () => {
@@ -37,7 +36,7 @@ describe('canvasFontService', () => {
       id: 'Custom Display',
       src: 'https://example.com/custom.woff2',
     });
-    expect(canvasFontService.resolve('Custom Display, sans-serif')?.id).toBe(
+    expect(resolveCanvasFont('Custom Display, sans-serif')?.id).toBe(
       'Custom Display'
     );
     expect(

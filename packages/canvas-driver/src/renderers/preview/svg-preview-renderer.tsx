@@ -1,4 +1,4 @@
-import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import type { LayerPreviewDescriptor } from '@openenvx/editor/preview';
 import { useMemo } from 'react';
 
 import type { LayerPreviewRendererHostProps } from '../../contributions/layer-preview-renderer-contribution';

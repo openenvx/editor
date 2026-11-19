@@ -2,7 +2,7 @@ import {
   buildSampleVariableValues,
   formatVariableToken,
   nodeTransform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

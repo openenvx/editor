@@ -1,6 +1,6 @@
-import type { DocumentNode as SceneLayer } from '@openenvx/studio';
-import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import { createDefaultFrame } from '@openenvx/studio/schema';
+import type { DocumentNode as SceneLayer } from '@openenvx/editor';
+import type { LayerPreviewDescriptor } from '@openenvx/editor/preview';
+import { createDefaultFrame } from '@openenvx/editor/schema';
 import type Konva from 'konva';
 import { describe, expect, it } from 'vitest';
 

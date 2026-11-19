@@ -1,7 +1,7 @@
 import {
   createVariableTokenExtension,
   type VariableTokenCatalog,
-} from '@openenvx/studio/plugins/variables/tiptap';
+} from '@openenvx/editor/plugins/variables/tiptap';
 import { Color } from '@tiptap/extension-color';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { TextStyle } from '@tiptap/extension-text-style';

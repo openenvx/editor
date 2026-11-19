@@ -1,6 +1,7 @@
-import { getActiveArtboard, localize } from '@openenvx/studio';
-import type { CommandContext, Document } from '@openenvx/studio';
-import { artboardRulesLayout } from '@openenvx/studio/schema';
+import { getActiveArtboard, requireDocumentStore } from '@openenvx/editor';
+import type { Document } from '@openenvx/editor/schema';
+import { artboardRulesLayout } from '@openenvx/editor/schema';
+import { localize, type CommandContext } from '@openenvx/studio';
 
 import { resolvePagePreset } from '../page-presets';
 import { resizeAbsolutePage } from './scale-page-content';
@@ -33,12 +34,15 @@ export function applyPagePresetResize(
   ctx: CommandContext,
   presetId: string
 ): boolean {
-  const nextScene = resizeSceneToPagePreset(ctx.scene.getDocument(), presetId);
+  const nextScene = resizeSceneToPagePreset(
+    requireDocumentStore(ctx).getDocument(),
+    presetId
+  );
   if (!nextScene) {
     return false;
   }
 
-  ctx.scene.apply({
+  requireDocumentStore(ctx).apply({
     apply: () => nextScene,
     label: localize(ctx.services, 'canvas.history.resizePage', {
       defaultValue: 'Resize page',
