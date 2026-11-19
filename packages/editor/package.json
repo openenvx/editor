@@ -1,0 +1,121 @@
+{
+  "name": "@openenvx/editor",
+  "version": "0.3.12",
+  "description": "OpenEnvx document model, scene store, and editor plugins",
+  "license": "MPL-2.0",
+  "type": "module",
+  "imports": {
+    "#editor": "./src/index.ts",
+    "#editor/schema": "./src/schema/index.ts",
+    "#editor/preview": "./src/preview/index.ts",
+    "#/*": "./src/*"
+  },
+  "files": [
+    "dist",
+    "scene.schema.json"
+  ],
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./schema": {
+      "development": "./src/schema/index.ts",
+      "types": "./src/schema/index.ts",
+      "import": "./src/schema/index.ts",
+      "default": "./src/schema/index.ts"
+    },
+    "./schema/scene.schema.json": "./scene.schema.json",
+    "./preview": {
+      "development": "./src/preview/index.ts",
+      "types": "./src/preview/index.ts",
+      "import": "./src/preview/index.ts",
+      "default": "./src/preview/index.ts"
+    },
+    "./chrome": {
+      "development": "./src/chrome/index.ts",
+      "types": "./src/chrome/index.ts",
+      "import": "./src/chrome/index.ts",
+      "default": "./src/chrome/index.ts"
+    },
+    "./chrome.css": {
+      "development": "./src/chrome/floating-toolbar.module.css",
+      "import": "./src/chrome/floating-toolbar.module.css",
+      "default": "./src/chrome/floating-toolbar.module.css"
+    },
+    "./plugins/variables": {
+      "development": "./src/plugins/variables/index.ts",
+      "types": "./src/plugins/variables/index.ts",
+      "import": "./src/plugins/variables/index.ts",
+      "default": "./src/plugins/variables/index.ts"
+    },
+    "./plugins/variables/tiptap": {
+      "development": "./src/plugins/variables/tiptap/index.ts",
+      "types": "./src/plugins/variables/tiptap/index.ts",
+      "import": "./src/plugins/variables/tiptap/index.ts",
+      "default": "./src/plugins/variables/tiptap/index.ts"
+    },
+    "./plugins/version-history": "./src/plugins/version-history/index.ts",
+    "./host-surface": {
+      "development": "./src/host-surface.ts",
+      "types": "./src/host-surface.ts",
+      "import": "./src/host-surface.ts",
+      "default": "./src/host-surface.ts"
+    },
+    "./test/document-fixtures": "./src/test/document-fixtures.ts",
+    "./test/mock-command-context": "./src/test/mock-command-context.ts",
+    "./test/create-workbench-with-editor": "./src/test/create-workbench-with-editor.ts"
+  },
+  "scripts": {
+    "build": "node -e \"require('fs').mkdirSync('dist',{recursive:true});require('fs').writeFileSync('dist/.source-only','')\"",
+    "generate:json-schema": "bun run src/schema/generate-json-schema.ts",
+    "test": "vitest run",
+    "check-types": "tsc --noEmit"
+  },
+  "turbo": {
+    "tasks": {
+      "build": {
+        "dependsOn": []
+      }
+    }
+  },
+  "dependencies": {
+    "@openenvx/studio": "workspace:*",
+    "@tabler/icons-react": "^3.52.0",
+    "@tiptap/core": "^3.27.3",
+    "@tiptap/pm": "^3.27.3",
+    "@tiptap/react": "^3.27.3",
+    "clsx": "2.1.1",
+    "i18next": "^26.3.4",
+    "react-i18next": "^17.0.8",
+    "uqr": "^0.1.3",
+    "zod": "4.4.3"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@openenvx/typescript-config": "workspace:*",
+    "@testing-library/react": "16.3.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "jsdom": "29.1.1",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:testing"
+  },
+  "private": true
+}

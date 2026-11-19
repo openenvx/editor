@@ -1,12 +1,12 @@
-import type { DocumentNode, Transform } from '@openenvx/studio';
-import { getChildNodes } from '@openenvx/studio';
+import type { DocumentNode, Transform } from '@openenvx/editor';
+import { getChildNodes } from '@openenvx/editor';
 import {
   applyNodeTransform,
   artboardSpaceSize,
   createDefaultFrame,
   nodeTransform,
-} from '@openenvx/studio/schema';
-import type { Artboard } from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
+import type { Artboard } from '@openenvx/editor/schema';
 
 import {
   CANVAS_GROUP_LAYER_TYPE,

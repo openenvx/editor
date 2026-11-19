@@ -238,30 +238,36 @@ const editorSmokeSource = `'use client';
 
 import {
   createCanvasScene,
-  defaultCanvasWorkbench,
+  createDefaultCanvasWorkbench,
 } from '@openenvx/canvas-driver';
 import { WorkbenchShell } from '@openenvx/studio/shell';
 import '@openenvx/canvas-driver/theme.css';
 import '@openenvx/canvas-driver/fonts.css';
 import '@openenvx/studio/theme.css';
 
+const workbench = createDefaultCanvasWorkbench({
+  document: createCanvasScene(),
+  editorTitle: 'Smoke',
+  editorUri: 'openenvx://smoke',
+});
+
 export function EditorSmoke() {
-  const initialScene = createCanvasScene();
   return (
     <WorkbenchShell
-      createPropertyHostContext={
-        defaultCanvasWorkbench.createPropertyHostContext
-      }
-      editorTitle="Smoke"
-      editorUri="openenvx://smoke"
-      initialScene={initialScene}
-      layout={defaultCanvasWorkbench.layout}
-      plugins={defaultCanvasWorkbench.plugins}
+      createPropertyHostContext={workbench.createPropertyHostContext}
+      layout={workbench.layout}
+      plugins={workbench.plugins}
+      sliceBuilders={workbench.sliceBuilders}
     />
   );
 }
 `;
 
+await runCommand(
+  'bun',
+  ['run', 'build'],
+  path.join(repoRoot, 'packages/editor')
+);
 await runCommand(
   'bun',
   ['run', 'build'],
@@ -273,6 +279,7 @@ await runCommand(
   path.join(repoRoot, 'packages/studio')
 );
 
+const editorTgz = await packPackage('packages/editor');
 const studioTgz = await packPackage('packages/studio');
 const canvasTgz = await packPackage('packages/canvas-driver');
 
@@ -281,6 +288,7 @@ const workDir = await mkdtemp(path.join(tmpdir(), 'openenvx-consumer-smoke-'));
 try {
   const baseDeps = {
     '@openenvx/canvas-driver': `file:${canvasTgz}`,
+    '@openenvx/editor': `file:${editorTgz}`,
     '@openenvx/studio': `file:${studioTgz}`,
     react: '19.2.3',
     'react-dom': '19.2.3',
@@ -303,6 +311,11 @@ try {
         dependencies: {
           ...baseDeps,
           next: '16.3.0',
+        },
+        overrides: {
+          '@openenvx/studio': `file:${studioTgz}`,
+          '@openenvx/editor': `file:${editorTgz}`,
+          '@openenvx/canvas-driver': `file:${canvasTgz}`,
         },
         devDependencies: {
           '@types/node': '22.10.5',

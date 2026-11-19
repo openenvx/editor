@@ -1,7 +1,8 @@
 /** Public npm surface — keep in sync with `apps/canvas-package-demo`. */
 export {
-  DEFAULT_CANVAS_WORKBENCH_PLUGINS,
+  createDefaultCanvasWorkbench,
   defaultCanvasWorkbench,
+  type DefaultCanvasWorkbenchOptions,
 } from './default-canvas-workbench';
 export { downloadBytes } from './export/bytes-to-data-url';
 export {

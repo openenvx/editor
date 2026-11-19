@@ -1,16 +1,16 @@
-import { createPropertyBuilder, LayerDefinition } from '@openenvx/studio';
-import type {
-  CommandContext,
-  DocumentNode,
-  LayerPreviewContext,
-  PropertySectionDescriptor,
-} from '@openenvx/studio';
+import { LayerDefinition } from '@openenvx/editor';
+import type { DocumentNode, LayerPreviewContext } from '@openenvx/editor';
 import {
   createLayerPreviewBuilder,
   encodeQrToSvg,
-} from '@openenvx/studio/preview';
-import type { Artboard } from '@openenvx/studio/schema';
-import { createDefaultFrame } from '@openenvx/studio/schema';
+} from '@openenvx/editor/preview';
+import type { Artboard } from '@openenvx/editor/schema';
+import { createDefaultFrame } from '@openenvx/editor/schema';
+import { createPropertyBuilder } from '@openenvx/studio';
+import type {
+  CommandContext,
+  PropertySectionDescriptor,
+} from '@openenvx/studio';
 import { z } from 'zod';
 
 export const canvasQrSchema = z.object({

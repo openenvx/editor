@@ -1,5 +1,5 @@
-import { clampTransformSize, MIN_LAYER_SIZE } from '@openenvx/studio';
-import type { Transform } from '@openenvx/studio/schema';
+import { clampTransformSize, MIN_LAYER_SIZE } from '@openenvx/editor';
+import type { Transform } from '@openenvx/editor/schema';
 
 import { constrainTransformerBox } from './geometry';
 import type { TransformerBox } from './geometry';

@@ -1,6 +1,6 @@
-import type { DocumentNode } from '@openenvx/studio/schema';
-import { getChildNodes } from '@openenvx/studio';
-import { nodeTransform } from '@openenvx/studio/schema';
+import type { DocumentNode } from '@openenvx/editor/schema';
+import { getChildNodes } from '@openenvx/editor';
+import { nodeTransform } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

@@ -1,5 +1,8 @@
-import type { EditorSession, LiveProjectSnapshot } from '../scene/types';
-import type { EditorInput } from '../workbench/editor-service';
+import type {
+  WorkbenchEditorInput,
+  WorkbenchEditorSession,
+  WorkbenchProjectSnapshot,
+} from '../workbench/workbench-document-events';
 import { Emitter } from './emitter';
 import type { Event } from './emitter';
 import type { InteractionState } from './interaction-state';
@@ -19,13 +22,13 @@ export type WorkbenchEventName =
   (typeof WorkbenchEvents)[keyof typeof WorkbenchEvents];
 
 export interface WorkbenchEventPayloads {
-  [WorkbenchEvents.DidChangeActiveEditor]: EditorInput | null;
+  [WorkbenchEvents.DidChangeActiveEditor]: WorkbenchEditorInput | null;
   [WorkbenchEvents.DidChangeContext]: void;
   [WorkbenchEvents.DidChangeDirty]: boolean;
   [WorkbenchEvents.DidChangeInteraction]: InteractionState;
   [WorkbenchEvents.DidChangeLocale]: string;
-  [WorkbenchEvents.DidChangeDocument]: LiveProjectSnapshot;
-  [WorkbenchEvents.DidChangeSelection]: EditorSession;
+  [WorkbenchEvents.DidChangeDocument]: WorkbenchProjectSnapshot;
+  [WorkbenchEvents.DidChangeSelection]: WorkbenchEditorSession;
   [WorkbenchEvents.DidExecuteCommand]: {
     commandId: string;
     result?: unknown;
@@ -42,13 +45,13 @@ export interface EventBus {
     event: K,
     payload: WorkbenchEventPayloads[K]
   ): void;
-  readonly onDidChangeActiveEditor: Event<EditorInput | null>;
+  readonly onDidChangeActiveEditor: Event<WorkbenchEditorInput | null>;
   readonly onDidChangeContext: Event<void>;
   readonly onDidChangeDirty: Event<boolean>;
   readonly onDidChangeInteraction: Event<InteractionState>;
   readonly onDidChangeLocale: Event<string>;
-  readonly onDidChangeDocument: Event<LiveProjectSnapshot>;
-  readonly onDidChangeSelection: Event<EditorSession>;
+  readonly onDidChangeDocument: Event<WorkbenchProjectSnapshot>;
+  readonly onDidChangeSelection: Event<WorkbenchEditorSession>;
   readonly onDidExecuteCommand: Event<{
     commandId: string;
     result?: unknown;
@@ -56,13 +59,14 @@ export interface EventBus {
 }
 
 export class WorkbenchEventService implements EventBus {
-  private readonly activeEditorEmitter = new Emitter<EditorInput | null>();
+  private readonly activeEditorEmitter =
+    new Emitter<WorkbenchEditorInput | null>();
   private readonly contextEmitter = new Emitter<void>();
   private readonly dirtyEmitter = new Emitter<boolean>();
   private readonly interactionEmitter = new Emitter<InteractionState>();
   private readonly localeEmitter = new Emitter<string>();
-  private readonly documentEmitter = new Emitter<LiveProjectSnapshot>();
-  private readonly selectionEmitter = new Emitter<EditorSession>();
+  private readonly documentEmitter = new Emitter<WorkbenchProjectSnapshot>();
+  private readonly selectionEmitter = new Emitter<WorkbenchEditorSession>();
   private readonly commandEmitter = new Emitter<{
     commandId: string;
     result?: unknown;
@@ -84,7 +88,7 @@ export class WorkbenchEventService implements EventBus {
     switch (event) {
       case WorkbenchEvents.DidChangeActiveEditor: {
         return this.onDidChangeActiveEditor(
-          handler as (value: EditorInput | null) => void
+          handler as (value: WorkbenchEditorInput | null) => void
         ).dispose;
       }
       case WorkbenchEvents.DidChangeContext: {
@@ -106,12 +110,12 @@ export class WorkbenchEventService implements EventBus {
       }
       case WorkbenchEvents.DidChangeDocument: {
         return this.onDidChangeDocument(
-          handler as (value: LiveProjectSnapshot) => void
+          handler as (value: WorkbenchProjectSnapshot) => void
         ).dispose;
       }
       case WorkbenchEvents.DidChangeSelection: {
         return this.onDidChangeSelection(
-          handler as (value: EditorSession) => void
+          handler as (value: WorkbenchEditorSession) => void
         ).dispose;
       }
       case WorkbenchEvents.DidExecuteCommand: {

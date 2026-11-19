@@ -1,4 +1,5 @@
-import { Command, localize, updateNodeInTree } from '@openenvx/studio';
+import { updateNodeInTree, requireDocumentStore } from '@openenvx/editor';
+import { Command, localize } from '@openenvx/studio';
 import type { CommandContext } from '@openenvx/studio';
 
 import { hasActiveCrop, readImageCrop } from '../crop/normalized-crop';
@@ -7,7 +8,7 @@ export class ResetImageCropCommand extends Command {
   readonly id = 'canvas.resetImageCrop';
 
   canExecute(ctx: CommandContext): boolean {
-    const layer = ctx.scene.getPrimaryNode();
+    const layer = requireDocumentStore(ctx).getPrimaryNode();
     if (!layer || layer.type !== 'canvas.image') {
       return false;
     }
@@ -18,12 +19,12 @@ export class ResetImageCropCommand extends Command {
   }
 
   execute(ctx: CommandContext): void {
-    const layer = ctx.scene.getPrimaryNode();
+    const layer = requireDocumentStore(ctx).getPrimaryNode();
     if (!layer) {
       return;
     }
 
-    ctx.scene.apply({
+    requireDocumentStore(ctx).apply({
       apply: (scene) => ({
         ...scene,
         artboards: scene.artboards.map((page) => ({

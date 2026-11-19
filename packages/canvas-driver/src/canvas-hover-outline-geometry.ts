@@ -1,4 +1,4 @@
-import { nodeTransform } from '@openenvx/studio/schema';
+import { nodeTransform } from '@openenvx/editor/schema';
 import type Konva from 'konva';
 
 import type { FlattenedStageLayer } from './flatten-layer-surface';

@@ -1,10 +1,10 @@
 import {
+  requireDocumentStore,
   canDuplicateLayer,
   canSelectLayer,
-  Command,
   findNodeById,
-  ShortcutContribution,
-} from '@openenvx/studio';
+} from '@openenvx/editor';
+import { Command, ShortcutContribution } from '@openenvx/studio';
 import type { CommandContext } from '@openenvx/studio';
 
 import {
@@ -18,31 +18,35 @@ import {
 } from './canvas-clipboard-commands';
 
 function findSelectedLayer(ctx: CommandContext, id: string) {
-  return findNodeById(ctx.scene.getDocument(), id);
+  return findNodeById(requireDocumentStore(ctx).getDocument(), id);
 }
 
 function canExecuteWithSelection(ctx: CommandContext): boolean {
   if (!canExecuteCanvasClipboard(ctx)) {
     return false;
   }
-  if (ctx.selection.selectedNodeIds.length === 0) {
+  if (requireDocumentStore(ctx).getSession().selectedNodeIds.length === 0) {
     return false;
   }
-  return ctx.selection.selectedNodeIds.every((id) => {
-    const layer = findSelectedLayer(ctx, id);
-    return layer && canSelectLayer(layer);
-  });
+  return requireDocumentStore(ctx)
+    .getSession()
+    .selectedNodeIds.every((id) => {
+      const layer = findSelectedLayer(ctx, id);
+      return layer && canSelectLayer(layer);
+    });
 }
 
 function canExecuteWithWritableSelection(ctx: CommandContext): boolean {
   if (!canExecuteWithSelection(ctx)) {
     return false;
   }
-  const scene = ctx.scene.getDocument();
-  return ctx.selection.selectedNodeIds.every((id) => {
-    const layer = findSelectedLayer(ctx, id);
-    return layer && canDuplicateLayer(layer, scene);
-  });
+  const scene = requireDocumentStore(ctx).getDocument();
+  return requireDocumentStore(ctx)
+    .getSession()
+    .selectedNodeIds.every((id) => {
+      const layer = findSelectedLayer(ctx, id);
+      return layer && canDuplicateLayer(layer, scene);
+    });
 }
 
 export class CopyLayersCommand extends Command {

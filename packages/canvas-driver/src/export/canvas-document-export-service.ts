@@ -1,5 +1,5 @@
+import type { Document, LengthUnit } from '@openenvx/editor/schema';
 import { createServiceId } from '@openenvx/studio';
-import type { Document, LengthUnit } from '@openenvx/studio/schema';
 
 export type CanvasExportFormat = 'png' | 'jpg' | 'pdf';
 
@@ -16,7 +16,7 @@ export interface CanvasExportOptions {
    * Values for `{{{key}}}` tokens in layer data strings. Unknown keys stay as tokens.
    * Omit only when the raster should show raw tokens; for WYSIWYG with editor sample
    * preview, pass the same map you would use for `applyTemplateVariables` (e.g.
-   * `buildSampleVariableValues(scene)` from `@openenvx/studio/schema`).
+   * `buildSampleVariableValues(scene)` from `@openenvx/editor/schema`).
    */
   variables?: Record<string, string>;
 }

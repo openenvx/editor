@@ -6,7 +6,7 @@ import { WIDGET_LAYER_ESCAPE_TYPES } from '@openenvx/editor-sandbox/protocol';
 import {
   defaultTransform,
   type DocumentNode as Layer,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 import { buildFaceLayer, faceTransform } from './document-node-build';
 import { readLayoutIntent, resolveAutoLayout } from './resolve-auto-layout';

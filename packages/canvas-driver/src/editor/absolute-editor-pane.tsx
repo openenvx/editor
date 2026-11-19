@@ -1,15 +1,17 @@
 import {
-  ContextKeyServiceId,
   getActiveArtboard,
   type Document,
   type EditorSession,
+} from '@openenvx/editor';
+import { artboardSpaceSize } from '@openenvx/editor/schema';
+import {
+  ContextKeyServiceId,
   type EditorPaneHostProps,
 } from '@openenvx/studio';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
 } from '@openenvx/studio/react';
-import { artboardSpaceSize } from '@openenvx/studio/schema';
 import { memo, useCallback, useMemo } from 'react';
 
 import { CanvasHostProvider } from '../canvas-host-context';
@@ -20,6 +22,10 @@ import { useCanvasApi } from '../hooks/use-canvas-api';
 import { useCanvasRegistries } from '../hooks/use-canvas-registries';
 import { useCanvasStageInteraction } from '../hooks/use-canvas-stage-interaction';
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
+import {
+  selectNodesViaApi,
+  updatePropertyViaApi,
+} from '../workbench-document-api';
 import { CanvasEditor, type CanvasEditorProps } from './canvas-editor';
 
 export const AbsoluteEditorPane = memo(
@@ -29,8 +35,12 @@ export const AbsoluteEditorPane = memo(
     onViewportApiReady,
   }: EditorPaneHostProps) => {
     const { api, executeCommand } = useWorkbenchContext();
-    const scene = useWorkbenchContextSelector((state) => state.scene);
-    const selection = useWorkbenchContextSelector((state) => state.selection);
+    const scene = useWorkbenchContextSelector((state) => state.scene) as
+      | Document
+      | undefined;
+    const selection = useWorkbenchContextSelector(
+      (state) => state.selection
+    ) as EditorSession | undefined;
     const layerSurface = useWorkbenchContextSelector(
       (state) => state.layerSurface
     );
@@ -44,11 +54,11 @@ export const AbsoluteEditorPane = memo(
         getService: (token) => api.getService(token),
         runCommand: (commandId, args) => api.runCommand(commandId, args),
         selectNodes: (layerIds, primaryNodeId) =>
-          api.selectNodes(layerIds, primaryNodeId),
+          selectNodesViaApi(api, layerIds, primaryNodeId),
         setContextKey: (key, value) =>
           api.getService(ContextKeyServiceId)?.setContext(key, value),
         updateProperty: (layerId, key, value) =>
-          api.updateProperty(layerId, key, value),
+          updatePropertyViaApi(api, layerId, key, value),
       }),
       [api, executeCommand]
     );
@@ -132,7 +142,7 @@ const AbsoluteEditorPaneInner = memo(
       (layerId: string, key: string, value: unknown) => {
         const fit = resolveTextBoxFitPropertyUpdate(scene, layerId, key, value);
         if (!fit) {
-          api.updateProperty(layerId, key, value);
+          updatePropertyViaApi(api, layerId, key, value);
           return;
         }
         void canvasApi.updateLayerTransform(layerId, fit.transform, {
@@ -145,27 +155,28 @@ const AbsoluteEditorPaneInner = memo(
     const handleSelectLayer = useCallback(
       (layerId: string, options?: CanvasSelectLayerOptions) => {
         if (!layerId) {
-          api.selectNodes([], null);
+          selectNodesViaApi(api, [], null);
           return;
         }
         if (options?.setPrimary) {
-          api.selectNodes(selection.selectedNodeIds, layerId);
+          selectNodesViaApi(api, selection.selectedNodeIds, layerId);
           return;
         }
         if (options?.additive) {
           const current = selection.selectedNodeIds;
           if (current.includes(layerId)) {
             const next = current.filter((id) => id !== layerId);
-            api.selectNodes(next, next[0] ?? null);
+            selectNodesViaApi(api, next, next[0] ?? null);
             return;
           }
-          api.selectNodes(
+          selectNodesViaApi(
+            api,
             [...current, layerId],
             selection.primaryNodeId ?? layerId
           );
           return;
         }
-        api.selectNodes([layerId], layerId);
+        selectNodesViaApi(api, [layerId], layerId);
       },
       [api, selection.primaryNodeId, selection.selectedNodeIds]
     );

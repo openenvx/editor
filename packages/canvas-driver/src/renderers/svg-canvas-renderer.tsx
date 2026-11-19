@@ -1,4 +1,4 @@
-import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import type { LayerPreviewDescriptor } from '@openenvx/editor/preview';
 import { memo, useMemo } from 'react';
 import { Image as KonvaImage, Rect } from 'react-konva';
 
