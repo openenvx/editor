@@ -6,7 +6,7 @@ import {
   normalizeDocument,
   withArtboardRulesLayout,
   type Document,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 const NAME_TOKEN = formatVariableToken('name');
 const TITLE_TOKEN = formatVariableToken('title');

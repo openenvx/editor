@@ -88,6 +88,7 @@
     "quickjs-emscripten": "0.32.0"
   },
   "devDependencies": {
+    "@openenvx/editor": "workspace:*",
     "@openenvx/studio": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
     "@testing-library/react": "16.3.2",

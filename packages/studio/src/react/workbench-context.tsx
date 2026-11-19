@@ -10,3 +10,5 @@ export {
 } from './use-workbench-selector';
 
 export { useStoreSelector } from './use-store-selector';
+export { useMountEffect } from '../hooks/use-mount-effect';
+export { useWorkbenchTranslation } from '../i18n/use-workbench-translation';

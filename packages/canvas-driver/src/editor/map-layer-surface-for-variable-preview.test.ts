@@ -1,9 +1,9 @@
-import { encodeQrToSvg } from '@openenvx/studio/preview';
+import { encodeQrToSvg } from '@openenvx/editor/preview';
 import {
   applyTemplateVariablesForPreview,
   formatVariableToken,
   nodeTransform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';

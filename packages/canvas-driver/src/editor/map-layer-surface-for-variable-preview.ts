@@ -1,12 +1,12 @@
-import { findNodeById } from '@openenvx/studio';
-import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import { encodeQrToSvg } from '@openenvx/studio/preview';
-import type { CanvasQrProps, Document } from '@openenvx/studio/schema';
+import { findNodeById } from '@openenvx/editor';
+import type { LayerPreviewDescriptor } from '@openenvx/editor/preview';
+import { encodeQrToSvg } from '@openenvx/editor/preview';
+import type { CanvasQrProps, Document } from '@openenvx/editor/schema';
 import {
   applyNodeTransform,
   nodeProps,
   nodeTransform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';
 import { prepareCanvasSceneForRender } from '../prepare-canvas-scene-for-render';

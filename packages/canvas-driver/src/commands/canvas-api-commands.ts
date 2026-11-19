@@ -1,24 +1,23 @@
 import {
-  Command,
+  requireDocumentStore,
   canResizePage,
   canTransformLayer,
   findNodeById,
-  FontServiceId,
   getActiveArtboard,
-  localize,
   updateNodeInTree,
-} from '@openenvx/studio';
-import type {
-  CommandContext,
-  FontDescriptor,
-  FontService,
-} from '@openenvx/studio';
+} from '@openenvx/editor';
 import {
   applyNodeTransform,
   artboardRulesLayout,
   nodeTransform,
   type Transform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
+import { Command, FontServiceId, localize } from '@openenvx/studio';
+import type {
+  CommandContext,
+  FontDescriptor,
+  FontService,
+} from '@openenvx/studio';
 
 import {
   CanvasCommandRequestServiceId,
@@ -68,12 +67,12 @@ function getDocumentExporter(
 }
 
 function canTransformLayerById(ctx: CommandContext, layerId: string): boolean {
-  const layer = findNodeById(ctx.scene.getDocument(), layerId);
+  const layer = findNodeById(requireDocumentStore(ctx).getDocument(), layerId);
   return layer ? canTransformLayer(layer) : false;
 }
 
 function canTransformPrimaryLayer(ctx: CommandContext): boolean {
-  const layer = ctx.scene.getPrimaryNode();
+  const layer = requireDocumentStore(ctx).getPrimaryNode();
   return layer ? canTransformLayer(layer) : false;
 }
 
@@ -81,7 +80,7 @@ export class SetPageSizeCommand extends Command {
   readonly id = 'canvas.setPageSize';
 
   canExecute(ctx: CommandContext): boolean {
-    const scene = ctx.scene.getDocument();
+    const scene = requireDocumentStore(ctx).getDocument();
     return (
       artboardRulesLayout(getActiveArtboard(scene)) === 'absolute' &&
       canResizePage(scene)
@@ -93,8 +92,8 @@ export class SetPageSizeCommand extends Command {
     if (!size) {
       return;
     }
-    const activeArtboardId = ctx.scene.getActiveArtboardId();
-    ctx.scene.apply({
+    const activeArtboardId = requireDocumentStore(ctx).getActiveArtboardId();
+    requireDocumentStore(ctx).apply({
       apply: (scene) => ({
         ...scene,
         artboards: scene.artboards.map((page) =>
@@ -145,8 +144,9 @@ export class SetBleedMmCommand extends Command {
 
   canExecute(ctx: CommandContext): boolean {
     return (
-      artboardRulesLayout(getActiveArtboard(ctx.scene.getDocument())) ===
-      'absolute'
+      artboardRulesLayout(
+        getActiveArtboard(requireDocumentStore(ctx).getDocument())
+      ) === 'absolute'
     );
   }
 
@@ -155,8 +155,8 @@ export class SetBleedMmCommand extends Command {
     if (bleedMm === null) {
       return;
     }
-    const activeArtboardId = ctx.scene.getActiveArtboardId();
-    ctx.scene.apply({
+    const activeArtboardId = requireDocumentStore(ctx).getActiveArtboardId();
+    requireDocumentStore(ctx).apply({
       apply: (scene) => ({
         ...scene,
         artboards: scene.artboards.map((page) =>
@@ -180,8 +180,9 @@ export class SetSafeMmCommand extends Command {
 
   canExecute(ctx: CommandContext): boolean {
     return (
-      artboardRulesLayout(getActiveArtboard(ctx.scene.getDocument())) ===
-      'absolute'
+      artboardRulesLayout(
+        getActiveArtboard(requireDocumentStore(ctx).getDocument())
+      ) === 'absolute'
     );
   }
 
@@ -190,8 +191,8 @@ export class SetSafeMmCommand extends Command {
     if (safeMm === null) {
       return;
     }
-    const activeArtboardId = ctx.scene.getActiveArtboardId();
-    ctx.scene.apply({
+    const activeArtboardId = requireDocumentStore(ctx).getActiveArtboardId();
+    requireDocumentStore(ctx).apply({
       apply: (scene) => ({
         ...scene,
         artboards: scene.artboards.map((page) =>
@@ -214,7 +215,7 @@ export class SetPagePresetCommand extends Command {
   readonly id = 'canvas.setPagePreset';
 
   canExecute(ctx: CommandContext): boolean {
-    const scene = ctx.scene.getDocument();
+    const scene = requireDocumentStore(ctx).getDocument();
     return (
       artboardRulesLayout(getActiveArtboard(scene)) === 'absolute' &&
       canResizePage(scene)
@@ -232,11 +233,11 @@ export class SetPagePresetCommand extends Command {
         CanvasPageResizeServiceId
       );
       const nextScene = pageResize.resizeSceneToPreset(
-        ctx.scene.getDocument(),
+        requireDocumentStore(ctx).getDocument(),
         presetId
       );
       if (nextScene) {
-        ctx.scene.apply({
+        requireDocumentStore(ctx).apply({
           apply: () => nextScene,
           label: localize(ctx.services, 'canvas.history.resizePage', {
             defaultValue: 'Resize page',
@@ -261,10 +262,13 @@ export class ResizePagePresetCommand extends Command {
   readonly id = 'canvas.resizePagePreset';
 
   canExecute(ctx: CommandContext, args?: unknown): boolean {
-    if (artboardRulesLayout(ctx.scene.getActiveArtboard()) !== 'absolute') {
+    if (
+      artboardRulesLayout(requireDocumentStore(ctx).getActiveArtboard()) !==
+      'absolute'
+    ) {
       return false;
     }
-    if (!canResizePage(ctx.scene.getDocument())) {
+    if (!canResizePage(requireDocumentStore(ctx).getDocument())) {
       return false;
     }
     return Boolean((args as PagePresetArgs | undefined)?.presetId);
@@ -385,7 +389,7 @@ export class UpdateRichTextTransformCommand extends Command {
     if (!update) {
       return;
     }
-    ctx.scene.apply({
+    requireDocumentStore(ctx).apply({
       apply: (scene) => ({
         ...scene,
         artboards: scene.artboards.map((page) => ({
@@ -442,7 +446,7 @@ export class ExportImageCommand extends Command {
     if (!exporter) {
       return null;
     }
-    const scene = ctx.scene.getDocument();
+    const scene = requireDocumentStore(ctx).getDocument();
     const page = getActiveArtboard(scene);
     const options =
       args && typeof args === 'object'
@@ -481,7 +485,7 @@ function applyLayerTransform(
   transform: Transform,
   dataPatch?: Record<string, unknown>
 ): void {
-  ctx.scene.apply({
+  requireDocumentStore(ctx).apply({
     apply: (scene) => ({
       ...scene,
       artboards: scene.artboards.map((page) => ({
@@ -517,7 +521,7 @@ function setLayerRotation(
   layerId: string,
   rotation: number
 ): void {
-  const layer = findNodeById(ctx.scene.getDocument(), layerId);
+  const layer = findNodeById(requireDocumentStore(ctx).getDocument(), layerId);
   if (!layer?.frame) {
     return;
   }
@@ -529,7 +533,7 @@ function setLayerRotation(
 }
 
 function adjustLayerRotation(ctx: CommandContext, delta: number): void {
-  const layer = ctx.scene.getPrimaryNode();
+  const layer = requireDocumentStore(ctx).getPrimaryNode();
   if (!layer?.frame) {
     return;
   }

@@ -1,13 +1,11 @@
+import { InstantiationService, type CommandContext } from '@openenvx/studio';
 import {
   AssetServiceId,
-  EditorService,
+  DocumentStoreServiceId,
   InMemoryAssetService,
-  InstantiationService,
   DocumentStore,
-  WorkbenchEventService,
-  type CommandContext,
-} from '@openenvx/studio';
-import { createDefaultFrame, nodeTransform } from '@openenvx/studio/schema';
+} from '@openenvx/editor';
+import { createDefaultFrame, nodeTransform } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import { CanvasClipboardServiceId } from '../canvas-service-tokens';
@@ -29,11 +27,9 @@ function createContext(sceneStore: DocumentStore): CommandContext {
   services.registerFactory(AssetServiceId, () => new InMemoryAssetService());
   const clipboard = services.createInstance(CanvasClipboardService);
   services.registerInstance(CanvasClipboardServiceId, clipboard);
+  services.registerInstance(DocumentStoreServiceId, sceneStore);
   return {
-    editor: new EditorService(),
-    events: new WorkbenchEventService(),
-    scene: sceneStore,
-    selection: sceneStore.getSession(),
+    events: { emit: () => {}, on: () => () => {} },
     services,
   };
 }

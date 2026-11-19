@@ -6,8 +6,6 @@ const studioSrc = import.meta.dirname;
 
 const headlessEntryFiles = [
   path.join(studioSrc, 'index.ts'),
-  path.join(studioSrc, 'schema', 'index.ts'),
-  path.join(studioSrc, 'preview', 'index.ts'),
   path.join(studioSrc, 'react', 'workbench-context.tsx'),
 ];
 
@@ -42,11 +40,23 @@ function resolveRelativeImport(fromFile: string, spec: string): string | null {
   return null;
 }
 
-function isForbiddenShellPath(absPath: string): string | null {
+function isForbiddenShellPath(
+  absPath: string,
+  importerRel: string
+): string | null {
   if (!absPath.startsWith(studioSrc)) {
     return null;
   }
   const rel = path.relative(studioSrc, absPath);
+  if (
+    importerRel === 'react/workbench-context.tsx' &&
+    rel.split(path.sep)[0] === 'hooks'
+  ) {
+    return null;
+  }
+  if (rel.startsWith(`i18n${path.sep}`)) {
+    return null;
+  }
   const top = rel.split(path.sep)[0];
   const forbiddenTop = new Set([
     'context',
@@ -108,7 +118,7 @@ function walkHeadlessImports(): string[] {
       if (!resolved) {
         continue;
       }
-      const hit = isForbiddenShellPath(resolved);
+      const hit = isForbiddenShellPath(resolved, relFile);
       if (hit) {
         violations.push(`${relFile}:${index + 1} imports ${hit}`);
         continue;

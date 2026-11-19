@@ -1,5 +1,5 @@
-import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import type { Transform } from '@openenvx/studio/schema';
+import type { LayerPreviewDescriptor } from '@openenvx/editor/preview';
+import type { Transform } from '@openenvx/editor/schema';
 import Konva from 'konva';
 
 import { DEFAULT_MIN_FONT_SIZE, fitFontSize } from '../fit-font-size';

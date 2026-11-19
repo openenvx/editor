@@ -11,7 +11,6 @@ import type {
   ViewContainerLocation,
   TreeItemAction,
 } from '../contributions/view-contribution';
-import type { LayerPreviewDescriptor } from '../preview/layer-preview';
 import type { PropertyLayoutNode } from '../properties/property-layout-node';
 import type { PropertyValuePath } from '../properties/property-value-path';
 import type { WorkbenchContributionDisposable } from '../registries/workbench-registries';
@@ -22,10 +21,7 @@ import type { ExternalStore } from '../runtime/external-store';
 import type { InteractionState } from '../runtime/interaction-state';
 import type { Plugin } from '../runtime/plugin';
 import type { EventBus } from '../runtime/workbench-events';
-import type { DocumentStore } from '../scene/document-store';
-import type { Document, DocumentNode, EditorSession } from '../scene/types';
 import type { WorkbenchContribution } from '../workbench-contributions/workbench-contribution';
-import type { EditorInput, EditorService } from '../workbench/editor-service';
 import type {
   ActiveDialog,
   ConfirmDialogOptions,
@@ -39,8 +35,20 @@ import type {
   ViewPanelRegistration,
 } from './panel-registrations';
 import type { StatusBarItemRendererRegistration } from './status-bar-item-renderer-registration';
+import type {
+  WorkbenchEditorInput,
+  WorkbenchEditorSession,
+} from './workbench-document-events';
 import type { WorkbenchLayout } from './workbench-layout';
 import type { WorkbenchLayoutStore } from './workbench-layout-store';
+import type {
+  EditorSlice,
+  SceneSlice,
+  SliceBuilders,
+} from './workbench-state-cache';
+
+/** Opaque preview descriptor from document slice builders (@openenvx/editor). */
+export type LayerPreviewDescriptor = Record<string, unknown>;
 
 export type ViewTreeItemAction = TreeItemAction;
 
@@ -116,14 +124,14 @@ export interface ViewContainerDescriptor {
 }
 
 export interface LayerSurfaceItem {
-  layer: DocumentNode;
+  layer: unknown;
   view: LayerPreviewDescriptor;
 }
 
 export interface WorkbenchState {
   revision: number;
-  scene: Document;
-  selection: EditorSession;
+  scene: unknown;
+  selection: WorkbenchEditorSession;
   interaction: InteractionState;
   viewContainers: ViewContainerDescriptor[];
   viewLocations: Record<string, ViewContainerLocation>;
@@ -146,14 +154,12 @@ export interface WorkbenchState {
   fieldRenderers: FieldRendererRegistration[];
   viewPanels: ViewPanelRegistration[];
   activeDialog: ActiveDialog | null;
-  editor: EditorInput | null;
+  editor: WorkbenchEditorInput | null;
   layout: WorkbenchLayout;
 }
 
 export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   commands: CommandService;
-  scene: DocumentStore;
-  editor: EditorService;
   events: EventBus;
   executeCommand: (commandId: string, args?: unknown) => Promise<boolean>;
   runCommand: <T = unknown>(
@@ -162,9 +168,6 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   ) => Promise<CommandExecutionResult<T>>;
   subscribe: (listener: (state: WorkbenchState) => void) => () => void;
   registerServiceInstance: <T>(id: ServiceId<T>, instance: T) => void;
-  updateProperty: (layerId: string, key: string, value: unknown) => void;
-  /** Apply multiple layer data keys in one history step. */
-  updateProperties: (layerId: string, updates: Record<string, unknown>) => void;
   selectViewItem: (
     viewId: string,
     item: unknown,
@@ -176,7 +179,6 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
     target: unknown,
     position: 'before' | 'after' | 'inside'
   ) => void;
-  selectNodes: (layerIds: string[], primaryNodeId?: string | null) => void;
   setHoveredLayer: (layerId: string | null) => void;
   setActiveContainer: (
     location: ViewContainerLocation,
@@ -201,14 +203,6 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   registerWorkbenchContributions: (
     ...contributions: WorkbenchContribution[]
   ) => WorkbenchContributionDisposable;
-  undo: () => boolean;
-  redo: () => boolean;
-  save: (saveFn?: (input: EditorInput) => Promise<void>) => Promise<void>;
-  saveAs: (uri: string) => Promise<void>;
-  openDocument: (uri: string) => Promise<void>;
-  revert: () => void;
-  serializeScene: () => Document;
-  loadScene: (scene: Document) => void;
   closeDialog: () => void;
   showConfirm: (options: ConfirmDialogOptions) => Promise<boolean>;
   /** Resolves a pending {@link showConfirm} dialog. No-op when none is active. */
@@ -223,22 +217,30 @@ export interface WorkbenchApi extends ExternalStore<WorkbenchState> {
   isEditorDebug: () => boolean;
 }
 
+export interface DocumentSliceBuilders {
+  buildSceneSlice: (
+    ctx: import('../state/workbench-slice-context').WorkbenchSliceContext
+  ) => SceneSlice;
+  buildEditorSlice: (
+    ctx: import('../state/workbench-slice-context').WorkbenchSliceContext
+  ) => EditorSlice;
+  buildSelectionDerivedPatch?: (
+    ctx: import('../state/workbench-slice-context').WorkbenchSliceContext,
+    viewContainers: ViewContainerDescriptor[]
+  ) => Pick<SceneSlice, 'properties' | 'viewContainers'>;
+}
+
 export interface WorkbenchControllerOptions {
   plugins: Plugin[];
-  initialScene?: Document;
-  initialEditorState?: EditorSession;
-  editorUri?: string;
-  editorTitle?: string;
   layout?: Partial<WorkbenchLayout>;
   layoutStore?: WorkbenchLayoutStore;
-  /**
-   * When true (default), layer writeMode / showInLayers / templatePolicy are
-   * enforced (embed consumer). Dashboard authoring should pass false.
-   */
-  enforceTemplatePolicy?: boolean;
+  /** Host-supplied document slice builders (e.g. from `createEditorPlugins`). */
+  sliceBuilders?: DocumentSliceBuilders;
   /**
    * Initial editor diagnostics when `localStorage.openenvx:debug` is unset.
    * Apps often pass `import.meta.env.DEV`.
    */
   debug?: boolean;
 }
+
+export type { EditorSlice, SceneSlice, SliceBuilders };

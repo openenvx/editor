@@ -4,19 +4,20 @@ import {
   getActiveArtboard,
   getLayerWriteMode,
   isLayerShownInLayers,
-  createPropertyHostContext,
-} from '@openenvx/studio';
+} from '@openenvx/editor';
+import {
+  nodeTransform,
+  resolveArtboardBleedMm,
+  resolveArtboardSafeMm,
+  type Document,
+  type Transform,
+} from '@openenvx/editor/schema';
+import { createPropertyHostContext } from '@openenvx/studio';
 import type {
   PropertyValuePath,
   PropertyHostContext,
   PropertyPathContextOptions,
 } from '@openenvx/studio';
-import {
-  nodeTransform,
-  resolveArtboardBleedMm,
-  resolveArtboardSafeMm,
-  type Transform,
-} from '@openenvx/studio/schema';
 
 import {
   type CanvasTextDisplayTransformCache,
@@ -48,12 +49,13 @@ export function createCanvasPropertyHostContext(
 ): PropertyHostContext {
   const base = createPropertyHostContext(options);
   const {
-    scene,
+    scene: sceneInput,
     activeArtboardId,
     selectedLayerId,
     updateLayerTransform,
     executeCommand,
   } = options;
+  const scene = sceneInput as Document;
   const primaryLayer = selectedLayerId
     ? findNodeById(scene, selectedLayerId)
     : null;

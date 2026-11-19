@@ -2,9 +2,7 @@ import type { MutableRefObject, ReactNode } from 'react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 import {
-  DocumentHostServiceId,
   LocalizationServiceId,
-  MutableDocumentHostService,
   ThemeServiceId,
   ShellUiServiceId,
   shouldMountSecondarySidebar,
@@ -15,8 +13,9 @@ import {
   type ToolbarPlacement,
   type WorkbenchApi,
   type WorkbenchControllerOptions,
+  type DocumentSliceBuilders,
+  WorkbenchEvents,
 } from '#studio';
-import type { Document } from '#studio/schema';
 
 import { EditorViewportProvider } from '../context/editor-viewport-context';
 import { DEFAULT_LOCALE, LocaleProvider } from '../context/locale-context';
@@ -53,26 +52,12 @@ export interface WorkbenchShellProps {
   className?: string;
   theme?: 'light' | 'dark' | string;
   onThemeChange?: (theme: string) => void;
-  initialScene?: Document;
-  editorUri?: string;
-  editorTitle?: string;
   layout?: WorkbenchControllerOptions['layout'];
   layoutStore?: WorkbenchControllerOptions['layoutStore'];
-  /**
-   * When true (default), embed/template write policy is enforced.
-   * Dashboard authoring should pass false so the Embed properties tab appears
-   * and authors can edit locked layers freely.
-   */
-  enforceTemplatePolicy?: boolean;
+  sliceBuilders?: DocumentSliceBuilders;
   showEditorArea?: boolean;
-  onOpenDocument?: () => Promise<string | undefined>;
-  onSaveAs?: () => Promise<string | undefined>;
-  /**
-   * Called when scene *content* changes (edits, undo/redo, load).
-   * Selection and hover do not fire. The shell always subscribes, so a
-   * callback passed after the first paint still receives later edits.
-   */
-  onSceneChange?: (scene: Document) => void;
+  /** Fired when document content changes (via workbench events). */
+  onSceneChange?: (scene: unknown) => void;
   createPropertyHostContext?: (
     options: PropertyPathContextOptions,
     helpers: {
@@ -325,16 +310,16 @@ function SceneChangeBinding({
   onSceneChangeRef,
 }: {
   api: WorkbenchApi;
-  onSceneChangeRef: MutableRefObject<((scene: Document) => void) | undefined>;
+  onSceneChangeRef: MutableRefObject<((scene: unknown) => void) | undefined>;
 }) {
   useMountEffect(() => {
-    let lastRevision = api.scene.getContentRevision();
-    return api.scene.subscribe((snapshot) => {
+    let lastRevision = -1;
+    return api.events.on(WorkbenchEvents.DidChangeDocument, (snapshot) => {
       if (snapshot.contentRevision === lastRevision) {
         return;
       }
       lastRevision = snapshot.contentRevision;
-      onSceneChangeRef.current?.(api.serializeScene());
+      onSceneChangeRef.current?.(snapshot.document);
     });
   });
   return null;
@@ -370,39 +355,6 @@ function LocaleServiceBinding({
     }
     localization.setLocale(locale);
     localization.setFallbackLocale(fallbackLocale);
-  });
-
-  return null;
-}
-
-function DocumentHostBinding({
-  api,
-  onOpenDocument,
-  onSaveAs,
-}: {
-  api: WorkbenchApi;
-  onOpenDocument?: () => Promise<string | undefined>;
-  onSaveAs?: () => Promise<string | undefined>;
-}) {
-  const onOpenDocumentRef = useRef(onOpenDocument);
-  const onSaveAsRef = useRef(onSaveAs);
-  onOpenDocumentRef.current = onOpenDocument;
-  onSaveAsRef.current = onSaveAs;
-
-  useMountEffect(() => {
-    const documentHost = api.getService(DocumentHostServiceId);
-    if (!(documentHost instanceof MutableDocumentHostService)) {
-      return;
-    }
-
-    documentHost.configurePrompts({
-      promptOpen: Boolean(onOpenDocument),
-      promptSaveAs: Boolean(onSaveAs),
-    });
-    documentHost.updateBindings({
-      promptOpen: () => onOpenDocumentRef.current?.() ?? Promise.resolve(null),
-      promptSaveAs: () => onSaveAsRef.current?.() ?? Promise.resolve(null),
-    });
   });
 
   return null;
@@ -464,15 +416,10 @@ export function WorkbenchShell({
   className,
   theme = DEFAULT_THEME,
   onThemeChange,
-  initialScene,
-  editorUri,
-  editorTitle,
   layout,
   layoutStore,
-  enforceTemplatePolicy,
+  sliceBuilders,
   showEditorArea = true,
-  onOpenDocument,
-  onSaveAs,
   onSceneChange,
   createPropertyHostContext,
   renderEditorPane,
@@ -508,23 +455,12 @@ export function WorkbenchShell({
 
   const workbenchOptions = useMemo(
     (): WorkbenchControllerOptions => ({
-      editorTitle,
-      editorUri,
-      enforceTemplatePolicy,
-      initialScene,
       layout,
       layoutStore,
       plugins: resolvedPlugins,
+      sliceBuilders,
     }),
-    [
-      editorTitle,
-      editorUri,
-      enforceTemplatePolicy,
-      initialScene,
-      layout,
-      layoutStore,
-      resolvedPlugins,
-    ]
+    [layout, layoutStore, resolvedPlugins, sliceBuilders]
   );
 
   const { api, ready } = useWorkbench(workbenchOptions);
@@ -584,12 +520,6 @@ export function WorkbenchShell({
                 fallbackLocale={fallbackLocale}
                 key={`${locale}:${fallbackLocale}`}
                 locale={activeLocale}
-              />
-              <DocumentHostBinding
-                api={api}
-                key={`${Boolean(onOpenDocument)}:${Boolean(onSaveAs)}`}
-                onOpenDocument={onOpenDocument}
-                onSaveAs={onSaveAs}
               />
               <ExternalHostsBinding
                 api={api}

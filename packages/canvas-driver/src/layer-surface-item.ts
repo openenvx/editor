@@ -1,5 +1,5 @@
-import type { DocumentNode } from '@openenvx/studio';
-import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import type { DocumentNode } from '@openenvx/editor';
+import type { LayerPreviewDescriptor } from '@openenvx/editor/preview';
 
 export interface CanvasLayerSurfaceItem {
   layer: DocumentNode;

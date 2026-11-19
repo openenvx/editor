@@ -14,7 +14,7 @@ export async function loadCanvasFonts(families: string[]): Promise<void> {
 
   await Promise.all(
     uniqueFamilies.map((family) =>
-      canvasFontService.ensureLoaded(family).catch(() => {})
+      Promise.resolve(canvasFontService.ensureLoaded(family)).catch(() => {})
     )
   );
 

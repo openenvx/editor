@@ -1,5 +1,5 @@
-import type { Artboard, LengthUnit } from '@openenvx/studio/schema';
-import { artboardSpaceSize, toPx } from '@openenvx/studio/schema';
+import type { Artboard, LengthUnit } from '@openenvx/editor/schema';
+import { artboardSpaceSize, toPx } from '@openenvx/editor/schema';
 
 export interface PageSizePreset {
   id: string;

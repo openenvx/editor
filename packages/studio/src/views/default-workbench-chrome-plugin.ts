@@ -4,21 +4,11 @@ import {
   ShellUiServiceId,
   WorkbenchPlugin,
   type CommandPaletteBuilder,
+  type CommandContext,
+  type PluginContext,
   type ShellUiService,
   type WorkbenchPluginContext,
-  type CommandContext,
 } from '#studio';
-
-import {
-  LayersTreeProvider,
-  PagesTreeProvider,
-  WORKBENCH_LAYERS_VIEW_ID,
-  WORKBENCH_PAGES_VIEW_ID,
-  WorkbenchLayersView,
-  WorkbenchPagesView,
-  WorkbenchSidebarContainer,
-  WorkbenchStatusBarContribution,
-} from './workbench-chrome-contributions';
 
 export const DEFAULT_WORKBENCH_CHROME_PLUGIN_ID =
   'openworkbench.default-chrome';
@@ -63,18 +53,16 @@ class WorkbenchLayoutPaletteContribution extends CommandPaletteContribution {
   }
 }
 
-/** Pages + Layers activity sidebar and generic dirty status. */
+/** Layout chrome toggles only — pages/layers live in `@openenvx/editor`. */
 export class DefaultWorkbenchChromePlugin extends WorkbenchPlugin {
   readonly id = DEFAULT_WORKBENCH_CHROME_PLUGIN_ID;
 
+  override activate(ctx: PluginContext): void {
+    this.activateWorkbench(ctx as WorkbenchPluginContext);
+  }
+
   activateWorkbench(ctx: WorkbenchPluginContext): void {
-    ctx.registerWorkbench(
-      new WorkbenchSidebarContainer(),
-      new WorkbenchPagesView(),
-      new WorkbenchLayersView(),
-      new WorkbenchStatusBarContribution(),
-      new WorkbenchLayoutPaletteContribution()
-    );
+    ctx.registerWorkbench(new WorkbenchLayoutPaletteContribution());
     ctx.register(
       createToggleChromeCommand(
         WORKBENCH_TOGGLE_ACTIVITY_BAR_COMMAND_ID,
@@ -88,14 +76,6 @@ export class DefaultWorkbenchChromePlugin extends WorkbenchPlugin {
         WORKBENCH_TOGGLE_SECONDARY_SIDEBAR_COMMAND_ID,
         (shell) => shell.toggleSecondarySidebar()
       )
-    );
-    ctx.registerTreeDataProvider(
-      WORKBENCH_PAGES_VIEW_ID,
-      new PagesTreeProvider()
-    );
-    ctx.registerTreeDataProvider(
-      WORKBENCH_LAYERS_VIEW_ID,
-      new LayersTreeProvider()
     );
   }
 }

@@ -6,8 +6,6 @@
   "type": "module",
   "imports": {
     "#studio": "./src/index.ts",
-    "#studio/schema": "./src/schema/index.ts",
-    "#studio/preview": "./src/preview/index.ts",
     "#studio/react": "./src/react/workbench-context.tsx",
     "#studio/shell": "./src/shell/index.ts",
     "#studio/internal": "./src/workbench-barrel.ts",
@@ -46,55 +44,17 @@
       "import": "./dist/shell.js",
       "default": "./dist/shell.js"
     },
-    "./schema": {
-      "development": "./src/schema/index.ts",
-      "types": "./dist/schema/index.d.ts",
-      "import": "./dist/schema/index.js",
-      "default": "./dist/schema/index.js"
-    },
-    "./schema/scene.schema.json": "./scene.schema.json",
-    "./preview": {
-      "development": "./src/preview/index.ts",
-      "types": "./dist/preview/index.d.ts",
-      "import": "./dist/preview/index.js",
-      "default": "./dist/preview/index.js"
-    },
     "./react": {
       "development": "./src/react/workbench-context.tsx",
       "types": "./dist/react/workbench-context.d.ts",
       "import": "./dist/react/workbench-context.js",
       "default": "./dist/react/workbench-context.js"
     },
-    "./chrome": {
-      "development": "./src/chrome/index.ts",
-      "types": "./dist/chrome.d.ts",
-      "import": "./dist/chrome.js",
-      "default": "./dist/chrome.js"
-    },
-    "./chrome.css": {
-      "development": "./src/chrome/floating-toolbar.module.css",
-      "import": "./dist/chrome.css",
-      "default": "./dist/chrome.css"
-    },
-    "./internal": "./src/workbench-barrel.ts",
-    "./plugins": "./src/plugins/index.ts",
-    "./plugins/variables": {
-      "development": "./src/plugins/variables/index.ts",
-      "types": "./dist/plugins/variables/index.d.ts",
-      "import": "./dist/plugins/variables/index.js",
-      "default": "./dist/plugins/variables/index.js"
-    },
-    "./plugins/variables/tiptap": {
-      "development": "./src/plugins/variables/tiptap/index.ts",
-      "types": "./dist/plugins/variables/tiptap/index.d.ts",
-      "import": "./dist/plugins/variables/tiptap/index.js",
-      "default": "./dist/plugins/variables/tiptap/index.js"
-    },
-    "./plugins/version-history": "./src/plugins/version-history/index.ts"
+    "./internal": "./src/workbench-barrel.ts"
   },
   "scripts": {
     "generate:json-schema": "bun run src/schema/generate-json-schema.ts",
-    "build": "bun ./clean-dist.ts && rolldown -c rolldown.core.publish.config.ts && rolldown -c rolldown.variables-plugin.config.ts && rolldown -c rolldown.shell.config.ts && rolldown -c rolldown.chrome.config.ts && node ./build-dts.ts",
+    "build": "bun ./clean-dist.ts && rolldown -c rolldown.core.publish.config.ts && rolldown -c rolldown.shell.config.ts && node ./build-dts.ts",
     "build:debug": "STUDIO_SOURCEMAP=1 bun run build",
     "prepack": "bun run build",
     "test": "vitest run",
@@ -141,6 +101,7 @@
     }
   },
   "devDependencies": {
+    "@openenvx/editor": "workspace:*",
     "@openenvx/typescript-config": "workspace:*",
     "@tailwindcss/node": "^4.3.2",
     "@testing-library/react": "16.3.2",

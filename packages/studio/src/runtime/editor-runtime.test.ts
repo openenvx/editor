@@ -1,52 +1,25 @@
 import { describe, expect, it } from 'vitest';
 
-import { EditorRuntime } from '../runtime/editor-runtime';
+import { WorkbenchRuntime } from '../runtime/workbench-runtime';
 import { WorkbenchEvents } from '../runtime/workbench-events';
-import { DocumentStore } from '../scene/document-store';
-import { EditorService } from '../workbench/editor-service';
 
-describe('EditorRuntime events', () => {
-  it('bridges scene, editor dirty, and active editor changes to the event bus', () => {
-    const scene = new DocumentStore();
-    const editor = new EditorService();
-    const runtime = new EditorRuntime(scene, editor);
+describe('WorkbenchRuntime events', () => {
+  it('emits context change events through the bus', () => {
+    const runtime = new WorkbenchRuntime();
     const events = runtime.getEvents();
+    let contextChangeCount = 0;
 
-    const sceneChanges: number[] = [];
-    const dirtyChanges: boolean[] = [];
-    const editorChanges: number[] = [];
-
-    events.on(WorkbenchEvents.DidChangeDocument, (snapshot) => {
-      sceneChanges.push(snapshot.contentRevision);
-    });
-    events.on(WorkbenchEvents.DidChangeDirty, (isDirty) => {
-      dirtyChanges.push(isDirty);
-    });
-    events.on(WorkbenchEvents.DidChangeActiveEditor, (activeEditor) => {
-      editorChanges.push(activeEditor ? 1 : 0);
+    events.on(WorkbenchEvents.DidChangeContext, () => {
+      contextChangeCount += 1;
     });
 
-    editor.open(
-      {
-        isDirty: false,
-        scene: scene.getDocument(),
-        title: 'Untitled',
-        uri: 'untitled://scene',
-      },
-      scene.getContentRevision()
-    );
+    runtime.getContextKeys().setContext('test.workbench', true);
 
-    scene.selectNodes([], null);
-
-    expect(sceneChanges.length).toBeGreaterThan(0);
-    expect(dirtyChanges).toContain(false);
-    expect(editorChanges).toContain(1);
+    expect(contextChangeCount).toBeGreaterThan(0);
   });
 
   it('disposes event listeners and context keys', () => {
-    const scene = new DocumentStore();
-    const editor = new EditorService();
-    const runtime = new EditorRuntime(scene, editor);
+    const runtime = new WorkbenchRuntime();
     const events = runtime.getEvents();
     let contextChangeCount = 0;
 

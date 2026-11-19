@@ -1,4 +1,4 @@
-import { normalizeDocument } from '@openenvx/studio/schema';
+import { normalizeDocument } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import { CanvasImageLayer } from './canvas-image-layer';

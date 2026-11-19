@@ -171,7 +171,7 @@ describe('useViewTreeSelectionSync', () => {
       const [collapsed, setCollapsed] = useState<Set<string>>(
         () => new Set(['group', 'child'])
       );
-      useViewTreeSelectionSync(view, selected, scene, setCollapsed);
+      useViewTreeSelectionSync(view, selected, scene, 'p1', setCollapsed);
       return collapsed;
     });
 
@@ -186,7 +186,7 @@ describe('useViewTreeSelectionSync', () => {
       const [collapsed, setCollapsed] = useState<Set<string>>(
         () => new Set(['group'])
       );
-      useViewTreeSelectionSync(view, selected, scene, setCollapsed);
+      useViewTreeSelectionSync(view, selected, scene, 'p1', setCollapsed);
       return collapsed;
     });
 

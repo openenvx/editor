@@ -1,24 +1,23 @@
-import {
-  FontServiceId,
-  createPropertyBuilder,
-  escapeHtml,
-  LayerDefinition,
-  sanitizeHtml,
-} from '@openenvx/studio';
-import type {
-  CommandContext,
-  DocumentNode,
-  FontService,
-  LayerPreviewContext,
-  PropertySectionDescriptor,
-} from '@openenvx/studio';
-import { createLayerPreviewBuilder } from '@openenvx/studio/preview';
-import type { Artboard } from '@openenvx/studio/schema';
+import { LayerDefinition } from '@openenvx/editor';
+import type { DocumentNode, LayerPreviewContext } from '@openenvx/editor';
+import { createLayerPreviewBuilder } from '@openenvx/editor/preview';
+import type { Artboard } from '@openenvx/editor/schema';
 import {
   clampTextCurve,
   createDefaultFrame,
   MAX_TEXT_CURVE,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
+import {
+  FontServiceId,
+  createPropertyBuilder,
+  escapeHtml,
+  sanitizeHtml,
+} from '@openenvx/studio';
+import type {
+  CommandContext,
+  FontService,
+  PropertySectionDescriptor,
+} from '@openenvx/studio';
 import { z } from 'zod';
 
 import { fitCanvasTextLayerToContent } from '../fit-text-layer-to-content';

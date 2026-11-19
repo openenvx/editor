@@ -13,7 +13,7 @@ const sourcemap = process.env.STUDIO_SOURCEMAP === '1';
 
 const variablesExternals = [
   '@openenvx/studio',
-  '@openenvx/studio/schema',
+  '@openenvx/editor/schema',
   '@openenvx/studio/react',
   'react',
   'react-dom',

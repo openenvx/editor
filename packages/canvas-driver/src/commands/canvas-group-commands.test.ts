@@ -1,13 +1,8 @@
-import {
-  EditorService,
-  getChildNodes,
-  InstantiationService,
-  DocumentStore,
-  WorkbenchEventService,
-  type CommandContext,
-} from '@openenvx/studio';
-import { createDefaultFrame } from '@openenvx/studio/schema';
-import type { EditorSession } from '@openenvx/studio/schema';
+import { getChildNodes, DocumentStore, requireDocumentStore } from '@openenvx/editor';
+import type { CommandContext } from '@openenvx/studio';
+import { createCanvasCommandContextFromStore } from '../test/mock-command-context';
+import { createDefaultFrame } from '@openenvx/editor/schema';
+import type { EditorSession } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -23,13 +18,7 @@ import {
 } from '../test/canvas-document-fixtures';
 
 function createContext(sceneStore: DocumentStore): CommandContext {
-  return {
-    editor: new EditorService(),
-    events: new WorkbenchEventService(),
-    scene: sceneStore,
-    selection: sceneStore.getSession(),
-    services: new InstantiationService(),
-  };
+  return createCanvasCommandContextFromStore(sceneStore);
 }
 
 const baseNodes = [
@@ -76,10 +65,10 @@ describe('canvas group commands', () => {
     const command = new InsertCanvasGroupCommand();
     expect(command.canExecute(ctx)).toBe(true);
     command.execute(ctx);
-    const page = ctx.scene.getDocument().artboards[0];
+    const page = requireDocumentStore(ctx).getDocument().artboards[0];
     const group = page?.nodes.find((layer) => layer.type === 'canvas.group');
     expect(group).toBeDefined();
-    expect(ctx.scene.getSession().primaryNodeId).toBe(group?.id);
+    expect(requireDocumentStore(ctx).getSession().primaryNodeId).toBe(group?.id);
   });
 
   it('groupSelection wraps selected root layers', () => {
@@ -88,7 +77,7 @@ describe('canvas group commands', () => {
     const command = new GroupSelectionCommand();
     expect(command.canExecute(ctx)).toBe(true);
     command.execute(ctx);
-    const page = ctx.scene.getDocument().artboards[0];
+    const page = requireDocumentStore(ctx).getDocument().artboards[0];
     expect(page?.nodes).toHaveLength(1);
     const groupLayer = page?.nodes[0];
     expect(groupLayer?.type).toBe('canvas.group');
@@ -118,7 +107,7 @@ describe('canvas group commands', () => {
     const command = new UngroupSelectionCommand();
     expect(command.canExecute(ctx)).toBe(true);
     command.execute(ctx);
-    const page = ctx.scene.getDocument().artboards[0];
+    const page = requireDocumentStore(ctx).getDocument().artboards[0];
     expect(page?.nodes).toHaveLength(2);
     expect(page?.nodes.map((layer) => layer.id)).toStrictEqual([
       'rect-1',

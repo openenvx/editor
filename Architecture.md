@@ -42,7 +42,8 @@ Author how-to (under `docs/architecture/`):
 
 | Tier | Packages | License / publish | Responsibility |
 | --- | --- | --- | --- |
-| Foundation | `@openenvx/studio` (`.`, `/schema`, `/preview`, `/react`) | Published npm, MPL-2.0 | Document model (Zod + JSON Schema), plugin host primitives |
+| Document & scene | `@openenvx/editor` (`/schema`, `/preview`, default editor plugins) | Workspace (pre-publish) | `DocumentStore`, scene commands, schema/normalize, preview IR, `createEditorPlugins` |
+| Workbench | `@openenvx/studio` (`.`, `./shell`, `./react`) | Published npm, MPL-2.0 | Plugin host, `WorkbenchController`, contributions, React shell |
 | Sandbox extensions | `editor-sandbox` (`@openenvx/editor-sandbox`, `./protocol`, `./host`) | Published package, MPL-2.0 | Author SDK, protocol validators, optional QuickJS host runtime |
 | Product libs | `variables`, `agent` | Workspace-private | Variables plugin, agent |
 | Published product | `@openenvx/studio`, `@openenvx/canvas-driver`, `@openenvx/editor-sandbox` | Public npm, MPL-2.0 | Composable shell + canvas engine for open-source hosts |
@@ -51,8 +52,8 @@ Author how-to (under `docs/architecture/`):
 
 | Put it here | Examples |
 | --- | --- |
-| `@openenvx/studio` (`./schema`) | Document Zod schemas, `validateDocument` / `normalizeDocument`, JSON Schema export |
-| `@openenvx/studio` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, scene store, `PropertyBuilder`, `Registry`, `WorkbenchController`, `WorkbenchPlugin`, UI contributions, property host context |
+| `@openenvx/editor` (`./schema`, `./preview`) | Document Zod schemas, `DocumentStore`, scene commands, normalize/validate, preview builders |
+| `@openenvx/studio` | `Command`, `LayerDefinition`, `Plugin`, `EditorRuntime`, `PluginManager`, `PropertyBuilder`, `Registry`, `WorkbenchController`, `WorkbenchPlugin`, workbench UI contributions |
 | `@openenvx/canvas-driver` | Konva stage, layers, renderers, `CanvasPlugin`, `CanvasEditor` |
 | `@openenvx/studio/plugins/variables` | Opt-in `VariablesPlugin` (catalog sidebar + `showForm` editor); `./tiptap` chip/suggest helpers |
 | `@openenvx/studio` | Published headless runtime (`.`: plugin host) + `./shell` (`WorkbenchShell`, CSS) + `./schema`, `./preview`, `./react` |

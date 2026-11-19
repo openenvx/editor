@@ -2,7 +2,6 @@ import type { ComponentType } from 'react';
 import { useCallback, useMemo } from 'react';
 
 import {
-  findNodeById,
   createPropertyHostContext,
   ContextKeyServiceId,
   evaluatePropertyLayoutWhen,
@@ -22,6 +21,7 @@ import { useWorkbenchContext } from '../../context/workbench-context';
 import { useContextKeysRevision } from '../../hooks/use-context-key';
 import { useWorkbenchContextSelector } from '../../hooks/use-workbench-selector';
 import { ViewPane } from '../../layout/view-pane';
+import { findNodeInSceneDocument } from '../../utils/find-node-in-scene-document';
 import { PanelSection } from '../primitives/panel-section';
 import { ListViewRenderer } from './list-view-renderer';
 import { PropertyContentRenderer } from './property-content-renderer';
@@ -62,7 +62,7 @@ function usePropertiesHostContext(
     if (!scene || !primaryNodeId) {
       return null;
     }
-    const primaryLayer = findNodeById(scene, primaryNodeId);
+    const primaryLayer = findNodeInSceneDocument(scene, primaryNodeId);
     if (
       !primaryLayer ||
       typeof primaryLayer.props !== 'object' ||
@@ -85,7 +85,7 @@ function usePropertiesHostContext(
         layerData,
         scene,
         selectedLayerId: primaryNodeId ?? null,
-        updateProperty: api.updateProperty,
+        updateProperty: () => {},
       },
       { api, executeCommand }
     );
