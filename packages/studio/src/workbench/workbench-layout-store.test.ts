@@ -1,3 +1,4 @@
+import { createEmptyEditorPlugins } from '@openenvx/editor';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -55,9 +56,11 @@ describe('WorkbenchLayoutStore', () => {
       save: vi.fn(),
     };
 
+    const { plugins, sliceBuilders } = createEmptyEditorPlugins();
     const controller = new WorkbenchController({
       layoutStore: store,
-      plugins: [new TestLayoutPlugin()],
+      plugins: [...plugins, new TestLayoutPlugin()],
+      sliceBuilders,
     });
     await controller.start();
 
@@ -78,9 +81,11 @@ describe('WorkbenchLayoutStore', () => {
       save,
     };
 
+    const { plugins, sliceBuilders } = createEmptyEditorPlugins();
     const controller = new WorkbenchController({
       layoutStore: store,
-      plugins: [new TestLayoutPlugin()],
+      plugins: [...plugins, new TestLayoutPlugin()],
+      sliceBuilders,
     });
     await controller.start();
     save.mockClear();
@@ -115,9 +120,11 @@ describe('WorkbenchLayoutStore', () => {
       save: vi.fn(),
     };
 
+    const { plugins, sliceBuilders } = createEmptyEditorPlugins();
     const controller = new WorkbenchController({
       layoutStore: store,
-      plugins: [new TestLayoutPlugin()],
+      plugins: [...plugins, new TestLayoutPlugin()],
+      sliceBuilders,
     });
     await controller.start();
 
@@ -137,9 +144,11 @@ describe('WorkbenchLayoutStore', () => {
       save: vi.fn(),
     };
 
+    const { plugins, sliceBuilders } = createEmptyEditorPlugins();
     const controller = new WorkbenchController({
       layoutStore: store,
-      plugins: [new TestLayoutPlugin()],
+      plugins: [...plugins, new TestLayoutPlugin()],
+      sliceBuilders,
     });
     await controller.start();
 

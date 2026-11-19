@@ -1,17 +1,17 @@
 import {
-  Command,
+  requireDocumentStore,
   findNodeById,
   getActiveArtboard,
-  localize,
   updateNodeInTree,
-} from '@openenvx/studio';
-import type { CommandContext } from '@openenvx/studio';
+} from '@openenvx/editor';
 import {
   applyNodeTransform,
   artboardRulesLayout,
   nodeTransform,
   type Transform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
+import { Command, localize } from '@openenvx/studio';
+import type { CommandContext } from '@openenvx/studio';
 
 import { alignTransforms, distributeHorizontally } from '../layer-align/align';
 
@@ -21,15 +21,17 @@ function getSelectedTransforms(ctx: CommandContext): {
   layerIds: string[];
   transforms: Transform[];
 } {
-  const scene = ctx.scene.getDocument();
+  const scene = requireDocumentStore(ctx).getDocument();
   const page = getActiveArtboard(scene);
   if (artboardRulesLayout(page) !== 'absolute') {
     return { layerIds: [], transforms: [] };
   }
-  const pairs = ctx.selection.selectedNodeIds.flatMap((layerId) => {
-    const layer = findNodeById(scene, layerId);
-    return layer ? [{ layerId, transform: nodeTransform(layer) }] : [];
-  });
+  const pairs = requireDocumentStore(ctx)
+    .getSession()
+    .selectedNodeIds.flatMap((layerId) => {
+      const layer = findNodeById(scene, layerId);
+      return layer ? [{ layerId, transform: nodeTransform(layer) }] : [];
+    });
   return {
     layerIds: pairs.map((pair) => pair.layerId),
     transforms: pairs.map((pair) => pair.transform),
@@ -43,8 +45,8 @@ function applyTransforms(
   labelKey: string,
   defaultLabel: string
 ): void {
-  const activeArtboardId = ctx.scene.getActiveArtboardId();
-  ctx.scene.apply({
+  const activeArtboardId = requireDocumentStore(ctx).getActiveArtboardId();
+  requireDocumentStore(ctx).apply({
     apply: (scene) => ({
       ...scene,
       artboards: scene.artboards.map((page) =>

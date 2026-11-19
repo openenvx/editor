@@ -1,11 +1,14 @@
 import {
   moveNodeRelativeToTarget,
-} from '../backbone';
-import type { CommandContext, DocumentNode } from '../backbone';
-import { createDefaultFrame } from '#studio/schema';
+  requireDocumentStore,
+  type DocumentNode,
+} from '@openenvx/editor';
+import { createDefaultFrame } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
-import { normalizeDocumentForTest } from '../test/document-fixtures';
+import type { CommandContext } from '../backbone';
+import { normalizeProjectSnapshotForTest } from '../test/document-fixtures';
+import { createWorkbenchWithEditor } from '../test/create-workbench-with-editor';
 
 import {
   TreeDataProvider,
@@ -13,13 +16,12 @@ import {
   ViewContribution,
 } from '../contributions/view-contribution';
 import { ViewProviderRegistryImpl } from '../registries/view-provider-registry';
-import { WorkbenchController } from './workbench-controller';
 import { WorkbenchPlugin } from './workbench-plugin';
 import type { WorkbenchPluginContext } from './workbench-plugin-context';
 
 class LayersTreeProvider extends TreeDataProvider<DocumentNode> {
   getRootChildren(ctx: CommandContext): DocumentNode[] {
-    return ctx.scene.getActiveArtboard().nodes;
+    return requireDocumentStore(ctx).getActiveArtboard().nodes;
   }
 
   getChildren(): DocumentNode[] {
@@ -36,9 +38,10 @@ class LayersTreeProvider extends TreeDataProvider<DocumentNode> {
     position: 'before' | 'after' | 'inside',
     ctx: CommandContext
   ): void {
-    const page = ctx.scene.getActiveArtboard();
+    const store = requireDocumentStore(ctx);
+    const page = store.getActiveArtboard();
     const effectivePosition = position === 'inside' ? 'after' : position;
-    ctx.scene.apply({
+    store.apply({
       apply: (scene) => ({
         ...scene,
         artboards: scene.artboards.map((p) =>
@@ -82,8 +85,8 @@ class LayersPlugin extends WorkbenchPlugin {
 
 describe('moveViewItem', () => {
   it('delegates to tree provider handleMove', async () => {
-    const controller = new WorkbenchController({
-      initialScene: normalizeDocumentForTest({
+    const controller = createWorkbenchWithEditor(
+      normalizeProjectSnapshotForTest({
         pages: [
           {
             id: 'p1',
@@ -109,8 +112,8 @@ describe('moveViewItem', () => {
         ],
         activeArtboardId: 'p1',
       }),
-      plugins: [new LayersPlugin()],
-    });
+      [new LayersPlugin()]
+    );
     await controller.start();
     controller.moveViewItem(
       'layers.tree',
@@ -152,8 +155,8 @@ describe('view when clause', () => {
   }
 
   it('omits views when when clause is false', async () => {
-    const controller = new WorkbenchController({
-      initialScene: normalizeDocumentForTest({
+    const controller = createWorkbenchWithEditor(
+      normalizeProjectSnapshotForTest({
         pages: [
           {
             id: 'p1',
@@ -166,12 +169,13 @@ describe('view when clause', () => {
         ],
         activeArtboardId: 'p1',
       }),
-      plugins: [new HiddenViewPlugin()],
-    });
+      [new HiddenViewPlugin()]
+    );
     await controller.start();
-    const containers = controller.getState().viewContainers;
-    expect(containers).toHaveLength(1);
-    expect(containers[0]!.views).toStrictEqual([]);
+    const layers = controller
+      .getState()
+      .viewContainers.find((container) => container.id === 'layers');
+    expect(layers?.views).toStrictEqual([]);
   });
 });
 
@@ -189,8 +193,8 @@ describe('registerTreeDataProvider primary and order', () => {
       }
     }
 
-    const controller = new WorkbenchController({
-      initialScene: normalizeDocumentForTest({
+    const controller = createWorkbenchWithEditor(
+      normalizeProjectSnapshotForTest({
         pages: [
           {
             id: 'p1',
@@ -203,8 +207,8 @@ describe('registerTreeDataProvider primary and order', () => {
         ],
         activeArtboardId: 'p1',
       }),
-      plugins: [new PrimaryPlugin()],
-    });
+      [new PrimaryPlugin()]
+    );
     await controller.start();
     expect(controller.getState().viewContainers[0]!.views).toHaveLength(1);
   });
@@ -224,8 +228,8 @@ describe('registerTreeDataProvider primary and order', () => {
       }
     }
 
-    const controller = new WorkbenchController({
-      initialScene: normalizeDocumentForTest({
+    const controller = createWorkbenchWithEditor(
+      normalizeProjectSnapshotForTest({
         pages: [
           {
             id: 'p1',
@@ -238,8 +242,8 @@ describe('registerTreeDataProvider primary and order', () => {
         ],
         activeArtboardId: 'p1',
       }),
-      plugins: [new OrderPlugin()],
-    });
+      [new OrderPlugin()]
+    );
     await controller.start();
     expect(controller.getState().viewContainers[0]!.views).toHaveLength(1);
   });

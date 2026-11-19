@@ -2,8 +2,9 @@ import {
   useVariableChipLabels,
   useVariableRichTextSuggest,
   VariableSuggestMenu,
-} from '@openenvx/studio/plugins/variables';
-import { isRichTextBlurInsideVariableChrome } from '@openenvx/studio/plugins/variables/tiptap';
+} from '@openenvx/editor/plugins/variables';
+import { isRichTextBlurInsideVariableChrome } from '@openenvx/editor/plugins/variables/tiptap';
+import type { TemplateVariable } from '@openenvx/editor/schema';
 import {
   useWorkbenchContext,
   useWorkbenchContextSelector,
@@ -26,6 +27,8 @@ import { RichTextBubbleMenuToolbar } from './rich-text-bubble-menu';
 import { createRichTextEditorExtensions } from './rich-text-editor-extensions';
 
 import styles from './canvas-editor.module.css';
+
+const EMPTY_SCENE_VARIABLES: TemplateVariable[] = [];
 
 function shouldShowRichTextBubbleMenu({
   state,
@@ -65,7 +68,12 @@ export function CanvasRichTextEditor({
 }: CanvasRichTextEditorProps) {
   const { executeCommand } = useWorkbenchContext();
   const sceneVariables =
-    useWorkbenchContextSelector((state) => state.scene?.variables) ?? [];
+    useWorkbenchContextSelector((state) => {
+      const scene = state.scene as
+        | { variables?: TemplateVariable[] }
+        | undefined;
+      return scene?.variables ?? EMPTY_SCENE_VARIABLES;
+    }) ?? [];
   const { missingTip, pickerTitle, createVariable } = useVariableChipLabels();
   const editorRef = useRef<Editor | null>(null);
   const {

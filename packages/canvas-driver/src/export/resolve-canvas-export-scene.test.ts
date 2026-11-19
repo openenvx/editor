@@ -1,4 +1,4 @@
-import { formatVariableToken, nodeTransform } from '@openenvx/studio/schema';
+import { formatVariableToken, nodeTransform } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import { resolveCanvasExportScene } from './resolve-canvas-export-scene';

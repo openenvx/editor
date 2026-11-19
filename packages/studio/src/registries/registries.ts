@@ -1,11 +1,5 @@
 import type { Command } from '../contributions/command';
 import type { ContextKeyContribution } from '../contributions/context-key-contribution';
-import type { LayerDefinition } from '../contributions/layer-definition';
-import type { NodeCompilerContribution } from '../contributions/node-compiler-contribution';
-import type { NodeDefinition } from '../contributions/node-definition';
-import type { NodeInspectorContribution } from '../contributions/node-inspector-contribution';
-import type { NodeTreeContribution } from '../contributions/node-tree-contribution';
-import type { PageRulesContribution } from '../contributions/page-rules-contribution';
 import type { ServiceContribution } from '../contributions/service-contribution';
 import type { ShortcutContribution } from '../contributions/shortcut-contribution';
 import { I18nBundleRegistry } from '../i18n/i18n-bundle-registry';
@@ -13,10 +7,21 @@ import type { I18nContribution } from '../i18n/i18n-contribution';
 import { LocalizationServiceId } from '../i18n/localization-service-id';
 import { CommandService } from '../runtime/command-service';
 import type { Contribution } from '../runtime/contribution';
-import type { EditorRuntime } from '../runtime/editor-runtime';
 import type { Disposable } from '../runtime/emitter';
 import { KeybindingService } from '../runtime/keybinding-service';
+import type { WorkbenchRuntime } from '../runtime/workbench-runtime';
 import { Registry } from './registry';
+
+type LayerDefinition = Contribution & { readonly type: string };
+type NodeDefinition = Contribution & { readonly type: string };
+type NodeInspectorContribution = Contribution & { readonly type: string };
+type NodeTreeContribution = Contribution & {
+  readonly type: string;
+  label?(node: { type: string }): string;
+  icon?: string;
+};
+type NodeCompilerContribution = Contribution & { readonly type: string };
+type PageRulesContribution = Contribution & { readonly layout: string };
 
 export class Registries {
   readonly commands = new CommandService();
@@ -115,9 +120,9 @@ class NodeTreeRegistry {
     return this.trees.get(type);
   }
 
-  label(node: import('#studio/schema').DocumentNode): string {
+  label(node: { type: string }): string {
     const tree = this.trees.get(node.type);
-    return tree?.label(node) ?? node.type;
+    return tree?.label?.(node) ?? node.type;
   }
 
   icon(type: string): string | undefined {
@@ -152,7 +157,7 @@ class NodeCompilerRegistry {
 export function registerContribution(
   registries: Registries,
   contribution: Contribution,
-  runtime: EditorRuntime
+  runtime: WorkbenchRuntime
 ): Disposable {
   const { services } = runtime;
   switch (contribution.contributionPoint) {

@@ -1,4 +1,4 @@
-import type { Transform } from '@openenvx/studio/schema';
+import type { Transform } from '@openenvx/editor/schema';
 import type Konva from 'konva';
 
 import { applyTransformToNode } from './geometry';

@@ -1,5 +1,5 @@
-import { getChildNodes } from '@openenvx/studio';
-import { nodeTransform } from '@openenvx/studio/schema';
+import { getChildNodes } from '@openenvx/editor';
+import { nodeTransform } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import { legacyLayer } from '../test/canvas-document-fixtures';

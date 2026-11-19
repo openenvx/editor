@@ -1,4 +1,4 @@
-import type { Transform } from '@openenvx/studio/schema';
+import type { Transform } from '@openenvx/editor/schema';
 
 export function alignTransforms(
   transforms: Transform[],

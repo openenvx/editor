@@ -1,8 +1,7 @@
+import type { DocumentTransaction } from '@openenvx/editor/host-surface';
+import type { Document, EditorSession } from '@openenvx/editor/schema';
 import type {
   Command,
-  Document,
-  DocumentTransaction,
-  EditorSession,
   WorkbenchContribution,
   WorkbenchContributionDisposable,
 } from '@openenvx/studio';

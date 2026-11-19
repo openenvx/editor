@@ -1,6 +1,6 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 
-import { getActiveArtboard, type Document, type ViewDescriptor } from '#studio';
+import type { ViewDescriptor } from '#studio';
 
 import { getNodeAncestorIds } from './get-layer-ancestor-ids';
 
@@ -25,7 +25,7 @@ export function resolveViewHoveredIds(
 export function useViewTreeHoverExpand(
   view: ViewDescriptor,
   hoveredLayerId: string | null,
-  scene: Document,
+  scene: { artboards: { id: string; nodes: unknown[] }[] },
   setCollapsed: Dispatch<SetStateAction<Set<string>>>
 ): void {
   const viewHover = view.viewHover;
@@ -34,8 +34,14 @@ export function useViewTreeHoverExpand(
     if (viewHover !== 'layer' || !hoveredLayerId) {
       return;
     }
-    const page = getActiveArtboard(scene);
-    const ancestorIds = getNodeAncestorIds(page, hoveredLayerId);
+    const page = scene.artboards[0];
+    if (!page) {
+      return;
+    }
+    const ancestorIds = getNodeAncestorIds(
+      { nodes: page.nodes as import('@openenvx/editor/schema').DocumentNode[] },
+      hoveredLayerId
+    );
     if (ancestorIds.length === 0) {
       return;
     }

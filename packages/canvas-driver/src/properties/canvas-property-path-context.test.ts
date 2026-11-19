@@ -5,7 +5,7 @@ import {
   createDefaultFrame,
   formatVariableToken,
   nodeTransform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 import { createCanvasPropertyHostContext } from './canvas-property-path-context';
 import {

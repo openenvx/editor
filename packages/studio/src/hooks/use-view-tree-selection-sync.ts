@@ -1,6 +1,6 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 
-import type { Document, ViewDescriptor } from '#studio';
+import type { ViewDescriptor } from '#studio';
 
 import { getSelectionExpandIds } from './get-selection-expand-ids';
 
@@ -11,7 +11,8 @@ import { getSelectionExpandIds } from './get-selection-expand-ids';
 export function useViewTreeSelectionSync(
   view: ViewDescriptor,
   selectedNodeIds: Set<string>,
-  scene: Document,
+  scene: { artboards: { id: string; nodes: unknown[] }[] },
+  activeArtboardId: string,
   setCollapsed: Dispatch<SetStateAction<Set<string>>>
 ): void {
   const viewSelection = view.viewSelection;
@@ -20,7 +21,11 @@ export function useViewTreeSelectionSync(
     if (viewSelection !== 'layer' || selectedNodeIds.size === 0) {
       return;
     }
-    const expandIds = getSelectionExpandIds(scene, selectedNodeIds);
+    const expandIds = getSelectionExpandIds(
+      scene,
+      selectedNodeIds,
+      activeArtboardId
+    );
     if (expandIds.size === 0) {
       return;
     }
@@ -35,5 +40,5 @@ export function useViewTreeSelectionSync(
       }
       return changed ? next : prev;
     });
-  }, [scene, selectedNodeIds, setCollapsed, viewSelection]);
+  }, [activeArtboardId, scene, selectedNodeIds, setCollapsed, viewSelection]);
 }

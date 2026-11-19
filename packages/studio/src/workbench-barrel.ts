@@ -81,17 +81,6 @@ export {
   WORKBENCH_TOGGLE_PRIMARY_SIDEBAR_COMMAND_ID,
   WORKBENCH_TOGGLE_SECONDARY_SIDEBAR_COMMAND_ID,
 } from './views/default-workbench-chrome-plugin';
-export {
-  LayersTreeProvider,
-  PagesTreeProvider,
-  WORKBENCH_LAYERS_VIEW_ID,
-  WORKBENCH_PAGES_VIEW_ID,
-  WORKBENCH_SIDEBAR_CONTAINER_ID,
-  WorkbenchLayersView,
-  WorkbenchPagesView,
-  WorkbenchSidebarContainer,
-  WorkbenchStatusBarContribution,
-} from './views/workbench-chrome-contributions';
 export { SecondarySidebarRenderer } from './ui/renderers/secondary-sidebar-renderer';
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/primitives/tabs';
 export { NumericControl } from './ui/inputs/basic/numeric-control';
@@ -110,6 +99,16 @@ export {
 } from './layout/activity-sidebar';
 export { Button } from './ui/primitives/button';
 export { createMockWorkbenchApi } from './test/mock-workbench-context';
+export type {
+  SceneSlice,
+  EditorSlice,
+  SliceBuilders,
+} from './workbench/workbench-state-cache';
+export type { WorkbenchSliceContext } from './state/workbench-slice-context';
+export { buildViewContainer } from './state/view-descriptor-builder';
+export { getNestedValue, setNestedValue } from './utils/nested-value';
+export { IconButton } from './ui/primitives/icon-button';
+export { cn } from './lib/cn';
 export { ConfirmDialog } from './ui/primitives/confirm-dialog';
 export { Input } from './ui/primitives/input';
 export { ModalDialog } from './ui/primitives/modal-dialog';
@@ -139,17 +138,3 @@ export {
   ColorPickerPopover,
   type ColorPickerPopoverProps,
 } from './ui/primitives/color-picker';
-export {
-  VersionHistoryPlugin,
-  VERSION_HISTORY_CONTAINER_ID,
-  VERSION_HISTORY_VIEW_ID,
-  VERSION_HISTORY_PANEL_COMPONENT_ID,
-  VERSION_HISTORY_PLUGIN_ID,
-  type VersionHistoryPluginOptions,
-} from './plugins/version-history/version-history-plugin';
-export { VersionHistoryPanel } from './plugins/version-history/version-history-panel';
-export {
-  RestoreVersionCommand,
-  VERSION_HISTORY_RESTORE_COMMAND_ID,
-  type RestoreVersionArgs,
-} from './plugins/version-history/restore-version-command';

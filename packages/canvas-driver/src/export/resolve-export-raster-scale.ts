@@ -1,8 +1,8 @@
 import {
   resolveArtboardDpi,
   resolveArtboardPixelDimensions,
-} from '@openenvx/studio/schema';
-import type { Artboard } from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
+import type { Artboard } from '@openenvx/editor/schema';
 
 import type { CanvasExportOptions } from './canvas-document-export-service';
 

@@ -1,6 +1,6 @@
-import { cloneNodeTree, createNodeId } from '@openenvx/studio';
-import type { DocumentNode } from '@openenvx/studio/schema';
-import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
+import { cloneNodeTree, createNodeId } from '@openenvx/editor';
+import type { DocumentNode } from '@openenvx/editor/schema';
+import { applyNodeTransform, nodeTransform } from '@openenvx/editor/schema';
 
 export { createNodeId };
 

@@ -1,7 +1,9 @@
-import { Command, updateNodeInTree } from '@openenvx/studio';
-import type { CommandContext, DocumentNode } from '@openenvx/studio';
-import type { OpenEnvxWidgetProps } from '@openenvx/studio/schema';
-import { applyNodeTransform, nodeTransform } from '@openenvx/studio/schema';
+import type { DocumentNode } from '@openenvx/editor';
+import { updateNodeInTree, requireDocumentStore } from '@openenvx/editor';
+import type { OpenEnvxWidgetProps } from '@openenvx/editor/schema';
+import { applyNodeTransform, nodeTransform } from '@openenvx/editor/schema';
+import type { CommandContext } from '@openenvx/studio';
+import { Command } from '@openenvx/studio';
 
 import { WIDGET_LAYER_TYPE } from '../layers/openenvx-widget-layer';
 
@@ -62,18 +64,18 @@ export class DetachWidgetCommand extends Command {
   readonly title = 'Detach Widget';
 
   execute(ctx: CommandContext): void {
-    const primary = ctx.scene.getPrimaryNode();
+    const primary = requireDocumentStore(ctx).getPrimaryNode();
     if (!primary || primary.type !== WIDGET_LAYER_TYPE) {
       return;
     }
     const group = detachedReplacement(primary);
 
-    ctx.scene.apply({
+    requireDocumentStore(ctx).apply({
       label: 'Detach widget',
       apply: (scene) => ({
         ...scene,
         artboards: scene.artboards.map((page) => {
-          if (page.id !== ctx.scene.getActiveArtboard().id) {
+          if (page.id !== requireDocumentStore(ctx).getActiveArtboard().id) {
             return page;
           }
           return {

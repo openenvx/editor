@@ -13,9 +13,14 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "paths": {
+      "@openenvx/editor": ["../editor/src/index.ts"],
+      "@openenvx/editor/schema": ["../editor/src/schema/index.ts"],
+      "@openenvx/editor/preview": ["../editor/src/preview/index.ts"],
       "@openenvx/studio": ["../studio/src/index.ts"],
       "@openenvx/studio/shell": ["../studio/src/shell/index.ts"],
-      "@openenvx/studio/schema": ["../studio/src/schema/index.ts"]
+      "@openenvx/studio/schema": ["../studio/src/schema/index.ts"],
+      "@openenvx/studio/react": ["../studio/src/react/workbench-context.tsx"],
+      "@openenvx/studio/internal": ["../studio/src/workbench-barrel.ts"]
     }
   }
 }

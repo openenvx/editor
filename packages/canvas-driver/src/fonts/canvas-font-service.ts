@@ -12,8 +12,11 @@ import {
   pickGoogleFontLoadVariants,
 } from './google-font-variant';
 
-const fontsByFamily = new Map<string, FontDescriptor>();
-const fontsById = new Map<string, FontDescriptor>();
+/** Canvas font rows may carry a direct `src` (not on core FontDescriptor). */
+type CanvasFontDescriptor = FontDescriptor & { src?: string };
+
+const fontsByFamily = new Map<string, CanvasFontDescriptor>();
+const fontsById = new Map<string, CanvasFontDescriptor>();
 /** Google (or provider) face keys - canvas-private, not on core FontDescriptor. */
 const variantsById = new Map<string, string[]>();
 const loadedFaceKeys = new Set<string>();
@@ -22,8 +25,11 @@ const ensurePromises = new Map<string, Promise<void>>();
 let featuredPreloadPromise: Promise<void> | null = null;
 let seeded = false;
 
-function rememberEntry(entry: CanvasFontCatalogEntry): FontDescriptor {
-  const descriptor = toFontDescriptor(entry);
+function rememberEntry(entry: CanvasFontCatalogEntry): CanvasFontDescriptor {
+  const descriptor: CanvasFontDescriptor = {
+    ...toFontDescriptor(entry),
+    ...(entry.src ? { src: entry.src } : {}),
+  };
   fontsByFamily.set(descriptor.family, descriptor);
   fontsById.set(descriptor.id.toLowerCase(), descriptor);
   if (entry.variants && entry.variants.length > 0) {
@@ -42,11 +48,11 @@ function seedRegistry(): void {
   }
 }
 
-function faceKey(font: FontDescriptor): string {
+function faceKey(font: CanvasFontDescriptor): string {
   return `${font.family}::${font.src ?? ''}`;
 }
 
-function injectFontFace(font: FontDescriptor): void {
+function injectFontFace(font: CanvasFontDescriptor): void {
   if (!font.src || typeof document === 'undefined') {
     return;
   }
@@ -153,7 +159,7 @@ function preloadFeaturedFonts(): Promise<void> {
   return featuredPreloadPromise;
 }
 
-function resolveFont(family: string): FontDescriptor | null {
+export function resolveCanvasFont(family: string): CanvasFontDescriptor | null {
   seedRegistry();
   const trimmed = family.trim();
   if (!trimmed) {
@@ -177,7 +183,7 @@ function resolveFont(family: string): FontDescriptor | null {
 }
 
 async function ensureFontLoaded(family: string): Promise<void> {
-  const font = resolveFont(family);
+  const font = resolveCanvasFont(family);
   if (!font) {
     return;
   }
@@ -218,10 +224,6 @@ export const canvasFontService: FontService = {
   listFeatured(): FontDescriptor[] {
     seedRegistry();
     return createFeaturedFontCatalog().map(toFontDescriptor);
-  },
-
-  resolve(family: string): FontDescriptor | null {
-    return resolveFont(family);
   },
 
   register(font: FontDescriptor): void {

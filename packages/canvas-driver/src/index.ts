@@ -189,8 +189,9 @@ export {
 } from './contributions/canvas-property-pane-contributions';
 export { DEFAULT_CANVAS_LAYOUT } from './default-canvas-layout';
 export {
-  DEFAULT_CANVAS_WORKBENCH_PLUGINS,
+  createDefaultCanvasWorkbench,
   defaultCanvasWorkbench,
+  type DefaultCanvasWorkbenchOptions,
 } from './default-canvas-workbench';
 export { createCanvasScene, type Document } from './publish-runtime';
 export { exportCanvasDocument } from './export/browser/export-canvas-document';

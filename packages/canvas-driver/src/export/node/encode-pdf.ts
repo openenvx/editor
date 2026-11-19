@@ -1,5 +1,5 @@
-import { computeArtboardExportDimensions } from '@openenvx/studio/schema';
-import type { Artboard } from '@openenvx/studio/schema';
+import { computeArtboardExportDimensions } from '@openenvx/editor/schema';
+import type { Artboard } from '@openenvx/editor/schema';
 import { PDFDocument } from 'pdf-lib';
 
 export async function encodePngBytesToPdf(

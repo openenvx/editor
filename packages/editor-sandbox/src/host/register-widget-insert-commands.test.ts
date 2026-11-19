@@ -7,7 +7,7 @@ import {
   type DocumentNode,
   type OpenEnvxWidgetProps,
   withArtboardRulesLayout,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { extensionBlockStore } from './panel-tree/extension-block-store';

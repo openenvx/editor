@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { formatVariableToken, nodeTransform } from '@openenvx/studio/schema';
+import { formatVariableToken, nodeTransform } from '@openenvx/editor/schema';
 import {
   legacyArtboard,
   legacyLayer,

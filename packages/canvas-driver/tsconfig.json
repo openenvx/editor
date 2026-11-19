@@ -7,13 +7,22 @@
     "paths": {
       "@openenvx/studio": ["../studio/src/index.ts"],
       "@openenvx/studio/shell": ["../studio/src/shell/index.ts"],
-      "@openenvx/studio/schema": ["../studio/src/schema/index.ts"],
-      "@openenvx/studio/preview": ["../studio/src/preview/index.ts"],
       "@openenvx/studio/react": ["../studio/src/react/workbench-context.tsx"],
       "@openenvx/studio/internal": ["../studio/src/workbench-barrel.ts"],
+      "@openenvx/editor": ["../editor/src/index.ts"],
+      "@openenvx/editor/schema": ["../editor/src/schema/index.ts"],
+      "@openenvx/editor/preview": ["../editor/src/preview/index.ts"],
+      "@openenvx/editor/plugins/variables": [
+        "../editor/src/plugins/variables/index.ts"
+      ],
+      "@openenvx/editor/plugins/variables/tiptap": [
+        "../editor/src/plugins/variables/tiptap/index.ts"
+      ],
       "@openenvx/editor-sandbox/host": ["../editor-sandbox/src/host/index.ts"],
       "@openenvx/editor-sandbox/protocol": ["../editor-sandbox/src/protocol/index.ts"],
-      "@openenvx/editor-sandbox/canvas-widget": ["../editor-sandbox/src/canvas-widget/index.ts"]
+      "@openenvx/editor-sandbox/canvas-widget": [
+        "../editor-sandbox/src/canvas-widget/index.ts"
+      ]
     }
   },
   "include": ["src"],
