@@ -7,7 +7,7 @@
  * 3. Opposite corner is pinned to drag-start origin after every frame.
  * 4. Baked nodes always land at scale 1 (no leftover Transformer scale).
  */
-import { createDefaultFrame } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import { applyTransformToNode } from './geometry';

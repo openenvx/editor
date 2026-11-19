@@ -1,4 +1,4 @@
-import { createDefaultFrame, nodeTransform } from '@openenvx/studio/schema';
+import { createDefaultFrame, nodeTransform } from '@openenvx/editor/schema';
 import { describe, expect, it } from 'vitest';
 
 import {

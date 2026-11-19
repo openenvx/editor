@@ -1,4 +1,4 @@
-import type { Transform } from '@openenvx/studio/schema';
+import type { Transform } from '@openenvx/editor/schema';
 import { useCallback } from 'react';
 
 import { useCanvasHost } from '../canvas-host-context';

@@ -1,4 +1,4 @@
-import { createDefaultFrame } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/editor/schema';
 import type Konva from 'konva';
 import { describe, expect, it } from 'vitest';
 

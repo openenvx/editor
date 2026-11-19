@@ -1,7 +1,7 @@
-import type { DocumentNode as SceneLayer } from '@openenvx/studio';
-import { canTransformLayer, getChildNodes } from '@openenvx/studio';
+import type { DocumentNode as SceneLayer } from '@openenvx/editor';
+import { canTransformLayer, getChildNodes } from '@openenvx/editor';
+import { nodeTransform } from '@openenvx/editor/schema';
 import { useStoreSelector } from '@openenvx/studio/react';
-import { nodeTransform } from '@openenvx/studio/schema';
 import type Konva from 'konva';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';

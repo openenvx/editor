@@ -1,10 +1,26 @@
-import { walkNodes, type Artboard } from '#studio';
+import type { DocumentNode } from '@openenvx/editor/schema';
 
-/** Ancestor layer ids from root to parent of `layerId` (excludes self). */
-export function getNodeAncestorIds(page: Artboard, layerId: string): string[] {
+function walkNodes(
+  nodes: DocumentNode[],
+  visitor: (node: DocumentNode, path: DocumentNode[]) => void,
+  path: DocumentNode[] = []
+): void {
+  for (const node of nodes) {
+    visitor(node, path);
+    const children = node.children;
+    if (children?.length) {
+      walkNodes(children, visitor, [...path, node]);
+    }
+  }
+}
+
+export function getNodeAncestorIds(
+  page: { nodes: DocumentNode[] },
+  layerId: string
+): string[] {
   let ancestorIds: string[] = [];
-  walkNodes(page.nodes, (layer, path) => {
-    if (layer.id === layerId) {
+  walkNodes(page.nodes, (node, path) => {
+    if (node.id === layerId) {
       ancestorIds = path.map((ancestor) => ancestor.id);
     }
   });

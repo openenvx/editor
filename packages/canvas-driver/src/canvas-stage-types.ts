@@ -1,5 +1,5 @@
-import type { DocumentNode as SceneLayer } from '@openenvx/studio';
-import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
+import type { DocumentNode as SceneLayer } from '@openenvx/editor';
+import type { LayerPreviewDescriptor } from '@openenvx/editor/preview';
 
 import type {
   CanvasLayerInteractionRegistration,
@@ -37,7 +37,7 @@ export interface CanvasStageLayer {
 }
 
 export interface CanvasTransformChange {
-  transform: import('@openenvx/studio/schema').Transform;
+  transform: import('@openenvx/editor/schema').Transform;
   fontSize?: number;
   dataPatch?: Record<string, unknown>;
 }

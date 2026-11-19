@@ -7,8 +7,7 @@ import type { ToolbarItemDescriptor } from '../builders/toolbar-builder';
 import type { TopBarItemDescriptor } from '../builders/top-bar-builder';
 import type { OverlayDescriptor } from '../contributions/overlay-contribution';
 import type { InteractionState } from '../runtime/interaction-state';
-import type { Document, EditorSession } from '../scene/types';
-import type { EditorInput } from '../workbench/editor-service';
+import type { WorkbenchSliceContext } from '../state/workbench-slice-context';
 import type {
   FieldRendererRegistration,
   ViewPanelRegistration,
@@ -16,6 +15,10 @@ import type {
 import type { ActiveDialog } from './dialog-registrations';
 import type { EditorPaneRegistration } from './editor-pane-host-props';
 import type { StatusBarItemRendererRegistration } from './status-bar-item-renderer-registration';
+import type {
+  WorkbenchEditorInput,
+  WorkbenchEditorSession,
+} from './workbench-document-events';
 import type { WorkbenchLayout } from './workbench-layout';
 import type {
   LayerSurfaceItem,
@@ -30,8 +33,8 @@ export type SliceName =
   | 'interaction';
 
 export interface SceneSlice {
-  scene: Document;
-  selection: EditorSession;
+  scene: unknown;
+  selection: WorkbenchEditorSession;
   properties: PropertySectionDescriptor[] | null;
   viewContainers: ViewContainerDescriptor[];
   fieldRenderers: FieldRendererRegistration[];
@@ -43,7 +46,7 @@ export interface EditorSlice {
   layerSurface: LayerSurfaceItem[];
   editorPaneKind: string;
   editorPanes: EditorPaneRegistration[];
-  editor: EditorInput | null;
+  editor: WorkbenchEditorInput | null;
 }
 
 export interface ChromeSlice {
@@ -65,10 +68,10 @@ export interface CommandsSlice {
 export type InteractionSlice = InteractionState;
 
 export interface SliceBuilders {
-  buildSceneSlice: () => SceneSlice;
-  buildEditorSlice: () => EditorSlice;
-  buildChromeSlice: () => ChromeSlice;
-  buildCommandsSlice: () => CommandsSlice;
+  buildSceneSlice: (ctx: WorkbenchSliceContext) => SceneSlice;
+  buildEditorSlice: (ctx: WorkbenchSliceContext) => EditorSlice;
+  buildChromeSlice: (ctx: WorkbenchSliceContext) => ChromeSlice;
+  buildCommandsSlice: (ctx: WorkbenchSliceContext) => CommandsSlice;
   buildInteractionSlice: () => InteractionSlice;
 }
 
@@ -114,8 +117,8 @@ export class WorkbenchStateCache {
   }
 
   invalidateSelectionOnly(
-    scene: Document,
-    selection: EditorSession,
+    scene: unknown,
+    selection: WorkbenchEditorSession,
     contentRevision: number,
     rebuildSelectionDerived?: (
       current: SceneSlice
@@ -129,6 +132,7 @@ export class WorkbenchStateCache {
         ...derived,
       };
       this.sceneSlice = { ...this.sceneSlice, ...patch };
+      this.dirty.delete('scene');
     } else {
       this.dirty.add('scene');
     }
@@ -161,7 +165,8 @@ export class WorkbenchStateCache {
   assemble(
     _revision: number,
     _layout: WorkbenchLayout,
-    builders: SliceBuilders
+    builders: SliceBuilders,
+    sliceCtx: WorkbenchSliceContext
   ): {
     scene: SceneSlice;
     editor: EditorSlice;
@@ -170,19 +175,19 @@ export class WorkbenchStateCache {
     interaction: InteractionSlice;
   } {
     if (this.dirty.has('scene') || !this.sceneSlice) {
-      this.sceneSlice = builders.buildSceneSlice();
+      this.sceneSlice = builders.buildSceneSlice(sliceCtx);
       this.rebuildCounts.scene += 1;
     }
     if (this.dirty.has('editor') || !this.editorSlice) {
-      this.editorSlice = builders.buildEditorSlice();
+      this.editorSlice = builders.buildEditorSlice(sliceCtx);
       this.rebuildCounts.editor += 1;
     }
     if (this.dirty.has('chrome') || !this.chromeSlice) {
-      this.chromeSlice = builders.buildChromeSlice();
+      this.chromeSlice = builders.buildChromeSlice(sliceCtx);
       this.rebuildCounts.chrome += 1;
     }
     if (this.dirty.has('commands') || !this.commandsSlice) {
-      this.commandsSlice = builders.buildCommandsSlice();
+      this.commandsSlice = builders.buildCommandsSlice(sliceCtx);
       this.rebuildCounts.commands += 1;
     }
     if (this.dirty.has('interaction') || !this.interactionSlice) {

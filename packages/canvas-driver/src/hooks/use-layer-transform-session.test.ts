@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
-import { createDefaultFrame } from '@openenvx/studio/schema';
+import { createDefaultFrame } from '@openenvx/editor/schema';
 import type Konva from 'konva';
 import { describe, expect, it, vi } from 'vitest';
 

@@ -61,7 +61,8 @@ Read **Architecture.md** (and the relevant `docs/architecture/*` chapter) before
 
 | Put it here | Examples |
 | --- | --- |
-| `@openenvx/studio` | Scene (`./schema`), preview IR (`./preview`), `Command`, `Plugin`, `EditorRuntime`, `WorkbenchController`, workbench contributions, `./react` |
+| `@openenvx/editor` | `DocumentStore`, scene commands, `./schema`, `./preview`, `createEditorPlugins`, default pages/layers/variables chrome |
+| `@openenvx/studio` | `Command`, `Plugin`, `EditorRuntime`, `WorkbenchController`, workbench contributions, selection-only property paths, `./react` |
 | `@openenvx/studio/shell` | `WorkbenchShell`, default chrome plugins, shell CSS |
 | `@openenvx/canvas-driver` | Konva stage, interactions, layer renderers, `CanvasPlugin`, `CanvasEditor`, `CanvasHostProvider` |
 | `@openenvx/editor-sandbox` | Sandbox author SDK (`./protocol`, element subpaths, `defineExtension`, Vite) + host runtime (`./host`) + canvas widget face bridge (`./canvas-widget`) |

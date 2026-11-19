@@ -66,7 +66,6 @@ export function createWorkbenchPluginContext(
   return {
     commands: base.commands,
     contextKeys: base.contextKeys,
-    editor: base.editor,
     events: base.events,
     register: base.register.bind(base),
     registerWorkbench(
@@ -145,7 +144,6 @@ export function createWorkbenchPluginContext(
         },
       });
     },
-    scene: base.scene,
     services: base.services,
   };
 }

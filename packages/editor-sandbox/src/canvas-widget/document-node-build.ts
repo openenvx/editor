@@ -4,7 +4,7 @@ import {
   nodeTransform,
   type DocumentNode,
   type Transform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 export type FaceLayer = DocumentNode;
 

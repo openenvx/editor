@@ -6,6 +6,7 @@ import { defineConfig } from 'vite';
 import {
   hostReactRuntimeViteAliases,
   openenvxPublishedExportConditions,
+  openenvxPublishedPackageAliases,
 } from '../host-react-runtime-vite-aliases';
 
 const appDir = import.meta.dirname;
@@ -15,10 +16,13 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     conditions: [...openenvxPublishedExportConditions],
-    alias: hostReactRuntimeViteAliases(appDir),
+    alias: [
+      ...openenvxPublishedPackageAliases(monorepoRoot),
+      ...hostReactRuntimeViteAliases(appDir),
+    ],
   },
   optimizeDeps: {
-    exclude: ['@openenvx/canvas-driver', '@openenvx/studio'],
+    exclude: ['@openenvx/editor'],
   },
   server: {
     fs: { allow: [monorepoRoot] },

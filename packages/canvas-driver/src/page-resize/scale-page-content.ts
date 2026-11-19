@@ -3,18 +3,18 @@ import {
   isContainerNode,
   mapNodes,
   MIN_LAYER_SIZE,
-} from '@openenvx/studio';
+} from '@openenvx/editor';
 import type {
   ContainerLayoutModel,
   DocumentNode,
   Transform,
-} from '@openenvx/studio';
-import type { Artboard, NodeStyle } from '@openenvx/studio/schema';
+} from '@openenvx/editor';
+import type { Artboard, NodeStyle } from '@openenvx/editor/schema';
 import {
   applyNodeTransform,
   artboardSpaceSize,
   nodeTransform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 import { measureRichTextHeight } from '../rich-text-layout';
 import { MIN_RICH_TEXT_FONT_SIZE } from '../rich-text-resize';

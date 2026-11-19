@@ -1,19 +1,20 @@
+import type { DocumentNode } from '@openenvx/editor';
 import {
-  Command,
+  requireDocumentStore,
   canInsertLayers,
   canTransformLayer,
   cloneNodeTree,
   findNodeById,
-  localize,
   getChildNodes,
-} from '@openenvx/studio';
-import type { CommandContext, DocumentNode } from '@openenvx/studio';
-import type { DocumentComponent } from '@openenvx/studio/schema';
+} from '@openenvx/editor';
+import type { DocumentComponent } from '@openenvx/editor/schema';
 import {
   applyNodeTransform,
   createDefaultFrame,
   nodeTransform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
+import type { CommandContext } from '@openenvx/studio';
+import { Command, localize } from '@openenvx/studio';
 
 import { createGroupFromLayers } from '../scene/group-layers';
 
@@ -30,14 +31,14 @@ export class CreateComponentFromSelectionCommand extends Command {
   readonly id = 'canvas.createComponent';
 
   canExecute(ctx: CommandContext): boolean {
-    if (!canInsertLayers(ctx.scene.getDocument())) {
+    if (!canInsertLayers(requireDocumentStore(ctx).getDocument())) {
       return false;
     }
-    const ids = ctx.selection.selectedNodeIds;
+    const ids = requireDocumentStore(ctx).getSession().selectedNodeIds;
     if (ids.length === 0) {
       return false;
     }
-    const scene = ctx.scene.getDocument();
+    const scene = requireDocumentStore(ctx).getDocument();
     return ids.every((id) => {
       const layer = findNodeById(scene, id);
       return layer ? canTransformLayer(layer) : false;
@@ -48,10 +49,11 @@ export class CreateComponentFromSelectionCommand extends Command {
     if (!this.canExecute(ctx)) {
       return;
     }
-    const scene = ctx.scene.getDocument();
-    const page = ctx.scene.getActiveArtboard();
-    const selected = ctx.selection.selectedNodeIds
-      .map((id) => findNodeById(scene, id))
+    const scene = requireDocumentStore(ctx).getDocument();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
+    const selected = requireDocumentStore(ctx)
+      .getSession()
+      .selectedNodeIds.map((id) => findNodeById(scene, id))
       .filter((layer): layer is DocumentNode => Boolean(layer));
     if (selected.length === 0) {
       return;
@@ -73,10 +75,12 @@ export class CreateComponentFromSelectionCommand extends Command {
       { id: instanceId, props: { componentId }, type: 'canvas.instance' },
       nodeTransform(group)
     );
-    const selectedSet = new Set(ctx.selection.selectedNodeIds);
+    const selectedSet = new Set(
+      requireDocumentStore(ctx).getSession().selectedNodeIds
+    );
     const activeArtboardId = page.id;
 
-    ctx.scene.apply({
+    requireDocumentStore(ctx).apply({
       apply: (current) => ({
         ...current,
         components: {
@@ -99,7 +103,7 @@ export class CreateComponentFromSelectionCommand extends Command {
         defaultValue: 'Create component',
       }),
     });
-    ctx.scene.selectNodes([instance.id], instance.id);
+    requireDocumentStore(ctx).selectNodes([instance.id], instance.id);
   }
 }
 
@@ -107,7 +111,7 @@ export class InsertComponentInstanceCommand extends Command {
   readonly id = 'canvas.insertInstance';
 
   canExecute(ctx: CommandContext, args?: unknown): boolean {
-    if (!canInsertLayers(ctx.scene.getDocument())) {
+    if (!canInsertLayers(requireDocumentStore(ctx).getDocument())) {
       return false;
     }
     const componentId = (args as { componentId?: string } | undefined)
@@ -115,7 +119,9 @@ export class InsertComponentInstanceCommand extends Command {
     if (!componentId) {
       return false;
     }
-    return Boolean(ctx.scene.getDocument().components?.[componentId]);
+    return Boolean(
+      requireDocumentStore(ctx).getDocument().components?.[componentId]
+    );
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -124,7 +130,7 @@ export class InsertComponentInstanceCommand extends Command {
     if (!componentId || !this.canExecute(ctx, args)) {
       return;
     }
-    const page = ctx.scene.getActiveArtboard();
+    const page = requireDocumentStore(ctx).getActiveArtboard();
     const instance: DocumentNode = applyNodeTransform(
       {
         props: { componentId },
@@ -143,7 +149,7 @@ export class InsertComponentInstanceCommand extends Command {
       }
     );
     const activeArtboardId = page.id;
-    ctx.scene.apply({
+    requireDocumentStore(ctx).apply({
       apply: (scene) => ({
         ...scene,
         artboards: scene.artboards.map((entry) =>
@@ -156,7 +162,7 @@ export class InsertComponentInstanceCommand extends Command {
         defaultValue: 'Insert instance',
       }),
     });
-    ctx.scene.selectNodes([instance.id], instance.id);
+    requireDocumentStore(ctx).selectNodes([instance.id], instance.id);
   }
 }
 
@@ -171,7 +177,9 @@ export class UpdateComponentDefinitionCommand extends Command {
     if (!(componentId && Array.isArray(layers))) {
       return false;
     }
-    return Boolean(ctx.scene.getDocument().components?.[componentId]);
+    return Boolean(
+      requireDocumentStore(ctx).getDocument().components?.[componentId]
+    );
   }
 
   execute(ctx: CommandContext, args?: unknown): void {
@@ -185,7 +193,7 @@ export class UpdateComponentDefinitionCommand extends Command {
       return;
     }
     const componentId = input.componentId;
-    ctx.scene.apply({
+    requireDocumentStore(ctx).apply({
       apply: (scene) => {
         const existing = scene.components?.[componentId];
         if (!existing) {

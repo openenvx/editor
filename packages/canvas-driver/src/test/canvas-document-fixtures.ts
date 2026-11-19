@@ -3,12 +3,12 @@ import type {
   Document,
   DocumentNode,
   Transform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 import {
   migrateLegacyLayerInput,
   normalizeDocument,
   withArtboardRulesLayout,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 
 export function testTransform(partial: Partial<Transform> = {}): Transform {
   return {

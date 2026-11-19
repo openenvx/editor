@@ -1,15 +1,15 @@
 import {
-  Command,
   getActiveArtboard,
   insertNodeIntoContainer,
-} from '@openenvx/studio';
+} from '@openenvx/editor/host-surface';
 import {
   applyNodeTransform,
   artboardRulesLayout,
   createDefaultFrame,
   type Artboard,
   type DocumentNode,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
+import { Command } from '@openenvx/studio';
 
 import type {
   ExtensionManifest,

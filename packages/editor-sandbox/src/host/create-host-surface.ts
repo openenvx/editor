@@ -1,12 +1,25 @@
+import {
+  DocumentStoreServiceId,
+  type DocumentStore,
+  type DocumentTransaction,
+} from '@openenvx/editor/host-surface';
+import type { Document } from '@openenvx/editor/schema';
 import type {
   Command,
-  Document,
-  DocumentTransaction,
   WorkbenchApi,
+  WorkbenchContribution,
   WorkbenchContributionDisposable,
 } from '@openenvx/studio';
 
 import type { SandboxHostSurface } from './sandbox-host-surface';
+
+function requireStore(api: WorkbenchApi): DocumentStore {
+  const store = api.getService(DocumentStoreServiceId);
+  if (!store) {
+    throw new Error('DocumentStore is not registered');
+  }
+  return store;
+}
 
 /**
  * Build a narrow sandbox host surface from public {@link WorkbenchApi} fields.
@@ -17,13 +30,14 @@ export function createSandboxHostSurface(
   trackDisposable: (disposable: WorkbenchContributionDisposable) => void
 ): SandboxHostSurface {
   return {
-    getSelection: () => api.scene.getSession(),
-    getDocument: (): Document => api.scene.getDocument(),
-    apply: (transaction: DocumentTransaction) => api.scene.apply(transaction),
+    getSelection: () => requireStore(api).getSession(),
+    getDocument: (): Document => requireStore(api).getDocument(),
+    apply: (transaction: DocumentTransaction) =>
+      requireStore(api).apply(transaction),
     selectNodes: (layerIds, primaryNodeId) =>
-      api.selectNodes(layerIds, primaryNodeId ?? null),
+      requireStore(api).selectNodes(layerIds, primaryNodeId ?? null),
     onDidChangeDocument: (listener) =>
-      api.scene.onDidChangeDocument(() => listener()).dispose,
+      requireStore(api).onDidChangeDocument(() => listener()).dispose,
     onDidChangeSelection: (listener) =>
       api.events.onDidChangeSelection(() => listener()).dispose,
     executeCommand: async (commandId, args) => {
@@ -40,7 +54,9 @@ export function createSandboxHostSurface(
       trackDisposable(disposable);
       return disposable;
     },
-    registerWorkbenchContributions: (...contributions) => {
+    registerWorkbenchContributions: (
+      ...contributions: WorkbenchContribution[]
+    ) => {
       const disposable = api.registerWorkbenchContributions(...contributions);
       trackDisposable(disposable);
       return disposable;

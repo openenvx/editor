@@ -1,4 +1,4 @@
-import { nodeTransform, defaultTransform } from '@openenvx/studio/schema';
+import { nodeTransform, defaultTransform } from '@openenvx/editor/schema';
 import type Konva from 'konva';
 import { useCallback } from 'react';
 import type { RefObject } from 'react';
@@ -58,7 +58,7 @@ export function useCanvasDragSnap({
     (
       layerId: string,
       node: Konva.Group,
-      transform: import('@openenvx/studio/schema').Transform
+      transform: import('@openenvx/editor/schema').Transform
     ) => {
       const interaction = stageInteractionRef.current;
       const session = dragSessionRef.current;

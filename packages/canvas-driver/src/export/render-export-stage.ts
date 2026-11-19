@@ -1,6 +1,6 @@
+import { nodeTransform } from '@openenvx/editor/schema';
+import type { Document } from '@openenvx/editor/schema';
 import type { LayerRegistry } from '@openenvx/studio';
-import { nodeTransform } from '@openenvx/studio/schema';
-import type { Document } from '@openenvx/studio/schema';
 import Konva from 'konva';
 
 import type { CanvasLayerSurfaceItem } from '../layer-surface-item';

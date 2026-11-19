@@ -1,7 +1,9 @@
 import {
-  Command,
   DocumentHostServiceId,
   DocumentOperationsServiceId,
+} from '@openenvx/editor';
+import {
+  Command,
   ShellUiServiceId,
   type CommandContext,
 } from '@openenvx/studio';

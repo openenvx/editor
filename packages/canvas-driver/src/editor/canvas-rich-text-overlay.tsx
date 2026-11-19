@@ -1,11 +1,11 @@
-import { canEditLayerData } from '@openenvx/studio';
-import type { LayerPreviewDescriptor } from '@openenvx/studio/preview';
-import type { DocumentNode, Transform } from '@openenvx/studio/schema';
+import { canEditLayerData } from '@openenvx/editor';
+import type { LayerPreviewDescriptor } from '@openenvx/editor/preview';
+import type { DocumentNode, Transform } from '@openenvx/editor/schema';
 import {
   createDefaultFrame,
   nodeProps,
   nodeTransform,
-} from '@openenvx/studio/schema';
+} from '@openenvx/editor/schema';
 import { memo, useMemo } from 'react';
 
 import { computeArtboardOffset } from '../artboard-offset';

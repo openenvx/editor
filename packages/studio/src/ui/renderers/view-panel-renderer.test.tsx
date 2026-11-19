@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { WorkbenchProvider } from '../../context/workbench-context';
 import { createMockWorkbenchApi } from '../../test/mock-workbench-context';
-import { WorkbenchLayersView } from '../../views/workbench-chrome-contributions';
+import { WorkbenchLayersView } from '@openenvx/editor';
 import { ViewPanelRenderer } from './view-panel-renderer';
 
 afterEach(cleanup);

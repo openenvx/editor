@@ -1,0 +1,319 @@
+import {
+  Command,
+  WorkbenchEvents,
+  TextBlockInsertServiceId,
+  getNestedValue,
+  setNestedValue,
+} from '@openenvx/studio';
+import type { CommandContext } from '@openenvx/studio';
+
+import { requireDocumentStore } from '../document-store-access';
+import { findNodeById, updateNodeByIdInDocument } from '../scene/layer-tree';
+import {
+  addVariableToDocument,
+  createVariableId,
+  documentVariables,
+  formatVariableToken,
+  isValidVariableKey,
+  nextVariableKey,
+  removeVariableFromDocument,
+  reorderVariablesInDocument,
+  resolvePrimaryTextPropPath,
+  updateVariableInDocument,
+  validateVariableKeyForCatalog,
+} from '../schema/template-variables';
+import type { TemplateVariable } from '../schema/types';
+import { RichTextInsertServiceId } from '../services/rich-text-insert-service';
+
+function appendTokenToNodeField(
+  node: { props?: Record<string, unknown> },
+  propPath: string,
+  token: string
+): void {
+  const props = { ...node.props };
+  const current = getNestedValue(props, propPath);
+  const next =
+    typeof current === 'string' && current.length > 0
+      ? `${current}${token}`
+      : token;
+  setNestedValue(props, propPath, next);
+  node.props = props;
+}
+
+function catalogHasKey(ctx: CommandContext, key: string): boolean {
+  return documentVariables(requireDocumentStore(ctx).getDocument()).some(
+    (entry) => entry.key === key
+  );
+}
+
+function canResolveVariableInsertTarget(ctx: CommandContext): boolean {
+  const richText = ctx.services.get(RichTextInsertServiceId);
+  if (richText?.hasHandler()) {
+    return true;
+  }
+  const selectedId =
+    requireDocumentStore(ctx).getSession().primaryNodeId ??
+    requireDocumentStore(ctx).getSession().selectedNodeIds[0];
+  if (selectedId) {
+    const layer = findNodeById(
+      requireDocumentStore(ctx).getDocument(),
+      selectedId
+    );
+    if (layer && resolvePrimaryTextPropPath(layer.type)) {
+      return true;
+    }
+  }
+  const textBlockInsert = ctx.services.has(TextBlockInsertServiceId)
+    ? ctx.services.get(TextBlockInsertServiceId)
+    : undefined;
+  return textBlockInsert !== undefined;
+}
+
+export interface AddVariableArgs {
+  key?: string;
+  sample?: string;
+}
+
+export class AddVariableCommand extends Command {
+  readonly id = 'scene.addVariable';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    const patch = args as AddVariableArgs | undefined;
+    const variables = documentVariables(
+      requireDocumentStore(ctx).getDocument()
+    );
+    if (patch?.key !== undefined) {
+      const validation = validateVariableKeyForCatalog(variables, patch.key);
+      return validation.ok;
+    }
+    return true;
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const patch = (args as AddVariableArgs | undefined) ?? {};
+    const variables = documentVariables(
+      requireDocumentStore(ctx).getDocument()
+    );
+    const key = patch.key?.trim() || nextVariableKey(variables);
+    const validation = validateVariableKeyForCatalog(variables, key);
+    if (!validation.ok) {
+      return;
+    }
+    const variable: TemplateVariable = {
+      id: createVariableId(),
+      key,
+      sample: patch.sample,
+    };
+    requireDocumentStore(ctx).apply({
+      apply: (scene) => addVariableToDocument(scene, variable),
+      label: 'Add variable',
+    });
+  }
+}
+
+export interface UpdateVariableArgs {
+  id: string;
+  key?: string;
+  sample?: string;
+}
+
+export class UpdateVariableCommand extends Command {
+  readonly id = 'scene.updateVariable';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    const patch = args as UpdateVariableArgs | undefined;
+    if (!patch?.id) {
+      return false;
+    }
+    const variables = documentVariables(
+      requireDocumentStore(ctx).getDocument()
+    );
+    const variable = variables.find((entry) => entry.id === patch.id);
+    if (!variable) {
+      return false;
+    }
+    if (patch.key !== undefined) {
+      const validation = validateVariableKeyForCatalog(
+        variables,
+        patch.key,
+        patch.id
+      );
+      return validation.ok;
+    }
+    return true;
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const patch = args as UpdateVariableArgs | undefined;
+    if (!patch?.id) {
+      return;
+    }
+    requireDocumentStore(ctx).apply({
+      apply: (scene) => {
+        const next = updateVariableInDocument(scene, patch.id, {
+          key: patch.key,
+          sample: patch.sample,
+        });
+        return next ?? scene;
+      },
+      label: 'Update variable',
+    });
+  }
+}
+
+export interface RemoveVariableArgs {
+  id: string;
+}
+
+export class RemoveVariableCommand extends Command {
+  readonly id = 'scene.removeVariable';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    const patch = args as RemoveVariableArgs | undefined;
+    if (!patch?.id) {
+      return false;
+    }
+    return documentVariables(requireDocumentStore(ctx).getDocument()).some(
+      (entry) => entry.id === patch.id
+    );
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const patch = args as RemoveVariableArgs | undefined;
+    if (!patch?.id) {
+      return;
+    }
+    requireDocumentStore(ctx).apply({
+      apply: (scene) => removeVariableFromDocument(scene, patch.id),
+      label: 'Remove variable',
+    });
+  }
+}
+
+export interface ReorderVariablesArgs {
+  activeId: string;
+  overId: string;
+}
+
+export class ReorderVariablesCommand extends Command {
+  readonly id = 'scene.reorderVariables';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    const patch = args as ReorderVariablesArgs | undefined;
+    if (!patch?.activeId || !patch.overId) {
+      return false;
+    }
+    const variables = documentVariables(
+      requireDocumentStore(ctx).getDocument()
+    );
+    return (
+      variables.some((entry) => entry.id === patch.activeId) &&
+      variables.some((entry) => entry.id === patch.overId)
+    );
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const patch = args as ReorderVariablesArgs | undefined;
+    if (!patch?.activeId || !patch.overId) {
+      return;
+    }
+    requireDocumentStore(ctx).apply({
+      apply: (scene) =>
+        reorderVariablesInDocument(scene, patch.activeId, patch.overId),
+      label: 'Reorder variables',
+    });
+  }
+}
+
+export interface InsertVariableArgs {
+  key: string;
+}
+
+export class InsertVariableCommand extends Command {
+  readonly id = 'scene.insertVariable';
+
+  canExecute(ctx: CommandContext, args?: unknown): boolean {
+    const patch = args as InsertVariableArgs | undefined;
+    if (!patch?.key || !isValidVariableKey(patch.key)) {
+      return false;
+    }
+    if (!catalogHasKey(ctx, patch.key)) {
+      return false;
+    }
+    return canResolveVariableInsertTarget(ctx);
+  }
+
+  execute(ctx: CommandContext, args?: unknown): void {
+    const patch = args as InsertVariableArgs | undefined;
+    if (!patch?.key || !isValidVariableKey(patch.key)) {
+      return;
+    }
+    if (!catalogHasKey(ctx, patch.key)) {
+      return;
+    }
+    const token = formatVariableToken(patch.key);
+    const richText = ctx.services.get(RichTextInsertServiceId);
+    if (richText?.insert(token)) {
+      return;
+    }
+
+    const selectedId =
+      requireDocumentStore(ctx).getSession().primaryNodeId ??
+      requireDocumentStore(ctx).getSession().selectedNodeIds[0];
+    if (selectedId) {
+      const scene = requireDocumentStore(ctx).getDocument();
+      const layer = findNodeById(scene, selectedId);
+      const dataPath = layer ? resolvePrimaryTextPropPath(layer.type) : null;
+      if (layer && dataPath) {
+        requireDocumentStore(ctx).apply({
+          apply: (currentScene) =>
+            updateNodeByIdInDocument(
+              currentScene,
+              selectedId,
+              (targetLayer) => {
+                const next = { ...targetLayer };
+                appendTokenToNodeField(next, dataPath, token);
+                return next;
+              }
+            ),
+          label: 'Insert variable',
+        });
+        return;
+      }
+    }
+
+    const textBlockInsert = ctx.services.has(TextBlockInsertServiceId)
+      ? ctx.services.get(TextBlockInsertServiceId)
+      : undefined;
+    textBlockInsert?.insert(ctx, token);
+  }
+}
+
+const addVariableCommand = new AddVariableCommand();
+const updateVariableCommand = new UpdateVariableCommand();
+const removeVariableCommand = new RemoveVariableCommand();
+
+/** Runs a scene variable command and emits {@link WorkbenchEvents.DidExecuteCommand}. */
+export async function executeSceneVariableCommand(
+  ctx: CommandContext,
+  commandId:
+    | 'scene.addVariable'
+    | 'scene.updateVariable'
+    | 'scene.removeVariable',
+  args?: unknown
+): Promise<void> {
+  const command =
+    commandId === 'scene.addVariable'
+      ? addVariableCommand
+      : commandId === 'scene.updateVariable'
+        ? updateVariableCommand
+        : removeVariableCommand;
+  if (command.canExecute && !command.canExecute(ctx, args)) {
+    return;
+  }
+  const result = await command.execute(ctx, args);
+  ctx.events.emit(WorkbenchEvents.DidExecuteCommand, {
+    commandId,
+    result,
+  });
+}
